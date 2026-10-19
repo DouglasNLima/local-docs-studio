@@ -1,0 +1,940 @@
+{
+  "DiagnosticOnly": true,
+  "NativeMetadata": {
+    "Tool": "Microsoft.Diagnostics.Tracing.TraceEvent 4.0.0; streamed rows v2",
+    "DiagnosticOnly": true,
+    "OriginalTraceSha256": "99803B207681F5032AE6428E2A5E1B1192C14C825CC6BA98F7099A351122242C",
+    "EtlxSha256": "6DFE6F0188958B19A3812DB97A357322B4D2C7D61DEEBDC7BFCF0A64555AD8FA",
+    "ApplicationTraceFiles": [
+      {
+        "Path": "artifacts/layout-input/f5950d4/native-profiles/appearance-minimal/observations\\appearance-control-trace.json",
+        "Sha256": "2C7F10D2EAEEA6B9282BB79433AE407D041CEBF81B8DA4AB512A500B78C11CB6"
+      }
+    ],
+    "EventsLost": 0,
+    "SessionStartTime": "2026-10-19T20:35:52.1197286+01:00",
+    "SessionEndTime": "2026-10-19T20:35:57.363628+01:00",
+    "SelectedOriginalQpcWindows": {
+      "DiagnosticOnly": true,
+      "OriginalEtwRemainsComplete": true,
+      "Meaning": "All >=100 ms application/probe intervals, each timer maximum, first focus/keyboard and every native dialogue initialisation. Native rows only are clipped; no acceptance sample is filtered.",
+      "Windows": [
+        {
+          "StartTimestamp": 6093735200,
+          "EndTimestamp": 6094829343,
+          "Reason": "native-delivered"
+        },
+        {
+          "StartTimestamp": 6093621106,
+          "EndTimestamp": 6095322443,
+          "Reason": "input-delivered"
+        },
+        {
+          "StartTimestamp": 6096110895,
+          "EndTimestamp": 6097623929,
+          "Reason": "input-delivered"
+        },
+        {
+          "StartTimestamp": 6093522203,
+          "EndTimestamp": 6095321366,
+          "Reason": "appearance-control.json:Input"
+        },
+        {
+          "StartTimestamp": 6096053747,
+          "EndTimestamp": 6097620680,
+          "Reason": "appearance-control.json:Input"
+        }
+      ]
+    },
+    "UiNativeThreads": [
+      3828
+    ],
+    "Processes": [
+      4964
+    ],
+    "SymbolLookups": [
+      {
+        "FilePath": "c:\\windows\\system32\\combase.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\ntdll.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\user32.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\win32u.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\uxtheme.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\msctf.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\shell32.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\program files\\dotnet\\shared\\microsoft.windowsdesktop.app\\10.0.13\\wpfgfx_cor3.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\windows.storage.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      },
+      {
+        "FilePath": "c:\\windows\\system32\\coremessaging.dll",
+        "Status": "LOOKUP_ATTEMPTED"
+      }
+    ],
+    "UiEvents": 1095,
+    "RuntimeEvents": 0,
+    "Meaning": "Scheduling/stacks from a separately profiled execution, not acceptance. Missing/unresolved symbols and runtime events remain missing; overlap is not causality."
+  },
+  "DecodedRowsSha256": "edd6b9b1f7e4c6c2829ce60e2d4ce921dc958f5061577de082d34484f6534f61",
+  "Windows": [
+    {
+      "StartTimestamp": 6093735200,
+      "EndTimestamp": 6094829343,
+      "Reason": "native-delivered",
+      "DurationMilliseconds": 109.4143,
+      "CpuSamples": 6,
+      "SamplesWithUnresolvedFrames": 6,
+      "FirstResolvedNativeAncestorCountsNotSelfCpu": [
+        [
+          "user32!DispatchHookA",
+          5
+        ],
+        [
+          "ntdll!NtQueryVirtualMemory",
+          1
+        ]
+      ],
+      "SelectedNamedAncestorCountsNotSelfCpu": [],
+      "FullyPairedObservedOffCpuMilliseconds": 101.7239,
+      "ObservedReadyToRunningMilliseconds": 87.5626,
+      "LongestPairedOffCpuIntervals": [
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6093965865,
+          "ReadyTimestamp": 6093965865,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094287384,
+          "Milliseconds": 32.1519
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094465147,
+          "ReadyTimestamp": 6094465147,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094778683,
+          "Milliseconds": 31.3536
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094345361,
+          "ReadyTimestamp": 6094345361,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "31",
+          "BlockingThreadNamedAncestors": [
+            "user32!DispatchHookA",
+            "user32!fnHkINLPCWPRETSTRUCTA",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094450186,
+          "Milliseconds": 10.4825
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094295482,
+          "ReadyTimestamp": 6094295482,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "31",
+          "BlockingThreadNamedAncestors": [
+            "user32!DispatchHookA",
+            "user32!fnHkINLPCWPRETSTRUCTA",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094344834,
+          "Milliseconds": 4.9352
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094791625,
+          "ReadyTimestamp": 6094791625,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094828581,
+          "Milliseconds": 3.6956
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6093807866,
+          "ReadyTimestamp": 6093822967,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "27",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6093823484,
+          "Milliseconds": 1.5618
+        }
+      ]
+    },
+    {
+      "StartTimestamp": 6093621106,
+      "EndTimestamp": 6095322443,
+      "Reason": "input-delivered",
+      "DurationMilliseconds": 170.1337,
+      "CpuSamples": 24,
+      "SamplesWithUnresolvedFrames": 24,
+      "FirstResolvedNativeAncestorCountsNotSelfCpu": [
+        [
+          "user32!DispatchHookA",
+          7
+        ],
+        [
+          "user32!UserCallWinProcCheckWow",
+          6
+        ],
+        [
+          "ntdll!RtlpLowFragHeapAllocFromContext",
+          2
+        ],
+        [
+          "ntdll!NtQueryVirtualMemory",
+          1
+        ],
+        [
+          "ntdll!RtlFreeHeap",
+          1
+        ],
+        [
+          "combase!CFmCtrlUnknown::QueryInterface",
+          1
+        ],
+        [
+          "ntdll!NtAlpcSendWaitReceivePort",
+          1
+        ],
+        [
+          "win32u!NtUserGetThreadState",
+          1
+        ],
+        [
+          "win32u!NtUserGetMessage",
+          1
+        ],
+        [
+          "win32u!NtUserCalcMenuBar",
+          1
+        ],
+        [
+          "win32u!NtUserBeginPaint",
+          1
+        ],
+        [
+          "win32u!NtUserEndPaint",
+          1
+        ]
+      ],
+      "SelectedNamedAncestorCountsNotSelfCpu": [
+        [
+          "combase!RoActivateInstance",
+          1
+        ],
+        [
+          "combase!CFmCtrlUnknown::QueryInterface",
+          1
+        ],
+        [
+          "combase!WinRTCreateInstanceOfInprocClass",
+          1
+        ],
+        [
+          "combase!WinRTActivateInstanceInternal",
+          1
+        ],
+        [
+          "combase!_RoActivateInstance",
+          1
+        ],
+        [
+          "combase!_RoGetActivationFactory",
+          1
+        ],
+        [
+          "combase!LoadLibraryWithLogging",
+          1
+        ],
+        [
+          "combase!RoGetActivationFactory",
+          1
+        ],
+        [
+          "combase!CClassCache::CDllPathEntry::Create",
+          1
+        ],
+        [
+          "combase!CClassCache::GetOrLoadDllPathEntryForWinrt",
+          1
+        ],
+        [
+          "combase!CClassCache::GetOrLoadWinRTInprocClass",
+          1
+        ],
+        [
+          "combase!WinRTGetActivationFactoryOfInprocClass",
+          1
+        ],
+        [
+          "uxtheme!ThemeDefWindowProc",
+          1
+        ],
+        [
+          "uxtheme!CThemeWnd::GetNcWindowMetrics",
+          1
+        ],
+        [
+          "uxtheme!OnDwpNcPaint",
+          1
+        ],
+        [
+          "uxtheme!ThemeDefWindowProcW",
+          1
+        ]
+      ],
+      "FullyPairedObservedOffCpuMilliseconds": 143.6329,
+      "ObservedReadyToRunningMilliseconds": 100.9922,
+      "LongestPairedOffCpuIntervals": [
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6093965865,
+          "ReadyTimestamp": 6093965865,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094287384,
+          "Milliseconds": 32.1519
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094465147,
+          "ReadyTimestamp": 6094465147,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094778683,
+          "Milliseconds": 31.3536
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6095195423,
+          "ReadyTimestamp": 6095316379,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6095318530,
+          "Milliseconds": 12.3107
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6093522419,
+          "ReadyTimestamp": 6093633684,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6093633862,
+          "Milliseconds": 11.1443
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094345361,
+          "ReadyTimestamp": 6094345361,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "31",
+          "BlockingThreadNamedAncestors": [
+            "user32!DispatchHookA",
+            "user32!fnHkINLPCWPRETSTRUCTA",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094450186,
+          "Milliseconds": 10.4825
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6095133191,
+          "ReadyTimestamp": 6095191090,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6095191250,
+          "Milliseconds": 5.8059
+        }
+      ]
+    },
+    {
+      "StartTimestamp": 6096110895,
+      "EndTimestamp": 6097623929,
+      "Reason": "input-delivered",
+      "DurationMilliseconds": 151.3034,
+      "CpuSamples": 15,
+      "SamplesWithUnresolvedFrames": 14,
+      "FirstResolvedNativeAncestorCountsNotSelfCpu": [
+        [
+          "user32!UserCallWinProcCheckWow",
+          5
+        ],
+        [
+          "win32u!NtUserGetMessage",
+          2
+        ],
+        [
+          "user32!DispatchHookA",
+          2
+        ],
+        [
+          "win32u!NtUserSetTimer",
+          1
+        ],
+        [
+          "ntdll!RtlUserThreadStart",
+          1
+        ],
+        [
+          "win32u!NtUserGetThreadState",
+          1
+        ],
+        [
+          "user32!CtfHookProcWorker",
+          1
+        ]
+      ],
+      "SelectedNamedAncestorCountsNotSelfCpu": [],
+      "FullyPairedObservedOffCpuMilliseconds": 136.5454,
+      "ObservedReadyToRunningMilliseconds": 81.2352,
+      "LongestPairedOffCpuIntervals": [
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6096552760,
+          "ReadyTimestamp": 6096552760,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserPostMessage",
+            "user32!PostMessageW",
+            "user32!UserCallWinProcCheckWow",
+            "user32!DispatchMessageWorker",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6096860839,
+          "Milliseconds": 30.8079
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6096374256,
+          "ReadyTimestamp": 6096374256,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserKillTimer",
+            "user32!UserCallWinProcCheckWow",
+            "user32!DispatchMessageWorker",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6096545476,
+          "Milliseconds": 17.122
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097426949,
+          "ReadyTimestamp": 6097541452,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097541662,
+          "Milliseconds": 11.4713
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097298057,
+          "ReadyTimestamp": 6097409698,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "37",
+          "BlockingThreadNamedAncestors": [
+            "ntdll!NtWaitForAlertByThreadId",
+            "ntdll!RtlpWaitOnCriticalSection",
+            "ntdll!RtlpEnterCriticalSectionContended",
+            "ntdll!RtlEnterCriticalSection",
+            "user32!DispatchHookA",
+            "user32!fnHkINLPCWPSTRUCTA",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserBeginPaint",
+            "user32!UserCallWinProcCheckWow",
+            "user32!DispatchClientMessage",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserDispatchMessage",
+            "user32!DispatchMessageWorker",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097410202,
+          "Milliseconds": 11.2145
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097543217,
+          "ReadyTimestamp": 6097614042,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097614211,
+          "Milliseconds": 7.0994
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097039901,
+          "ReadyTimestamp": 6097039901,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097107637,
+          "Milliseconds": 6.7736
+        }
+      ]
+    },
+    {
+      "StartTimestamp": 6093522203,
+      "EndTimestamp": 6095321366,
+      "Reason": "appearance-control.json:Input",
+      "DurationMilliseconds": 179.9163,
+      "CpuSamples": 24,
+      "SamplesWithUnresolvedFrames": 24,
+      "FirstResolvedNativeAncestorCountsNotSelfCpu": [
+        [
+          "user32!DispatchHookA",
+          7
+        ],
+        [
+          "user32!UserCallWinProcCheckWow",
+          6
+        ],
+        [
+          "ntdll!RtlpLowFragHeapAllocFromContext",
+          2
+        ],
+        [
+          "ntdll!NtQueryVirtualMemory",
+          1
+        ],
+        [
+          "ntdll!RtlFreeHeap",
+          1
+        ],
+        [
+          "combase!CFmCtrlUnknown::QueryInterface",
+          1
+        ],
+        [
+          "ntdll!NtAlpcSendWaitReceivePort",
+          1
+        ],
+        [
+          "win32u!NtUserGetThreadState",
+          1
+        ],
+        [
+          "win32u!NtUserGetMessage",
+          1
+        ],
+        [
+          "win32u!NtUserCalcMenuBar",
+          1
+        ],
+        [
+          "win32u!NtUserBeginPaint",
+          1
+        ],
+        [
+          "win32u!NtUserEndPaint",
+          1
+        ]
+      ],
+      "SelectedNamedAncestorCountsNotSelfCpu": [
+        [
+          "combase!RoActivateInstance",
+          1
+        ],
+        [
+          "combase!CFmCtrlUnknown::QueryInterface",
+          1
+        ],
+        [
+          "combase!WinRTCreateInstanceOfInprocClass",
+          1
+        ],
+        [
+          "combase!WinRTActivateInstanceInternal",
+          1
+        ],
+        [
+          "combase!_RoActivateInstance",
+          1
+        ],
+        [
+          "combase!_RoGetActivationFactory",
+          1
+        ],
+        [
+          "combase!LoadLibraryWithLogging",
+          1
+        ],
+        [
+          "combase!RoGetActivationFactory",
+          1
+        ],
+        [
+          "combase!CClassCache::CDllPathEntry::Create",
+          1
+        ],
+        [
+          "combase!CClassCache::GetOrLoadDllPathEntryForWinrt",
+          1
+        ],
+        [
+          "combase!CClassCache::GetOrLoadWinRTInprocClass",
+          1
+        ],
+        [
+          "combase!WinRTGetActivationFactoryOfInprocClass",
+          1
+        ],
+        [
+          "uxtheme!ThemeDefWindowProc",
+          1
+        ],
+        [
+          "uxtheme!CThemeWnd::GetNcWindowMetrics",
+          1
+        ],
+        [
+          "uxtheme!OnDwpNcPaint",
+          1
+        ],
+        [
+          "uxtheme!ThemeDefWindowProcW",
+          1
+        ]
+      ],
+      "FullyPairedObservedOffCpuMilliseconds": 153.5016,
+      "ObservedReadyToRunningMilliseconds": 100.9922,
+      "LongestPairedOffCpuIntervals": [
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6093965865,
+          "ReadyTimestamp": 6093965865,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094287384,
+          "Milliseconds": 32.1519
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094465147,
+          "ReadyTimestamp": 6094465147,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094778683,
+          "Milliseconds": 31.3536
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6095195423,
+          "ReadyTimestamp": 6095316379,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6095318530,
+          "Milliseconds": 12.3107
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6093522419,
+          "ReadyTimestamp": 6093633684,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6093633862,
+          "Milliseconds": 11.1443
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6094345361,
+          "ReadyTimestamp": 6094345361,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "31",
+          "BlockingThreadNamedAncestors": [
+            "user32!DispatchHookA",
+            "user32!fnHkINLPCWPRETSTRUCTA",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6094450186,
+          "Milliseconds": 10.4825
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6095133191,
+          "ReadyTimestamp": 6095191090,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6095191250,
+          "Milliseconds": 5.8059
+        }
+      ]
+    },
+    {
+      "StartTimestamp": 6096053747,
+      "EndTimestamp": 6097620680,
+      "Reason": "appearance-control.json:Input",
+      "DurationMilliseconds": 156.6933,
+      "CpuSamples": 15,
+      "SamplesWithUnresolvedFrames": 14,
+      "FirstResolvedNativeAncestorCountsNotSelfCpu": [
+        [
+          "user32!UserCallWinProcCheckWow",
+          5
+        ],
+        [
+          "win32u!NtUserGetMessage",
+          2
+        ],
+        [
+          "user32!DispatchHookA",
+          2
+        ],
+        [
+          "win32u!NtUserSetTimer",
+          1
+        ],
+        [
+          "ntdll!RtlUserThreadStart",
+          1
+        ],
+        [
+          "win32u!NtUserGetThreadState",
+          1
+        ],
+        [
+          "user32!CtfHookProcWorker",
+          1
+        ]
+      ],
+      "SelectedNamedAncestorCountsNotSelfCpu": [],
+      "FullyPairedObservedOffCpuMilliseconds": 141.4915,
+      "ObservedReadyToRunningMilliseconds": 81.3384,
+      "LongestPairedOffCpuIntervals": [
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6096552760,
+          "ReadyTimestamp": 6096552760,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserPostMessage",
+            "user32!PostMessageW",
+            "user32!UserCallWinProcCheckWow",
+            "user32!DispatchMessageWorker",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6096860839,
+          "Milliseconds": 30.8079
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6096374256,
+          "ReadyTimestamp": 6096374256,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserKillTimer",
+            "user32!UserCallWinProcCheckWow",
+            "user32!DispatchMessageWorker",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6096545476,
+          "Milliseconds": 17.122
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097426949,
+          "ReadyTimestamp": 6097541452,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097541662,
+          "Milliseconds": 11.4713
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097298057,
+          "ReadyTimestamp": 6097409698,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "37",
+          "BlockingThreadNamedAncestors": [
+            "ntdll!NtWaitForAlertByThreadId",
+            "ntdll!RtlpWaitOnCriticalSection",
+            "ntdll!RtlpEnterCriticalSectionContended",
+            "ntdll!RtlEnterCriticalSection",
+            "user32!DispatchHookA",
+            "user32!fnHkINLPCWPSTRUCTA",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserBeginPaint",
+            "user32!UserCallWinProcCheckWow",
+            "user32!DispatchClientMessage",
+            "user32!__fnDWORD",
+            "ntdll!KiUserCallbackDispatcherContinue",
+            "win32u!NtUserDispatchMessage",
+            "user32!DispatchMessageWorker",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097410202,
+          "Milliseconds": 11.2145
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097543217,
+          "ReadyTimestamp": 6097614042,
+          "OldThreadState": "Wait",
+          "OldWaitReasonRaw": "Unknown",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097614211,
+          "Milliseconds": 7.0994
+        },
+        {
+          "Thread": 3828,
+          "StartTimestamp": 6097039901,
+          "ReadyTimestamp": 6097039901,
+          "OldThreadState": "Ready",
+          "OldWaitReasonRaw": "32",
+          "BlockingThreadNamedAncestors": [
+            "win32u!NtUserGetMessage",
+            "user32!GetMessageW",
+            "ntdll!RtlUserThreadStart"
+          ],
+          "EndTimestamp": 6097107637,
+          "Milliseconds": 6.7736
+        }
+      ]
+    }
+  ],
+  "PairsOmittedAcrossUnobservedSelectedWindowGaps": 0,
+  "UnpairedEnds": [],
+  "Limits": "Window-edge/missing pairs remain unassigned. Off-CPU includes normal waits, not necessarily a fault. Ready-to-running requires an observed Ready state/event. Native ancestors are not exclusive/self CPU or identities of unresolved managed callbacks. No runtime GC/suspension coverage is inferred from zero captured CLR events. Profiling overhead is outside acceptance."
+}

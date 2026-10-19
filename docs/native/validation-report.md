@@ -1,6 +1,10 @@
 # Native validation report
 
-## PR #38 completion continuation
+## PR #38 Input responsiveness continuation
+
+The [bounded continuation and operation breakdown](continuous-input-responsiveness-continuation.md) preserve all 160 candidate layout/presentation passes and the frozen functional scope at the new full source `eac5d7b`. Both strict gates still fail: appearance 228.87/192.51 ms, native media 454.69/6,190.40 ms and host-1 paragraph mouse interaction 148.88 ms. The historical 311.25 ms list interval remains unresolved. A stock control precondition is corrected using actual drag/drop evidence; no new renderer performance fix is claimed. Current `9558abf` visual proof supplements the source-stale review row without rewriting the failing receipt. Proposed operation criteria are unapproved documentation, not new gates. **INSUFFICIENT EVIDENCE for a migration proposal**; stock remains default, #37 incomplete and `.749` separate/open. Final source, reused/affected regression identities and experiment-only executable provenance belong to the current PR receipt.
+
+## Preserved PR #38 completion at `25b9c20`
 
 [The current full v2 evaluation](continuous-layout-architecture-prototype.md#final-controlled-v2-result-at-7601be9) retains all 292 completed observations at `7601be9`, by source/host/temperature, including every zero. Both gates strictly FAIL Input; all required functional proof, 160 candidate layout/presentation observations, actual OS appearance/lifecycle, cancellation, winning readiness and visual rows pass. The fourteen independent clients and 968-operation oracle run on both hosts. Source-labelled ordinary regressions and exact-final-source executable verification are separate; they cannot promote candidate acceptance. The decision remains **INSUFFICIENT EVIDENCE**; `.749` remains unresolved.
 

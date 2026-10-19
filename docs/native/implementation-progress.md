@@ -1,6 +1,10 @@
 # Native implementation progress
 
-## PR #38 completion continuation
+## PR #38 Input responsiveness continuation
+
+The [bounded continuation and operation breakdown](continuous-input-responsiveness-continuation.md) preserve all 160 candidate layout/presentation passes and the frozen functional scope at the new full source `eac5d7b`. Both strict gates still fail: appearance 228.87/192.51 ms, native media 454.69/6,190.40 ms and host-1 paragraph mouse interaction 148.88 ms. The historical 311.25 ms list interval remains unresolved. A stock control precondition is corrected using actual drag/drop evidence; no new renderer performance fix is claimed. Current `9558abf` visual proof supplements the source-stale review row without rewriting the failing receipt. Proposed operation criteria are unapproved documentation, not new gates. **INSUFFICIENT EVIDENCE for a migration proposal**; stock remains default, #37 incomplete and `.749` separate/open. Final source, reused/affected regression identities and experiment-only executable provenance belong to the current PR receipt.
+
+## Preserved PR #38 completion at `25b9c20`
 
 The isolated six-workload prototype completes the recorded functional scope. At `7601be9`, both full hosts retain 66 original samples per adapter plus fourteen independent UIA cases: all 160 candidate layout/presentation observations and functional/cancellation/appearance/lifecycle/visual rows pass. Required Input still fails (including native media/appearance and one list interaction). **INSUFFICIENT EVIDENCE for a migration proposal.** [The current result and evidence](continuous-layout-architecture-prototype.md#completion-evaluation--current-result) retain all earlier failures. Stock remains the ordinary default, #37 remains incomplete and `.749` stays open. Exact final source, ordinary CI and experiment-only executable provenance belong to the final #38 receipt.
 

@@ -2,13 +2,14 @@
   "Contract": "continuous-layout-v2",
   "Status": "PASS",
   "Meaning": "Representative visual equivalence review, separate from byte-identical raster output and all performance rows. Not physical screen-reader certification or migration approval.",
-  "CapturedSource": "4fdf27da2aca4da282567966d3551fd641932c80",
-  "CaptureRun": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39297514676",
-  "RenderingInputsSha256": "8AD542182809B00AB75372D98DAF17850D36D35B640903CFD964E47D45F957BF",
+  "CapturedSource": "9558abff9f7393e5376877343de952b2f414c370",
+  "CaptureRun": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39316798762",
+  "RenderingInputsSha256": "2241B9474B9F8C6202E3F7BFC3832F574DE673FBB9DB87010319DBEA3A6A6F55",
   "WpfFrameworkSha256": "C6950A0D6ADDFB7A365C11FE0AA82A4677043A263102F1779AA9BE8FD3624019",
   "ImageVersion": "20261007.264.1",
   "Compilation": "ReadyToRun",
-  "CaptureManifestSha256": "5C2BDBC095D14C0040089F4FE5A01598CC414FB233D74CF984F60A71691675B7",
+  "CaptureManifestSha256": "7D2B6B3AB7DA5C0943F3E3B8ED929BA016248F0D3ACC93C874C7F450A8375303",
+  "CaptureManifestPath": "docs/native/evidence/continuous-layout-architecture/v2/input-continuation/visual-capture-manifest.json",
   "OriginalWorkloadsReviewed": 6,
   "AppearancesReviewed": 3,
   "TargetedCasesReviewed": 8,
@@ -17,7 +18,7 @@
     "Originals": "First viewport, whole selection and distant selected content for list/table/paragraphs/quote/details/mixed in all three appearances.",
     "Targets": "Rich/code, original nested lists, genuine three-level numbering, wrapping/aligned and spanning/nested-block tables, collapsed details and Unicode/bidi in all appearances.",
     "Boundaries": "Selected cells after distant scrolling and native media plus command buttons; exact background pixels unchanged.",
-    "SourceBinding": "336/336 host-1 and 333/336 host-2 images match the reviewed 9fab9cc set by exact RGBA bytes. All candidate images match. Three host-2 HC nested-list stock captures now show official HC scrollbar chrome; their complete content area is identical and the chrome difference is individually reviewed. All 42 logical/style/geometry subsets pass per host. Decoration geometry remains complete/eager."
+    "SourceBinding": "Current 9558abf: 336/336 host-1 images and 333/336 host-2 images exactly match reviewed 4fdf27d by RGBA bytes. All candidate images match. Three host-2 stock HC nested-list images have the individually reviewed normal/HC scrollbar template variant, only x=623..639; all content pixels match. All 42 current subsets pass per host. Every current PNG is also byte-identical to its archived eac5d7b full-run PNG; manifest binds the current execution separately. No aggregate failing gate is rewritten."
   },
   "Classifications": {
     "TextEdges": "Minor text-edge/antialiasing differences remain; typography, wrapping, logical/style assertions, measured positions and selection geometry agree. No global raster tolerance.",
@@ -25,5 +26,6 @@
     "KnownNativeChromeDifference": "Native stock HC scrollbar chrome varies between the first rich/nested-list reference captures despite native/WPF HC state being true. Candidate consistently uses the official contrasting Classic HC scrollbar, as current host-2 nested-list and later stock references do. Exact scrollbar template identity is not claimed; this explicit native-chrome variant needs product review before migration.",
     "ByteIdentical": "Current paired-image exact RGBA counts: [{\"Host\": 1, \"PairedImages\": 144, \"PixelIdentical\": 6}, {\"Host\": 2, \"PairedImages\": 144, \"PixelIdentical\": 6}]. Visual equivalence is not a byte-identical-rendering claim."
   },
-  "PhysicalScreenReaderCertification": false
+  "PhysicalScreenReaderCertification": false,
+  "SupplementToFullRun": "eac5d7b / 39313369040 retained PENDING_VISUAL_REVIEW and FAIL at execution. This current review is a later supplement, not a reclassification of those receipts."
 }

@@ -17,7 +17,89 @@ This bounded continuation investigates ordinary initial list interaction first, 
 
 Ordinary reading/editing/selection/scroll, automatic appearance and native dialogues receive separate rows in addition to the unchanged aggregate v2 gate. Any proposed product criteria remain a recommendation with explicit boundaries, numbers, evidence and risks; they are not installed as an accepted gate. Remaining required Input failures mean **INSUFFICIENT EVIDENCE**, even when layout/parity pass.
 
-Results and recommendations will be appended after execution. The historical `.749` incident remains separate and open.
+**Decision: INSUFFICIENT EVIDENCE for a migration proposal.** Required v2 Input still fails. The layout/functional milestone remains achieved; no new renderer architecture, functional expansion or 250 ms optimisation is undertaken. The historical `.749` incident remains separate and open.
+
+## Current operation breakdown
+
+The [complete `eac5d7b` comparison and every host/temperature sample](evidence/continuous-layout-architecture/v2/input-continuation/full-eac5d7b/measurements.md) retain both strict FAIL results. Each host has 66 original observations per adapter plus fourteen independent candidate cases: 292 observations, including every repeated/edit zero. **All 160 candidate complete-layout and presentation observations pass.** Functional/source/selection/interchange/UIA, actual OS appearance/lifecycle, cancellation and winning-readiness checks pass. These are new source-labelled observations, not a causal before/after comparison with `7601be9`.
+
+| Operation / required property | Host 1 | Host 2 | Interpretation |
+|---|---:|---:|---|
+| Original controlled layout <=1,000 ms and complete presentation <=1,500 ms | 80/80 PASS, including additional cases | 80/80 PASS | Complete eager geometry and original fixtures preserved |
+| Ordinary additional UIA interaction Input <=100 ms | FAIL: paragraphs 148.88 ms | PASS | The new paragraph interval occurs during mouse selection, before copying; complete cause unresolved |
+| Automatic appearance Input <=100 ms | FAIL: 228.87 ms | FAIL: 192.51 ms | Automatic enable/current/disable/current, selection/focus and installation currency pass |
+| Native media Save/Cancel Input <=100 ms | FAIL: 454.69 ms | FAIL: 6,190.40 ms | Actual Save/Cancel, decoded SVG/PNG and immediate owner response pass; opening delay remains a defect |
+| Studio editing/source/search/outline/tab Input <=100 ms | 68.65 ms | 85.22 ms | PASS in the executed scenario |
+| Lifecycle Input <=100 ms | 92.47 ms | 62.91 ms | PASS; cancellation <=250 ms and winning complete/Input readiness <=1,500 ms also pass |
+| Source-bound visual row at full-run execution | PENDING_VISUAL_REVIEW | PENDING_VISUAL_REVIEW | Diagnostics changed the conservative C# input hash; the original gate receipt is not rewritten. Later current captures/review supplement this row separately |
+
+The six original timing cohorts and all fourteen additional cases remain separate in the linked tables/CSV. Raw allocation, natural collection and bounded retention observations remain in the original receipts. There is no forced GC, cold prewarm, sample suppression, target retry or new percentile claim.
+
+### Ordinary first focus and navigation
+
+The historical `7601be9` 311.25 ms list interval remains **unresolved, not fixed**. Both original first-interaction cases at `f5950d4` record 95.48/95.26 ms. The later focused `eac5d7b` cases record 111.07/68.73 ms; these are separate hosts/source observations. There is no consistent whole-interaction gain from changing the independent client to MTA, so the established acceptance client is unchanged.
+
+The new fresh-process stock/candidate controls perform actual text/tree inspection, distant navigation, first focus, keyboard extension and mouse selection. First focus UIA calls at `f5950d4` take 38.73–82.79 ms across the four stock/candidate/apartment combinations per host. This is a call duration, not a dispatcher gap. Stock exposes a different semantic-tree surface under this query, so its approximately 1 ms tree query and the candidate's 7–11 seconds of complete 4,000-item UIA transport are not equivalent renderer work or a speed comparison. Required geometry is already complete before either query.
+
+One `f5950d4` candidate MTA mouse interval is a genuine 117.14 ms Input-timer gap: an independently posted Input callback waits 102.80 ms, while native owner messages continue to arrive within 0.04–15.28 ms and four measured selection/render pairs take approximately 0.06–0.10 ms each. This demonstrates Input-priority delivery delay during active processing; it does not prove a 117 ms frozen UI, excuse the v2 failure or explain the old 311 ms interval. The target never synchronously waits for its client: it awaits child completion, and acknowledgement uses PostMessage/immutable shared scalars. Client polling/held-key dwell and UIA transport are separately timestamped.
+
+The stock mouse-control failure is now established as a **test precondition error**. The preceding Shift+Down leaves the first item selected; beginning a drag inside it invokes stock WPF text drag/drop, rather than starting a new range. Neither the two-pixel endpoint hypothesis nor replacing position-setting with queued SendInput moves fixes that state; every failed attempt is retained. At `9558abf`, collapsing the starting range *after* successful first-keyboard checks makes all four stock/candidate/apartment cases complete on each host. Retaining the prior selection reproduces five/two WPF QueryContinueDrag and GiveFeedback events and the original selection on the two controls; corrected cases produce none. No product drag/drop behaviour is disabled. The prototype's existing parity matrix is not expanded to native selected-text drag/drop.
+
+Corrected focused candidate Input maxima are STA/MTA **58.12/63.01 ms** on host 1 and **79.10/94.47 ms** on host 2. Stock maxima remain **111.05/124.49 ms** and **134.41/187.10 ms**. All retain the same uninterrupted timer and real input. This validates the control correction, not the historical interval or universal ordinary responsiveness. No further reading-driver hypothesis loop is performed.
+
+### Automatic appearance
+
+Same-host `f5950d4` candidate/unchanged stock/minimal controls observe maximum Input **246.71/1,447.33/101.66 ms** on host 1 and **191.43/1,337.00/93.69 ms** on host 2, with reversed route order. Stock and candidate selection/focus/source and automatic actual OS enable/current/disable/current succeed. Minimal controls have no model/formatting worker. Their failures do not certify the candidate or establish impossibility; one minimal host meets 100 ms.
+
+The separate profiled candidate's 459.66 ms interval contains 378.83 ms of fully paired observed off-CPU time, including 169.23 ms of observed ready-to-running time. Native stacks include `uxtheme!ThemeBroadcastChangeProc` and its broadcast/window callbacks. The minimal 179.92 ms interval includes 153.50 ms off-CPU and 100.99 ms observed ready-to-running. These are within-profile scheduling observations with profiler overhead, not attribution of another host's failure. Some managed/JIT frames remain unresolved; native ancestors are not exclusive/self CPU or private WPF callback identities. No CLR suspension coverage is captured, so no GC explanation is asserted.
+
+Existing notification coalescing, bounded owner-dispatcher theme preparation, source/palette/version guards and automatic theme ownership remain intact. No additional application-owned synchronous bottleneck with a supported bounded correction is established. Framework internals, accessibility updates, shell settings and runtime trust remain unchanged.
+
+### Native dialogues
+
+The new full-run host-2 **6,190.40 ms** interval is distinct from both the uninstrumented historical 13,239.25 ms failure and the earlier 14,490.12 ms / 13,075.83 ms WM_INITDIALOG reproduction. At `eac5d7b`, first SVG ShowDialog entry precedes the first WM_INITDIALOG by **5,594.37 ms**; WM_INITDIALOG itself takes **571.43 ms**. Owner disable arrives approximately **5,579.62 ms** after entry. The independently posted native owner message waits **6,021.94 ms** and Input callback **6,180.41 ms**. Much of this interval has an enabled, unresponsive owner before a shown native dialogue; it is not simply intentional modal ownership or a timer-only measurement artefact.
+
+The UIA invocation has already returned before the command starts. Encoding begins only after ShowDialog returns, and writing follows on its worker. Existing prepared SVG reuse, worker-based conflict-safe writing, current-source cancellation and supported owning STA remain unchanged. No evidence assigns the pre-initialisation delay to encoding, copying or renderer layout.
+
+In the earlier same-host focused round, candidate/stock/minimal Save/Cancel Input maxima are **325.98/335.55/255.78 ms** and **205.29/809.85/261.10 ms**. Actual chosen SVG/PNG decode and Cancel creates no file. Separate warm-host native profiles show shell view creation (`shell32!CExplorerBrowser::BrowseObject`, view switching and collection creation) during WM_INITDIALOG on all routes. The first candidate profiled callback is 259.54 ms with 18.32 ms fully paired observed off-CPU time and 247 CPU samples; sample ancestry is not self CPU. Whole modal callbacks also include actual dialogue interaction and must not be mistaken for uninterrupted stalls.
+
+One additional bounded cold-profile pair follows the *new* pre-WM_INITDIALOG failure. These are independent freshly provisioned hosts, not a causal route-speed pair. Candidate/stock Input is **1,120.81/1,122.97 ms**, with first WM_INITDIALOG **585.73/571.94 ms**. Candidate pre-WM_INITDIALOG is **332.75 ms**; its native samples include `windows.storage!SHCreateItemFromParsingName`, display-name parsing and known-folder cache lookup/rebuilding. This establishes shell path preparation in that profiled phase, not the cause of another host's 5.59-second interval. The long pre-initialisation delay is not reproduced or explained, and is not marked fixed. No more historical-launch or native-dialogue retry loop is undertaken. No global shell, security-service, association or ordinary desktop setting is altered.
+
+## Product-contract recommendation — proposal only
+
+**Keep v2 failing and defer migration.** The current 100 ms dispatcher/Input requirement is explicit and no measurement fault justifies replacing it with native acknowledgements, subtracting modal time or pausing a probe. Retain ordinary reading/editing/first focus/selection/scroll/copy/UIA responsiveness at **100 ms**, cancellation **250 ms**, complete layout **1,000 ms** and winning complete/Input readiness **1,500 ms**. Ordinary 148.88 ms and unresolved historical 311.25 ms observations remain material.
+
+If the product chooses operation-specific criteria for platform transitions, the following small revision is reviewable. It is **not approved, implemented as a gate, or a claim of passing evidence**:
+
+| Proposed operation property | Start → end | Suggested budget | Basis and remaining risk |
+|---|---|---:|---|
+| Automatic appearance becomes fully current, retaining selection/focus/source | First application-observed Windows appearance notification → complete current presentation and Input delivery | 1,500 ms | Reuses the existing winning-preview/presentation allowance; stock/minimal traces show native broadcast/scheduling participation. Replacing the 100 ms rule *during this interval* would explicitly permit perceptible queued input. Actual key delivery/no-loss during transition would require additional validation after approval |
+| Native Save dialogue opens visibly and accepts input | Actual command callback entry → shown native dialogue, enabled filename control and independently confirmed first real input response | 1,000 ms | A product choice informed by Microsoft's 500–1,000 ms responsive-operation class, not a WPF guarantee or the worst observed sample. The current 6.19-second and earlier long failures would still be defects; current UIA discovery timestamps alone do not certify this proposed visible/interactive boundary |
+| Visible dialogue input and application recovery | Actual dialogue key/mouse event → visible response; closure → owner Input readiness | 100 ms each | Preserve prompt interaction and immediate recovery; expected modal owner disabling is reported separately. Whole-operation native/dispatcher timelines remain required |
+
+[Microsoft's interaction guidance](https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/planning-and-measuring-performance) motivates operation classes; it does not override this product's contract. Even approval of these proposals would not cure the ordinary interaction failure or multi-second native opening defect, nor certify the proposed boundaries. All existing v2 raw rows and decisions remain independently visible. No 250 ms layout stretch work or threshold implementation is included.
+
+## Reproduction, source and verification
+
+Use the [evidence index](evidence/continuous-layout-architecture/v2/input-continuation/README.md) for every raw source/host/temperature group and failed control. `eac5d7b` is the complete timed source; `9558abf` is the corrected-control/capture source. Later edits are report/evidence, source-bound visual metadata and its safe manifest-path resolution. The original full gate's pending visual receipt stays unchanged. Current manifest/hash validation and an evidence-directory traversal control pass; historical reviews without a path retain the original default. No timing or correctness condition is loosened.
+
+The [measured-route identity](evidence/continuous-layout-architecture/v2/input-continuation/measured-route-identity.json) records identical timed adapter bodies and the later opt-in diagnostic differences. It does not claim that a later compiled executable was timed at its own source. [Protected ordinary source identities](evidence/continuous-layout-architecture/v2/input-continuation/ordinary-input-identity.json) bind 973 identical code/fixture/browser entries between `25b9c20` and `9558abf`. Earlier checks retain their actual source; the final PR receipt names reused/affected CI and the independently verified final-source payload separately.
+
+```powershell
+# Fresh output directories; official .NET 10 Windows Desktop, no installation.
+pwsh -NoProfile -File scripts/native/Build-ContinuousLayoutExperiment.ps1 -Compilation ReadyToRun -OutputDirectory artifacts/layout-input-bin
+& artifacts/layout-input-bin/LensDocsStudio.LayoutExperiment.exe --reading-input-checks --adapter candidate --client-apartment STA --detailed-input-trace --output artifacts/reading-candidate
+& artifacts/layout-input-bin/LensDocsStudio.LayoutExperiment.exe --reading-input-checks --adapter stock --client-apartment STA --detailed-input-trace --output artifacts/reading-stock
+# The negative control retains the keyboard selection and intentionally fails
+# its new-selection assertion while recording actual native drag/drop.
+& artifacts/layout-input-bin/LensDocsStudio.LayoutExperiment.exe --reading-input-checks --adapter stock --client-apartment STA --reading-preselected-control --detailed-input-trace --output artifacts/reading-negative-control
+```
+
+`Test-ContinuousInputDiagnostics.ps1 -Replication 1 -DriverRound` runs the bounded current/negative controls on an authorised disposable hosted desktop; replication 2 reverses order. Its negative control remains a failed assertion and the diagnostic job remains red. It is not the acceptance command. Actual OS appearance routes and `Trace-ContinuousInputDiagnostics.ps1` are restricted to disposable hosted machines. Never use them to mutate the ordinary desktop.
+
+For offline native analysis, run `select-input-trace-windows.py <observations> <fresh-windows.json>`, then `dotnet run --file scripts/native/Inspect-InputNativeTrace.cs -- <native.etl> <observations> <fresh-derived-directory> --windows <fresh-windows.json> --symbols`, followed by `summarise-input-native-windows.py`. Compile file-based tooling sequentially to avoid shared build-cache collisions. Original ETLs and every acceptance sample remain unfiltered. The [analysis attempt record](evidence/continuous-layout-architecture/v2/input-continuation/analysis-attempts.json) identifies the failed/unavailable local proofs; they are not silently relabelled.
+
+The unchanged complete acceptance commands remain in the main report. One full two-host comparison is performed during this continuation; no additional full matrix is run to seek a pass. Exact-final-source compilation/deterministic/provenance verification is separate from those measured clocks. Stock defaults, source/recovery/workspace, exports, five editors, runtime and installed identity remain protected. No migration, dependency merge, release, tag movement, signing or ordinary installation occurs.
 
 ## Bounded execution log
 

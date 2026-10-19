@@ -1,6 +1,22 @@
 # Continuous layout architecture experiment
 
-## Completion evaluation — current result
+## Input responsiveness continuation — current result
+
+**INSUFFICIENT EVIDENCE for a migration proposal.** The [bounded continuation, operation breakdown, established causes and proposed product criteria](continuous-input-responsiveness-continuation.md) preserve the achieved layout/functional milestone and unchanged v2 limits. No new renderer architecture, parity expansion or 250 ms optimisation occurs.
+
+The [complete `eac5d7b` comparison](evidence/continuous-layout-architecture/v2/input-continuation/full-eac5d7b/measurements.md) retains all 292 observations, including every zero sample. All 160 candidate layout/presentation observations and required functional, cancellation, winning-readiness and actual OS appearance/lifecycle checks pass. Input still fails: appearance **228.87/192.51 ms**, media **454.69/6,190.40 ms**, plus host-1 paragraphs **148.88 ms** during mouse selection before copying. These hosts do not establish a causal improvement over `7601be9`.
+
+The original 311.25 ms list interval is not reproduced or fixed. New controls establish a harness precondition error: dragging inside the keyboard-selected stock text starts native WPF drag/drop. Collapsing the range first makes both stock/candidate controls complete; retained preselected controls reproduce actual drag/drop events. Endpoint and input-stream hypotheses which did not fix it remain failed evidence. The acceptance client and frozen parity matrix remain unchanged.
+
+Native profiling locates shell view construction during dialogue initialisation and broadcast/scheduling participation in appearance intervals, with explicit unresolved managed frames and absent CLR suspension coverage. A new long media failure is **not** another 13-second WM_INITDIALOG observation: **5,594.37 ms precedes WM_INITDIALOG**, which then takes **571.43 ms**; owner disable comes only after approximately 5.58 seconds. Native and Input delivery both stall before encoding/writing. Two bounded cold profiles do not reproduce the long pre-initialisation delay. No complete cause or supported additional application performance correction is established, and no modal exemption is introduced.
+
+The full `eac5d7b` gate also retains `PENDING_VISUAL_REVIEW` because diagnostics changed its conservative source hash. Separately executed current `9558abf` captures pass all 42 subsets per host. Every candidate image matches the reviewed baseline exactly; host 1 matches all 336 images and host 2 differs only in three known stock HC scrollbar strips. Supplemental source-bound review is distinct from the original failing gate receipt. Exact-final-source executable checks and affected/unaffected regression identities are recorded in the PR receipt; ordinary regression success cannot certify candidate Input acceptance.
+
+Later `9558abf` code changes are confined to explicitly routed reading controls and opt-in diagnostics; `eac5d7b` remains the measured full-protocol source. The engine, six fixture bytes, typography, complete-layout clocks, default acceptance input client and budgets are unchanged. Both identities remain explicit. Proposed operation criteria require product review and would still leave ordinary and multi-second native opening defects. Stock remains the default, #37 remains incomplete, and `.749` remains separate/open.
+
+<a id="completion-evaluation--current-result"></a>
+
+## Preserved completion evaluation at `25b9c20`
 
 **INSUFFICIENT EVIDENCE for a migration proposal.** This continuation implements the missing stock-equivalent slices and corrects demonstrated ownership, geometry, interchange and harness faults. The unchanged v2 gate still rejects every required timing miss. This is not an architectural impossibility result. Stock remains the ordinary default; #37 and the original performance goal remain incomplete. The historical v1 NO-GO and earlier v2 failures below retain their own sources/contracts. The unrelated `.749` first-launch incident remains open with its earlier diagnostics.
 
