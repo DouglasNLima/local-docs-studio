@@ -16,7 +16,7 @@ internal sealed class ClipboardSerialisation
 {
     private readonly LayoutSnapshot snapshot;
     private readonly CancellationToken cancellation;
-    private readonly List<(StyledRun Run, Run Element)> spans = [];
+    private readonly List<(StyledRun Run, Inline Element)> spans = [];
     private readonly List<(Item Item, Block Element)> paragraphs = [];
     private readonly Brush foreground, surface, link;
     private ClipboardSerialisation(LayoutSnapshot snapshot, CancellationToken cancellation)
@@ -59,7 +59,7 @@ internal sealed class ClipboardSerialisation
     {
         var candidates = spans.Where(value => offset >= value.Run.Start && offset <= value.Run.Start + value.Run.Text.Length).ToArray();
         if (candidates.Length > 0)
-        { var value = ending ? candidates[0] : candidates[^1]; return value.Element.ContentStart.GetPositionAtOffset(offset - value.Run.Start)!; }
+        { var value = ending ? candidates[0] : candidates[^1]; if (value.Element is LineBreak) return offset > value.Run.Start ? value.Element.ElementEnd : value.Element.ElementStart; return value.Element.ContentStart.GetPositionAtOffset(offset - value.Run.Start)!; }
         var embedded = paragraphs.FirstOrDefault(value => value.Element is BlockUIContainer && offset >= value.Item.Start && offset <= value.Item.Start + value.Item.Length);
         if (embedded.Element is not null) return offset > embedded.Item.Start ? embedded.Element.ContentEnd : embedded.Element.ContentStart;
         var next = paragraphs.FirstOrDefault(value => value.Item.Start >= offset);
@@ -113,6 +113,7 @@ internal sealed class ClipboardSerialisation
         foreach (var run in item.Runs)
         {
             cancellation.ThrowIfCancellationRequested();
+            if (run.Text == "\r\n" && !run.Code) { var line = new LineBreak(); paragraph.Inlines.Add(line); spans.Add((run, line)); continue; }
             var media = node.Kind == "Media" ? node : node.Children.FirstOrDefault(child => child.Start == run.Start && child.Media is not null);
             if (media?.Kind == "Toggle")
             {

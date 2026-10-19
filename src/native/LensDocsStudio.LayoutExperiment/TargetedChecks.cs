@@ -59,6 +59,11 @@ internal static class TargetedChecks
                     var band = line.Clusters.FirstOrDefault(cluster => cluster.Start <= logical && cluster.End > logical)?.Bounds.FirstOrDefault() ?? new Rect(caret.X, line.Top, 0, line.Height);
                     geometry.Add(new { literal.Source.Start, Native = rectangle.ToString(), CandidateCaretX = caret.X, CandidateBand = band.ToString(), Text = literal.Run.Text });
                     Require(Math.Abs(caret.X - rectangle.X) <= .01 && Math.Abs(band.Top - rectangle.Top) <= .01, "Actual literal source/caret position: " + literal.Source.Start, checks);
+                    var ending = logical + literal.Source.Length;
+                    var lastLine = snapshot.Lines.First(value => ending > value.Start && ending <= value.End);
+                    var lastCaret = lastLine.Carets.MinBy(value => Math.Abs(value.Offset - ending))!;
+                    var nativeEnd = literal.End.GetCharacterRect(LogicalDirection.Backward);
+                    Require(Math.Abs(lastCaret.X - nativeEnd.X) <= .01, "Actual wrapped literal ending caret: " + literal.Source.Start, checks);
                 }
                 Program.Write(Path.Combine(destination, "literal-geometry.json"), geometry);
                 var logicalText = snapshot.Model.Text;

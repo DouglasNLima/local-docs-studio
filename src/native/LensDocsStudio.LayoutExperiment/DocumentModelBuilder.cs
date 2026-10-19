@@ -84,6 +84,7 @@ internal sealed class DocumentModelBuilder
                 var tableOwner = cell.Parent?.Parent as Table;
                 var column = ((TableRow)cell.Parent!).IndexOf(cell);
                 if (cell.ColumnSpan != 1 || cell.RowSpan != 1) throw new NotSupportedException("Spanning table cells require a separate geometry contract.");
+                if (cell.Count > 1 || cell.Any(child => child is not ParagraphBlock)) throw new NotSupportedException("Multi-paragraph or nested-block table cells require a separate geometry contract.");
                 var align = tableOwner is not null && column < tableOwner.ColumnDefinitions.Count ? tableOwner.ColumnDefinitions[column].Alignment : null;
                 var savedSeparator = separator; separator = column + 1 == ((TableRow)cell.Parent!).Count ? "\r\n" : "\t";
                 var cellNode = Container(cell, "Cell"); separator = savedSeparator;
@@ -158,7 +159,7 @@ internal sealed class DocumentModelBuilder
                     case LiteralInline literal: AddText(literal.Content.ToString(), inline.Span.Start, inline.Span.End + 1, emphasis, false, link, runs); break;
                     case HtmlEntityInline entity: AddText(entity.Transcoded.ToString(), inline.Span.Start, inline.Span.End + 1, emphasis, false, link, runs, atomic: true); break;
                     case CodeInline code: AddText(code.Content, inline.Span.Start, inline.Span.End + 1, emphasis, true, link, runs); break;
-                    case LineBreakInline line: AddText(line.IsHard ? "\n" : " ", inline.Span.Start, inline.Span.End + 1, emphasis, false, link, runs, atomic: true); break;
+                    case LineBreakInline line: AddText(line.IsHard ? "\r\n" : " ", inline.Span.Start, inline.Span.End + 1, emphasis, false, link, runs, atomic: true); break;
                     case DocumentAnchorInline anchor:
                         var anchorStart = text.Length; AddText(anchor.Text, inline.Span.Start, inline.Span.End + 1, emphasis, false, link, runs);
                         inlineNodes.Add(Node("Anchor", anchorStart, inline.Span.Start, inline.Span.End + 1, []) with { Target = anchor.Id }); break;

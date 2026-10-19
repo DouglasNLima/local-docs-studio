@@ -19,6 +19,9 @@ $env:LENS_LAYOUT_SOURCE_REVISION = $source
 $sourceDirty = [bool](& git status --porcelain)
 $env:LENS_LAYOUT_SOURCE_DIRTY = $sourceDirty.ToString()
 $payloadDirectory = Split-Path -Parent $exe
+# The Native assembly is a referenced library here. Ship only the diagnostic apphost.
+$ordinaryLauncher = Join-Path $payloadDirectory 'LensDocsStudio.Native.exe'
+if (Test-Path -LiteralPath $ordinaryLauncher) { Remove-Item -LiteralPath $ordinaryLauncher }
 $provenance = [ordered]@{
     Label='EXPERIMENT ONLY'; Contract='continuous-layout-v2'; Source=$source; SourceDirty=$sourceDirty
     Base='a937399a3f822c4e911e1ebe5ec0e426b64c56ac'; Dependency='9a64dfa5adf79dc447db1f671ea39c94ec42de40'
@@ -56,7 +59,7 @@ if (-not $FirstOnly) {
     foreach ($side in $order) { Invoke-Sample 'all' $side 'distant-edit' 3 -Edit }
     foreach ($fixture in $fixtures) { Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia }
     foreach ($fixture in @('rich','nested-lists','table-wrap','collapsed-details','unicode-bidi')) { Invoke-Sample $fixture 'candidate' 'targeted-uia' -Uia }
-    foreach ($mode in @('lifecycle','appearance','studio-checks','parity-all')) {
+    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','parity-all')) {
         $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
         if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force }
@@ -91,17 +94,18 @@ $failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interacti
 $coverage = Get-Content src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json -Raw | ConvertFrom-Json
 $missing = @($coverage.Requirements | Where-Object Implementation -ne 'Implemented')
 $special = @{}
-foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('parity-all','targeted-parity.json'))) {
+foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('parity-all','targeted-parity.json'))) {
     $path = Join-Path $output ($receipt[0] + '/' + $receipt[1])
     $special[$receipt[0]] = if (Test-Path -LiteralPath $path) { Get-Content -LiteralPath $path -Raw | ConvertFrom-Json } else { @{Status='MISSING'} }
 }
 $interactionReceipts = @(Get-ChildItem -LiteralPath $output -Filter independent-uia.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json })
+$lifecycleBudgetMisses = $special['lifecycle'].CancellationAcceptance -ne 'PASS' -or $special['lifecycle'].WinningPreviewReadinessAcceptance -ne 'PASS'
 $specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
 $executionFailures = @($runs | Where-Object ExitCode -ne 0)
 $missingSamples = $controlled.Count -ne 66 -or @($samples | Where-Object { $_.Adapter -eq 'stock' }).Count -ne 66
 $proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 11 -or @($special.Values | Where-Object Status -ne 'PASS').Count -gt 0
 $timingFail = $failedInteractionInput.Count -gt 0 -or $layoutMisses.Count -gt 0 -or $presentationMisses.Count -gt 0 -or $inputMisses.Count -gt 0 -or $specialInputMisses.Count -gt 0
-$fullPass = -not $proofMissing -and -not $timingFail -and $missing.Count -eq 0 -and $executionFailures.Count -eq 0
+$fullPass = -not $lifecycleBudgetMisses -and -not $proofMissing -and -not $timingFail -and $missing.Count -eq 0 -and $executionFailures.Count -eq 0
 [ordered]@{
     Contract='continuous-layout-v2'; Status=$(if ($fullPass) {'PASS'} elseif ($timingFail -or $executionFailures.Count) {'FAIL'} else {'INCOMPLETE'})
     CandidateSamples=$candidate.Count; RequiredControlledSamples=66; RecordedControlledSamples=$controlled.Count; MissingControlledSamples=$missingSamples; RawTimedBoundaries=$rawBoundaries
@@ -109,8 +113,8 @@ $fullPass = -not $proofMissing -and -not $timingFail -and $missing.Count -eq 0 -
     PreparationPresentation=@{ BudgetMilliseconds=1500; Status=$(if($presentationMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$presentationMisses.Count }
     ObservedShownWindowInput=@{ BudgetMilliseconds=100; Status=$(if($inputMisses.Count -or $specialInputMisses.Count){'FAIL'}elseif($proofMissing){'INCOMPLETE'}else{'PASS'}); SampleFailures=$inputMisses.Count; SpecialScenarioFailures=$specialInputMisses.Count }
     FunctionalSelectionClipboardSourceUiaParity=$(if($missing.Count -or $proofMissing -or @($interactionReceipts | Where-Object Status -ne 'PASS').Count){'INCOMPLETE_OR_FAIL'}else{'PASS'})
-    ActualOsAppearanceLifecycle=@{ Status=$(if(@($special.Values | Where-Object Status -ne 'PASS').Count -or $specialInputMisses.Count){'INCOMPLETE_OR_FAIL'}else{'PASS'}); Receipts=$special }
-    PairIdentityChecks=$pairChecks; FailedInteractionInputReceipts=$failedInteractionInput; ParityCoverage=$coverage; MissingCapabilities=$missing; InteractionReceipts=$interactionReceipts
+    ActualOsAppearanceLifecycle=@{ Status=$(if($lifecycleBudgetMisses -or @($special.Values | Where-Object Status -ne 'PASS').Count -or $specialInputMisses.Count){'INCOMPLETE_OR_FAIL'}else{'PASS'}); Receipts=$special }
+    LifecycleBudgetMisses=$lifecycleBudgetMisses; PairIdentityChecks=$pairChecks; FailedInteractionInputReceipts=$failedInteractionInput; ParityCoverage=$coverage; MissingCapabilities=$missing; InteractionReceipts=$interactionReceipts
     Stretch250=@{ Blocking=$false; Exceeded=@($candidate | Where-Object CompleteLayoutInputMilliseconds -gt 250).Count }
     ExecutionFailures=$executionFailures; Samples=$samples
     Decision=$(if($fullPass){'VIABLE FOR A SEPARATE MIGRATION PROPOSAL: tested workloads and hosts only; no migration authorised'}else{'INSUFFICIENT EVIDENCE: required v2 timing, capabilities or validation remain unsuccessful/incomplete'})

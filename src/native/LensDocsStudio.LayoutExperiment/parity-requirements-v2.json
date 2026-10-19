@@ -2,24 +2,101 @@
   "Contract": "continuous-layout-v2",
   "Meaning": "Implementation status is not an execution pass. The gate also requires all controlled samples, independent clients, parity, appearance, studio and lifecycle receipts.",
   "Requirements": [
-    { "Requirement": "Six unchanged workloads and complete eager geometry", "Implementation": "Implemented", "Proof": "66 controlled samples per adapter plus parity-all and deterministic" },
-    { "Requirement": "Nested/continued numbered lists, multi-paragraph items", "Implementation": "Implemented", "Proof": "nested-lists parity and independent UIA" },
-    { "Requirement": "Rich/code text, syntax colours, Unicode/complex shaping", "Implementation": "Implemented", "Proof": "rich and unicode-bidi geometry and decoded RTF/Xaml style comparisons" },
-    { "Requirement": "Tables: alignment, wrapping, row/cell geometry and selection", "Implementation": "Implemented", "Proof": "table, table-wrap and mixed comparisons/independent clients" },
-    { "Requirement": "Spanning cells and nested block content in tables", "Implementation": "Missing", "Proof": "Spanning cells explicitly rejected; nested cell blocks lack complete layout support" },
-    { "Requirement": "Quotes, details, headings, outline and internal links", "Implementation": "Implemented", "Proof": "targeted parity, independent rich client and studio-checks" },
-    { "Requirement": "Workspace images, Mermaid geometry and native commands", "Implementation": "Implemented", "Proof": "mixed media geometry, independent zoom/source copy; interactive SVG/PNG save dialogues not independently certified" },
-    { "Requirement": "External/workspace link activation and SVG/PNG save dialogue parity", "Implementation": "Unverified", "Proof": "Safe routes implemented; independent end-to-end destination/output checks pending" },
-    { "Requirement": "Mouse/keyboard selection, transformed source spans, range lifetime", "Implementation": "Implemented", "Proof": "independent clients, deterministic source assertions, studio replacement and lifecycle" },
-    { "Requirement": "Visual-direction keyboard caret movement within bidirectional runs", "Implementation": "Missing", "Proof": "Formatter shaping/geometry are real; Left/Right currently follow logical offsets" },
-    { "Requirement": "Exact selected plain text, decoded RTF/Xaml and whole-document CF_HTML", "Implementation": "Implemented", "Proof": "stock serialisation oracles, parity-all styles, actual independent copy and HTML decoding" },
-    { "Requirement": "All partial-range list marker/tab cases and XamlPackage media fidelity", "Implementation": "Unverified", "Proof": "Basic stock partial oracle and rich actual partial copy exist; exhaustive independent comparison pending" },
-    { "Requirement": "UIA document/list/table/heading/link tree, selection and measured ranges", "Implementation": "Implemented", "Proof": "independent UIA clients, cell/header relationships, point/off-screen/visible bounds and ScrollIntoView" },
-    { "Requirement": "Complete stock-oracle TextUnit and text-attribute range operation matrix", "Implementation": "Unverified", "Proof": "Character/word/paragraph and selected attributes tested; full format/line/page/movement/attribute oracle pending" },
-    { "Requirement": "Search, source navigation, anchors and transient document lifecycle", "Implementation": "Implemented", "Proof": "studio-checks independent real input and lifecycle leading/distant edits" },
-    { "Requirement": "Light/Dark/automatic actual OS High Contrast transitions", "Implementation": "Implemented", "Proof": "Hosted appearance test, every installation currency checked; no manual disable refresh" },
-    { "Requirement": "Queued/active cancellation and closure with separate observations", "Implementation": "Implemented", "Proof": "lifecycle event timestamps, active closure/reopen and latest-version rejection" },
-    { "Requirement": "Stale failure and clipboard-close races; bounded retention across full studio stress", "Implementation": "Unverified", "Proof": "Guards implemented; exhaustive independent race/retention execution pending" }
+    {
+      "Requirement": "Six unchanged workloads and complete eager geometry",
+      "Implementation": "Implemented",
+      "Proof": "66 controlled samples per adapter plus parity-all and deterministic"
+    },
+    {
+      "Requirement": "Nested/continued numbered lists, multi-paragraph items",
+      "Implementation": "Implemented",
+      "Proof": "nested-lists parity and independent UIA"
+    },
+    {
+      "Requirement": "Rich/code text, syntax colours, Unicode/complex shaping",
+      "Implementation": "Implemented",
+      "Proof": "rich and unicode-bidi geometry and decoded RTF/Xaml style comparisons"
+    },
+    {
+      "Requirement": "Tables: alignment, wrapping, row/cell geometry and selection",
+      "Implementation": "Implemented",
+      "Proof": "table, table-wrap and mixed comparisons/independent clients"
+    },
+    {
+      "Requirement": "Spanning cells and nested block content in tables",
+      "Implementation": "Missing",
+      "Proof": "Spanning cells explicitly rejected; nested cell blocks lack complete layout support"
+    },
+    {
+      "Requirement": "Quotes, details, headings, outline and internal links",
+      "Implementation": "Implemented",
+      "Proof": "targeted parity, independent rich client and studio-checks"
+    },
+    {
+      "Requirement": "Workspace images, Mermaid geometry and native commands",
+      "Implementation": "Implemented",
+      "Proof": "mixed media geometry, independent zoom/source copy; actual SVG/PNG save dialogues and decoded output: media-checks"
+    },
+    {
+      "Requirement": "External/workspace link activation parity",
+      "Implementation": "Unverified",
+      "Proof": "Safe routes implemented; independent external/workspace destination checks pending"
+    },
+    {
+      "Requirement": "Mouse/keyboard selection, transformed source spans, range lifetime",
+      "Implementation": "Implemented",
+      "Proof": "independent clients, deterministic source assertions, studio replacement and lifecycle"
+    },
+    {
+      "Requirement": "Visual-direction keyboard caret movement within bidirectional runs",
+      "Implementation": "Missing",
+      "Proof": "Formatter shaping/geometry are real; Left/Right currently follow logical offsets"
+    },
+    {
+      "Requirement": "Exact selected plain text, decoded RTF/Xaml and whole-document CF_HTML",
+      "Implementation": "Implemented",
+      "Proof": "stock serialisation oracles, parity-all styles, actual independent copy and HTML decoding"
+    },
+    {
+      "Requirement": "All partial-range list marker/tab cases and XamlPackage media fidelity",
+      "Implementation": "Unverified",
+      "Proof": "Basic stock partial oracle and rich actual partial copy exist; exhaustive independent comparison pending"
+    },
+    {
+      "Requirement": "UIA document/list/table/heading/link tree, selection and measured ranges",
+      "Implementation": "Implemented",
+      "Proof": "independent UIA clients, cell/header relationships, point/off-screen/visible bounds and ScrollIntoView"
+    },
+    {
+      "Requirement": "Complete stock-oracle TextUnit and text-attribute range operation matrix",
+      "Implementation": "Unverified",
+      "Proof": "Character/word/paragraph and selected attributes tested; full format/line/page/movement/attribute oracle pending"
+    },
+    {
+      "Requirement": "Search, source navigation, anchors and transient document lifecycle",
+      "Implementation": "Implemented",
+      "Proof": "studio-checks independent real input and lifecycle leading/distant edits"
+    },
+    {
+      "Requirement": "Light/Dark/automatic actual OS High Contrast transitions",
+      "Implementation": "Implemented",
+      "Proof": "Hosted appearance test, every installation currency checked; no manual disable refresh"
+    },
+    {
+      "Requirement": "Queued/active cancellation and closure with separate observations",
+      "Implementation": "Implemented",
+      "Proof": "lifecycle event timestamps, active closure/reopen and latest-version rejection"
+    },
+    {
+      "Requirement": "Stale failure and clipboard-close races; bounded retention across full studio stress",
+      "Implementation": "Unverified",
+      "Proof": "Guards implemented; exhaustive independent race/retention execution pending"
+    },
+    {
+      "Requirement": "Visual equivalence review beyond measured logical/style/geometry assertions",
+      "Implementation": "Unverified",
+      "Proof": "At f86d6df, 11/66 raster pairs per host are byte-identical. Other fixtures show text-edge, table-border and details-toggle paint differences; native toggle chrome correction requires new captures. Geometry/style agreement alone does not classify every raster difference."
+    }
   ],
   "PhysicalScreenReader": "Not certified; independent UIA verification is not physical screen-reader certification"
 }

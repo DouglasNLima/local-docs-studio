@@ -72,6 +72,8 @@ internal static class LifecycleChecks
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
             ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
+            CancellationBudgetMilliseconds = 250, CancellationAcceptance = cancellation.All(item => item.WorkerMilliseconds is <= 250 && item.DispatcherMilliseconds is <= 250) ? "PASS" : "FAIL_OR_UNAVAILABLE",
+            WinningPreviewReadinessBudgetMilliseconds = 1500, WinningPreviewReadinessAcceptance = readiness.All(item => item.WinningPreviewReadyMilliseconds <= 1500) ? "PASS" : "FAIL",
             TabIntegration = "Separate --studio-checks independent client", Appearance = "Separate --appearance actual OS probe", Reopen = "PASS" });
     }
     private static async Task Wait(Func<bool> condition)

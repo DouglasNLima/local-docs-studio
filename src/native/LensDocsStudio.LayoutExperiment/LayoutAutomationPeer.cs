@@ -109,7 +109,15 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             .Concat(root.Surface.Children.OfType<System.Windows.Controls.Button>().Where(button => button.Tag is ControlBox box && box.Node == id).Select(button => (AutomationPeer)UIElementAutomationPeer.CreatePeerForElement(button))).ToList();
         protected override Rect GetBoundingRectangleCore()
         {
-            _ = Current; var rectangles = root.Surface.Bounds(Node.Start, Node.End, true).ToArray();
+            var current = Current;
+            if (Node.Kind is "Table" or "Row" or "Cell" or "Details" or "List" or "ListItem" or "Quote" or "Media"
+                && current.NodeBounds.TryGetValue(id, out var structure))
+            {
+                var scroll = root.Surface.Scroller;
+                structure.Intersect(new Rect(scroll?.HorizontalOffset ?? 0, scroll?.VerticalOffset ?? 0, scroll?.ViewportWidth ?? 640, scroll?.ViewportHeight ?? 300));
+                return structure.IsEmpty ? Rect.Empty : new(root.Surface.PointToScreen(structure.TopLeft), root.Surface.PointToScreen(structure.BottomRight));
+            }
+            var rectangles = root.Surface.Bounds(Node.Start, Node.End, true).ToArray();
             if (rectangles.Length == 0) return Rect.Empty;
             var bounds = rectangles.Aggregate(Rect.Empty, Rect.Union);
             return new(root.Surface.PointToScreen(bounds.TopLeft), root.Surface.PointToScreen(bounds.BottomRight));

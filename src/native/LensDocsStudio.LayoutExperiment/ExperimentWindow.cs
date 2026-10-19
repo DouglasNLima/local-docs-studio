@@ -19,8 +19,10 @@ internal sealed class ExperimentWindow : Window
     private CancellationTokenSource? active;
     private sealed record RequestData(string Source, string Appearance, long Version, string? Path, string? Root, Dictionary<int, bool> Details, DiagnosticView? Restore, TaskCompletionSource<bool> Completion);
     private RequestData? pending;
+    private RequestData? activeRequest;
     private DiagnosticView? restoreView;
     private bool running, closed;
+    private bool hasDocument;
     private long version;
     private long activeVersion;
     public long CurrentVersion => version;
@@ -84,7 +86,7 @@ internal sealed class ExperimentWindow : Window
         Dispatcher.VerifyAccess(); renderedCopy?.Cancel();
         if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); }
         if (pending is { } queued) { Log("queued-rejected", queued.Version); queued.Completion.TrySetResult(false); pending = null; }
-        version++; Surface.Install(null); Scroller.ScrollToTop(); LatestSource = "";
+        version++; Surface.Install(null); Scroller.ScrollToTop(); LatestSource = ""; hasDocument = false;
         details.Clear(); if (view is not null) foreach (var value in view.Details) details.Add(value.Key, value.Value);
         restoreView = view; Log("document-switched");
     }
@@ -112,20 +114,27 @@ internal sealed class ExperimentWindow : Window
     }
     public void InstallMeasured(LayoutSnapshot snapshot)
     {
-        Dispatcher.VerifyAccess(); LatestSource = snapshot.Model.Source; version = snapshot.Version;
+        Dispatcher.VerifyAccess(); LatestSource = snapshot.Model.Source; version = snapshot.Version; hasDocument = true;
         ThemePreference = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ThemePreference : snapshot.Appearance;
         Surface.Install(snapshot);
     }
     private void AppearanceChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) { if (!closed) _ = Dispatcher.InvokeAsync(RefreshAppearance, DispatcherPriority.Background); }
     private void RefreshAppearance()
     {
-        if (!closed && LatestSource.Length > 0 && Surface.Snapshot?.Appearance != ExperimentAppearance.Capture(ThemePreference)) _ = Request(LatestSource, ThemePreference);
+        if (closed || !hasDocument) return;
+        var appearance = ExperimentAppearance.Capture(ThemePreference);
+        if (Surface.Snapshot?.Appearance == appearance) return;
+        // Windows broadcasts several related property changes for one palette.
+        // Do not repeatedly cancel the identical current rebuild before it installs.
+        if (pending is { } queued && queued.Source == LatestSource && queued.Appearance == appearance) return;
+        if (activeRequest is { } preparing && preparing.Version == version && preparing.Source == LatestSource && preparing.Appearance == appearance) return;
+        _ = Request(LatestSource, ThemePreference);
     }
     private void Log(string name, long? owner = null) => Events.Enqueue(new(name, Stopwatch.GetTimestamp(), Environment.CurrentManagedThreadId, owner ?? Volatile.Read(ref version)));
     public Task<bool> Request(string source, string appearance = "Light")
     {
         Dispatcher.VerifyAccess(); if (closed) return Task.FromCanceled<bool>(new CancellationToken(true));
-        LatestSource = source;
+        LatestSource = source; hasDocument = true;
         ThemePreference = appearance.StartsWith("HC:", StringComparison.Ordinal) ? ThemePreference : appearance;
         appearance = ExperimentAppearance.Capture(ThemePreference);
         version++;
@@ -143,7 +152,7 @@ internal sealed class ExperimentWindow : Window
         {
             while (pending is { } request && !closed)
             {
-                pending = null; active = new(); activeVersion = request.Version; var token = active.Token;
+                pending = null; activeRequest = request; active = new(); activeVersion = request.Version; var token = active.Token;
                 var sourcePath = request.Path; var workspaceRoot = request.Root; var detailState = request.Details;
                 var old = Surface.Snapshot;
                 var selectionStart = Surface.SelectionSourceStart; var selectionEnd = Surface.SelectionSourceEnd;
@@ -181,7 +190,7 @@ internal sealed class ExperimentWindow : Window
                     if (closed || request.Version != version || token.IsCancellationRequested) { Log("stale-failure-rejected", request.Version); request.Completion.TrySetResult(false); }
                     else { Log("current-failure", request.Version); CurrentFailure?.Invoke(error.Message); request.Completion.TrySetException(error); }
                 }
-                finally { active.Dispose(); active = null; }
+                finally { active.Dispose(); active = null; activeRequest = null; }
             }
         }
         finally { running = false; }
