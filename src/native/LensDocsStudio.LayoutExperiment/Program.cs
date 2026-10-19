@@ -36,6 +36,7 @@ internal static class Program
         }
         var output = Path.GetFullPath(Option("--output") ?? "artifacts/layout-experiment/local"); Directory.CreateDirectory(output);
         Write(Path.Combine(output, "execution-identity.json"), new { Source = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"), SourceDirty = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_DIRTY"),
+            CompilationConfiguration = Environment.GetEnvironmentVariable("LENS_LAYOUT_COMPILATION") ?? "IL",
             HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)), Arguments = args, Process = Environment.ProcessId, UiThread = Environment.CurrentManagedThreadId,
             Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, WpfAssembly = typeof(TextElement).Assembly.Location, CpuAvailable = Environment.ProcessorCount, Os = Environment.OSVersion.ToString() });
         if (args.Contains("--deterministic"))
@@ -157,6 +158,7 @@ internal static class Program
                 Contract = acceptanceV2 ? AcceptanceV2.Contract : "historical-v1", Fixture = fixture.Name, Adapter = adapter, Repetition = repetition, Edited = edited,
                 RunGroup = Environment.GetEnvironmentVariable("LENS_LAYOUT_RUN_GROUP"),
                 SourceRevision = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"), SourceDirty = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_DIRTY"),
+                CompilationConfiguration = Environment.GetEnvironmentVariable("LENS_LAYOUT_COMPILATION") ?? "IL",
                 HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)), FixtureSha256 = Hash(Encoding.UTF8.GetBytes(fixture.Source)), SourceSha256 = Hash(Encoding.UTF8.GetBytes(source)),
                 CompleteLayoutInputMilliseconds = complete, EndToEndReadinessMilliseconds = readiness, ReadinessStartTimestamp = readinessStartTimestamp, SourceIoMilliseconds = sourceIoMilliseconds, EmptyHostSetupMilliseconds = hostSetupMilliseconds,
                 InputGapsMilliseconds = timingGaps, UiStartThread = uiThread, PreparationThread = preparationThread, WorkerLayoutThread = worker, UiEndThread = endThread, CandidateStages = snapshot?.Stages,
@@ -201,6 +203,7 @@ internal static class Program
                 Temperature = repetition > 0 ? "Repeated complete fresh construction, same process" : ordinal == 0 ? "First fixture execution in fresh process; no prewarm" : "First construction for this fixture after earlier fixtures in the same process",
                 FixtureSha256 = Hash(Encoding.UTF8.GetBytes(fixture.Source)), SourceSha256 = Hash(Encoding.UTF8.GetBytes(source)),
                 HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)),
+                CompilationConfiguration = Environment.GetEnvironmentVariable("LENS_LAYOUT_COMPILATION") ?? "IL",
                 SourceRevision = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"), SourceDirty = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_DIRTY"),
                 ProductSha256 = Hash(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location)),
                 HarnessInformationalVersion = System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(Program).Assembly)?.InformationalVersion,

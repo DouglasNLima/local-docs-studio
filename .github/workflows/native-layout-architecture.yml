@@ -31,24 +31,14 @@ jobs:
         run: |
           dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          New-Item -ItemType Directory -Force -Path artifacts/layout-compile/locks | Out-Null
-          foreach ($name in @('LensDocsStudio.LayoutExperiment','LensDocsStudio.Native','LensDocsStudio.Core')) {
-            Copy-Item -LiteralPath "src/native/$name/packages.lock.json" -Destination "artifacts/layout-compile/locks/$name.packages.lock.json"
-          }
-          # Keep RID-specific restore metadata in the diagnostic output. Application
-          # source and ordinary project lock files remain unchanged.
-          '<Project><PropertyGroup><NuGetLockFilePath>$(MSBuildThisFileDirectory)locks/$(MSBuildProjectName).packages.lock.json</NuGetLockFilePath></PropertyGroup></Project>' | Set-Content artifacts/layout-compile/restore.targets
-          $restoreTargets = (Resolve-Path artifacts/layout-compile/restore.targets).Path
-          dotnet publish src/native/LensDocsStudio.LayoutExperiment -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -p:RestoreLockedMode=false "-p:CustomBeforeMicrosoftCommonTargets=$restoreTargets" --output artifacts/layout-compile/r2r
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          $ordinaryLauncher = 'artifacts/layout-compile/r2r/LensDocsStudio.Native.exe'
-          if (Test-Path -LiteralPath $ordinaryLauncher) { Remove-Item -LiteralPath $ordinaryLauncher }
+          & scripts/native/Build-ContinuousLayoutExperiment.ps1 -Compilation ReadyToRun -OutputDirectory artifacts/layout-compile/r2r
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = ([bool](git status --porcelain)).ToString()
           $order = if (${{ matrix.replication }} -eq 1) { @('IL','R2R') } else { @('R2R','IL') }
           $runs = @()
           foreach ($scenario in @('list','mixed')) {
             foreach ($configuration in $order) {
+              $env:LENS_LAYOUT_COMPILATION = if ($configuration -eq 'IL') { 'IL' } else { 'ReadyToRun' }
               $exe = if ($configuration -eq 'IL') { 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe' } else { 'artifacts/layout-compile/r2r/LensDocsStudio.LayoutExperiment.exe' }
               $destination = "artifacts/layout-compile/observations/$scenario-$configuration"
               New-Item -ItemType Directory -Force -Path $destination | Out-Null
@@ -83,10 +73,10 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Same compiled adapters, complete layout and real GUI/UIA
-        run: pwsh -NoProfile -File scripts/native/Test-ContinuousLayoutArchitectureV2.ps1 -Replication ${{ matrix.replication }}
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousLayoutArchitectureV2.ps1 -Replication ${{ matrix.replication }} -Compilation ReadyToRun
       - name: Deterministic complete-geometry and source checks, without timing assertions
         if: always()
-        run: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe --deterministic --output artifacts/layout-architecture-v2/deterministic
+        run: artifacts/layout-experiment-bin/LensDocsStudio.LayoutExperiment.exe --deterministic --output artifacts/layout-architecture-v2/deterministic
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -98,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: EXPERIMENT-ONLY-layout-harness-${{ matrix.replication }}
-          path: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/
+          path: artifacts/layout-experiment-bin/
           retention-days: 90
   focused-diagnostics:
     if: github.event_name == 'push' || inputs.scope == 'focused'
@@ -117,11 +107,13 @@ jobs:
       - name: Build and exercise unchanged stock route, candidate and minimal dialogue
         shell: pwsh
         run: |
-          dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & scripts/native/Build-ContinuousLayoutExperiment.ps1 -Compilation ReadyToRun -OutputDirectory artifacts/layout-focused-bin
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
-          $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
+          $env:LENS_LAYOUT_COMPILATION = 'ReadyToRun'
+          $exe = 'artifacts/layout-focused-bin/LensDocsStudio.LayoutExperiment.exe'
+          New-Item -ItemType Directory -Force -Path artifacts/layout-focused | Out-Null
+          Copy-Item -LiteralPath artifacts/layout-focused-bin/compilation.json -Destination artifacts/layout-focused/compilation.json
           $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-legacy-directory','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') }
           $failed = $false
           foreach ($mode in $modes) {
@@ -151,7 +143,8 @@ jobs:
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
           $trace = 'artifacts/layout-profile-tools/dotnet-trace.exe'
-          $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
+          $env:LENS_LAYOUT_COMPILATION = 'ReadyToRun'
+          $exe = 'artifacts/layout-focused-bin/LensDocsStudio.LayoutExperiment.exe'
           foreach ($scenario in @('appearance','list','mixed')) {
             $destination = "artifacts/layout-focused/$scenario-sampling"
             New-Item -ItemType Directory -Force -Path $destination | Out-Null

@@ -1,6 +1,7 @@
 param(
     [ValidateSet(1,2)][int]$Replication = 1,
     [string]$OutputDirectory = 'artifacts/layout-architecture-v2',
+    [ValidateSet('IL','ReadyToRun')][string]$Compilation = 'IL',
     [switch]$SkipBuild,
     [switch]$FirstOnly
 )
@@ -10,10 +11,13 @@ Set-Location $root
 $output = [IO.Path]::GetFullPath((Join-Path $root $OutputDirectory))
 New-Item -ItemType Directory -Force -Path $output | Out-Null
 if (-not $SkipBuild) {
-    & dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
-    if ($LASTEXITCODE -ne 0) { throw 'Experiment build failed.' }
+    if ($Compilation -eq 'IL') {
+        & dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
+        if ($LASTEXITCODE -ne 0) { throw 'Experiment build failed.' }
+    } else { & (Join-Path $PSScriptRoot 'Build-ContinuousLayoutExperiment.ps1') -Compilation ReadyToRun }
 }
-$exe = (Resolve-Path src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe).Path
+$exe = (Resolve-Path $(if ($Compilation -eq 'IL') { 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe' } else { 'artifacts/layout-experiment-bin/LensDocsStudio.LayoutExperiment.exe' })).Path
+$env:LENS_LAYOUT_COMPILATION = $Compilation
 $source = (& git rev-parse HEAD).Trim()
 $env:LENS_LAYOUT_SOURCE_REVISION = $source
 $sourceDirty = [bool](& git status --porcelain)
@@ -23,10 +27,11 @@ $payloadDirectory = Split-Path -Parent $exe
 $ordinaryLauncher = Join-Path $payloadDirectory 'LensDocsStudio.Native.exe'
 if (Test-Path -LiteralPath $ordinaryLauncher) { Remove-Item -LiteralPath $ordinaryLauncher }
 $provenance = [ordered]@{
-    Label='EXPERIMENT ONLY'; Contract='continuous-layout-v2'; Source=$source; SourceDirty=$sourceDirty
+    Label='EXPERIMENT ONLY'; Contract='continuous-layout-v2'; Source=$source; SourceDirty=$sourceDirty; Compilation=$Compilation
     Base='a937399a3f822c4e911e1ebe5ec0e426b64c56ac'; Dependency='9a64dfa5adf79dc447db1f671ea39c94ec42de40'
     Runtime='Framework-dependent official unmodified .NET 10 Windows Desktop'
     ProductionDefault='Stock FlowDocument/PTS; experimental project outside ordinary packages'
+    CompilationEvidence=$(if (Test-Path -LiteralPath (Join-Path $payloadDirectory 'compilation.json')) { Get-Content (Join-Path $payloadDirectory 'compilation.json') -Raw | ConvertFrom-Json } else { @{Compilation='IL'; FrameworkDependent=$true} })
     Payload=@(Get-ChildItem -LiteralPath $payloadDirectory -File -Recurse | Where-Object Name -ne 'provenance.json' | ForEach-Object { [ordered]@{ Path=[IO.Path]::GetRelativePath($payloadDirectory,$_.FullName); Sha256=(Get-FileHash -LiteralPath $_.FullName).Hash } })
 }
 $provenance | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $payloadDirectory 'provenance.json')
@@ -85,12 +90,13 @@ $inputMisses = @($candidate | Where-Object { $_.MaximumInputGapMilliseconds -gt 
 [ordered]@{
     Contract='continuous-layout-v2'; Source=$source; SourceDirty=$sourceDirty; Replication=$Replication; FirstOnly=[bool]$FirstOnly
     InitialOrder=$order; Provenance=$provenance; HarnessSha256=(Get-FileHash ([IO.Path]::ChangeExtension($exe,'.dll'))).Hash
+    Compilation=$Compilation
     OfficialRuntime=& dotnet --list-runtimes; OS=[Environment]::OSVersion.ToString(); CpuAvailable=[Environment]::ProcessorCount
     ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; Runs=$runs
 } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $output 'protocol-v2.json')
 $pairChecks = @($samples | Where-Object RunGroup -notin @('independent-uia','targeted-uia','extended-table-uia') | Group-Object { "$($_.RunGroup)|$($_.Fixture)|$($_.Repetition)|$($_.Edited)" } | ForEach-Object {
     $group = $_.Group
-    $mismatched = @('Width','Height','Dpi','Zoom','Appearance','Runtime','WpfFrameworkSha256','WpfFormattingSha256','ProductSha256','SourceRevision','SourceDirty','CpuAvailable','Cpu','OS','ImageOS','ImageVersion','HostMachine') | Where-Object { @($group | Select-Object -ExpandProperty $_ -Unique).Count -ne 1 }
+    $mismatched = @('Width','Height','Dpi','Zoom','Appearance','Runtime','WpfFrameworkSha256','WpfFormattingSha256','ProductSha256','SourceRevision','SourceDirty','CompilationConfiguration','CpuAvailable','Cpu','OS','ImageOS','ImageVersion','HostMachine') | Where-Object { @($group | Select-Object -ExpandProperty $_ -Unique).Count -ne 1 }
     [ordered]@{ MismatchedControlledFields=@($mismatched); Key=$_.Name; Pass=@($mismatched).Count -eq 0 -and $group.Count -eq 2 -and @($group | Select-Object -ExpandProperty Adapter -Unique).Count -eq 2 -and @($group | Select-Object -ExpandProperty FixtureSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty SourceSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty HarnessSha256 -Unique).Count -eq 1 }
 })
 $failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interaction-heartbeat-failure.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json } | Where-Object { @($_.InteractionInputGaps | Where-Object { $_ -gt 100 }).Count })
@@ -112,7 +118,7 @@ $reviewPath = Join-Path $root 'src/native/LensDocsStudio.LayoutExperiment/visual
 if (Test-Path -LiteralPath $reviewPath) {
     $visualReview = Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json
     if ($visualStatus -eq 'PENDING_VISUAL_REVIEW' -and $visualReview.Status -eq 'PASS' -and $visualReview.RenderingInputsSha256 -eq $visualInputsHash -and
-        $visualReview.WpfFrameworkSha256 -eq ($samples | Select-Object -First 1).WpfFrameworkSha256 -and $visualReview.ImageVersion -eq $env:ImageVersion -and
+        $visualReview.WpfFrameworkSha256 -eq ($samples | Select-Object -First 1).WpfFrameworkSha256 -and $visualReview.ImageVersion -eq $env:ImageVersion -and $visualReview.Compilation -eq $Compilation -and
         $visualReview.OriginalWorkloadsReviewed -eq 6 -and $visualReview.AppearancesReviewed -eq 3 -and $visualReview.CaptureManifestSha256 -match '^[A-Fa-f0-9]{64}$') { $visualStatus = 'PASS' }
 }
 $specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
