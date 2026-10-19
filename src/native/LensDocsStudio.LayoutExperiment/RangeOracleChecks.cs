@@ -17,14 +17,16 @@ internal static class RangeOracleChecks
     {
         var source = Source + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nFinal marker.\n";
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
-        var gaps = new List<double>(); var last = Stopwatch.GetTimestamp();
+        var gaps = new List<double>(); var timeline = new List<object>(); var candidateGaps = new List<double>(); var last = Stopwatch.GetTimestamp(); var phase = "setup";
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
-        timer.Tick += (_, _) => { var at = Stopwatch.GetTimestamp(); gaps.Add((at - last) * 1000d / Stopwatch.Frequency); last = at; }; timer.Start();
+        timer.Tick += (_, _) => { var at = Stopwatch.GetTimestamp(); var gap = (at - last) * 1000d / Stopwatch.Frequency; gaps.Add(gap);
+            timeline.Add(new { Phase = phase, StartTimestamp = last, EndTimestamp = at, Milliseconds = gap }); if (phase.StartsWith("candidate", StringComparison.Ordinal)) candidateGaps.Add(gap); last = at; }; timer.Start();
         try
         {
             foreach (var side in new[] { "stock", "candidate" })
             {
                 var folder = Path.Combine(output, side); Directory.CreateDirectory(folder);
+                phase = side + "-setup";
                 if (side == "stock")
                 {
                     var parsed = new MarkdownService().Parse(source);
@@ -35,22 +37,30 @@ internal static class RangeOracleChecks
                 }
                 else { window.Content = window.Scroller; window.BeginDocument(null); await window.Request(source); }
                 window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                phase = side + "-interaction";
+                using var acknowledgement = new InputAcknowledgement(window);
                 var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-                foreach (var argument in new[] { "--range-client", folder, Environment.ProcessId.ToString(), side }) start.ArgumentList.Add(argument);
+                foreach (var argument in new[] { "--range-client", folder, Environment.ProcessId.ToString(), side, acknowledgement.Name }) start.ArgumentList.Add(argument);
                 using var client = (await Task.Run(() => Process.Start(start)))!;
                 using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(120)); await client.WaitForExitAsync(deadline.Token);
+                Program.Write(Path.Combine(folder, "input-acknowledgements.json"), acknowledgement.Receipts);
                 if (client.ExitCode != 0) throw new IOException("Independent range oracle failed: " + side);
             }
+            await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Input); phase = "diagnostic-comparison";
             var stockRows = File.ReadAllText(Path.Combine(output, "stock", "operations.json"));
             var candidateRows = File.ReadAllText(Path.Combine(output, "candidate", "operations.json"));
             var matched = stockRows == candidateRows;
-            Program.Write(Path.Combine(output, "range-parity.json"), new { Status = matched ? "PASS" : "FAIL", OperationsEqual = matched, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps });
+            Program.Write(Path.Combine(output, "range-parity.json"), new { Status = matched ? "PASS" : "FAIL", OperationsEqual = matched,
+                InputProbe = "range-phase-v2: uninterrupted timer; candidate setup/interaction row separate from stock; held-modifier Input acknowledgements",
+                MaximumInputGapMilliseconds = candidateGaps.DefaultIfEmpty().Max(), CandidateInputGapsMilliseconds = candidateGaps,
+                WholeStockAndCandidateMaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), WholeScenarioInputGapsMilliseconds = gaps, Timeline = timeline });
             if (!matched) throw new IOException("Actual stock/candidate range or visual-direction keyboard operations differ; all rows retained.");
         }
         finally { timer.Stop(); }
     }
-    public static int Client(string output, int processId, string side)
+    public static int Client(string output, int processId, string side, string acknowledgementName)
     {
+        using var acknowledgement = new InputAcknowledgement(acknowledgementName);
         var rows = new List<object>();
         try
         {
@@ -64,7 +74,7 @@ internal static class RangeOracleChecks
                 var found = text.DocumentRange.FindText(target, false, false) ?? throw new IOException("Missing target " + target);
                 var expanded = found.Clone(); expanded.ExpandToEnclosingUnit(unit);
                 rows.Add(new { Target = target, Unit = unit.ToString(), Operation = "expand", Text = expanded.GetText(-1) });
-                foreach (var count in new[] { -1, 0, 1 })
+                foreach (var count in new[] { -2, -1, 0, 1, 2 })
                 foreach (var collapsed in new[] { false, true })
                 {
                     TextPatternRange Range() { var range = found.Clone(); if (collapsed) range.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start); return range; }
@@ -77,6 +87,32 @@ internal static class RangeOracleChecks
                     }
                 }
             }
+            foreach (var target in new[] { "bold", "code", "العربيّة", "Final marker." })
+            {
+                var range = text.DocumentRange.FindText(target, false, false)!;
+                rows.Add(new { Operation = "clone-compare", Target = target, Equal = range.Compare(range.Clone()) });
+                foreach (var operation in new[] { "add-selection", "remove-selection" })
+                {
+                    var status = "Succeeded";
+                    try { if (operation == "add-selection") range.AddToSelection(); else range.RemoveFromSelection(); }
+                    catch (InvalidOperationException) { status = "InvalidOperationException"; }
+                    rows.Add(new { Operation = operation, Target = target, Status = status });
+                }
+                foreach (var attribute in new[] { TextPattern.IsReadOnlyAttribute, TextPattern.IsHiddenAttribute, TextPattern.CultureAttribute, TextPattern.FontNameAttribute, TextPattern.FontSizeAttribute,
+                    TextPattern.FontWeightAttribute, TextPattern.IsItalicAttribute, TextPattern.IsSubscriptAttribute, TextPattern.IsSuperscriptAttribute,
+                    TextPattern.UnderlineStyleAttribute, TextPattern.StrikethroughStyleAttribute, TextPattern.ForegroundColorAttribute, TextPattern.BackgroundColorAttribute })
+                {
+                    var value = range.GetAttributeValue(attribute);
+                    var label = value == AutomationElement.NotSupported ? "NotSupported" : value == TextPattern.MixedAttributeValue ? "Mixed" : Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+                    rows.Add(new { Operation = "attribute", Target = target, Attribute = attribute.ProgrammaticName, Value = label });
+                    if (value == AutomationElement.NotSupported || value == TextPattern.MixedAttributeValue) continue;
+                    foreach (var backward in new[] { false, true })
+                    {
+                        var found = range.FindAttribute(attribute, value, backward);
+                        rows.Add(new { Operation = "find-attribute", Target = target, Attribute = attribute.ProgrammaticName, Backward = backward, Text = found?.GetText(-1) });
+                    }
+                }
+            }
             foreach (var shift in new[] { false, true })
             {
                 var caret = text.DocumentRange.FindText("Latin", false, false)!;
@@ -84,10 +120,20 @@ internal static class RangeOracleChecks
                 foreach (var key in new byte[] { 0x27, 0x25 })
                 for (var step = 0; step < 27; step++)
                 {
-                    if (shift) IndependentUiaClient.Chord(0x10, key); else IndependentUiaClient.Chord(key);
+                    if (shift) IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x10, key);
+                    else IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, key);
                     var selection = text.GetSelection().Single(); var prefix = text.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, selection, TextPatternRangeEndpoint.End);
                     rows.Add(new { Operation = shift ? "actual-shift-arrow" : "actual-arrow", Key = key, Step = step, Text = selection.GetText(-1), EndPrefix = prefix.GetText(-1) });
                 }
+            }
+            foreach (var keys in new byte[][] { [0x24], [0x23], [0x26], [0x28], [0x21], [0x22], [0x11,0x24], [0x11,0x23], [0x11,0x25], [0x11,0x27],
+                [0x10,0x24], [0x10,0x23], [0x10,0x26], [0x10,0x28], [0x11,0x10,0x25], [0x11,0x10,0x27] })
+            {
+                var caret = text.DocumentRange.FindText("Latin", false, false)!; caret.ScrollIntoView(true);
+                caret.MoveEndpointByRange(TextPatternRangeEndpoint.End, caret, TextPatternRangeEndpoint.Start); caret.Select(); document.SetFocus();
+                IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, keys);
+                var selection = text.GetSelection().Single(); var prefix = text.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, selection, TextPatternRangeEndpoint.End);
+                rows.Add(new { Operation = "actual-key-vector", Keys = string.Join('+', keys.Select(key => key.ToString("X2"))), Text = selection.GetText(-1), EndPrefix = prefix.GetText(-1) });
             }
             Program.Write(Path.Combine(output, "operations.json"), rows); return 0;
         }

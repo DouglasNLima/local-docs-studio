@@ -18,6 +18,7 @@ internal static class AppearanceChecks
                 && snapshot.Appearance == ExperimentAppearance.Capture(window.ThemePreference);
             invalid |= !current;
             installations.Add(new { snapshot.Version, snapshot.Appearance, Current = current, ActualOsHighContrast = ExperimentAppearance.ActualHighContrast,
+                PreparationAndLayoutStages = snapshot.Stages,
                 SourceHash = Program.Hash(System.Text.Encoding.UTF8.GetBytes(snapshot.Model.Source)), Thread = Environment.CurrentManagedThreadId, Timestamp = Stopwatch.GetTimestamp() });
         };
         var watch = Stopwatch.StartNew(); var last = 0d; var gaps = new List<double>(); var timeline = new List<object>(); var captures = new List<object>(); var phase = "Light";

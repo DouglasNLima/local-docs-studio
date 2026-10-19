@@ -16,7 +16,7 @@ internal static class DocumentLayout
         using var session = new Session(model, appearance, cancellation);
         var watch = Stopwatch.StartNew();
         var bottom = session.Block(model.Root, 28, 28, width - 56 - SystemParameters.VerticalScrollBarWidth, true);
-        cancellation.ThrowIfCancellationRequested(); session.Decorations.Freeze();
+        cancellation.ThrowIfCancellationRequested(); session.CompletePaint(); session.Decorations.Freeze();
         var snapshot = new LayoutSnapshot(model, session.Lines.ToImmutableArray(), width, bottom + 28, Environment.CurrentManagedThreadId,
             watch.Elapsed.TotalMilliseconds, version, appearance, new Dictionary<string, double>
             { ["FormatLineMilliseconds"] = session.FormatTicks * 1000d / Stopwatch.Frequency,
@@ -40,11 +40,13 @@ internal static class DocumentLayout
         public readonly List<ControlBox> Controls = [];
         public readonly HashSet<int> HiddenControlNodes = [];
         public readonly DrawingGroup Decorations = new();
+        private DrawingContext? paint;
         public long FormatTicks, GeometryTicks;
         private bool hidden;
         private bool cellHeader;
         public Session(ListModel model, string appearance, CancellationToken cancellation)
         {
+            paint = Decorations.Open();
             this.model = model; this.cancellation = cancellation; this.appearance = appearance; highContrast = appearance.StartsWith("HC:", StringComparison.Ordinal);
             foreground = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 0) : appearance == "Dark" ? "#E8EAED" : "#202124");
             surface = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 1) : appearance == "Dark" ? "#292B2F" : "#F3F4F6");
@@ -52,7 +54,12 @@ internal static class DocumentLayout
         }
         private static SolidColorBrush Brush(string colour) { var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colour)); brush.Freeze(); return brush; }
         private void Rectangle(Brush? fill, Pen? pen, Rect rectangle)
-        { if (hidden) return; using var dc = Decorations.Append(); dc.DrawRectangle(fill, pen, rectangle); }
+        { if (!hidden) paint!.DrawRectangle(fill, pen, rectangle); }
+        private void CellPaint(bool header, Rect rectangle)
+        {
+            if (header) Rectangle(surface, null, rectangle);
+            Rectangle(null, new Pen(Brush("#808080"), .5), new Rect(rectangle.X + .25, rectangle.Y + .25, Math.Max(0, rectangle.Width - .5), Math.Max(0, rectangle.Height - .5)));
+        }
         public double Block(SemanticNode node, double x, double top, double width, bool first = false, (bool Ordered, int Number)? marker = null, TextAlignment alignment = TextAlignment.Left)
         {
             cancellation.ThrowIfCancellationRequested(); var begin = top;
@@ -68,7 +75,7 @@ internal static class DocumentLayout
                     break;
                 case "Quote":
                     top += 4; top = Flow(node.Children, x + 15, top, width - 19, first, false, docTop: first);
-                    Rectangle(null, new Pen(Brush("#FF883E"), 3), new Rect(x + 1.5, begin, 0, top - begin + 4)); top += 4; break;
+                    Rectangle(Brush("#FF883E"), null, new Rect(x, begin, 3, top - begin + 4)); top += 4; break;
                 case "Details":
                     top += 15;
                     top = Block(node.Children[0], x + 11, top, width - 22, true);
@@ -83,7 +90,7 @@ internal static class DocumentLayout
                     top += 6;
                     var scale = Math.Min(width / media.Width, 900 / media.Height);
                     var rectangle = new Rect(x, top, media.Width * scale, media.Height * scale);
-                    if (!hidden) { using var dc = Decorations.Append(); dc.DrawImage(media, rectangle); }
+                    if (!hidden) paint!.DrawImage(media, rectangle);
                     var item = model.Items[node.Paragraph];
                     var drawing = new DrawingGroup(); drawing.Freeze();
                     Lines.Add(new(item.Start, item.Start + item.Length, node.Paragraph, top, rectangle.Height, rectangle.Height, drawing,
@@ -162,7 +169,7 @@ internal static class DocumentLayout
                 {
                     var rectangle = new Rect(left, rowTop, columns[column], bottom - rowTop);
                     Bounds[row.Children[column].Id] = rectangle;
-                    Rectangle(row.Level == 1 ? surface : null, new Pen(Brush("#808080"), .5), rectangle);
+                    CellPaint(row.Level == 1, rectangle);
                     left += columns[column];
                 }
                 Bounds[row.Id] = new Rect(x, rowTop, width, bottom - rowTop); top = bottom;
@@ -196,7 +203,7 @@ internal static class DocumentLayout
             {
                 var rectangle = new Rect(x + cell.Column * width / columns, rowTops[row], cell.ColumnSpan * width / columns,
                     rowTops[Math.Min(table.Children.Length, row + cell.RowSpan)] - rowTops[row]);
-                Bounds[cell.Id] = rectangle; Rectangle(header ? surface : null, new Pen(Brush("#808080"), .5), rectangle);
+                Bounds[cell.Id] = rectangle; CellPaint(header, rectangle);
             }
             return rowTops[^1];
         }
@@ -271,7 +278,8 @@ internal static class DocumentLayout
             finally { previous?.Dispose(); }
             return top;
         }
-        public void Dispose() => formatter.Dispose();
+        public void CompletePaint() { paint?.Close(); paint = null; }
+        public void Dispose() { CompletePaint(); formatter.Dispose(); }
     }
     private sealed class Properties : TextRunProperties
     {

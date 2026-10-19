@@ -40,6 +40,7 @@ internal sealed class ExperimentWindow : Window
     internal Action<long>? PreparationBoundaryForChecks { get; set; }
     private CancellationTokenSource? renderedCopy;
     private DispatcherOperation? appearanceRefresh;
+    private int appearanceQueued;
     public ExperimentWindow()
     {
         Title = "EXPERIMENT ONLY — Continuous TextFormatter layout";
@@ -81,7 +82,15 @@ internal sealed class ExperimentWindow : Window
         SystemParameters.StaticPropertyChanged += AppearanceChanged;
         SourceInitialized += (_, _) => ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).AddHook((IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled) =>
         { if (message is 0x001A or 0x0015 or 0x031A) ScheduleAppearance(); return IntPtr.Zero; });
-        Closed += (_, _) => { closed = true; appearanceRefresh?.Abort(); appearanceRefresh = null; renderedCopy?.Cancel(); Surface.CloseClipboard(); SystemParameters.StaticPropertyChanged -= AppearanceChanged; version++; if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); } pending?.Completion.TrySetCanceled(); pending = null; Surface.Install(null); Log("closed"); };
+        Closed += (_, _) =>
+        {
+            closed = true; appearanceRefresh?.Abort(); appearanceRefresh = null; renderedCopy?.Cancel(); Surface.CloseClipboard();
+            SystemParameters.StaticPropertyChanged -= AppearanceChanged; version++;
+            if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); }
+            pending?.Completion.TrySetCanceled(); pending = null; Surface.Install(null);
+            Scroller.Content = null; Surface.ReleaseOwner(); Content = null; LatestSource = ""; SourcePath = WorkspaceRoot = null; hasDocument = false;
+            Installed = null; CurrentFailure = null; PreparationRequested = null; PreparationBoundaryForChecks = null; Log("closed");
+        };
     }
     public DiagnosticView CaptureView()
     {
@@ -129,9 +138,9 @@ internal sealed class ExperimentWindow : Window
     private void ScheduleAppearance()
     {
         if (closed || Dispatcher.HasShutdownStarted) return;
-        if (appearanceRefresh?.Status == DispatcherOperationStatus.Pending) { Trace?.Stage("appearance-notification-coalesced"); return; }
+        if (Interlocked.CompareExchange(ref appearanceQueued, 1, 0) != 0) { Trace?.Stage("appearance-notification-coalesced"); return; }
         Trace?.Stage("appearance-notification-queued");
-        appearanceRefresh = Dispatcher.InvokeAsync(() => { appearanceRefresh = null; RefreshAppearance(); }, DispatcherPriority.Background);
+        appearanceRefresh = Dispatcher.InvokeAsync(() => { Volatile.Write(ref appearanceQueued, 0); appearanceRefresh = null; RefreshAppearance(); }, DispatcherPriority.Background);
     }
     private void RefreshAppearance()
     {

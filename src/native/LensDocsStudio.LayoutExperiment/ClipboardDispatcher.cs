@@ -17,7 +17,7 @@ internal sealed class ClipboardDispatcher : IDisposable
     private TaskCompletionSource<ClipboardCommit>? queuedCompletion;
     private bool closed;
     public ClipboardCommit? LastCommit { get; private set; }
-    private readonly Action? beforeCommitForChecks;
+    private Action? beforeCommitForChecks;
     public ClipboardDispatcher(Action? beforeCommitForChecks = null)
     {
         this.beforeCommitForChecks = beforeCommitForChecks;
@@ -71,6 +71,7 @@ internal sealed class ClipboardDispatcher : IDisposable
         lock (gate)
         {
             if (closed) return; closed = true;
+            beforeCommitForChecks = null;
             if (queued?.Status == DispatcherOperationStatus.Pending) { queued.Abort(); queuedCompletion?.TrySetCanceled(); }
             queued = null; queuedCompletion = null;
         }

@@ -83,7 +83,8 @@ internal static class LifecycleChecks
         await Wait(() => window.Events.Any(item => item.Event == "worker-format-started" && item.Version == activeVersion));
         window.Close(); await closeWork;
         if (window.CurrentWork is { } work) await work;
-        if (window.Surface.Snapshot is not null) throw new IOException("Closed surface retained its layout.");
+        if (window.Surface.Snapshot is not null || window.Surface.Parent is not null || window.Surface.Scroller is not null || window.Scroller.Content is not null || window.LatestSource.Length != 0)
+            throw new IOException("Closed surface retained its layout, owner tree or source.");
         var events = window.Events.ToArray();
         var cancellation = events.Where(item => item.Event == "cancellation-requested").GroupBy(item => item.Version).Select(group =>
         {

@@ -23,10 +23,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args.Length > 4 ? args[4] : "list");
-        if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]));
+        if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args[4], args[5]);
+        if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]), args[3]);
         if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4]);
-        if (args.FirstOrDefault() == "--range-client") return RangeOracleChecks.Client(args[1], int.Parse(args[2]), args[3]);
+        if (args.FirstOrDefault() == "--range-client") return RangeOracleChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
+        if (args.FirstOrDefault() == "--link-client") return LinkChecks.Client(args[1], long.Parse(args[2]), args[3], args[4]);
         if (args.FirstOrDefault() == "--stock-serialisation-oracle")
         {
             try { _ = IndependentUiaClient.StockOracle(args[1]); return 0; }
@@ -48,7 +49,9 @@ internal static class Program
             if (started) return; started = true;
             try
             {
-                if (args.Contains("--range-checks")) await RangeOracleChecks.Run(window, output);
+                if (args.Contains("--link-checks")) await LinkChecks.Run(window, output);
+                else if (args.Contains("--visual-checks")) await VisualChecks.Run(window, output);
+                else if (args.Contains("--range-checks")) await RangeOracleChecks.Run(window, output);
                 else if (args.Contains("--media-controls")) await MediaControlChecks.Run(window, output);
                 else if (args.Contains("--media-checks")) await MediaChecks.Run(window, output);
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
@@ -168,13 +171,15 @@ internal static class Program
             {
                 interactionAllocated = GC.GetTotalAllocatedBytes(); interactionCollections = Enumerable.Range(0, 3).Select(GC.CollectionCount).ToArray();
                 gaps.Clear(); lastInput = watch.Elapsed.TotalMilliseconds; timer.Start();
+                using var acknowledgement = new InputAcknowledgement(window);
                 var executable = Environment.ProcessPath!;
                 var start = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true };
-                foreach (var arg in new[] { "--uia-client", output, Environment.ProcessId.ToString(), Hash(Encoding.UTF8.GetBytes(snapshot!.Model.Text[..LayoutAutomationPeer.TextEnd(snapshot)])), scenario }) start.ArgumentList.Add(arg);
+                foreach (var arg in new[] { "--uia-client", output, Environment.ProcessId.ToString(), Hash(Encoding.UTF8.GetBytes(snapshot!.Model.Text[..LayoutAutomationPeer.TextEnd(snapshot)])), scenario, acknowledgement.Name }) start.ArgumentList.Add(arg);
                 using var client = (await Task.Run(() => Process.Start(start)))!;
                 using var clientDeadline = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 try { await client.WaitForExitAsync(clientDeadline.Token); }
                 catch (OperationCanceledException) { client.Kill(true); throw new TimeoutException("Independent UIA client exceeded its external 60-second bound."); }
+                finally { Write(Path.Combine(output, "input-acknowledgements.json"), acknowledgement.Receipts); }
                 if (client.ExitCode != 0)
                 {
                     Write(Path.Combine(output, "interaction-heartbeat-failure.json"), new { TimingInputGaps = timingGaps, InteractionInputGaps = gaps, InteractionObserved = uia && adapter == "candidate", InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, InteractionAllocatedBytes = GC.GetTotalAllocatedBytes() - interactionAllocated, InteractionNaturalCollections = Enumerable.Range(0, 3).Select(i => GC.CollectionCount(i) - interactionCollections[i]).ToArray(), CompleteLayout = complete, PreparationPresentation = readiness });

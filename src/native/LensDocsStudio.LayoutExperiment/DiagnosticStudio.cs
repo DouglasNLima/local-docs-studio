@@ -51,34 +51,43 @@ internal sealed class DiagnosticStudio
         search.TextChanged += (_, _) => { window.Surface.Search(search.Text); };
         outline.SelectionChanged += (_, _) => { if (outline.SelectedItem is DocumentHeading heading) { window.Surface.NavigateSource(heading.SourceStart); editor.Select(heading.SourceStart, 0); editor.ScrollToLine(heading.SourceLine + 1); } };
         window.Surface.SelectionUpdated += () => { if (window.Surface.Snapshot is not { } displayed || displayed.Model.Source != editor.Text || !window.Surface.IsKeyboardFocusWithin) return; editor.Select(window.Surface.SelectionSourceStart, Math.Max(0, window.Surface.SelectionSourceEnd - window.Surface.SelectionSourceStart)); };
-        window.Surface.Activated += node =>
+        window.Surface.Activated += async node =>
         {
+            var version = window.CurrentVersion;
             if (node.Kind == "Link" && node.Target is { } target && !target.StartsWith('#'))
             {
                 try
                 {
                     if (Uri.TryCreate(target, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" or "mailto")
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+                    {
+                        // Preserve the existing native external-link confirmation route.
+                        if (new DesktopDialogs { Owner = window }.Confirm("Open this external link in its default application?\n\n" + target, "External link")
+                            && version == window.CurrentVersion)
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+                    }
                     else if (window.SourcePath is { } sourcePath && window.WorkspaceRoot is { } workspace)
                     {
                         var linked = new LensDocsStudio.Core.Workspace.WorkspacePath(workspace).ResolveLink(sourcePath, target);
                         if (new FileInfo(linked).Length > 4 * 1024 * 1024 || Path.GetExtension(linked).ToLowerInvariant() is not (".md" or ".markdown" or ".txt")) throw new IOException("Open a supported Markdown document within the selected workspace.");
-                        Open(Path.GetFileName(linked), File.ReadAllText(linked), linked, root: workspace);
+                        var document = await new LensDocsStudio.Core.Workspace.DocumentStore(window.ExportRecoveryDirectory).ReadAsync(linked);
+                        if (version == window.CurrentVersion) Open(Path.GetFileName(linked), document.Text, linked, root: workspace);
                     }
                     else status.Text = "Choose a workspace source path before opening a relative link.";
                 }
-                catch (Exception error) { status.Text = error.Message; }
+                catch (Exception error) { if (version == window.CurrentVersion) status.Text = error.Message; }
             }
         };
         window.Installed += snapshot => { outline.ItemsSource = snapshot.Model.Headings; window.Surface.Search(search.Text); status.Text = $"Complete version {snapshot.Version}; {snapshot.Appearance}; {snapshot.Model.Items.Length} text blocks; source unchanged"; };
+        window.PreparationRequested += () => status.Text = $"Preparing version {window.CurrentVersion}; {window.ThemePreference}";
         window.CurrentFailure += message => status.Text = message;
         Open(path is null ? "Diagnostic document" : System.IO.Path.GetFileName(path), source, path);
 
         void Add(string label, Action action) { var button = new Button { Content = label, Margin = new(3) }; AutomationProperties.SetAutomationId(button, "Experimental" + label.Replace(" ", "", StringComparison.Ordinal)); button.Click += (_, _) => action(); tools.Children.Add(button); }
         async Task Prepare()
         {
+            var session = activeSession; var version = window.CurrentVersion + 1;
             try { if (current >= 0) await window.Request(editor.Text, theme.SelectedItem as string ?? "Light"); }
-            catch (Exception error) { status.Text = error.Message; }
+            catch (Exception error) { if (ReferenceEquals(session, activeSession) && version == window.CurrentVersion) status.Text = error.Message; }
         }
     }
     private void Open(string name, string source, string? path, DiagnosticView? view = null, string? root = null)
@@ -94,7 +103,12 @@ internal sealed class DiagnosticStudio
         finally { switching = false; }
         _ = RequestCurrent();
     }
-    private async Task RequestCurrent() { try { await window.Request(editor.Text, window.ThemePreference); } catch (Exception error) { status.Text = error.Message; } }
+    private async Task RequestCurrent()
+    {
+        var session = activeSession; var version = window.CurrentVersion + 1;
+        try { await window.Request(editor.Text, window.ThemePreference); }
+        catch (Exception error) { if (ReferenceEquals(session, activeSession) && version == window.CurrentVersion) status.Text = error.Message; }
+    }
     private void CloseDocument()
     {
         if (current < 0) return;

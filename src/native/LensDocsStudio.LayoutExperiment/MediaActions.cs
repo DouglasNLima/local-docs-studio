@@ -51,9 +51,12 @@ internal sealed class MediaActions
             if (accepted != true) return;
             var output = dialog.FileName;
             if (!Path.GetExtension(output).Equals("." + box.Label, StringComparison.OrdinalIgnoreCase)) throw new IOException("Choose the matching diagram extension.");
-            owner.Trace?.Stage("media-existing-file-read-enter", new { Output = output });
-            var expected = await LensDocsStudio.Core.Exports.ExportFileStore.ReadExistingAsync(output, cancellation);
-            owner.Trace?.Stage("media-existing-file-read-exit");
+            var expected = await Task.Run(async () =>
+            {
+                owner.Trace?.Stage("media-existing-file-read-enter", new { Output = output });
+                try { return await LensDocsStudio.Core.Exports.ExportFileStore.ReadExistingAsync(output, cancellation); }
+                finally { owner.Trace?.Stage("media-existing-file-read-exit"); }
+            }, cancellation);
             owner.Surface.InteractionStages.Add(new { Stage = "media-save-accepted", box.Label, Output = output, Version = snapshot.Version, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
             var bytes = await ExperimentWindow.Worker(() =>
             {
@@ -68,9 +71,13 @@ internal sealed class MediaActions
             owner.Trace?.Stage("media-worker-delivered", new { box.Label, Bytes = bytes.Length });
             cancellation.ThrowIfCancellationRequested();
             if (!ReferenceEquals(owner.Surface.Snapshot, snapshot) || snapshot.Version != owner.CurrentVersion) throw new IOException("The diagram changed before export completed.");
-            owner.Trace?.Stage("media-write-enter", new { box.Label, Output = output });
-            await new LensDocsStudio.Core.Exports.ExportFileStore(owner.ExportRecoveryDirectory).WriteAsync(output, bytes, expected, cancellation);
-            owner.Trace?.Stage("media-write-exit", new { box.Label });
+            var recovery = owner.ExportRecoveryDirectory;
+            await Task.Run(async () =>
+            {
+                owner.Trace?.Stage("media-write-enter", new { box.Label, Output = output });
+                try { await new LensDocsStudio.Core.Exports.ExportFileStore(recovery).WriteAsync(output, bytes, expected, cancellation); }
+                finally { owner.Trace?.Stage("media-write-exit", new { box.Label }); }
+            }, cancellation);
             owner.Surface.InteractionStages.Add(new { Stage = "media-save-completed", box.Label, Output = output, Bytes = bytes.Length, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
         }
         catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)

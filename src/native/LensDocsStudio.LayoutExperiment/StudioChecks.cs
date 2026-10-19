@@ -33,8 +33,9 @@ internal static class StudioChecks
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
         timer.Tick += (_, _) => { var at = watch.Elapsed.TotalMilliseconds; gaps.Add(at - last); timeline.Add(new { Timestamp = Stopwatch.GetTimestamp(), GapMilliseconds = at - last }); last = at; };
         timer.Start();
+        using var acknowledgement = new InputAcknowledgement(window);
         var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in new[] { "--studio-client", output, Environment.ProcessId.ToString() }) start.ArgumentList.Add(argument);
+        foreach (var argument in new[] { "--studio-client", output, Environment.ProcessId.ToString(), acknowledgement.Name }) start.ArgumentList.Add(argument);
         using var client = (await Task.Run(() => Process.Start(start)))!;
         try
         {
@@ -49,10 +50,11 @@ internal static class StudioChecks
             Program.Write(Path.Combine(output, "studio.json"), new { Status = "FAIL", Error = error.ToString(), Installations = installations,
                 MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, InputTimeline = timeline, Events = window.Events.ToArray() }); throw;
         }
-        finally { timer.Stop(); }
+        finally { timer.Stop(); Program.Write(Path.Combine(output, "input-acknowledgements.json"), acknowledgement.Receipts); }
     }
-    public static int Client(string output, int processId)
+    public static int Client(string output, int processId, string acknowledgementName)
     {
+        using var acknowledgement = new InputAcknowledgement(acknowledgementName);
         var checks = new List<string>(); var stages = new List<object>();
         void Stage(string stage) { stages.Add(new { Stage = stage, Timestamp = Stopwatch.GetTimestamp() }); Program.Write(Path.Combine(output, "studio-client-stages.json"), stages); }
         try
@@ -69,7 +71,9 @@ internal static class StudioChecks
             using var clipboard = new IndependentUiaClient.ClipboardOwner();
             void ReplaceSource(string value)
             {
-                clipboard.SetSentinel(value); var bounds = editor.Current.BoundingRectangle; SetPhysicalCursorPos((int)bounds.Left + 80, (int)bounds.Top + 25); mouse_event(2, 0, 0, 0, UIntPtr.Zero); mouse_event(4, 0, 0, 0, UIntPtr.Zero); IndependentUiaClient.Chord(0x11, 0x41); IndependentUiaClient.Chord(0x11, 0x56);
+                clipboard.SetSentinel(value); var bounds = editor.Current.BoundingRectangle; SetPhysicalCursorPos((int)bounds.Left + 80, (int)bounds.Top + 25); mouse_event(2, 0, 0, 0, UIntPtr.Zero); mouse_event(4, 0, 0, 0, UIntPtr.Zero);
+                acknowledgement.AfterRealInput(process.MainWindowHandle);
+                IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x11, 0x41); IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x11, 0x56);
             }
             var original = File.ReadAllText(Path.Combine(output, "source.md"));
             Stage("search");
@@ -110,6 +114,18 @@ internal static class StudioChecks
             IndependentUiaClient.Wait(() => Content().Contains("Rapid edit winning.", StringComparison.Ordinal));
             if (Content().Contains("Rapid edit zero.", StringComparison.Ordinal)) throw new IOException("Obsolete source installed.");
             checks.Add("Real source input, replacements and winning current preview");
+            var held = new List<System.Windows.Automation.Text.TextPatternRange>();
+            for (var replacement = 0; replacement < 12; replacement++)
+            {
+                held.Add(Text().DocumentRange.Clone()); var marker = "Retained range replacement " + replacement + ".";
+                ReplaceSource(second + "\n" + marker + "\n"); IndependentUiaClient.Wait(() => Content().Contains(marker, StringComparison.Ordinal));
+                foreach (var range in held)
+                {
+                    var unavailable = false; try { range.GetText(-1); } catch (ElementNotAvailableException) { unavailable = true; }
+                    if (!unavailable) throw new IOException("A retained independent range survived studio replacement.");
+                }
+            }
+            checks.Add("Twelve retained independent ranges remain unavailable through repeated studio replacement; no forced collection");
             Stage("complete"); Program.Write(Path.Combine(output, "studio-client.json"), new { Status = "PASS", Checks = checks }); return 0;
         }
         catch (Exception error) { Program.Write(Path.Combine(output, "studio-client.json"), new { Status = "FAIL", Checks = checks, Error = error.ToString() }); return 1; }

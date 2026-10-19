@@ -77,7 +77,10 @@ internal static class MediaChecks
                 AutomationElement? fileName = null;
                 IndependentUiaClient.Wait(() => (fileName = dialogue!.FindFirst(TreeScope.Descendants, new AndCondition(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit), new PropertyCondition(AutomationElement.NameProperty, "File name:"))))?.Current.IsEnabled == true);
                 fileName!.SetFocus(); IndependentUiaClient.Wait(() => fileName.Current.HasKeyboardFocus);
-                clipboard.SetSentinel(path); IndependentUiaClient.Chord(0x11, 0x41); IndependentUiaClient.Chord(0x11, 0x56);
+                At("filename-clipboard-enter", new { OleThread = clipboard.ThreadId, Sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence });
+                clipboard.SetSentinel(path);
+                At("filename-clipboard-exit", new { OleThread = clipboard.ThreadId, Sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence });
+                IndependentUiaClient.Chord(0x11, 0x41); IndependentUiaClient.Chord(0x11, 0x56);
                 IndependentUiaClient.Wait(() => ((ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern)).Current.Value == path);
                 At("dialogue-real-input-confirmed", new { format, cancel, Value = path });
                 var save = dialogue!.FindFirst(TreeScope.Descendants, new AndCondition(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button), new PropertyCondition(AutomationElement.AutomationIdProperty, "1")))!;

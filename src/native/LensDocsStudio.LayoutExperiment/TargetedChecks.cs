@@ -13,7 +13,7 @@ namespace LensDocsStudio.LayoutExperiment;
 
 internal static class TargetedChecks
 {
-    public static async Task Run(ExperimentWindow window, string output, bool all = false, string? scenario = null)
+    public static async Task Run(ExperimentWindow window, string output, bool all = false, string? scenario = null, string appearance = "Light")
     {
         var results = new List<object>(); var failed = false;
         if (scenario is not null && !TargetedFixtures.Cases.Any(value => value.Name == scenario) && !all) throw new ArgumentException("Unknown targeted parity scenario: " + scenario);
@@ -25,15 +25,18 @@ internal static class TargetedChecks
             {
                 if (all && !TargetedFixtures.Cases.Any(value => value.Name == fixture.Name)) _ = LensDocsStudio.Native.Validation.ContinuousPreviewFixtures.Create(destination, fixture.Name);
                 var path = Path.Combine(destination, "fixture.md"); File.WriteAllText(path, fixture.Source);
-                var parsed = new MarkdownService().Parse(fixture.Source); var prepared = await ExperimentWindow.Worker(() => StockPreparation.Create(parsed, path, destination));
-                var stock = await new NativeMarkdownRenderer(new NativeSvgService()).RenderAsync(parsed, false, prepared.Diagrams, _ => { }, (_, _) => { },
+                var dark = ExperimentAppearance.IsDark(appearance);
+                var parsed = new MarkdownService().Parse(fixture.Source); var prepared = await ExperimentWindow.Worker(() => StockPreparation.Create(parsed, path, destination, dark));
+                var stock = await new NativeMarkdownRenderer(new NativeSvgService()).RenderAsync(parsed, dark, prepared.Diagrams, _ => { }, (_, _) => { },
                     preparedDrawings: prepared.Drawings, preparedImages: prepared.Images, codeSyntax: prepared.Syntax);
-                var viewer = new FlowDocumentScrollViewer { Document = stock.Document, Width = 640, Height = 300, IsToolBarVisible = false };
+                var background = appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(appearance, 1) : dark ? "#202124" : "#FFFFFF";
+                var viewer = new FlowDocumentScrollViewer { Document = stock.Document, Width = 640, Height = 300, IsToolBarVisible = false,
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(background)) };
                 window.Content = viewer; window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 var stockText = new TextRange(stock.Document.ContentStart, stock.Document.ContentEnd).Text;
                 var scrolling = (ScrollViewer)viewer.Template.FindName("PART_ContentHost", viewer);
                 var stockHeight = scrolling.ExtentHeight; Program.Capture(viewer, Path.Combine(destination, "stock.png"));
-                var snapshot = await ExperimentWindow.Worker(() => CompleteLayout.Format(CompleteLayout.Parse(fixture.Source, CancellationToken.None, path, destination), 640, 1, "Light", CancellationToken.None));
+                var snapshot = await ExperimentWindow.Worker(() => CompleteLayout.Format(CompleteLayout.Parse(fixture.Source, CancellationToken.None, path, destination, appearance), 640, 1, appearance, CancellationToken.None));
                 var checks = new List<string>();
                 var expected = Regex.Replace(stockText, @"(?m)^\t*(?:•|\d+\.)\t", "");
                 Program.Write(Path.Combine(destination, "raw-comparison.json"), new { StockText = stockText, CandidateText = snapshot.Model.Text,
@@ -75,8 +78,19 @@ internal static class TargetedChecks
                     var stops = StringInfo.ParseCombiningCharacters(logicalText.Substring(item.Start, item.Length)).Select(at => at + item.Start).Append(item.Start + item.Length).ToHashSet();
                     Require(linesByItem[itemIndex].SelectMany(line => line.Carets).All(caret => stops.Contains(caret.Offset)), "No surrogate/combining/ZWJ split", checks);
                 }
+                var distantLiteral = stock.TextMap.Literals.LastOrDefault();
+                if (distantLiteral is not null)
+                {
+                    distantLiteral.Run.BringIntoView(); viewer.Selection.Select(distantLiteral.Start, distantLiteral.End); viewer.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(viewer, Path.Combine(destination, "stock-distant-selected.png"));
+                }
                 window.Content = window.Scroller; window.InstallMeasured(snapshot); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 Program.Capture(window.Scroller, Path.Combine(destination, "candidate.png"));
+                if (distantLiteral is not null)
+                {
+                    window.Surface.SelectSource(distantLiteral.Source.Start, distantLiteral.Source.End); window.Surface.Reveal(window.Surface.Start); window.Surface.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(window.Scroller, Path.Combine(destination, "candidate-distant-selected.png"));
+                }
                 foreach (var media in snapshot.Model.Root.Descendants().Where(node => node.Kind == "Media"))
                 {
                     window.Surface.Reveal(media.Start); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);

@@ -21,6 +21,7 @@ internal static class IndependentUiaClient
     {
         private readonly System.Windows.Threading.Dispatcher dispatcher;
         private readonly Thread thread;
+        public int ThreadId => thread.ManagedThreadId;
         public ClipboardOwner()
         {
             var ready = new TaskCompletionSource<System.Windows.Threading.Dispatcher>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -38,8 +39,21 @@ internal static class IndependentUiaClient
         foreach (var key in keys) { Key(key); Thread.Sleep(30); }
         foreach (var key in keys.Reverse()) { Key(key, true); Thread.Sleep(30); }
     }
-    public static int Run(string output, int processId, string expectedHash, string scenario)
+    internal static void ChordObserved(InputAcknowledgement acknowledgement, IntPtr window, params byte[] keys)
     {
+        // Modifiers remain physically held until the target has delivered Input.
+        // A UIA read after key release alone cannot establish that ordering.
+        try
+        {
+            foreach (var key in keys) { Key(key); Thread.Sleep(30); }
+            acknowledgement.AfterRealInput(window);
+        }
+        finally { foreach (var key in keys.Reverse()) { Key(key, true); Thread.Sleep(30); } }
+        acknowledgement.AfterRealInput(window);
+    }
+    public static int Run(string output, int processId, string expectedHash, string scenario, string acknowledgementName)
+    {
+        using var acknowledgement = new InputAcknowledgement(acknowledgementName);
         SetThreadDpiAwarenessContext(new IntPtr(-4)); // UIA rectangles are physical screen coordinates.
         using var clipboardOwner = new ClipboardOwner();
         var checks = new List<string>(); var stages = new List<object>();
@@ -152,8 +166,9 @@ internal static class IndependentUiaClient
             var first = text.DocumentRange.FindText(names.Item1, false, false)!; first.ScrollIntoView(true);
             SetForegroundWindow(target.MainWindowHandle); document.SetFocus();
             Wait(() => AutomationElement.FocusedElement.Current.ProcessId == processId);
-            Chord(0x11, 0x24); // Ctrl+Home
-            Chord(0x10, 0x28); // Shift+Down across the first list boundary
+            var insertion = first.Clone(); insertion.MoveEndpointByRange(TextPatternRangeEndpoint.End, insertion, TextPatternRangeEndpoint.Start); insertion.Select();
+            ChordObserved(acknowledgement, target.MainWindowHandle, 0x11, 0x24); // Stock read-only Ctrl+Home scrolls; insertion is explicitly selected above.
+            ChordObserved(acknowledgement, target.MainWindowHandle, 0x10, 0x28); // Shift+Down across the first boundary.
             Wait(() => text.GetSelection().Single().GetText(-1).Contains("\r\n", StringComparison.Ordinal));
             checks.Add("Real keyboard extension across items, focus retained");
             Trace("mouse");
@@ -164,10 +179,12 @@ internal static class IndependentUiaClient
             Program.Write(Path.Combine(output, "mouse-drag-geometry.json"), new { First = a.ToString(), Second = b.ToString(), Document = document.Current.BoundingRectangle.ToString(), Foreground = GetForegroundWindow().ToInt64(), ExpectedWindow = target.MainWindowHandle.ToInt64() });
             Require(GetForegroundWindow() == target.MainWindowHandle && document.Current.BoundingRectangle.Contains(a.TopLeft) && document.Current.BoundingRectangle.Contains(b.BottomRight), "Real foreground and physical drag points remain in the shown document", checks);
             SetPhysicalCursorPos((int)a.Left + 1, (int)(a.Top + a.Height / 2)); mouse_event(2, 0, 0, 0, UIntPtr.Zero);
+            acknowledgement.AfterRealInput(target.MainWindowHandle);
             for (var step = 1; step <= 8; step++)
             { SetPhysicalCursorPos((int)(a.Left + (b.Right - a.Left) * step / 8), (int)(a.Top + a.Height / 2 + (b.Top - a.Top) * step / 8)); Thread.Sleep(15); }
             mouse_event(4, 0, 0, 0, UIntPtr.Zero);
-            Wait(() => text.GetSelection().Single().GetText(-1).Contains("\r\n", StringComparison.Ordinal));
+            acknowledgement.AfterRealInput(target.MainWindowHandle);
+            Wait(() => { var selected = text.GetSelection().Single().GetText(-1); return selected.Contains("\r\n", StringComparison.Ordinal) && selected.Contains(names.Item1, StringComparison.Ordinal) && selected.Contains(names.Item2, StringComparison.Ordinal); });
             checks.Add("Real mouse drag across items");
             Trace("select-all");
             Chord(0x11, 0x41); Wait(() => text.GetSelection().Single().GetText(-1) == actual);

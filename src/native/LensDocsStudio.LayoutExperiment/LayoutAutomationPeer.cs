@@ -30,6 +30,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
     public void Changed()
     {
         peers = []; nodes = surface.Snapshot?.Model.Root.Descendants().ToDictionary(node => node.Id) ?? [];
+        ResetChildrenCache(); InvalidatePeer();
         RaiseAutomationEvent(AutomationEvents.TextPatternOnTextChanged);
     }
     public void SelectionChanged() => RaiseAutomationEvent(AutomationEvents.TextPatternOnTextSelectionChanged);
@@ -53,8 +54,16 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         throw new ArgumentException("The element is not a child of the current document.");
     }
     internal TextRange Range(int start, int end) => new(this, surface.Snapshot, Math.Min(start, TextEnd(surface.Snapshot)), Math.Min(end, TextEnd(surface.Snapshot)));
-    internal IRawElementProviderSimple[] Children(int start, int end) => nodes.Values.Where(node => node.Start >= start && node.End <= end && node.Kind is "List" or "Table" or "Image" or "Media" or "Link" or "Heading" or "Details")
-        .Select(node => Provider(Peer(node))).ToArray();
+    internal IRawElementProviderSimple[] Children(int start, int end)
+    {
+        if (start == end) return [];
+        var enclosing = nodes.Values.Where(node => node.Start <= start && node.End >= end).MinBy(node => node.End - node.Start);
+        var children = nodes.Values.Where(node => node.Start < end && node.End > start && node.Id != enclosing?.Id
+            && (enclosing is null || node.Start >= enclosing.Start && node.End <= enclosing.End)
+            && node.Kind is "List" or "Table" or "Image" or "Media" or "Link" or "Heading" or "Details").ToArray();
+        return children.Where(node => !children.Any(parent => parent.Id != node.Id && parent.Start <= node.Start && parent.End >= node.End))
+            .Select(node => Provider(Peer(node))).ToArray();
+    }
     internal IRawElementProviderSimple Enclosing(int start, int end)
     {
         var node = nodes.Values.Where(node => node.Start <= start && node.End >= end).MinBy(node => node.End - node.Start);
@@ -81,10 +90,11 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
     }
     private sealed class NodePeer : SemanticPeer, ITableProvider, ITableItemProvider, IInvokeProvider, IExpandCollapseProvider
     {
-        private readonly LayoutAutomationPeer root;
+        private readonly WeakReference<LayoutAutomationPeer> rootIdentity;
+        private LayoutAutomationPeer root => rootIdentity.TryGetTarget(out var value) ? value : throw new ElementNotAvailableException();
         private readonly WeakReference<LayoutSnapshot> identity;
         private readonly int id;
-        public NodePeer(LayoutAutomationPeer root, LayoutSnapshot snapshot, int id) { this.root = root; identity = new(snapshot); this.id = id; }
+        public NodePeer(LayoutAutomationPeer root, LayoutSnapshot snapshot, int id) { rootIdentity = new(root); identity = new(snapshot); this.id = id; }
         private LayoutSnapshot Current => identity.TryGetTarget(out var value) && ReferenceEquals(root.Surface.Snapshot, value) ? value : throw new ElementNotAvailableException();
         private SemanticNode Node { get { _ = Current; return root.nodes[id]; } }
         public override object? GetPattern(PatternInterface pattern) => pattern switch
@@ -157,17 +167,33 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
 
     internal sealed class TextRange(LayoutAutomationPeer peer, LayoutSnapshot? snapshot, int start, int end) : ITextRangeProvider
     {
+        private readonly WeakReference<LayoutAutomationPeer> owner = new(peer);
+        private LayoutAutomationPeer Peer => owner.TryGetTarget(out var value) ? value : throw new ElementNotAvailableException();
         private int start = start, end = end;
         private bool formatBackward = true;
+        // A styled-run edge and its text insertion point can share one text/source
+        // offset. Preserve that real semantic boundary in endpoint comparison.
+        private int startOrder = BeforeRun(snapshot, start);
+        private int endOrder = start == end ? BeforeRun(snapshot, start) : 0;
+        private static int BeforeRun(LayoutSnapshot? snapshot, int at) => snapshot?.Model.Items.SelectMany(item => item.Runs).Any(run => run.Start == at) == true ? -1 : 0;
+        private void OrderEndpoints(TextPatternRangeEndpoint changed)
+        {
+            if ((start, startOrder).CompareTo((end, endOrder)) <= 0) return;
+            if (changed == TextPatternRangeEndpoint.Start) { end = start; endOrder = startOrder; }
+            else { start = end; startOrder = endOrder; }
+        }
         private readonly WeakReference<LayoutSnapshot>? identity = snapshot is null ? null : new(snapshot);
         private LayoutSnapshot? Identity => identity is not null && identity.TryGetTarget(out var value) ? value : null;
-        private LayoutSnapshot Current => Identity is { } current && ReferenceEquals(peer.Surface.Snapshot, current) ? current : throw new ElementNotAvailableException();
-        public ITextRangeProvider Clone() => new TextRange(peer, Current, start, end) { formatBackward = formatBackward };
+        private LayoutSnapshot Current => Identity is { } current && ReferenceEquals(Peer.Surface.Snapshot, current) ? current : throw new ElementNotAvailableException();
+        public ITextRangeProvider Clone() => new TextRange(Peer, Current, start, end) { formatBackward = formatBackward, startOrder = startOrder, endOrder = endOrder };
         private TextRange Other(ITextRangeProvider other)
         { _ = Current; return other is TextRange range && ReferenceEquals(range.Identity, Identity) ? range : throw new ArgumentException("Ranges belong to different documents."); }
-        public bool Compare(ITextRangeProvider range) { var other = Other(range); return start == other.start && end == other.end; }
+        public bool Compare(ITextRangeProvider range) { var other = Other(range); return start == other.start && end == other.end && startOrder == other.startOrder && endOrder == other.endOrder; }
         public int CompareEndpoints(TextPatternRangeEndpoint endpoint, ITextRangeProvider targetRange, TextPatternRangeEndpoint targetEndpoint)
-        { var other = Other(targetRange); return (endpoint == TextPatternRangeEndpoint.Start ? start : end).CompareTo(targetEndpoint == TextPatternRangeEndpoint.Start ? other.start : other.end); }
+        {
+            var other = Other(targetRange); var value = endpoint == TextPatternRangeEndpoint.Start ? (start, startOrder) : (end, endOrder);
+            return value.CompareTo(targetEndpoint == TextPatternRangeEndpoint.Start ? (other.start, other.startOrder) : (other.end, other.endOrder));
+        }
         private int[] Units(TextUnit unit)
         {
             var model = Current.Model;
@@ -204,6 +230,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         }
         private void Expand(TextUnit unit, bool expandStart, bool expandEnd)
         {
+            if (expandStart) startOrder = 0; if (expandEnd) endOrder = 0;
             var limit = TextEnd(Current);
             if (unit is TextUnit.Page or TextUnit.Document) { if (expandStart) start = 0; if (expandEnd) end = limit; return; }
             var spans = Spans(unit);
@@ -222,28 +249,40 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             if (units.Length < 2) { start = end = 0; return; }
             if (expandStart) start = units[Math.Max(0, Array.FindLastIndex(units, value => value <= start))];
             if (expandEnd) { var next = Array.FindIndex(units, value => value >= end); end = next < 0 ? limit : units[next]; }
-            if (unit == TextUnit.Word && expandEnd && Current.Model.Items.FirstOrDefault(item => start >= item.Start && start <= item.Start + item.Length) is { } paragraph)
+            if (unit == TextUnit.Word && expandEnd && Current.Model.Items.FirstOrDefault(item => start >= item.Start && start < item.Start + item.Length) is { } paragraph)
                 end = Math.Min(end, paragraph.Start + paragraph.Length);
         }
         public ITextRangeProvider? FindText(string text, bool backward, bool ignoreCase)
         {
             var value = Current.Model.Text[start..end]; var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             var at = backward ? value.LastIndexOf(text, comparison) : value.IndexOf(text, comparison);
-            return at < 0 ? null : new TextRange(peer, Current, start + at, start + at + text.Length);
+            return at < 0 ? null : new TextRange(Peer, Current, start + at, start + at + text.Length);
         }
         public ITextRangeProvider? FindAttribute(int attributeId, object value, bool backward)
         {
             _ = Current;
-            var runs = Current.Model.Items.SelectMany(item => item.Runs).Where(run => run.Start + run.Text.Length > start && run.Start < end);
-            if (backward) runs = runs.Reverse();
-            var found = runs.FirstOrDefault(run => Equals(value, RunAttribute(run, attributeId)));
-            return found is null ? null : new TextRange(peer, Current, Math.Max(start, found.Start), Math.Min(end, found.Start + found.Text.Length));
+            if (attributeId == TextPatternIdentifiers.IsReadOnlyAttribute.Id || attributeId == TextPatternIdentifiers.IsHiddenAttribute.Id || attributeId == TextPatternIdentifiers.CultureAttribute.Id)
+                return AttributeEquals(value, GetAttributeValue(attributeId)) ? Clone() : null;
+            var groups = new List<(int Start, int End)>();
+            foreach (var run in Current.Model.Items.SelectMany(item => item.Runs).Where(run => run.Start + run.Text.Length > start && run.Start < end))
+            {
+                if (!AttributeEquals(value, RunAttribute(run, attributeId))) { groups.Add((-1, -1)); continue; }
+                var begin = Math.Max(start, run.Start); var finish = Math.Min(end, run.Start + run.Text.Length);
+                if (groups.Count > 0 && groups[^1].Start >= 0 && begin >= groups[^1].End
+                    && Current.Model.Text.AsSpan(groups[^1].End, begin - groups[^1].End).IndexOfAnyExcept('\r', '\n', '\t') < 0)
+                    groups[^1] = (groups[^1].Start, finish);
+                else groups.Add((begin, finish));
+            }
+            var found = backward ? groups.LastOrDefault(group => group.Item1 >= 0, (-1, -1)) : groups.FirstOrDefault(group => group.Item1 >= 0, (-1, -1));
+            return found.Item1 < 0 ? null : new TextRange(Peer, Current, found.Item1, found.Item2);
         }
+        private static bool AttributeEquals(object left, object right) => Equals(left is Enum ? Convert.ToInt32(left) : left, right is Enum ? Convert.ToInt32(right) : right);
         public object GetAttributeValue(int attributeId)
         {
             _ = Current;
             if (attributeId == TextPatternIdentifiers.IsReadOnlyAttribute.Id) return true;
             if (attributeId == TextPatternIdentifiers.CultureAttribute.Id) return TextCulture.Value.LCID;
+            if (attributeId == TextPatternIdentifiers.IsHiddenAttribute.Id) return false;
             return Attribute(run => RunAttribute(run, attributeId));
         }
         private object RunAttribute(StyledRun run, int attributeId)
@@ -261,7 +300,15 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
                 var appearance = Current.Appearance; var hc = appearance.StartsWith("HC:", StringComparison.Ordinal);
                 var colour = hc ? ExperimentAppearance.Slot(appearance, run.Link is null ? 0 : 5) : run.Link is not null ? appearance == "Dark" ? "#87CEFA" : "#4169E1" : run.Colour is not null ? "#" + run.Colour : appearance == "Dark" ? "#E8EAED" : "#202124";
                 var value = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colour);
-                return value.R | value.G << 8 | value.B << 16;
+                return value.R << 16 | value.G << 8 | value.B;
+            }
+            if (attributeId == TextPatternIdentifiers.BackgroundColorAttribute.Id)
+            {
+                var appearance = Current.Appearance; var hc = appearance.StartsWith("HC:", StringComparison.Ordinal);
+                var surface = run.Code || run.Emphasis.HasFlag(LensDocsStudio.Core.Parsing.MarkdownEmphasis.Highlight);
+                if (!surface) return 0; // Native text's transparent Background, separate from the canvas paint.
+                var colour = hc ? ExperimentAppearance.Slot(appearance, 1) : appearance == "Dark" ? "#292B2F" : "#F3F4F6";
+                var value = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colour); return value.R << 16 | value.G << 8 | value.B;
             }
             return AutomationElementIdentifiers.NotSupported;
         }
@@ -269,15 +316,16 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         private object Attribute<T>(Func<StyledRun, T> select)
         {
             var values = Current.Model.Items.SelectMany(item => item.Runs).Where(run => run.Start + run.Text.Length > start && run.Start < Math.Max(end, start + 1)).Select(select).Distinct().ToArray();
+            if (values.Length == 0 && start == end && Current.Model.Items.SelectMany(item => item.Runs).LastOrDefault(run => run.Start <= start) is { } previous) return select(previous)!;
             return values.Length == 1 ? values[0]! : TextPatternIdentifiers.MixedAttributeValue;
         }
         public double[] GetBoundingRectangles()
         {
             _ = Current;
-            return peer.Surface.Bounds(start, end, true).SelectMany(rectangle =>
-            { var point = peer.Surface.PointToScreen(rectangle.TopLeft); var end = peer.Surface.PointToScreen(rectangle.BottomRight); return new[] { point.X, point.Y, end.X - point.X, end.Y - point.Y }; }).ToArray();
+            return Peer.Surface.Bounds(start, end, true).SelectMany(rectangle =>
+            { var point = Peer.Surface.PointToScreen(rectangle.TopLeft); var end = Peer.Surface.PointToScreen(rectangle.BottomRight); return new[] { point.X, point.Y, end.X - point.X, end.Y - point.Y }; }).ToArray();
         }
-        public IRawElementProviderSimple GetEnclosingElement() { _ = Current; return peer.Enclosing(start, end); }
+        public IRawElementProviderSimple GetEnclosingElement() { _ = Current; return Peer.Enclosing(start, end); }
         public string GetText(int maxLength)
         { var text = Current.Model.Text[start..end]; return maxLength < 0 || maxLength >= text.Length ? text : text[..maxLength]; }
         public int Move(TextUnit unit, int count)
@@ -287,6 +335,8 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             var units = Units(unit); if (units.Length < 2) return 0;
             var index = Math.Min(units.Length - 2, Math.Max(0, Array.FindLastIndex(units, value => value <= start)));
             var target = Math.Clamp(index + count, 0, units.Length - 2); var moved = target - index;
+            if (moved == 0 && count > 0 && unit is TextUnit.Line or TextUnit.Paragraph && Current.Model.Items.LastOrDefault() is { } last && start < last.Start + last.Length)
+            { Expand(unit, true, true); return 1; }
             if (moved == 0) return 0;
             start = units[target]; end = Math.Min(TextEnd(Current), SnapshotIndices.Adjacent(Current.Indices.Characters, start, true)); formatBackward = false;
             Expand(unit, true, true);
@@ -296,12 +346,22 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         {
             if (count == 0) { _ = Current; return 0; }
             var units = Units(unit); var value = endpoint == TextPatternRangeEndpoint.Start ? start : end;
+            if (unit == TextUnit.Format && count > 0 && formatBackward && Current.Model.Items.SelectMany(item => item.Runs).Any(run => run.Start == value)
+                && (endpoint == TextPatternRangeEndpoint.Start || start == end && !Current.Model.Items.Any(item => item.Start == value)))
+            {
+                if (endpoint == TextPatternRangeEndpoint.Start) startOrder = 0;
+                formatBackward = false;
+                OrderEndpoints(endpoint);
+                if (count == 1) return 1;
+                return 1 + MoveEndpointByUnit(endpoint, unit, count - 1);
+            }
             if (unit is TextUnit.Document or TextUnit.Page)
             {
                 var boundary = unit == TextUnit.Page ? count < 0 ? 0 : TextEnd(Current) : endpoint == TextPatternRangeEndpoint.Start ? 0 : TextEnd(Current);
-                if (boundary == value) return 0;
+                if (boundary == value && (unit != TextUnit.Document || endpoint == TextPatternRangeEndpoint.Start && count < 0 || endpoint == TextPatternRangeEndpoint.End && count > 0)) return 0;
                 if (endpoint == TextPatternRangeEndpoint.Start) start = boundary; else end = boundary;
-                if (start > end) { if (endpoint == TextPatternRangeEndpoint.Start) end = start; else start = end; }
+                if (endpoint == TextPatternRangeEndpoint.Start) startOrder = 0; else endOrder = 0;
+                OrderEndpoints(endpoint);
                 return Math.Sign(count);
             }
             if (unit is TextUnit.Line or TextUnit.Paragraph)
@@ -314,6 +374,8 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
                     var isStart = endpoint == TextPatternRangeEndpoint.Start;
                     var at = count > 0 ? isStart ? targetItem + 1 : boundary < spans[targetItem].End ? targetItem : targetItem + 1
                         : isStart ? boundary > spans[targetItem].Start ? targetItem : targetItem - 1 : targetItem - 1;
+                    if (at >= spans.Length && isStart && count > 0 && boundary < spans[^1].End)
+                    { boundary = spans[^1].End; moved += Math.Sign(count); break; }
                     if (at < 0 || at >= spans.Length) break;
                     var next = isStart ? spans[at].Start : spans[at].End;
                     if (next == boundary) break; targetItem = at; boundary = next; moved += Math.Sign(count);
@@ -321,27 +383,31 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
                 if (endpoint == TextPatternRangeEndpoint.Start) start = boundary; else end = boundary;
                 formatBackward = false;
                 if (moved != 0) Expand(unit, endpoint == TextPatternRangeEndpoint.Start, endpoint == TextPatternRangeEndpoint.End);
-                if (start > end) { if (endpoint == TextPatternRangeEndpoint.Start) end = start; else start = end; }
+                OrderEndpoints(endpoint);
                 return moved;
             }
             var index = count < 0 ? Array.FindIndex(units, at => at >= value) : Array.FindLastIndex(units, at => at <= value);
             index = Math.Max(0, index);
-            var target = Math.Clamp(index + count, 0, units.Length - 1);
-            if (endpoint == TextPatternRangeEndpoint.Start) { start = units[target]; if (start > end) end = start; }
-            else { end = units[target]; if (end < start) start = end; }
+            var lastBoundary = unit == TextUnit.Format && endpoint == TextPatternRangeEndpoint.Start ? Math.Max(0, units.Length - 2) : units.Length - 1;
+            var target = Math.Clamp(index + count, 0, lastBoundary);
+            if (endpoint == TextPatternRangeEndpoint.Start) start = units[target];
+            else end = units[target];
+            if (endpoint == TextPatternRangeEndpoint.Start) startOrder = 0; else endOrder = unit == TextUnit.Format ? BeforeRun(Current, end) : 0;
+            OrderEndpoints(endpoint);
             formatBackward = false;
             return target - index;
         }
         public void MoveEndpointByRange(TextPatternRangeEndpoint endpoint, ITextRangeProvider targetRange, TextPatternRangeEndpoint targetEndpoint)
         {
             var other = Other(targetRange); var value = targetEndpoint == TextPatternRangeEndpoint.Start ? other.start : other.end;
-            if (endpoint == TextPatternRangeEndpoint.Start) { start = value; if (start > end) end = start; }
-            else { end = value; if (end < start) start = end; }
+            var order = targetEndpoint == TextPatternRangeEndpoint.Start ? other.startOrder : other.endOrder;
+            if (endpoint == TextPatternRangeEndpoint.Start) { start = value; startOrder = order; if ((start, startOrder).CompareTo((end, endOrder)) > 0) { end = start; endOrder = startOrder; } }
+            else { end = value; endOrder = order; if ((end, endOrder).CompareTo((start, startOrder)) < 0) { start = end; startOrder = endOrder; } }
         }
-        public void Select() { _ = Current; peer.Surface.Select(start, end); }
-        public void AddToSelection() { _ = Current; if (peer.Surface.Start != peer.Surface.End && (peer.Surface.Start != start || peer.Surface.End != end)) throw new InvalidOperationException("Only one text selection is supported."); Select(); }
-        public void RemoveFromSelection() { _ = Current; peer.Surface.Select(end, end); }
-        public void ScrollIntoView(bool alignToTop) { _ = Current; peer.Surface.Reveal(alignToTop ? start : end); }
-        public IRawElementProviderSimple[] GetChildren() { _ = Current; return peer.Children(start, end); }
+        public void Select() { _ = Current; Peer.Surface.Select(start, end); }
+        public void AddToSelection() { _ = Current; throw new InvalidOperationException("Only one text selection is supported."); }
+        public void RemoveFromSelection() { _ = Current; throw new InvalidOperationException("Only one text selection is supported."); }
+        public void ScrollIntoView(bool alignToTop) { _ = Current; Peer.Surface.Reveal(alignToTop ? start : end); }
+        public IRawElementProviderSimple[] GetChildren() { _ = Current; return Peer.Children(start, end); }
     }
 }

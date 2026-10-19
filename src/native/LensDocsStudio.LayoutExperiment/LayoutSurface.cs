@@ -34,6 +34,14 @@ internal sealed class LayoutSurface : Panel
     public Func<LayoutSnapshot, bool>? IsCurrent { get; set; }
     private bool Current(LayoutSnapshot snapshot) => ReferenceEquals(Snapshot, snapshot) && (IsCurrent?.Invoke(snapshot) ?? true);
     public void CancelCopyPreparation() { selectedCopy?.Cancel(); pendingCopy = null; }
+    public void ReleaseOwner()
+    {
+        // A remote client may retain an invalidated range/provider after closure.
+        // It must not keep a visual-parent chain, source editor or studio alive.
+        Activated = null; MediaAction = null; SelectionUpdated = null;
+        SourceNavigationRequested = null; SearchRequested = null; IsCurrent = null;
+        ContextMenu = null; Scroller = null;
+    }
     private readonly List<(int Start, int End)> matches = [];
     public void Search(string text)
     {
@@ -295,17 +303,21 @@ internal sealed class LayoutSurface : Panel
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         LastKey = e.Key + ":" + Keyboard.Modifiers;
-        if (KeyHistory.Count < 40) KeyHistory.Add(LastKey);
+        if (KeyHistory.Count < 512) KeyHistory.Add(LastKey);
         base.OnPreviewKeyDown(e); if (Snapshot is not { } snapshot) return;
         var control = Keyboard.Modifiers.HasFlag(ModifierKeys.Control); var shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
         if (control && e.Key == Key.A) { Select(0, snapshot.Model.Text.Length); e.Handled = true; return; }
         if (control && e.Key == Key.C) { Copy(); e.Handled = true; return; }
+        // The stock read-only viewer leaves navigation without Shift to its
+        // ScrollViewer. Shift extends the selected insertion point.
+        if (!shift) return;
         var stops = snapshot.Indices.Characters;
         var line = snapshot.Lines.FirstOrDefault(line => Active >= line.Start && Active <= line.End) ?? snapshot.Lines[^1];
         var next = e.Key switch
         {
             Key.Home => control ? 0 : line.Start,
-            Key.End => control ? snapshot.Model.Text.Length : line.End,
+            Key.End => control ? snapshot.Model.Text.Length : line.End == snapshot.Model.Items[line.Item].Start + snapshot.Model.Items[line.Item].Length
+                ? line.Item + 1 < snapshot.Model.Items.Length ? snapshot.Model.Items[line.Item + 1].Start : snapshot.Model.Text.Length : line.End,
             Key.Left => SnapshotIndices.Adjacent(control ? snapshot.Indices.Words : stops, Active, false),
             Key.Right => SnapshotIndices.Adjacent(control ? snapshot.Indices.Words : stops, Active, true),
             Key.Up => Vertical(line, false),

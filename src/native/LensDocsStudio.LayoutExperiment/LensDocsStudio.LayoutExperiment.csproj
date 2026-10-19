@@ -12,5 +12,6 @@
     <Compile Include="../LensDocsStudio.Native.Validation/NativeTestHighContrast.cs" Link="NativeTestHighContrast.cs" />
     <Content Include="parity-requirements-v2.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="EXPERIMENT-ONLY.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -68,7 +68,7 @@ jobs:
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
           $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
-          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance','range-checks','parity-all') } else { @('media-controls','media-checks','appearance','range-checks','parity-all') }
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') } else { @('media-controls','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') }
           $failed = $false
           foreach ($mode in $modes) {
             $destination = "artifacts/layout-focused/$mode"
@@ -78,24 +78,34 @@ jobs:
             $process.Refresh()
             if ($process.ExitCode) { $failed = $true }
           }
+          foreach ($scenario in @('list','mixed','table-spans','table-blocks')) {
+            $destination = "artifacts/layout-focused/actual-uia-$scenario"
+            New-Item -ItemType Directory -Force -Path $destination | Out-Null
+            $process = Start-Process -FilePath $exe -ArgumentList @('--scenario',$scenario,'--adapter','candidate','--uia','--contract-v2','--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$destination/stdout.txt" -RedirectStandardError "$destination/stderr.txt"
+            if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force; $failed = $true; '120-second diagnostic process deadline exceeded.' | Set-Content "$destination/deadline-failure.txt" }
+            $process.Refresh(); if ($process.ExitCode) { $failed = $true }
+          }
           if ($failed) { exit 1 }
-      - name: Separate appearance sampling profile; never acceptance data
+      - name: Separate appearance/list/mixed sampling profiles; never acceptance data
         if: always() && matrix.replication == 1
         shell: pwsh
         run: |
-          $destination = 'artifacts/layout-focused/appearance-sampling'
-          New-Item -ItemType Directory -Force -Path $destination | Out-Null
           dotnet tool install dotnet-trace --version 10.0.750501 --tool-path artifacts/layout-profile-tools
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
           $trace = 'artifacts/layout-profile-tools/dotnet-trace.exe'
           $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
-          & $trace --version | Set-Content "$destination/tool-version.txt"
-          & $trace collect --profile dotnet-common,dotnet-sampled-thread-time --duration 00:00:00:40 --output "$destination/appearance.nettrace" -- $exe --appearance --output "$destination/observations"
-          $collectionExit = $LASTEXITCODE
-          & $trace convert "$destination/appearance.nettrace" --format Speedscope --output "$destination/appearance"
-          if ($collectionExit) { exit $collectionExit }
+          foreach ($scenario in @('appearance','list','mixed')) {
+            $destination = "artifacts/layout-focused/$scenario-sampling"
+            New-Item -ItemType Directory -Force -Path $destination | Out-Null
+            & $trace --version | Set-Content "$destination/tool-version.txt"
+            $arguments = if ($scenario -eq 'appearance') { @('--appearance') } else { @('--scenario',$scenario,'--adapter','candidate','--contract-v2') }
+            & $trace collect --profile dotnet-common,dotnet-sampled-thread-time --duration 00:00:00:40 --output "$destination/profile.nettrace" -- $exe @arguments --output "$destination/observations"
+            $collectionExit = $LASTEXITCODE
+            & $trace convert "$destination/profile.nettrace" --format Speedscope --output "$destination/profile"
+            if ($collectionExit) { exit $collectionExit }
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
