@@ -25,6 +25,7 @@ internal sealed class LayoutSurface : Panel
         if (InteractionStages.Count >= 2048) { InteractionStages.RemoveRange(0, 1024); DroppedInteractionObservations += 1024; }
         InteractionStages.Add(observation);
     }
+    public void ViewportChanged() { InvalidateVisual(); mediaSelection?.InvalidateVisual(); }
     private (SemanticNode Node, Point Point)? pressedLink;
     private SelectionOverlay? mediaSelection;
     private SemanticNode[] selectedCells = [];

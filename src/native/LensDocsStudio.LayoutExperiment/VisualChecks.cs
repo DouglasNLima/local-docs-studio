@@ -22,7 +22,9 @@ internal static class VisualChecks
             await Current(true);
             var appearance = ExperimentAppearance.Capture("Dark");
             var hcFolder = Path.Combine(output, "actual-high-contrast"); Directory.CreateDirectory(hcFolder);
+            var hcStart = Stopwatch.GetTimestamp();
             await TargetedChecks.Run(window, hcFolder, true, appearance: appearance);
+            observations.Add(new { Appearance = "actual-high-contrast", StartTimestamp = hcStart, EndTimestamp = Stopwatch.GetTimestamp(), TimingAcceptanceData = false });
             var source = window.LatestSource;
             await Task.Run(contrast.Dispose); restored = true;
             await Current(false);

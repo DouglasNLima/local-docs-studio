@@ -9,6 +9,7 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 Set-Location $root
 $output = [IO.Path]::GetFullPath((Join-Path $root $OutputDirectory))
+if ((Test-Path -LiteralPath $output) -and @(Get-ChildItem -LiteralPath $output -Force).Count) { throw 'Choose a fresh v2 result directory; earlier observations must not be overwritten or reused as current proof.' }
 New-Item -ItemType Directory -Force -Path $output | Out-Null
 if (-not $SkipBuild) {
     if ($Compilation -eq 'IL') {

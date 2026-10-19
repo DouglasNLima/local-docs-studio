@@ -50,7 +50,7 @@ internal sealed class ExperimentWindow : Window
         SizeToContent = SizeToContent.WidthAndHeight; WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Scroller = new ScrollViewer { Content = Surface, Width = 640, Height = 300, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Visible, CanContentScroll = false, Background = System.Windows.Media.Brushes.White };
-        Surface.Scroller = Scroller; Scroller.ScrollChanged += (_, _) => Surface.InvalidateVisual();
+        Surface.Scroller = Scroller; Scroller.ScrollChanged += (_, _) => Surface.ViewportChanged();
         Content = Scroller;
         Surface.IsCurrent = snapshot => !closed && snapshot.Version == version && snapshot.Model.Source == LatestSource
             && snapshot.Appearance == ExperimentAppearance.Capture(ThemePreference);

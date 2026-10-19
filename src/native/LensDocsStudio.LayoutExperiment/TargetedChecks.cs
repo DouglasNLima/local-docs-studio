@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Native.Rendering;
@@ -102,7 +103,7 @@ internal static class TargetedChecks
                     var stops = StringInfo.ParseCombiningCharacters(logicalText.Substring(item.Start, item.Length)).Select(at => at + item.Start).Append(item.Start + item.Length).ToHashSet();
                     Require(linesByItem[itemIndex].SelectMany(line => line.Carets).All(caret => stops.Contains(caret.Offset)), "No surrogate/combining/ZWJ split", checks);
                 }
-                (int Start, int End, double Offset)? cellSelection = null;
+                (int Start, int End, double Offset, Point Pixel)? cellSelection = null;
                 var selectionTable = snapshot.Model.Root.Descendants().FirstOrDefault(node => node.Kind == "Table" && node.Children.Length > 1 && node.Children.Take(2).All(row => row.Children.Length > 1));
                 if (selectionTable is not null)
                 {
@@ -111,10 +112,15 @@ internal static class TargetedChecks
                     var end = snapshot.Model.Items.First(item => item.Start >= lastCell.Start && item.Start < lastCell.End).Start + 1;
                     var sourceBegin = snapshot.Model.SourceBoundaries[begin]; var sourceEnd = snapshot.Model.SourceEnds[end - 1];
                     if (!stock.TextMap.TryPreviewRange(sourceBegin, sourceEnd - sourceBegin, out var selectionFrom, out var selectionTo)) throw new IOException("Table selection capture source oracle missing.");
-                    viewer.Selection.Select(selectionFrom!, selectionTo!); viewer.Focus(); (selectionFrom!.Parent as FrameworkContentElement)?.BringIntoView();
+                    viewer.Selection.Select(selectionFrom!, selectionTo!); viewer.Focus();
+                    var beforeCharacter = selectionFrom!.GetCharacterRect(LogicalDirection.Forward); var beforeOffset = scrolling.VerticalOffset;
+                    scrolling.ScrollToVerticalOffset(Math.Max(0, beforeOffset + beforeCharacter.Top - 20));
                     window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    var selectedCharacter = selectionFrom.GetCharacterRect(LogicalDirection.Forward);
+                    Program.Write(Path.Combine(destination, "cross-row-view.json"), new { BeforeCharacter = beforeCharacter.ToString(), BeforeOffset = beforeOffset, AfterCharacter = selectedCharacter.ToString(), Offset = scrolling.VerticalOffset, scrolling.ViewportHeight, LogicalStart = begin, LogicalEnd = end });
+                    Require(selectedCharacter.Top + selectedCharacter.Height >= 0 && selectedCharacter.Top < scrolling.ViewportHeight, "Actual stock cross-row capture contains the selected source character", checks);
                     Program.Capture(viewer, Path.Combine(destination, "stock-cross-row-cell-selected.png"));
-                    cellSelection = (begin, end, scrolling.VerticalOffset);
+                    cellSelection = (begin, end, scrolling.VerticalOffset, new Point(Math.Floor(selectedCharacter.X + 1), Math.Floor(selectedCharacter.Y + 1)));
                 }
                 var distantLiteral = stock.TextMap.Literals.LastOrDefault();
                 if (distantLiteral is not null)
@@ -134,7 +140,17 @@ internal static class TargetedChecks
                 {
                     window.Surface.Select(cells.Start, cells.End); window.Surface.Focus(); window.Scroller.ScrollToVerticalOffset(cells.Offset);
                     window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Require(window.Surface.Bounds(cells.Start, cells.End, true).Any(), "Actual candidate cross-row capture contains selected cell text", checks);
                     Program.Capture(window.Scroller, Path.Combine(destination, "candidate-cross-row-cell-selected.png"));
+                    byte[] Pixel(string name)
+                    {
+                        var decoder = BitmapDecoder.Create(new Uri(Path.GetFullPath(Path.Combine(destination, name))), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                        var bitmap = new FormatConvertedBitmap(decoder.Frames[0], PixelFormats.Pbgra32, null, 0); var bytes = new byte[4];
+                        bitmap.CopyPixels(new Int32Rect((int)cells.Pixel.X, (int)cells.Pixel.Y, 1, 1), bytes, 4, 0); return bytes;
+                    }
+                    var nativePixel = Pixel("stock-cross-row-cell-selected.png"); var candidatePixel = Pixel("candidate-cross-row-cell-selected.png");
+                    Program.Write(Path.Combine(destination, "cross-row-selected-pixel.json"), new { Point = cells.Pixel.ToString(), Stock = nativePixel, Candidate = candidatePixel });
+                    Require(nativePixel.SequenceEqual(candidatePixel), "Exact selected-cell background pixel after distant scrolling, outside glyph ink", checks);
                     window.Surface.Select(0, 0);
                 }
                 if (distantLiteral is not null)
