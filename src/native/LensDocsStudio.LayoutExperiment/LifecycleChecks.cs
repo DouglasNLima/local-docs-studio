@@ -109,6 +109,7 @@ internal static class LifecycleChecks
                 WinningPreviewReadyMilliseconds = (ready.Timestamp - requested.Timestamp) * 1000d / Stopwatch.Frequency };
         }).ToArray();
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
+            window.DroppedPreparationObservations, window.Surface.DroppedInteractionObservations, ReopenDroppedPreparationObservations = reopen.DroppedPreparationObservations,
             ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", SupersededCopyBeforeGrant = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
             InjectedFailureVersion = faultVersion, InjectedFailureCancellationObservation = "Deliberate non-cancellation failure; separately asserted stale rejection, not a natural cancellation timing sample",

@@ -16,6 +16,8 @@ internal sealed class ExperimentWindow : Window
     public LayoutSurface Surface { get; } = new();
     public ScrollViewer Scroller { get; }
     public System.Collections.Concurrent.ConcurrentQueue<PreparationEvent> Events { get; } = new();
+    private int droppedPreparationObservations;
+    public int DroppedPreparationObservations => Volatile.Read(ref droppedPreparationObservations);
     private CancellationTokenSource? active;
     private sealed record RequestData(string Source, string Appearance, long Version, string? Path, string? Root, Dictionary<int, bool> Details, DiagnosticView? Restore, TaskCompletionSource<bool> Completion);
     private RequestData? pending;
@@ -120,7 +122,7 @@ internal sealed class ExperimentWindow : Window
                 .Prepare(snapshot.Model.Source, path, root, snapshot.Appearance == "Dark", owner.Token), cancellationToken: owner.Token));
             if (owner.IsCancellationRequested || Surface.IsCurrent?.Invoke(snapshot) != true) { Log("rendered-copy-stale-rejected"); return; }
             var commit = await Surface.ClipboardWorker.Rendered(payload, sequence, owner.Token);
-            Surface.InteractionStages.Add(new { Stage = "rendered-copy", NativeCommit = commit,
+            Surface.RecordInteraction(new { Stage = "rendered-copy", NativeCommit = commit,
                 NativeCommitMilliseconds = (commit.EndTimestamp - commit.StartTimestamp) * 1000d / Stopwatch.Frequency });
             if (!owner.IsCancellationRequested && Surface.IsCurrent?.Invoke(snapshot) == true) Log("rendered-copy-committed");
             else Log("rendered-copy-stale-completion-rejected");
@@ -156,7 +158,11 @@ internal sealed class ExperimentWindow : Window
         if (activeRequest is { } preparing && preparing.Version == version && preparing.Source == LatestSource && preparing.Appearance == appearance) return;
         _ = Request(LatestSource, ThemePreference);
     }
-    private void Log(string name, long? owner = null) => Events.Enqueue(new(name, Stopwatch.GetTimestamp(), Environment.CurrentManagedThreadId, owner ?? Volatile.Read(ref version)));
+    private void Log(string name, long? owner = null)
+    {
+        Events.Enqueue(new(name, Stopwatch.GetTimestamp(), Environment.CurrentManagedThreadId, owner ?? Volatile.Read(ref version)));
+        while (Events.Count > 8192 && Events.TryDequeue(out _)) Interlocked.Increment(ref droppedPreparationObservations);
+    }
     public Task<bool> Request(string source, string appearance = "Light")
     {
         Dispatcher.VerifyAccess(); if (closed) return Task.FromCanceled<bool>(new CancellationToken(true));

@@ -7,11 +7,53 @@ on:
       scope:
         description: Focused diagnosis or complete v2 acceptance
         type: choice
-        options: [full, focused, compile-comparison]
+        options: [full, focused, compile-comparison, artifact]
         default: full
 permissions:
   contents: read
 jobs:
+  artifact-verification:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'artifact'
+    name: Exact-source experiment executable; no performance reclassification
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build diagnostic payload, verify all six deterministic geometries and provenance
+        shell: pwsh
+        run: |
+          & scripts/native/Build-ContinuousLayoutExperiment.ps1 -Compilation ReadyToRun -OutputDirectory artifacts/layout-final-bin
+          $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
+          $env:LENS_LAYOUT_SOURCE_DIRTY = ([bool](git status --porcelain)).ToString()
+          $env:LENS_LAYOUT_COMPILATION = 'ReadyToRun'
+          if ($env:LENS_LAYOUT_SOURCE_DIRTY -ne 'False') { throw 'Exact-source executable requires a clean checkout.' }
+          & artifacts/layout-final-bin/LensDocsStudio.LayoutExperiment.exe --deterministic --output artifacts/layout-final-checks
+          if ($LASTEXITCODE) { throw 'Downloaded-payload deterministic checks failed.' }
+          $identity = Get-Content artifacts/layout-final-checks/execution-identity.json -Raw | ConvertFrom-Json
+          $framework = Split-Path -Parent $identity.WpfAssembly
+          $runtime = foreach ($name in @('PresentationFramework.dll','PresentationCore.dll','PresentationFramework.Classic.dll')) {
+            $path = Join-Path $framework $name
+            $signature = Get-AuthenticodeSignature -LiteralPath $path
+            if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'Microsoft Corporation') { throw "Untrusted shared runtime: $name" }
+            @{ Name=$name; Sha256=(Get-FileHash -LiteralPath $path).Hash; Signature=$signature.Status.ToString(); Signer=$signature.SignerCertificate.Subject }
+          }
+          $payload = @(Get-ChildItem artifacts/layout-final-bin -File -Recurse | ForEach-Object { @{ Path=[IO.Path]::GetRelativePath((Resolve-Path artifacts/layout-final-bin).Path,$_.FullName); Sha256=(Get-FileHash -LiteralPath $_.FullName).Hash } })
+          @{ Label='EXPERIMENT ONLY'; Source=$env:LENS_LAYOUT_SOURCE_REVISION; SourceDirty=$false; Compilation='ReadyToRun'; Base='a937399a3f822c4e911e1ebe5ec0e426b64c56ac'; Dependency='9a64dfa5adf79dc447db1f671ea39c94ec42de40'; Runtime=$runtime; Payload=$payload; Deterministic='PASS'; Meaning='Exact-source executable verification only. Controlled v2 results retain their measured source and are not reclassified.' } | ConvertTo-Json -Depth 10 | Set-Content artifacts/layout-final-bin/provenance.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EXPERIMENT-ONLY-final-source-executable
+          path: artifacts/layout-final-bin/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exact-source-executable-checks
+          path: artifacts/layout-final-checks/
+          retention-days: 90
   compile-comparison:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'compile-comparison'
     name: Bounded IL/ReadyToRun compiler comparison (${{ matrix.replication }})

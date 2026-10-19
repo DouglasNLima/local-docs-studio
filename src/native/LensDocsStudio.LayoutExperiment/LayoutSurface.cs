@@ -19,6 +19,12 @@ internal sealed class LayoutSurface : Panel
     public List<string> KeyHistory { get; } = [];
     public List<object> MouseHistory { get; } = [];
     public List<object> InteractionStages { get; } = [];
+    public int DroppedInteractionObservations { get; private set; }
+    public void RecordInteraction(object observation)
+    {
+        if (InteractionStages.Count >= 2048) { InteractionStages.RemoveRange(0, 1024); DroppedInteractionObservations += 1024; }
+        InteractionStages.Add(observation);
+    }
     private (SemanticNode Node, Point Point)? pressedLink;
     private SelectionOverlay? mediaSelection;
     private SemanticNode[] selectedCells = [];
@@ -214,19 +220,19 @@ internal sealed class LayoutSurface : Panel
                     var prepared = watch.Elapsed.TotalMilliseconds;
                     await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
                     if (!Current(snapshot) || Start != start || End != end || owner.IsCancellationRequested)
-                    { InteractionStages.Add(new { Stage = "copy-stale-rejected", Thread = Environment.CurrentManagedThreadId }); continue; }
+                    { RecordInteraction(new { Stage = "copy-stale-rejected", Thread = Environment.CurrentManagedThreadId }); continue; }
                     var currentSequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
                     var previous = ClipboardWorker.LastCommit;
                     if (sequence != currentSequence && previous is not null && previous.EndTimestamp > request.Requested && previous.Sequence == currentSequence) sequence = currentSequence;
                     if (sequence != currentSequence) throw new IOException("The clipboard changed while the copy was being prepared.");
                     var grant = System.Diagnostics.Stopwatch.GetTimestamp();
                     var commit = await ClipboardWorker.Selected(payload, sequence, owner.Token);
-                    InteractionStages.Add(new { Stage = "copy", PreparedMilliseconds = prepared, UiGrantTimestamp = grant,
+                    RecordInteraction(new { Stage = "copy", PreparedMilliseconds = prepared, UiGrantTimestamp = grant,
                         Serialisation = payload.Serialisation, NativeCommit = commit, NativeCommitMilliseconds = (commit.EndTimestamp - commit.StartTimestamp) * 1000d / System.Diagnostics.Stopwatch.Frequency,
                         TotalMilliseconds = watch.Elapsed.TotalMilliseconds, CurrentOnCompletion = Current(snapshot) && !owner.IsCancellationRequested, Thread = Environment.CurrentManagedThreadId });
                 }
                 catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)
-                { InteractionStages.Add(new { Stage = "copy-rejected-or-failed", Error = error.Message, Thread = Environment.CurrentManagedThreadId }); }
+                { RecordInteraction(new { Stage = "copy-rejected-or-failed", Error = error.Message, Thread = Environment.CurrentManagedThreadId }); }
                 finally { if (ReferenceEquals(selectedCopy, owner)) selectedCopy = null; owner.Dispose(); }
             }
         }

@@ -42,12 +42,14 @@ internal static class StudioChecks
             using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(90)); await client.WaitForExitAsync(deadline.Token);
             if (client.ExitCode != 0 || invalid || !original.SequenceEqual(File.ReadAllBytes(path))) throw new IOException("Diagnostic studio interaction, installation currency or workspace byte preservation failed.");
             Program.Write(Path.Combine(output, "studio.json"), new { Status = "PASS", IndependentClient = "PASS", WorkspaceBytesUnchanged = true,
+                window.DroppedPreparationObservations, window.Surface.DroppedInteractionObservations,
                 Installations = installations, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, InputTimeline = timeline, Events = window.Events.ToArray() });
         }
         catch (Exception error)
         {
             if (!client.HasExited) client.Kill(true);
             Program.Write(Path.Combine(output, "studio.json"), new { Status = "FAIL", Error = error.ToString(), Installations = installations,
+                window.DroppedPreparationObservations, window.Surface.DroppedInteractionObservations,
                 MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, InputTimeline = timeline, Events = window.Events.ToArray() }); throw;
         }
         finally { timer.Stop(); Program.Write(Path.Combine(output, "input-acknowledgements.json"), acknowledgement.Receipts); }

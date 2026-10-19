@@ -112,6 +112,7 @@ $interactionReceipts = @(Get-ChildItem -LiteralPath $output -Filter independent-
 $lifecycleBudgetMisses = $special['lifecycle'].CancellationAcceptance -ne 'PASS' -or $special['lifecycle'].WinningPreviewReadinessAcceptance -ne 'PASS'
 $appearanceFunctional = $special['appearance'].AutomaticEnableCurrentDisableCurrent -eq 'PASS' -and $special['appearance'].ManualThemeAfterDisable -eq $false
 $functionalSpecialFailures = @('lifecycle','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','image-clipboard-checks') | Where-Object { $special[$_].Status -ne 'PASS' }
+$truncatedRequiredObservations = @('lifecycle','studio-checks') | Where-Object { $special[$_].DroppedPreparationObservations -gt 0 -or $special[$_].DroppedInteractionObservations -gt 0 -or $special[$_].ReopenDroppedPreparationObservations -gt 0 }
 $visualStatus = if ($special['visual-checks'].Status -eq 'CAPTURED_PENDING_VISUAL_REVIEW') { 'PENDING_VISUAL_REVIEW' } else { 'MISSING_OR_FAILED_CAPTURES' }
 $visualReview = $null
 $visualInputsHash = & (Join-Path $PSScriptRoot 'Get-LayoutVisualInputsHash.ps1')
@@ -127,7 +128,7 @@ if (Test-Path -LiteralPath $reviewPath) {
 $specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
 $executionFailures = @($runs | Where-Object ExitCode -ne 0)
 $missingSamples = $controlled.Count -ne 66 -or @($samples | Where-Object { $_.Adapter -eq 'stock' }).Count -ne 66
-$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 14 -or $functionalSpecialFailures.Count -gt 0 -or -not $appearanceFunctional -or $visualStatus -ne 'PASS'
+$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 14 -or $functionalSpecialFailures.Count -gt 0 -or $truncatedRequiredObservations.Count -gt 0 -or -not $appearanceFunctional -or $visualStatus -ne 'PASS'
 $timingFail = $failedInteractionInput.Count -gt 0 -or $layoutMisses.Count -gt 0 -or $presentationMisses.Count -gt 0 -or $inputMisses.Count -gt 0 -or $specialInputMisses.Count -gt 0
 $officialRuntimeValid = $runtimeChecks.Count -eq 2 -and @($runtimeChecks | Where-Object { $_.SignatureStatus -ne 'Valid' -or $_.Signer -notmatch 'Microsoft Corporation' }).Count -eq 0
 $compiledSourceMatches = $samples.Count -gt 0 -and @($samples | Where-Object { $_.HarnessInformationalVersion -notmatch [regex]::Escape($source) }).Count -eq 0
@@ -143,7 +144,7 @@ $fullPass = $compiledSourceMatches -and -not $sourceDirty -and $officialRuntimeV
     Cancellation=@{ BudgetMilliseconds=250; Status=$special['lifecycle'].CancellationAcceptance; Observations=$special['lifecycle'].Cancellation }
     WinningPreviewReadiness=@{ BudgetMilliseconds=1500; Status=$special['lifecycle'].WinningPreviewReadinessAcceptance; Observations=$special['lifecycle'].WinningPreviewReadiness }
     VisualParity=@{ Status=$visualStatus; RenderingInputsSha256=$visualInputsHash; Review=$visualReview; Captures=$special['visual-checks']; Meaning='Source-bound representative visual review and successful current captures/geometry/styles are both required. Pending or stale review fails the full gate.' }
-    LifecycleBudgetMisses=$lifecycleBudgetMisses; PairIdentityChecks=$pairChecks; FailedInteractionInputReceipts=$failedInteractionInput; ParityCoverage=$coverage; MissingCapabilities=$missing; InteractionReceipts=$interactionReceipts
+    LifecycleBudgetMisses=$lifecycleBudgetMisses; TruncatedRequiredObservations=@($truncatedRequiredObservations); PairIdentityChecks=$pairChecks; FailedInteractionInputReceipts=$failedInteractionInput; ParityCoverage=$coverage; MissingCapabilities=$missing; InteractionReceipts=$interactionReceipts
     Stretch250=@{ Blocking=$false; Exceeded=@($candidate | Where-Object CompleteLayoutInputMilliseconds -gt 250).Count }
     ExecutionFailures=$executionFailures; Samples=$samples
     Decision=$(if($fullPass){'VIABLE FOR A SEPARATE MIGRATION PROPOSAL: tested workloads and hosts only; no migration authorised'}else{'INSUFFICIENT EVIDENCE: required v2 timing, capabilities or validation remain unsuccessful/incomplete'})
