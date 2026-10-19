@@ -117,9 +117,11 @@ $visualInputsHash = & (Join-Path $PSScriptRoot 'Get-LayoutVisualInputsHash.ps1')
 $reviewPath = Join-Path $root 'src/native/LensDocsStudio.LayoutExperiment/visual-review-v2.json'
 if (Test-Path -LiteralPath $reviewPath) {
     $visualReview = Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json
+    $reviewManifestPath = Join-Path $root 'docs/native/evidence/continuous-layout-architecture/v2/completion/visual-capture-manifest.json'
+    $reviewManifestValid = (Test-Path -LiteralPath $reviewManifestPath) -and (Get-FileHash -LiteralPath $reviewManifestPath).Hash -eq $visualReview.CaptureManifestSha256
     if ($visualStatus -eq 'PENDING_VISUAL_REVIEW' -and $visualReview.Status -eq 'PASS' -and $visualReview.RenderingInputsSha256 -eq $visualInputsHash -and
         $visualReview.WpfFrameworkSha256 -eq ($samples | Select-Object -First 1).WpfFrameworkSha256 -and $visualReview.ImageVersion -eq $env:ImageVersion -and $visualReview.Compilation -eq $Compilation -and
-        $visualReview.OriginalWorkloadsReviewed -eq 6 -and $visualReview.AppearancesReviewed -eq 3 -and $visualReview.CaptureManifestSha256 -match '^[A-Fa-f0-9]{64}$') { $visualStatus = 'PASS' }
+        $visualReview.OriginalWorkloadsReviewed -eq 6 -and $visualReview.AppearancesReviewed -eq 3 -and $reviewManifestValid) { $visualStatus = 'PASS' }
 }
 $specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
 $executionFailures = @($runs | Where-Object ExitCode -ne 0)

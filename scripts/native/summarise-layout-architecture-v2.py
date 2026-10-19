@@ -58,7 +58,7 @@ def main():
               "CompleteLayoutInputMilliseconds", "EndToEndReadinessMilliseconds", "MaximumInputGapMilliseconds",
               "MaximumInteractionInputGapMilliseconds", "AllocatedBytes", "ManagedBytes", "PrivateMemorySize64",
               "NaturalCollections", "UiStartThread", "PreparationThread", "WorkerLayoutThread", "UiEndThread",
-              "HarnessSha256", "FixtureSha256", "SourceSha256", "Runtime", "Cpu", "CpuAvailable", "Dpi", "Zoom", "Appearance", "SourceDirty"]
+              "HarnessSha256", "FixtureSha256", "SourceSha256", "CompilationConfiguration", "Runtime", "Cpu", "CpuAvailable", "Dpi", "Zoom", "Appearance", "SourceDirty"]
     with (args.output / "every-sample.csv").open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()

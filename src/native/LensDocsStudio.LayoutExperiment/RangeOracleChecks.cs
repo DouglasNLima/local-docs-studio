@@ -65,6 +65,7 @@ internal static class RangeOracleChecks
         var rows = new List<object>();
         try
         {
+            using var clipboard = new IndependentUiaClient.ClipboardOwner();
             using var process = Process.GetProcessById(processId); var window = AutomationElement.FromHandle(process.MainWindowHandle);
             AutomationElement? document = null;
             IndependentUiaClient.Wait(() => (document = window.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, side == "stock" ? "RangeOracleDocument" : "ExperimentalDocument"))) is not null);
@@ -76,6 +77,17 @@ internal static class RangeOracleChecks
                 range.MoveEndpointByRange(TextPatternRangeEndpoint.End, ending, TextPatternRangeEndpoint.End);
                 var before = range.GetText(-1); range.Select(); var selected = text.GetSelection();
                 rows.Add(new { Operation = "actual-table-selection", First = first, Last = last, Before = before, Text = selected.Select(value => value.GetText(-1)).ToArray() });
+                document.SetFocus(); var sentinel = "Table copy sentinel " + first + last; clipboard.SetSentinel(sentinel);
+                IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x11, 0x43);
+                IndependentUiaClient.Wait(() => Clipboard.ContainsText() && Clipboard.GetText() != sentinel && Clipboard.ContainsData(DataFormats.Rtf));
+                var data = Clipboard.GetDataObject()!;
+                var rtf = (string)data.GetData(DataFormats.Rtf)!; var xaml = (string)data.GetData(DataFormats.Xaml)!;
+                File.WriteAllText(Path.Combine(output, "table-copy-" + first.Replace(' ', '-') + "-" + last.Replace(' ', '-') + ".rtf"), rtf);
+                var decodedRtf = InterchangeChecks.Decode(System.Text.Encoding.UTF8.GetBytes(rtf), DataFormats.Rtf);
+                var decodedXaml = InterchangeChecks.Decode(System.Text.Encoding.UTF8.GetBytes(xaml), DataFormats.Xaml);
+                rows.Add(new { Operation = "actual-table-copy", First = first, Last = last, Text = data.GetData(DataFormats.UnicodeText, false) as string,
+                    Formats = data.GetFormats(false).Order(StringComparer.Ordinal).ToArray(), RtfText = new TextRange(decodedRtf.ContentStart, decodedRtf.ContentEnd).Text,
+                    RtfStyles = TargetedChecks.Styles(decodedRtf), XamlText = new TextRange(decodedXaml.ContentStart, decodedXaml.ContentEnd).Text, XamlStyles = TargetedChecks.Styles(decodedXaml) });
             }
             foreach (var target in new[] { "bold", "العربيّة", "Final marker." })
             foreach (var unit in Enum.GetValues<TextUnit>())
