@@ -16,6 +16,7 @@ internal static class MediaControlChecks
     public static async Task Run(ExperimentWindow experiment, string output)
     {
         experiment.Hide();
+        var errors = new List<string>();
         // The controls are separate fresh processes when invoked by the focused script.
         // This route exercises the existing MainWindow button and ExportDiagram handler,
         // with the normal updater/start-up/session loader replaced by isolated test setup.
@@ -41,6 +42,7 @@ internal static class MediaControlChecks
         if (firstMedia is null) throw new IOException("The stock control has no real media block.");
         firstMedia.BringIntoView(); stock.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
         try { await MediaChecks.Exercise(stock, stockOutput, "stock"); }
+        catch (Exception error) { errors.Add("Stock: " + error); }
         finally { stock.Close(); }
         if (File.ReadAllText(path) != fixture.Source) throw new IOException("The stock control changed the source.");
 
@@ -61,8 +63,10 @@ internal static class MediaControlChecks
         }
         control.Show();
         try { await MediaChecks.Exercise(control, controlOutput, "native-dialogue-only"); }
+        catch (Exception error) { errors.Add("Minimal native control: " + error); }
         finally { control.Close(); }
-        Program.Write(Path.Combine(output, "media-control-comparison.json"), new { Status = "PASS", StockRoute = "Unmodified MainWindow.ExportDiagram", MinimalRoute = "Owned public SaveFileDialog", SaveAndCancel = true,
+        Program.Write(Path.Combine(output, "media-control-comparison.json"), new { Status = errors.Count == 0 ? "PASS" : "FAIL", Errors = errors, StockRoute = "Unmodified MainWindow.ExportDiagram", MinimalRoute = "Owned public SaveFileDialog", SaveAndCancel = errors.Count == 0,
             Acceptance = "Controls are comparative evidence; their timings do not exempt or certify the candidate." });
+        if (errors.Count > 0) throw new IOException("Native media control comparison failed; both independent routes were attempted and failures retained.");
     }
 }

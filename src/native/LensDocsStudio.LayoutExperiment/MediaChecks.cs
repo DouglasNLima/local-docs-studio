@@ -47,6 +47,7 @@ internal static class MediaChecks
     public static int Client(string output, int processId, long handle, string route)
     {
         var checks = new List<string>(); using var clipboard = new IndependentUiaClient.ClipboardOwner();
+        var responseFailures = new List<string>();
         var timeline = new List<object>();
         void At(string stage, object? detail = null) => timeline.Add(new { Stage = stage, Timestamp = Stopwatch.GetTimestamp(), Thread = Environment.CurrentManagedThreadId, Detail = detail });
         try
@@ -92,8 +93,8 @@ internal static class MediaChecks
                 At("owner-enabled-after-dialogue");
                 response = Stopwatch.GetTimestamp(); ack = SendMessageTimeout(ownerHandle, 0, IntPtr.Zero, IntPtr.Zero, 2, 100, out _);
                 At("owner-immediate-native-response", new { Success = ack != IntPtr.Zero, Milliseconds = (Stopwatch.GetTimestamp() - response) * 1000d / Stopwatch.Frequency });
-                if (ack == IntPtr.Zero) throw new IOException("The application did not respond immediately after dialogue closure.");
-                if (cancel) { if (File.Exists(path)) throw new IOException("Cancel wrote a file."); checks.Add(format + " actual Cancel, no file and immediate owner recovery"); continue; }
+                if (ack == IntPtr.Zero) responseFailures.Add(format + (cancel ? " Cancel" : " Save") + ": owner native acknowledgement missed the unchanged 100 ms bound");
+                if (cancel) { if (File.Exists(path)) throw new IOException("Cancel wrote a file."); checks.Add(format + " actual Cancel, no file; owner acknowledgement recorded separately"); continue; }
                 IndependentUiaClient.Wait(() => File.Exists(path) && new FileInfo(path).Length > 0);
                 if (format == "SVG")
                 {
@@ -107,8 +108,9 @@ internal static class MediaChecks
                 checks.Add("Actual native " + format + " save dialogue, chosen path and decoded drawing");
                 At("chosen-file-decoded", new { format, path, Bytes = new FileInfo(path).Length });
             }
-            Program.Write(Path.Combine(output, "media-client.json"), new { Status = "PASS", Route = route, Checks = checks, Timeline = timeline }); return 0;
+            if (responseFailures.Count > 0) throw new IOException("Native response assertions failed; subsequent Save/Cancel/file checks were completed independently: " + string.Join("; ", responseFailures));
+            Program.Write(Path.Combine(output, "media-client.json"), new { Status = "PASS", Route = route, Checks = checks, Timeline = timeline, ResponseBudgetFailures = responseFailures }); return 0;
         }
-        catch (Exception error) { Program.Write(Path.Combine(output, "media-client.json"), new { Status = "FAIL", Checks = checks, Timeline = timeline, Error = error.ToString() }); return 1; }
+        catch (Exception error) { Program.Write(Path.Combine(output, "media-client.json"), new { Status = "FAIL", Checks = checks, Timeline = timeline, ResponseBudgetFailures = responseFailures, Error = error.ToString() }); return 1; }
     }
 }

@@ -89,6 +89,7 @@ internal static class TargetedChecks
                     Program.Capture(viewer, Path.Combine(destination, "stock-distant-selected.png"));
                 }
                 var selectedStockOffset = scrolling.VerticalOffset;
+                window.SourcePath = path; window.WorkspaceRoot = destination;
                 window.Content = window.Scroller; window.InstallMeasured(snapshot); window.Scroller.ScrollToTop(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 Program.Capture(window.Scroller, Path.Combine(destination, "candidate.png"));
                 if (distantLiteral is not null)
