@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--quadrant-compatibility")
+        {
+            try { NativeQuadrantCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--source-editor-fidelity")
         {
             try { NativeSourceEditorChecks.Run(Path.GetFullPath(args[1])); return 0; }
