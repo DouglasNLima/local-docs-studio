@@ -188,6 +188,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             || Core.ClassDiagrams.ClassDiagramSourceParser.IsClass(diagram.Source)
                             || Core.PieDiagrams.PieVisualDraft.IsPie(diagram.Source)
                             || Core.QuadrantDiagrams.QuadrantVisualDraft.IsQuadrant(diagram.Source)
+                            || Core.TimelineDiagrams.TimelineVisualDraft.IsTimeline(diagram.Source)
                             || Core.Mindmaps.MindmapVisualDraft.IsMindmap(diagram.Source)
                             || Core.GanttDiagrams.GanttVisualDraft.IsGantt(diagram.Source)))
                     {
