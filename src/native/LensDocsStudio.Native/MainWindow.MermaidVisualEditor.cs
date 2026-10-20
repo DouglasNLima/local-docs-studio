@@ -7,6 +7,7 @@ using LensDocsStudio.Core.Sequence;
 using LensDocsStudio.Core.StateDiagrams;
 using LensDocsStudio.Core.ErDiagrams;
 using LensDocsStudio.Core.ClassDiagrams;
+using LensDocsStudio.Core.PieDiagrams;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.ViewModels;
@@ -43,7 +44,8 @@ public partial class MainWindow
         => InsertMermaidVisually(false, er: true);
     private void InsertClass(object sender, RoutedEventArgs e)
         => InsertMermaidVisually(false, classDiagram: true);
-    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false)
+    private void InsertPie(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, pie: true);
+    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
         if (tab.EditorDocument.TextLength > MermaidDocumentEditSession.MaximumDocumentCharacters)
@@ -62,7 +64,7 @@ public partial class MainWindow
             var suffix = span.End == current.Length || current[span.End..].StartsWith(newline + newline, StringComparison.Ordinal) ? "" : current[span.End..].StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
             return prefix + "```mermaid" + newline + draft.TrimEnd('\r', '\n') + newline + "```" + suffix;
         });
-        OpenVisualDraft(tab, session, classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
+        OpenVisualDraft(tab, session, pie ? PieVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
     }
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
     private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
@@ -80,7 +82,9 @@ public partial class MainWindow
             }
             catch (ArgumentException error) { return error.Message; }
         }
-        Window window = ClassDiagramSourceParser.IsClass(source)
+        Window window = PieVisualDraft.IsPie(source)
+            ? new PieVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : ClassDiagramSourceParser.IsClass(source)
             ? new ClassVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : ErDiagramSourceParser.IsEr(source)
             ? new ErVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
