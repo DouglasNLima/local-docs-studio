@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory)][string]$Installer,
     [Parameter(Mandatory)][string]$UpgradeInstaller,
     [Parameter(Mandatory)][string]$ExpectedSourceRevision,
-    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie")][string]$Family = "Class"
+    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie", "Timeline", "Journey", "Quadrant")][string]$Family = "Class",
+    [switch]$NoFileAssociations
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
@@ -18,6 +19,8 @@ if ((Test-Path -LiteralPath $uninstallKey) -or (Test-Path -LiteralPath $shortcut
 $root = Join-Path $repo ('artifacts/native/' + $Family.ToLowerInvariant() + '-install-smoke/' + [guid]::NewGuid().ToString('N'))
 $installDirectory = Join-Path $root 'installed'
 New-Item -ItemType Directory -Path $root -Force | Out-Null
+. (Join-Path $PSScriptRoot 'NativeAssociationExclusion.ps1')
+if ($NoFileAssociations) { Assert-NativeAssociationAbsence }
 $checks = [Collections.Generic.List[string]]::new()
 $versions = [Collections.Generic.List[object]]::new()
 $completed = $false
@@ -60,19 +63,21 @@ try {
         if ($phase -eq 'reinstall') { Remove-Installation 'before-reinstall' }
         $package = if ($phase -eq 'install') { $Installer } else { $UpgradeInstaller }
         $expected = Get-Content -LiteralPath (Join-Path ([IO.Path]::GetDirectoryName($package)) 'version.json') -Raw | ConvertFrom-Json
-        $process = Start-Process -FilePath $package -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),('/LOG="' + (Join-Path $root ($phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
+        $taskExclusions = if ($NoFileAssociations) { @('/TASKS=""') } else { @() }
+        $process = Start-Process -FilePath $package -ArgumentList (@($taskExclusions) + @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),('/LOG="' + (Join-Path $root ($phase + '.log')) + '"'))) -WindowStyle Hidden -Wait -PassThru
         if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $uninstallKey)) { throw "${phase}: isolated $Family installation failed." }
         $identity = Get-Content -LiteralPath (Join-Path $installDirectory 'version.json') -Raw | ConvertFrom-Json
         $binary = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $installDirectory 'LensDocsStudio.Native.dll')).ProductVersion.Split('+')[0]
         $registered = (Get-ItemProperty -LiteralPath $uninstallKey).DisplayVersion
         if ($identity.version -ne $expected.version -or $identity.sourceRevision -ne $ExpectedSourceRevision -or $binary -ne $expected.version -or $registered -ne $expected.version) { throw "${phase}: installed $Family provenance differs from the exact PR head." }
+        if ($NoFileAssociations) { Assert-NativeAssociationAbsence; $checks.Add("${phase}: optional association tasks explicitly disabled and registrations absent") }
         Assert-Payload $package $phase
         $versions.Add(@{ phase=$phase; version=$identity.version; source=$identity.sourceRevision; binary=$binary; registered=$registered })
         Push-Location $repo
         try {
-            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie' } { '--source-editor-ui' } default { '--class-ui' } }
+            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant' } { '--source-editor-ui' } default { '--class-ui' } }
             $arguments = @('run', '--project', 'src/native/LensDocsStudio.Native.Validation', '-c', 'Release', '--no-build', '--', $mode, (Join-Path $installDirectory 'LensDocsStudio.Native.exe'), (Join-Path $root $phase))
-            if ($Family -in 'Gantt','Mindmap','Pie') { $arguments += $Family }
+            if ($Family -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant') { $arguments += $Family }
             $arguments += '--normal'
             if ($Family -eq 'Flowchart') { $arguments += '--polish' }
             & dotnet @arguments
@@ -81,6 +86,7 @@ try {
         $checks.Add("${phase}: real installed $Family authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel")
     }
     Remove-Installation 'final-uninstall'
+    if ($NoFileAssociations) { Assert-NativeAssociationAbsence }
     $completed = $true
 } finally {
     try { Remove-Installation 'cleanup' } finally {

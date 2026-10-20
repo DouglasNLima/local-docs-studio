@@ -10,6 +10,9 @@ using LensDocsStudio.Core.ClassDiagrams;
 using LensDocsStudio.Core.PieDiagrams;
 using LensDocsStudio.Core.Mindmaps;
 using LensDocsStudio.Core.GanttDiagrams;
+using LensDocsStudio.Core.QuadrantDiagrams;
+using LensDocsStudio.Core.TimelineDiagrams;
+using LensDocsStudio.Core.JourneyDiagrams;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.ViewModels;
@@ -49,7 +52,10 @@ public partial class MainWindow
     private void InsertPie(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, pie: true);
     private void InsertMindmap(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, mindmap: true);
     private void InsertGantt(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, gantt: true);
-    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false, bool mindmap = false, bool gantt = false)
+    private void InsertQuadrant(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, quadrant: true);
+    private void InsertTimeline(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, timeline: true);
+    private void InsertJourney(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, journey: true);
+    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false, bool mindmap = false, bool gantt = false, bool quadrant = false, bool timeline = false, bool journey = false)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
         if (tab.EditorDocument.TextLength > MermaidDocumentEditSession.MaximumDocumentCharacters)
@@ -68,12 +74,12 @@ public partial class MainWindow
             var suffix = span.End == current.Length || current[span.End..].StartsWith(newline + newline, StringComparison.Ordinal) ? "" : current[span.End..].StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
             return prefix + "```mermaid" + newline + draft.TrimEnd('\r', '\n') + newline + "```" + suffix;
         });
-        OpenVisualDraft(tab, session, gantt ? GanttVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : mindmap ? MindmapVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : pie ? PieVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
+        OpenVisualDraft(tab, session, journey ? JourneyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : timeline ? TimelineVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : quadrant ? QuadrantVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gantt ? GanttVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : mindmap ? MindmapVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : pie ? PieVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
     }
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
     private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
     {
-        if ((GanttVisualDraft.IsGantt(source) || MindmapVisualDraft.IsMindmap(source) || PieVisualDraft.IsPie(source))
+        if ((GanttVisualDraft.IsGantt(source) || MindmapVisualDraft.IsMindmap(source) || PieVisualDraft.IsPie(source) || QuadrantVisualDraft.IsQuadrant(source) || TimelineVisualDraft.IsTimeline(source) || JourneyVisualDraft.IsJourney(source))
             && (source.Length > 100_000 || source.Count(character => character == '\n') + (source.Length > 0 && !source.EndsWith('\n') ? 1 : 0) > 1500))
         { model.Status = "This diagram exceeds the 100,000-character or 1,500-line visual source budget. Use Edit source; the document is unchanged."; return; }
         async Task<string?> ApplyDraft(string draft, CancellationToken cancellationToken)
@@ -90,7 +96,13 @@ public partial class MainWindow
             catch (ArgumentException error) { return error.Message; }
         }
         Window window;
-        try { window = GanttVisualDraft.IsGantt(source)
+        try { window = JourneyVisualDraft.IsJourney(source)
+            ? new JourneyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : TimelineVisualDraft.IsTimeline(source)
+            ? new TimelineVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : QuadrantVisualDraft.IsQuadrant(source)
+            ? new QuadrantVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : GanttVisualDraft.IsGantt(source)
             ? new GanttVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : MindmapVisualDraft.IsMindmap(source)
             ? new MindmapVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)

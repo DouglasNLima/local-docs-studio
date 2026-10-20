@@ -142,6 +142,16 @@
       "fields": []
     },
     {
+      "id": "mermaid/quadrant",
+      "group": "Mermaid",
+      "label": "Quadrant chart",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "quadrant.mmd",
+      "contentPattern": "quadrantChart\n  title Documentation priorities\n  x-axis Low effort --> High effort\n  y-axis Low impact --> High impact\n  quadrant-1 Invest\n  quadrant-2 Quick wins\n  quadrant-3 Reconsider\n  quadrant-4 Defer\n  Guides: [0.25, 0.75]\n  Reference: [0.75, 0.25]\n",
+      "fields": []
+    },
+    {
       "id": "mermaid-snippet/subgraph",
       "group": "Mermaid",
       "label": "Subgraph",

@@ -1,7 +1,7 @@
 name: Validate expanded native Mermaid editors
 on:
   push:
-    branches: [feature/native-mermaid-gantt-mindmap-pie-editors]
+    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors]
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Gantt, Mindmap, Pie]
+        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant]
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4

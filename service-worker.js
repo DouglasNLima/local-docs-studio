@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v68';
+const CACHE_NAME = 'lens-docs-studio-v70';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -65,11 +65,17 @@ self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
     const assets = [...LOCAL_ASSETS, ...await readVendorAssets()];
-    await Promise.all(assets.map(async (url) => {
-      try {
-        await cache.add(new Request(url, { mode: 'same-origin', cache: 'reload' }));
-      } catch {
-        // The app still works online if an optional cached asset is unavailable during install.
+    // A cold install must not exhaust browser network buffers while the page loads its own assets.
+    // Keep every asset and optional-failure behaviour, with a bounded cache-fetch queue.
+    let next = 0;
+    await Promise.all(Array.from({ length: Math.min(6, assets.length) }, async () => {
+      while (next < assets.length) {
+        const url = assets[next++];
+        try {
+          await cache.add(new Request(url, { mode: 'same-origin', cache: 'reload' }));
+        } catch {
+          // The app still works online if an optional cached asset is unavailable during install.
+        }
       }
     }));
     await self.skipWaiting();

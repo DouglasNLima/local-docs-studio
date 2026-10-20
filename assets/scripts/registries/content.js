@@ -261,6 +261,21 @@ gantt
   2026-05-22 : Diagram Studio
 `,
       },
+      quadrant: {
+        name: 'quadrant.mmd',
+        label: 'Quadrant chart',
+        content: `quadrantChart
+  title Documentation priorities
+  x-axis Low effort --> High effort
+  y-axis Low impact --> High impact
+  quadrant-1 Invest
+  quadrant-2 Quick wins
+  quadrant-3 Reconsider
+  quadrant-4 Defer
+  Guides: [0.25, 0.75]
+  Reference: [0.75, 0.25]
+`,
+      },
     };
 
     const studioSnippets = {

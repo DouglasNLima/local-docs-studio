@@ -1,0 +1,429 @@
+{
+  "source": "7a1348e0e5fbcd3181726a8d0e0e92369fce73fa",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39393043058",
+  "results": [
+    {
+      "family": "Timeline",
+      "appearance": "normal",
+      "status": "PASS",
+      "checks": [
+        "Independent UIA connections agree on occurrence selection and persistent inspector",
+        "Real canonical pointer selection resolves occurrence geometry through the ordinary native adapter",
+        "Invalid pending input preserves the last valid source and cannot Apply",
+        "Private edits preserve the owner and saved bytes",
+        "Apply and focused field are reachable at 880x600",
+        "Apply and focused field are reachable at 1280x800",
+        "Second identical fence Apply, one-step owner Undo/Redo and Save preserve neighbouring source",
+        "Reopen uses exact applied source",
+        "Cancel retains owner source",
+        "Stale-owner rejection retains both sources",
+        "Standalone Mermaid uses the same normal editor route",
+        "Normal Insert menu uses the family starter",
+        "Insertion produces portable Mermaid",
+        "Protection/raw-value explanation is visible",
+        "Rejected structural move retains unknown source and raw values",
+        "Safe local editing retains continuation/actor/raw-coordinate source",
+        "Off-screen keyboard navigation reveals the selected occurrence"
+      ],
+      "observations": [
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1146.9282,
+          "WorkingSetBytes": 186908672,
+          "SourceCharacters": 201
+        },
+        {
+          "Operation": "Canonical pointer",
+          "Bounds": "52,116,160,36",
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 1,
+          "ScreenX": 614,
+          "ScreenY": 282
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1164.1476,
+          "WorkingSetBytes": 187609088,
+          "SourceCharacters": 197
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 456.6908,
+          "WorkingSetBytes": 199929856,
+          "SourceCharacters": 197
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1293.3693,
+          "WorkingSetBytes": 184385536,
+          "SourceCharacters": 201
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1294.1965,
+          "WorkingSetBytes": 182165504,
+          "SourceCharacters": 65
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1612.7656,
+          "WorkingSetBytes": 200187904,
+          "SourceCharacters": 869
+        }
+      ]
+    },
+    {
+      "family": "Timeline",
+      "appearance": "high-contrast",
+      "status": "PASS",
+      "checks": [
+        "Actual Windows High Contrast is active",
+        "Independent UIA connections agree on occurrence selection and persistent inspector",
+        "Real canonical pointer selection resolves occurrence geometry through the ordinary native adapter",
+        "Invalid pending input preserves the last valid source and cannot Apply",
+        "Private edits preserve the owner and saved bytes",
+        "Apply and focused field are reachable at 880x600",
+        "Apply and focused field are reachable at 1280x800",
+        "Second identical fence Apply, one-step owner Undo/Redo and Save preserve neighbouring source",
+        "Reopen uses exact applied source",
+        "Cancel retains owner source",
+        "Stale-owner rejection retains both sources",
+        "Standalone Mermaid uses the same normal editor route",
+        "Normal Insert menu uses the family starter",
+        "Insertion produces portable Mermaid",
+        "Protection/raw-value explanation is visible",
+        "Rejected structural move retains unknown source and raw values",
+        "Safe local editing retains continuation/actor/raw-coordinate source",
+        "Off-screen keyboard navigation reveals the selected occurrence"
+      ],
+      "observations": [
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1070.1939,
+          "WorkingSetBytes": 186208256,
+          "SourceCharacters": 201
+        },
+        {
+          "Operation": "Canonical pointer",
+          "Bounds": "52,116,160,36",
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 1,
+          "ScreenX": 614,
+          "ScreenY": 282
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 970.7881,
+          "WorkingSetBytes": 187568128,
+          "SourceCharacters": 197
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 379.0923,
+          "WorkingSetBytes": 199680000,
+          "SourceCharacters": 197
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1056.4389,
+          "WorkingSetBytes": 185311232,
+          "SourceCharacters": 201
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1049.8399,
+          "WorkingSetBytes": 181936128,
+          "SourceCharacters": 65
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1274.3446,
+          "WorkingSetBytes": 194289664,
+          "SourceCharacters": 869
+        }
+      ]
+    },
+    {
+      "family": "Journey",
+      "appearance": "normal",
+      "status": "PASS",
+      "checks": [
+        "Independent UIA connections agree on occurrence selection and persistent inspector",
+        "Real canonical pointer selection resolves occurrence geometry through the ordinary native adapter",
+        "Invalid pending input preserves the last valid source and cannot Apply",
+        "Private edits preserve the owner and saved bytes",
+        "Apply and focused field are reachable at 880x600",
+        "Apply and focused field are reachable at 1280x800",
+        "Second identical fence Apply, one-step owner Undo/Redo and Save preserve neighbouring source",
+        "Reopen uses exact applied source",
+        "Cancel retains owner source",
+        "Stale-owner rejection retains both sources",
+        "Standalone Mermaid uses the same normal editor route",
+        "Normal Insert menu uses the family starter",
+        "Insertion produces portable Mermaid",
+        "Protection/raw-value explanation is visible",
+        "Rejected structural move retains unknown source and raw values",
+        "Safe local editing retains continuation/actor/raw-coordinate source",
+        "Off-screen keyboard navigation reveals the selected occurrence"
+      ],
+      "observations": [
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1820.6801,
+          "WorkingSetBytes": 191172608,
+          "SourceCharacters": 194
+        },
+        {
+          "Operation": "Canonical pointer",
+          "Bounds": "52,116,175.66,44",
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 0.9758456855102563,
+          "ScreenX": 618.4525022048991,
+          "ScreenY": 282.66670460041536
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1525.6991,
+          "WorkingSetBytes": 192602112,
+          "SourceCharacters": 191
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 767.0124,
+          "WorkingSetBytes": 207745024,
+          "SourceCharacters": 191
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1675.183,
+          "WorkingSetBytes": 186290176,
+          "SourceCharacters": 194
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1672.85,
+          "WorkingSetBytes": 185434112,
+          "SourceCharacters": 50
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 2075.2408,
+          "WorkingSetBytes": 195493888,
+          "SourceCharacters": 478
+        }
+      ]
+    },
+    {
+      "family": "Journey",
+      "appearance": "high-contrast",
+      "status": "PASS",
+      "checks": [
+        "Actual Windows High Contrast is active",
+        "Independent UIA connections agree on occurrence selection and persistent inspector",
+        "Real canonical pointer selection resolves occurrence geometry through the ordinary native adapter",
+        "Invalid pending input preserves the last valid source and cannot Apply",
+        "Private edits preserve the owner and saved bytes",
+        "Apply and focused field are reachable at 880x600",
+        "Apply and focused field are reachable at 1280x800",
+        "Second identical fence Apply, one-step owner Undo/Redo and Save preserve neighbouring source",
+        "Reopen uses exact applied source",
+        "Cancel retains owner source",
+        "Stale-owner rejection retains both sources",
+        "Standalone Mermaid uses the same normal editor route",
+        "Normal Insert menu uses the family starter",
+        "Insertion produces portable Mermaid",
+        "Protection/raw-value explanation is visible",
+        "Rejected structural move retains unknown source and raw values",
+        "Safe local editing retains continuation/actor/raw-coordinate source",
+        "Off-screen keyboard navigation reveals the selected occurrence"
+      ],
+      "observations": [
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1963.8415,
+          "WorkingSetBytes": 200720384,
+          "SourceCharacters": 194
+        },
+        {
+          "Operation": "Canonical pointer",
+          "Bounds": "52,116,175.66,44",
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 0.9758456855102563,
+          "ScreenX": 618.4525022048991,
+          "ScreenY": 282.66670460041536
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1735.7509,
+          "WorkingSetBytes": 192200704,
+          "SourceCharacters": 191
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 704.0866,
+          "WorkingSetBytes": 205185024,
+          "SourceCharacters": 191
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1870.2341,
+          "WorkingSetBytes": 188014592,
+          "SourceCharacters": 194
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1780.2701,
+          "WorkingSetBytes": 185503744,
+          "SourceCharacters": 50
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 2046.7594,
+          "WorkingSetBytes": 195461120,
+          "SourceCharacters": 478
+        }
+      ]
+    },
+    {
+      "family": "Quadrant",
+      "appearance": "normal",
+      "status": "PASS",
+      "checks": [
+        "Independent UIA connections agree on occurrence selection and persistent inspector",
+        "Real canonical pointer selection resolves occurrence geometry through the ordinary native adapter",
+        "Invalid pending input preserves the last valid source and cannot Apply",
+        "Private edits preserve the owner and saved bytes",
+        "Apply and focused field are reachable at 880x600",
+        "Apply and focused field are reachable at 1280x800",
+        "Second identical fence Apply, one-step owner Undo/Redo and Save preserve neighbouring source",
+        "Reopen uses exact applied source",
+        "Cancel retains owner source",
+        "Stale-owner rejection retains both sources",
+        "Standalone Mermaid uses the same normal editor route",
+        "Normal Insert menu uses the family starter",
+        "Insertion produces portable Mermaid",
+        "Protection/raw-value explanation is visible",
+        "Rejected structural move retains unknown source and raw values",
+        "Safe local editing retains continuation/actor/raw-coordinate source",
+        "Off-screen keyboard navigation reveals the selected occurrence"
+      ],
+      "observations": [
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1946.2134,
+          "WorkingSetBytes": 189816832,
+          "SourceCharacters": 279
+        },
+        {
+          "Operation": "Canonical pointer",
+          "Bounds": "187,193,22,22",
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 0.7375776397515527,
+          "ScreenX": 628.0403726708074,
+          "ScreenY": 298.46583850931677
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1616.8643,
+          "WorkingSetBytes": 188227584,
+          "SourceCharacters": 291
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 706.657,
+          "WorkingSetBytes": 204681216,
+          "SourceCharacters": 291
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1741.1696,
+          "WorkingSetBytes": 183291904,
+          "SourceCharacters": 279
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1758.6966,
+          "WorkingSetBytes": 184078336,
+          "SourceCharacters": 61
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 2075.8104,
+          "WorkingSetBytes": 188166144,
+          "SourceCharacters": 804
+        }
+      ]
+    },
+    {
+      "family": "Quadrant",
+      "appearance": "high-contrast",
+      "status": "PASS",
+      "checks": [
+        "Actual Windows High Contrast is active",
+        "Independent UIA connections agree on occurrence selection and persistent inspector",
+        "Real canonical pointer selection resolves occurrence geometry through the ordinary native adapter",
+        "Invalid pending input preserves the last valid source and cannot Apply",
+        "Private edits preserve the owner and saved bytes",
+        "Apply and focused field are reachable at 880x600",
+        "Apply and focused field are reachable at 1280x800",
+        "Second identical fence Apply, one-step owner Undo/Redo and Save preserve neighbouring source",
+        "Reopen uses exact applied source",
+        "Cancel retains owner source",
+        "Stale-owner rejection retains both sources",
+        "Standalone Mermaid uses the same normal editor route",
+        "Normal Insert menu uses the family starter",
+        "Insertion produces portable Mermaid",
+        "Protection/raw-value explanation is visible",
+        "Rejected structural move retains unknown source and raw values",
+        "Safe local editing retains continuation/actor/raw-coordinate source",
+        "Off-screen keyboard navigation reveals the selected occurrence"
+      ],
+      "observations": [
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1072.608,
+          "WorkingSetBytes": 188190720,
+          "SourceCharacters": 279
+        },
+        {
+          "Operation": "Canonical pointer",
+          "Bounds": "187,193,22,22",
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 0.7375776397515527,
+          "ScreenX": 628.0403726708074,
+          "ScreenY": 298.46583850931677
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1008.7647,
+          "WorkingSetBytes": 184909824,
+          "SourceCharacters": 291
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 372.2052,
+          "WorkingSetBytes": 199852032,
+          "SourceCharacters": 291
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1079.0218,
+          "WorkingSetBytes": 182546432,
+          "SourceCharacters": 279
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1083.1965,
+          "WorkingSetBytes": 181129216,
+          "SourceCharacters": 61
+        },
+        {
+          "Operation": "Open canonical editor and UIA",
+          "Milliseconds": 1154.2456,
+          "WorkingSetBytes": 188223488,
+          "SourceCharacters": 804
+        }
+      ]
+    }
+  ]
+}

@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(16, NativeHelpGuide.Topics.Count);
-        Assert.Equal(16, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(17, NativeHelpGuide.Topics.Count);
+        Assert.Equal(17, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -23,6 +23,11 @@ public sealed class NativeHelpGuideTests
         Assert.Equal("gantt-mind-map-and-pie-visual-authoring", topic.Anchor);
         foreach (var phrase in new[] { "native calendar", "Duplicate", "Zero rows", "Embedded double quotes", "one owner-document", "Cancel", "stale", "protected" })
             Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
+    }
+    [Fact] public void Timeline_Journey_and_Quadrant_topic_explains_occurrences_clamping_and_local_actor_scope()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Timeline, User Journey and Quadrant visual authoring"));
+        foreach (var phrase in new[] { "continuation", "raw", "1–5", "0–1", "actor", "task only", "quadrant 1", "pending", "Undo", "Cancel" }) Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Mermaid_visual_authoring_has_an_independent_searchable_source_preservation_topic()
     {

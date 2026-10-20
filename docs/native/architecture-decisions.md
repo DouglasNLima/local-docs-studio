@@ -1,5 +1,17 @@
 # Native architecture decisions
 
+## Eleven native Mermaid editors — Expansion II
+
+Timeline, User Journey and Quadrant join the existing eight normal editor families.
+They reuse #40's source occurrences, source-group patching, private history, shared
+native workspace and owner Apply session. No renderer/runtime upgrade, browser
+fallback or LayoutExperiment is included. See the [syntax matrix](timeline-journey-quadrant-editors.md)
+and [engineering receipt](expansion-ii-engineering-receipt.md) for source-labelled
+verification, known protections and the Draft PR's final package/results record.
+Stock Continuous and paused #38 retain their documented status. Internal packaging
+and actual OS/installer acceptance are isolated; optional associations stay disabled.
+
+
 ## Accepted consolidation — 19 October 2026
 
 The product decision accepts the bounded production improvements in PRs #36/#37

@@ -119,6 +119,9 @@
     <MenuItem Header="Gantt chart visually…" Click="InsertGantt" AutomationProperties.AutomationId="InsertGantt"/>
     <MenuItem Header="Mind map visually…" Click="InsertMindmap" AutomationProperties.AutomationId="InsertMindmap"/>
     <MenuItem Header="Pie chart visually…" Click="InsertPie" AutomationProperties.AutomationId="InsertPie"/>
+    <MenuItem Header="Quadrant chart visually…" Click="InsertQuadrant" AutomationProperties.AutomationId="InsertQuadrant"/>
+    <MenuItem Header="Timeline visually…" Click="InsertTimeline" AutomationProperties.AutomationId="InsertTimeline"/>
+    <MenuItem Header="User Journey visually…" Click="InsertJourney" AutomationProperties.AutomationId="InsertJourney"/>
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>
