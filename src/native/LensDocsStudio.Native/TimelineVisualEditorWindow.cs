@@ -52,7 +52,7 @@ public sealed class TimelineVisualEditorWindow : SourceVisualEditorWindow
         var title = timeline.Selection == timeline.Model.HeaderIdentity; var section = timeline.Model.Sections.FirstOrDefault(s => s.Identity == timeline.Selection); var p = Period; var evt = p?.Events.FirstOrDefault(e => e.Identity == timeline.Selection);
         label.Text = title ? timeline.Model.Title?.Value ?? "" : section?.Tokens is not null ? section.Name : evt?.Label ?? p?.Label ?? "";
         label.IsEnabled = title || section?.Tokens is not null || evt is not null || p is { Protected: false };
-        var selected = (destination.SelectedItem as Choice)?.Identity; destination.ItemsSource = timeline.Model.Sections.Select(s => new Choice(s.Identity, s.Name)).ToArray();
+        var selected = (destination.SelectedItem as Choice)?.Identity; destination.ItemsSource = timeline.Model.Sections.Select((s, i) => new Choice(s.Identity, s.Tokens is null ? "Unsectioned" : "Section " + i + " · " + s.Name)).ToArray();
         destination.SelectedItem = destination.Items.OfType<Choice>().FirstOrDefault(c => c.Identity == selected) ?? destination.Items.OfType<Choice>().FirstOrDefault(c => c.Identity != p?.Section); destination.IsEnabled = p is not null;
         Describe(title ? "Timeline title" : evt is not null ? "Event · " + evt.Label : p is not null ? "Period · " + p.Label : section?.Name ?? "Select a source occurrence",
             timeline.Model.Errors.FirstOrDefault() ?? "Period labels are authored text, without date sorting. Colons separate events and cannot be escaped in a new label. Moves carry complete continuation groups and proved leading comments. Empty sections and unknown source remain inspectable; ambiguous structure is protected.");

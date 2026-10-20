@@ -58,7 +58,7 @@ public sealed class JourneyVisualEditorWindow : SourceVisualEditorWindow
         var title = journey.Selection == journey.Model.HeaderIdentity; var section = journey.Model.Sections.FirstOrDefault(s => s.Identity == journey.Selection); var t = TaskRow; var actor = t?.Actors.FirstOrDefault(a => a.Identity == journey.Selection);
         label.Text = title ? journey.Model.Title?.Value ?? "" : section?.Tokens is not null ? section.Name : actor?.Name ?? t?.Label ?? ""; label.IsEnabled = title || section?.Tokens is not null || t is not null;
         score.Text = t?.Score ?? ""; score.IsEnabled = t is not null && actor is null;
-        var selected = (destination.SelectedItem as Choice)?.Identity; destination.ItemsSource = journey.Model.Sections.Select(s => new Choice(s.Identity, s.Name)).ToArray();
+        var selected = (destination.SelectedItem as Choice)?.Identity; destination.ItemsSource = journey.Model.Sections.Select((s, i) => new Choice(s.Identity, s.Tokens is null ? "Unsectioned" : "Section " + i + " · " + s.Name)).ToArray();
         destination.SelectedItem = destination.Items.OfType<Choice>().FirstOrDefault(c => c.Identity == selected) ?? destination.Items.OfType<Choice>().FirstOrDefault(c => c.Identity != t?.Section); destination.IsEnabled = t is not null;
         Describe(title ? "User Journey title" : actor is not null ? "Actor · " + actor.Name + " · selected task only" : t?.Label ?? section?.Name ?? "Select a source occurrence",
             journey.Model.Errors.FirstOrDefault() ?? (t is null ? "Empty sections and ignored source remain inspectable. Structural changes cannot cross unproved source. Select a task or one of its actor occurrences to author that task's actors." :

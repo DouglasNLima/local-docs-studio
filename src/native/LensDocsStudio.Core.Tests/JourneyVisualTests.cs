@@ -70,4 +70,10 @@ public class JourneyVisualTests
         var root = System.Xml.Linq.XDocument.Parse(rendered.Svg!); var dots = root.Descendants().Where(e => (string?)e.Attribute("class") == "actor-dot").ToArray();
         dots[1].Remove(); dots[0].AddAfterSelf(dots[1]); Assert.Throws<ArgumentException>(() => JourneyVisualDraft.VerifyCanonical(draft.Model, root.ToString()));
     }
+    [Fact] public async Task Duplicate_named_sections_are_distinct_destinations_without_raw_score_or_actor_loss()
+    {
+        const string source = "journey\n section Same\n Same: 9: Me, Me\n section Same\n Same: 2:\n"; var draft = new JourneyVisualDraft(source); var task = draft.Model.Tasks[0]; var destination = draft.Model.Sections[2]; draft.Select(task.Identity);
+        Success(await draft.MoveToSectionAsync(task.Identity, destination.Identity)); Assert.Equal(destination.Identity, draft.Model.Tasks.Single(t => t.Identity == task.Identity).Section); Assert.Equal("9", draft.Model.Tasks[^1].Score); Assert.Equal(new[] { "Me", "Me" }, draft.Model.Tasks[^1].Actors.Select(a => a.Name));
+        draft.Undo(); Assert.Equal(source, draft.Source); Assert.Equal(task.Identity, draft.Selection); draft.Redo(); Assert.Equal(destination.Identity, draft.Model.Tasks.Single(t => t.Identity == task.Identity).Section);
+    }
 }

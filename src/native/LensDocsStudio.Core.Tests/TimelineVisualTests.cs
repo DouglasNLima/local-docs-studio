@@ -71,4 +71,11 @@ public class TimelineVisualTests
         Success(await draft.DeleteAsync(draft.Model.Periods[0].Events[0].Identity)); Assert.Equal("timeline\n  Period : Second\n    :  Third\n    : Fourth\n", draft.Source);
         draft.Undo(); Assert.Equal(source, draft.Source);
     }
+    [Fact] public async Task Duplicate_named_sections_are_distinct_destinations_and_keep_complete_period_groups()
+    {
+        const string source = "timeline\n section Same\n Same : First\n  : Continuation\n section Same\n Same : Second\n"; var draft = new TimelineVisualDraft(source); var period = draft.Model.Periods[0]; var destination = draft.Model.Sections[2]; draft.Select(period.Identity);
+        Success(await draft.MoveToSectionAsync(period.Identity, destination.Identity)); Assert.Equal(destination.Identity, draft.Model.Periods.Single(p => p.Identity == period.Identity).Section);
+        Assert.Equal("First", draft.Model.Periods[^1].Events[0].Label); Assert.Equal("Continuation", draft.Model.Periods[^1].Events[1].Label); Assert.Equal(3, draft.Model.Sections.Count);
+        draft.Undo(); Assert.Equal(source, draft.Source); Assert.Equal(period.Identity, draft.Selection); draft.Redo(); Assert.Equal(destination.Identity, draft.Model.Periods.Single(p => p.Identity == period.Identity).Section);
+    }
 }
