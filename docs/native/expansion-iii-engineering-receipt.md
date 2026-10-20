@@ -179,3 +179,15 @@ and reinstall. Full preserved-file maps are retained in the installed result JSO
 This supplements exact portable/installed payload parity and association exclusions.
 The version-pair upgrade remains source-identical and synthetic; it is not historical
 upgrade acceptance. No installer executes on the ordinary desktop.
+
+### Minimum-axis contract correction
+
+Final review found an artificial three-axis floor in Radar removal. The pinned
+engine supports one/two axes, so this restriction is removed. New exact-source tests
+construct empty XY/Radar charts without padding existing data, exercise one/two-axis
+curves and protect only a final-axis removal that would require unsupported empty
+curve vectors. Ordinary native SVG/PNG conversion proves both minimal Radar forms.
+Unproved body text still protects initial construction. The focused chart suite now
+has 56 cases; the compatibility gate has 82 outcomes. Earlier c5f0009 results remain
+attributed to that preserved candidate; the corrected final head must pass fresh CI
+and produce its own package version.

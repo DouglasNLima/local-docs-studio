@@ -152,6 +152,9 @@ The range uses unsigned decimals; a blank maximum selects the automatic maximum.
 Axis names reject commas, braces, brackets and quotes. Quoted curve IDs/labels
 can contain commas, braces and brackets; embedded double quotes have no supported escape.
 Legend, graticule and tick settings remain available unchanged in source.
+Empty simple charts can gain their first axis. One- and two-axis profiles remain
+supported. Remove curves before removing the final axis; empty curve vectors are
+not invented.
 
 **Sankey:** select a numbered link to edit only that row's source, target or positive
 weight. Equal parallel links remain separate. Select **Rename node across proved

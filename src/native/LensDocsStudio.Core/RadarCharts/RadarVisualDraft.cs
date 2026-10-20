@@ -180,7 +180,13 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
     }, token);
     public Task<SourceAuthoringResult> AddAxisAsync(string id, string label, string initial, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Aligned(m); Name(id, false); Name(label, true); SourceVector.Number(initial);
+        Name(id, false); Name(label, true); SourceVector.Number(initial);
+        if (m.Axes.Count == 0 && m.AxisRows.Count == 0 && m.Curves.Count == 0)
+        {
+            if (m.Protected.Any(key => t.Index(key) > t.Index(m.HeaderIdentity) && !t.Line(key).InitDirective)) throw new ArgumentException("Unproved body declarations protect initial axis construction. Inspect source first; no curve vector is invented.");
+            return t.Insert(t.Index(m.HeaderIdentity) + 1, "    axis " + AxisText(id, label));
+        }
+        Aligned(m);
         if (m.Axes.Any(a => a.Id == id)) throw new ArgumentException("An existing axis has this ID. Choose a distinct ID.");
         var last = m.AxisRows[^1]; t = t.Replace(last.Axes.Add(t.Line(last.Identity), AxisText(id, label)));
         foreach (var c in m.Curves) t = t.Replace(c.Values.Add(t.Line(c.Identity), initial)); return t;
@@ -193,7 +199,7 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
         if (c is not null) { Simple(c); return direction == 0 ? ChartSource.DeleteRow(t, id) : ChartSource.MoveRow(t, m.Curves.Select(c => c.Identity).ToArray(), id, direction); }
         var axis = m.Axes.FirstOrDefault(a => a.Identity == id) ?? throw new ArgumentException("Select an axis or curve. Individual value moves would break axis correspondence and are protected.");
         Aligned(m); var at = m.Axes.ToList().IndexOf(axis); var next = at + direction;
-        if (direction == 0 && m.Axes.Count <= 3) throw new ArgumentException("Keep at least three axes for this editable slice.");
+        if (direction == 0 && m.Axes.Count <= 1 && m.Curves.Count > 0) throw new ArgumentException("The final axis has non-empty curve vectors. Remove the curves first or use Edit source; no empty vector is invented.");
         if (direction != 0 && (next < 0 || next >= m.Axes.Count)) throw new ArgumentException("There is no axis in that direction.");
         var row = m.AxisRows.Single(r => r.Identity == axis.Row); var local = row.Axes.Items.ToList().FindIndex(i => i.Identity == id);
         if (direction == 0 && row.Axes.Items.Count == 1) t = ChartSource.DeleteRow(t, row.Identity);

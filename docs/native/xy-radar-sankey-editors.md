@@ -101,3 +101,10 @@ Later source checks and captures are identified separately in the PR delivery re
 | XY Chart | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-light.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-dark.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-viewport-880x600.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-high-contrast-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-high-contrast-viewport-880x600.png) |
 | Radar | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-light.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-dark.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-viewport-880x600.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-high-contrast-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-high-contrast-viewport-880x600.png) |
 | Sankey | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-light.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-dark.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-viewport-880x600.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-high-contrast-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-high-contrast-viewport-880x600.png) |
+
+Empty simple XY/Radar sources can gain their first explicit category/axis without
+padding existing data. Radar supports the pinned one- and two-axis forms; ordinary
+native SVG/PNG conversion proves both. Removing the last axis while curves remain
+is protected because their required non-empty vectors cannot be represented as
+empty without dropping source semantics. Remove curves first or use Edit source.
+Unproved body declarations protect initial construction.

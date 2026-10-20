@@ -100,6 +100,13 @@ internal static class NativeChartCompatibilityChecks
         }
         void Radar(XElement root, string source, bool dark)
         {
+            foreach (var axes in new[] { "A", "A,B" })
+            {
+                var minimal = diagrams.Render("radar-beta\naxis " + axes + "\ncurve c{" + (axes == "A" ? "1" : "1,2") + "}\n", dark);
+                var png = NativeSvgService.ToPng(new NativeSvgService().Render(minimal.Svg ?? throw new IOException(minimal.Error)));
+                Check(png.Length > 100 && Groups(XDocument.Parse(minimal.Svg!).Root!, "radar-curve")[0].Elements().Count(e => e.Name.LocalName == "circle") == axes.Split(',').Length,
+                    "Radar: actual one/two-axis canonical marks convert through the ordinary native SVG/PNG path without an invented minimum");
+            }
             var curves = Groups(root, "radar-curve");
             Check(curves.Select(e => (string?)e.Attribute("data-curve")).SequenceEqual(new[] { "first", "second", "third" }) && curves.All(e => e.Elements().Count(p => p.Name.LocalName == "circle") == 4), "Radar: curve declaration order and every positional mark survive canonical rendering");
             Check(Geometry(curves[0]) == Geometry(curves[1]), "Radar: overlapping curves have identical real geometry and remain separate occurrences");

@@ -15,7 +15,7 @@ public sealed record XySourceModel(string HeaderIdentity, Match Header, SourceDe
     public XyAxisSource? Categories => Axes.LastOrDefault(a => a.Categories is not null);
     public XyAxisSource? Range => Axes.LastOrDefault(a => a.Name == "y-axis" && a.Range is not null);
     public string AxisTitle(string name) => Axes.LastOrDefault(a => a.Name == name && a.Title is not null)?.Title ?? "";
-    public bool Aligned => Categories?.Categories is { Balanced: true } c && c.Items.All(i => i.Value.Length > 0) && Series.Count > 0 && Series.All(s => s.Simple && s.Values.Items.Count == c.Items.Count);
+    public bool Aligned => Categories?.Categories is { Balanced: true } c && c.Items.All(i => i.Value.Length > 0) && Series.All(s => s.Simple && s.Values.Items.Count == c.Items.Count);
 }
 
 public sealed class XyVisualDraft : SourceDraft<XySourceModel>
@@ -87,6 +87,8 @@ public sealed class XyVisualDraft : SourceDraft<XySourceModel>
     {
         SourceDeclarations.VerifyTitle(svg, model.Title); var root = XDocument.Parse(svg).Root!;
         var groups = root.Descendants().Where(e => (string?)e.Attribute("class") is "xy-bars" or "xy-line" or "xy-box").ToArray();
+        if (groups.Any(g => !int.TryParse((string?)g.Attribute("data-series"), NumberStyles.None, CultureInfo.InvariantCulture, out var index) || index < 0 || index >= model.Series.Count))
+            throw new ArgumentException("An unproved canonical XY series protects this source. Inspect the original declaration before editing.");
         var categories = model.Categories?.Categories?.Items.Count(i => i.Value.Length > 0) ?? 0;
         if (categories == 0) categories = Math.Max(1, model.Series.Select(s => s.Values.Items.Count).DefaultIfEmpty(0).Max());
         var grid = SourceDeclarations.Groups(svg, "xy-grid").FirstOrDefault();
@@ -221,7 +223,13 @@ public sealed class XyVisualDraft : SourceDraft<XySourceModel>
     { var s = m.Series.Single(s => s.Identity == series); Simple(s); SourceVector.Number(value); return text.Replace(s.Values.Add(text.Line(series), value)); }, token);
     public Task<SourceAuthoringResult> AddCategoryAsync(string label, string initial, CancellationToken token = default) => ChangeAsync((text, m) =>
     {
-        Aligned(m); SourceVector.Number(initial); var a = m.Categories!;
+        SourceVector.Number(initial); SourceText.Label(label);
+        if (m.Categories is null && m.Series.Count == 0)
+        {
+            if (m.Protected.Any(key => text.Index(key) > text.Index(m.HeaderIdentity) && !text.Line(key).InitDirective)) throw new ArgumentException("Unproved body declarations protect initial category construction. Inspect source first; no implicit vector is reshaped.");
+            return text.Insert(text.Index(m.HeaderIdentity) + 1, "    x-axis [" + SourceVector.Quote(label) + "]");
+        }
+        Aligned(m); var a = m.Categories!;
         text = text.Replace(a.Categories!.Add(text.Line(a.Identity), SourceVector.Quote(label)));
         foreach (var s in m.Series) text = text.Replace(s.Values.Add(text.Line(s.Identity), initial)); return text;
     }, token);

@@ -8,6 +8,14 @@ namespace LensDocsStudio.Core.Tests;
 public class ChartSourceAuthoringTests
 {
     private static void Pass(SourceAuthoringResult result) => Assert.True(result.Success, result.Error);
+    [Fact] public async Task Empty_charts_can_gain_explicit_source_occurrences_without_padding_existing_data()
+    {
+        var xy = new XyVisualDraft("xychart\n"); Pass(await xy.AddCategoryAsync("First Ω", "0")); Pass(await xy.AddSeriesAsync("bar")); Assert.Single(xy.Model.Series[0].Values.Items); Pass(await xy.ValidateAsync());
+        var radar = new RadarVisualDraft("radar-beta\n"); Pass(await radar.AddAxisAsync("a", "First Ω", "0")); Pass(await radar.AddCurveAsync("curve", "One axis", "1")); Pass(await radar.ValidateAsync());
+        Pass(await radar.AddAxisAsync("b", "Second", "0")); Assert.Equal(new[] { "1", "0" }, radar.Model.Curves[0].Values.Items.Select(v => v.Raw)); Pass(await radar.DeleteAsync(radar.Model.Axes[1].Identity));
+        Assert.Single(radar.Model.Axes); Assert.Single(radar.Model.Curves[0].Values.Items); var one = radar.Source; Assert.False((await radar.DeleteAsync(radar.Model.Axes[0].Identity)).Success); Assert.Equal(one, radar.Source);
+        Pass(await radar.DeleteAsync(radar.Model.Curves[0].Identity)); Pass(await radar.DeleteAsync(radar.Model.Axes[0].Identity)); Assert.Empty(radar.Model.Axes); Assert.Equal("radar-beta\n", radar.Source);
+    }
     [Fact] public async Task Radar_dropped_tokens_have_proved_read_only_canonical_positions_without_changing_source()
     {
         const string source = "radar-beta\n axis A,B,C\n curve malformed{1,invalid,C:3}\n curve simple{3,2,1}\n"; var draft = new RadarVisualDraft(source); Pass(await draft.ValidateAsync());
