@@ -28,7 +28,7 @@ public sealed class RadarVisualEditorWindow : ChartVisualEditorWindow
         foreach (var (c, i) in m.Curves.Select((c, i) => (c, i)))
         {
             yield return new(c.Identity, "Curve " + (i + 1) + " · " + c.Id + " · " + c.Label + (c.Simple ? "" : " · protected"));
-            foreach (var (v, index) in c.Values.Items.Select((v, index) => (v, index))) yield return new(v.Identity, "Curve " + (i + 1) + (c.Simple ? " · axis " : " · protected source token ") + (index + 1) + " · " + (c.Simple && index < m.Axes.Count ? m.Axes[index].Label + " · " : "") + v.Raw);
+            foreach (var (v, index) in c.Values.Items.Select((v, index) => (v, index))) yield return new(v.Identity, "Curve " + (i + 1) + (!c.Simple ? " · protected source token " : index < m.Axes.Count ? " · axis " : " · extra source value ") + (index + 1) + " · " + (c.Simple && index < m.Axes.Count ? m.Axes[index].Label + " · " : "") + v.Raw);
         }
         foreach (var key in m.Protected.Where(k => m.Curves.All(c => c.Identity != k))) yield return new(key, "Protected source · " + radar.Text.Line(key).Content);
     }
@@ -37,7 +37,7 @@ public sealed class RadarVisualEditorWindow : ChartVisualEditorWindow
     protected override void ShowProperties()
     {
         var m = radar.Model; var id = radar.Selection; var a = m.Axes.FirstOrDefault(a => a.Identity == id); var c = m.Curves.FirstOrDefault(c => c.Identity == id || c.Values.Items.Any(v => v.Identity == id)); var v = c?.Values.Items.FirstOrDefault(v => v.Identity == id);
-        Captions(id == m.HeaderIdentity ? "Diagram title" : a is not null ? "Axis label" : "Curve label", a is not null ? "Axis ID" : "Curve ID", id == m.HeaderIdentity + ":range" ? "Minimum (unsigned decimal)" : "Value for this axis (decimal point)", "Maximum (blank for automatic)");
+        Captions(id == m.HeaderIdentity ? "Diagram title" : a is not null ? "Axis label" : "Curve label", a is not null ? "Axis ID" : "Curve ID", id == m.HeaderIdentity + ":range" ? "Minimum (unsigned decimal)" : v is not null && !c!.Simple ? "Protected source token" : v is not null && c!.Values.Items.ToList().IndexOf(v) >= m.Axes.Count ? "Extra source value (decimal point)" : "Value for this axis (decimal point)", "Maximum (blank for automatic)");
         if (id == m.HeaderIdentity) Properties(m.Title?.Value ?? "", editLabel: true);
         else if (id == m.HeaderIdentity + ":range") Properties(value: m.Effective("min")?.Value ?? "0", maximum: m.Effective("max")?.Value ?? "", editValue: true, editMaximum: true);
         else if (a is not null) Properties(a.Label, a.Id, editLabel: a.Simple, editIdentifier: a.Simple);

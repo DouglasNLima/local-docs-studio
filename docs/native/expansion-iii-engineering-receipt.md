@@ -17,9 +17,11 @@ Stock Continuous is unchanged. The historical 250 ms goal remains incomplete and
    ordinary native adapter, SVG/PNG, document preview and HTML/DOCX/PDF export proof.
 2. Implemented: shared source token helpers, stable inline keys and lossless XY, Radar and Sankey drafts. Initial 43 focused Core cases pass.
 3. Implemented: native editors, canonical shape selection, normal routes, catalogue and protection guide. Initial 78 native fidelity/owner outcomes pass.
-4. Pending: final source validation, independent normal/High Contrast UIA, fourteen
-   installed-authoring suites on disposable runners, packages and provenance.
-5. Pending: one reviewable Draft PR to `develop`; no merge or public release.
+4. Final source validation, independent normal/High Contrast UIA, fourteen installed
+   lifecycle suites, packages and provenance are recorded in the final delivery record
+   linked below; earlier candidate outcomes retain their original source labels.
+5. [Draft PR #42](https://github.com/DouglasNLima/local-docs-studio/pull/42) is open
+   against `develop`; no merge or public release is authorised.
 
 ## Pinned source inspection
 
@@ -191,3 +193,8 @@ Unproved body text still protects initial construction. The focused chart suite 
 has 56 cases; the compatibility gate has 82 outcomes. Earlier c5f0009 results remain
 attributed to that preserved candidate; the corrected final head must pass fresh CI
 and produce its own package version.
+
+Final inspector wording distinguishes an extra numeric source value from a plotted
+Radar axis, and a protected raw token from an accepted numeric position. No extra
+axis or source occurrence is invented. The final PR delivery record supersedes
+implementation-stage pending markers and owns the actual immutable package hashes.
