@@ -54,8 +54,9 @@ internal static class NativeWorkflowCompatibilityChecks
             }
             foreach (var header in new[] { "kanban", "requirementDiagram", "gitGraph LR:" })
             { Render(header + "\n", "empty-" + header.Split(' ')[0]); Render(header + "\n" + (header == "kanban" ? "  Bare\n    [Card]\n" : header == "requirementDiagram" ? "requirement a {\n}\n" : "commit\n"), "small-" + header.Split(' ')[0]); }
-            var board = Render("kanban\n  A\n    same[One]@{ assigned: old, ASSIGNED: 'new', priority: HIGH }\n      same[Two]\n B\n\t\tCard\n", "kanban-semantics");
+            var board = Render("kanban\n  A\n    same[One]@{ assigned: old, ASSIGNED: 'new', priority: HIGH }\n      same[Two]\n B\n\t\t\tCard\n", "kanban-semantics");
             Check(G(board, "kanban-column").Select(e => (string?)e.Attribute("data-id")).SequenceEqual(new[] { "A", "B" }) && G(board, "kanban-card").Length == 3, "Kanban: first content indentation counts each tab as one character; all deeper content is cards");
+            Check(G(Render("kanban\n  A\n\t\tB\n", "kanban-tab-boundary"), "kanban-column").Length == 2, "Kanban: two tabs equal two spaces at the fixed first-column boundary and create a column");
             Check(G(board, "kanban-card").Take(2).All(e => (string?)e.Attribute("data-id") == "same") && board.Svg!.Contains(">new<", StringComparison.Ordinal) && !board.Svg.Contains(">old<", StringComparison.Ordinal), "Kanban: duplicate IDs survive; case-insensitive metadata is last-wins");
             var title = Render("kanban\n  A\n    title Global\n    [Bare]\n", "kanban-global-title"); Check(G(title, "kanban-card").Length == 1 && G(title, "diagram-title").Single().Value.Contains("Global", StringComparison.Ordinal), "Kanban: title lines are global even at card indentation; bracket-only form couples ID and title");
             var req = Render("requirementDiagram\nelement same {\ntype: hidden\n}\nrequirement same {\nid: first\nID: effective\nrisk: unsupported\n}\nrequirement same {\nid: hidden\n}\nsame - traces -> missing\n", "requirement-hidden");
