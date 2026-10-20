@@ -69,6 +69,9 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
     {
         var columns = SourceDeclarations.Groups(svg, "kanban-column"); var cards = SourceDeclarations.Groups(svg, "kanban-card");
         if (!columns.Select(e => (string?)e.Attribute("data-id")).SequenceEqual(m.Columns.Select(r => r.Id)) || !cards.Select(e => (string?)e.Attribute("data-id")).SequenceEqual(m.Cards.Select(r => r.Id))) throw new ArgumentException("Canonical Kanban membership or occurrence order differs from source. Apply is protected; inspect original source.");
+        for (var i = 0; i < columns.Length; i++)
+            if ((string?)columns[i].Attribute("data-count") != m.Cards.Count(c => c.Column == m.Columns[i].Identity).ToString(System.Globalization.CultureInfo.InvariantCulture))
+                throw new ArgumentException("Canonical Kanban column membership counts differ from the proved source groups. Apply is protected.");
         // Cards precede their containing columns for pointer hit testing. Duplicates retain occurrence order.
         return m.Cards.Zip(cards, (r, s) => (r, s)).Concat(m.Columns.Zip(columns, (r, s) => (r, s))).ToArray();
     }

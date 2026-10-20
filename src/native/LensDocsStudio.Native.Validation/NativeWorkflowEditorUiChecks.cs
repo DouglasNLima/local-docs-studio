@@ -72,7 +72,7 @@ internal static partial class NativeUiChecks
                 Click("AddBranch"); Window? prompt = null;
                 Wait(() => (prompt = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Append GitGraph branch")))?.AsWindow()) is not null, "Branch name prompt missing.");
                 var beforeBranch = Draft(); Find(prompt!, "WorkspacePathInput").AsTextBox().Text = " bad name "; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
-                Wait(() => Find(prompt!, "WorkspacePathInput").AsTextBox().Text == " bad name " && prompt!.FindAllDescendants().Any(e => e.Name.Contains("Spaces, quotes and line breaks", StringComparison.Ordinal)), "Invalid branch name was not retained with grammar feedback.");
+                Wait(() => Find(prompt!, "WorkspacePathInput").AsTextBox().Text == " bad name " && prompt!.FindAllDescendants().Any(e => e.Name?.Contains("Spaces, quotes and line breaks", StringComparison.Ordinal) == true), "Invalid branch name was not retained with grammar feedback.");
                 Check(Draft() == beforeBranch && !Find(visual!, prefix + "Apply").IsEnabled, "Invalid branch input remains visible, disables owner Apply and preserves the last valid draft without trimming or repair");
                 prompt!.CaptureToFile(Path.Combine(output, "invalid-branch-name.png"));
                 Find(prompt!, "WorkspacePathInput").AsTextBox().Text = "topic"; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke(); Await(() => Draft().Contains("branch topic", StringComparison.Ordinal));

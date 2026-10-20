@@ -186,3 +186,13 @@ retained in `artifacts/native/expansion-iv/79069bf/corpus/` and its corpus log. 
 exact source's hosted ordinary corpus step passed. No observation deadline, fixture
 or assertion was changed. These outcomes remain distinct in the final delivery
 receipt; later hosted acceptance must identify its actual committed source.
+
+
+The final Kanban correspondence oracle also checks each actual canonical column's
+card count, independently of flattened card IDs/order. A tampered native SVG
+control proves that incorrect membership is rejected. The focused suite has 70
+cases. The `05c51b6` GitGraph UIA runs exposed a null Name on an unnamed native
+automation element in the new validation-feedback lookup; the lookup now handles
+unnamed elements while retaining the exact feedback, unchanged draft, disabled
+Apply and raw pending-input assertions. Both failed appearance logs are retained;
+fresh final-source runs are required.

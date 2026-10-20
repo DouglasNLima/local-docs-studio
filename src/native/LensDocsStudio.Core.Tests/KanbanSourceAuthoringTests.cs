@@ -78,4 +78,10 @@ public class KanbanSourceAuthoringTests
         var before = d.Source; Assert.False((await d.UpdateAsync(card.Identity, card.Id, "Bad[label", "", "", "")).Success); Assert.Equal(before, d.Source);
         Pass(await d.AddCardAsync(d.Model.Columns[0].Identity, "new", label)); Assert.Equal(label, d.Model.Cards[^1].Label); Assert.Equal("explicit", d.Model.Cards[^1].Form);
     }
+    [Fact] public void Native_column_membership_must_match_even_when_flattened_card_IDs_and_order_match()
+    {
+        var d = new KanbanVisualDraft(KanbanVisualDraft.Starter); var render = new LensDocsStudio.Core.Rendering.DiagramService().Render(d.Source); var root = System.Xml.Linq.XDocument.Parse(render.Svg!);
+        root.Descendants().First(e => ((string?)e.Attribute("class") ?? "").Split(' ').Contains("kanban-column")).SetAttributeValue("data-count", "99");
+        Assert.Throws<ArgumentException>(() => KanbanVisualDraft.Correspondence(d.Model, root.ToString()));
+    }
 }
