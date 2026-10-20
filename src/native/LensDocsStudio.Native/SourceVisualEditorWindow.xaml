@@ -1,0 +1,71 @@
+<Window x:Class="LensDocsStudio.Native.SourceVisualEditorWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:edit="http://icsharpcode.net/sharpdevelop/avalonedit" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+ Width="1280" Height="840" MinWidth="880" MinHeight="600" WindowStartupLocation="CenterOwner"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="12"
+ Icon="Resources/Brand/application.ico" UseLayoutRounding="True" PreviewKeyDown="Shortcut">
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Resources/MermaidEditorStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ <DockPanel>
+  <ToolBar DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}">
+   <Button x:Name="UndoButton" Click="Undo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Undo private edit (Ctrl+Z)"><ui:CommandIcon Kind="Undo"/></Button>
+   <Button x:Name="RedoButton" Click="Redo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Redo private edit (Ctrl+Y)"><ui:CommandIcon Kind="Redo"/></Button>
+   <Separator/>
+   <Button x:Name="DeleteButton" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Remove selection (Delete)"><ui:CommandIcon Kind="Delete"/></Button>
+   <Button x:Name="MoveUpButton" Content="Move up" Click="MoveUp" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move selected source group up"/>
+   <Button x:Name="MoveDownButton" Content="Move down" Click="MoveDown" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move selected source group down"/>
+   <Separator/>
+   <Button Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom out (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomOut"/></Button>
+   <Slider x:Name="Zoom" Width="80" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage"/>
+   <TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.#}%}" MinWidth="44" VerticalAlignment="Center"/>
+   <Button Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom in (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomIn"/></Button>
+   <Button x:Name="FitButton" Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Fit diagram (F)"><ui:CommandIcon Kind="Focus"/></Button>
+   <Button Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Actual size (Ctrl+0)"><ui:CommandIcon Kind="Selection"/></Button>
+   <Button Click="Centre" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Centre canonical layout"><ui:CommandIcon Kind="AutoLayout"/></Button>
+   <Button Click="ToggleSource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Show or hide Mermaid source"><ui:CommandIcon Kind="Code"/></Button>
+   <Button Click="Preview" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Rendered preview"><ui:CommandIcon Kind="Preview"/></Button>
+  </ToolBar>
+  <Border DockPanel.Dock="Bottom" Padding="12,8" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock x:Name="Status" Text="Preparing canonical preview…" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite"/>
+    <StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="EditSourceButton" Content="Edit source" Click="EditSource" Style="{StaticResource Form.Action}"/>
+     <Button x:Name="CancelButton" Content="Cancel" Click="Cancel" Style="{StaticResource Form.Action}"/>
+     <Button x:Name="ApplyButton" Content="Apply" Click="Apply" Style="{StaticResource Mermaid.PrimaryAction}" ToolTip="Apply as one document Undo action (Ctrl+Enter)"/>
+    </StackPanel>
+   </Grid>
+  </Border>
+  <Grid Margin="8"><Grid.ColumnDefinitions><ColumnDefinition Width="220" MinWidth="180"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*" MinWidth="220"/><ColumnDefinition Width="6"/><ColumnDefinition Width="310" MinWidth="240"/></Grid.ColumnDefinitions>
+   <DockPanel Background="{DynamicResource PanelBrush}">
+    <StackPanel x:Name="Palette" DockPanel.Dock="Top" Margin="8"><TextBlock x:Name="FamilyHeading" Style="{StaticResource Desktop.PanelHeading}"/></StackPanel>
+    <ListBox x:Name="Elements" Style="{StaticResource Mermaid.Navigation}" SelectionChanged="SelectionChanged" AutomationProperties.Name="Source occurrences in semantic order"/>
+   </DockPanel>
+   <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize navigation panel"/>
+   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="6"/><RowDefinition Height="40" MinHeight="40"/></Grid.RowDefinitions>
+    <ScrollViewer x:Name="Viewport" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" PreviewMouseWheel="Wheel" PreviewMouseDown="PanStart" PreviewMouseMove="PanMove" PreviewMouseUp="PanEnd" Focusable="True" AutomationProperties.Name="Canonical diagram; middle mouse pans, arrow keys scroll">
+     <Canvas x:Name="Surface" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent"><Canvas.LayoutTransform><ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform></Canvas>
+    </ScrollViewer>
+    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutomationProperties.Name="Resize source panel"/>
+    <Expander ui:MermaidWorkspace.AdjustableSource="True" x:Name="SourcePanel" Grid.Row="2" Header="Portable Mermaid source and validation" IsExpanded="False" Style="{StaticResource Mermaid.SourcePanel}">
+     <DockPanel><WrapPanel DockPanel.Dock="Top"><Button x:Name="ValidateButton" Content="Validate source" Click="ValidateSource" Style="{StaticResource Form.Action}"/>
+      <Button x:Name="OriginalButton" Content="Original source" Click="ShowOriginal" Style="{StaticResource Form.Action}"/><Button Click="CopySource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Copy Mermaid draft source"><ui:CommandIcon Kind="Copy"/></Button>
+     </WrapPanel><edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" LineNumbersForeground="{DynamicResource MutedTextBrush}" WordWrap="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" TextChanged="SourceChanged" AutomationProperties.Name="Private draft source"/>
+     </DockPanel>
+    </Expander>
+   </Grid>
+   <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize inspector panel"/>
+   <ui:MermaidInspectorPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+     <StackPanel Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
+      <TextBlock x:Name="Summary" Style="{StaticResource Mermaid.InspectorHeading}"/><TextBlock x:Name="InspectorState" Text="Ready" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+     </StackPanel>
+     <ScrollViewer x:Name="InspectorViewport" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12,0,12,12">
+      <StackPanel x:Name="InspectorFields"/><TextBlock x:Name="Capabilities" Style="{StaticResource Form.Help}" TextWrapping="Wrap" Margin="0,10"/>
+      <Button x:Name="LocateButton" Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}"/>
+     </StackPanel></ScrollViewer>
+     <WrapPanel Grid.Row="2" Margin="12,8"><Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}"/>
+      <Button x:Name="ResetButton" Content="Reset changes" Click="ResetProperties" Style="{StaticResource Form.Action}"/>
+     </WrapPanel>
+    </Grid>
+   </ui:MermaidInspectorPanel>
+  </Grid>
+ </DockPanel>
+</Window>

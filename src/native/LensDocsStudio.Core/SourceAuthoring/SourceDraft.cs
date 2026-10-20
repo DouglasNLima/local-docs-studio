@@ -43,20 +43,20 @@ public abstract class SourceDraft<T> : ISourceDraft where T : class
     public void Select(string? identity) { Selection = identity; history[index] = history[index] with { Selection = identity }; }
     public async Task<SourceAuthoringResult> ChangeAsync(Func<SourceText, T, SourceText> edit, CancellationToken cancellationToken = default, string? select = null)
     {
-        var version = ++generation; var original = Text;
+        var version = ++generation; var original = Text; var originalModel = Model;
         try
         {
             var candidate = await Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var changed = edit(original, Model); var model = Scan(changed);
+                var changed = edit(original, originalModel); var model = Scan(changed);
                 Validate(changed, model, Diagrams.Render(changed.Source, cancellationToken: cancellationToken));
                 return (changed, model);
             }, cancellationToken);
             if (ValidatePresentation is { } presentation) await presentation(candidate.changed, candidate.model, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (version != generation || !ReferenceEquals(original, Text)) return new(false, "A newer draft superseded this operation.");
-            if (candidate.changed.Source == Source) return new(true, null);
+            if (candidate.changed.Source == Source && candidate.changed.Lines.Select(line => line.Key).SequenceEqual(Text.Lines.Select(line => line.Key))) return new(true, null);
             Text = candidate.changed; Model = candidate.model;
             Selection = select ?? Selection; if (Selection is not null && !Contains(Model, Selection)) Selection = null;
             if (index + 1 < history.Count) history.RemoveRange(index + 1, history.Count - index - 1);
@@ -67,7 +67,7 @@ public abstract class SourceDraft<T> : ISourceDraft where T : class
         catch (Exception error) when (error is not OutOfMemoryException) { return new(false, error is OperationCanceledException ? "Validation cancelled; the draft is unchanged." : error.Message); }
     }
     public Task<SourceAuthoringResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
-        => ChangeAsync((_, _) => SourceText.Read(source), cancellationToken);
+        => source == Source ? ValidateAsync(cancellationToken) : ChangeAsync((_, _) => SourceText.Read(source), cancellationToken);
     public async Task<SourceAuthoringResult> ValidateAsync(CancellationToken cancellationToken = default)
     {
         var version = generation; var current = Text; var model = Model;

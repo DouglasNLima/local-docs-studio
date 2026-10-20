@@ -54,6 +54,21 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
         return index;
     }
     public static Regex Pattern(string pattern, RegexOptions options = RegexOptions.None) => new(pattern, options | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+    public static string Header(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) ?? "";
+    public static string PrepareRendererSource(string source)
+    {
+        if (!Pattern(@"^(?:pie|gantt)(?:\s|$)|^mindmap$", RegexOptions.IgnoreCase).IsMatch(Header(source))) return source;
+        // The pinned detector examines the first raw line, although its parsers skip comments.
+        // Adapt only leading inert trivia for these families; DiagramResult retains authoritative source.
+        var offset = 0;
+        foreach (var line in source.Split('\n'))
+        {
+            var trimmed = line.Trim();
+            if (trimmed.Length > 0 && (!trimmed.StartsWith("%%", StringComparison.Ordinal) || trimmed.StartsWith("%%{", StringComparison.Ordinal))) break;
+            offset += line.Length + (offset + line.Length < source.Length ? 1 : 0);
+        }
+        return source[offset..];
+    }
     public static void Label(string value)
     {
         if (string.IsNullOrWhiteSpace(value) || value != value.Trim() || value.Length > 2000 || value.Any(char.IsControl))
