@@ -100,7 +100,12 @@ public partial class SourceVisualEditorWindow : Window
         updating = true;
         try
         {
-            if (SourceEditor.Text != Draft.Source) SourceEditor.Text = Draft.Source;
+            if (SourceEditor.Text != Draft.Source)
+            {
+                var vertical = SourceEditor.VerticalOffset; var horizontal = SourceEditor.HorizontalOffset; var caret = SourceEditor.CaretOffset;
+                SourceEditor.Text = Draft.Source; SourceEditor.CaretOffset = Math.Min(caret, SourceEditor.Text.Length);
+                SourceEditor.ScrollToVerticalOffset(vertical); SourceEditor.ScrollToHorizontalOffset(horizontal);
+            }
             Elements.ItemsSource = Choices().ToArray(); RestoreSelection(); ShowProperties(); PropertiesLoaded();
         }
         finally { updating = false; }
@@ -172,6 +177,7 @@ public partial class SourceVisualEditorWindow : Window
     private void UpdateActions()
     {
         if (Draft is null) return; var clean = !PendingProperties && !PendingSource;
+        InspectorFields.IsEnabled = !busy; SourceEditor.IsReadOnly = busy; Palette.IsEnabled = Ready && clean;
         UndoButton.IsEnabled = !busy && clean && Draft.CanUndo; RedoButton.IsEnabled = !busy && clean && Draft.CanRedo;
         ApplyButton.IsEnabled = Ready && clean && mapped; UpdateButton.IsEnabled = Ready && PendingProperties;
         ResetButton.IsEnabled = !busy && PendingProperties; ValidateButton.IsEnabled = !busy && !PendingProperties;
