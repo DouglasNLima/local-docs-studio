@@ -89,7 +89,8 @@ public partial class MainWindow
             }
             catch (ArgumentException error) { return error.Message; }
         }
-        Window window = GanttVisualDraft.IsGantt(source)
+        Window window;
+        try { window = GanttVisualDraft.IsGantt(source)
             ? new GanttVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : MindmapVisualDraft.IsMindmap(source)
             ? new MindmapVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
@@ -103,7 +104,9 @@ public partial class MainWindow
             ? new StateVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : SequenceSourceParser.IsSequence(source)
             ? new SequenceVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : new MermaidVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize);
+            : new MermaidVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize); }
+        catch (Exception error) when (error is ArgumentException or System.Text.RegularExpressions.RegexMatchTimeoutException)
+        { model.Status = "Visual authoring could not safely inspect this source. The document is unchanged; use Edit source. " + error.Message; return; }
         window.Owner = this;
         window.Show();
     }

@@ -1,0 +1,26 @@
+{
+  "Status": "FAIL",
+  "Family": "Pie",
+  "Checks": [
+    "Independent UIA clients agree on semantic selection and inspector text",
+    "Independent canonical wedge has a real pointer interior"
+  ],
+  "Observations": [
+    {
+      "Operation": "Open native editor with canonical rendering and independent UIA transport",
+      "Milliseconds": 1729.5587,
+      "WorkingSetBytes": 187817984,
+      "SourceCharacters": 102
+    },
+    {
+      "Operation": "Actual Pie wedge pointer coordinates",
+      "SourcePointX": 177.08509368896483,
+      "SourcePointY": 316.8,
+      "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+      "Scale": 1,
+      "ScreenX": 659.0850936889649,
+      "ScreenY": 464.8
+    }
+  ],
+  "Error": "System.InvalidOperationException: Actual wedge pointer did not select the corresponding category occurrence.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func\u00601 condition, String failure, Int32 seconds) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1799\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass14_0.\u003CRunSourceEditor\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeSourceEditorUiChecks.cs:line 54"
+}

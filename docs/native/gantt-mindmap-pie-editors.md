@@ -3,8 +3,9 @@
 Implementation branch starts at verified `develop` `1f0c6a4`. The three source
 adapters use Mermaider **0.15.1**, the ordinary native SVG conversion, shared
 five-editor resources and the existing document/version Apply session. PR #38
-remains paused and is not a dependency. Acceptance and packaging are in progress;
-the family commits alone do not certify delivery.
+remains paused and is not a dependency. Final-source verification, preview identity, package hashes and installed acceptance
+are recorded in the [delivery receipt](https://github.com/DouglasNLima/local-docs-studio/pull/40).
+The family commits alone do not certify any other revision.
 
 | Family | First authoring slice | Preserved/protected source |
 | --- | --- | --- |
@@ -32,5 +33,6 @@ draft is written to the owner before Apply.
 Focused Core coverage currently contains 19 Pie, 16 Mind map and 26 Gantt cases.
 The independent native UIA acceptance route is `--source-editor-ui` with family
 `Gantt`, `Mindmap` or `Pie`; actual display/High Contrast mutation runs only on
-authorised disposable GitHub-hosted Windows runners. Final-source counts, captures,
-installed acceptance, provenance and preview links belong in the delivery receipt.
+authorised disposable GitHub-hosted Windows runners. The [engineering receipt](expanded-editor-engineering-receipt.md) indexes source-labelled
+captures and corrections. Final-source counts, installed acceptance, provenance and
+preview links belong in the PR delivery receipt.
