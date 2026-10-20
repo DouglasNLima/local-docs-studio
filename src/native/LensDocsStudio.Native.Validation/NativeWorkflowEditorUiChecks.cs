@@ -82,6 +82,15 @@ internal static partial class NativeUiChecks
             {
                 visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height); Click("Fit"); Select(first);
                 var input = Find(visual!, prefix + "Label"); input.Focus(); Wait(() => !input.IsOffscreen, "Focused inspector input is off screen.");
+                if (width == 880)
+                {
+                    var locate = Find(visual!, prefix + "Locate"); locate.Focus();
+                    Wait(() => !locate.IsOffscreen && Find(visual!, prefix + "InspectorViewport").Patterns.Scroll.Pattern.VerticalScrollPercent.Value > 0, "Native focus did not scroll the final inspector action into view.");
+                    var selectedName = Find(visual!, prefix + "Elements").AsListBox().SelectedItem?.Name;
+                    Keyboard.Type(VirtualKeyShort.SPACE); Wait(() => !Find(visual!, prefix + "SourceEditor").IsOffscreen, "Keyboard Locate did not reveal the source panel.");
+                    Check(Draft() == changed && Find(visual!, prefix + "Elements").AsListBox().SelectedItem?.Name == selectedName, "Actual inspector scrolling and keyboard Locate retain source, selection and inspector context in a small window");
+                    input.Focus(); Wait(() => !input.IsOffscreen, "Returning focus did not restore the top inspector field.");
+                }
                 Check(visual.BoundingRectangle.Contains(Find(visual, prefix + "Apply").BoundingRectangle), "Apply and inspector remain reachable at " + width + "x" + height); Capture("viewport-" + width + "x" + height);
             }
             if (!highContrast)

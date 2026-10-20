@@ -160,3 +160,10 @@ edits and comment-like new IDs still cannot commit. Two ordinary native compatib
 controls retain the actual literal SVG output. The focused workflow suite now has
 63 cases. No assertion or fixture from the original fourteen families changed.
 Final clean-source gates and package identity are recorded in the PR delivery receipt.
+
+
+The final UIA harness explicitly focuses the off-screen final inspector action at
+880x600, checks actual native vertical scrolling, activates Locate with the keyboard,
+and checks unchanged source/selection/context before returning focus to the first
+field. This strengthens the small-window source/inspector scrolling evidence and
+runs in all six new-family appearance jobs and their installed lifecycle phases.
