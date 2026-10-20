@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(17, NativeHelpGuide.Topics.Count);
-        Assert.Equal(17, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(18, NativeHelpGuide.Topics.Count);
+        Assert.Equal(18, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -16,6 +16,12 @@ public sealed class NativeHelpGuideTests
             Assert.Equal(topic.Title, heading.Title); Assert.Equal(topic.Anchor, heading.Anchor);
             Assert.True(topic.Source.Length > 400);
         }
+    }
+    [Fact] public void Chart_topic_explains_alignment_pending_input_and_local_versus_global_endpoint_edits()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("XY Chart, Radar and Sankey visual authoring"));
+        foreach (var phrase in new[] { "aligned", "ragged", "positive", "Rename node", "collision", "pending", "Undo", "Cancel", "source-only" })
+            Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Expanded_editor_topic_explains_source_ownership_and_pinned_family_limits()
     {

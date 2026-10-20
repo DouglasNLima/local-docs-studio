@@ -1,0 +1,132 @@
+{
+  "sourceRevision": "1a4fcd5e8d948d7db4cf3a1dc4af298637e5d123",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39420457335",
+  "files": [
+    {
+      "path": "1a4fcd5-xy-normal-light.png",
+      "sha256": "fbe65dc62bbf88aded20a1bb9c5ab93e888eb3450f40fe6754928953e63e3510",
+      "family": "Xy",
+      "appearance": "normal",
+      "capture": "light"
+    },
+    {
+      "path": "1a4fcd5-xy-normal-dark.png",
+      "sha256": "fa442bc00c4b040d94f193be716e0aa3efe4efe54a9b6a61b7adfe30b8412c3a",
+      "family": "Xy",
+      "appearance": "normal",
+      "capture": "dark"
+    },
+    {
+      "path": "1a4fcd5-xy-normal-viewport-1280x800.png",
+      "sha256": "bde703fa525a684ec2dcb19e1d02a87a417d41d326e76697e069ac61559364d5",
+      "family": "Xy",
+      "appearance": "normal",
+      "capture": "viewport-1280x800"
+    },
+    {
+      "path": "1a4fcd5-xy-normal-viewport-880x600.png",
+      "sha256": "bd1bc2922dd23256d344da33ccf7691a851148f3e5678fa228dbf0dbc0bc1f98",
+      "family": "Xy",
+      "appearance": "normal",
+      "capture": "viewport-880x600"
+    },
+    {
+      "path": "1a4fcd5-xy-high-contrast-viewport-1280x800.png",
+      "sha256": "e4abfa2e89c29a6f1cce945ea8f1259ed85f34e21950e3dea8678438123eec06",
+      "family": "Xy",
+      "appearance": "high-contrast",
+      "capture": "viewport-1280x800"
+    },
+    {
+      "path": "1a4fcd5-xy-high-contrast-viewport-880x600.png",
+      "sha256": "ce6f27e42931e47fda7e187389e13925b514dda58340648cf9dfa0d3ce15953d",
+      "family": "Xy",
+      "appearance": "high-contrast",
+      "capture": "viewport-880x600"
+    },
+    {
+      "path": "1a4fcd5-radar-normal-light.png",
+      "sha256": "84a9376dcdbd72fa457fc23acdf1f82db859e06e51d4bc488322bca0a2ab9d32",
+      "family": "Radar",
+      "appearance": "normal",
+      "capture": "light"
+    },
+    {
+      "path": "1a4fcd5-radar-normal-dark.png",
+      "sha256": "d80501608885c63dca495e5f3418709e4d8ace268780e3763f8b91c2bd20b33f",
+      "family": "Radar",
+      "appearance": "normal",
+      "capture": "dark"
+    },
+    {
+      "path": "1a4fcd5-radar-normal-viewport-1280x800.png",
+      "sha256": "ea2468827ab4290f84e77345c0fb3b1b093cf5aa83b41da7ab2fc72063c69264",
+      "family": "Radar",
+      "appearance": "normal",
+      "capture": "viewport-1280x800"
+    },
+    {
+      "path": "1a4fcd5-radar-normal-viewport-880x600.png",
+      "sha256": "e8b12b6551e79d9da5544adbe5bd737c0a7c5e5a3eb24b3045c91350241aa493",
+      "family": "Radar",
+      "appearance": "normal",
+      "capture": "viewport-880x600"
+    },
+    {
+      "path": "1a4fcd5-radar-high-contrast-viewport-1280x800.png",
+      "sha256": "2a69e15bb558155323553bca694a2c93447336786917fe3bbaaefd8c2d1c0d98",
+      "family": "Radar",
+      "appearance": "high-contrast",
+      "capture": "viewport-1280x800"
+    },
+    {
+      "path": "1a4fcd5-radar-high-contrast-viewport-880x600.png",
+      "sha256": "02f46802e72588601ca37faa2b1ae3f949ff862b490175e5c29058e351bd74d0",
+      "family": "Radar",
+      "appearance": "high-contrast",
+      "capture": "viewport-880x600"
+    },
+    {
+      "path": "1a4fcd5-sankey-normal-light.png",
+      "sha256": "adc8865c7261b68bd32057d409355c7e1136f9e7388e7cc8f7cf44d41a01aae1",
+      "family": "Sankey",
+      "appearance": "normal",
+      "capture": "light"
+    },
+    {
+      "path": "1a4fcd5-sankey-normal-dark.png",
+      "sha256": "496bbe6587e2fd2a7988b21995cc11971b318555fa8b4f600d8bdb66a588dd7a",
+      "family": "Sankey",
+      "appearance": "normal",
+      "capture": "dark"
+    },
+    {
+      "path": "1a4fcd5-sankey-normal-viewport-1280x800.png",
+      "sha256": "b873785965ee2e626f365710b17c7716160d8963e6250e395a5d78c38b073818",
+      "family": "Sankey",
+      "appearance": "normal",
+      "capture": "viewport-1280x800"
+    },
+    {
+      "path": "1a4fcd5-sankey-normal-viewport-880x600.png",
+      "sha256": "f4e471f5107d5664c785d2624783d301930d54476f91c918bbc148fed531ae75",
+      "family": "Sankey",
+      "appearance": "normal",
+      "capture": "viewport-880x600"
+    },
+    {
+      "path": "1a4fcd5-sankey-high-contrast-viewport-1280x800.png",
+      "sha256": "414eedf97c3378fdba307722ddaa0beb1a9d8fecb16762592a180200b8fa6d66",
+      "family": "Sankey",
+      "appearance": "high-contrast",
+      "capture": "viewport-1280x800"
+    },
+    {
+      "path": "1a4fcd5-sankey-high-contrast-viewport-880x600.png",
+      "sha256": "24048a91c4bd13297e3bfed7eded894b86d8f48d6736ef93639d9ac43823117b",
+      "family": "Sankey",
+      "appearance": "high-contrast",
+      "capture": "viewport-880x600"
+    }
+  ]
+}

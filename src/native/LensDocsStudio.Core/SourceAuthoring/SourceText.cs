@@ -6,6 +6,10 @@ namespace LensDocsStudio.Core.SourceAuthoring;
 /// <summary>Lossless source lines, including their original terminators. Keys belong to occurrences, never labels.</summary>
 public sealed record SourceLine(string Key, string Text)
 {
+    // Token keys travel with list occurrences when a family edits an inline vector.
+    // Empty initial maps derive keys from original slot positions, never token values.
+    public IReadOnlyList<string> OccurrenceKeys { get; init; } = [];
+    public string Occurrence(int index) => index < OccurrenceKeys.Count ? OccurrenceKeys[index] : Key + ":" + index;
     public string Body => Text.TrimEnd('\r', '\n');
     public string Ending => Text[Body.Length..];
     public string Indent => Body[..(Body.Length - Body.TrimStart(' ', '\t').Length)];
@@ -58,6 +62,7 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
     public static string Header(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) ?? "";
     public static string PrepareRendererSource(string source)
     {
+        if (source.Length <= 100_000 && ChartSource.IsChart(source)) return ChartSource.Prepare(source);
         if (!Pattern(@"^(?:pie|gantt|timeline|journey|quadrantChart)(?:\s|$)|^mindmap$", RegexOptions.IgnoreCase).IsMatch(Header(source))) return source;
         // The pinned detector examines the first raw line, although its parsers skip comments.
         // Adapt only leading inert trivia for these families; DiagramResult retains authoritative source.

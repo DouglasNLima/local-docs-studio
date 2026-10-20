@@ -18,6 +18,8 @@ Native State and ER diagrams also have dedicated **Visual Edit** and **Insert** 
 
 Native Class diagrams open their own **Visual Edit** window; **Insert → Class diagram visually…** creates a portable starter. The inspector edits supported classes, distinct attribute/method occurrences, visibility, types/parameters, static attributes and six relationship types. Endpoint markers/cardinalities survive reverse and reconnection. Unknown source, ambiguous declarations, method classifiers, namespace membership and notes retain protected inspection. The [Class report](docs/native/mermaid-class-visual-editor.md) records the pinned grammar, exact source model, native acceptance, screenshots, resource observations and package certification scope.
 
+The native application also includes Gantt, Mind map, Pie, Timeline, User Journey, Quadrant, XY Chart, Radar and Sankey authoring, for fourteen editor families. Chart editors preserve raw numeric lexemes and distinct occurrences; aligned category/axis operations are atomic, while ignored tokens, ragged vectors and unproved Sankey topology stay protected. See the [fourteen-family capability matrix](docs/native/diagram-compatibility.md), [chart grammar guide](docs/native/xy-radar-sankey-editors.md) and [source-labelled engineering receipt](docs/native/expansion-iii-engineering-receipt.md).
+
 Source-specific UX refinement, Word template compatibility and earlier private-sample acceptance remain recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md). Current integration acceptance uses synthetic fixtures and the separate integration report.
 
 ```powershell

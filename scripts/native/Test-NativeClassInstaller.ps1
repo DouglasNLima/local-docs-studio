@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)][string]$Installer,
     [Parameter(Mandatory)][string]$UpgradeInstaller,
     [Parameter(Mandatory)][string]$ExpectedSourceRevision,
-    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie", "Timeline", "Journey", "Quadrant")][string]$Family = "Class",
+    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie", "Timeline", "Journey", "Quadrant", "Xy", "Radar", "Sankey")][string]$Family = "Class",
     [switch]$NoFileAssociations
 )
 $ErrorActionPreference = 'Stop'
@@ -20,6 +20,8 @@ $root = Join-Path $repo ('artifacts/native/' + $Family.ToLowerInvariant() + '-in
 $installDirectory = Join-Path $root 'installed'
 New-Item -ItemType Directory -Path $root -Force | Out-Null
 . (Join-Path $PSScriptRoot 'NativeAssociationExclusion.ps1')
+. (Join-Path $PSScriptRoot 'NativeAuthoringStatePreservation.ps1')
+$preserved = @{}
 if ($NoFileAssociations) { Assert-NativeAssociationAbsence }
 $checks = [Collections.Generic.List[string]]::new()
 $versions = [Collections.Generic.List[object]]::new()
@@ -57,9 +59,12 @@ function Remove-Installation([string]$Phase) {
     $process = Start-Process -FilePath $uninstaller -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -WindowStyle Hidden -Wait -PassThru
     if ($process.ExitCode -ne 0 -or (Test-Path -LiteralPath $uninstallKey) -or (Test-Path -LiteralPath $shortcut)) { throw "${Phase}: isolated $Family uninstall failed." }
     $checks.Add("${Phase}: native installation and shortcuts removed")
+    $preservedCount = Assert-NativeAuthoringStatePreserved -Snapshot $preserved
+    $checks.Add("${Phase}: $preservedCount previous authored/source/state/evidence files retain exact SHA-256 after uninstall")
 }
 try {
     foreach ($phase in 'install', 'upgrade', 'reinstall') {
+        [void](Assert-NativeAuthoringStatePreserved -Snapshot $preserved)
         if ($phase -eq 'reinstall') { Remove-Installation 'before-reinstall' }
         $package = if ($phase -eq 'install') { $Installer } else { $UpgradeInstaller }
         $expected = Get-Content -LiteralPath (Join-Path ([IO.Path]::GetDirectoryName($package)) 'version.json') -Raw | ConvertFrom-Json
@@ -72,24 +77,28 @@ try {
         if ($identity.version -ne $expected.version -or $identity.sourceRevision -ne $ExpectedSourceRevision -or $binary -ne $expected.version -or $registered -ne $expected.version) { throw "${phase}: installed $Family provenance differs from the exact PR head." }
         if ($NoFileAssociations) { Assert-NativeAssociationAbsence; $checks.Add("${phase}: optional association tasks explicitly disabled and registrations absent") }
         Assert-Payload $package $phase
+        $preservedCount = Assert-NativeAuthoringStatePreserved -Snapshot $preserved
+        $checks.Add("${phase}: $preservedCount previous authored/source/state/evidence files retain exact SHA-256 after installation")
         $versions.Add(@{ phase=$phase; version=$identity.version; source=$identity.sourceRevision; binary=$binary; registered=$registered })
         Push-Location $repo
         try {
-            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant' } { '--source-editor-ui' } default { '--class-ui' } }
+            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant','Xy','Radar','Sankey' } { '--source-editor-ui' } default { '--class-ui' } }
             $arguments = @('run', '--project', 'src/native/LensDocsStudio.Native.Validation', '-c', 'Release', '--no-build', '--', $mode, (Join-Path $installDirectory 'LensDocsStudio.Native.exe'), (Join-Path $root $phase))
-            if ($Family -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant') { $arguments += $Family }
+            if ($Family -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant','Xy','Radar','Sankey') { $arguments += $Family }
             $arguments += '--normal'
             if ($Family -eq 'Flowchart') { $arguments += '--polish' }
             & dotnet @arguments
             if ($LASTEXITCODE -ne 0) { throw "${phase}: installed $Family native authoring failed." }
         } finally { Pop-Location }
         $checks.Add("${phase}: real installed $Family authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel")
+        $snapshotCount = Add-NativeAuthoringStateSnapshot -Directory (Join-Path $root $phase) -Snapshot $preserved
+        $checks.Add("${phase}: $snapshotCount authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation")
     }
     Remove-Installation 'final-uninstall'
     if ($NoFileAssociations) { Assert-NativeAssociationAbsence }
     $completed = $true
 } finally {
     try { Remove-Installation 'cleanup' } finally {
-        @{ status=$(if ($completed) { 'PASS' } else { 'FAIL' }); sourceRevision=$ExpectedSourceRevision; versions=$versions; checks=$checks } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $root ($Family.ToLowerInvariant() + '-installer-results.json'))
+        @{ status=$(if ($completed) { 'PASS' } else { 'FAIL' }); sourceRevision=$ExpectedSourceRevision; versions=$versions; checks=$checks; preservedFiles=$preserved } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $root ($Family.ToLowerInvariant() + '-installer-results.json'))
     }
 }

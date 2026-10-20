@@ -125,8 +125,51 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Families outside the eight visual editors keep their existing
+than four connections per node. Families outside the fourteen visual editors keep their existing
 [rendering and export commands](#mermaid-diagrams-and-maths).
+
+## XY Chart, Radar and Sankey visual authoring
+
+Use **Visual Edit** in the native preview or **Insert → XY Chart / Radar / Sankey
+visually…**. The same editors open Markdown fences and standalone Mermaid files.
+Select occurrences in the keyboard-accessible list when marks overlap or clip.
+The source panel and inspector keep their normal resizing and scrolling controls.
+
+**XY Chart:** edit the effective title, category labels, axis titles, horizontal or
+vertical presentation, individual values and series names. Select **Y range** and
+enter an increasing minimum/maximum, or leave both blank for automatic range.
+Add bar/line commands explicitly start new series with zero values. Category
+add/remove/reorder changes every exactly aligned simple series in one private
+Undo step. Independent series/value operations retain existing ragged lengths.
+Box series, invalid tokens coerced to zero, ignored point suffixes and unproved
+axis syntax remain protected and exact in source. Numeric X ranges stay source-only.
+
+**Radar:** edit the effective title, ordered axis/curve IDs and labels, and each
+curve's value for a positional axis. Axis add/remove/reorder changes all affected
+simple curves atomically; new axes and curves explicitly start with value 0.
+Ragged, extra, dropped or keyed-looking tokens protect alignment operations.
+The range uses unsigned decimals; a blank maximum selects the automatic maximum.
+Axis names reject commas, braces, brackets and quotes. Quoted curve IDs/labels
+can contain commas, braces and brackets; embedded double quotes have no supported escape.
+Legend, graticule and tick settings remain available unchanged in source.
+Empty simple charts can gain their first axis. One- and two-axis profiles remain
+supported. Remove curves before removing the final axis; empty curve vectors are
+not invented.
+
+**Sankey:** select a numbered link to edit only that row's source, target or positive
+weight. Equal parallel links remain separate. Select **Rename node across proved
+endpoints** for an explicit global rename; a collision with an existing node is
+rejected. Add link starts with weight 1. Commas and doubled quotes in endpoint names
+are supported; line breaks are not. Ignored rows and extra fields remain exact.
+Cycles and self-links remain source-accessible, with visual topology edits protected
+because the pinned renderer can omit their ribbons. There is no invented title directive.
+Integral node totals at or above 2^63 also protect authoring because the pinned
+renderer cannot label them correctly; their original weight lexemes remain in source.
+
+Update properties validates pending text without changing saved source. Invalid
+input stays visible and disables Apply. Reset restores the last valid draft.
+Private Undo/Redo stays inside the editor; Apply revalidates and commits one owner
+Undo step. Cancel discards private edits. Save persists the applied source.
 
 ## Desktop workspace and synchronisation
 

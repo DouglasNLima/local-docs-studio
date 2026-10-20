@@ -29,6 +29,12 @@ public sealed class DiagramService
         cancellationToken.ThrowIfCancellationRequested();
         var resolvedTheme = DiagramThemes.ResolveName(theme, dark);
         if (source.Length > 100_000) return new(source, null, "The diagram exceeds the 100,000-character rendering limit.");
+        if (SourceAuthoring.ChartSource.Header(source).Equals("radar-beta", StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (System.Text.RegularExpressions.Match ticks in SourceAuthoring.SourceText.Pattern(@"(?m)^[ \t]*ticks[ \t]+(?<count>[0-9]+)[ \t]*\r?$").Matches(source))
+                if (!int.TryParse(ticks.Groups["count"].Value, out var count) || count > 100)
+                    return new(source, null, "Radar tick controls exceed the supported 100-control resource budget. Correct the original source.");
+        }
         lock (gate) if (cache.TryGetValue((source, resolvedTheme), out var existing)) return existing;
         var result = RenderUncached(source, resolvedTheme, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
@@ -52,7 +58,7 @@ public sealed class DiagramService
     {
         using var diagnosticPhase = MermaidDiagnostics.Measure("renderer.pipeline");
         IDisposable? parsingPhase = null, svgPhase = null;
-        if (System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
+        if (!SourceAuthoring.ChartSource.IsChart(source) && System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try
         {

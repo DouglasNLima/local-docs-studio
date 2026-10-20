@@ -139,6 +139,7 @@ public partial class SourceVisualEditorWindow : Window
         var version = ++generation; var source = Draft.Source; var appearance = dark; mapped = false; UpdateActions(); var leased = false;
         try
         {
+            if (Draft.ValidationError is { } sourceError) throw new ArgumentException(sourceError);
             await renderGate.WaitAsync(cancellation.Token); leased = true;
             var result = await Task.Run(() => Diagrams.Render(source, appearance, diagramTheme, cancellation.Token), cancellation.Token);
             var presentation = await StaWorker.RunAsync(() =>

@@ -1,5 +1,23 @@
 # Windows internal preview guide
 
+## Fourteen native Mermaid editors — Expansion III
+
+XY Chart, Radar and Sankey extend the eleven existing native families. Use Visual
+Edit or Insert for category-based comparisons, positional profiles and weighted
+flows. Source spans, duplicate occurrences, raw numeric spelling, private history
+and the existing atomic owner Apply session are preserved. Unsupported coercion,
+ragged alignment, ambiguous quoting and cyclic Sankey operations remain protected
+with exact source access. Mermaider 0.15.1, the official .NET 10/WPF runtime and
+stock Continuous are unchanged. This is an unsigned internal preview.
+
+The [Draft PR #42 delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/42)
+and [engineering receipt](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-xy-radar-sankey-editors/docs/native/expansion-iii-engineering-receipt.md)
+own exact source, validation, package hashes and certification limits. Earlier
+previews retain their original source attribution. No production release or merge
+is implied. PR #38 remains paused; the historical 250 ms goal is incomplete and
+.749 unresolved.
+
+
 ## Eleven native Mermaid editors â€” Expansion II
 
 Timeline, User Journey and Quadrant join the existing eight normal editor families.
@@ -16,7 +34,7 @@ Local Markdown, Mermaid, and documentation studio. This is an **unsigned interna
 
 ## Obtain and verify the package
 
-Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [Class editor Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/35). The [Class engineering report](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-class-visual-editor/docs/native/mermaid-class-visual-editor.md) documents all five editors' regression evidence, Class syntax, capabilities, measurements and certification requirements. Acceptance requires completed checks for the identified source; a queued, skipped or failed mandatory gate does not establish acceptance. These source records are linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
+Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [Draft PR #42 delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/42). Its engineering receipt identifies all fourteen families, protected syntax, package provenance and the actual source-specific checks. Acceptance requires completed checks for the identified source; a queued, skipped or failed mandatory gate does not establish acceptance. These records are linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
 
 ```powershell
 gh run download <verified-run-id> --repo DouglasNLima/local-docs-studio --name native-validation --dir <new-empty-directory>

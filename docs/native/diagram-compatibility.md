@@ -17,6 +17,12 @@ implementation alone does not imply readiness.
 | Gantt | Title, sections, labels, explicit ISO starts and whole-day durations; advanced scheduling protected | [Expansion report](gantt-mindmap-pie-editors.md) |
 | Mind map | One root, labels, complete subtree operations, recognised shape/ID preservation | [Expansion report](gantt-mindmap-pie-editors.md) |
 | Pie | Title, separate category occurrences, invariant decimal values and canonical wedge selection | [Expansion report](gantt-mindmap-pie-editors.md) |
+| Timeline | Effective title, sections, periods and individual event occurrences | [Expansion II](timeline-journey-quadrant-editors.md) |
+| User Journey | Effective title, sections, tasks, scores and ordered actor occurrences | [Expansion II](timeline-journey-quadrant-editors.md) |
+| Quadrant | Title, axis/quadrant labels and distinct point occurrences | [Expansion II](timeline-journey-quadrant-editors.md) |
+| XY Chart | Category-based bar/line series, values, titles, presentation, explicit/automatic Y range and atomic aligned categories | [Expansion III grammar and protections](xy-radar-sankey-editors.md); certification pending in the receipt |
+| Radar | Positional axes/curves, finite values, supported range directives and atomic aligned axis changes | [Expansion III grammar and protections](xy-radar-sankey-editors.md); certification pending in the receipt |
+| Sankey | Separate positive weighted link occurrences, local endpoints and explicit collision-protected node rename | [Expansion III grammar and protections](xy-radar-sankey-editors.md); certification pending in the receipt |
 
 
 The [ER visual editor report](mermaid-er-visual-editor.md) records the fourth native
