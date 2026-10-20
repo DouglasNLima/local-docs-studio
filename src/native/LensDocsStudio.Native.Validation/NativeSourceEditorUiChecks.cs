@@ -63,6 +63,25 @@ internal static partial class NativeUiChecks
             }
             Set("Label", "Edited Ω"); Click("Update"); Await(() => Draft().Contains("Edited Ω", StringComparison.Ordinal)); var edited = Draft();
             Click("Undo"); Await(() => Draft() == source); Click("Redo"); Await(() => Draft() == edited);
+            if (family == "Gantt")
+            {
+                Set("StartDate", "2026-10-21"); Set("Duration", "4"); Click("Update"); Await(() => Draft().Contains("guide, 2026-10-21, 4d", StringComparison.Ordinal)); edited = Draft();
+                Check(Find(visual!, "GanttStartDate").AsTextBox().Text == "2026-10-21", "Actual native date/duration fields commit invariant scheduling tokens without rewriting the task ID");
+            }
+            else if (family == "Pie")
+            {
+                Set("Value", "7" + System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator + "25000"); Click("Update"); Await(() => Draft().Contains("7.25000", StringComparison.Ordinal)); edited = Draft();
+                Check(true, "Actual native decimal field retains entered precision in invariant source");
+            }
+            else
+            {
+                ChooseParent("Reference"); Click("Reparent"); Await(() =>
+                {
+                    var model = new MindmapVisualDraft(Draft()).Model; var node = model.Nodes.Single(item => item.Label == "Edited Ω"); return model.Nodes.Single(item => item.Identity == node.Parent).Label == "Reference";
+                });
+                ChooseParent("Root ·"); Click("Reparent"); Await(() => new MindmapVisualDraft(Draft()).Model.Nodes.Single(item => item.Label == "Edited Ω").Depth == 1); edited = Draft();
+                Check(true, "Actual parent selector reparents the complete subtree and restores it under the root");
+            }
             // Actual keyboard input can remain incomplete without resetting the inspector or selection.
             var field = Find(visual!, family == "Pie" ? "PieValue" : family == "Gantt" ? "GanttDuration" : "MindmapLabel");
             field.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(family == "Mindmap" ? "Pending branch" : "1.");
@@ -104,7 +123,10 @@ internal static partial class NativeUiChecks
             var external = expected.Replace(changed, source.Replace("\r\n", "\n", StringComparison.Ordinal), StringComparison.Ordinal); FocusWindow(main!); Find(main!, "MarkdownEditor").Patterns.Value.Pattern.SetValue(external); FocusWindow(visual!); Click("Apply");
             Wait(() => Find(visual!, family + "Status").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Stale-owner Apply was not rejected."); Check(Draft() == privateSource && ReadEditorText(Find(main!, "MarkdownEditor")) == external, "Stale-owner rejection preserves private and external source"); Capture("owner-conflict"); Click("Cancel"); Discard(); WaitClosed(); Stop();
             // Standalone documents use the same normal preview entry point and current source.
-            var standalone = Path.Combine(root, family + ".mmd"); File.WriteAllText(standalone, source); Launch(standalone); Open(0); Check(Draft() == source, "Standalone Mermaid uses its native editor"); Click("Cancel"); WaitClosed(); Stop();
+            var standalone = Path.Combine(root, family + ".mmd"); File.WriteAllText(standalone, source); Launch(standalone); Open(0); Check(Draft() == source, "Standalone Mermaid uses its native editor"); Click("Cancel"); WaitClosed();
+            FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "Insert" + family).AsMenuItem().Invoke(); WaitVisual();
+            Check(Draft() == starter, "Normal Insert menu opens the exact family starter"); Click("Apply"); WaitClosed(); var insertedOwner = Find(main!, "MarkdownEditor");
+            Check(ReadEditorText(insertedOwner).Contains(starter.TrimEnd('\r', '\n'), StringComparison.Ordinal), "Normal Insert applies portable Mermaid source"); FocusWindow(main!); insertedOwner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(insertedOwner) == "", "Insertion was not one owner Undo step."); Stop();
             RunProtectedAndNavigation();
             Check(true, "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised");
             File.WriteAllText(Path.Combine(output, "authoring-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", Family = family, SourceRevision = typeof(PieVisualEditorWindow).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
@@ -120,12 +142,17 @@ internal static partial class NativeUiChecks
         {
             var timer = Stopwatch.StartNew();
             FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + offset)) is not null, "Exact diagram action missing."); Find(main!, "DiagramEditVisually" + offset).AsButton().Invoke();
-            Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(family + "VisualEditor")))?.AsWindow()) is not null, "Native family editor did not open.");
-            Wait(() => Find(visual!, family + "Apply").IsEnabled, "Canonical native draft did not become valid: " + Find(visual!, family + "Status").Name);
-            Find(visual!, family + "SourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); Click("Fit");
+            WaitVisual();
             using var process = Process.GetProcessById(app!.ProcessId);
             observations.Add(new { Operation = "Open native editor with canonical rendering and independent UIA transport", Milliseconds = timer.Elapsed.TotalMilliseconds, WorkingSetBytes = process.WorkingSet64, SourceCharacters = Draft().Length });
         }
+        void WaitVisual()
+        {
+            Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(family + "VisualEditor")))?.AsWindow()) is not null, "Native family editor did not open.");
+            Wait(() => Find(visual!, family + "Apply").IsEnabled, "Canonical native draft did not become valid: " + Find(visual!, family + "Status").Name);
+            Find(visual!, family + "SourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); Click("Fit");
+        }
+        void ChooseParent(string fragment) { var combo = Find(visual!, "MindmapParent").AsComboBox(); combo.Patterns.ExpandCollapse.Pattern.Expand(); var match = combo.Items.Single(item => item.Name.Contains(fragment, StringComparison.Ordinal)); combo.Select(match.Text); combo.Patterns.ExpandCollapse.Pattern.Collapse(); }
         void Select(int index) { var list = Find(visual!, family + "Elements").AsListBox(); list.Select(index); Wait(() => list.SelectedItem is not null && Find(visual!, family + "Label").IsEnabled, "Semantic selection did not reach inspector."); }
         string Draft() => ReadEditorText(Find(visual!, family + "SourceEditor"));
         void Set(string id, string value) => Find(visual!, family + id).AsTextBox().Text = value;
