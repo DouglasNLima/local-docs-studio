@@ -69,3 +69,9 @@ appearance operations run only on authorised disposable hosted Windows. Preview
 production signing, trusted updater publication or ordinary desktop installation
 is part of this delivery. SDK-free clean Windows, higher-DPI and physical screen
 reader certification are not claimed.
+
+The inherited installer wizard/lifecycle originally enabled optional Open with
+registrations on disposable runners. That exceeded this goal's association boundary;
+the candidate run was stopped. Final acceptance explicitly excludes that task and
+asserts no native ProgID/OpenWith entries, while retaining the existing optional-task
+checks on other branches. The ordinary desktop was never modified.

@@ -174,7 +174,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--interrupted-save")
             return NativeUiChecks.RunInterruptedSave(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/interrupted-save");
         if (args.FirstOrDefault() == "--installer-wizard")
-            return NativeUiChecks.RunInstallerWizard(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/installer-wizard");
+            return NativeUiChecks.RunInstallerWizard(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/installer-wizard", args.Contains("--no-file-associations"));
         if (args.FirstOrDefault() == "--restore-installed-session")
             return NativeUiChecks.RunInstalledSession(args[1], args[2], args[3]);
         if (args.FirstOrDefault() == "--seed-installed-drafts")
