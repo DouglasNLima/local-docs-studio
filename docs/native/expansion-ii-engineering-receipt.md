@@ -50,7 +50,7 @@ Meaningful authored captures at `7a1348e` (later results remain source-labelled 
 | Quadrant | [Capture](evidence/expansion-ii/7a1348e-quadrant-light.png) | [Capture](evidence/expansion-ii/7a1348e-quadrant-dark.png) | [Capture](evidence/expansion-ii/7a1348e-quadrant-high-contrast.png) |
 
 [Inspect the compact source-labelled UIA results](evidence/expansion-ii/7a1348e-authoring-summary.json).
-Focused family coverage now comprises 67 cases; the final full Core count is recorded
+Focused family coverage now comprises 68 cases; the final full Core count is recorded
 against the final clean source in the PR. Additional native duplicate/reordered checks
 include Timeline continuation groups, Journey raw-score/repeated actors and Quadrant
 coincident markers, comparing each source key with its actual SVG geometry.

@@ -64,4 +64,10 @@ public class JourneyVisualTests
         var source = "journey title Header\n title First\n title Last\n section A\n A: 3: Me\n section B\n B: 4\n"; var draft = new JourneyVisualDraft(source); Success(await draft.SetTitleAsync("New")); Assert.Contains("title Header\n title First\n title New", draft.Source);
         var section = draft.Model.Sections[1]; draft.Select(section.Identity); Success(await draft.DeleteAsync(section.Identity)); Assert.DoesNotContain("A: 3", draft.Source); draft.Undo(); Assert.Equal(section.Identity, draft.Selection); draft.Undo(); Assert.Equal(source, draft.Source);
     }
+    [Fact] public void Canonical_actor_validation_checks_task_ownership_even_when_global_actor_order_is_identical()
+    {
+        const string source = "journey\n A: 3: Me\n B: 4: Me\n"; var draft = new JourneyVisualDraft(source); var rendered = new LensDocsStudio.Core.Rendering.DiagramService().Render(source);
+        var root = System.Xml.Linq.XDocument.Parse(rendered.Svg!); var dots = root.Descendants().Where(e => (string?)e.Attribute("class") == "actor-dot").ToArray();
+        dots[1].Remove(); dots[0].AddAfterSelf(dots[1]); Assert.Throws<ArgumentException>(() => JourneyVisualDraft.VerifyCanonical(draft.Model, root.ToString()));
+    }
 }

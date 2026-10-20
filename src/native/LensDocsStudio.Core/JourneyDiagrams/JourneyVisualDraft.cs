@@ -70,8 +70,16 @@ public sealed class JourneyVisualDraft : SourceDraft<JourneySourceModel>
             throw new ArgumentException("Canonical Journey task counts, order, labels or effective scores differ from source occurrences. Apply is protected.");
         var actors = SourceDeclarations.Groups(svg, "actor-dot").Select(e => e.Elements().Single(t => t.Name.LocalName == "title").Value);
         if (!actors.SequenceEqual(model.Tasks.SelectMany(t => t.Actors).Select(a => a.Name))) throw new ArgumentException("Canonical actor order or task-local actor occurrences differ from source. Apply is protected.");
+        for (var i = 0; i < tasks.Length; i++)
+        {
+            var localActors = tasks[i].ElementsAfterSelf().TakeWhile(e => !((string?)e.Attribute("class") ?? "").Split(' ').Contains("journey-task"))
+                .Where(e => (string?)e.Attribute("class") == "actor-dot").Select(e => e.Elements().Single(t => t.Name.LocalName == "title").Value);
+            if (!localActors.SequenceEqual(model.Tasks[i].Actors.Select(a => a.Name))) throw new ArgumentException("Canonical actors no longer belong to their intended task occurrence. Apply is protected.");
+        }
         var groups = SourceDeclarations.Groups(svg, "subgraph"); var expected = model.Sections.Where(s => model.Tasks.Any(t => t.Section == s.Identity)).ToArray();
         if (groups.Length != expected.Length || groups.Where((g, i) => (string?)g.Attribute("data-section") != i.ToString(CultureInfo.InvariantCulture)).Any()) throw new ArgumentException("Canonical Journey source sections differ.");
+        var headers = System.Xml.Linq.XDocument.Parse(svg).Root!.Elements().Where(e => e.Name.LocalName == "text").Select(e => SourceDeclarations.TextValue(e.Value).ToUpperInvariant());
+        if (!headers.SequenceEqual(expected.Where(s => s.Tokens is not null).Select(s => SourceDeclarations.TextValue(s.Name).ToUpperInvariant()))) throw new ArgumentException("Canonical Journey section labels differ from their source groups.");
     }
     public Task<SourceAuthoringResult> SetTitleAsync(string value, CancellationToken token = default) => ChangeAsync((text, model) => SourceDeclarations.SetTitle(text, model.HeaderIdentity, model.Title, value), token);
     public Task<SourceAuthoringResult> SetSectionAsync(string identity, string label, CancellationToken token = default) => ChangeAsync((text, model) =>
