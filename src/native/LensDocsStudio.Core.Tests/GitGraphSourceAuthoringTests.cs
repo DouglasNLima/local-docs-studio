@@ -53,4 +53,13 @@ public class GitGraphSourceAuthoringTests
     {
         const string source = "gitGraph\ncommit id: \"old\" TYPE: hIgHlIgHt\n"; var d = new GitGraphVisualDraft(source); Pass(await d.ValidateAsync()); Pass(await d.UpdateAsync(d.Model.Commands[0].Identity, "new", "", "HIGHLIGHT")); Assert.Equal(source.Replace("\"old\"", "\"new\"", StringComparison.Ordinal), d.Source);
     }
+    [Theory, InlineData("topic\n"), InlineData(" topic "), InlineData("bad name"), InlineData("\"quoted\""), InlineData("main")]
+    public async Task New_branch_names_reject_control_whitespace_quotes_and_collisions_without_coercion(string name)
+    {
+        var d = new GitGraphVisualDraft("gitGraph\ncommit\n"); Assert.NotNull(GitGraphVisualDraft.NewBranchProblem(d.Model, name)); Assert.False((await d.AppendAsync("branch", name)).Success); Assert.Equal(d.OriginalSource, d.Source); Assert.False(d.CanUndo);
+    }
+    [Fact] public async Task New_Unicode_branch_names_have_actual_native_lane_and_head_correspondence()
+    {
+        var d = new GitGraphVisualDraft("gitGraph\ncommit\n"); Pass(await d.AppendAsync("branch", "dóc-Ω")); Pass(await d.AppendAsync("commit")); Assert.Equal("dóc-Ω", d.Model.CurrentBranch); Assert.Contains("branch dóc-Ω", d.Source); Pass(await d.ValidateAsync());
+    }
 }

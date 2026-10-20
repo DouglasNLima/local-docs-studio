@@ -20,8 +20,9 @@ public sealed class GitGraphVisualEditorWindow : ChartVisualEditorWindow
         ActionButton("Append commit", "AddCommit", () => Append("commit"));
         ActionButton("Append new branch", "AddBranch", () =>
         {
+            if (!git.Model.Basic) return Task.FromResult(Protected("Unproved history protects branch creation. Inspect the preserved source first."));
             var n = 1; while (git.Model.Branches.Contains("branch" + n)) n++;
-            var prompt = new TextPromptWindow("Append GitGraph branch", "Name the new diagram branch. Appending it changes the current branch.", "branch" + n, "Append", "New branch name", "Use letters, digits, underscore, dot, slash or hyphen; begin with a letter or underscore.") { Owner = this };
+            var prompt = new TextPromptWindow("Append GitGraph branch", "Name the new diagram branch. Appending it changes the current branch.", "branch" + n, "Append", "New branch name", "Use letters, digits, underscore, dot, slash or hyphen; begin with a letter or underscore.", value => GitGraphVisualDraft.NewBranchProblem(git.Model, value), trimInput: false) { Owner = this };
             return prompt.ShowDialog() == true ? Append("branch", prompt.Value) : Task.FromResult(Protected("New branch cancelled; source is unchanged."));
         });
         branch = new ComboBox { Style = (System.Windows.Style)FindResource("Form.ComboBox") }; Identify(branch, "Branch", "Existing branch destination"); InspectorFields.Children.Add(new Label { Content = "Existing branch destination", Target = branch }); InspectorFields.Children.Add(branch);
@@ -41,7 +42,7 @@ public sealed class GitGraphVisualEditorWindow : ChartVisualEditorWindow
     {
         var c = Command; var editable = c is { Simple: true, Mark: true } && c.Kind != "cherry-pick";
         Captions("Explicit ID (blank: anonymous)", "Tag", "Commit type (NORMAL, HIGHLIGHT, REVERSE)");
-        Properties(c?.Value("id") ?? "", c?.Value("tag") ?? "", c?.Value("type") ?? "", editLabel: editable, editIdentifier: editable, editValue: editable);
+        Properties(c?.Value("id") ?? "", c?.Value("tag") ?? "", c?.Mark == true ? c.Value("type") : "", editLabel: editable, editIdentifier: editable, editValue: editable);
         branch.ItemsSource = git.Model.Branches.ToArray(); branch.SelectedIndex = 0;
         Describe(c is null ? "GitGraph · current branch " + git.Model.CurrentBranch : c.Kind + " · branch before: " + c.BranchBefore + " · after: " + c.BranchAfter + (c.Label is null ? "" : " · native label: " + c.Label),
             "Actual native history; this editor writes Mermaid text. Commands without visible marks remain in the occurrence list. Branch creation changes current branch. Anonymous numbering includes merges; appending/editing never inserts IDs into untouched commands. New merges require distinct non-empty branch heads. Only final uninterrupted simple commits can move or be removed. Orientation, lane order, repeated branches, unknown references and cherry-pick protect stream operations; source is retained exactly. Branch rename and implicit main rename are outside this slice.");

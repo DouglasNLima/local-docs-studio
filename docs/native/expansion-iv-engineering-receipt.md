@@ -167,3 +167,22 @@ The final UIA harness explicitly focuses the off-screen final inspector action a
 and checks unchanged source/selection/context before returning focus to the first
 field. This strengthens the small-window source/inspector scrolling evidence and
 runs in all six new-family appearance jobs and their installed lifecycle phases.
+
+
+## Branch-name pending input and retained local deadlines
+
+The new GitGraph branch prompt now validates raw input before closing. Invalid names
+remain visible with an explanation while owner Apply is disabled; whitespace is not
+trimmed into another name. The existing prompt helper's trimming default stays
+unchanged for other flows. Strict whole-string grammar rejects terminal line breaks,
+spaces, quotes and collisions, with actual native proof for Unicode letter names.
+Non-mark commands expose branch context without an invented commit-type field.
+The focused suite now has 69 cases, and the independent GitGraph UIA runs exercise
+invalid branch entry before correcting and appending the valid command.
+
+The clean `79069bf` local full corpus recorded four dispatcher observation deadlines:
+document layout, inline layout, preview scheduling and pagination. Raw failures are
+retained in `artifacts/native/expansion-iv/79069bf/corpus/` and its corpus log. The
+exact source's hosted ordinary corpus step passed. No observation deadline, fixture
+or assertion was changed. These outcomes remain distinct in the final delivery
+receipt; later hosted acceptance must identify its actual committed source.

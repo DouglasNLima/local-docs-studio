@@ -29,7 +29,9 @@ public sealed class GitGraphVisualDraft : SourceDraft<GitGraphSourceModel>
     private static readonly Regex Merge = SourceText.Pattern("^[ \\t]*merge\\s+\"?(?<name>[^\"]+?)\"?(?:\\s+(?<rest>.+))?$");
     private static readonly Regex Commit = SourceText.Pattern(@"^[ \t]*commit(?:\s+(?<rest>.+))?$"), Cherry = SourceText.Pattern(@"^[ \t]*cherry-pick\s+(?<rest>.+)$");
     private static readonly Regex Attribute = SourceText.Pattern("(?<name>id|tag|parent):\\s*(?<value>\"[^\"]+\")|(?<name>(?i:type)):\\s*(?<value>(?i:NORMAL|HIGHLIGHT|REVERSE))");
-    private static readonly Regex NewBranch = SourceText.Pattern(@"^[A-Za-z_][A-Za-z0-9_./-]*$");
+    private static readonly Regex NewBranch = SourceText.Pattern(@"^[\p{L}_][\p{L}\p{N}_./-]*\z");
+    public static string? NewBranchProblem(GitGraphSourceModel model, string name) => name.Length == 0 || name.Length > 2000 || name.Any(char.IsControl) || !NewBranch.IsMatch(name) || model.Branches.Contains(name)
+        ? "Use an unused branch name with letters, digits, underscore, dot, slash or hyphen, beginning with a letter or underscore. Spaces, quotes and line breaks are unsupported." : null;
     public static bool IsGitGraph(string source) => Header.IsMatch(ChartSource.Header(source));
     public GitGraphVisualDraft(string source, DiagramService? diagrams = null) : base(source, diagrams) { }
     protected override GitGraphSourceModel Scan(SourceText t)
@@ -127,7 +129,7 @@ public sealed class GitGraphVisualDraft : SourceDraft<GitGraphSourceModel>
     {
         Basic(m); ValidateText(id); ValidateText(tag); if (!new[] { "NORMAL", "HIGHLIGHT", "REVERSE" }.Contains(type)) throw new ArgumentException("Choose NORMAL, HIGHLIGHT or REVERSE.");
         if (id.Length > 0 && m.Commands.Any(c => c.Value("id") == id)) throw new ArgumentException("Choose an unused explicit commit ID.");
-        if (kind == "branch") { if (!NewBranch.IsMatch(reference) || m.Branches.Contains(reference)) throw new ArgumentException("Use a new branch name with letters, digits, underscore, dot, slash or hyphen, beginning with a letter or underscore."); }
+        if (kind == "branch") { if (NewBranchProblem(m, reference) is { } problem) throw new ArgumentException(problem); }
         else if (kind is "checkout" or "switch" or "merge")
         { if (!m.Branches.Contains(reference)) throw new ArgumentException("Choose an existing branch."); if (kind == "merge" && (reference == m.CurrentBranch || !m.Heads.ContainsKey(reference) || !m.Heads.ContainsKey(m.CurrentBranch))) throw new ArgumentException("A merge requires two distinct existing branches with non-empty heads."); }
         else if (kind != "commit") throw new ArgumentException("Append commit, branch, checkout/switch or merge. Cherry-pick authoring is protected.");
