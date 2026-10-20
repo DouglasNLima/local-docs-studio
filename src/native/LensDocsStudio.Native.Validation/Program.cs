@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--workflow-compatibility")
+        {
+            try { NativeWorkflowCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--chart-compatibility")
         {
             try { NativeChartCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }

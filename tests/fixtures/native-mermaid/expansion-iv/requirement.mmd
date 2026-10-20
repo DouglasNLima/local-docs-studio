@@ -1,0 +1,15 @@
+%% Symbolic names are distinct from display IDs.
+requirementDiagram
+title Documentation traceability Ω
+direction LR
+requirement guide {
+    id: "DOC-17"
+    text: "Publish a local guide"
+    risk: low
+    verifymethod: inspection
+}
+element studio {
+    type: "Documentation studio"
+    docRef: "guide.md"
+}
+guide <- satisfies - studio

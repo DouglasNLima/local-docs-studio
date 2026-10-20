@@ -1,0 +1,9 @@
+%% This is diagram source; no repository operations.
+gitGraph LR:
+    commit id: "Start Ω"
+    branch docs
+    commit tag: "Draft" type: HIGHLIGHT
+    checkout main
+    commit type: REVERSE
+    merge docs id: "Reviewed" tag: "v1"
+    commit
