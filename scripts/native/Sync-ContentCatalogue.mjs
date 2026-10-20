@@ -68,7 +68,12 @@ for (const [key, label, content] of [
   ['sankey', 'Sankey', 'sankey-beta\n    Draft,Review,3.000\n    Draft,Review,2.000\n    Review,Published,5.000\n    Research,Published,2.000\n'],
 ]) {
   add(`mermaid/${key}`, 'Mermaid', label, 'template', 'mermaid', `${key}.mmd`, content);
-  add(`mermaid-snippet/${key}`, 'Mermaid', `${label} chart`, 'snippet', 'mermaid', null, content);
+  const snippet = {
+    xychart: ['XY Chart series', 'bar "New series" [0, 0, 0]\n'],
+    radar: ['Radar curve', 'curve example["Example"]{0, 0, 0}\n'],
+    sankey: ['Sankey link', '"New source","New target",1\n'],
+  }[key];
+  add(`mermaid-snippet/${key}`, 'Mermaid', snippet[0], 'snippet', 'mermaid', null, snippet[1]);
 }
 const output = JSON.stringify({ version: 1, entries }, null, 2) + '\n';
 const target = new URL('../../src/native/LensDocsStudio.Core/Content/built-in-catalogue.json', import.meta.url);

@@ -156,3 +156,15 @@ packages must pass this strengthened gate and all fourteen installed lifecycle s
 Local committed-source `2b1d53a` native build passed with zero warnings/errors and
 all **1,840 Core tests passed**, zero skipped. The full corpus and final CI results
 are recorded in the final PR delivery receipt after completion.
+
+### Complete native corpus correction
+
+The local `2b1d53a` corpus rendered 142 ordinary diagram cases and generated validated
+DOCX/PDF exports, but correctly failed two native catalogue/help inventory checks:
+Mermaid snippets increased from six to nine and help topics from seventeen to
+eighteen. The native-window assertions retain exact counts, now additionally checking
+all three new snippet entries and the searchable chart chapter. New snippets are
+contextual series/curve/link rows, with matching pinned-family render fixtures;
+complete chart starters remain templates. The original failure summary and log are
+retained under `artifacts/native/2b1d53a-corpus/` and `final-corpus-2b1d53a.log`.
+A fresh complete corpus pass at the final source is still required.

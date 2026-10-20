@@ -57,8 +57,10 @@ internal static class NativeContentCatalogueChecks
             if (!preview.Text.Contains("Native Café requirements", StringComparison.Ordinal)) throw new IOException("Filtering discarded generator field edits.");
             filter.Clear(); ((ComboBox)window.FindName("Kind")).SelectedIndex = 1;
             ((ComboBox)window.FindName("Category")).SelectedItem = "Mermaid";
-            if (entries.Items.Count != 6 || (string)use.Content != "Insert snippet" || !((TextBlock)window.FindName("Status")).Text.Contains("matching type", StringComparison.Ordinal))
+            if (entries.Items.Count != 9 || (string)use.Content != "Insert snippet" || !((TextBlock)window.FindName("Status")).Text.Contains("matching type", StringComparison.Ordinal))
                 throw new IOException("Mermaid snippets lost category filtering or insertion guidance.");
+            foreach (var family in new[] { "xychart", "radar", "sankey" })
+                if (!entries.Items.Cast<CatalogueEntry>().Any(entry => entry.Id == "mermaid-snippet/" + family)) throw new IOException("The chart snippet is missing from its actual native category: " + family);
             host.RootVisual = null; surface.Child = null; window.Close();
         }
 
@@ -70,8 +72,12 @@ internal static class NativeContentCatalogueChecks
             var generated = BuiltInContentCatalogue.Generate(entry, date: new DateOnly(2026, 10, 12));
             var source = generated.Content;
             if (entry.Format == "mermaid" && entry.IsSnippet)
-                source = (entry.Id == "mermaid-snippet/sequenceNote" ? "sequenceDiagram\nparticipant User\nparticipant App\nUser->>App: Review\n"
-                    : "flowchart LR\nA[Source] --> B[Preview]\n") + source;
+                source = (entry.Id switch {
+                    "mermaid-snippet/sequenceNote" => "sequenceDiagram\nparticipant User\nparticipant App\nUser->>App: Review\n",
+                    "mermaid-snippet/xychart" => "xychart-beta\nx-axis [A,B,C]\n",
+                    "mermaid-snippet/radar" => "radar-beta\naxis A,B,C\n",
+                    "mermaid-snippet/sankey" => "sankey-beta\n",
+                    _ => "flowchart LR\nA[Source] --> B[Preview]\n" }) + source;
             var blocks = parser.Parse(source, entry.Format == "mermaid").Syntax.Descendants<FencedCodeBlock>()
                 .Where(block => string.Equals(block.Info, "mermaid", StringComparison.OrdinalIgnoreCase)).ToArray();
             for (var index = 0; index < blocks.Length; index++)
