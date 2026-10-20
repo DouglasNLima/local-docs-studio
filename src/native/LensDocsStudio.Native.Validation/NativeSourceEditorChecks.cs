@@ -9,6 +9,9 @@ using System.Windows.Media.Imaging;
 using LensDocsStudio.Core.GanttDiagrams;
 using LensDocsStudio.Core.Mindmaps;
 using LensDocsStudio.Core.PieDiagrams;
+using LensDocsStudio.Core.TimelineDiagrams;
+using LensDocsStudio.Core.JourneyDiagrams;
+using LensDocsStudio.Core.QuadrantDiagrams;
 using LensDocsStudio.Core.SourceAuthoring;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Parsing;
@@ -29,18 +32,24 @@ internal static class NativeSourceEditorChecks
         var donut = System.Xml.Linq.XElement.Parse("<svg viewBox=\"0 0 80 80\"><g><circle cx=\"40\" cy=\"40\" r=\"20\" fill=\"none\" stroke=\"black\" stroke-width=\"10\"/></g></svg>");
         var donutHit = NativeSourceHit.ShapeGeometry(donut.Elements().Single(), donut)!;
         Check(!donutHit.FillContains(new Point(40, 40)) && donutHit.FillContains(new Point(64, 40)), "One-slice canonical stroked-circle geometry retains its donut hole and actual outer stroke");
-        foreach (var family in new[] { "Gantt", "Mindmap", "Pie" })
+        foreach (var family in new[] { "Gantt", "Mindmap", "Pie", "Timeline", "Journey", "Quadrant" })
         foreach (var dark in new[] { false, true })
         {
-            var starter = family switch { "Gantt" => GanttVisualDraft.Starter, "Mindmap" => MindmapVisualDraft.Starter, _ => PieVisualDraft.Starter };
-            ISourceDraft draft = family switch { "Gantt" => new GanttVisualDraft(starter), "Mindmap" => new MindmapVisualDraft(starter), _ => new PieVisualDraft(starter) };
+            var starter = family switch { "Gantt" => GanttVisualDraft.Starter, "Mindmap" => MindmapVisualDraft.Starter, "Timeline" => TimelineVisualDraft.Starter, "Journey" => JourneyVisualDraft.Starter, "Quadrant" => QuadrantVisualDraft.Starter, _ => PieVisualDraft.Starter };
+            ISourceDraft draft = family switch { "Gantt" => new GanttVisualDraft(starter), "Mindmap" => new MindmapVisualDraft(starter), "Timeline" => new TimelineVisualDraft(starter), "Journey" => new JourneyVisualDraft(starter), "Quadrant" => new QuadrantVisualDraft(starter), _ => new PieVisualDraft(starter) };
             SourceAuthoringResult change = family switch {
+                "Timeline" => ((TimelineVisualDraft)draft).UpdateAsync(((TimelineVisualDraft)draft).Model.Periods[0].Events[0].Identity, "Updated guide").GetAwaiter().GetResult(),
+                "Journey" => ((JourneyVisualDraft)draft).UpdateAsync(((JourneyVisualDraft)draft).Model.Tasks[0].Identity, "Updated guide", "4").GetAwaiter().GetResult(),
+                "Quadrant" => ((QuadrantVisualDraft)draft).UpdateAsync(((QuadrantVisualDraft)draft).Model.Points[0].Identity, "Updated guide", ".125000", ".875000").GetAwaiter().GetResult(),
                 "Gantt" => ((GanttVisualDraft)draft).UpdateAsync(((GanttVisualDraft)draft).Model.Tasks[0].Identity, "Updated guide", "2026-10-21", "4").GetAwaiter().GetResult(),
                 "Mindmap" => ((MindmapVisualDraft)draft).UpdateAsync(((MindmapVisualDraft)draft).Model.Nodes[1].Identity, "Updated guides").GetAwaiter().GetResult(),
                 _ => ((PieVisualDraft)draft).UpdateAsync(((PieVisualDraft)draft).Model.Entries[0].Identity, "Updated guides", "7.25000").GetAwaiter().GetResult() };
             Check(change.Success, family + ": source transformation validates before native presentation");
             var source = draft.Source; var render = diagrams.Render(source, dark); Check(render.Success, family + ": authored source renders through ordinary native adapter");
             SourceVisualEditorWindow editor = family switch {
+                "Timeline" => new TimelineVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
+                "Journey" => new JourneyVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
+                "Quadrant" => new QuadrantVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "Gantt" => new GanttVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "Mindmap" => new MindmapVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 _ => new PieVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark) };
@@ -48,7 +57,7 @@ internal static class NativeSourceEditorChecks
             // Construct the same shared hit-target type/style without showing a desktop window.
             var target = new ToggleButton { Style = (Style)editor.FindResource("Mermaid.CanonicalElement") }; target.ApplyTemplate();
             var hits = (IReadOnlyList<NativeSourceHit>)editor.GetType().GetMethod("Correspondence", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(editor, [source, render])!;
-            var expected = family switch { "Gantt" => ((GanttVisualDraft)draft).Model.Tasks.Count, "Mindmap" => ((MindmapVisualDraft)draft).Model.Nodes.Count, _ => ((PieVisualDraft)draft).Model.Entries.Count(entry => entry.Value > 0) };
+            var expected = family switch { "Gantt" => ((GanttVisualDraft)draft).Model.Tasks.Count, "Mindmap" => ((MindmapVisualDraft)draft).Model.Nodes.Count, "Timeline" => ((TimelineVisualDraft)draft).Model.Periods.Sum(p => 1 + p.Events.Count), "Journey" => ((JourneyVisualDraft)draft).Model.Tasks.Count, "Quadrant" => ((QuadrantVisualDraft)draft).Model.Points.Count, _ => ((PieVisualDraft)draft).Model.Entries.Count(entry => entry.Value > 0) };
             Check(hits.Count == expected && hits.Select(hit => hit.Identity).Distinct().Count() == expected, family + ": every supported occurrence has distinct canonical geometry");
             var svg = new NativeSvgService(); var canonical = (DrawingImage)typeof(NativeSvgService).GetMethod("RenderCanonical", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(svg, [render, svg.Prepare(render.Svg!), false, CancellationToken.None])!;
             foreach (var hit in hits) Check(new Rect(0, 0, canonical.Width, canonical.Height).Contains(hit.Bounds), family + ": actual SVG hit bounds stay inside canonical canvas");
