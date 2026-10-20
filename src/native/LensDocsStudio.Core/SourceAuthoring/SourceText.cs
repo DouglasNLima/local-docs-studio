@@ -62,7 +62,7 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
     public static string Header(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) ?? "";
     public static string PrepareRendererSource(string source)
     {
-        if (source.Length <= 100_000 && ChartSource.IsChart(source)) return ChartSource.Prepare(source);
+        if (source.Length <= 100_000 && (ChartSource.IsChart(source) || WorkflowSource.IsWorkflow(source))) return ChartSource.Prepare(source);
         if (!Pattern(@"^(?:pie|gantt|timeline|journey|quadrantChart)(?:\s|$)|^mindmap$", RegexOptions.IgnoreCase).IsMatch(Header(source))) return source;
         // The pinned detector examines the first raw line, although its parsers skip comments.
         // Adapt only leading inert trivia for these families; DiagramResult retains authoritative source.

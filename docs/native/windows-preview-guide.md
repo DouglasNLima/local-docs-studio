@@ -1,5 +1,21 @@
 # Windows internal preview guide
 
+## Seventeen native Mermaid editors - Expansion IV
+
+Kanban, Requirement and basic GitGraph extend the fourteen existing families. Use
+Visual Edit, standalone Mermaid or the Insert command, with canonical native output
+and exact source preservation. Fixed Kanban indentation, Requirement symbolic names
+and GitGraph branch/head dependencies have explicit protection. Mermaider stays at
+0.15.1 and the official .NET 10/WPF runtime is unchanged.
+
+The [Draft PR #43 delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/43)
+identifies exact final-source checks, source-labelled Windows captures and fresh
+unsigned internal packages. Acceptance requires completed gates for the identified
+source. Earlier Expansion III records below remain historical and retain their real
+source and package attribution. Stock Continuous timing is paused; .749 remains
+unresolved. No production signing or public release is authorised.
+
+
 ## Fourteen native Mermaid editors — Expansion III
 
 XY Chart, Radar and Sankey extend the eleven existing native families. Use Visual

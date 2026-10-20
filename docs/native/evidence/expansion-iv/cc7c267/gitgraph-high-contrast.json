@@ -1,0 +1,35 @@
+{
+  "Status": "PASS",
+  "Family": "GitGraph",
+  "SourceRevision": "0.1.0-preview.1\u002Bcc7c26793249838e4c8d824bccc1661f508d03fe",
+  "Checks": [
+    "Actual Windows High Contrast is active; UIA is not physical screen-reader certification",
+    "Independent native UIA connections agree on source occurrence selection",
+    "Actual canonical pointer shape has a visible interior",
+    "Real pointer selection follows actual native geometry and exact source occurrence",
+    "Invalid pending input retains last valid draft, remains visible and disables Apply",
+    "Persistent inspector exposes operation and protection context",
+    "Actual named branch, commit, checkout and merge commands preserve current branch and two proved native parent heads",
+    "Private source, inspector and history never mutate owner or disk before Apply",
+    "Apply and inspector remain reachable at 880x600",
+    "Apply and inspector remain reachable at 1280x800",
+    "Exact second identical fence Apply, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+    "Reopened chart retains exact authored source and untouched lexemes",
+    "Cancel preserves exact saved and owner source",
+    "Stale Apply preserves both private and changed owner source",
+    "Standalone Mermaid uses the ordinary visual authoring route",
+    "Insert uses the correct full-family editor and portable starter",
+    "Insert produces portable Mermaid source",
+    "Off-screen list navigation and Locate preserve source with adjustable source and inspector scrolling",
+    "Historical unproved source remains exact; protected operations cannot silently repair or discard source"
+  ],
+  "Observations": [
+    {
+      "Operation": "Canonical pointer",
+      "Bounds": "106.69999999999999,47.5,9,9",
+      "Scale": 1,
+      "ScreenX": 589.15,
+      "ScreenY": 197.75
+    }
+  ]
+}

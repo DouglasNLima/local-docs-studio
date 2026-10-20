@@ -57,7 +57,7 @@ internal static class NativeContentCatalogueChecks
             if (!preview.Text.Contains("Native Café requirements", StringComparison.Ordinal)) throw new IOException("Filtering discarded generator field edits.");
             filter.Clear(); ((ComboBox)window.FindName("Kind")).SelectedIndex = 1;
             ((ComboBox)window.FindName("Category")).SelectedItem = "Mermaid";
-            if (entries.Items.Count != 9 || (string)use.Content != "Insert snippet" || !((TextBlock)window.FindName("Status")).Text.Contains("matching type", StringComparison.Ordinal))
+            if (entries.Items.Count != 12 || (string)use.Content != "Insert snippet" || !((TextBlock)window.FindName("Status")).Text.Contains("matching type", StringComparison.Ordinal))
                 throw new IOException("Mermaid snippets lost category filtering or insertion guidance.");
             foreach (var family in new[] { "xychart", "radar", "sankey" })
                 if (!entries.Items.Cast<CatalogueEntry>().Any(entry => entry.Id == "mermaid-snippet/" + family)) throw new IOException("The chart snippet is missing from its actual native category: " + family);
@@ -77,6 +77,9 @@ internal static class NativeContentCatalogueChecks
                     "mermaid-snippet/xychart" => "xychart-beta\nx-axis [A,B,C]\n",
                     "mermaid-snippet/radar" => "radar-beta\naxis A,B,C\n",
                     "mermaid-snippet/sankey" => "sankey-beta\n",
+                    "mermaid-snippet/kanban-native" => "kanban\n    todo[To do]\n",
+                    "mermaid-snippet/requirement-native" => "requirementDiagram\n",
+                    "mermaid-snippet/gitgraph-native" => "gitGraph LR:\n",
                     _ => "flowchart LR\nA[Source] --> B[Preview]\n" }) + source;
             var blocks = parser.Parse(source, entry.Format == "mermaid").Syntax.Descendants<FencedCodeBlock>()
                 .Where(block => string.Equals(block.Info, "mermaid", StringComparison.OrdinalIgnoreCase)).ToArray();

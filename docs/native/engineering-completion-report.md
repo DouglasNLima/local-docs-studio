@@ -1,5 +1,15 @@
 # Native Windows preview acceptance and engineering delivery
 
+## Seventeen native Mermaid editors - Expansion IV
+
+Kanban, Requirement and basic GitGraph use lossless source drafts and the shared
+canonical native workspace. The [grammar/protection guide](kanban-requirement-gitgraph-editors.md)
+and [engineering receipt](expansion-iv-engineering-receipt.md) separate implemented
+scope from final-source Windows certification and packaging. Mermaider 0.15.1 and
+official .NET 10/WPF are unchanged. Stock Continuous timing remains paused and .749
+unresolved; no new performance acceptance is claimed.
+
+
 The fourth native Mermaid authoring family is implemented on
 `feature/native-mermaid-er-visual-editor`, based on consolidated `develop`
 `3229246af356829771a200134a5df38d3cc8a04c`. The

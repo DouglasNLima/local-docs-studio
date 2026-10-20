@@ -17,6 +17,16 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--workflow-editor-fidelity")
+        {
+            try { NativeWorkflowEditorChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--workflow-compatibility")
+        {
+            try { NativeWorkflowCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--chart-compatibility")
         {
             try { NativeChartCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
@@ -159,6 +169,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--suite-baseline-ui") return NativeUiChecks.RunMermaidSuite(args[1], args[2], args.Contains("--high-contrast"), true, args.Contains("--dark"));
         if (args.FirstOrDefault() == "--suite-ui") return NativeUiChecks.RunMermaidSuite(args[1], args[2], args.Contains("--high-contrast"));
         if (args.FirstOrDefault() == "--class-performance-ui") return NativeUiChecks.RunClassPerformance(args[1], args[2], args.Contains("--high-contrast"));
+        if (args.FirstOrDefault() == "--source-editor-ui" && args[3] is "Kanban" or "Requirement" or "GitGraph") return NativeUiChecks.RunWorkflowEditor(args[1], args[2], args[3], args.Contains("--high-contrast"));
         if (args.FirstOrDefault() == "--source-editor-ui" && args[3] is "Xy" or "Radar" or "Sankey") return NativeUiChecks.RunChartEditor(args[1], args[2], args[3], args.Contains("--high-contrast"));
         if (args.FirstOrDefault() == "--source-editor-ui") return args[3] is "Timeline" or "Journey" or "Quadrant"
             ? NativeUiChecks.RunExpansionEditor(args[1], args[2], args[3], args.Contains("--high-contrast"))

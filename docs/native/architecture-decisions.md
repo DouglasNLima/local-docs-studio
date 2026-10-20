@@ -1,5 +1,15 @@
 # Native architecture decisions
 
+## Seventeen native Mermaid editors - Expansion IV
+
+Kanban, Requirement and basic GitGraph use lossless source drafts and the shared
+canonical native workspace. The [grammar/protection guide](kanban-requirement-gitgraph-editors.md)
+and [engineering receipt](expansion-iv-engineering-receipt.md) separate implemented
+scope from final-source Windows certification and packaging. Mermaider 0.15.1 and
+official .NET 10/WPF are unchanged. Stock Continuous timing remains paused and .749
+unresolved; no new performance acceptance is claimed.
+
+
 ## Fourteen native Mermaid editors — Expansion III
 
 XY Chart, Radar and Sankey add category comparisons, positional profiles and weighted

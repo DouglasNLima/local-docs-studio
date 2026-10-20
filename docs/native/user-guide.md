@@ -125,7 +125,7 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Families outside the fourteen visual editors keep their existing
+than four connections per node. Families outside the seventeen visual editors keep their existing
 [rendering and export commands](#mermaid-diagrams-and-maths).
 
 ## XY Chart, Radar and Sankey visual authoring
@@ -546,3 +546,16 @@ they are corrected or reset. Private Undo/Redo restores draft source and selecti
 Apply creates one owner Undo step; Save persists it. Cancel leaves the owner unchanged,
 and stale-owner Apply is rejected. Zoom/Fit, source validation and the persistent inspector
 use the shared native workspace. See the [supported/protected matrix](timeline-journey-quadrant-editors.md).
+
+
+## Kanban, Requirement and GitGraph visual authoring
+
+Use Visual Edit in a document preview, a standalone Mermaid file, or the family command in Insert. The shared editor shows actual canonical native output. Its complete occurrence list includes duplicates, overlapping shapes and commands without visible marks. Locate opens the adjustable source panel; the inspector and source scroll independently. Private Undo/Redo affects only the draft until Apply.
+
+Kanban supports ordered columns/cards, title, separate explicit IDs and titles, and simple assigned, ticket and priority metadata. Bare/bracket forms couple ID and title. The first content line fixes the column indentation boundary; deeper indentation means cards, never subtasks. Move card to selected column has an explicit destination. Mixed column indentation or ambiguous comments protect structural operations. Column deletion requires empty cards or explicit complete removal. Metadata is case-insensitive and last-wins; unknown keys remain exact. Supported priorities are Very high, High, Medium, Low and Very low. Partial metadata protects affected fields. Bracketed/explicit titles can retain literal title words, quotes, commas and braces when the native ID/title and source form are proved unchanged; bare title directives remain protected.
+
+Requirement supports six kinds, element blocks, display ID, text, risk, verification, type and docRef, four directions and seven relationship types. Display ID edits do not rename symbolic nodes. Updating a unique symbolic name patches every proved reference atomically, preserving forward/reverse arrow spelling. Empty final properties override repeated older values. Unknown keys and values stay exact. Hidden/duplicate nodes, malformed blocks, missing endpoints and parallel/self/cyclic relationships protect affected topology. Remove incident relationships before deleting connected blocks.
+
+GitGraph edits Mermaid command text. Branch creation changes the current branch, and the inspector shows before/after context. Append commits, branches, checkout or merges using keyboard-accessible commands. New merges require distinct branches with non-empty heads. Tags and NORMAL/HIGHLIGHT/REVERSE types follow native output. Anonymous numbering includes merges and can change after deliberate edits; untouched commands never gain invented IDs. Only independent commits in the final uninterrupted commit run can move or be removed. The pinned renderer ignores parsed orientation and branch order. Repeated branches, unknown checkouts, empty merge heads and cherry-pick retain source access and protect stream operations. Branch rename is outside this slice.
+
+Double quotes and line breaks have no general escape support. Invalid pending fields stay visible with actionable feedback, retain the last valid draft and disable Apply. Apply validates exact source and makes one owner-document Undo action. Cancel discards only the private draft; stale-owner conflicts preserve both versions. Save and reopen the portable source to persist authoring. Mermaider stays at 0.15.1. This editor invokes no Git repository operation or remote service.
