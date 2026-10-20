@@ -168,3 +168,14 @@ contextual series/curve/link rows, with matching pinned-family render fixtures;
 complete chart starters remain templates. The original failure summary and log are
 retained under `artifacts/native/2b1d53a-corpus/` and `final-corpus-2b1d53a.log`.
 A fresh complete corpus pass at the final source is still required.
+
+### Installed state preservation evidence
+
+All fourteen installed-family suites retain their existing real authoring and
+Save/restart/reopen assertions. Their common lifecycle extension now additionally
+records SHA-256 for each completed phase's authored files, settings/recovery and
+evidence, and checks every prior file after install, synthetic upgrade, uninstall
+and reinstall. Full preserved-file maps are retained in the installed result JSON.
+This supplements exact portable/installed payload parity and association exclusions.
+The version-pair upgrade remains source-identical and synthetic; it is not historical
+upgrade acceptance. No installer executes on the ordinary desktop.
