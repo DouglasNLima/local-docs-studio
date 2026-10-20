@@ -2,6 +2,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.RequirementDiagrams;
@@ -55,7 +58,18 @@ internal static class NativeWorkflowEditorChecks
             Check(selected == code.Span.Start, family + ": ordinary document exposes exact Visual Edit context action");
             var editorPng = NativeSvgService.ToPng(drawing); var previewPng = NativeSvgService.ToPng(ordinary.Media.Single().Image.Source);
             Check(NativeSourceEditorChecks.Pixels(editorPng).SequenceEqual(NativeSourceEditorChecks.Pixels(previewPng)), family + ": complete editor and ordinary preview pixels match at identical source, appearance and scale with zero tolerance");
+            RenderActual(window);
+            var surface = (Canvas)window.FindName("Surface"); var actualImage = surface.Children.OfType<Image>().Single();
+            Check(actualImage.Source is DrawingImage && ReferenceEquals(actualImage.Source, typeof(SourceVisualEditorWindow).GetField("drawing", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)), family + ": actual editor render publishes its canonical drawing directly on the complete source canvas");
+            Check(NativeSourceEditorChecks.Pixels(NativeSvgService.ToPng(actualImage.Source)).SequenceEqual(NativeSourceEditorChecks.Pixels(previewPng)), family + ": actual asynchronous editor render and ordinary preview retain every pixel with zero tolerance");
+            var previewSurface = new Canvas { Width = surface.Width, Height = surface.Height, Background = Brushes.Transparent, UseLayoutRounding = surface.UseLayoutRounding, SnapsToDevicePixels = surface.SnapsToDevicePixels };
+            previewSurface.Children.Add(new Image { Source = ordinary.Media.Single().Image.Source, Stretch = Stretch.None, IsHitTestVisible = false, SnapsToDevicePixels = actualImage.SnapsToDevicePixels });
+            var actualCanvas = CanvasPixels(surface); var previewCanvas = CanvasPixels(previewSurface);
+            var canvasName = family + (dark ? "-dark" : "-light"); File.WriteAllBytes(Path.Combine(output, canvasName + "-actual-editor-canvas.png"), actualCanvas); File.WriteAllBytes(Path.Combine(output, canvasName + "-ordinary-preview-canvas.png"), previewCanvas);
+            File.WriteAllText(Path.Combine(output, canvasName + "-canvas-options.json"), JsonSerializer.Serialize(new { SourceRevision = typeof(KanbanVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, SourceWidth = surface.Width, SourceHeight = surface.Height, SourceActualWidth = surface.ActualWidth, SourceActualHeight = surface.ActualHeight, PreviewActualWidth = previewSurface.ActualWidth, PreviewActualHeight = previewSurface.ActualHeight, SourceBounds = VisualTreeHelper.GetDescendantBounds(surface).ToString(), PreviewBounds = VisualTreeHelper.GetDescendantBounds(previewSurface).ToString(), SourceOffset = VisualTreeHelper.GetOffset(surface).ToString(), PreviewOffset = VisualTreeHelper.GetOffset(previewSurface).ToString(), ImageOffset = VisualTreeHelper.GetOffset(actualImage).ToString(), ImageActualWidth = actualImage.ActualWidth, ImageActualHeight = actualImage.ActualHeight, LayoutTransform = surface.LayoutTransform.Value.ToString(), SourceDpi = VisualTreeHelper.GetDpi(surface).ToString(), PreviewDpi = VisualTreeHelper.GetDpi(previewSurface).ToString(), SourceImageBounds = VisualTreeHelper.GetContentBounds(actualImage).ToString(), PreviewImageBounds = VisualTreeHelper.GetContentBounds(previewSurface.Children.OfType<Image>().Single()).ToString(), SourceImageSize = actualImage.RenderSize.ToString(), PreviewImageSize = previewSurface.Children.OfType<Image>().Single().RenderSize.ToString(), SourceImageDpi = VisualTreeHelper.GetDpi(actualImage).DpiScaleY, PreviewImageDpi = VisualTreeHelper.GetDpi(previewSurface.Children.OfType<Image>().Single()).DpiScaleY, SourceDrawingSize = actualImage.Source.Height, PreviewDrawingSize = ordinary.Media.Single().Image.Source.Height, SourceSnap = actualImage.SnapsToDevicePixels, PreviewSnap = previewSurface.Children.OfType<Image>().Single().SnapsToDevicePixels, SourceClip = actualImage.Clip?.Bounds.ToString(), PreviewClip = previewSurface.Children.OfType<Image>().Single().Clip?.Bounds.ToString() }, new JsonSerializerOptions { WriteIndented = true }));
+            Check(NativeSourceEditorChecks.Pixels(actualCanvas).SequenceEqual(NativeSourceEditorChecks.Pixels(previewCanvas)), family + ": complete actual WPF editor canvas including every unselected hit overlay exactly matches ordinary preview at identical viewport/layout options");
             var name = family + (dark ? "-dark" : "-light"); File.WriteAllBytes(Path.Combine(output, name + "-editor.png"), editorPng); File.WriteAllBytes(Path.Combine(output, name + "-preview.png"), previewPng);
+            File.WriteAllBytes(Path.Combine(output, name + "-actual-editor-canvas.png"), actualCanvas); File.WriteAllBytes(Path.Combine(output, name + "-ordinary-preview-canvas.png"), previewCanvas);
             foreach (var nl in new[] { "\n", "\r\n" })
             {
                 var body = source.ReplaceLineEndings(nl); var block = "```mermaid" + nl + body.TrimEnd('\r', '\n') + nl + "```" + nl;
@@ -73,5 +87,29 @@ internal static class NativeWorkflowEditorChecks
         }
         File.WriteAllText(Path.Combine(output, "workflow-editor-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", SourceRevision = typeof(KanbanVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, Checks = checks }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
+    }
+    private static void RenderActual(SourceVisualEditorWindow window)
+    {
+        var dispatcher = Dispatcher.CurrentDispatcher; var previous = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(dispatcher));
+        try
+        {
+            var task = (Task)typeof(SourceVisualEditorWindow).GetMethod("Render", BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(bool)], null)!.Invoke(window, [false])!;
+            if (!task.IsCompleted)
+            {
+                var frame = new DispatcherFrame(); var expired = false; var timer = new DispatcherTimer(DispatcherPriority.Send, dispatcher) { Interval = TimeSpan.FromSeconds(30) };
+                timer.Tick += (_, _) => { expired = true; frame.Continue = false; };
+                _ = task.ContinueWith(_ => dispatcher.BeginInvoke(DispatcherPriority.Send, () => frame.Continue = false), TaskScheduler.Default);
+                timer.Start(); Dispatcher.PushFrame(frame); timer.Stop(); if (expired) throw new TimeoutException("Actual source-editor render exceeded its observation deadline.");
+            }
+            task.GetAwaiter().GetResult();
+        }
+        finally { SynchronizationContext.SetSynchronizationContext(previous); }
+    }
+    private static byte[] CanvasPixels(Canvas canvas)
+    {
+        var size = new Size(canvas.Width, canvas.Height); canvas.Measure(size); canvas.Arrange(new Rect(size)); canvas.UpdateLayout();
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height), 96, 96, PixelFormats.Pbgra32); bitmap.Render(canvas);
+        var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); using var bytes = new MemoryStream(); encoder.Save(bytes); return bytes.ToArray();
     }
 }

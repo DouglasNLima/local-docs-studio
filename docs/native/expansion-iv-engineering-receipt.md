@@ -120,3 +120,30 @@ installed lifecycle suites and fresh capture/CI links are recorded in the immuta
 [Draft PR #43 delivery receipt](https://github.com/DouglasNLima/local-docs-studio/pull/43)
 after its gates complete. That delivery record is authoritative for final status,
 package SHA-256, runtime/provenance, artefact expiry, preserved paths and elapsed time.
+
+
+## Complete actual-canvas fidelity gate
+
+The strengthened gate invokes the application's actual asynchronous editor render,
+reads the drawing published on its complete WPF canvas, and compares both that
+image and the entire canvas (including every unselected hit overlay) against the
+ordinary document preview. Source, appearance, dimensions, scale, layout rounding
+and device-pixel snapping are identical. No pixels are masked and tolerance remains
+zero. All six family/Light-Dark cases pass: **100 workflow fidelity checks** in the
+working-tree proof. Fresh clean-source CI repeats this gate.
+
+The first diagnostic call found an ambiguous inherited Render overload; reflection
+now selects the application's Boolean overload explicitly. The first full-canvas
+comparison then exposed mismatched test-surface pixel-snapping settings (true on
+the editor, false on the unhosted comparison). Both now use the actual editor's
+display options. Original mismatched pairs/options/logs are preserved under
+`artifacts/native/expansion-iv/working-actual-canvas-{2,3,4}/`; the passing pair is
+under `working-actual-canvas-5/`. These are labelled working-tree results, not
+misattributed clean-source acceptance. No product rendering or comparison threshold
+was changed for this additional gate.
+
+Clean `e3984d0716392b40a0b4a615897bdae88ff36b2b` also passed 1,904 Core cases,
+the full 148-case ordinary native corpus with zero failures, static/service-worker
+checks, all compatibility/fidelity gates then present, and all 24 hosted shared-source
+UIA appearance runs. The later actual-canvas change is validation-only; its final
+compiled source is identified by the PR delivery record and fresh package metadata.
