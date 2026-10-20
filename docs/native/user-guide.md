@@ -456,9 +456,8 @@ unproved metadata attachment or mixed indentation protects local structural edit
 The selected category highlights its actual canonical wedge. Values display the
 current decimal separator and save in invariant decimal notation. Untouched number
 precision stays exact. Zero rows stay in source and have no slice. At least one
-positive value and a finite total are required to Apply. Embedded double quotes
-and line breaks cannot be encoded by this pinned parser; rejected input stays in
-the inspector for correction. Percentages come only from canonical rendering.
+positive value and a finite total are required to Apply. Label line breaks are safely encoded as `\n`. Embedded double quotes cannot be
+encoded by this pinned parser; rejected input stays in the inspector for correction. Percentages come only from canonical rendering.
 
 Update or reset pending properties before selecting another occurrence. Private
 Undo/Redo restores exact source and selection; Apply commits one owner-document

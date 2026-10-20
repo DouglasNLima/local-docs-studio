@@ -10,7 +10,7 @@ the family commits alone do not certify delivery.
 | --- | --- | --- |
 | Gantt | Title, section names, task labels, explicit `yyyy-MM-dd` starts and positive whole-day `Nd` durations; add/remove/move tasks within a section and complete section groups | Existing IDs are retained; new independent tasks need no ID. Dependencies, implicit starts, statuses, milestones, calendars, incompatible date formats, duplicate IDs and unknown directives protect temporal/structural operations. Labels remain locally editable. `YYYY-MM-DD` and equivalent `yyyy-MM-dd` dateFormat directives are compatible. Empty sections remain source-only until populated. |
 | Mind map | One root, text, child/sibling insertion, subtree removal, sibling movement, indent/outdent and reparenting | Occurrence identities handle duplicate labels. Recognised shape delimiters and ID prefixes remain unchanged. Cycles, root deletion/reparenting, ambiguous indentation and unproved icon/class/style attachment are protected locally. The pinned renderer treats unsupported metadata as literal nodes; the editor does not invent icon support. |
-| Pie | Title, category labels, invariant decimal values, add/remove/move and actual canonical slice geometry | Untouched numeric lexemes retain precision. Duplicate labels remain separate occurrences. Zero rows stay in source and have no rendered slice. Empty/all-zero/non-finite-total drafts cannot Apply. The pinned parser cannot encode embedded quotes or physical line breaks in labels; rejected pending input remains available for correction. showData, comments and unknown directives remain unchanged. |
+| Pie | Title, category labels, invariant decimal values, add/remove/move and actual canonical slice geometry | Untouched numeric lexemes retain precision. Duplicate labels remain separate occurrences. Zero rows stay in source and have no rendered slice. Empty/all-zero/non-finite-total drafts cannot Apply. Label line breaks are safely encoded as `\n`, preserving unchanged escape/`<br/>` spelling. The pinned parser cannot encode embedded double quotes; rejected pending input remains available for correction. showData, comments and unknown directives remain unchanged. |
 
 All source lines retain original terminators and unrelated bytes. Token updates
 replace owned spans. Structural operations carry complete source groups: contiguous
@@ -29,7 +29,7 @@ native conversion is validated before Apply. Owner Apply keeps existing fence an
 version checks, one document Undo step, Cancel and conflict behaviour. No session
 draft is written to the owner before Apply.
 
-Focused Core coverage currently contains 17 Pie, 16 Mind map and 23 Gantt cases.
+Focused Core coverage currently contains 19 Pie, 16 Mind map and 23 Gantt cases.
 The independent native UIA acceptance route is `--source-editor-ui` with family
 `Gantt`, `Mindmap` or `Pie`; actual display/High Contrast mutation runs only on
 authorised disposable GitHub-hosted Windows runners. Final-source counts, captures,

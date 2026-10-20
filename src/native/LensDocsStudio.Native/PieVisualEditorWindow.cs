@@ -18,6 +18,7 @@ public sealed class PieVisualEditorWindow : SourceVisualEditorWindow
         : base("Pie", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         label = Field("Label or title", "Label"); number = Field("Value (decimal)", "Value");
+        label.AcceptsReturn = true; label.TextWrapping = System.Windows.TextWrapping.Wrap; label.MaxHeight = 100; label.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Auto;
         pie = new(source, diagrams); pie.ValidatePresentation = (text, _, token) => ValidateNative(text, token);
         ActionButton("Add category", "AddCategory", async () => { var result = await pie.AddAsync("New category", "1", Lifetime.Token); if (result.Success) pie.Select(pie.Model.Entries[^1].Identity); return result; }); Start(pie);
     }
@@ -30,13 +31,13 @@ public sealed class PieVisualEditorWindow : SourceVisualEditorWindow
     protected override void ShowProperties()
     {
         var entry = pie.Model.Entries.FirstOrDefault(item => item.Identity == pie.Selection); var title = pie.Selection == pie.Model.HeaderIdentity;
-        label.Text = title ? pie.Model.Title : entry?.Label ?? "";
+        label.Text = title ? pie.Model.Title : entry is null ? "" : PieVisualDraft.DisplayLabel(entry.Label);
         // UI uses the current decimal separator. Original source precision is retained if this field is untouched.
         number.Text = entry?.Number.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal) ?? "";
         label.IsEnabled = title || entry is not null; number.IsEnabled = entry is not null;
         Describe(title ? "Pie title" : entry is null ? "Select a category or title" : entry.Label,
             pie.Model.Errors.FirstOrDefault() ?? (entry is null && !title ? "Select a source occurrence. Protected directives remain unchanged." :
-            "Quoted labels and non-negative decimals. Duplicate labels retain separate source occurrences. Zero rows remain in source and have no slice. The chart needs a positive finite total. Embedded quotes and line breaks are unsupported by Mermaider 0.15.1."));
+            "Quoted labels and non-negative decimals. Duplicate labels retain separate source occurrences. Zero rows remain in source and have no slice. The chart needs a positive finite total. Line breaks are safely encoded as \\n. Embedded double quotes are unsupported by Mermaider 0.15.1."));
     }
     protected override Task<SourceAuthoringResult> UpdateProperties()
     {

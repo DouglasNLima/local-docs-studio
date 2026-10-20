@@ -30,10 +30,18 @@ public class PieVisualTests
         var result = await draft.UpdateAsync(row.Identity, row.Label, number); Assert.False(result.Success); Assert.Equal(PieVisualDraft.Starter, draft.Source); Assert.Equal(row.Identity, draft.Selection); Assert.False(draft.CanUndo);
         Success(await draft.UpdateAsync(row.Identity, row.Label, "0.125"));
     }
-    [Theory, InlineData("A\"B"), InlineData("A\nB"), InlineData("")]
+    [Theory, InlineData("A\"B"), InlineData("A\rB"), InlineData("")]
     public async Task Labels_the_pinned_parser_cannot_encode_are_rejected_without_statement_injection(string label)
     {
         var draft = new PieVisualDraft(PieVisualDraft.Starter); Assert.False((await draft.AddAsync(label, "1")).Success); Assert.Equal(PieVisualDraft.Starter, draft.Source);
+    }
+    [Fact] public async Task Label_line_breaks_are_encoded_safely_and_unchanged_escape_spellings_are_retained()
+    {
+        var source = "pie showData\n  \"First<br/>second\" : 1.25000\n  \"Other\" : 2\n"; var draft = new PieVisualDraft(source); var row = draft.Model.Entries[0];
+        Success(await draft.UpdateAsync(row.Identity, "First\nsecond", row.Number)); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+        Success(await draft.UpdateAsync(row.Identity, "New\nline : Ω", row.Number)); Assert.Equal(source.Replace("First<br/>second", "New\\nline : Ω", StringComparison.Ordinal), draft.Source);
+        Success(await draft.AddAsync("Third\nline", "3")); Assert.Contains("\"Third\\nline\" : 3", draft.Source);
+        Assert.Equal(3, new System.Xml.Linq.XDocument(System.Xml.Linq.XDocument.Parse(new LensDocsStudio.Core.Rendering.DiagramService().Render(draft.Source).Svg!)).Descendants().Count(element => (string?)element.Attribute("class") == "pie-slice"));
     }
     [Fact] public async Task Zero_rows_are_retained_and_empty_or_all_zero_charts_cannot_apply()
     {
@@ -59,5 +67,11 @@ public class PieVisualTests
         var source = "pie\n \"Valid\" : 1\n \"Broken\" : -4\n"; var draft = new PieVisualDraft(source);
         Assert.False((await draft.ValidateAsync()).Success); Assert.False((await draft.SetTitleAsync("Title")).Success); Assert.Equal(source, draft.Source);
         Success(await draft.ValidateSourceAsync(source.Replace("-4", "4", StringComparison.Ordinal)));
+    }
+    [Fact] public async Task A_positive_decimal_that_underflows_cannot_be_silently_omitted_as_a_zero_row()
+    {
+        var tiny = "0." + new string('0', 400) + "1"; var draft = new PieVisualDraft(PieVisualDraft.Starter); var original = draft.Source;
+        Assert.False((await draft.AddAsync("Tiny", tiny)).Success); Assert.Equal(original, draft.Source);
+        var supplied = new PieVisualDraft("pie\n  \"Positive\" : 1\n  \"Tiny\" : " + tiny + "\n"); Assert.False((await supplied.ValidateAsync()).Success);
     }
 }

@@ -40,7 +40,7 @@ public sealed class PieVisualDraft : SourceDraft<PieSourceModel>
             if (entry.Success)
             {
                 var number = entry.Groups["value"].Value;
-                if (!double.TryParse(number, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var value) || !double.IsFinite(value)) errors.Add("Pie values must be finite non-negative decimals.");
+                if (!double.TryParse(number, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var value) || !double.IsFinite(value) || value == 0 && number.Any(character => character is >= '1' and <= '9')) errors.Add("Pie values must be finite non-negative decimals within the pinned renderer's numeric range. A non-zero value must not underflow into an omitted zero row.");
                 else entries.Add(new(line.Key, entry.Groups["label"].Value, number, value, entry));
                 continue;
             }
@@ -70,17 +70,18 @@ public sealed class PieVisualDraft : SourceDraft<PieSourceModel>
     public Task<SourceAuthoringResult> UpdateAsync(string identity, string label, string number, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         var entry = model.Entries.Single(item => item.Identity == identity); ValidateLabel(label); ValidateNumber(number);
+        var encoded = label == DisplayLabel(entry.Label) ? entry.Label : EncodeLabel(label);
         var line = text.Line(identity);
         // Patch right-to-left and retain untouched decimal spelling/precision.
         if (number != entry.Number) line = line.Replace(entry.Tokens.Groups["value"].Index, entry.Tokens.Groups["value"].Length, number);
-        if (label != entry.Label) line = line.Replace(entry.Tokens.Groups["label"].Index, entry.Tokens.Groups["label"].Length, label);
+        if (encoded != entry.Label) line = line.Replace(entry.Tokens.Groups["label"].Index, entry.Tokens.Groups["label"].Length, encoded);
         return text.Replace(line);
     }, token);
     public Task<SourceAuthoringResult> AddAsync(string label, string number, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         ValidateLabel(label); ValidateNumber(number);
         var last = model.Entries.LastOrDefault(); var index = last is null ? text.Index(model.HeaderIdentity) + 1 : text.Index(last.Identity) + 1;
-        return text.Insert(index, (last is null ? "    " : text.Line(last.Identity).Indent) + "\"" + label + "\" : " + number);
+        return text.Insert(index, (last is null ? "    " : text.Line(last.Identity).Indent) + "\"" + EncodeLabel(label) + "\" : " + number);
     }, token);
     public Task<SourceAuthoringResult> DeleteAsync(string identity, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
@@ -95,10 +96,13 @@ public sealed class PieVisualDraft : SourceDraft<PieSourceModel>
         return SourceRowMoves.Swap(text, model.Entries[Math.Min(index, other)].Identity, model.Entries[Math.Max(index, other)].Identity);
     }, token);
     public static void ValidateLabel(string value)
-    { SourceText.Label(value); if (value.Contains('"')) throw new ArgumentException("Mermaider 0.15.1 cannot encode a quote inside a Pie label. Remove the quote; the pending label is retained."); }
+    { SourceText.Label(EncodeLabel(value)); if (value.Contains('"')) throw new ArgumentException("Mermaider 0.15.1 cannot encode a quote inside a Pie label. Remove the quote; the pending label is retained."); }
+    public static string EncodeLabel(string value) => value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\n", "\\n", StringComparison.Ordinal);
+    public static string DisplayLabel(string value) => SourceText.Pattern(@"<br\s*/?>", RegexOptions.IgnoreCase).Replace(value, "\n").Replace("\\n", "\n", StringComparison.Ordinal);
     public static void ValidateNumber(string value)
     {
         if (!SourceText.Pattern(@"^[0-9]+(?:\.[0-9]+)?$").IsMatch(value) || !double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var number) || !double.IsFinite(number))
-            throw new ArgumentException("Enter a complete non-negative decimal, for example 12.50. Exponents, signs, NaN and infinity are unsupported.");
+                throw new ArgumentException("Enter a complete non-negative decimal, for example 12.50. Exponents, signs, NaN and infinity are unsupported.");
+        if (number == 0 && value.Any(character => character is >= '1' and <= '9')) throw new ArgumentException("This non-zero decimal is too small for the pinned renderer and would be omitted. Enter a representable value; the pending text is retained.");
     }
 }
