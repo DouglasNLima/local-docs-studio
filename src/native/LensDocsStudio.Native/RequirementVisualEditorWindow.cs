@@ -19,7 +19,7 @@ public sealed class RequirementVisualEditorWindow : ChartVisualEditorWindow
         : base("Requirement", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         requirement = new(source, diagrams); requirement.ValidatePresentation = (t, _, token) => ValidateNative(t, token);
-        kind = Field("Requirement kind", "Kind"); risk = Field("Risk (low, medium, high or blank)", "Risk"); verification = Field("Verification (analysis, demonstration, inspection, test or blank)", "Verification"); docRef = Field("Element document reference", "DocRef");
+        kind = Field("Requirement kind", "Kind"); risk = Field("Risk (low, medium, high or blank)", "Risk"); verification = Field("Verification method", "Verification"); docRef = Field("Element document reference", "DocRef");
         ActionButton("Add requirement", "AddRequirement", () => AddBlock("requirement")); ActionButton("Add element", "AddElement", () => AddBlock("element"));
         sourceEndpoint = Endpoint("New relation source", "SourceEndpoint"); targetEndpoint = Endpoint("New relation target", "TargetEndpoint"); relationType = Endpoint("New relation type", "RelationType"); relationType.ItemsSource = RequirementVisualDraft.RelationTypes; relationType.SelectedIndex = 0;
         ActionButton("Add relationship", "AddRelation", () => requirement.AddRelationAsync(sourceEndpoint.SelectedItem as string ?? "", targetEndpoint.SelectedItem as string ?? "", relationType.SelectedItem as string ?? "", Lifetime.Token), InspectorFields);
@@ -41,7 +41,7 @@ public sealed class RequirementVisualEditorWindow : ChartVisualEditorWindow
     protected override void ShowProperties()
     {
         var b = Block; var r = Relation; var heading = requirement.Selection == requirement.Model.HeaderIdentity; var editable = b is not null && b.Complete && requirement.Model.Unique(b.Name);
-        Captions(b is null ? heading ? "Effective title" : "Source symbolic name" : "Symbolic name (Update renames all proved references)", b is null ? heading ? "Direction (TB, BT, LR, RL)" : "Target symbolic name" : b.Element ? "Element type" : "Display ID (does not rename the node)", b is null ? "Relation type" : "Requirement text");
+        Captions(b is null ? heading ? "Effective title" : "Source symbolic name" : "Symbolic name (renames references)", b is null ? heading ? "Direction (TB, BT, LR, RL)" : "Target symbolic name" : b.Element ? "Element type" : "Display ID (keeps symbolic name)", b is null ? "Relation type" : "Requirement text");
         Properties(b?.Name ?? r?.Source ?? (heading ? requirement.Model.Title?.Value ?? "" : ""), b is not null ? b.Value(b.Element ? "type" : "id") : r?.Target ?? (heading ? requirement.Model.Direction?.Value ?? "TB" : ""), b?.Value("text") ?? r?.Type ?? "",
             editLabel: editable || r is not null && requirement.Model.TopologySafe || heading, editIdentifier: editable || r is not null && requirement.Model.TopologySafe || heading, editValue: editable && !b!.Element || r is not null && requirement.Model.TopologySafe);
         kind.Text = b?.Kind ?? ""; risk.Text = b?.Value("risk") ?? ""; verification.Text = b?.Value("verifymethod") ?? ""; docRef.Text = b?.Value("docRef") ?? "";

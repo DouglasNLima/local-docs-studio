@@ -40,6 +40,14 @@ internal static class NativeWorkflowEditorChecks
             if (draft is KanbanVisualDraft board) Check(hits.Count == board.Model.Rows.Count, "Kanban: every duplicate card and column has distinct canonical correspondence");
             if (draft is RequirementVisualDraft req) Check(hits.Count == req.Model.Visible.Count + req.Model.Relations.Count, "Requirement: visible boxes and proved native relationship paths map separately");
             if (draft is GitGraphVisualDraft git) Check(hits.Count == git.Model.Marks.Count, "GitGraph: actual commit marks map by command occurrence; non-mark commands remain in the list");
+            if (draft is GitGraphVisualDraft history)
+            {
+                var appended = history.AppendAsync("commit").GetAwaiter().GetResult(); Check(appended.Success, "GitGraph: anonymous commit can be appended through the actual editor draft"); history.Select(history.Model.Commands[^1].Identity);
+                var fields = (Panel)window.FindName("InspectorFields"); fields.IsEnabled = false;
+                window.GetType().GetMethod("ShowProperties", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, []);
+                Check(new[] { "Label", "Identifier" }.All(name => ((FrameworkElement)typeof(ChartVisualEditorWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!).Visibility == Visibility.Visible), "GitGraph: empty editable ID and tag fields remain visible while validation disables their ancestor");
+                fields.IsEnabled = true; history.Undo();
+            }
             var markdown = "Before Ω\n\n```mermaid\n" + source + "\n```\n\nAfter\n";
             var parsed = new MarkdownService().Parse(markdown); var code = parsed.Syntax.OfType<FencedCodeBlock>().Single(); var selected = -1;
             var ordinary = new NativeMarkdownRenderer(native).Render(parsed, dark, new Dictionary<FencedCodeBlock, DiagramResult> { [code] = result }, _ => { }, (_, _) => { }, editDiagramVisually: offset => selected = offset);

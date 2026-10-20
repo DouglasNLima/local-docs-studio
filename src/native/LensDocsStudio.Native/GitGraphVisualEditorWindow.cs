@@ -18,7 +18,12 @@ public sealed class GitGraphVisualEditorWindow : ChartVisualEditorWindow
     {
         git = new(source, diagrams); git.ValidatePresentation = (t, _, token) => ValidateNative(t, token);
         ActionButton("Append commit", "AddCommit", () => Append("commit"));
-        ActionButton("Append new branch", "AddBranch", () => { var n = 1; while (git.Model.Branches.Contains("branch" + n)) n++; return Append("branch", "branch" + n); });
+        ActionButton("Append new branch", "AddBranch", () =>
+        {
+            var n = 1; while (git.Model.Branches.Contains("branch" + n)) n++;
+            var prompt = new TextPromptWindow("Append GitGraph branch", "Name the new diagram branch. Appending it changes the current branch.", "branch" + n, "Append", "New branch name", "Use letters, digits, underscore, dot, slash or hyphen; begin with a letter or underscore.") { Owner = this };
+            return prompt.ShowDialog() == true ? Append("branch", prompt.Value) : Task.FromResult(Protected("New branch cancelled; source is unchanged."));
+        });
         branch = new ComboBox { Style = (System.Windows.Style)FindResource("Form.ComboBox") }; Identify(branch, "Branch", "Existing branch destination"); InspectorFields.Children.Add(new Label { Content = "Existing branch destination", Target = branch }); InspectorFields.Children.Add(branch);
         ActionButton("Append checkout", "Checkout", () => Append("checkout", branch.SelectedItem as string ?? ""), InspectorFields);
         ActionButton("Append merge", "Merge", () => Append("merge", branch.SelectedItem as string ?? ""), InspectorFields);
@@ -35,7 +40,7 @@ public sealed class GitGraphVisualEditorWindow : ChartVisualEditorWindow
     protected override void ShowProperties()
     {
         var c = Command; var editable = c is { Simple: true, Mark: true } && c.Kind != "cherry-pick";
-        Captions("Explicit commit ID (blank keeps anonymous numbering)", "Tag", "Commit type (NORMAL, HIGHLIGHT, REVERSE)");
+        Captions("Explicit ID (blank: anonymous)", "Tag", "Commit type (NORMAL, HIGHLIGHT, REVERSE)");
         Properties(c?.Value("id") ?? "", c?.Value("tag") ?? "", c?.Value("type") ?? "", editLabel: editable, editIdentifier: editable, editValue: editable);
         branch.ItemsSource = git.Model.Branches.ToArray(); branch.SelectedIndex = 0;
         Describe(c is null ? "GitGraph · current branch " + git.Model.CurrentBranch : c.Kind + " · branch before: " + c.BranchBefore + " · after: " + c.BranchAfter + (c.Label is null ? "" : " · native label: " + c.Label),

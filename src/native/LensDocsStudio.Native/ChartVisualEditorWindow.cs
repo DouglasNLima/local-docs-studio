@@ -23,9 +23,10 @@ public abstract class ChartVisualEditorWindow : SourceVisualEditorWindow
     {
         Label.Text = label; Identifier.Text = identifier; Value.Text = value; Maximum.Text = maximum;
         Label.IsEnabled = editLabel; Identifier.IsEnabled = editIdentifier; Value.IsEnabled = editValue; Maximum.IsEnabled = editMaximum;
-        foreach (var field in new[] { Label, Identifier, Value, Maximum })
+        foreach (var (field, editable) in new[] { (Label, editLabel), (Identifier, editIdentifier), (Value, editValue), (Maximum, editMaximum) })
         {
-            var visibility = field.IsEnabled || field.Text.Length > 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            // An ancestor is disabled during validation; effective IsEnabled must not hide an editable empty field.
+            var visibility = editable || field.Text.Length > 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
             field.Visibility = visibility;
             InspectorFields.Children[InspectorFields.Children.IndexOf(field) - 1].Visibility = visibility;
         }

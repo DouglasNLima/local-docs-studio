@@ -20,7 +20,7 @@ public sealed class KanbanVisualEditorWindow : ChartVisualEditorWindow
         : base("Kanban", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         kanban = new(source, diagrams); kanban.ValidatePresentation = (t, _, token) => ValidateNative(t, token);
-        assigned = Field("Assigned", "Assigned"); ticket = Field("Ticket", "Ticket"); priority = Field("Priority (Very high, High, Medium, Low, Very low)", "Priority");
+        assigned = Field("Assigned", "Assigned"); ticket = Field("Ticket", "Ticket"); priority = Field("Priority", "Priority");
         destination = new ComboBox { Style = (Style)FindResource("Form.ComboBox"), DisplayMemberPath = "Description" }; Identify(destination, "Destination", "Destination column");
         InspectorFields.Children.Add(new Label { Content = "Destination column", Target = destination }); InspectorFields.Children.Add(destination);
         ActionButton("Move card to selected column", "MoveCard", () => kanban.MoveCardAsync(kanban.Selection ?? "", (destination.SelectedItem as Choice)?.Identity ?? "", Lifetime.Token), InspectorFields);
@@ -45,7 +45,7 @@ public sealed class KanbanVisualEditorWindow : ChartVisualEditorWindow
     protected override void ShowProperties()
     {
         var row = Row; var header = kanban.Selection == kanban.Model.HeaderIdentity;
-        Captions("Title", "Source ID (coupled to title for bare forms)"); Properties(row?.Label ?? (header ? kanban.Model.Title?.Value ?? "" : ""), row?.Id ?? "", editLabel: row is not null || header, editIdentifier: row is not null);
+        Captions("Title", "ID (bare forms share the title)"); Properties(row?.Label ?? (header ? kanban.Model.Title?.Value ?? "" : ""), row?.Id ?? "", editLabel: row is not null || header, editIdentifier: row is not null);
         assigned.Text = row?.Meta("assigned") ?? ""; ticket.Text = row?.Meta("ticket") ?? ""; priority.Text = row?.Meta("priority") ?? "";
         assigned.IsEnabled = ticket.IsEnabled = priority.IsEnabled = row?.Column is not null && row.MetadataSafe;
         destination.ItemsSource = kanban.Model.Columns.Select(c => new Choice(c.Identity, c.Label + " · ID: " + c.Id)).ToArray(); destination.SelectedIndex = 0; destination.IsEnabled = row?.Column is not null;

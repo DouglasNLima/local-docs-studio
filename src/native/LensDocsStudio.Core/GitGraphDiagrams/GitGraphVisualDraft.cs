@@ -90,6 +90,10 @@ public sealed class GitGraphVisualDraft : SourceDraft<GitGraphSourceModel>
     }
     private static void VerifyLinks(GitGraphSourceModel m, string svg, XElement[] shapes)
     {
+        var branches = SourceDeclarations.Groups(svg, "gitgraph-branch");
+        if (m.Marks.Count > 0 && !branches.Select(b => (string?)b.Attribute("data-branch")).SequenceEqual(m.Branches)) throw new ArgumentException("Canonical GitGraph branch declaration order differs from source.");
+        var laneCentres = branches.ToDictionary(b => (string)b.Attribute("data-branch")!, b => Centre(b).Y, StringComparer.Ordinal);
+        foreach (var (command, shape) in m.Marks.Zip(shapes)) if (Math.Abs(Centre(shape).Y - laneCentres[command.BranchAfter]) > .1) throw new ArgumentException("Canonical GitGraph commit lane differs from its proved current branch.");
         var centres = m.Marks.Zip(shapes).ToDictionary(p => p.First.Identity, p => Centre(p.Second)); var actual = SourceDeclarations.Groups(svg, "gitgraph-link").ToList();
         foreach (var expected in m.Links)
         {

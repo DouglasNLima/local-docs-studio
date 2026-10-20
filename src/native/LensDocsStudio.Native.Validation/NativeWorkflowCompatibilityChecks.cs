@@ -62,7 +62,13 @@ internal static class NativeWorkflowCompatibilityChecks
             var req = Render("requirementDiagram\nelement same {\ntype: hidden\n}\nrequirement same {\nid: first\nID: effective\nrisk: unsupported\n}\nrequirement same {\nid: hidden\n}\nsame - traces -> missing\n", "requirement-hidden");
             Check(G(req, "req-node").Length == 1 && G(req, "req-node")[0].Value.Contains("effective", StringComparison.Ordinal) && !G(req, "req-node")[0].Value.Contains("hidden", StringComparison.Ordinal) && G(req, "req-relation").Length == 0, "Requirement: requirements precede elements, first symbolic box wins, properties last-win, unknown references are omitted");
             const string pair = "requirementDiagram\nrequirement a {\n}\nelement b {\n}\n";
-            foreach (var direction in new[] { "TB", "BT", "LR", "RL" }) Render(pair.Replace("requirementDiagram\n", "requirementDiagram\ndirection " + direction + "\n", StringComparison.Ordinal) + "a - satisfies -> b\n", "requirement-direction-" + direction);
+            foreach (var direction in new[] { "TB", "BT", "LR", "RL" })
+            {
+                var directed = Render(pair.Replace("requirementDiagram\n", "requirementDiagram\ndirection " + direction + "\n", StringComparison.Ordinal) + "a - satisfies -> b\n", "requirement-direction-" + direction);
+                var rectangles = G(directed, "req-node").ToDictionary(n => (string)n.Attribute("data-id")!, n => n.Elements().First(e => e.Name.LocalName == "rect"));
+                var a = rectangles["a"]; var b = rectangles["b"]; var axis = direction is "LR" or "RL" ? "x" : "y";
+                Check(direction is "LR" or "TB" ? ChartSource.Attribute(a, axis) < ChartSource.Attribute(b, axis) : ChartSource.Attribute(a, axis) > ChartSource.Attribute(b, axis), "Requirement: actual " + direction + " box positions follow the declared direction");
+            }
             Check(Geometry(Render(pair + "a - verifies -> b\n", "requirement-forward")) == Geometry(Render(pair + "b <- verifies - a\n", "requirement-reverse")), "Requirement: reverse arrows retain actual source/target semantics");
             foreach (var kind in new[] { "requirement", "functionalRequirement", "interfaceRequirement", "performanceRequirement", "physicalRequirement", "designConstraint" }) Check(G(Render("requirementDiagram\n" + kind + " a {\n}\n", "requirement-kind-" + kind), "req-node").Length == 1, "Requirement kind renders: " + kind);
             foreach (var relation in new[] { "contains", "copies", "derives", "satisfies", "verifies", "refines", "traces" }) Check(G(Render(pair + "a - " + relation + " -> b\n", "requirement-relation-" + relation), "req-relation").Single().Attribute("data-type")!.Value == relation, "Requirement relation renders: " + relation);

@@ -71,3 +71,27 @@ check counts/skips, source-labelled Windows screenshots, Actions artefacts and e
 fresh unsigned self-contained installer/portable versions, SHA-256, preserved-copy
 paths, exact compiled source/resources/runtime identity, independent complete payload
 parity and negative controls. Earlier working candidates do not certify final source.
+
+
+## Initial hosted candidate and inspector correction
+
+Draft PR #43 targets develop. Candidate `432ee1960030f411ea06b2019e67b8375fe8a20a`
+passed all 1,896 Core tests locally (zero skipped), a zero-warning locked native
+build, 94 compatibility and 78 canonical-fidelity checks. Its initial hosted new
+UIA runs exposed a real shared inspector bug: empty ID/tag fields were hidden when
+an ancestor was temporarily disabled during validation. Visibility now uses the
+intended field capability rather than inherited effective IsEnabled, with a direct
+native regression. The Requirement/Kanban harness also retained an old label when
+selecting an occurrence after rename; it now follows the stable ordered occurrence
+prefix. Assertions and source semantics are retained. Failed job logs, raw outputs
+and screenshots are preserved under `artifacts/native/expansion-iv/432ee19-hosted/`
+and `artifacts/expansion-iv-432ee19-job-*.log`.
+
+Review additionally protects partial/unclosed Kanban metadata quotation, including
+an empty unquoted value, while retaining independent safe labels. Requirement
+literal property braces are distinguished from actual nested declaration lines.
+The focused workflow suite now has 58 cases. Native GitGraph validation additionally
+checks branch badge order and actual commit-lane centres; the compatibility gate
+asserts all four Requirement directions against actual box coordinates. New UIA
+cases exercise destination card movement, relation-type editing and explicit named
+branch/commit/checkout/merge commands. Final-source outcomes remain pending.

@@ -32,7 +32,7 @@ internal static partial class NativeUiChecks
         var source = starter.ReplaceLineEndings("\r\n"); var block = "```mermaid\r\n" + source + "```\r\n";
         var original = "# Seventeen-family authoring Ω\r\n\r\n" + block + "\r\nBetween identical diagrams.\r\n\r\n" + block + "\r\nAfter.\r\n";
         var path = Path.Combine(root, family + ".md"); File.WriteAllText(path, original); Application? app = null; Window? main = null, visual = null;
-        var first = family == "Kanban" ? "Card · Write guide" : family == "Requirement" ? "Requirement · guide" : "Command 1 · commit";
+        var first = family == "Kanban" ? "Card · " : family == "Requirement" ? "Requirement · " : "Command 1 · commit";
         try
         {
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active; UIA is not physical screen-reader certification");
@@ -55,6 +55,27 @@ internal static partial class NativeUiChecks
             var beforeAdd = Draft(); Click(family == "Kanban" ? "AddCard" : family == "Requirement" ? "AddRequirement" : "AddCommit"); Await(() => Draft() != beforeAdd); if (family == "GitGraph") { Set("Label", "Added candidate"); Click("Update"); Await(() => Draft().Contains("Added candidate", StringComparison.Ordinal)); } var added = Draft();
             Check(Find(visual!, prefix + "Capabilities").Name.Length > 20, "Persistent inspector exposes operation and protection context");
             Click("MoveUp"); Await(() => Draft() != added); Click("Undo"); Await(() => Draft() == added); Click("Redo"); Await(() => Draft() != added); Click("Delete"); Await(() => Draft() == beforeAdd);
+            if (family == "Kanban")
+            {
+                Select(first); Find(visual!, prefix + "Destination").AsComboBox().Select("Done · ID: done"); Click("MoveCard");
+                Await(() => { var board = new KanbanVisualDraft(Draft()).Model; return board.Cards.Single(c => c.Id == "guide").Column == board.Columns.Single(c => c.Id == "done").Identity; });
+                Check(true, "Keyboard-accessible destination command moves only the selected card to the proved column"); Click("Undo"); Await(() => Draft() == beforeAdd);
+            }
+            else if (family == "Requirement")
+            {
+                Select("Relation · "); Set("Value", "verifies"); Click("Update"); Await(() => Draft().Contains("- verifies ->", StringComparison.Ordinal));
+                Check(true, "Actual relationship inspector changes the native relation type while preserving symbolic endpoints"); Click("Undo"); Await(() => Draft() == beforeAdd);
+            }
+            else
+            {
+                Click("AddBranch"); Window? prompt = null;
+                Wait(() => (prompt = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Append GitGraph branch")))?.AsWindow()) is not null, "Branch name prompt missing.");
+                Find(prompt!, "WorkspacePathInput").AsTextBox().Text = "topic"; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke(); Await(() => Draft().Contains("branch topic", StringComparison.Ordinal));
+                Click("AddCommit"); Await(() => new GitGraphVisualDraft(Draft()).Model.Heads.ContainsKey("topic"));
+                Find(visual!, prefix + "Branch").AsComboBox().Select("main"); Click("Checkout"); Await(() => new GitGraphVisualDraft(Draft()).Model.CurrentBranch == "main");
+                Find(visual!, prefix + "Branch").AsComboBox().Select("topic"); Click("Merge"); Await(() => Draft().Contains("merge topic", StringComparison.Ordinal));
+                Check(true, "Actual named branch, commit, checkout and merge commands preserve current branch and two proved native parent heads");
+            }
             var changed = Draft(); Check(ReadEditorText(owner) == original && File.ReadAllText(path) == original, "Private source, inspector and history never mutate owner or disk before Apply");
             foreach (var (width, height) in new[] { (880, 600), (1280, 800) })
             {

@@ -48,6 +48,7 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
                 {
                     if (raw[at..pair.Index].Any(c => !char.IsWhiteSpace(c) && c != ',')) safe = false;
                     var g = pair.Groups["single"].Success ? pair.Groups["single"] : pair.Groups["double"].Success ? pair.Groups["double"] : pair.Groups["plain"];
+                    if (!g.Success || g == pair.Groups["plain"] && g.Value.IndexOfAny(['\'', '"']) >= 0) safe = false;
                     var tokenStart = offset + meta.Groups["meta"].Index + g.Index; var rawValue = g.Value; var value = rawValue.Trim();
                     if (pair.Groups["single"].Success || pair.Groups["double"].Success) { tokenStart--; rawValue = line.Body.Substring(tokenStart, g.Length + 2); value = g.Value; }
                     else tokenStart += rawValue.Length - rawValue.TrimStart().Length;

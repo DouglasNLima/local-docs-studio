@@ -66,4 +66,8 @@ public class RequirementSourceAuthoringTests
     {
         const string source = "requirementDiagram\n%% attached\nrequirement a {\nid: 1\n}\nelement b {\ntype: app\n}\n"; var d = new RequirementVisualDraft(source); var b = d.Model.Blocks[0]; d.Select(b.Identity); Pass(await d.MoveAsync(b.Identity, 1)); Assert.EndsWith("%% attached\nrequirement a {\nid: 1\n}\n", d.Source); Assert.Equal(b.Identity, d.Model.Blocks[1].Identity); d.Undo(); Assert.Equal(source, d.Source); Assert.Equal(b.Identity, d.Selection);
     }
+    [Fact] public async Task Literal_property_braces_are_distinct_from_nested_declaration_boundaries()
+    {
+        var d = new RequirementVisualDraft("requirementDiagram\nrequirement a {\ntext: \"A {literal} value\"\n}\n"); Assert.True(d.Model.Blocks[0].Complete); Pass(await d.UpdateBlockAsync(d.Model.Blocks[0].Identity, "requirement", new Dictionary<string, string> { ["id"] = "DOC-1" })); Assert.Contains("text: \"A {literal} value\"", d.Source);
+    }
 }

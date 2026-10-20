@@ -59,4 +59,11 @@ public class KanbanSourceAuthoringTests
     {
         var d = new KanbanVisualDraft("kanban\n"); Pass(await d.ValidateAsync()); Pass(await d.AddColumnAsync("todo", "To do")); Pass(await d.AddCardAsync(d.Model.Columns[0].Identity, "card", "Guide Ω")); Assert.Equal("card", d.Model.Cards[0].Id); Assert.False((await d.AddColumnAsync("card", "Collision")).Success);
     }
+    [Theory, InlineData("assigned: 'unclosed"), InlineData("assigned: \"unclosed"), InlineData("assigned:")]
+    public async Task Unsupported_or_partial_quotation_protects_metadata_even_when_native_parser_falls_back_to_bare_value(string metadata)
+    {
+        var d = new KanbanVisualDraft("kanban\n  A\n    id[Card]@{ " + metadata + " }\n"); var r = d.Model.Cards[0]; Pass(await d.ValidateAsync()); Assert.False(r.MetadataSafe);
+        Assert.False((await d.UpdateAsync(r.Identity, r.Id, r.Label, "New", "", "")).Success); Assert.Equal(d.OriginalSource, d.Source);
+        Pass(await d.UpdateAsync(r.Identity, r.Id, "Safe label", r.Meta("assigned"), r.Meta("ticket"), r.Meta("priority"))); Assert.Contains(metadata, d.Source);
+    }
 }

@@ -56,7 +56,6 @@ public sealed class RequirementVisualDraft : SourceDraft<RequirementSourceModel>
                 for (i++; i < rows.Count; i++)
                 {
                     var body = rows[i]; end = body.Key; if (body.Content == "}") { closed = true; break; }
-                    if (body.Content.Contains('{') || body.Content.Contains('}')) complete = false;
                     var p = Property.Match(body.Body); if (p.Success) fields.Add(WorkflowSource.Field(body, p.Groups["key"].Value, p.Groups["value"], true));
                     else { complete = false; protect.Add(body.Key); }
                 }
