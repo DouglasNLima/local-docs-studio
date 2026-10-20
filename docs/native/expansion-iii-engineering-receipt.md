@@ -113,3 +113,31 @@ Initial raw hosted UIA artefacts are preserved locally under
 `artifacts/native/22e1ffe-hosted-source-uia/`; the failure log is retained as
 `artifacts/native/22e1ffe-hosted-native-failure.log`. Final-source screenshots, packages
 and receipt identifiers remain pending.
+
+## Refined committed-source Windows evidence
+
+The six new-family independent UIA runs also passed after inspector refinement at
+`1a4fcd5e8d948d7db4cf3a1dc4af298637e5d123`,
+[run 39420457335](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39420457335).
+The actual screenshots and source-labelled checks are checked in under
+`docs/native/evidence/expansion-iii/`; the grammar guide links all eighteen captures.
+Local web smoke passed **270/270** across Chromium and Edge at the original
+implementation's unchanged static-web source. Final-source CI repeats the web gate.
+
+Final review additionally proves read-only Radar dropped-token correspondence from
+actual accepted numeric positions, without calling a dropped source token valid or
+rewriting its vector. Safe neighbouring curves retain canonical proof and independent
+editing. XY historical equal/reversed ranges keep exact lexemes during safe edits;
+new ranges still require a finite positive span. The focused chart suite now has
+55 cases. Final clean-source native build, complete Core, corpus, canonical gates,
+UIA, installed-authoring and packages remain mandatory.
+
+### Final delivery record
+
+The [Draft PR #42 delivery receipt](https://github.com/DouglasNLima/local-docs-studio/pull/42)
+records the final clean head, exact final-source CI/check counts, final screenshot
+artefacts, installer/portable pairs, SHA-256, expiry and preserved local copies.
+Package identity is taken from compiled source/version/resources and independent
+payload inspection, never inferred from a later merge or documentation commit.
+The final receipt is completed after those immutable outputs exist, without
+changing their source attribution. No merge or public publication is authorised.

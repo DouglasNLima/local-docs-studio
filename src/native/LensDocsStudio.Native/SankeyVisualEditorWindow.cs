@@ -41,8 +41,8 @@ public sealed class SankeyVisualEditorWindow : ChartVisualEditorWindow
             : "Each link is a separate source occurrence, including parallel equal links. Endpoint edits change only this row. Quotes, commas, doubled quotes, extra fields and untouched precision survive. Weights must be positive and finite. Ignored invalid rows remain protected in the source list. All ribbons and nodes use actual canonical output."));
     }
     protected override Task<SourceAuthoringResult> UpdateProperties() => Node is { } node ? sankey.RenameNodeAsync(node, Label.Text, Lifetime.Token) : sankey.UpdateAsync(sankey.Selection ?? "", Label.Text, Identifier.Text, Value.Text, Lifetime.Token);
-    protected override Task<SourceAuthoringResult> DeleteSelection() => sankey.DeleteAsync(sankey.Selection ?? "", Lifetime.Token);
-    protected override Task<SourceAuthoringResult> MoveSelection(int direction) => sankey.MoveAsync(sankey.Selection ?? "", direction, Lifetime.Token);
+    protected override Task<SourceAuthoringResult> DeleteSelection() => Node is null ? sankey.DeleteAsync(sankey.Selection ?? "", Lifetime.Token) : Task.FromResult(Protected("Select a numbered link to remove it. Node deletion and merging are outside this authoring slice."));
+    protected override Task<SourceAuthoringResult> MoveSelection(int direction) => Node is null ? sankey.MoveAsync(sankey.Selection ?? "", direction, Lifetime.Token) : Task.FromResult(Protected("Select a numbered link to move its source occurrence. Node order follows actual endpoint first appearance."));
     protected override IReadOnlyList<NativeSourceHit> Correspondence(string source, DiagramResult render)
     {
         if (source != sankey.Source) return []; var pairs = SankeyVisualDraft.Correspondence(sankey.Model, render.Svg!); var root = XDocument.Parse(render.Svg!).Root!; var hits = new List<NativeSourceHit>();

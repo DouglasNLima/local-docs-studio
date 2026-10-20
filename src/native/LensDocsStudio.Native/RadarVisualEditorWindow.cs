@@ -62,11 +62,10 @@ public sealed class RadarVisualEditorWindow : ChartVisualEditorWindow
     {
         if (source != radar.Source) return []; RadarVisualDraft.VerifyCanonical(radar.Model, render.Svg!);
         var root = XDocument.Parse(render.Svg!).Root!; var groups = SourceDeclarations.Groups(render.Svg!, "radar-curve"); var hits = new List<NativeSourceHit>();
-        if (radar.Model.Curves.Any(c => !c.Simple)) return hits;
         for (var i = 0; i < groups.Length; i++)
         {
-            var c = radar.Model.Curves[i]; var marks = groups[i].Elements().Where(e => e.Name.LocalName == "circle").ToArray();
-            for (var j = 0; j < Math.Min(marks.Length, c.Values.Items.Count); j++) if (Hit(c.Values.Items[j].Identity, "Curve " + (i + 1) + " · axis " + (j + 1), marks[j], root) is { } point) hits.Add(point);
+            var c = radar.Model.Curves[i]; var marks = groups[i].Elements().Where(e => e.Name.LocalName == "circle").ToArray(); var values = RadarSourceModel.SemanticValues(c);
+            for (var j = 0; j < Math.Min(marks.Length, values.Count); j++) if (Hit(values[j].Token.Identity, "Curve " + (i + 1) + " · actual axis " + (j + 1), marks[j], root) is { } point) hits.Add(point);
         }
         for (var i = 0; i < groups.Length; i++) if (Hit(radar.Model.Curves[i].Identity, "Curve " + (i + 1) + " · " + radar.Model.Curves[i].Label, groups[i], root) is { } hit) hits.Add(hit);
         return hits;

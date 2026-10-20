@@ -15,11 +15,12 @@ public sealed record RadarSourceModel(string HeaderIdentity, SourceDeclaration? 
 {
     public SourceDeclaration? Effective(string name) => Declarations.LastOrDefault(d => d.Name == name);
     public double Minimum => double.Parse(Effective("min")?.Value ?? "0", CultureInfo.InvariantCulture);
-    public double AutomaticMaximum => Curves.SelectMany(c => c.Values.Items).Select(v =>
+    public static IReadOnlyList<(SourceToken Token, double Value)> SemanticValues(RadarCurveSource curve) => curve.Values.Items.Select(v =>
     {
         var value = v.Raw; var colon = value.IndexOf(':'); if (colon >= 0) value = value[(colon + 1)..].Trim();
-        return double.TryParse(value, CultureInfo.InvariantCulture, out var n) ? n : 0;
-    }).Aggregate(5d, (max, n) => n > max ? n : max);
+        var accepted = double.TryParse(value, CultureInfo.InvariantCulture, out var n); return (Token: v, Value: n, Accepted: accepted);
+    }).Where(v => v.Accepted).Select(v => (v.Token, v.Value)).ToArray();
+    public double AutomaticMaximum => Curves.SelectMany(SemanticValues).Aggregate(5d, (max, n) => n.Value > max ? n.Value : max);
     public double Maximum => Effective("max") is { } max ? double.Parse(max.Value, CultureInfo.InvariantCulture) : AutomaticMaximum;
     public bool Aligned => Axes.Count > 0 && Axes.All(a => a.Simple) && Curves.All(c => c.Simple && c.Values.Items.Count == Axes.Count) &&
         Axes.Select(a => a.Id).Distinct(StringComparer.Ordinal).Count() == Axes.Count && Curves.Select(c => c.Id).Distinct(StringComparer.Ordinal).Count() == Curves.Count;
@@ -74,7 +75,12 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
                     "graticule" => value.Equals("circle", StringComparison.OrdinalIgnoreCase) || value.Equals("polygon", StringComparison.OrdinalIgnoreCase),
                     "showLegend" => value.Equals("true", StringComparison.OrdinalIgnoreCase) || value.Equals("false", StringComparison.OrdinalIgnoreCase), _ => true };
                 if (supported) { var declaration = new SourceDeclaration(line.Key, name, value, d); declarations.Add(declaration); if (name == "title") title = declaration; }
-                else { protect.Add(line.Key); if (name == "ticks") errors.Add("Radar tick controls exceed the supported 1–100 resource budget. Correct the original source."); }
+                else
+                {
+                    protect.Add(line.Key);
+                    if (name == "ticks") errors.Add("Radar tick controls exceed the supported 1–100 resource budget. Correct the original source.");
+                    if (name is "min" or "max" && SourceText.Pattern(@"^[0-9]+(?:\.[0-9]+)?$").IsMatch(value)) errors.Add("The Radar source range exceeds finite numeric representation. Correct the original source.");
+                }
                 continue;
             }
             protect.Add(line.Key);
@@ -103,7 +109,6 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
         var curves = SourceDeclarations.Groups(svg, "radar-curve");
         // Unsupported historical vectors remain protected, with exact original source accessible.
         if (!double.IsFinite(m.Maximum - m.Minimum)) throw new ArgumentException("The Radar display range must be finite. Correct the original source.");
-        if (m.Curves.All(c => c.Simple))
         {
             var expected = m.Maximum > m.Minimum && m.Axes.Count > 0 ? m.Curves.Count : 0;
             if (curves.Length != expected) throw new ArgumentException("Canonical Radar curve occurrences differ from source. Apply is protected.");
@@ -115,9 +120,10 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
                 var cx = ChartSource.Attribute(spoke, "x1"); var cy = ChartSource.Attribute(spoke, "y1");
                 var radius = Math.Abs(cy - ChartSource.Attribute(spoke, "y2"));
                 var marks = curves[i].Elements().Where(e => e.Name.LocalName == "circle").ToArray();
+                var values = RadarSourceModel.SemanticValues(m.Curves[i]);
                 for (var axis = 0; axis < marks.Length; axis++)
                 {
-                    var value = axis < m.Curves[i].Values.Items.Count ? double.Parse(m.Curves[i].Values.Items[axis].Raw, CultureInfo.InvariantCulture) : 0;
+                    var value = axis < values.Count ? values[axis].Value : 0;
                     var r = radius * Math.Clamp((value - m.Minimum) / (m.Maximum - m.Minimum), 0, 1); var angle = 2 * Math.PI * axis / marks.Length - Math.PI / 2;
                     if (Math.Abs(ChartSource.Attribute(marks[axis], "cx") - cx - r * Math.Cos(angle)) > .02 || Math.Abs(ChartSource.Attribute(marks[axis], "cy") - cy - r * Math.Sin(angle)) > .02)
                         throw new ArgumentException("Canonical Radar radius or positional axis correspondence differs from source. Apply is protected.");

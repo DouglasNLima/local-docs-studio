@@ -8,6 +8,18 @@ namespace LensDocsStudio.Core.Tests;
 public class ChartSourceAuthoringTests
 {
     private static void Pass(SourceAuthoringResult result) => Assert.True(result.Success, result.Error);
+    [Fact] public async Task Radar_dropped_tokens_have_proved_read_only_canonical_positions_without_changing_source()
+    {
+        const string source = "radar-beta\n axis A,B,C\n curve malformed{1,invalid,C:3}\n curve simple{3,2,1}\n"; var draft = new RadarVisualDraft(source); Pass(await draft.ValidateAsync());
+        var semantic = RadarSourceModel.SemanticValues(draft.Model.Curves[0]); Assert.Equal(new[] { "1", "C:3" }, semantic.Select(v => v.Token.Raw)); Assert.Equal(draft.Model.Curves[0].Values.Items[2].Identity, semantic[1].Token.Identity);
+        var safe = draft.Model.Curves[1].Values.Items[0]; Pass(await draft.UpdateValueAsync(safe.Identity, "4.000")); Assert.Contains("curve malformed{1,invalid,C:3}", draft.Source); Assert.False((await draft.UpdateValueAsync(semantic[1].Token.Identity, "4")).Success);
+    }
+    [Theory, InlineData("5 --> 5"), InlineData("10 --> -10")]
+    public async Task Historical_XY_equal_and_reversed_ranges_remain_exact_during_safe_local_edits(string range)
+    {
+        var source = "xychart\n x-axis [A,B]\n y-axis " + range + "\n line [1.000,2e0]\n"; var draft = new XyVisualDraft(source); Pass(await draft.ValidateAsync());
+        Pass(await draft.UpdateSeriesAsync(draft.Model.Series[0].Identity, "Named Ω")); Assert.Contains("y-axis " + range, draft.Source); Assert.Contains("[1.000,2e0]", draft.Source); Assert.False((await draft.SetRangeAsync("5", "5")).Success);
+    }
     [Theory, InlineData("0"), InlineData("-1"), InlineData("-1e-2")]
     public async Task New_Sankey_weights_must_remain_positive_without_clamping(string weight)
     {

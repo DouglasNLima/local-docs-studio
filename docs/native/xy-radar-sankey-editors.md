@@ -85,3 +85,19 @@ Installed-authoring acceptance uses the existing installer/payload harness. A sy
 source-identical version-pair upgrade does not certify historical upgrades. UIA is
 not physical screen-reader certification. Higher DPI and SDK-free clean Windows
 remain unavailable unless the receipt records actual supporting evidence.
+
+## Actual Windows screenshots
+
+These captures are from clean committed source
+`1a4fcd5e8d948d7db4cf3a1dc4af298637e5d123` in
+[hosted run 39420457335](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39420457335).
+They demonstrate the actual ordinary editor in Light/Dark and small/normal actual
+OS High Contrast. The [capture index](evidence/expansion-iii/1a4fcd5-capture-index.json)
+records file hashes; adjacent UIA JSON retains assertions and actual pointer observations.
+Later source checks and captures are identified separately in the PR delivery receipt.
+
+| Family | Light | Dark | Normal window | Small window | High Contrast normal | High Contrast small |
+|---|---|---|---|---|---|---|
+| XY Chart | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-light.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-dark.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-normal-viewport-880x600.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-high-contrast-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-xy-high-contrast-viewport-880x600.png) |
+| Radar | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-light.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-dark.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-normal-viewport-880x600.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-high-contrast-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-radar-high-contrast-viewport-880x600.png) |
+| Sankey | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-light.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-dark.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-normal-viewport-880x600.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-high-contrast-viewport-1280x800.png) | [Open](evidence/expansion-iii/1a4fcd5-sankey-high-contrast-viewport-880x600.png) |

@@ -70,7 +70,8 @@ internal static class NativeChartCompatibilityChecks
         }
         File.WriteAllText(Path.Combine(output, "chart-compatibility.json"), JsonSerializer.Serialize(new
         {
-            Status = "PASS", Renderer = "Mermaider 0.15.1", RendererSource = "71b64845570d633a94d29e85579c0a02786fece8", Checks = checks, Captures = captures
+            Status = "PASS", SourceRevision = System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(XyVisualEditorWindow).Assembly)!.InformationalVersion,
+            Renderer = "Mermaider 0.15.1", RendererSource = "71b64845570d633a94d29e85579c0a02786fece8", Checks = checks, Captures = captures
         }, new JsonSerializerOptions { WriteIndented = true }));
 
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
