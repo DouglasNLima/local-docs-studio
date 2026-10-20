@@ -64,6 +64,7 @@ public sealed class JourneyVisualDraft : SourceDraft<JourneySourceModel>
     }
     public static void VerifyCanonical(JourneySourceModel model, string svg)
     {
+        SourceDeclarations.VerifyTitle(svg, model.Title);
         var tasks = SourceDeclarations.Groups(svg, "journey-task");
         if (tasks.Length != model.Tasks.Count || tasks.Where((t, i) => (string?)t.Attribute("data-label") != model.Tasks[i].Label || (string?)t.Attribute("data-score") != model.Tasks[i].EffectiveScore.ToString(CultureInfo.InvariantCulture)).Any())
             throw new ArgumentException("Canonical Journey task counts, order, labels or effective scores differ from source occurrences. Apply is protected.");
@@ -78,10 +79,13 @@ public sealed class JourneyVisualDraft : SourceDraft<JourneySourceModel>
     public Task<SourceAuthoringResult> UpdateAsync(string identity, string label, string score, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         var task = model.Tasks.Single(t => t.Identity == identity);
-        if (label != task.Label) { SourceDeclarations.PlainLabel(label, ":"); SourceDeclarations.RejectDirectiveName(label, "title|section"); }
+        if (label != task.Label) { SourceText.Label(label); SourceDeclarations.RejectDirectiveName(label, "title|section", ignoreCase: true); }
         if (score != task.Score && (!SourceText.Pattern(@"^[1-5]$").IsMatch(score))) throw new ArgumentException("Enter a complete integer score from 1 to 5. The original raw score is preserved until explicitly corrected.");
         var line = text.Line(identity); if (score != task.Score) line = line.Replace(task.Tokens.Groups["score"].Index, task.Tokens.Groups["score"].Length, score);
         if (label != task.Label) line = line.Replace(task.Tokens.Groups["label"].Index, task.Tokens.Groups["label"].Length, label);
+        var intended = TaskLine.Match(line.Body);
+        if (!intended.Success || intended.Groups["label"].Value.Trim() != label || intended.Groups["score"].Value != score || intended.Groups["actors"].Success != task.Tokens.Groups["actors"].Success || intended.Groups["actors"].Value != task.Tokens.Groups["actors"].Value)
+            throw new ArgumentException("This task name would be interpreted as score or actor separators. Choose a name whose colon is not followed by a score; pending input is retained.");
         return text.Replace(line);
     }, token);
     public Task<SourceAuthoringResult> AddSectionAsync(CancellationToken token = default) => ChangeAsync((text, _) => text.Insert(text.Lines.Count, "    section New section"), token);
@@ -111,7 +115,8 @@ public sealed class JourneyVisualDraft : SourceDraft<JourneySourceModel>
         if (owner.Actors.Count == 1) return text.Replace(text.Line(owner.Identity).Replace(owner.Tokens.Groups["actors"].Index, owner.Tokens.Groups["actors"].Length, ""));
         var begin = index == 0 ? actor.SegmentStart : actor.SegmentStart - 1;
         return text.Replace(text.Line(owner.Identity).Replace(begin, actor.SegmentLength + 1, ""));
-    }, token);
+    }, token, AfterRemoval(identity));
+    private string AfterRemoval(string identity) => Model.Tasks.FirstOrDefault(t => t.Actors.Any(a => a.Identity == identity))?.Identity ?? Model.Tasks.FirstOrDefault(t => t.Identity == identity)?.Section ?? Model.HeaderIdentity;
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default)
     {
         var owner = Model.Tasks.FirstOrDefault(t => t.Actors.Any(a => a.Identity == identity)); var actorIndex = owner is null ? -1 : owner.Actors.ToList().FindIndex(a => a.Identity == identity) + Math.Sign(direction);
@@ -123,6 +128,7 @@ public sealed class JourneyVisualDraft : SourceDraft<JourneySourceModel>
             {
                 var tasks = model.Tasks.Where(t => t.Section == task.Section).ToArray(); var i = Array.IndexOf(tasks, task); var j = i + Math.Sign(direction);
                 if (j < 0 || j >= tasks.Length) throw new ArgumentException("There is no task in that direction in this section. Use the destination selector to move between sections.");
+                SourceRowMoves.CheckTrailingAttachment(text, task.Identity); SourceRowMoves.CheckTrailingAttachment(text, tasks[j].Identity);
                 return SourceRowMoves.Swap(text, tasks[Math.Min(i, j)].Identity, tasks[Math.Max(i, j)].Identity);
             }
             var taskOwner = model.Tasks.Single(t => t.Actors.Any(a => a.Identity == identity)); var index = taskOwner.Actors.ToList().FindIndex(a => a.Identity == identity); var other = index + Math.Sign(direction);

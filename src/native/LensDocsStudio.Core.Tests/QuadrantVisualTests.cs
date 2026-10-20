@@ -47,7 +47,7 @@ public class QuadrantVisualTests
         var source = "quadrantChart\n A: [.25, .75]\n classDef preserved bytes\n B: [.75, .25]\n"; var draft = new QuadrantVisualDraft(source); var p = draft.Model.Points[1];
         Assert.Single(draft.Model.Protected); Assert.False((await draft.MoveAsync(p.Identity, -1)).Success); Success(await draft.UpdateAsync(p.Identity, "Safe", p.X, p.Y)); Assert.Contains("classDef preserved bytes", draft.Source);
     }
-    [Theory, InlineData("A:B"), InlineData("A\nB"), InlineData("A\rB"), InlineData("")]
+    [Theory, InlineData("A\nB"), InlineData("A\rB"), InlineData("")]
     public async Task Unrepresentable_new_names_do_not_create_extra_elements(string value)
     {
         var draft = new QuadrantVisualDraft(QuadrantVisualDraft.Starter); Assert.False((await draft.AddAsync(value, ".5", ".5")).Success); Assert.Equal(QuadrantVisualDraft.Starter, draft.Source);
@@ -57,5 +57,32 @@ public class QuadrantVisualTests
         var draft = new QuadrantVisualDraft(QuadrantVisualDraft.Starter); Success(await draft.AddAsync("New", "0", "1")); var added = draft.Source; var p = draft.Model.Points[^1]; draft.Select(p.Identity);
         Success(await draft.DeleteAsync(p.Identity)); Assert.Equal(QuadrantVisualDraft.Starter, draft.Source); draft.Undo(); Assert.Equal(added, draft.Source); Assert.Equal(p.Identity, draft.Selection);
         using var cancel = new CancellationTokenSource(); cancel.Cancel(); Assert.False((await draft.UpdateAsync(p.Identity, "Cancelled", p.X, p.Y, cancel.Token)).Success); Assert.Equal(added, draft.Source);
+    }
+    [Fact] public async Task Axis_side_edit_retains_untouched_separator_whitespace_and_one_sided_form()
+    {
+        var source = "quadrantChart\n  x-axis Left  -->   Right   \n  y-axis Bottom\n  A: [.5, .5]\n"; var draft = new QuadrantVisualDraft(source);
+        Success(await draft.SetAxisAsync("x-axis", "Left", "Right")); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+        Success(await draft.SetAxisAsync("x-axis", "Changed", "Right")); Assert.Equal(source.Replace("Left  -->", "Changed  -->", StringComparison.Ordinal), draft.Source);
+        Success(await draft.SetAxisAsync("y-axis", "Bottom", "Top")); Assert.Contains("y-axis Bottom --> Top", draft.Source);
+        Success(await draft.SetAxisAsync("y-axis", "Bottom", "")); Assert.Contains("y-axis Bottom\n", draft.Source);
+    }
+    [Fact] public async Task Coordinate_source_representation_is_invariant_under_a_comma_decimal_UI_culture()
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
+            var draft = new QuadrantVisualDraft(QuadrantVisualDraft.Starter); var p = draft.Model.Points[0]; Success(await draft.UpdateAsync(p.Identity, p.Label, "0.1234500", "0.9876500")); Assert.Contains("[0.1234500, 0.9876500]", draft.Source);
+            Assert.False((await draft.UpdateAsync(p.Identity, p.Label, "0,5", "0.5")).Success);
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+    [Theory, InlineData("title Hidden"), InlineData("x-axis Hidden"), InlineData("quadrant-1 Hidden"), InlineData("%% Hidden")]
+    public async Task Point_names_cannot_silently_turn_into_declarations_or_comments(string value)
+    { var draft = new QuadrantVisualDraft(QuadrantVisualDraft.Starter); Assert.False((await draft.AddAsync(value, ".5", ".5")).Success); Assert.Equal(QuadrantVisualDraft.Starter, draft.Source); }
+    [Fact] public async Task Colon_bearing_point_labels_retain_intended_coordinates_without_invented_escapes()
+    {
+        var draft = new QuadrantVisualDraft(QuadrantVisualDraft.Starter); Success(await draft.AddAsync("A:B", ".5", ".25")); var p = draft.Model.Points[^1]; Assert.Equal("A:B", p.Label);
+        Success(await draft.UpdateAsync(p.Identity, "A: [1, 1]", p.X, p.Y)); Assert.Equal("A: [1, 1]", draft.Model.Points[^1].Label); Assert.Equal(".5", draft.Model.Points[^1].X);
     }
 }

@@ -50,8 +50,7 @@ public sealed class QuadrantVisualEditorWindow : SourceVisualEditorWindow
         if (quadrant.Selection == quadrant.Model.HeaderIdentity) return quadrant.SetTitleAsync(label.Text, Lifetime.Token);
         if (DeclarationName is { } name)
         {
-            if (name is "x-axis" or "y-axis" && (label.Text.Contains("-->", StringComparison.Ordinal) || opposite.Text.Contains("-->", StringComparison.Ordinal))) return Task.FromResult(new SourceAuthoringResult(false, "An axis label cannot contain the --> separator. Pending input is retained."));
-            return quadrant.SetDeclarationAsync(name, label.Text + (opposite.Text.Length == 0 ? "" : " --> " + opposite.Text), Lifetime.Token);
+            return name is "x-axis" or "y-axis" ? quadrant.SetAxisAsync(name, label.Text, opposite.Text, Lifetime.Token) : quadrant.SetDeclarationAsync(name, label.Text, Lifetime.Token);
         }
         return quadrant.UpdateAsync(quadrant.Selection ?? "", label.Text, x.Text, y.Text, Lifetime.Token);
     }

@@ -13,7 +13,7 @@ using LensDocsStudio.Native.Rendering;
 
 namespace LensDocsStudio.Native;
 
-/// <summary>Shared presentation/ownership shell for the three source-based editors. Family semantics stay in their adapters.</summary>
+/// <summary>Shared presentation/ownership shell for source-based editors. Family semantics stay in their adapters.</summary>
 public partial class SourceVisualEditorWindow : Window
 {
     protected record Choice(string Identity, string Description) { public override string ToString() => Description; }

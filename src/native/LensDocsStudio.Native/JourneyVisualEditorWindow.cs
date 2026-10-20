@@ -20,6 +20,7 @@ public sealed class JourneyVisualEditorWindow : SourceVisualEditorWindow
         : base("Journey", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         Title = "Mermaid Visual Editor / User Journey";
+        FamilyHeading.Text = "USER JOURNEY";
         label = Field("Title, section, task or selected actor name", "Label"); score = Field("Task score (integer 1–5; original raw value)", "Score");
         destination = new ComboBox { Style = (System.Windows.Style)FindResource("Form.ComboBox") }; Identify(destination, "Destination", "Destination section for the selected task");
         InspectorFields.Children.Add(new Label { Content = "Destination section", Target = destination, Style = (System.Windows.Style)FindResource("Form.Label") }); InspectorFields.Children.Add(destination);

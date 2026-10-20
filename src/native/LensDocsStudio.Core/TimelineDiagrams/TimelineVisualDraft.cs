@@ -73,6 +73,7 @@ public sealed class TimelineVisualDraft : SourceDraft<TimelineSourceModel>
     }
     public static void VerifyCanonical(TimelineSourceModel model, string svg)
     {
+        SourceDeclarations.VerifyTitle(svg, model.Title);
         var periods = SourceDeclarations.Groups(svg, "timeline-period"); var events = SourceDeclarations.Groups(svg, "timeline-event"); var expected = model.Periods.SelectMany(p => p.Events).ToArray();
         if (periods.Length != model.Periods.Count || events.Length != expected.Length || periods.Where((p, i) => (string?)p.Attribute("data-label") != model.Periods[i].Label).Any() ||
             events.Where((e, i) => SourceDeclarations.VisibleText(e) != SourceDeclarations.TextValue(expected[i].Label)).Any())
@@ -83,8 +84,9 @@ public sealed class TimelineVisualDraft : SourceDraft<TimelineSourceModel>
     public Task<SourceAuthoringResult> SetTitleAsync(string value, CancellationToken token = default) => ChangeAsync((text, model) => SourceDeclarations.SetTitle(text, model.HeaderIdentity, model.Title, value), token);
     public Task<SourceAuthoringResult> UpdateAsync(string identity, string label, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
-        SourceDeclarations.PlainLabel(label, ":");
+        SourceText.Label(label);
         if (model.Sections.FirstOrDefault(s => s.Identity == identity && s.Tokens is not null) is { } section) return text.Patch(identity, section.Tokens!.Groups["label"], label);
+        SourceDeclarations.PlainLabel(label, ":");
         if (model.Periods.FirstOrDefault(p => p.Identity == identity) is { } period)
         { if (period.Protected) throw new ArgumentException("An orphan continuation protects this period. Use Edit source."); SourceDeclarations.RejectDirectiveName(label, "title|section"); return text.Patch(identity, period.Tokens.Groups["label"], label); }
         var evt = model.Periods.SelectMany(p => p.Events).Single(e => e.Identity == identity); return text.Replace(text.Line(evt.LineIdentity).Replace(evt.Start, evt.Length, label));
@@ -101,7 +103,7 @@ public sealed class TimelineVisualDraft : SourceDraft<TimelineSourceModel>
         var period = model.Periods.Single(p => p.Identity == periodId); SafePeriod(text, model, period);
         return text.Insert(period.End, text.Line(period.Identity).Indent + "    : New event");
     }, token);
-    private static IEnumerable<string> Supported(TimelineSourceModel model) => model.Sections.Where(s => s.Tokens is not null).Select(s => s.Identity).Concat(model.Periods.Where(p => !p.Protected).Select(p => p.Identity)).Concat(model.Periods.SelectMany(p => p.Events).Select(e => e.LineIdentity));
+    private static IEnumerable<string> Supported(TimelineSourceModel model) => model.Sections.Where(s => s.Tokens is not null).Select(s => s.Identity).Concat(model.Periods.Where(p => !p.Protected).Select(p => p.Identity)).Concat(model.Periods.Where(p => !p.Protected).SelectMany(p => p.Events).Select(e => e.LineIdentity));
     private static void SafePeriod(SourceText text, TimelineSourceModel model, TimelinePeriodSource period)
     {
         if (period.Protected) throw new ArgumentException("An orphan continuation protects this period group.");
@@ -117,12 +119,22 @@ public sealed class TimelineVisualDraft : SourceDraft<TimelineSourceModel>
         var siblings = owner.Events.Where(e => e.LineIdentity == evt.LineIdentity).ToArray(); var index = Array.IndexOf(siblings, evt);
         if (siblings.Length == 1)
         {
-            if (evt.LineIdentity == owner.Identity) throw new ArgumentException("The first period line needs an event. Reorder an event onto this line before removing it.");
+            if (evt.LineIdentity == owner.Identity)
+            {
+                var next = owner.Events[1];
+                if (text.Lines.Skip(text.Index(owner.Identity) + 1).Take(text.Index(next.LineIdentity) - text.Index(owner.Identity) - 1).Any(l => l.Content.Length > 0))
+                    throw new ArgumentException("An intervening comment or directive protects promotion of the next continuation event.");
+                var nextSiblings = owner.Events.Where(e => e.LineIdentity == next.LineIdentity).ToArray(); SourceText changed;
+                if (nextSiblings.Length == 1) { SourceRowMoves.CheckTrailingAttachment(text, next.LineIdentity); changed = text.Splice(text.Index(next.LineIdentity), 1, []); }
+                else changed = text.Replace(text.Line(next.LineIdentity).Replace(next.SegmentStart, next.SegmentLength + 1, ""));
+                return changed.Replace(text.Line(evt.LineIdentity).Replace(evt.Start, evt.Length, next.Label));
+            }
             SourceRowMoves.CheckTrailingAttachment(text, evt.LineIdentity); var start = text.AttachedStart(evt.LineIdentity); return text.Splice(start, text.Index(evt.LineIdentity) + 1 - start, []);
         }
         var begin = index == 0 ? evt.SegmentStart : evt.SegmentStart - 1; var length = evt.SegmentLength + 1;
         return text.Replace(text.Line(evt.LineIdentity).Replace(begin, length, ""));
-    }, token);
+    }, token, AfterRemoval(identity));
+    private string AfterRemoval(string identity) => Model.Periods.FirstOrDefault(p => p.Events.Any(e => e.Identity == identity))?.Identity ?? Model.Periods.FirstOrDefault(p => p.Identity == identity)?.Section ?? Model.HeaderIdentity;
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default)
     {
         var eventOwner = Model.Periods.FirstOrDefault(p => p.Events.Any(e => e.Identity == identity)); var target = eventOwner is null ? -1 : eventOwner.Events.ToList().FindIndex(e => e.Identity == identity) + Math.Sign(direction);

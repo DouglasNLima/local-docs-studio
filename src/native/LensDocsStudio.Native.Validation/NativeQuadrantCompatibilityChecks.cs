@@ -31,13 +31,14 @@ internal static class NativeQuadrantCompatibilityChecks
             Check(Number(quadrants["1"].Elements().First(), "x") > left && Number(quadrants["3"].Elements().First(), "y") > top,
                 name + ": engine numbering is 1 top right, 2 top left, 3 bottom left, 4 bottom right");
             var points = root.Descendants().Where(e => (string?)e.Attribute("class") == "quadrant-point").ToArray();
-            var values = new[] { (.25, .75), (.75, .25), (.5, .5), (.5, .5), (0d, 0d), (1d, 1d) };
+            var values = new[] { (.25, .75), (.75, .25), (.5, .5), (.5, .5), (0d, 0d), (1d, 1d), (.12345, .98765) };
             Check(points.Length == values.Length, name + ": all duplicate, coincident, boundary and limit occurrences render");
             for (var i = 0; i < points.Length; i++)
             {
                 var circle = points[i].Elements().First();
-                Check(Math.Abs(Number(circle, "cx") - (left + values[i].Item1 * width)) < .001 &&
-                    Math.Abs(Number(circle, "cy") - (top + (1 - values[i].Item2) * height)) < .001,
+                double Emitted(double value) => double.Parse(Math.Round(value, 3).ToString("0.##", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+                Check(Number(circle, "cx") == Emitted(left + values[i].Item1 * width) &&
+                    Number(circle, "cy") == Emitted(top + (1 - values[i].Item2) * height),
                     name + ": canonical point " + i + " follows actual panel extent and inverted Y");
             }
             var native = new NativeSvgService(); var prepared = native.Prepare(result.Svg!);

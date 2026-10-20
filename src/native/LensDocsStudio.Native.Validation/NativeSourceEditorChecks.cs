@@ -85,6 +85,23 @@ internal static class NativeSourceEditorChecks
             captures.Add(new { Family = family, Dark = dark, SourceSha256 = Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(source))).ToLowerInvariant(), HitCount = hits.Count, PixelTolerance = 0 });
             DocumentChecks(source, family);
         }
+        foreach (var family in new[] { "Timeline", "Journey", "Quadrant" })
+        foreach (var dark in new[] { false, true })
+        {
+            var source = family switch { "Timeline" => "timeline\n Same : A : B\n  : C\n Same : D\n  : E\n", "Journey" => "journey\n Same: 9: Me, Me\n Same: 1: Me, Me\n", _ => "quadrantChart\n Same: [.25, .75]\n Same: [.75, .25]\n Same: [0.7500, 0.2500]\n" };
+            ISourceDraft author = family switch { "Timeline" => new TimelineVisualDraft(source), "Journey" => new JourneyVisualDraft(source), _ => new QuadrantVisualDraft(source) };
+            var move = author switch { TimelineVisualDraft t => t.MoveAsync(t.Model.Periods[1].Identity, -1), JourneyVisualDraft j => j.MoveAsync(j.Model.Tasks[1].Identity, -1), QuadrantVisualDraft q => q.MoveAsync(q.Model.Points[1].Identity, -1), _ => throw new IOException() };
+            Check(move.GetAwaiter().GetResult().Success, family + ": complete duplicate occurrence moves before native correspondence"); source = author.Source;
+            SourceVisualEditorWindow editor = family switch { "Timeline" => new TimelineVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark), "Journey" => new JourneyVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark), _ => new QuadrantVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark) };
+            var owned = (ISourceDraft)typeof(SourceVisualEditorWindow).GetField("Draft", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(editor)!;
+            var ids = owned switch { TimelineVisualDraft t => t.Model.Periods.Select(p => p.Identity).Concat(t.Model.Periods.SelectMany(p => p.Events).Select(e => e.Identity)).ToArray(), JourneyVisualDraft j => j.Model.Tasks.Select(t => t.Identity).ToArray(), QuadrantVisualDraft q => q.Model.Points.Select(p => p.Identity).ToArray(), _ => throw new IOException() };
+            var rendered = diagrams.Render(source, dark); var hits = (IReadOnlyList<NativeSourceHit>)editor.GetType().GetMethod("Correspondence", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(editor, [source, rendered])!;
+            Check(hits.Select(h => h.Identity).SequenceEqual(ids), family + ": reordered duplicates keep exact occurrence keys and canonical order, including coincident points and repeated actors");
+            var groups = family == "Timeline" ? SourceDeclarations.Groups(rendered.Svg!, "timeline-period").Concat(SourceDeclarations.Groups(rendered.Svg!, "timeline-event")).ToArray() : SourceDeclarations.Groups(rendered.Svg!, family == "Journey" ? "journey-task" : "quadrant-point");
+            var root = System.Xml.Linq.XDocument.Parse(rendered.Svg!).Root!;
+            for (var i = 0; i < hits.Count; i++) Check(hits[i].Bounds == NativeSourceHit.ShapeBounds(groups[i], root), family + ": duplicate occurrence " + i + " uses its actual canonical SVG geometry");
+            editor.Close();
+        }
         File.WriteAllText(Path.Combine(output, "source-editor-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", Checks = checks, Captures = captures }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
         void Reject(Action action, string message) { try { action(); } catch (ArgumentException) { checks.Add(message); return; } throw new IOException(message); }

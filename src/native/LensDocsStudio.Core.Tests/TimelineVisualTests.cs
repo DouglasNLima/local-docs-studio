@@ -65,4 +65,10 @@ public class TimelineVisualTests
         var source = "timeline showData title Header\n title First\n A : Event\n title Last\n"; var draft = new TimelineVisualDraft(source); Assert.Equal("Last", draft.Model.Title!.Value);
         Success(await draft.SetTitleAsync("Effective Ω")); Assert.Equal(source.Replace("title Last", "title Effective Ω", StringComparison.Ordinal), draft.Source);
     }
+    [Fact] public async Task Removing_the_only_first_line_event_promotes_one_continuation_without_losing_its_siblings()
+    {
+        var source = "timeline\n  Period : First\n    : Second : Third\n    : Fourth\n"; var draft = new TimelineVisualDraft(source);
+        Success(await draft.DeleteAsync(draft.Model.Periods[0].Events[0].Identity)); Assert.Equal("timeline\n  Period : Second\n    :  Third\n    : Fourth\n", draft.Source);
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
 }

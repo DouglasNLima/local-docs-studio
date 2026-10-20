@@ -43,6 +43,17 @@ internal static partial class NativeUiChecks
                 Check(Find(second, family + "Elements").AsListBox().SelectedItem is not null && Find(second, family + "Label").AsTextBox().Text == Find(visual!, family + "Label").AsTextBox().Text,
                     "Independent UIA connections agree on occurrence selection and persistent inspector");
             }
+            Probe(0, "Authored title Ω");
+            if (family == "Quadrant")
+            {
+                foreach (var index in new[] { 1, 2 })
+                {
+                    Select(index); var before = Draft(); Set("Label", "First axis Ω"); Set("OppositeLabel", "Opposite axis Ω"); Click("Update"); Await(() => Draft().Contains("First axis Ω --> Opposite axis Ω", StringComparison.Ordinal)); Click("Undo"); Await(() => Draft() == before);
+                }
+                foreach (var index in new[] { 3, 4, 5, 6 }) Probe(index, "Quadrant label " + index);
+                Check(true, "UIA authors both ends of both axes and all four actual numbered quadrant labels");
+            }
+            else { Probe(2, "Authored section Ω"); if (family == "Timeline") Probe(4, "Authored event Ω"); }
             // Compute the pointer from actual ordinary SVG geometry and the current native viewport.
             Select(family == "Quadrant" ? 8 : family == "Timeline" ? 8 : 6); Click("Fit");
             var rendered = new DiagramService().Render(Draft()); var svgRoot = XDocument.Parse(rendered.Svg!).Root!;
@@ -113,6 +124,7 @@ internal static partial class NativeUiChecks
         void Discard() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Discard confirmation missing."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
         void Capture(string name) { if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Editor remained busy before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
+        void Probe(int index, string value) { Select(index); var before = Draft(); Set("Label", value); Click("Update"); Await(() => Draft().Contains(value, StringComparison.Ordinal)); Click("Undo"); Await(() => Draft() == before); Check(true, "UIA field update and exact Undo for occurrence " + index); }
         void ProtectedAndNavigation()
         {
             var mixed = family switch { "Timeline" => "timeline\n Same : One : Two\n ignored bytes\n  : Three\n Same : Four\n", "Journey" => "journey\n Same: 9: Me, Me\n ignored bytes\n Same: 3:\n", _ => "quadrantChart\n Same: [9, -2]\n ignored bytes\n Same: [.5, .50]\n" };

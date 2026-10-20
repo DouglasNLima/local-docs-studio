@@ -27,9 +27,15 @@ public static class SourceDeclarations
     public static string VisibleText(XElement element) => string.Concat(element.Descendants().Where(e => e.Name.LocalName == "text")
         .SelectMany(e => e.Value).Where(c => !char.IsWhiteSpace(c)));
     public static string TextValue(string text) => string.Concat(text.Where(c => !char.IsWhiteSpace(c)));
-    public static void RejectDirectiveName(string label, string directives)
+    public static void VerifyTitle(string svg, SourceDeclaration? title)
     {
-        if (label.StartsWith("%%", StringComparison.Ordinal) || SourceText.Pattern(@"^(?:" + directives + @")(?:\s|$)", RegexOptions.IgnoreCase).IsMatch(label))
+        var groups = Groups(svg, "diagram-title");
+        if (groups.Length != (title is null ? 0 : 1) || title is not null && VisibleText(groups[0]) != TextValue(title.Value))
+            throw new ArgumentException("The canonical title differs from the effective source declaration. Apply is protected.");
+    }
+    public static void RejectDirectiveName(string label, string directives, bool ignoreCase = false)
+    {
+        if (label.StartsWith("%%", StringComparison.Ordinal) || SourceText.Pattern(@"^(?:" + directives + @")(?:\s|$)", ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None).IsMatch(label))
             throw new ArgumentException("This name would be interpreted as a comment or directive. Choose a different name; pending input is retained.");
     }
 }

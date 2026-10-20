@@ -65,6 +65,7 @@ public sealed class QuadrantVisualDraft : SourceDraft<QuadrantSourceModel>
     }
     public static void VerifyCanonical(QuadrantSourceModel model, string svg)
     {
+        SourceDeclarations.VerifyTitle(svg, model.Title);
         var groups = SourceDeclarations.Groups(svg, "quadrant").ToDictionary(e => (string)e.Attribute("data-quadrant")!);
         var points = SourceDeclarations.Groups(svg, "quadrant-point");
         if (groups.Count != 4 || points.Length != model.Points.Count) throw new ArgumentException("Canonical Quadrant occurrence counts differ from source. Apply is protected.");
@@ -74,15 +75,49 @@ public sealed class QuadrantVisualDraft : SourceDraft<QuadrantSourceModel>
         for (var i = 0; i < points.Length; i++)
         {
             var p = model.Points[i]; var circle = points[i].Elements().First();
+            // The pinned renderer rounds positions to 3 decimals, then SvgFormat emits 0.##.
+            // Source precision remains authoritative; compare the actual documented SVG quantisation.
+            double Position(double value) => double.Parse(Math.Round(value, 3).ToString("0.##", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
             if (SourceDeclarations.VisibleText(points[i]) != SourceDeclarations.TextValue(p.Label) ||
-                Math.Abs(Number(circle, "cx") - Math.Round(left + p.EffectiveX * width, 3)) > .0001 ||
-                Math.Abs(Number(circle, "cy") - Math.Round(top + (1 - p.EffectiveY) * height, 3)) > .0001)
+                Math.Abs(Number(circle, "cx") - Position(left + p.EffectiveX * width)) > .0001 ||
+                Math.Abs(Number(circle, "cy") - Position(top + (1 - p.EffectiveY) * height)) > .0001)
                 throw new ArgumentException("Canonical point label, order or coordinate differs from its source occurrence. Apply is protected.");
         }
         foreach (var q in new[] { "1", "2", "3", "4" })
             if (((string?)groups[q].Attribute("data-label") ?? "") != (model.Effective("quadrant-" + q)?.Value ?? "")) throw new ArgumentException("Canonical quadrant labels differ from effective declarations.");
+        var root = XDocument.Parse(svg).Root!;
+        foreach (var name in new[] { "x-axis", "y-axis" })
+        {
+            var raw = model.Effective(name)?.Value;
+            var match = raw is null ? null : SourceText.Pattern(@"^(?<first>.+?)(?:\s*-->\s*(?<second>.+))?$").Match(raw);
+            var first = match?.Groups["first"].Value.Trim() ?? ""; var second = match?.Groups["second"].Value.Trim() ?? "";
+            var nodes = name == "x-axis" ? root.Elements().Where(e => e.Name.LocalName == "text").ToArray() :
+                root.Elements().Where(e => ((string?)e.Attribute("transform"))?.Contains("rotate(-90)", StringComparison.Ordinal) == true).SelectMany(e => e.Elements().Where(t => t.Name.LocalName == "text")).ToArray();
+            var actual = nodes.ToDictionary(e => (string?)e.Attribute("text-anchor") ?? "", e => SourceDeclarations.TextValue(e.Value));
+            if (actual.GetValueOrDefault("start", "") != SourceDeclarations.TextValue(first) || actual.GetValueOrDefault("end", "") != SourceDeclarations.TextValue(second) || actual.Count != (first.Length > 0 ? 1 : 0) + (second.Length > 0 ? 1 : 0))
+                throw new ArgumentException("Canonical axis labels or one-sided precedence differ from source. Apply is protected.");
+        }
     }
     public Task<SourceAuthoringResult> SetTitleAsync(string value, CancellationToken token = default) => ChangeAsync((text, model) => SourceDeclarations.SetTitle(text, model.HeaderIdentity, model.Title, value), token);
+    public Task<SourceAuthoringResult> SetAxisAsync(string name, string first, string second, CancellationToken token = default) => ChangeAsync((text, model) =>
+    {
+        if (name is not ("x-axis" or "y-axis")) throw new ArgumentException("Select an axis.");
+        SourceText.Label(first); if (second.Length > 0) SourceText.Label(second);
+        if (first.Contains("-->", StringComparison.Ordinal) || second.Contains("-->", StringComparison.Ordinal)) throw new ArgumentException("An axis label cannot contain the --> separator. Pending input is retained.");
+        var old = model.Effective(name);
+        if (old is null) return text.Insert(text.Index(model.HeaderIdentity) + 1, "    " + name + " " + first + (second.Length == 0 ? "" : " --> " + second));
+        var tokens = SourceText.Pattern(@"^[ \t]*" + name + @"[ \t]+(?<first>.+?)(?:[ \t]*-->[ \t]*(?<second>.+?))?[ \t]*$").Match(text.Line(old.Identity).Body);
+        if (!tokens.Success) throw new ArgumentException("This axis declaration has ambiguous boundaries. Inspect its original source.");
+        var a = tokens.Groups["first"]; var b = tokens.Groups["second"]; var line = text.Line(old.Identity);
+        if (second != b.Value)
+        {
+            if (b.Success && second.Length > 0) line = line.Replace(b.Index, b.Length, second);
+            else if (b.Success) line = line.Replace(a.Index + a.Length, b.Index + b.Length - a.Index - a.Length, "");
+            else line = line.Replace(a.Index + a.Length, 0, " --> " + second);
+        }
+        if (first != a.Value) line = line.Replace(a.Index, a.Length, first);
+        return text.Replace(line);
+    }, token);
     public Task<SourceAuthoringResult> SetDeclarationAsync(string name, string value, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         if (!new[] { "x-axis", "y-axis", "quadrant-1", "quadrant-2", "quadrant-3", "quadrant-4" }.Contains(name)) throw new ArgumentException("Select an axis or numbered quadrant.");
@@ -96,27 +131,30 @@ public sealed class QuadrantVisualDraft : SourceDraft<QuadrantSourceModel>
     public Task<SourceAuthoringResult> UpdateAsync(string identity, string label, string x, string y, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         var point = model.Points.Single(p => p.Identity == identity);
-        if (label != point.Label) { SourceDeclarations.PlainLabel(label, ":"); SourceDeclarations.RejectDirectiveName(label, "title|x-axis|y-axis|quadrant-[1-4]"); }
+        if (label != point.Label) { SourceText.Label(label); SourceDeclarations.RejectDirectiveName(label, "title|x-axis|y-axis|quadrant-[1-4]"); }
         if (x != point.X) Coordinate(x); if (y != point.Y) Coordinate(y);
         var line = text.Line(identity);
         if (y != point.Y) line = line.Replace(point.Tokens.Groups["y"].Index, point.Tokens.Groups["y"].Length, y);
         if (x != point.X) line = line.Replace(point.Tokens.Groups["x"].Index, point.Tokens.Groups["x"].Length, x);
         if (label != point.Label) line = line.Replace(point.Tokens.Groups["label"].Index, point.Tokens.Groups["label"].Length, label);
+        var intended = Point.Match(line.Body);
+        if (!intended.Success || intended.Groups["label"].Value.Trim() != label || intended.Groups["x"].Value != x || intended.Groups["y"].Value != y) throw new ArgumentException("This point label would change its coordinate separators. Pending input is retained.");
         return text.Replace(line);
     }, token);
     public Task<SourceAuthoringResult> AddAsync(string label, string x, string y, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
-        SourceDeclarations.PlainLabel(label, ":"); SourceDeclarations.RejectDirectiveName(label, "title|x-axis|y-axis|quadrant-[1-4]"); Coordinate(x); Coordinate(y);
+        SourceText.Label(label); SourceDeclarations.RejectDirectiveName(label, "title|x-axis|y-axis|quadrant-[1-4]"); Coordinate(x); Coordinate(y);
         var last = model.Points.LastOrDefault(); return text.Insert(last is null ? text.Lines.Count : text.Index(last.Identity) + 1, "    " + label + ": [" + x + ", " + y + "]");
     }, token);
     public Task<SourceAuthoringResult> DeleteAsync(string identity, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         _ = model.Points.Single(p => p.Identity == identity); SourceRowMoves.CheckTrailingAttachment(text, identity); var start = text.AttachedStart(identity); return text.Splice(start, text.Index(identity) + 1 - start, []);
-    }, token);
+    }, token, Model.Points.FirstOrDefault(p => p.Identity != identity)?.Identity ?? Model.HeaderIdentity);
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         var index = model.Points.ToList().FindIndex(p => p.Identity == identity); var other = index + Math.Sign(direction);
         if (index < 0 || other < 0 || other >= model.Points.Count) throw new ArgumentException("There is no point in that direction.");
+        SourceRowMoves.CheckTrailingAttachment(text, model.Points[index].Identity); SourceRowMoves.CheckTrailingAttachment(text, model.Points[other].Identity);
         return SourceRowMoves.Swap(text, model.Points[Math.Min(index, other)].Identity, model.Points[Math.Max(index, other)].Identity);
     }, token);
     public static void Coordinate(string value)

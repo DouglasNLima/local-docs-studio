@@ -51,9 +51,14 @@ public class JourneyVisualTests
         var source = "journey\n A: 3\n Ignored: 999999999999999999999999999\n unknown bytes\n B: 9: Me\n"; var draft = new JourneyVisualDraft(source); Success(await draft.ValidateAsync()); Assert.Equal(2, draft.Model.Tasks.Count); Assert.Equal(2, draft.Model.Protected.Count);
         var b = draft.Model.Tasks[1]; Assert.False((await draft.MoveAsync(b.Identity, -1)).Success); Success(await draft.UpdateAsync(b.Identity, "Safe", b.Score)); Assert.Contains("Ignored: 999999999999999999999999999", draft.Source); Assert.Contains("Safe: 9", draft.Source);
     }
-    [Theory, InlineData("title Hidden"), InlineData("section Hidden"), InlineData("%% Hidden"), InlineData("A:B")]
+    [Theory, InlineData("title Hidden"), InlineData("section Hidden"), InlineData("%% Hidden"), InlineData("A:3")]
     public async Task Task_names_cannot_turn_into_directives_or_separator_injection(string value)
     { var draft = new JourneyVisualDraft(JourneyVisualDraft.Starter); var t = draft.Model.Tasks[0]; Assert.False((await draft.UpdateAsync(t.Identity, value, t.Score)).Success); Assert.Equal(JourneyVisualDraft.Starter, draft.Source); }
+    [Fact] public async Task A_representable_colon_in_a_task_name_keeps_the_intended_score_and_actor_list()
+    {
+        var draft = new JourneyVisualDraft(JourneyVisualDraft.Starter); var t = draft.Model.Tasks[0]; Success(await draft.UpdateAsync(t.Identity, "Read: documentation", t.Score));
+        Assert.Equal("Read: documentation", draft.Model.Tasks[0].Label); Assert.Equal(t.Score, draft.Model.Tasks[0].Score); Assert.Equal(t.Actors.Select(a => a.Name), draft.Model.Tasks[0].Actors.Select(a => a.Name));
+    }
     [Fact] public async Task Task_section_removal_and_repeated_titles_have_exact_private_undo()
     {
         var source = "journey title Header\n title First\n title Last\n section A\n A: 3: Me\n section B\n B: 4\n"; var draft = new JourneyVisualDraft(source); Success(await draft.SetTitleAsync("New")); Assert.Contains("title Header\n title First\n title New", draft.Source);
