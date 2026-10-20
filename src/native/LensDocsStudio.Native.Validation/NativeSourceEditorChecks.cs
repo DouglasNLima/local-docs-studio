@@ -26,6 +26,9 @@ internal static class NativeSourceEditorChecks
     public static void Run(string output)
     {
         Directory.CreateDirectory(output); var checks = new List<string>(); var captures = new List<object>(); var diagrams = new DiagramService();
+        var donut = System.Xml.Linq.XElement.Parse("<svg viewBox=\"0 0 80 80\"><g><circle cx=\"40\" cy=\"40\" r=\"20\" fill=\"none\" stroke=\"black\" stroke-width=\"10\"/></g></svg>");
+        var donutHit = NativeSourceHit.ShapeGeometry(donut.Elements().Single(), donut)!;
+        Check(!donutHit.FillContains(new Point(40, 40)) && donutHit.FillContains(new Point(64, 40)), "One-slice canonical stroked-circle geometry retains its donut hole and actual outer stroke");
         foreach (var family in new[] { "Gantt", "Mindmap", "Pie" })
         foreach (var dark in new[] { false, true })
         {

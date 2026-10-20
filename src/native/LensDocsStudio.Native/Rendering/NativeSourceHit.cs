@@ -14,7 +14,14 @@ public sealed record NativeSourceHit(string Identity, string Description, Rect B
         Geometry shape;
         double Number(string name) => double.Parse((string?)element.Attribute(name) ?? "0", CultureInfo.InvariantCulture);
         if (element.Name.LocalName == "path") shape = Geometry.Parse((string?)element.Attribute("d") ?? "").Clone();
-        else shape = new EllipseGeometry(new Point(Number("cx"), Number("cy")), Number("r"), Number("r"));
+        else
+        {
+            var circle = new EllipseGeometry(new Point(Number("cx"), Number("cy")), Number("r"), Number("r"));
+            // The pinned Tonal one-slice chart paints a stroked circle (a donut), not a filled disc.
+            // Widen the actual declared stroke so its hole and outer radius remain exact pointer geometry.
+            shape = (string?)element.Attribute("fill") == "none" && Number("stroke-width") > 0
+                ? circle.GetWidenedPathGeometry(new Pen(Brushes.Black, Number("stroke-width"))) : circle;
+        }
         var viewBox = ((string?)root.Attribute("viewBox") ?? "0 0").Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
         shape.Transform = new TranslateTransform(-double.Parse(viewBox[0], CultureInfo.InvariantCulture), -double.Parse(viewBox[1], CultureInfo.InvariantCulture));
         shape.Freeze(); return shape;
