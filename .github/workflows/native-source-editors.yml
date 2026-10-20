@@ -1,0 +1,40 @@
+name: Validate expanded native Mermaid editors
+on:
+  push:
+    branches: [feature/native-mermaid-gantt-mindmap-pie-editors]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-source-editors-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  authoring:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        family: [Gantt, Mindmap, Pie]
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build exact-source ordinary native application and independent UIA client
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Exercise complete native authoring through normal application routes
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --source-editor-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/source-editors '${{ matrix.family }}' $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-${{ matrix.family }}-${{ matrix.appearance }}
+          path: artifacts/native/source-editors/
+          retention-days: 30

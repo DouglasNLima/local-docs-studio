@@ -13,20 +13,19 @@ namespace LensDocsStudio.Native;
 public sealed class GanttVisualEditorWindow : SourceVisualEditorWindow
 {
     private readonly GanttVisualDraft gantt;
-    private readonly TextBox label, duration;
-    private readonly DatePicker date;
-    private string originalDateText = "";
+    private readonly TextBox label, duration, date;
+    private readonly Calendar calendar;
+    private readonly Expander calendarPanel;
     protected override string Values => label is null ? "" : label.Text + '\u001f' + date.Text + '\u001f' + duration.Text;
     public GanttVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> apply,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, FontFamily? sourceFont = null, double sourceFontSize = 14)
         : base("Gantt", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         label = Field("Label or title", "Label");
-        date = new DatePicker { SelectedDateFormat = DatePickerFormat.Short, FirstDayOfWeek = DayOfWeek.Monday }; Identify(date, "StartDate", "Explicit task start date");
-        InspectorFields.Children.Add(new Label { Content = "Start date", Target = date, Style = (Style)FindResource("Form.Label") }); InspectorFields.Children.Add(date);
-        date.SelectedDateChanged += (_, _) => FieldsChanged(); date.AddHandler(System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent, new TextChangedEventHandler((_, _) => FieldsChanged()));
-        // Keep incomplete native DatePicker text for correction instead of throwing or replacing it.
-        date.DateValidationError += (_, args) => { args.ThrowException = false; };
+        date = Field("Start date (yyyy-MM-dd)", "StartDate");
+        calendar = new Calendar { FirstDayOfWeek = DayOfWeek.Monday }; Identify(calendar, "Calendar", "Choose an explicit start date");
+        calendarPanel = new Expander { Header = "Choose start date", Content = calendar }; InspectorFields.Children.Add(calendarPanel);
+        calendar.SelectedDatesChanged += (_, _) => { if (calendar.SelectedDate is { } chosen) date.Text = chosen.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture); };
         duration = Field("Duration (whole days)", "Duration"); gantt = new(source, diagrams); gantt.ValidatePresentation = (text, _, token) => ValidateNative(text, token);
         ActionButton("Add task", "AddTask", AddTask); ActionButton("Add section", "AddSection", async () =>
         { var result = await gantt.AddSectionAsync(Lifetime.Token); if (result.Success) gantt.Select(gantt.Model.Sections[^1].Identity); return result; }); Start(gantt);
@@ -51,11 +50,10 @@ public sealed class GanttVisualEditorWindow : SourceVisualEditorWindow
     {
         var task = gantt.Model.Tasks.FirstOrDefault(item => item.Identity == gantt.Selection); var section = gantt.Model.Sections.FirstOrDefault(item => item.Identity == gantt.Selection); var title = gantt.Selection == gantt.Model.HeaderIdentity;
         label.Text = title ? gantt.Model.Title : section?.Name ?? task?.Label ?? ""; label.IsEnabled = title || section is not null || task is not null;
-        date.SelectedDate = task?.Start is { } start && DateTime.TryParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed) ? parsed : null;
-        if (task?.Start is { } invalid && !GanttVisualDraft.ValidDate(invalid)) date.Text = invalid;
-        originalDateText = date.Text; duration.Text = task?.Duration ?? "";
+        date.Text = task?.Start ?? ""; duration.Text = task?.Duration ?? "";
+        calendar.SelectedDate = task?.Start is { } start && DateTime.TryParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed) ? parsed : null;
         var protection = task is null ? null : GanttVisualDraft.TemporalReason(gantt.Model, task);
-        date.IsEnabled = duration.IsEnabled = task is not null && protection is null;
+        calendarPanel.IsEnabled = date.IsEnabled = duration.IsEnabled = task is not null && protection is null;
         date.ToolTip = duration.ToolTip = protection ?? "Explicit ISO date and positive whole-day duration; source uses invariant yyyy-MM-dd and Nd.";
         System.Windows.Automation.AutomationProperties.SetHelpText(date, date.ToolTip.ToString()!); System.Windows.Automation.AutomationProperties.SetHelpText(duration, duration.ToolTip.ToString()!);
         Describe(title ? "Gantt title" : section is not null ? "Section · " + section.Name : task is not null ? "Task · " + task.Label : "Select a task, section or title",
@@ -67,13 +65,7 @@ public sealed class GanttVisualEditorWindow : SourceVisualEditorWindow
         if (gantt.Model.Sections.Any(item => item.Identity == gantt.Selection)) return gantt.SetSectionAsync(gantt.Selection!, label.Text, Lifetime.Token);
         var task = gantt.Model.Tasks.FirstOrDefault(item => item.Identity == gantt.Selection);
         if (task is null) return Task.FromResult(new SourceAuthoringResult(false, "Select an editable task, section or title."));
-        string? invariant = task.Start;
-        if (date.IsEnabled && date.Text != originalDateText)
-        {
-            if (!DateTime.TryParse(date.Text, CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsed)) return Task.FromResult(new SourceAuthoringResult(false, "Enter a complete real calendar date or select one from the calendar. The pending date is retained."));
-            invariant = parsed.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        }
-        return gantt.UpdateAsync(task.Identity, label.Text, invariant, task.Simple ? duration.Text : task.Duration, Lifetime.Token);
+        return gantt.UpdateAsync(task.Identity, label.Text, task.Simple ? date.Text : task.Start, task.Simple ? duration.Text : task.Duration, Lifetime.Token);
     }
     protected override Task<SourceAuthoringResult> DeleteSelection() => gantt.DeleteAsync(gantt.Selection ?? "", Lifetime.Token);
     protected override Task<SourceAuthoringResult> MoveSelection(int direction) => gantt.MoveAsync(gantt.Selection ?? "", direction, Lifetime.Token);
