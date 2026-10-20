@@ -67,6 +67,15 @@ launched two out-of-scope controlled profiling jobs at `9525de2`; both failed in
 [the retained run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39394954997).
 The exclusion now also covers this expansion branch. Ordinary stock Continuous
 interaction checks remain enabled; no performance target, fixture or renderer changed.
+Browser runs at `9525de2` (Edge) and `839cff6` (Chromium) each retained one stylesheet
+readiness failure. Their full traces identify `net::ERR_NO_BUFFER_SPACE` on the page's
+stylesheet request; later worker fetches transferred the full CSS file. The service
+worker's unbounded installation fan-out started 208 simultaneous cache requests in
+the new deterministic regression. Installation now uses at most six concurrent cache
+fetches, still attempts every asset and tolerates optional failures. Stylesheet/browser
+assertions, fixture breadth and retry settings remain unchanged. This is a bounded
+static-app resource fix; native rendering and the paused Continuous investigation
+remain unchanged. Final complete browser outcomes belong to the PR delivery record.
 
 The preview uses the normal unsigned self-contained Windows x64 installer/portable
 pipeline and official unmodified .NET 10/Mermaider 0.15.1. Isolated install/upgrade/

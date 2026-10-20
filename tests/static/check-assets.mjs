@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkServiceWorkerInstall } from './check-service-worker-install.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const productName = 'Lens Docs Studio';
@@ -338,4 +339,6 @@ for (const requiredDocText of [
   }
 }
 
+const installation = await checkServiceWorkerInstall(serviceWorker);
+console.log(`Service worker installation checks passed for ${installation.assets} attempted assets with ${installation.peak} concurrent cache fetches, including an optional failure.`);
 console.log(`Static checks passed for ${moduleFiles.length} module files, ${localAssets.length} shell assets, ${vendorAssets.length} vendor assets, and ${runtimeFilesForExternalScan.length} runtime external-dependency scans.`);
