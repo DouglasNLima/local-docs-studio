@@ -29,6 +29,7 @@ public partial class SourceVisualEditorWindow : Window
     private CancellationTokenSource? pending;
     private DrawingImage? drawing;
     private readonly Dictionary<string, FrameworkElement> hits = [];
+    private readonly Dictionary<string, Geometry> sourceShapes = [];
     private bool busy = true, updating, mapped, closed, discard, dark;
     private int generation;
     private string baseline = "";
@@ -56,6 +57,12 @@ public partial class SourceVisualEditorWindow : Window
         SourceEditor.FontFamily = sourceFont ?? new FontFamily("Cascadia Code, Consolas"); SourceEditor.FontSize = sourceFontSize;
         SourceEditor.Options.EnableHyperlinks = SourceEditor.Options.EnableEmailHyperlinks = false; SourceEditor.TextArea.TextView.LineTransformers.Add(highlighting);
         EditSourceButton.IsEnabled = editSource is not null;
+        Surface.PreviewMouseLeftButtonDown += (_, args) =>
+        {
+            var point = args.GetPosition(Surface);
+            foreach (var (identity, geometry) in sourceShapes)
+                if (geometry.FillContains(point)) { Select(identity); args.Handled = true; break; }
+        };
         Closing += ConfirmClose;
         Closed += async (_, _) => { closed = true; generation++; pending?.Cancel(); Lifetime.Cancel(); EndPan(); await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); Lifetime.Dispose(); };
         Deactivated += (_, _) => EndPan();
@@ -139,14 +146,14 @@ public partial class SourceVisualEditorWindow : Window
                 return (Drawing: svg.RenderCanonical(result, prepared, cancellationToken: cancellation.Token), Hits: Correspondence(source, result));
             }, cancellation.Token);
             if (closed || version != generation || source != Draft.Source) return;
-            drawing = presentation.Drawing; Surface.Children.Clear(); hits.Clear(); Surface.Width = drawing.Width; Surface.Height = drawing.Height;
+            drawing = presentation.Drawing; Surface.Children.Clear(); hits.Clear(); sourceShapes.Clear(); Surface.Width = drawing.Width; Surface.Height = drawing.Height;
             Surface.Children.Add(new Image { Source = drawing, Stretch = Stretch.None, IsHitTestVisible = false });
             foreach (var hit in presentation.Hits)
             {
                 if (hit.Shape is { } geometry)
                 {
-                    var shape = new System.Windows.Shapes.Path { Data = geometry, Fill = Brushes.Transparent, Stroke = Brushes.Transparent, StrokeThickness = 2, ToolTip = hit.Description };
-                    Identify(shape, "Preview" + hit.Identity, hit.Description); shape.MouseLeftButtonDown += (_, args) => { Select(hit.Identity); args.Handled = true; };
+                    var shape = new System.Windows.Shapes.Path { Data = geometry, Fill = Brushes.Transparent, Stroke = Brushes.Transparent, StrokeThickness = 2, StrokeDashArray = [3, 2], IsHitTestVisible = false, ToolTip = hit.Description };
+                    Identify(shape, "Preview" + hit.Identity, hit.Description); sourceShapes[hit.Identity] = geometry;
                     Surface.Children.Add(shape); hits[hit.Identity] = shape; continue;
                 }
                 var button = new ToggleButton { Width = hit.Bounds.Width, Height = hit.Bounds.Height, Background = Brushes.Transparent, BorderThickness = new Thickness(1), Style = (Style)FindResource("Mermaid.CanonicalElement"), ToolTip = hit.Description };
@@ -164,7 +171,7 @@ public partial class SourceVisualEditorWindow : Window
             if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent) Zoom.Value = 100; }
         }
         catch (OperationCanceledException) { }
-        catch (Exception error) when (error is not OutOfMemoryException) { if (!closed && version == generation) { Status.Text = error.Message; Surface.Children.Clear(); hits.Clear(); drawing = null; } }
+        catch (Exception error) when (error is not OutOfMemoryException) { if (!closed && version == generation) { Status.Text = error.Message; Surface.Children.Clear(); hits.Clear(); sourceShapes.Clear(); drawing = null; } }
         finally { if (leased) renderGate.Release(); if (ReferenceEquals(pending, cancellation)) pending = null; cancellation.Dispose(); if (!closed && version == generation) UpdateActions(); }
     }
     private void Highlight()
@@ -172,7 +179,7 @@ public partial class SourceVisualEditorWindow : Window
         foreach (var (key, element) in hits)
         {
             var colour = key == Draft.Selection ? (Brush)FindResource("AccentBrush") : Brushes.Transparent;
-            if (element is ToggleButton button) { button.BorderBrush = colour; button.IsChecked = key == Draft.Selection; } else if (element is System.Windows.Shapes.Path shape) shape.Stroke = colour;
+            if (element is ToggleButton button) { button.BorderBrush = colour; button.IsChecked = key == Draft.Selection; } else if (element is System.Windows.Shapes.Path shape) shape.Stroke = key == Draft.Selection ? (Brush)FindResource("TextBrush") : Brushes.Transparent;
         }
         if (Draft.Selection is { } selected && hits.TryGetValue(selected, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport);
     }
