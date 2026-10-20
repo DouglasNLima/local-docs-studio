@@ -45,6 +45,7 @@ public partial class SourceVisualEditorWindow : Window
     protected virtual Task<SourceAuthoringResult> DeleteSelection() => Task.FromResult(new SourceAuthoringResult(false, "Select a removable occurrence."));
     protected virtual Task<SourceAuthoringResult> MoveSelection(int direction) => Task.FromResult(new SourceAuthoringResult(false, "Select a movable occurrence."));
     protected virtual IReadOnlyList<NativeSourceHit> Correspondence(string source, DiagramResult render) => [];
+    protected virtual string SourceIdentity(string identity) => identity;
     protected SourceVisualEditorWindow(string family, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> apply,
         bool dark, string diagramTheme, Action? editSource, FontFamily? sourceFont, double sourceFontSize)
     {
@@ -231,7 +232,7 @@ public partial class SourceVisualEditorWindow : Window
     private void EditSource(object sender, RoutedEventArgs e) => editSource?.Invoke();
     private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
     private void LocateSource(object sender, RoutedEventArgs e)
-    { if (Draft.Selection is not { } key || PendingSource) return; var span = Draft.Text.Span(key); SourcePanel.IsExpanded = true; SourceEditor.Select(span.Start, span.Length); SourceEditor.ScrollToLine(SourceEditor.Document.GetLineByOffset(span.Start).LineNumber); SourceEditor.Focus(); }
+    { if (Draft.Selection is not { } key || PendingSource) return; var span = Draft.Text.Span(SourceIdentity(key)); SourcePanel.IsExpanded = true; SourceEditor.Select(span.Start, span.Length); SourceEditor.ScrollToLine(SourceEditor.Document.GetLineByOffset(span.Start).LineNumber); SourceEditor.Focus(); }
     private void ShowOriginal(object sender, RoutedEventArgs e) => new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = new ICSharpCode.AvalonEdit.TextEditor { Text = Draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true, FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = (Brush)FindResource("WindowBrush"), Foreground = (Brush)FindResource("TextBrush") }, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show();
     private void CopySource(object sender, RoutedEventArgs e) { try { Clipboard.SetText(SourceEditor.Text); Status.Text = "Mermaid draft source copied."; } catch (System.Runtime.InteropServices.ExternalException) { Status.Text = "Clipboard unavailable. Select and copy the source directly."; } }
     private void Preview(object sender, RoutedEventArgs e) { if (drawing is not null) new Window { Owner = this, Title = "Rendered " + family + " preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
