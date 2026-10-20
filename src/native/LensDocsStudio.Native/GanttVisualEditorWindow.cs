@@ -7,6 +7,7 @@ using LensDocsStudio.Core.GanttDiagrams;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Core.SourceAuthoring;
 using LensDocsStudio.Native.Rendering;
+using Calendar = System.Windows.Controls.Calendar;
 
 namespace LensDocsStudio.Native;
 

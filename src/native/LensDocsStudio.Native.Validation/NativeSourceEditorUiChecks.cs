@@ -67,7 +67,7 @@ internal static partial class NativeUiChecks
             FocusWindow(main!); owner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(owner) == original, "Apply was not one owner Undo action.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); Wait(() => ReadEditorText(owner) == expected, "Owner Redo failed."); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); Wait(() => ReadObservedText(path) == expected, "Save failed.");
             Check(true, "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass");
-            main!.Close(); Wait(() => app!.HasExited, "Saved application did not close gracefully."); app.Dispose(); app = null;
+            main!.Close(); Wait(() => app!.HasExited, "Saved application did not close gracefully."); app!.Dispose(); app = null;
             Launch(path); Wait(() => ReadEditorText(Find(main!, "MarkdownEditor")) == expected, "Save/restart/reopen lost source."); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); Check(Draft() == changed, "Reopen starts from exact applied source");
             Select(family == "Gantt" ? 3 : 1); Set("Label", "Cancelled private edit"); Click("Update"); Await(() => Draft().Contains("Cancelled private edit", StringComparison.Ordinal)); Click("Cancel"); Discard(); WaitClosed(); Check(File.ReadAllText(path) == expected && ReadEditorText(Find(main!, "MarkdownEditor")) == expected, "Cancel retains owner and saved source");
             // A stale editor must retain its private draft and reject replacement of changed owner source.
