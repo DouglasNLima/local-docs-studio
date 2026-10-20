@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)][string]$Installer,
     [Parameter(Mandatory)][string]$UpgradeInstaller,
     [Parameter(Mandatory)][string]$ExpectedSourceRevision,
-    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie", "Timeline", "Journey", "Quadrant")][string]$Family = "Class",
+    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie", "Timeline", "Journey", "Quadrant", "Xy", "Radar", "Sankey")][string]$Family = "Class",
     [switch]$NoFileAssociations
 )
 $ErrorActionPreference = 'Stop'
@@ -75,9 +75,9 @@ try {
         $versions.Add(@{ phase=$phase; version=$identity.version; source=$identity.sourceRevision; binary=$binary; registered=$registered })
         Push-Location $repo
         try {
-            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant' } { '--source-editor-ui' } default { '--class-ui' } }
+            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant','Xy','Radar','Sankey' } { '--source-editor-ui' } default { '--class-ui' } }
             $arguments = @('run', '--project', 'src/native/LensDocsStudio.Native.Validation', '-c', 'Release', '--no-build', '--', $mode, (Join-Path $installDirectory 'LensDocsStudio.Native.exe'), (Join-Path $root $phase))
-            if ($Family -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant') { $arguments += $Family }
+            if ($Family -in 'Gantt','Mindmap','Pie','Timeline','Journey','Quadrant','Xy','Radar','Sankey') { $arguments += $Family }
             $arguments += '--normal'
             if ($Family -eq 'Flowchart') { $arguments += '--polish' }
             & dotnet @arguments

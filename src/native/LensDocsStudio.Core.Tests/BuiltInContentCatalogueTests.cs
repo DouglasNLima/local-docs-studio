@@ -12,8 +12,13 @@ public sealed class BuiltInContentCatalogueTests
     [Fact] public void Bundled_inventory_covers_examples_diagrams_and_all_three_document_studios()
     {
         var entries = BuiltInContentCatalogue.Entries;
-        Assert.Equal(33, entries.Count(entry => !entry.IsSnippet)); Assert.Equal(25, entries.Count(entry => entry.IsSnippet));
-        Assert.Equal(11, entries.Count(entry => !entry.IsSnippet && entry.Format == "mermaid"));
+        Assert.Equal(36, entries.Count(entry => !entry.IsSnippet)); Assert.Equal(28, entries.Count(entry => entry.IsSnippet));
+        Assert.Equal(14, entries.Count(entry => !entry.IsSnippet && entry.Format == "mermaid"));
+        foreach (var family in new[] { "xychart", "radar", "sankey" })
+        {
+            Assert.Contains(entries, entry => entry.Id == "mermaid/" + family && entry.Format == "mermaid");
+            Assert.Contains(entries, entry => entry.Id == "mermaid-snippet/" + family && entry.IsSnippet);
+        }
         Assert.Equal(new[] { "Examples", "Mermaid", "Project Docs", "Release Notes", "Requirements" }, entries.Select(entry => entry.Group).Distinct());
         foreach (var entry in entries)
         {

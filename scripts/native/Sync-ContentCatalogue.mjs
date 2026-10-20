@@ -61,6 +61,15 @@ const decisionTitle = entries.find(entry => entry.id === 'project/adr').fields.f
 if (decisionTitle.defaultValue !== 'Use Browser-only Architecture') throw new Error('Review the native ADR default.');
 decisionTitle.defaultValue = 'Use a modular architecture';
 
+// Native-only chart examples use the grammar proved against the pinned Mermaider source.
+for (const [key, label, content] of [
+  ['xychart', 'XY Chart', 'xychart-beta\n    title Documentation comparisons\n    x-axis "Category" [Guides, Reference, Examples]\n    y-axis "Coverage" -10 --> 10\n    bar "Current" [-5, 0, 8]\n    line "Target" [2, 5, 10]\n'],
+  ['radar', 'Radar', 'radar-beta\n    title Documentation profiles\n    axis guides["Guides"], reference["Reference"], examples["Examples"], review["Review"]\n    min 0\n    max 10\n    curve current["Current"]{2, 4, 6, 8}\n    curve target["Target"]{8, 6, 4, 2}\n'],
+  ['sankey', 'Sankey', 'sankey-beta\n    Draft,Review,3.000\n    Draft,Review,2.000\n    Review,Published,5.000\n    Research,Published,2.000\n'],
+]) {
+  add(`mermaid/${key}`, 'Mermaid', label, 'template', 'mermaid', `${key}.mmd`, content);
+  add(`mermaid-snippet/${key}`, 'Mermaid', `${label} chart`, 'snippet', 'mermaid', null, content);
+}
 const output = JSON.stringify({ version: 1, entries }, null, 2) + '\n';
 const target = new URL('../../src/native/LensDocsStudio.Core/Content/built-in-catalogue.json', import.meta.url);
 if (process.argv.includes('--check')) {

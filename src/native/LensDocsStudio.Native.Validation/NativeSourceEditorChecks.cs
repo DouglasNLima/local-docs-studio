@@ -124,6 +124,6 @@ internal static class NativeSourceEditorChecks
             }
         }
     }
-    private static byte[] Pixels(byte[] png)
+    internal static byte[] Pixels(byte[] png)
     { using var input = new MemoryStream(png); var bitmap = new PngBitmapDecoder(input, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad).Frames[0]; var stride = (bitmap.PixelWidth * bitmap.Format.BitsPerPixel + 7) / 8; var bytes = new byte[stride * bitmap.PixelHeight]; bitmap.CopyPixels(bytes, stride, 0); return bytes; }
 }

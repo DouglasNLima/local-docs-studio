@@ -1,5 +1,17 @@
 # Functional parity matrix
 
+## Fourteen native Mermaid editors — Expansion III
+
+XY Chart, Radar and Sankey add category comparisons, positional profiles and weighted
+flows through the shared source editor, canonical native output and owner Apply
+sessions. See the [grammar/protection contract](xy-radar-sankey-editors.md) and
+[engineering receipt](expansion-iii-engineering-receipt.md). Implementation, initial
+local checks and final certification are distinct: hosted normal/High Contrast UIA,
+installed-authoring acceptance and final clean-source packages are pending. Mermaider
+0.15.1, the official .NET 10/WPF runtime and stock Continuous are unchanged. PR #38
+remains paused; the 250 ms goal is incomplete and .749 unresolved.
+
+
 ## Eleven native Mermaid editors â€” Expansion II
 
 Timeline, User Journey and Quadrant join the existing eight normal editor families.

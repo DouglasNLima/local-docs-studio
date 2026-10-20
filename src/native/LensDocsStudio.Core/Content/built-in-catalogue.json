@@ -748,6 +748,66 @@
       "namePattern": null,
       "contentPattern": "## User Flow\n\n```mermaid\nflowchart LR\n  A[Start] --> B[Choose option]\n  B --> C[Complete task]\n  C --> D[Confirm outcome]\n```\n",
       "fields": []
+    },
+    {
+      "id": "mermaid/xychart",
+      "group": "Mermaid",
+      "label": "XY Chart",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "xychart.mmd",
+      "contentPattern": "xychart-beta\n    title Documentation comparisons\n    x-axis \"Category\" [Guides, Reference, Examples]\n    y-axis \"Coverage\" -10 --> 10\n    bar \"Current\" [-5, 0, 8]\n    line \"Target\" [2, 5, 10]\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/xychart",
+      "group": "Mermaid",
+      "label": "XY Chart chart",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "xychart-beta\n    title Documentation comparisons\n    x-axis \"Category\" [Guides, Reference, Examples]\n    y-axis \"Coverage\" -10 --> 10\n    bar \"Current\" [-5, 0, 8]\n    line \"Target\" [2, 5, 10]\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/radar",
+      "group": "Mermaid",
+      "label": "Radar",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "radar.mmd",
+      "contentPattern": "radar-beta\n    title Documentation profiles\n    axis guides[\"Guides\"], reference[\"Reference\"], examples[\"Examples\"], review[\"Review\"]\n    min 0\n    max 10\n    curve current[\"Current\"]{2, 4, 6, 8}\n    curve target[\"Target\"]{8, 6, 4, 2}\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/radar",
+      "group": "Mermaid",
+      "label": "Radar chart",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "radar-beta\n    title Documentation profiles\n    axis guides[\"Guides\"], reference[\"Reference\"], examples[\"Examples\"], review[\"Review\"]\n    min 0\n    max 10\n    curve current[\"Current\"]{2, 4, 6, 8}\n    curve target[\"Target\"]{8, 6, 4, 2}\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/sankey",
+      "group": "Mermaid",
+      "label": "Sankey",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "sankey.mmd",
+      "contentPattern": "sankey-beta\n    Draft,Review,3.000\n    Draft,Review,2.000\n    Review,Published,5.000\n    Research,Published,2.000\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/sankey",
+      "group": "Mermaid",
+      "label": "Sankey chart",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "sankey-beta\n    Draft,Review,3.000\n    Draft,Review,2.000\n    Review,Published,5.000\n    Research,Published,2.000\n",
+      "fields": []
     }
   ]
 }

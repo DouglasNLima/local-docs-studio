@@ -1,0 +1,75 @@
+# XY Chart, Radar and Sankey engineering receipt
+
+Work branch: `feature/native-mermaid-xy-radar-sankey-editors`. Baseline is clean
+`develop` at `09c776495f6b2c4d7083d4919c5470f89727542e`, verified on 20 October 2026.
+PR #41 is merged, with reviewed feature source `5d669485122df0aa3b548bbdcecbd2d9c7198947`.
+Its .829 preview remains attributed to that feature source. Baseline native CI
+[39409135264](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39409135264)
+passed, with historical upgrade explicitly skipped. No advanced `develop` delta was present.
+
+PR #38 remains open, Draft and paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`.
+Stock Continuous is unchanged. The historical 250 ms goal remains incomplete and
+.749 unresolved. Original checkout attachments and all other worktrees are preserved.
+
+## Milestones and continuation
+
+1. Initial local proof passed: pinned grammar inspection, representative compatibility fixtures,
+   ordinary native adapter, SVG/PNG, document preview and HTML/DOCX/PDF export proof.
+2. Implemented: shared source token helpers, stable inline keys and lossless XY, Radar and Sankey drafts. Initial 43 focused Core cases pass.
+3. Implemented: native editors, canonical shape selection, normal routes, catalogue and protection guide. Initial 78 native fidelity/owner outcomes pass.
+4. Pending: final source validation, independent normal/High Contrast UIA, fourteen
+   installed-authoring suites on disposable runners, packages and provenance.
+5. Pending: one reviewable Draft PR to `develop`; no merge or public release.
+
+## Pinned source inspection
+
+The installed NuGet `mermaider.nuspec` identifies version **0.15.1**, source
+[`71b64845570d633a94d29e85579c0a02786fece8`](https://github.com/nullean/mermaider/tree/71b64845570d633a94d29e85579c0a02786fece8).
+An independent upstream checkout at that exact detached revision was inspected:
+`Parsing/{XyChart,Radar,Sankey}Parser.cs`, public `Models/{XyChart,RadarChart,SankeyDiagram}.cs`,
+`Rendering/{XyChart,Radar,Sankey}SvgRenderer.cs`, `DiagramPreprocessor.cs`,
+`DiagramDetector.cs`, `MermaidRenderer.PreprocessLines`, and matching parser/renderer tests.
+No package update, private API, engine fork or substitute layout is introduced.
+
+- XY has category quote toggling and doubled quotes. Invalid numeric tokens become
+  zero, suffixes may be ignored, vectors may differ in length, values are clipped
+  to the display range, and numeric X ranges do not drive continuous-X geometry.
+  Bars paint before lines but `data-series` retains source declaration indices.
+- Radar is positional, even with colon prefixes. Invalid values drop; missing
+  final positions render as zero and radii clamp. Min/max only accept unsigned
+  decimal directives. Duplicate labels do not establish occurrence identity.
+- Sankey uses line-based quote toggling/doubled quotes and trimmed endpoint identity.
+  Extra fields are ignored. Invalid/non-positive rows are omitted. Ribbons sort
+  by actual source layer then endpoint names; parallel occurrences remain distinct.
+  Self-links and feedback edges can be omitted. No topology editing is certified yet.
+
+## Commands and evidence
+
+Baseline commands: `git fetch origin`; `gh pr view 41`; `gh pr view 38`;
+`gh run list --branch develop`; `dotnet build src/native/LensDocsStudio.Native.slnx
+-c Release -p:RestoreLockedMode=true`: passed with zero warnings/errors at baseline.
+Baseline Core: 1,784 passed, zero skipped.
+
+Compatibility command after building: native validation executable
+`--chart-compatibility artifacts/native/chart-compatibility .`.
+Initial compatibility gate: **76 passed**, six family/appearance captures, including
+ordinary native preview and actual HTML PNG / validated DOCX PNG / parsed PDF image
+exports. Native editor fidelity: **78 passed**, complete pixels and owner histories.
+These are implementation-stage working-tree results, not final committed-source
+certification; the final-source gates must be rerun after the final code commit.
+
+Retained failures: the first HTML assertion incorrectly expected inline SVG, whereas
+the existing exporter embeds canonical PNG; corrected to compare actual image pixels.
+The initial configuration regression exposed the pre-existing incomplete-arrow guard
+matching YAML `---`; chart detection now leaves those inputs to pinned chart parsers.
+The first fidelity harness compile called an internal application helper directly;
+corrected to use the existing reflection-based application test approach. No private
+engine API is used. Full Core after catalogue expansion initially found the exact
+inventory assertion still at 33/25/11; it is updated to 36/28/14 with explicit checks
+for all three new template/snippet entries. Assertions are retained or strengthened.
+Raw local logs/TRX remain under the worktree's ignored `artifacts/` and `.log` files.
+
+Local toolchain: Windows x64; .NET SDK 10.0.401, official runtime 10.0.12.
+OS High Contrast mutation and installer execution remain restricted to disposable
+Windows runners. Higher DPI, physical screen reader and SDK-free clean Windows
+certification remain unavailable unless separately demonstrated.

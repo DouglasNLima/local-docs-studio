@@ -9,11 +9,20 @@ public sealed record NativeSourceHit(string Identity, string Description, Rect B
 {
     public static Geometry? ShapeGeometry(XElement group, XElement root)
     {
-        var element = group.Elements().FirstOrDefault(item => item.Name.LocalName is "path" or "circle");
+        var element = group.Name.LocalName is "path" or "circle" or "rect" or "polygon" ? group : group.Elements().FirstOrDefault(item => item.Name.LocalName is "path" or "circle" or "rect" or "polygon");
         if (element is null || group.AncestorsAndSelf().Any(item => item.Attribute("transform") is not null)) return null;
         Geometry shape;
         double Number(string name) => double.Parse((string?)element.Attribute(name) ?? "0", CultureInfo.InvariantCulture);
         if (element.Name.LocalName == "path") shape = Geometry.Parse((string?)element.Attribute("d") ?? "").Clone();
+        else if (element.Name.LocalName == "rect") shape = new RectangleGeometry(new Rect(Number("x"), Number("y"), Number("width"), Number("height")), Number("rx"), Number("ry"));
+        else if (element.Name.LocalName == "polygon")
+        {
+            var points = ((string?)element.Attribute("points") ?? "").Split([' ', ',', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+            if (points.Length < 6 || points.Length % 2 != 0) return null;
+            var polygon = new StreamGeometry(); using (var context = polygon.Open())
+            { context.BeginFigure(new Point(points[0], points[1]), true, true); for (var i = 2; i < points.Length; i += 2) context.LineTo(new Point(points[i], points[i + 1]), true, false); }
+            shape = polygon;
+        }
         else
         {
             var circle = new EllipseGeometry(new Point(Number("cx"), Number("cy")), Number("r"), Number("r"));

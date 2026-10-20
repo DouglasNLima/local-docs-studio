@@ -1,7 +1,7 @@
 name: Validate expanded native Mermaid editors
 on:
   push:
-    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors]
+    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors]
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant]
+        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey]
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +28,12 @@ jobs:
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify full canonical pixels, geometry, compiled workspace style and owner sessions
         run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --source-editor-fidelity artifacts/native/source-editor-fidelity
+      - name: Verify chart compatibility and complete canonical editor pixels
+        run: |
+          src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --chart-compatibility artifacts/native/chart-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --chart-editor-fidelity artifacts/native/chart-editor-fidelity .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise complete native authoring through normal application routes
         shell: pwsh
         run: |
@@ -41,4 +47,6 @@ jobs:
           path: |
             artifacts/native/source-editors/
             artifacts/native/source-editor-fidelity/
+            artifacts/native/chart-compatibility/
+            artifacts/native/chart-editor-fidelity/
           retention-days: 30

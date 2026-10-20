@@ -122,6 +122,9 @@
     <MenuItem Header="Quadrant chart visually…" Click="InsertQuadrant" AutomationProperties.AutomationId="InsertQuadrant"/>
     <MenuItem Header="Timeline visually…" Click="InsertTimeline" AutomationProperties.AutomationId="InsertTimeline"/>
     <MenuItem Header="User Journey visually…" Click="InsertJourney" AutomationProperties.AutomationId="InsertJourney"/>
+    <MenuItem Header="XY Chart visually…" Click="InsertXy" AutomationProperties.AutomationId="InsertXy"/>
+    <MenuItem Header="Radar visually…" Click="InsertRadar" AutomationProperties.AutomationId="InsertRadar"/>
+    <MenuItem Header="Sankey visually…" Click="InsertSankey" AutomationProperties.AutomationId="InsertSankey"/>
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>
