@@ -150,6 +150,8 @@ public partial class SourceVisualEditorWindow : Window
                     Surface.Children.Add(shape); hits[hit.Identity] = shape; continue;
                 }
                 var button = new ToggleButton { Width = hit.Bounds.Width, Height = hit.Bounds.Height, Background = Brushes.Transparent, BorderThickness = new Thickness(1), Style = (Style)FindResource("Mermaid.CanonicalElement"), ToolTip = hit.Description };
+                var outline = new Border { Background = Brushes.Transparent, BorderThickness = new Thickness(2), CornerRadius = new CornerRadius(3) };
+                outline.SetBinding(Border.BorderBrushProperty, new System.Windows.Data.Binding(nameof(Control.BorderBrush)) { Source = button }); button.Content = outline;
                 Identify(button, "Preview" + hit.Identity, hit.Description); button.Click += (_, _) => Select(hit.Identity);
                 Canvas.SetLeft(button, hit.Bounds.X); Canvas.SetTop(button, hit.Bounds.Y); Surface.Children.Add(button); hits[hit.Identity] = button;
             }

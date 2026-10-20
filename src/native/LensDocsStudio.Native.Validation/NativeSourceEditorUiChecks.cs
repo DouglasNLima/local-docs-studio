@@ -52,6 +52,13 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(visual!, "PieLabel").AsTextBox().Text == "Guides", "Actual wedge pointer did not select the corresponding category occurrence.");
                 Check(true, "Actual canonical Pie wedge pointer selects its exact source occurrence");
             }
+            else
+            {
+                var expectedName = family == "Gantt" ? "Task · Write guide" : "Node · Guides";
+                var previewTarget = visual!.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith(family + "Preview", StringComparison.Ordinal) && element.Name == expectedName);
+                previewTarget.Click(); Wait(() => Find(visual!, family + "Label").AsTextBox().Text == (family == "Gantt" ? "Write guide" : "Guides"), "Actual canonical pointer selection did not reach its exact inspector.");
+                Check(previewTarget.Patterns.Toggle.Pattern.ToggleState.Value == FlaUI.Core.Definitions.ToggleState.On, "Actual canonical native pointer target reports selected occurrence");
+            }
             Set("Label", "Edited Ω"); Click("Update"); Await(() => Draft().Contains("Edited Ω", StringComparison.Ordinal)); var edited = Draft();
             Click("Undo"); Await(() => Draft() == source); Click("Redo"); Await(() => Draft() == edited);
             // Actual keyboard input can remain incomplete without resetting the inspector or selection.
