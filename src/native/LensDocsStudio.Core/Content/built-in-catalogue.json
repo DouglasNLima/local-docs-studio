@@ -808,6 +808,66 @@
       "namePattern": null,
       "contentPattern": "\"New source\",\"New target\",1\n",
       "fields": []
+    },
+    {
+      "id": "mermaid/kanban",
+      "group": "Mermaid",
+      "label": "Kanban",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "kanban.mmd",
+      "contentPattern": "%% Existing columns and duplicate card IDs remain occurrences.\nkanban\ntitle Documentation board Ω\n  todo[To do]\n    same[Write guide]@{ assigned: 'Earlier', ASSIGNED: \"Author Ω\", ticket: DOC-17, priority: 'High', custom: keep }\n    same[Review guide]\n  done[Done]\n    shipped[Publish guide]@{ priority: 'Very low' }\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/kanban-native",
+      "group": "Mermaid",
+      "label": "Kanban native authoring",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "    card[New card]\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/requirement",
+      "group": "Mermaid",
+      "label": "Requirement",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "requirement.mmd",
+      "contentPattern": "%% Symbolic names are distinct from display IDs.\nrequirementDiagram\ntitle Documentation traceability Ω\ndirection LR\nrequirement guide {\n    id: \"DOC-17\"\n    text: \"Publish a local guide\"\n    risk: low\n    verifymethod: inspection\n}\nelement studio {\n    type: \"Documentation studio\"\n    docRef: \"guide.md\"\n}\nguide <- satisfies - studio\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/requirement-native",
+      "group": "Mermaid",
+      "label": "Requirement native authoring",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "requirement new_requirement {\n    id: \"DOC-1\"\n}\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/gitgraph",
+      "group": "Mermaid",
+      "label": "GitGraph",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "gitgraph.mmd",
+      "contentPattern": "%% This is diagram source; no repository operations.\ngitGraph LR:\n    commit id: \"Start Ω\"\n    branch docs\n    commit tag: \"Draft\" type: HIGHLIGHT\n    checkout main\n    commit type: REVERSE\n    merge docs id: \"Reviewed\" tag: \"v1\"\n    commit\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/gitgraph-native",
+      "group": "Mermaid",
+      "label": "GitGraph native authoring",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "commit tag: \"Draft\"\n",
+      "fields": []
     }
   ]
 }

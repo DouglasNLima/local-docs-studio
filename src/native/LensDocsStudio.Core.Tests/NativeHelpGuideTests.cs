@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(18, NativeHelpGuide.Topics.Count);
-        Assert.Equal(18, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(19, NativeHelpGuide.Topics.Count);
+        Assert.Equal(19, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -16,6 +16,11 @@ public sealed class NativeHelpGuideTests
             Assert.Equal(topic.Title, heading.Title); Assert.Equal(topic.Anchor, heading.Anchor);
             Assert.True(topic.Source.Length > 400);
         }
+    }
+    [Fact] public void Workflow_topic_explains_indentation_symbolic_references_and_stateful_history_protection()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Kanban, Requirement and GitGraph visual authoring"));
+        foreach (var phrase in new[] { "first content line", "last-wins", "Display ID", "symbolic", "non-empty heads", "cherry-pick", "pending", "Cancel", "stale-owner" }) Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Chart_topic_explains_alignment_pending_input_and_local_versus_global_endpoint_edits()
     {

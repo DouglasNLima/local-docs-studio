@@ -193,6 +193,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             || Core.XyCharts.XyVisualDraft.IsXy(diagram.Source)
                             || Core.RadarCharts.RadarVisualDraft.IsRadar(diagram.Source)
                             || Core.SankeyDiagrams.SankeyVisualDraft.IsSankey(diagram.Source)
+                            || Core.KanbanDiagrams.KanbanVisualDraft.IsKanban(diagram.Source)
+                            || Core.RequirementDiagrams.RequirementVisualDraft.IsRequirement(diagram.Source)
+                            || Core.GitGraphDiagrams.GitGraphVisualDraft.IsGitGraph(diagram.Source)
+
                             || Core.Mindmaps.MindmapVisualDraft.IsMindmap(diagram.Source)
                             || Core.GanttDiagrams.GanttVisualDraft.IsGantt(diagram.Source)))
                     {

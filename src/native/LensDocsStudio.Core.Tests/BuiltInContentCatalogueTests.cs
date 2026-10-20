@@ -12,12 +12,17 @@ public sealed class BuiltInContentCatalogueTests
     [Fact] public void Bundled_inventory_covers_examples_diagrams_and_all_three_document_studios()
     {
         var entries = BuiltInContentCatalogue.Entries;
-        Assert.Equal(36, entries.Count(entry => !entry.IsSnippet)); Assert.Equal(28, entries.Count(entry => entry.IsSnippet));
-        Assert.Equal(14, entries.Count(entry => !entry.IsSnippet && entry.Format == "mermaid"));
+        Assert.Equal(39, entries.Count(entry => !entry.IsSnippet)); Assert.Equal(31, entries.Count(entry => entry.IsSnippet));
+        Assert.Equal(17, entries.Count(entry => !entry.IsSnippet && entry.Format == "mermaid"));
         foreach (var family in new[] { "xychart", "radar", "sankey" })
         {
             Assert.Contains(entries, entry => entry.Id == "mermaid/" + family && entry.Format == "mermaid");
             Assert.Contains(entries, entry => entry.Id == "mermaid-snippet/" + family && entry.IsSnippet);
+        }
+        foreach (var family in new[] { "kanban", "requirement", "gitgraph" })
+        {
+            Assert.Contains(entries, e => e.Id == "mermaid/" + family && e.Format == "mermaid");
+            Assert.Contains(entries, e => e.Id == "mermaid-snippet/" + family + "-native" && e.IsSnippet);
         }
         Assert.Equal(new[] { "Examples", "Mermaid", "Project Docs", "Release Notes", "Requirements" }, entries.Select(entry => entry.Group).Distinct());
         foreach (var entry in entries)

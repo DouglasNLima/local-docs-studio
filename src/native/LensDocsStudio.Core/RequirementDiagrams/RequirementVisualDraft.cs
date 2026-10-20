@@ -132,7 +132,7 @@ public sealed class RequirementVisualDraft : SourceDraft<RequirementSourceModel>
         return changed;
     }
     public Task<SourceAuthoringResult> AddBlockAsync(string name, string kind, CancellationToken token = default) => ChangeAsync((t, m) =>
-    { Topology(m); Name(name); if (m.Blocks.Any(b => b.Name == name)) throw new ArgumentException("The symbolic name already exists."); if (!Kinds.Append("element").Contains(kind)) throw new ArgumentException("Choose a supported block kind."); var changed = t.Insert(t.Lines.Count, "    " + kind + " " + WorkflowSource.Quoted(name) + " {"); return changed.Insert(changed.Lines.Count, "    }"); }, token);
+    { Topology(m); Name(name); if (m.Blocks.Any(b => b.Name == name)) throw new ArgumentException("The symbolic name already exists."); if (!Kinds.Append("element").Contains(kind)) throw new ArgumentException("Choose a supported block kind."); var at = m.Relations.FirstOrDefault() is { } relation ? t.AttachedStart(relation.Identity) : t.Lines.Count; var changed = t.Insert(at, "    " + kind + " " + WorkflowSource.Quoted(name) + " {"); return changed.Insert(at + 1, "    }"); }, token);
     public Task<SourceAuthoringResult> AddRelationAsync(string source, string target, string type, CancellationToken token = default) => ChangeAsync((t, m) =>
     { Topology(m); Endpoints(m, source, target, type); var changed = t.Insert(t.Lines.Count, "    " + WorkflowSource.Quoted(source) + " - " + type + " -> " + WorkflowSource.Quoted(target)); if (!Scan(changed).TopologySafe) throw new ArgumentException("This relationship would create an unproved cycle."); return changed; }, token);
     private static void Endpoints(RequirementSourceModel m, string source, string target, string type)

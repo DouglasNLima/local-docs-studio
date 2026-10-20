@@ -23,6 +23,10 @@ implementation alone does not imply readiness.
 | XY Chart | Category-based bar/line series, values, titles, presentation, explicit/automatic Y range and atomic aligned categories | [Expansion III grammar and protections](xy-radar-sankey-editors.md); certification pending in the receipt |
 | Radar | Positional axes/curves, finite values, supported range directives and atomic aligned axis changes | [Expansion III grammar and protections](xy-radar-sankey-editors.md); certification pending in the receipt |
 | Sankey | Separate positive weighted link occurrences, local endpoints and explicit collision-protected node rename | [Expansion III grammar and protections](xy-radar-sankey-editors.md); certification pending in the receipt |
+| Kanban | Ordered columns/cards, effective title, coupled/bare and explicit IDs, simple metadata and proved membership moves | [Expansion IV grammar/protection guide](kanban-requirement-gitgraph-editors.md); final-source certification tracked in receipt |
+| Requirement | Six kinds, elements, property tokens, seven relation types, four directions and atomic symbolic rename | [Expansion IV grammar/protection guide](kanban-requirement-gitgraph-editors.md); hidden/malformed/unproved topology protected |
+| GitGraph | Basic ordered command history, commit IDs/tags/types, branch/checkout/merge and independent tail edits | [Expansion IV grammar/protection guide](kanban-requirement-gitgraph-editors.md); stateful references proved against native links |
+
 
 
 The [ER visual editor report](mermaid-er-visual-editor.md) records the fourth native

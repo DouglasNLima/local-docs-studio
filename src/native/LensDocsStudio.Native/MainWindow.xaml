@@ -125,6 +125,10 @@
     <MenuItem Header="XY Chart visually…" Click="InsertXy" AutomationProperties.AutomationId="InsertXy"/>
     <MenuItem Header="Radar visually…" Click="InsertRadar" AutomationProperties.AutomationId="InsertRadar"/>
     <MenuItem Header="Sankey visually…" Click="InsertSankey" AutomationProperties.AutomationId="InsertSankey"/>
+    <MenuItem Header="Kanban visually…" Click="InsertKanban" AutomationProperties.AutomationId="InsertKanban"/>
+    <MenuItem Header="Requirement visually…" Click="InsertRequirement" AutomationProperties.AutomationId="InsertRequirement"/>
+    <MenuItem Header="GitGraph visually…" Click="InsertGitGraph" AutomationProperties.AutomationId="InsertGitGraph"/>
+
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>

@@ -75,6 +75,13 @@ for (const [key, label, content] of [
   }[key];
   add(`mermaid-snippet/${key}`, 'Mermaid', snippet[0], 'snippet', 'mermaid', null, snippet[1]);
 }
+// Native workflow templates retain the exact proved source.
+add("mermaid/kanban", "Mermaid", "Kanban", "template", "mermaid", "kanban.mmd", "%% Existing columns and duplicate card IDs remain occurrences.\nkanban\ntitle Documentation board \u03a9\n  todo[To do]\n    same[Write guide]@{ assigned: 'Earlier', ASSIGNED: \"Author \u03a9\", ticket: DOC-17, priority: 'High', custom: keep }\n    same[Review guide]\n  done[Done]\n    shipped[Publish guide]@{ priority: 'Very low' }\n");
+add("mermaid-snippet/kanban-native", "Mermaid", "Kanban native authoring", "snippet", "mermaid", null, "    card[New card]\n");
+add("mermaid/requirement", "Mermaid", "Requirement", "template", "mermaid", "requirement.mmd", "%% Symbolic names are distinct from display IDs.\nrequirementDiagram\ntitle Documentation traceability \u03a9\ndirection LR\nrequirement guide {\n    id: \"DOC-17\"\n    text: \"Publish a local guide\"\n    risk: low\n    verifymethod: inspection\n}\nelement studio {\n    type: \"Documentation studio\"\n    docRef: \"guide.md\"\n}\nguide <- satisfies - studio\n");
+add("mermaid-snippet/requirement-native", "Mermaid", "Requirement native authoring", "snippet", "mermaid", null, "requirement new_requirement {\n    id: \"DOC-1\"\n}\n");
+add("mermaid/gitgraph", "Mermaid", "GitGraph", "template", "mermaid", "gitgraph.mmd", "%% This is diagram source; no repository operations.\ngitGraph LR:\n    commit id: \"Start \u03a9\"\n    branch docs\n    commit tag: \"Draft\" type: HIGHLIGHT\n    checkout main\n    commit type: REVERSE\n    merge docs id: \"Reviewed\" tag: \"v1\"\n    commit\n");
+add("mermaid-snippet/gitgraph-native", "Mermaid", "GitGraph native authoring", "snippet", "mermaid", null, "commit tag: \"Draft\"\n");
 const output = JSON.stringify({ version: 1, entries }, null, 2) + '\n';
 const target = new URL('../../src/native/LensDocsStudio.Core/Content/built-in-catalogue.json', import.meta.url);
 if (process.argv.includes('--check')) {
