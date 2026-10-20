@@ -47,10 +47,11 @@ internal static partial class NativeUiChecks
             Pointer();
             Select(first); Set("Label", "Authored Ω"); Click("Update"); Await(() => Draft().Contains("Authored Ω", StringComparison.Ordinal)); var authored = Draft();
             Click("Undo"); Await(() => Draft() == source); Click("Redo"); Await(() => Draft() == authored);
-            var beforeInvalid = Draft(); var field = Find(visual!, prefix + "Label"); field.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type("Bad\"quote");
-            Wait(() => field.AsTextBox().Text == "Bad\"quote", "Invalid pending text was not retained."); Click("Update");
-            Wait(() => Find(visual!, prefix + "Status").Name.Contains("quote", StringComparison.OrdinalIgnoreCase) || Find(visual!, prefix + "Status").Name.Contains("separator", StringComparison.OrdinalIgnoreCase), "Actionable grammar feedback missing.");
-            Check(Draft() == beforeInvalid && field.AsTextBox().Text == "Bad\"quote" && !Find(visual!, prefix + "Apply").IsEnabled, "Invalid pending input retains last valid draft, remains visible and disables Apply"); Click("Reset"); Await(() => Draft() == beforeInvalid);
+            var invalid = family == "Kanban" ? "Bad[label" : "Bad\"quote";
+            var beforeInvalid = Draft(); var field = Find(visual!, prefix + "Label"); field.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(invalid);
+            Wait(() => field.AsTextBox().Text == invalid, "Invalid pending text was not retained."); Click("Update");
+            Wait(() => Find(visual!, prefix + "Status").Name.Contains(family == "Kanban" ? "native ID" : "quote", StringComparison.OrdinalIgnoreCase) || Find(visual!, prefix + "Status").Name.Contains("separator", StringComparison.OrdinalIgnoreCase), "Actionable grammar feedback missing.");
+            Check(Draft() == beforeInvalid && field.AsTextBox().Text == invalid && !Find(visual!, prefix + "Apply").IsEnabled, "Invalid pending input retains last valid draft, remains visible and disables Apply"); Click("Reset"); Await(() => Draft() == beforeInvalid);
             Set(family == "Kanban" ? "Ticket" : "Identifier", family == "GitGraph" ? "Tag" : "DOC-42"); Click("Update"); Await(() => Draft().Contains(family == "GitGraph" ? "Tag" : "DOC-42", StringComparison.Ordinal));
             var beforeAdd = Draft(); Click(family == "Kanban" ? "AddCard" : family == "Requirement" ? "AddRequirement" : "AddCommit"); Await(() => Draft() != beforeAdd); if (family == "GitGraph") { Set("Label", "Added candidate"); Click("Update"); Await(() => Draft().Contains("Added candidate", StringComparison.Ordinal)); } var added = Draft();
             Check(Find(visual!, prefix + "Capabilities").Name.Length > 20, "Persistent inspector exposes operation and protection context");

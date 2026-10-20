@@ -147,3 +147,16 @@ the full 148-case ordinary native corpus with zero failures, static/service-work
 checks, all compatibility/fidelity gates then present, and all 24 hosted shared-source
 UIA appearance runs. The later actual-canvas change is validation-only; its final
 compiled source is identified by the PR delivery record and fresh package metadata.
+
+
+## Literal Kanban form proof
+
+Final pinned-grammar review distinguished bare title directives from bracketed
+literal titles. An early new-editor guard had treated both alike. Bracketed title
+words and explicit literal quotes/commas/braces now remain editable only when the
+candidate preserves the intended native ID/title, membership and original source
+form. A separate bare-title negative control retains protection; ambiguous bracket
+edits and comment-like new IDs still cannot commit. Two ordinary native compatibility
+controls retain the actual literal SVG output. The focused workflow suite now has
+63 cases. No assertion or fixture from the original fourteen families changed.
+Final clean-source gates and package identity are recorded in the PR delivery receipt.

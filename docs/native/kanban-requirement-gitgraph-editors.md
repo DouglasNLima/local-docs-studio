@@ -35,8 +35,10 @@ ID/bracket forms fall back to bare text. Known metadata keys are case-insensitiv
 with the last recognised key effective. Unknown keys, repetitions, quotes, order
 and spacing remain exact. Clearing writes an empty final value rather than revealing
 an earlier key. Only Very high, High, Medium, Low and Very low have native priority
-presentation. New delimiter-bearing labels/metadata are rejected when escaping is
-unproved. A column with cards needs explicit complete removal or prior card moves.
+presentation. Label edits retain their original bare/bracket/explicit form and must prove the
+intended native ID/title. Bare title/comment directives are rejected; literal title
+words and literal quotes/braces/commas in proved bracketed/explicit forms remain
+editable. Ambiguous delimiters or unproved metadata escaping are protected. A column with cards needs explicit complete removal or prior card moves.
 
 Requirement relationships resolve **symbolic names**, never the `id` display
 property. Forward and reverse arrow spellings retain their endpoint semantics.

@@ -21,11 +21,12 @@ public class KanbanSourceAuthoringTests
         var d = new KanbanVisualDraft("kanban\n  A\n    id[Card]@{ assigned: old, ASSIGNED: new }\n"); var r = d.Model.Cards[0];
         Pass(await d.UpdateAsync(r.Identity, r.Id, r.Label, "", "", "")); Assert.Contains("assigned: old, ASSIGNED: ''", d.Source); Assert.Equal("", d.Model.Cards[0].Meta("assigned"));
     }
-    [Fact] public async Task Bare_and_bracket_forms_remain_coupled_and_title_like_labels_are_rejected()
+    [Fact] public async Task Bare_and_bracket_forms_remain_coupled_and_preserve_literal_versus_directive_semantics()
     {
         var d = new KanbanVisualDraft("kanban\n  Bare\n    [Card]\n"); var row = d.Model.Cards[0];
-        Assert.False((await d.UpdateAsync(row.Identity, "Different", "New", "", "", "")).Success); Assert.False((await d.UpdateAsync(row.Identity, "title Changed", "title Changed", "", "", "")).Success);
+        Assert.False((await d.UpdateAsync(row.Identity, "Different", "New", "", "", "")).Success); Pass(await d.UpdateAsync(row.Identity, "title Changed", "title Changed", "", "", "")); Assert.Contains("[title Changed]", d.Source); Assert.Null(d.Model.Title); Assert.Equal(row.Identity, d.Model.Cards[0].Identity);
         Pass(await d.UpdateAsync(row.Identity, "New Ω", "New Ω", "", "", "")); Assert.Contains("    [New Ω]\n", d.Source); Assert.Equal("bracket", d.Model.Cards[0].Form);
+        var bare = new KanbanVisualDraft("kanban\n  Column\n    Card\n"); var card = bare.Model.Cards[0]; Assert.False((await bare.UpdateAsync(card.Identity, "title Changed", "title Changed", "", "", "")).Success); Assert.Equal(bare.OriginalSource, bare.Source);
     }
     [Fact] public async Task Column_move_carries_complete_proved_cards_and_comments_with_stable_duplicate_occurrences()
     {
@@ -69,5 +70,12 @@ public class KanbanSourceAuthoringTests
     [Fact] public async Task New_comment_like_IDs_cannot_silently_create_ignored_columns_or_cards()
     {
         var d = new KanbanVisualDraft(KanbanVisualDraft.Starter); Assert.False((await d.AddColumnAsync("%%hidden", "Column")).Success); Assert.False((await d.AddCardAsync(d.Model.Columns[0].Identity, "%%hidden", "Card")).Success); Assert.Equal(d.OriginalSource, d.Source);
+    }
+    [Fact] public async Task Literal_quotes_braces_commas_and_title_words_are_accepted_only_with_proved_unchanged_source_form()
+    {
+        var d = new KanbanVisualDraft("kanban\n  todo[To do]\n    id[Card]\n"); var card = d.Model.Cards[0]; const string label = "title \"Quoted\", {literal}";
+        Pass(await d.UpdateAsync(card.Identity, card.Id, label, "", "", "")); Assert.Equal(label, d.Model.Cards[0].Label); Assert.Null(d.Model.Title); Assert.Equal("explicit", d.Model.Cards[0].Form);
+        var before = d.Source; Assert.False((await d.UpdateAsync(card.Identity, card.Id, "Bad[label", "", "", "")).Success); Assert.Equal(before, d.Source);
+        Pass(await d.AddCardAsync(d.Model.Columns[0].Identity, "new", label)); Assert.Equal(label, d.Model.Cards[^1].Label); Assert.Equal("explicit", d.Model.Cards[^1].Form);
     }
 }

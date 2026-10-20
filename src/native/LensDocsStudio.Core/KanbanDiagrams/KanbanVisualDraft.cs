@@ -78,12 +78,12 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
         var row = m.Rows.SingleOrDefault(r => r.Identity == identity) ?? throw new ArgumentException("Select a column or card occurrence; title/configuration rows have protected structural operations."); var changed = t;
         if (id != row.Id || label != row.Label)
         {
-            SourceDeclarations.PlainLabel(label, "[]{}\""); SourceDeclarations.RejectDirectiveName(label, "title", true);
+            SourceText.Label(label); if (row.Form == "bare") SourceDeclarations.RejectDirectiveName(label, "title", true);
             if (row.Form != "explicit")
             { if (id != label) throw new ArgumentException("Bare text and bracket forms couple ID and title. Edit both to the same value; no syntax conversion is made."); changed = row.LabelToken.Set(changed, label); }
             else
             {
-                SourceDeclarations.PlainLabel(id, "[]{}\"@"); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("An explicit ID cannot contain whitespace.");
+                SourceText.Label(id); if (id.Any(char.IsWhiteSpace) || id.StartsWith("%%", StringComparison.Ordinal)) throw new ArgumentException("An explicit ID cannot contain whitespace or begin a comment.");
                 // Patch descending spans to retain every other byte.
                 changed = row.LabelToken.Set(changed, label); changed = row.IdToken.Set(changed, id);
             }
@@ -101,7 +101,7 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
             { var line = changed.Line(identity); changed = changed.Replace(current.MetadataEnd >= 0 ? line.Replace(current.MetadataEnd, 0, (current.Metadata.Count > 0 ? ", " : "") + key + ": '" + value + "'") : line.Replace(line.Body.TrimEnd().Length, 0, "@{ " + key + ": '" + value + "' }")); }
         }
         var after = Scan(changed).Rows.Single(r => r.Identity == identity);
-        if (after.Id != id || after.Label != label || after.Column != row.Column) throw new ArgumentException("This label would change native ID, title or membership. Pending input is retained.");
+        if (after.Id != id || after.Label != label || after.Column != row.Column || after.Form != row.Form) throw new ArgumentException("This label would change native ID, title, source form or membership. Pending input is retained.");
         return changed;
     }, token);
     private static void Structure(SourceText t, KanbanSourceModel m)
@@ -112,19 +112,19 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
     private static void Group(SourceText t, KanbanSourceModel m, int start, int end) => WorkflowSource.CompleteGroup(t, start, end, m.Rows.Select(r => r.Identity));
     public Task<SourceAuthoringResult> AddColumnAsync(string id, string label, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Structure(t, m); SourceDeclarations.PlainLabel(id, "[]{}\"@"); SourceDeclarations.PlainLabel(label, "[]{}\""); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("Use an ID without whitespace.");
+        Structure(t, m); SourceText.Label(id); SourceText.Label(label); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("Use an ID without whitespace.");
         if (m.Rows.Any(r => r.Id == id)) throw new ArgumentException("Choose an unused ID for a new column.");
         var changed = t.Insert(t.Lines.Count, (m.Columns.FirstOrDefault() is { } c ? t.Line(c.Identity).Indent : "    ") + id + "[" + label + "]");
         var added = Scan(changed).Columns.SingleOrDefault(r => r.Identity == changed.Lines[^1].Key);
-        if (added is null || added.Id != id || added.Label != label) throw new ArgumentException("This ID/title would become a comment or another source form. Choose a representable column ID/title."); return changed;
+        if (added is null || added.Id != id || added.Label != label || added.Form != "explicit") throw new ArgumentException("This ID/title would become a comment or another source form. Choose a representable column ID/title."); return changed;
     }, token);
     public Task<SourceAuthoringResult> AddCardAsync(string column, string id, string label, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Structure(t, m); var col = m.Columns.Single(c => c.Identity == column); SourceDeclarations.PlainLabel(id, "[]{}\"@"); SourceDeclarations.PlainLabel(label, "[]{}\""); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("Use an ID without whitespace.");
+        Structure(t, m); var col = m.Columns.Single(c => c.Identity == column); SourceText.Label(id); SourceText.Label(label); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("Use an ID without whitespace.");
         if (m.Rows.Any(r => r.Id == id)) throw new ArgumentException("Choose an unused ID for a new card.");
         var end = ColumnEnd(t, m, col); Group(t, m, t.Index(column), end); var changed = t.Insert(end, t.Line(column).Indent + "    " + id + "[" + label + "]");
         var added = Scan(changed).Cards.SingleOrDefault(r => r.Identity == changed.Lines[end].Key);
-        if (added is null || added.Id != id || added.Label != label || added.Column != column) throw new ArgumentException("This ID/title would change comment or card membership semantics. Choose a representable card ID/title."); return changed;
+        if (added is null || added.Id != id || added.Label != label || added.Column != column || added.Form != "explicit") throw new ArgumentException("This ID/title would change comment or card membership semantics. Choose a representable card ID/title."); return changed;
     }, token);
     public Task<SourceAuthoringResult> DeleteAsync(string identity, bool completeColumn = false, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
