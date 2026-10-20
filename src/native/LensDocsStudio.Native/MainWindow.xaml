@@ -116,6 +116,7 @@
     <MenuItem Header="State diagram visually…" Click="InsertState" AutomationProperties.AutomationId="InsertState"/>
     <MenuItem Header="ER diagram visually…" Click="InsertEr" AutomationProperties.AutomationId="InsertEr"/>
     <MenuItem Header="Class diagram visually…" Click="InsertClass" AutomationProperties.AutomationId="InsertClass"/>
+    <MenuItem Header="Gantt chart visually…" Click="InsertGantt" AutomationProperties.AutomationId="InsertGantt"/>
     <MenuItem Header="Mind map visually…" Click="InsertMindmap" AutomationProperties.AutomationId="InsertMindmap"/>
     <MenuItem Header="Pie chart visually…" Click="InsertPie" AutomationProperties.AutomationId="InsertPie"/>
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
