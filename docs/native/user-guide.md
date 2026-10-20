@@ -149,7 +149,8 @@ curve's value for a positional axis. Axis add/remove/reorder changes all affecte
 simple curves atomically; new axes and curves explicitly start with value 0.
 Ragged, extra, dropped or keyed-looking tokens protect alignment operations.
 The range uses unsigned decimals; a blank maximum selects the automatic maximum.
-Commas, braces, brackets and quotes have no supported escape in new names.
+Axis names reject commas, braces, brackets and quotes. Quoted curve IDs/labels
+can contain commas, braces and brackets; embedded double quotes have no supported escape.
 Legend, graticule and tick settings remain available unchanged in source.
 
 **Sankey:** select a numbered link to edit only that row's source, target or positive
@@ -159,6 +160,8 @@ rejected. Add link starts with weight 1. Commas and doubled quotes in endpoint n
 are supported; line breaks are not. Ignored rows and extra fields remain exact.
 Cycles and self-links remain source-accessible, with visual topology edits protected
 because the pinned renderer can omit their ribbons. There is no invented title directive.
+Integral node totals at or above 2^63 also protect authoring because the pinned
+renderer cannot label them correctly; their original weight lexemes remain in source.
 
 Update properties validates pending text without changing saved source. Invalid
 input stays visible and disables Apply. Reset restores the last valid draft.

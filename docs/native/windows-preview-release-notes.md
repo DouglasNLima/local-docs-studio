@@ -1,5 +1,23 @@
 # Windows internal preview release notes
 
+## Fourteen native Mermaid editors — Expansion III
+
+XY Chart, Radar and Sankey extend the eleven existing native families. Use Visual
+Edit or Insert for category-based comparisons, positional profiles and weighted
+flows. Source spans, duplicate occurrences, raw numeric spelling, private history
+and the existing atomic owner Apply session are preserved. Unsupported coercion,
+ragged alignment, ambiguous quoting and cyclic Sankey operations remain protected
+with exact source access. Mermaider 0.15.1, the official .NET 10/WPF runtime and
+stock Continuous are unchanged. This is an unsigned internal preview.
+
+The [Draft PR #42 delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/42)
+and [engineering receipt](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-xy-radar-sankey-editors/docs/native/expansion-iii-engineering-receipt.md)
+own exact source, validation, package hashes and certification limits. Earlier
+previews retain their original source attribution. No production release or merge
+is implied. PR #38 remains paused; the historical 250 ms goal is incomplete and
+.749 unresolved.
+
+
 ## Eleven native Mermaid editors â€” Expansion II
 
 Timeline, User Journey and Quadrant join the existing eight normal editor families.

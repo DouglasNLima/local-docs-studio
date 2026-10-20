@@ -60,7 +60,8 @@ public abstract class SourceDraft<T> : ISourceDraft where T : class
             if (ValidatePresentation is { } presentation) await presentation(candidate.changed, candidate.model, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (version != generation || !ReferenceEquals(original, Text)) return new(false, "A newer draft superseded this operation.");
-            if (candidate.changed.Source == Source && candidate.changed.Lines.Select(line => line.Key).SequenceEqual(Text.Lines.Select(line => line.Key))) return new(true, null);
+            if (candidate.changed.Source == Source && candidate.changed.Lines.Select(line => line.Key).SequenceEqual(Text.Lines.Select(line => line.Key)) &&
+                candidate.changed.Lines.Zip(Text.Lines).All(pair => pair.First.OccurrenceKeys.SequenceEqual(pair.Second.OccurrenceKeys))) return new(true, null);
             Text = candidate.changed; Model = candidate.model;
             Selection = select ?? Selection; if (Selection is not null && !Contains(Model, Selection)) Selection = null;
             if (index + 1 < history.Count) history.RemoveRange(index + 1, history.Count - index - 1);

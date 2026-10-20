@@ -15,7 +15,12 @@ public sealed record RadarSourceModel(string HeaderIdentity, SourceDeclaration? 
 {
     public SourceDeclaration? Effective(string name) => Declarations.LastOrDefault(d => d.Name == name);
     public double Minimum => double.Parse(Effective("min")?.Value ?? "0", CultureInfo.InvariantCulture);
-    public double Maximum => Effective("max") is { } max ? double.Parse(max.Value, CultureInfo.InvariantCulture) : Math.Max(5, Curves.SelectMany(c => c.Values.Items).Select(v => SourceVector.Finite(v.Raw, out var n) ? n : 0).DefaultIfEmpty(5).Max());
+    public double AutomaticMaximum => Curves.SelectMany(c => c.Values.Items).Select(v =>
+    {
+        var value = v.Raw; var colon = value.IndexOf(':'); if (colon >= 0) value = value[(colon + 1)..].Trim();
+        return double.TryParse(value, CultureInfo.InvariantCulture, out var n) ? n : 0;
+    }).Aggregate(5d, (max, n) => n > max ? n : max);
+    public double Maximum => Effective("max") is { } max ? double.Parse(max.Value, CultureInfo.InvariantCulture) : AutomaticMaximum;
     public bool Aligned => Axes.Count > 0 && Axes.All(a => a.Simple) && Curves.All(c => c.Simple && c.Values.Items.Count == Axes.Count) &&
         Axes.Select(a => a.Id).Distinct(StringComparer.Ordinal).Count() == Axes.Count && Curves.Select(c => c.Id).Distinct(StringComparer.Ordinal).Count() == Curves.Count;
 }
@@ -75,7 +80,14 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
             protect.Add(line.Key);
         }
         if (axes.Count + curves.Sum(c => c.Values.Items.Count) > 500) errors.Add("Radar exceeds the 500-element budget.");
-        return new(header?.Key ?? "", title, axes, axisRows, curves, declarations, protect.Distinct().ToArray(), errors);
+        foreach (var value in curves.SelectMany(c => c.Values.Items))
+        {
+            var raw = value.Raw; var colon = raw.IndexOf(':'); if (colon >= 0) raw = raw[(colon + 1)..].Trim();
+            if (double.TryParse(raw, CultureInfo.InvariantCulture, out var number) && !double.IsFinite(number)) errors.Add("Radar has a non-finite source value. Correct it in Edit source; the original bytes are preserved.");
+        }
+        var model = new RadarSourceModel(header?.Key ?? "", title, axes, axisRows, curves, declarations, protect.Distinct().ToArray(), errors);
+        if (!double.IsFinite(model.Maximum - model.Minimum) || model.Maximum <= model.Minimum) errors.Add("The Radar source range must be finite and increasing. Correct its min/max in the inspector or original source.");
+        return model;
     }
     protected override bool Contains(RadarSourceModel m, string id) => id == m.HeaderIdentity || id == m.HeaderIdentity + ":range" || m.Axes.Any(a => a.Identity == id) || m.Curves.Any(c => c.Identity == id || c.Values.Items.Any(v => v.Identity == id)) || m.Declarations.Any(d => d.Identity == id) || m.Protected.Contains(id);
     protected override string? SourceProblem(RadarSourceModel model) => model.Errors.FirstOrDefault();
@@ -128,7 +140,7 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
     }, token);
     public Task<SourceAuthoringResult> UpdateCurveAsync(string identity, string id, string label, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        var c = m.Curves.Single(c => c.Identity == identity); Simple(c); if (id == c.Id && label == c.Label) return t; Name(id, true); Name(label, true);
+        var c = m.Curves.Single(c => c.Identity == identity); Simple(c); if (id == c.Id && label == c.Label) return t; CurveName(id); CurveName(label);
         if (id != c.Id && m.Curves.Any(other => other.Identity != identity && other.Id == id)) throw new ArgumentException("An existing curve has this ID. Choose a distinct ID; pending input is retained.");
         var line = t.Line(identity); var name = c.Tokens.Groups["id"]; var oldLabel = c.Tokens.Groups["label"];
         if (label != c.Label)
@@ -142,7 +154,7 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
     }, token);
     public Task<SourceAuthoringResult> SetRangeAsync(string min, string max, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        var lo = SourceVector.Number(min, directive: true); var hi = max.Length > 0 ? SourceVector.Number(max, directive: true) : Math.Max(5, m.Curves.SelectMany(c => c.Values.Items).Select(v => SourceVector.Finite(v.Raw, out var n) ? n : 0).DefaultIfEmpty(5).Max());
+        var lo = SourceVector.Number(min, directive: true); var hi = max.Length > 0 ? SourceVector.Number(max, directive: true) : m.AutomaticMaximum;
         if (hi <= lo || !double.IsFinite(hi - lo)) throw new ArgumentException("The Radar maximum must exceed its minimum with a finite positive range. Pending input is retained.");
         foreach (var name in new[] { "min", "max" })
         {
@@ -156,7 +168,7 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
     }, token);
     public Task<SourceAuthoringResult> AddCurveAsync(string id, string label, string initial, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Name(id, true); Name(label, true); SourceVector.Number(initial);
+        CurveName(id); CurveName(label); SourceVector.Number(initial);
         if (m.Axes.Count == 0 || m.Curves.Any(c => c.Id == id)) throw new ArgumentException("Add axes first and choose a distinct curve ID.");
         return t.Insert(m.Curves.Count == 0 ? t.Lines.Count : t.Index(m.Curves[^1].Identity) + 1, "    curve \"" + id + "\"[\"" + label + "\"]{" + string.Join(", ", Enumerable.Repeat(initial, m.Axes.Count)) + "}");
     }, token);
@@ -180,10 +192,21 @@ public sealed class RadarVisualDraft : SourceDraft<RadarSourceModel>
         var row = m.AxisRows.Single(r => r.Identity == axis.Row); var local = row.Axes.Items.ToList().FindIndex(i => i.Identity == id);
         if (direction == 0 && row.Axes.Items.Count == 1) t = ChartSource.DeleteRow(t, row.Identity);
         else if (direction == 0 || m.Axes[next].Row == axis.Row) t = t.Replace(XyVisualDraft.ListChange(t.Line(row.Identity), row.Axes, local, direction));
-        else throw new ArgumentException("Moving an axis across declarations has unproved comment attachment. Use Edit source; every curve is unchanged.");
+        else
+        {
+            var other = m.Axes[next]; var otherRow = m.AxisRows.Single(r => r.Identity == other.Row);
+            var begin = Math.Min(t.Index(row.Identity), t.Index(otherRow.Identity)); var end = Math.Max(t.Index(row.Identity), t.Index(otherRow.Identity));
+            if (t.AttachedStart(row.Identity) != t.Index(row.Identity) || t.AttachedStart(otherRow.Identity) != t.Index(otherRow.Identity) || t.Lines.Skip(begin + 1).Take(end - begin - 1).Any(l => l.Content.Length > 0))
+                throw new ArgumentException("Intervening source or attached comments protect this cross-declaration axis move. Every curve is unchanged.");
+            SourceRowMoves.CheckTrailingAttachment(t, row.Identity); SourceRowMoves.CheckTrailingAttachment(t, otherRow.Identity);
+            var a = row.Axes.Items.ToList(); var b = otherRow.Axes.Items.ToList(); var second = b.FindIndex(v => v.Identity == other.Identity);
+            (a[local], b[second]) = (b[second], a[local]); t = t.Replace(row.Axes.Reorder(t.Line(row.Identity), a)); t = t.Replace(otherRow.Axes.Reorder(t.Line(otherRow.Identity), b));
+        }
         foreach (var curve in m.Curves) t = t.Replace(XyVisualDraft.ListChange(t.Line(curve.Identity), curve.Values, at, direction)); return t;
     }
     private static string AxisText(string id, string label) => id + "[\"" + label + "\"]";
+    private static void CurveName(string value)
+    { SourceText.Label(value); if (value.Contains('"')) throw new ArgumentException("The pinned Radar curve grammar has no double-quote escape. Pending input is retained."); }
     private static void Name(string value, bool spaces)
     {
         SourceText.Label(value);

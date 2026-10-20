@@ -31,6 +31,7 @@ public sealed class SankeyVisualEditorWindow : ChartVisualEditorWindow
     protected override void ShowProperties()
     {
         var l = sankey.Model.Links.FirstOrDefault(l => l.Identity == sankey.Selection); var node = Node;
+        Captions(node is null ? "Source endpoint (this link only)" : "New node name (all proved endpoints)", "Target endpoint (this link only)", "Positive finite weight (decimal point)");
         if (l is not null) Properties(l.Source, l.Target, l.Weight, editLabel: l.Simple && !sankey.Model.Cyclic, editIdentifier: l.Simple && !sankey.Model.Cyclic, editValue: l.Simple && !sankey.Model.Cyclic);
         else if (node is not null) Properties(node, editLabel: !sankey.Model.Cyclic);
         else Properties();

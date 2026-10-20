@@ -23,6 +23,20 @@ public abstract class ChartVisualEditorWindow : SourceVisualEditorWindow
     {
         Label.Text = label; Identifier.Text = identifier; Value.Text = value; Maximum.Text = maximum;
         Label.IsEnabled = editLabel; Identifier.IsEnabled = editIdentifier; Value.IsEnabled = editValue; Maximum.IsEnabled = editMaximum;
+        foreach (var field in new[] { Label, Identifier, Value, Maximum })
+        {
+            var visibility = field.IsEnabled || field.Text.Length > 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            field.Visibility = visibility;
+            InspectorFields.Children[InspectorFields.Children.IndexOf(field) - 1].Visibility = visibility;
+        }
+    }
+    protected void Captions(string label, string identifier = "Identifier", string value = "Value (decimal point)", string maximum = "Maximum (blank for automatic)")
+    {
+        foreach (var (field, caption) in new[] { (Label, label), (Identifier, identifier), (Value, value), (Maximum, maximum) })
+        {
+            ((System.Windows.Controls.Label)InspectorFields.Children[InspectorFields.Children.IndexOf(field) - 1]).Content = caption;
+            System.Windows.Automation.AutomationProperties.SetName(field, caption);
+        }
     }
     protected static NativeSourceHit? Hit(string id, string description, XElement shape, XElement root)
     {

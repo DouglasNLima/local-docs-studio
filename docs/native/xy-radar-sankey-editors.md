@@ -14,8 +14,8 @@ native SVG conversions; there is no browser, replacement layout or private engin
 | Family | Supported first slice | Protected or unchanged source |
 |---|---|---|
 | XY Chart | `xychart` / `xychart-beta`; effective header/body title; horizontal/vertical; category labels and axis titles; increasing finite Y range or automatic; named/unnamed bar/line series; independent finite values; ordered series/value operations; atomic aligned-category operations | Box series; ignored point suffixes; coerced invalid numbers; numeric X ranges; malformed quoting/categories; ambiguous structural comment boundaries; arbitrary directives. Ragged vectors remain ragged and block category alignment changes |
-| Radar | `radar-beta`; effective body title; ordered simple axis IDs/labels and curves; positional values; unsigned decimal min/max or automatic maximum; add/remove/reorder curves; atomic aligned axis operations with explicit initial zero | Keyed-looking prefixes, dropped/extra/ragged vectors, repeated IDs for structural changes, unsupported name separators, compound/ignored curve suffixes, legend/graticule/tick source. Cross-declaration axis moves are protected where attachment is unproved |
-| Sankey | `sankey-beta`; ordered source/target/positive weight occurrences; local endpoint edits; add/remove/reorder links; explicit global rename across proved endpoints; real node/ribbon selection | Ignored/invalid rows; ambiguous CSV quoting; extra fields; all cyclic/self-link topology edits; rename collisions or unproved global endpoint coverage; invented title directives; new multiline fields |
+| Radar | `radar-beta`; effective body title; ordered simple axis IDs/labels and curves; positional values; unsigned decimal min/max or automatic maximum; add/remove/reorder curves; atomic aligned axis operations with explicit initial zero, including unambiguous simple cross-declaration moves | Keyed-looking prefixes, dropped/extra/ragged vectors, repeated IDs for structural changes, unsupported axis separators/curve double quotes, compound/ignored curve suffixes, legend/graticule/tick source. Cross-declaration axis moves are protected where attachment is unproved |
+| Sankey | `sankey-beta`; ordered source/target/positive weight occurrences; local endpoint edits; add/remove/reorder links; explicit global rename across proved endpoints; real node/ribbon selection | Ignored/invalid rows; ambiguous CSV quoting; extra fields; all cyclic/self-link topology edits; rename collisions or unproved global endpoint coverage; integral node totals at or above 2^63; invented title directives; new multiline fields |
 
 ## Exact source and identity
 
@@ -28,6 +28,9 @@ and neighbouring Markdown stay exact. Same-indent immediately preceding comments
 attach to rows; ambiguous trailing comments and intervening directives protect moves.
 
 The engine's quoted category/CSV fields toggle quotation and decode doubled quotes.
+XY category brackets are representable inside quoted list fields. Radar curve IDs
+and labels can contain commas, braces and brackets inside their existing quotes;
+axis fields are more restrictive and neither Radar form has a double-quote escape.
 No unrelated escape convention is introduced. New numeric tokens must be finite
 in invariant decimal/exponent syntax; representational underflow is rejected.
 Radar min/max directives accept only unsigned decimals, unlike general curve values.
@@ -59,6 +62,9 @@ parallel-link order. Correspondence checks real node rectangles, ribbon endpoint
 and weight proportions. The engine can omit self-links/feedback ribbons: their bytes
 stay accessible but visual topology changes are protected. A local endpoint edit
 changes one row; global node rename is a separate selection and cannot merge identities.
+The pinned integral node-label formatter casts to Int64, so totals at or above 2^63
+can display an incorrect value. The compatibility gate records the actual label for
+`A,B,1e20`; authoring protects that construct and retains its exact source.
 
 ## Executable evidence
 

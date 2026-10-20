@@ -15,9 +15,9 @@ public sealed class RadarVisualEditorWindow : ChartVisualEditorWindow
         : base("Radar", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         radar = new(source, diagrams); radar.ValidatePresentation = (text, _, token) => ValidateNative(text, token);
-        ActionButton("Add axis with value 0 in every curve", "AddAxis", async () =>
+        ActionButton("Add axis (each curve: 0)", "AddAxis", async () =>
         { var n = 1; while (radar.Model.Axes.Any(a => a.Id == "axis" + n)) n++; var r = await radar.AddAxisAsync("axis" + n, "New axis", "0", Lifetime.Token); if (r.Success) radar.Select(radar.Model.Axes[^1].Identity); return r; });
-        ActionButton("Add curve with value 0 on every axis", "AddCurve", async () =>
+        ActionButton("Add curve (each axis: 0)", "AddCurve", async () =>
         { var n = 1; while (radar.Model.Curves.Any(c => c.Id == "curve" + n)) n++; var r = await radar.AddCurveAsync("curve" + n, "New curve", "0", Lifetime.Token); if (r.Success) radar.Select(radar.Model.Curves[^1].Identity); return r; });
         Start(radar);
     }
@@ -28,7 +28,7 @@ public sealed class RadarVisualEditorWindow : ChartVisualEditorWindow
         foreach (var (c, i) in m.Curves.Select((c, i) => (c, i)))
         {
             yield return new(c.Identity, "Curve " + (i + 1) + " · " + c.Id + " · " + c.Label + (c.Simple ? "" : " · protected"));
-            foreach (var (v, index) in c.Values.Items.Select((v, index) => (v, index))) yield return new(v.Identity, "Curve " + (i + 1) + " · axis " + (index + 1) + " · " + (index < m.Axes.Count ? m.Axes[index].Label : "extra position") + " · " + v.Raw);
+            foreach (var (v, index) in c.Values.Items.Select((v, index) => (v, index))) yield return new(v.Identity, "Curve " + (i + 1) + (c.Simple ? " · axis " : " · protected source token ") + (index + 1) + " · " + (c.Simple && index < m.Axes.Count ? m.Axes[index].Label + " · " : "") + v.Raw);
         }
         foreach (var key in m.Protected.Where(k => m.Curves.All(c => c.Identity != k))) yield return new(key, "Protected source · " + radar.Text.Line(key).Content);
     }
@@ -37,6 +37,7 @@ public sealed class RadarVisualEditorWindow : ChartVisualEditorWindow
     protected override void ShowProperties()
     {
         var m = radar.Model; var id = radar.Selection; var a = m.Axes.FirstOrDefault(a => a.Identity == id); var c = m.Curves.FirstOrDefault(c => c.Identity == id || c.Values.Items.Any(v => v.Identity == id)); var v = c?.Values.Items.FirstOrDefault(v => v.Identity == id);
+        Captions(id == m.HeaderIdentity ? "Diagram title" : a is not null ? "Axis label" : "Curve label", a is not null ? "Axis ID" : "Curve ID", id == m.HeaderIdentity + ":range" ? "Minimum (unsigned decimal)" : "Value for this axis (decimal point)", "Maximum (blank for automatic)");
         if (id == m.HeaderIdentity) Properties(m.Title?.Value ?? "", editLabel: true);
         else if (id == m.HeaderIdentity + ":range") Properties(value: m.Effective("min")?.Value ?? "0", maximum: m.Effective("max")?.Value ?? "", editValue: true, editMaximum: true);
         else if (a is not null) Properties(a.Label, a.Id, editLabel: a.Simple, editIdentifier: a.Simple);

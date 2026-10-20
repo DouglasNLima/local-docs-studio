@@ -6,6 +6,8 @@ namespace LensDocsStudio.Core.SourceAuthoring;
 public sealed record SourceToken(string Identity, int Start, int Length, string Raw, string Value, string Segment);
 public sealed record SourceVector(int Start, int Length, IReadOnlyList<SourceToken> Items, bool Balanced)
 {
+    private static readonly System.Text.RegularExpressions.Regex NumericPattern = SourceText.Pattern(@"^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$");
+    private static readonly System.Text.RegularExpressions.Regex DirectivePattern = SourceText.Pattern(@"^[0-9]+(?:\.[0-9]+)?$");
     /// <summary>Exact comma spans, with only the pinned quote toggling/doubled-quote rules when requested.</summary>
     public static SourceVector Read(SourceLine line, int start, int length, bool quoted = false)
     {
@@ -46,13 +48,13 @@ public sealed record SourceVector(int Start, int Length, IReadOnlyList<SourceTok
     public static bool Finite(string value, out double number)
     {
         number = 0;
-        return SourceText.Pattern(@"^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$").IsMatch(value)
+        return NumericPattern.IsMatch(value)
             && double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out number) && double.IsFinite(number)
             && (number != 0 || !value.Split(['e', 'E'])[0].Any(c => c is >= '1' and <= '9'));
     }
     public static double Number(string value, bool positive = false, bool directive = false)
     {
-        if (!Finite(value, out var number) || positive && number <= 0 || directive && !SourceText.Pattern(@"^[0-9]+(?:\.[0-9]+)?$").IsMatch(value))
+        if (!Finite(value, out var number) || positive && number <= 0 || directive && !DirectivePattern.IsMatch(value))
             throw new ArgumentException(directive ? "Enter an unsigned finite decimal directive, for example 10.5. Signs and exponents are unsupported here; pending input is retained."
                 : positive ? "Enter a positive finite weight with invariant decimal/exponent syntax. Pending input is retained."
                 : "Enter a complete finite number using a decimal point and optional exponent. Pending input is retained; no zero substitution is made.");

@@ -120,6 +120,9 @@ internal static class NativeChartCompatibilityChecks
             Check(Groups(XDocument.Parse(invalid.Svg!).Root!, "sankey-link").Select(e => (string?)e.Attribute("d")).SequenceEqual(links.Select(e => (string?)e.Attribute("d"))), "Sankey limitation: invalid rows and blank endpoints are ignored without becoming valid links");
             var cyclic = diagrams.Render("sankey-beta\nA,A,5\nA,B,3\nB,C,3\nC,A,3\n", dark);
             Check(cyclic.Success && Groups(XDocument.Parse(cyclic.Svg!).Root!, "sankey-link").Length < 4, "Sankey limitation: self-links and feedback ribbons can be omitted; topology operations require protection");
+            var overflow = diagrams.Render("sankey-beta\nA,B,1e20\n", dark);
+            var label = Groups(XDocument.Parse(overflow.Svg!).Root!, "sankey-node")[0].Elements().Last(e => e.Name.LocalName == "text").Value;
+            Check(label != "100000000000000000000", "Sankey limitation: integral node total 1e20 has incorrect pinned label " + label + "; authoring protects totals at or above 2^63");
         }
     }
 }

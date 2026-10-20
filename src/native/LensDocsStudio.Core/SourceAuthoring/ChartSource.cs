@@ -6,6 +6,8 @@ namespace LensDocsStudio.Core.SourceAuthoring;
 public static class ChartSource
 {
     public const string Numeric = @"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?";
+    public static readonly Regex Numbers = SourceText.Pattern(Numeric);
+    private static readonly Regex ChartHeader = SourceText.Pattern(@"^(?:xychart(?:-beta)?(?:\s|$)|radar-beta$|sankey-beta$)", RegexOptions.IgnoreCase);
     public static IReadOnlyList<SourceLine> Body(SourceText text)
     {
         var lines = text.Lines; var first = 0;
@@ -25,7 +27,7 @@ public static class ChartSource
         { var close = Array.IndexOf(lines, "---", at + 1); if (close >= 0) at = close + 1; }
         return lines.Skip(at).FirstOrDefault(l => l.Length > 0 && !l.StartsWith("%%", StringComparison.Ordinal)) ?? "";
     }
-    public static bool IsChart(string source) => SourceText.Pattern(@"^(?:xychart(?:-beta)?(?:\s|$)|radar-beta$|sankey-beta$)", RegexOptions.IgnoreCase).IsMatch(Header(source));
+    public static bool IsChart(string source) => ChartHeader.IsMatch(Header(source));
     public static string Prepare(string source)
     {
         // Keep configuration for the public preprocessor. Remove only inert trivia before detection.

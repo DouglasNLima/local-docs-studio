@@ -139,7 +139,7 @@ public sealed class XyVisualDraft : SourceDraft<XySourceModel>
                     if (marks[i].Name.LocalName == "rect") { low = ChartSource.Attribute(marks[i], model.Horizontal ? "x" : "y"); high = low + ChartSource.Attribute(marks[i], model.Horizontal ? "width" : "height"); }
                     else
                     {
-                        var coords = SourceText.Pattern(ChartSource.Numeric).Matches((string?)marks[i].Attribute("d") ?? "").Select(x => double.Parse(x.Value, CultureInfo.InvariantCulture)).Where((_, n) => n % 2 == (model.Horizontal ? 0 : 1)).ToArray();
+                        var coords = ChartSource.Numbers.Matches((string?)marks[i].Attribute("d") ?? "").Select(x => double.Parse(x.Value, CultureInfo.InvariantCulture)).Where((_, n) => n % 2 == (model.Horizontal ? 0 : 1)).ToArray();
                         low = coords.Min(); high = coords.Max();
                     }
                     if (Math.Abs(low - Math.Min(baseline, valuePosition)) > .02 || Math.Abs(high - Math.Max(baseline, valuePosition)) > .02)
@@ -177,7 +177,6 @@ public sealed class XyVisualDraft : SourceDraft<XySourceModel>
     {
         var a = m.Categories ?? throw new ArgumentException("No explicit category list is present."); Category(a, m);
         var c = a.Categories!.Items.Single(c => c.Identity == identity); if (c.Value == label) return text;
-        if (label.IndexOfAny(['[', ']']) >= 0) throw new ArgumentException("Category brackets are unsupported. Pending input is retained.");
         return text.Replace(a.Categories.Patch(text.Line(a.Identity), identity, SourceVector.Quote(label)));
     }, token);
     public Task<SourceAuthoringResult> SetAxisTitleAsync(string name, string value, CancellationToken token = default) => ChangeAsync((text, m) =>
@@ -222,7 +221,7 @@ public sealed class XyVisualDraft : SourceDraft<XySourceModel>
     { var s = m.Series.Single(s => s.Identity == series); Simple(s); SourceVector.Number(value); return text.Replace(s.Values.Add(text.Line(series), value)); }, token);
     public Task<SourceAuthoringResult> AddCategoryAsync(string label, string initial, CancellationToken token = default) => ChangeAsync((text, m) =>
     {
-        Aligned(m); SourceVector.Number(initial); if (label.IndexOfAny(['[', ']']) >= 0) throw new ArgumentException("Category brackets are unsupported."); var a = m.Categories!;
+        Aligned(m); SourceVector.Number(initial); var a = m.Categories!;
         text = text.Replace(a.Categories!.Add(text.Line(a.Identity), SourceVector.Quote(label)));
         foreach (var s in m.Series) text = text.Replace(s.Values.Add(text.Line(s.Identity), initial)); return text;
     }, token);

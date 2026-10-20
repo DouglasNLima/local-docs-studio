@@ -73,3 +73,43 @@ Local toolchain: Windows x64; .NET SDK 10.0.401, official runtime 10.0.12.
 OS High Contrast mutation and installer execution remain restricted to disposable
 Windows runners. Higher DPI, physical screen reader and SDK-free clean Windows
 certification remain unavailable unless separately demonstrated.
+
+## Initial committed-source acceptance and corrections
+
+Implementation commit `22e1ffeba3c91a8137970aa0e8398e57717db2b8` is retained in
+[Draft PR #42](https://github.com/DouglasNLima/local-docs-studio/pull/42). Hosted
+[expanded-editor run 39418707445](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39418707445)
+passed all eighteen family/appearance jobs, including all six new-family independent
+UIA runs in normal/actual Windows High Contrast. This source also passed committed
+local chart compatibility, 78 chart editor/owner checks and existing source-editor
+fidelity. These results do not certify later commits.
+
+[Native run 39418717299](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39418717299)
+failed the exact help topic count (17 before, 18 after the new chapter); its package
+and installed suites were correctly skipped. The count is updated with an additional
+assertion covering the new chapter's alignment, positive-weight, local/global rename,
+pending input and ownership guidance. No assertions or fixtures were removed.
+
+Local full Core at `22e1ffe` additionally recorded two 100 ms regex safety timeouts
+in ordinary short Sankey/Quadrant inputs during concurrent browser validation. The
+TRX retains both failures. Hosted Core at that source had no regex timeout (1,826
+passed, one help-count failure). Repeated chart numeric/geometry/header regexes now
+reuse static instances rather than rebuilding the same patterns for every token;
+the safety timeout is unchanged. Final Core must pass after these corrections.
+
+Further review found that a byte-identical duplicate vector swap was incorrectly
+treated as a no-op by the shared history check. Occurrence-key ordering now participates
+in that check, with exact duplicate-key Undo/Redo regression coverage. Radar moves
+across simple unambiguous declarations are now atomic across all curves; attached
+comments or intervening source retain protection. Quoted XY categories and Radar
+curve names have delimiter-specific evidence rather than a generic escaping rule.
+
+A further pinned Sankey limitation is now explicit: integral node totals at or above
+2^63 cannot be labelled correctly by the engine's Int64 formatter. The compatibility
+gate records the actual `A,B,1e20` label and authoring protects this construct while
+retaining exact source. No engine/layout replacement is introduced.
+
+Initial raw hosted UIA artefacts are preserved locally under
+`artifacts/native/22e1ffe-hosted-source-uia/`; the failure log is retained as
+`artifacts/native/22e1ffe-hosted-native-failure.log`. Final-source screenshots, packages
+and receipt identifiers remain pending.

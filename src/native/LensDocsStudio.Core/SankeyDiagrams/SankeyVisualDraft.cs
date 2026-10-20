@@ -44,11 +44,14 @@ public sealed class SankeyVisualDraft : SourceDraft<SankeySourceModel>
         }
         if (links.Count + links.SelectMany(l => new[] { l.Source, l.Target }).Distinct().Count() > 500) errors.Add("Sankey exceeds the 500-element budget.");
         if (links.GroupBy(l => l.Source).Any(g => !double.IsFinite(g.Sum(l => l.Value))) || links.GroupBy(l => l.Target).Any(g => !double.IsFinite(g.Sum(l => l.Value)))) errors.Add("Sankey endpoint totals exceed the finite range. Correct the original source.");
+        if (links.GroupBy(l => l.Source).Concat(links.GroupBy(l => l.Target)).Any(g => g.Sum(l => l.Value) >= 9223372036854775808d))
+            errors.Add("The pinned Sankey renderer cannot label integral node totals at or above 2^63 correctly. This source is preserved; reduce the affected weights in Edit source before visual authoring.");
         return new(header?.Key ?? "", links, protect.Distinct().ToArray(), errors);
     }
     protected override bool Contains(SankeySourceModel m, string id) => id == m.HeaderIdentity || m.Links.Any(l => l.Identity == id) || m.Protected.Contains(id) || m.Nodes.Any(n => NodeIdentity(m, n) == id);
     protected override string? SourceProblem(SankeySourceModel model) => model.Errors.FirstOrDefault();
-    public static string NodeIdentity(SankeySourceModel m, string node) => m.Links.First(l => l.Source == node || l.Target == node) is { } first ? first.Identity + (first.Source == node ? ":source-node" : ":target-node") : throw new ArgumentException("Select an existing node.");
+    public static string NodeIdentity(SankeySourceModel m, string node) => m.Links.Where(l => l.Source == node || l.Target == node)
+        .Select(l => l.Identity + (l.Source == node ? ":source-node" : ":target-node")).Order(StringComparer.Ordinal).FirstOrDefault() ?? throw new ArgumentException("Select an existing node.");
     protected override void Validate(SourceText text, SankeySourceModel m, DiagramResult render)
     {
         if (m.Errors.Count > 0) throw new ArgumentException(m.Errors[0]);
@@ -65,7 +68,7 @@ public sealed class SankeyVisualDraft : SourceDraft<SankeySourceModel>
         if (rendered.Length != ribbons.Length) throw new ArgumentException("Canonical Sankey ribbon occurrences differ from proved endpoint layers. Apply is protected.");
         for (var i = 0; i < ribbons.Length; i++)
         {
-            var l = rendered[i]; var numbers = SourceText.Pattern(ChartSource.Numeric).Matches((string?)ribbons[i].Attribute("d") ?? "").Select(v => double.Parse(v.Value, CultureInfo.InvariantCulture)).ToArray();
+            var l = rendered[i]; var numbers = ChartSource.Numbers.Matches((string?)ribbons[i].Attribute("d") ?? "").Select(v => double.Parse(v.Value, CultureInfo.InvariantCulture)).ToArray();
             var s = rectangles[l.Source]; var t = rectangles[l.Target];
             var sourceHeight = ChartSource.Attribute(s, "height") * (l.Value / Math.Max(m.Links.Where(x => x.Source == l.Source).Sum(x => x.Value), 1e-9));
             var targetHeight = ChartSource.Attribute(t, "height") * (l.Value / Math.Max(m.Links.Where(x => x.Target == l.Target).Sum(x => x.Value), 1e-9));

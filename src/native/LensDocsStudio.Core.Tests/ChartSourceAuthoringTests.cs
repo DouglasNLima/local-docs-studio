@@ -8,6 +8,56 @@ namespace LensDocsStudio.Core.Tests;
 public class ChartSourceAuthoringTests
 {
     private static void Pass(SourceAuthoringResult result) => Assert.True(result.Success, result.Error);
+    [Theory, InlineData("0"), InlineData("-1"), InlineData("-1e-2")]
+    public async Task New_Sankey_weights_must_remain_positive_without_clamping(string weight)
+    {
+        var draft = new SankeyVisualDraft(SankeyVisualDraft.Starter); var link = draft.Model.Links[0]; Assert.False((await draft.UpdateAsync(link.Identity, link.Source, link.Target, weight)).Success); Assert.False((await draft.AddAsync("X", "Y", weight)).Success); Assert.Equal(draft.OriginalSource, draft.Source); Assert.False(draft.CanUndo);
+    }
+    [Fact] public async Task Invariant_chart_numeric_spelling_is_preserved_under_a_comma_decimal_UI_culture()
+    {
+        var original = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
+            var xy = new XyVisualDraft(XyVisualDraft.Starter); Pass(await xy.UpdateValueAsync(xy.Model.Series[0].Values.Items[0].Identity, "+3.7500e+0")); Assert.Contains("+3.7500e+0", xy.Source);
+            var radar = new RadarVisualDraft(RadarVisualDraft.Starter); Pass(await radar.UpdateValueAsync(radar.Model.Curves[0].Values.Items[0].Identity, "+3.7500e+0")); Assert.Contains("+3.7500e+0", radar.Source);
+            var sankey = new SankeyVisualDraft(SankeyVisualDraft.Starter); var link = sankey.Model.Links[0]; Pass(await sankey.UpdateAsync(link.Identity, link.Source, link.Target, "+3.7500e+0")); Assert.Contains("+3.7500e+0", sankey.Source);
+            Assert.False((await xy.UpdateValueAsync(xy.Model.Series[0].Values.Items[0].Identity, "1,5")).Success);
+        }
+        finally { System.Globalization.CultureInfo.CurrentCulture = original; }
+    }
+    [Fact] public async Task Proven_quoted_category_and_curve_names_retain_delimiters_without_invented_escapes()
+    {
+        var xy = new XyVisualDraft(XyVisualDraft.Starter); var category = xy.Model.Categories!.Categories!.Items[0]; Pass(await xy.UpdateCategoryAsync(category.Identity, "[quoted], \"Ω\"")); Assert.Equal("[quoted], \"Ω\"", xy.Model.Categories.Categories.Items[0].Value);
+        var radar = new RadarVisualDraft(RadarVisualDraft.Starter); var curve = radar.Model.Curves[0]; Pass(await radar.UpdateCurveAsync(curve.Identity, "a,b{c}[d]", "Label, {braces} [brackets]")); Assert.Equal("a,b{c}[d]", radar.Model.Curves[0].Id); Assert.Equal("Label, {braces} [brackets]", radar.Model.Curves[0].Label);
+        Assert.False((await radar.UpdateCurveAsync(curve.Identity, "quote\"", "Pending")).Success);
+    }
+    [Fact] public async Task Invalid_Radar_range_non_finite_values_and_excessive_ticks_are_protected_before_rendering()
+    {
+        foreach (var suffix in new[] { " min 5\n max 5\n", " max 0\n", " ticks 999999999\n", " curve invalid{1,Infinity,3}\n" })
+        {
+            var draft = new RadarVisualDraft("radar-beta\n axis A,B,C\n curve c{1,2,3}\n" + suffix); Assert.NotNull(draft.ValidationError); Assert.False((await draft.ValidateAsync()).Success); Assert.Equal(draft.OriginalSource, draft.Source);
+        }
+        var corrected = new RadarVisualDraft("radar-beta\n axis A,B,C\n max 0\n curve c{1,2,3}\n"); Pass(await corrected.SetRangeAsync("0", "10"));
+        var keyed = new RadarVisualDraft("radar-beta\n axis A,B,C\n curve c{C:10,A:20,B:30}\n"); Assert.Equal(30, keyed.Model.AutomaticMaximum);
+    }
+    [Fact] public async Task Sankey_integral_node_label_overflow_is_a_concrete_protected_pinned_limitation()
+    {
+        var draft = new SankeyVisualDraft("sankey-beta\n A,B,1e20\n"); Assert.Contains("2^63", draft.ValidationError); Assert.False((await draft.ValidateAsync()).Success); Assert.Equal(draft.OriginalSource, draft.Source);
+        var ordinary = new SankeyVisualDraft(SankeyVisualDraft.Starter); var link = ordinary.Model.Links[0]; Assert.False((await ordinary.UpdateAsync(link.Identity, link.Source, link.Target, "1e20")).Success); Assert.Equal(ordinary.OriginalSource, ordinary.Source);
+    }
+    [Fact] public async Task Byte_identical_duplicate_vector_move_still_records_private_occurrence_history()
+    {
+        const string source = "xychart\n x-axis [ Same, Same]\n bar [ 1, 1]\n"; var draft = new XyVisualDraft(source); var category = draft.Model.Categories!.Categories!.Items[1]; var value = draft.Model.Series[0].Values.Items[1]; draft.Select(category.Identity);
+        Pass(await draft.MoveAsync(category.Identity, -1)); Assert.Equal(source, draft.Source); Assert.True(draft.CanUndo); Assert.Equal(category.Identity, draft.Model.Categories.Categories.Items[0].Identity); Assert.Equal(value.Identity, draft.Model.Series[0].Values.Items[0].Identity);
+        draft.Undo(); Assert.Equal(category.Identity, draft.Model.Categories.Categories.Items[1].Identity); Assert.Equal(value.Identity, draft.Model.Series[0].Values.Items[1].Identity); draft.Redo(); Assert.Equal(category.Identity, draft.Model.Categories.Categories.Items[0].Identity);
+    }
+    [Fact] public async Task Radar_axis_moves_across_unambiguous_simple_declarations_keep_every_curve_position()
+    {
+        const string source = "radar-beta\n axis a,b\n axis c,d\n curve c{1,2,3,4}\n"; var draft = new RadarVisualDraft(source); var axis = draft.Model.Axes[1]; draft.Select(axis.Identity);
+        Pass(await draft.MoveAsync(axis.Identity, 1)); Assert.Equal(axis.Identity, draft.Model.Axes[2].Identity); Assert.Equal(new[] { "1", "3", "2", "4" }, draft.Model.Curves[0].Values.Items.Select(v => v.Raw)); draft.Undo(); Assert.Equal(source, draft.Source);
+        var protectedSource = source.Replace(" axis c,d", " %% ambiguous group\n axis c,d", StringComparison.Ordinal); var guarded = new RadarVisualDraft(protectedSource); Assert.False((await guarded.MoveAsync(guarded.Model.Axes[1].Identity, 1)).Success); Assert.Equal(protectedSource, guarded.Source);
+    }
     [Theory, InlineData("\n"), InlineData("\r\n")]
     public async Task XY_local_value_and_category_edits_preserve_exact_neighbours_and_raw_lexemes(string nl)
     {

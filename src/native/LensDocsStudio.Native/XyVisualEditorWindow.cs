@@ -17,13 +17,13 @@ public sealed class XyVisualEditorWindow : ChartVisualEditorWindow
         xy = new(source, diagrams); xy.ValidatePresentation = (text, _, token) => ValidateNative(text, token);
         ActionButton("Add bar with zeros", "AddBar", async () => { var r = await xy.AddSeriesAsync("bar", Lifetime.Token); if (r.Success) xy.Select(xy.Model.Series[^1].Identity); return r; });
         ActionButton("Add line with zeros", "AddLine", async () => { var r = await xy.AddSeriesAsync("line", Lifetime.Token); if (r.Success) xy.Select(xy.Model.Series[^1].Identity); return r; });
-        ActionButton("Add value 0 to selected series", "AddValue", async () =>
+        ActionButton("Add value 0", "AddValue", async () =>
         {
             var s = xy.Model.Series.FirstOrDefault(s => s.Identity == xy.Selection || s.Values.Items.Any(v => v.Identity == xy.Selection));
             if (s is null) return Protected("Select a simple series or one of its values.");
             var r = await xy.AddValueAsync(s.Identity, "0", Lifetime.Token); if (r.Success) xy.Select(xy.Model.Series.Single(v => v.Identity == s.Identity).Values.Items[^1].Identity); return r;
         });
-        ActionButton("Add category with value 0 in every series", "AddCategory", async () => { var r = await xy.AddCategoryAsync("New category", "0", Lifetime.Token); if (r.Success) xy.Select(xy.Model.Categories!.Categories!.Items[^1].Identity); return r; });
+        ActionButton("Add category (each series: 0)", "AddCategory", async () => { var r = await xy.AddCategoryAsync("New category", "0", Lifetime.Token); if (r.Success) xy.Select(xy.Model.Categories!.Categories!.Items[^1].Identity); return r; });
         Start(xy);
     }
     protected override IEnumerable<Choice> Choices()
@@ -53,6 +53,8 @@ public sealed class XyVisualEditorWindow : ChartVisualEditorWindow
         var m = xy.Model; var id = xy.Selection;
         var s = m.Series.FirstOrDefault(s => s.Identity == id || s.Values.Items.Any(v => v.Identity == id)); var v = s?.Values.Items.FirstOrDefault(v => v.Identity == id);
         var c = m.Categories?.Categories?.Items.FirstOrDefault(c => c.Identity == id);
+        Captions(id == m.HeaderIdentity ? "Diagram title" : id == m.HeaderIdentity + ":orientation" ? "Presentation (horizontal or vertical)" : c is not null ? "Category label" : s is not null ? "Series name (optional)" : "Axis title",
+            value: id == m.HeaderIdentity + ":range" ? "Y minimum (blank for automatic)" : "Value (decimal point)", maximum: "Y maximum (blank for automatic)");
         if (id == m.HeaderIdentity) Properties(m.Title?.Value ?? "", editLabel: true);
         else if (id == m.HeaderIdentity + ":orientation") Properties(m.Horizontal ? "horizontal" : "vertical", editLabel: true);
         else if (id == m.HeaderIdentity + ":range") Properties(value: m.Range?.Range?.Groups["min"].Value ?? "", maximum: m.Range?.Range?.Groups["max"].Value ?? "", editValue: true, editMaximum: true);
