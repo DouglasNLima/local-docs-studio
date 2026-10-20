@@ -62,6 +62,11 @@ the scanner was corrected and its regression retained. A non-aligned Quadrant pr
 test rejected valid coordinates because correspondence overlooked the pinned SVG
 formatter's second rounding step; exact emitted-position checks now include that step,
 with raw source precision and comma-decimal UI culture coverage retained.
+The inherited Continuous workflow initially excluded only #40's branch. It automatically
+launched two out-of-scope controlled profiling jobs at `9525de2`; both failed in
+[the retained run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39394954997).
+The exclusion now also covers this expansion branch. Ordinary stock Continuous
+interaction checks remain enabled; no performance target, fixture or renderer changed.
 
 The preview uses the normal unsigned self-contained Windows x64 installer/portable
 pipeline and official unmodified .NET 10/Mermaider 0.15.1. Isolated install/upgrade/

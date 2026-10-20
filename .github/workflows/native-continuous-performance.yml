@@ -42,8 +42,8 @@ jobs:
           path: artifacts/continuous-interactions/
           retention-days: 30
   controlled-comparison:
-    # This editor expansion explicitly leaves the stock Continuous investigation paused.
-    if: github.head_ref != 'feature/native-mermaid-gantt-mindmap-pie-editors' && github.ref != 'refs/heads/feature/native-mermaid-gantt-mindmap-pie-editors'
+    # These editor expansions explicitly leave the stock Continuous investigation paused.
+    if: github.head_ref != 'feature/native-mermaid-gantt-mindmap-pie-editors' && github.ref != 'refs/heads/feature/native-mermaid-gantt-mindmap-pie-editors' && github.head_ref != 'feature/native-mermaid-timeline-journey-quadrant-editors' && github.ref != 'refs/heads/feature/native-mermaid-timeline-journey-quadrant-editors'
     name: Controlled 250 ms acceptance (replication ${{ matrix.replication }})
     runs-on: windows-latest
     timeout-minutes: 35
