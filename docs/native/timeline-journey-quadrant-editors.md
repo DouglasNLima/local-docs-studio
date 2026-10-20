@@ -1,8 +1,9 @@
 # Timeline, User Journey and Quadrant compatibility
 
-Implementation in progress on `feature/native-mermaid-timeline-journey-quadrant-editors`,
+Implemented on `feature/native-mermaid-timeline-journey-quadrant-editors`,
 from develop `546b27adf2e0bc615e0f8cab23fe47f3e8f5cfc3`. This is a source authoring
-contract, not a claim of completed native or installed acceptance.
+contract. The [engineering receipt](expansion-ii-engineering-receipt.md) and Draft PR
+delivery record identify source-labelled native/installed acceptance and package results.
 
 The ordinary adapter remains authoritative: Mermaider 0.15.1, upstream source
 [`71b6484`](https://github.com/nullean/mermaider/tree/71b64845570d633a94d29e85579c0a02786fece8).
@@ -12,8 +13,8 @@ establish the pinned grammar. No replacement renderer or private engine API is u
 
 | Family | Editable first scope | Preserved or protected |
 | --- | --- | --- |
-| Timeline | Effective title; named and unsectioned groups; ordered periods and colon-separated events, including continuation groups | Empty source sections retained; unknown lines and orphan continuations protect ambiguous structural operations; colon/newline inputs rejected without invented escaping |
-| User Journey | Effective title; groups; ordered tasks; integer score corrections 1–5; ordered actor occurrences scoped to one task | Original score lexemes, including clamped scores; absent versus empty suffix; duplicate actors and untouched whitespace; ignored lines protect crossing moves; new delimiter-bearing names rejected |
+| Timeline | Effective title; named and unsectioned groups; ordered periods and colon-separated events, including continuation groups | Empty source sections retained; unknown lines and orphan continuations protect ambiguous structural operations; period/event colon and newline inputs rejected without invented escaping |
+| User Journey | Effective title; groups; ordered tasks; integer score corrections 1–5; ordered actor occurrences scoped to one task | Original score lexemes, including clamped scores; absent versus empty suffix; duplicate actors and untouched whitespace; ignored lines protect crossing moves; separator-bearing task names require unchanged intended score/actors; new comma-bearing actor names rejected |
 | Quadrant | Effective title; X left/right and Y bottom/top labels; numbered quadrant labels; ordered point occurrences; finite new coordinates in [0,1] | Original precision and clamped lexemes; repeated declarations retained with last occurrence precedence; one-sided axes retained; unknown directives protect crossing moves |
 
 Title body declarations override header titles, with the last body declaration winning.
@@ -25,6 +26,11 @@ The actual Quadrant renderer numbers quadrants 1 top right, 2 top left, 3 bottom
 4 bottom right. Its canonical panel rectangles establish the plot extent, including
 the centre gap. X grows rightwards and Y grows upwards; pointer correspondence uses
 the emitted point shapes and SVG viewBox. Coincident points remain separate list entries.
+The engine rounds point positions to three decimals, then emits at most two SVG decimals.
+Saved coordinate precision remains unchanged. Representable colons in point/task names
+are accepted only when they retain the intended numeric values and task actor suffix.
+Axis label fields reject their `-->` separator, and a right/top-only declaration cannot
+be newly represented by this pinned grammar. Existing one-sided declarations stay exact.
 
 All operations must retain authoritative source, stable source keys and bounded private
 history. Structural attachment follows #40: immediately preceding same-indent comments

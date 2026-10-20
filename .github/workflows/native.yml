@@ -114,6 +114,8 @@ jobs:
             artifacts/native/signing-adapters/**/signing-adapters.json
             artifacts/native/validation/
             artifacts/native/theme-resources/
+            artifacts/native/quadrant-compatibility/
+            artifacts/native/source-editor-fidelity/
             artifacts/native/ui/
             artifacts/native/interrupted-save/
             artifacts/native/site-browser/

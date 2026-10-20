@@ -1,7 +1,19 @@
 # Windows internal preview release notes
 
+## Eleven native Mermaid editors — Expansion II
 
-## Eight native Mermaid editors — current expansion
+Timeline, User Journey and Quadrant join the existing eight normal editor families.
+They reuse #40's source occurrences, source-group patching, private history, shared
+native workspace and owner Apply session. No renderer/runtime upgrade, browser
+fallback or LayoutExperiment is included. See the [syntax matrix](timeline-journey-quadrant-editors.md)
+and [engineering receipt](expansion-ii-engineering-receipt.md) for source-labelled
+verification, known protections and the Draft PR's final package/results record.
+Stock Continuous and paused #38 retain their documented status. Internal packaging
+and actual OS/installer acceptance are isolated; optional associations stay disabled.
+
+
+
+## Eight native Mermaid editors — previous expansion
 
 Gantt, Mind map and Pie join Flowchart, Sequence, State, ER and Class in the
 ordinary native application. Each family uses its own source adapter, canonical

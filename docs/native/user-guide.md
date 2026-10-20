@@ -465,3 +465,41 @@ Undo step, and Save persists portable Mermaid. Cancel keeps the owning document.
 Stale owner changes are rejected with the draft retained. Source panels support
 validation, original-source inspection and copy. The [supported/protected matrix](gantt-mindmap-pie-editors.md)
 records this first scope and the source attachment rule.
+
+## Timeline, User Journey and Quadrant visual authoring
+
+Use **Visual Edit** on the ordinary native preview or **Insert → Timeline / User
+Journey / Quadrant chart visually…**. Markdown Mermaid fences and standalone
+`.mmd`/`.mermaid` documents share the same editors. The full-name occurrence list
+provides every supported field and structural action, including overlapping points,
+duplicate labels and source-only empty sections. The preview remains canonical.
+
+**Timeline:** edit the effective title, sections, period labels and individual events.
+Add/remove/reorder events or periods, move complete sections, or select a destination
+section for a period. A period move carries all continuation lines and proved attached
+comments. Period labels need no date format and stay in authored order. Colons separate
+events; a new label containing a colon or line break is rejected without guessed escapes.
+
+**User Journey:** edit title, sections, task names and integer scores 1–5. The inspector
+shows the raw source score and effective renderer score when the renderer clamps a value.
+For example, a raw score of `9` stays `9` through an unrelated label edit. Replace it
+explicitly with a valid score to correct it. Each task has ordered actor occurrences:
+select one to rename, remove or reorder it; **Add actor to this task** appends one.
+Actor edits affect the selected task only. Repeated actor names remain separate. Commas
+separate actor names; colon-bearing actor names are valid after the score/actor separator.
+
+**Quadrant:** edit title, X labels left/right, Y labels bottom/top and all four labels.
+The engine places quadrant 1 top right, 2 top left, 3 bottom left and 4 bottom right.
+Select a point on its actual rendered marker or in the list. Edit its label and finite
+coordinates 0–1 using a decimal point; Y grows upwards. Add/remove/reorder points in
+source order. Coincident points are fully reachable in the list. Raw out-of-range
+coordinates and untouched precision stay exact until explicitly corrected. One-sided
+axis declarations stay one-sided; earlier repeated declarations remain in source.
+
+Unknown/ignored directives and ambiguous attachments protect affected structural changes.
+Read the local explanation and inspect **Original source**. Invalid pending properties
+remain in their fields with the last valid draft retained; Apply stays disabled until
+they are corrected or reset. Private Undo/Redo restores draft source and selection.
+Apply creates one owner Undo step; Save persists it. Cancel leaves the owner unchanged,
+and stale-owner Apply is rejected. Zoom/Fit, source validation and the persistent inspector
+use the shared native workspace. See the [supported/protected matrix](timeline-journey-quadrant-editors.md).
