@@ -79,3 +79,23 @@ physical screen reader and SDK-free clean Windows certification remain unavailab
 
 Actual screenshots and final package/run links are added to the receipt only after
 their exact committed-source runs complete. Older captures remain historical.
+
+
+## Inspected Windows captures at cc7c267
+
+These are actual independent UIA captures from source
+`cc7c26793249838e4c8d824bccc1661f508d03fe`,
+[24/24 hosted appearance runs](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39446459035).
+They are labelled intermediate source; later grammar guards do not change presentation.
+All six new-family runs include pointer/keyboard selection, small/normal windows,
+private and owner histories, conflicts, Apply/Cancel and Save/restart/reopen. Final
+source repeats these gates and supplies fresh captures in the PR delivery record.
+
+| Family | Light | Dark | Actual Windows High Contrast, 880x600 |
+|---|---|---|---|
+| Kanban | [Capture](images/expansion-iv/cc7c267/kanban-light.png) | [Capture](images/expansion-iv/cc7c267/kanban-dark.png) | [Capture](images/expansion-iv/cc7c267/kanban-high-contrast-880x600.png) |
+| Requirement | [Capture](images/expansion-iv/cc7c267/requirement-light.png) | [Capture](images/expansion-iv/cc7c267/requirement-dark.png) | [Capture](images/expansion-iv/cc7c267/requirement-high-contrast-880x600.png) |
+| GitGraph | [Capture](images/expansion-iv/cc7c267/gitgraph-light.png) | [Capture](images/expansion-iv/cc7c267/gitgraph-dark.png) | [Capture](images/expansion-iv/cc7c267/gitgraph-high-contrast-880x600.png) |
+
+Raw source-labelled UIA summaries are retained in
+`evidence/expansion-iv/cc7c267/`. UIA does not certify a physical screen reader.

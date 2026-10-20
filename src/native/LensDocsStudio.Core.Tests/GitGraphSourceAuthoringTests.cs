@@ -49,4 +49,8 @@ public class GitGraphSourceAuthoringTests
     {
         var d = new GitGraphVisualDraft("gitGraph\n"); Pass(await d.ValidateAsync()); Pass(await d.AppendAsync("commit", id: "first")); Pass(await d.AppendAsync("commit", id: "second")); Pass(await d.UpdateAsync(d.Model.Commands[1].Identity, "", "", "NORMAL")); Assert.Equal("1", d.Model.Marks[1].Label); Assert.DoesNotContain("second", d.Source); Pass(await d.ValidateAsync());
     }
+    [Fact] public async Task ID_edits_preserve_untouched_case_insensitive_type_keyword_and_value_lexemes()
+    {
+        const string source = "gitGraph\ncommit id: \"old\" TYPE: hIgHlIgHt\n"; var d = new GitGraphVisualDraft(source); Pass(await d.ValidateAsync()); Pass(await d.UpdateAsync(d.Model.Commands[0].Identity, "new", "", "HIGHLIGHT")); Assert.Equal(source.Replace("\"old\"", "\"new\"", StringComparison.Ordinal), d.Source);
+    }
 }

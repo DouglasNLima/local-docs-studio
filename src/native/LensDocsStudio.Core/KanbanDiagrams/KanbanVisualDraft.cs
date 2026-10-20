@@ -75,7 +75,7 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
     public Task<SourceAuthoringResult> SetTitleAsync(string title, CancellationToken token = default) => ChangeAsync((t, m) => { SourceText.Label(title); return SourceDeclarations.SetTitle(t, m.HeaderIdentity, m.Title, title); }, token);
     public Task<SourceAuthoringResult> UpdateAsync(string identity, string id, string label, string assigned, string ticket, string priority, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        var row = m.Rows.Single(r => r.Identity == identity); var changed = t;
+        var row = m.Rows.SingleOrDefault(r => r.Identity == identity) ?? throw new ArgumentException("Select a column or card occurrence; title/configuration rows have protected structural operations."); var changed = t;
         if (id != row.Id || label != row.Label)
         {
             SourceDeclarations.PlainLabel(label, "[]{}\""); SourceDeclarations.RejectDirectiveName(label, "title", true);
@@ -114,23 +114,27 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
     {
         Structure(t, m); SourceDeclarations.PlainLabel(id, "[]{}\"@"); SourceDeclarations.PlainLabel(label, "[]{}\""); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("Use an ID without whitespace.");
         if (m.Rows.Any(r => r.Id == id)) throw new ArgumentException("Choose an unused ID for a new column.");
-        return t.Insert(t.Lines.Count, (m.Columns.FirstOrDefault() is { } c ? t.Line(c.Identity).Indent : "    ") + id + "[" + label + "]");
+        var changed = t.Insert(t.Lines.Count, (m.Columns.FirstOrDefault() is { } c ? t.Line(c.Identity).Indent : "    ") + id + "[" + label + "]");
+        var added = Scan(changed).Columns.SingleOrDefault(r => r.Identity == changed.Lines[^1].Key);
+        if (added is null || added.Id != id || added.Label != label) throw new ArgumentException("This ID/title would become a comment or another source form. Choose a representable column ID/title."); return changed;
     }, token);
     public Task<SourceAuthoringResult> AddCardAsync(string column, string id, string label, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
         Structure(t, m); var col = m.Columns.Single(c => c.Identity == column); SourceDeclarations.PlainLabel(id, "[]{}\"@"); SourceDeclarations.PlainLabel(label, "[]{}\""); if (id.Any(char.IsWhiteSpace)) throw new ArgumentException("Use an ID without whitespace.");
         if (m.Rows.Any(r => r.Id == id)) throw new ArgumentException("Choose an unused ID for a new card.");
-        var end = ColumnEnd(t, m, col); Group(t, m, t.Index(column), end); return t.Insert(end, t.Line(column).Indent + "    " + id + "[" + label + "]");
+        var end = ColumnEnd(t, m, col); Group(t, m, t.Index(column), end); var changed = t.Insert(end, t.Line(column).Indent + "    " + id + "[" + label + "]");
+        var added = Scan(changed).Cards.SingleOrDefault(r => r.Identity == changed.Lines[end].Key);
+        if (added is null || added.Id != id || added.Label != label || added.Column != column) throw new ArgumentException("This ID/title would change comment or card membership semantics. Choose a representable card ID/title."); return changed;
     }, token);
     public Task<SourceAuthoringResult> DeleteAsync(string identity, bool completeColumn = false, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Structure(t, m); var row = m.Rows.Single(r => r.Identity == identity); var start = t.AttachedStart(identity); var end = row.Column is null ? ColumnEnd(t, m, row) : t.Index(identity) + 1;
+        Structure(t, m); var row = m.Rows.SingleOrDefault(r => r.Identity == identity) ?? throw new ArgumentException("Select a column or card occurrence; title/configuration rows have protected structural operations."); var start = t.AttachedStart(identity); var end = row.Column is null ? ColumnEnd(t, m, row) : t.Index(identity) + 1;
         if (row.Column is null && m.Cards.Any(c => c.Column == identity) && !completeColumn) throw new ArgumentException("This column contains cards. Move/remove them first, or explicitly choose Remove column and all cards.");
         Group(t, m, start, end); if (row.Column is not null) SourceRowMoves.CheckTrailingAttachment(t, identity); return t.Splice(start, end - start, []);
     }, token);
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Structure(t, m); var row = m.Rows.Single(r => r.Identity == identity); var peers = m.Rows.Where(r => r.Column == row.Column).ToArray(); var at = Array.IndexOf(peers, row); var next = at + Math.Sign(direction);
+        Structure(t, m); var row = m.Rows.SingleOrDefault(r => r.Identity == identity) ?? throw new ArgumentException("Select a column or card occurrence; title/configuration rows have protected structural operations."); var peers = m.Rows.Where(r => r.Column == row.Column).ToArray(); var at = Array.IndexOf(peers, row); var next = at + Math.Sign(direction);
         if (next < 0 || next >= peers.Length) throw new ArgumentException("There is no occurrence in that direction.");
         if (row.Column is not null) return ChartSource.MoveRow(t, peers.Select(r => r.Identity).ToArray(), identity, direction);
         var a = peers[Math.Min(at, next)]; var b = peers[Math.Max(at, next)]; var ae = ColumnEnd(t, m, a); var be = ColumnEnd(t, m, b);
@@ -138,7 +142,7 @@ public sealed class KanbanVisualDraft : SourceDraft<KanbanSourceModel>
     }, token);
     public Task<SourceAuthoringResult> MoveCardAsync(string identity, string destination, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
-        Structure(t, m); var row = m.Cards.Single(r => r.Identity == identity); var column = m.Columns.Single(r => r.Identity == destination); if (row.Column == destination) return t;
+        Structure(t, m); var row = m.Cards.SingleOrDefault(r => r.Identity == identity) ?? throw new ArgumentException("Select a card occurrence to move between columns."); var column = m.Columns.SingleOrDefault(r => r.Identity == destination) ?? throw new ArgumentException("Choose an existing destination column."); if (row.Column == destination) return t;
         SourceRowMoves.CheckTrailingAttachment(t, identity); var start = t.AttachedStart(identity); var end = t.Index(identity) + 1; var to = ColumnEnd(t, m, column); Group(t, m, t.Index(destination), to);
         var indent = m.Cards.FirstOrDefault(c => c.Column == destination) is { } card ? t.Line(card.Identity).Indent : t.Line(destination).Indent + "    ";
         var changed = t.Splice(start, end - start, t.Lines.Skip(start).Take(end - start).Select(l => l with { Text = indent + l.Text[l.Indent.Length..] })); changed = SourceSections.MoveTo(changed, start, end, to);

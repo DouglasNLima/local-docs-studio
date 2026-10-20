@@ -31,8 +31,8 @@ movement, production Pages deployment or ordinary desktop installation is author
 5. Integration/validation: ordinary routes, catalogue/help, independent six new UIA
    runs, original regressions and all seventeen installed lifecycle families are
    implemented. Working-tree fidelity passed **78 checks**; this is explicitly an
-   intermediate result, not clean-source certification. Final-source gates pending.
-6. Packaging/handoff: pending final clean committed source and hosted validation.
+   intermediate result, not clean-source certification. Final-source gates are identified by the immutable PR delivery receipt.
+6. Packaging/handoff: the PR delivery receipt records final clean committed source, hosted validation and independently inspected packages.
 
 ## Source inspection and retained failures
 
@@ -66,11 +66,11 @@ screen-reader and SDK-free clean Windows certification remain unavailable.
 
 ## Final delivery record
 
-To be completed against the immutable final source: Draft PR URL, clean SHA, full
+The immutable PR delivery receipt records: Draft PR URL, clean SHA, full
 check counts/skips, source-labelled Windows screenshots, Actions artefacts and expiry,
 fresh unsigned self-contained installer/portable versions, SHA-256, preserved-copy
 paths, exact compiled source/resources/runtime identity, independent complete payload
-parity and negative controls. Earlier working candidates do not certify final source.
+parity and negative controls. Earlier working candidates do not certify final source. Use the source SHA and completed run links in the PR delivery receipt.
 
 
 ## Initial hosted candidate and inspector correction
@@ -95,3 +95,28 @@ checks branch badge order and actual commit-lane centres; the compatibility gate
 asserts all four Requirement directions against actual box coordinates. New UIA
 cases exercise destination card movement, relation-type editing and explicit named
 branch/commit/checkout/merge commands. Final-source outcomes remain pending.
+
+
+## Inspected committed-source Windows milestone
+
+Candidate `cc7c26793249838e4c8d824bccc1661f508d03fe` passed
+[all 24 shared-source appearance jobs](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39446459035),
+retaining the existing eighteen and adding all six new-family normal/actual Windows
+High Contrast runs. Source-labelled summaries and nine inspected captures are
+checked in under `docs/native/{evidence,images}/expansion-iv/cc7c267/` and linked by
+the grammar guide. All 270 local Chromium/Edge browser tests passed at the earlier
+unchanged web source `432ee19` (no retries); static/service-worker checks passed.
+
+Clean `cc7c267` local native checks: zero-warning locked Release build; 1,900 Core
+passed, zero skipped; workflow compatibility 98; workflow editor fidelity 82; prior
+chart compatibility 82; chart editor fidelity 78; source editor fidelity 397.
+These retain their actual source label and do not certify a later commit.
+
+Final review additionally rejects ignored comment-like Kanban IDs before source is
+committed; safely quotes legacy comment-like Requirement endpoints; and preserves
+untouched case-insensitive relation/commit type lexemes during independent edits.
+The final focused workflow suite has 62 cases. Final source, packages, all seventeen
+installed lifecycle suites and fresh capture/CI links are recorded in the immutable
+[Draft PR #43 delivery receipt](https://github.com/DouglasNLima/local-docs-studio/pull/43)
+after its gates complete. That delivery record is authoritative for final status,
+package SHA-256, runtime/provenance, artefact expiry, preserved paths and elapsed time.

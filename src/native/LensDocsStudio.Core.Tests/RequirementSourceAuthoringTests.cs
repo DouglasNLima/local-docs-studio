@@ -70,4 +70,12 @@ public class RequirementSourceAuthoringTests
     {
         var d = new RequirementVisualDraft("requirementDiagram\nrequirement a {\ntext: \"A {literal} value\"\n}\n"); Assert.True(d.Model.Blocks[0].Complete); Pass(await d.UpdateBlockAsync(d.Model.Blocks[0].Identity, "requirement", new Dictionary<string, string> { ["id"] = "DOC-1" })); Assert.Contains("text: \"A {literal} value\"", d.Source);
     }
+    [Fact] public async Task Legacy_comment_like_symbolic_names_receive_proved_quotes_when_used_in_new_relations()
+    {
+        var d = new RequirementVisualDraft("requirementDiagram\nrequirement \"%%legacy\" {\n}\nelement b {\n}\n"); Pass(await d.AddRelationAsync("%%legacy", "b", "traces")); Assert.Contains("\"%%legacy\" - traces -> b", d.Source); Assert.Single(d.Model.Relations); Pass(await d.ValidateAsync());
+    }
+    [Fact] public async Task Endpoint_edits_preserve_untouched_relation_type_casing_and_reverse_spelling()
+    {
+        const string source = "requirementDiagram\nrequirement a {\n}\nelement b {\n}\nelement c {\n}\nb <- TRACES - a\n"; var d = new RequirementVisualDraft(source); Pass(await d.UpdateRelationAsync(d.Model.Relations[0].Identity, "a", "c", "traces")); Assert.Equal(source.Replace("b <-", "c <-", StringComparison.Ordinal), d.Source);
+    }
 }

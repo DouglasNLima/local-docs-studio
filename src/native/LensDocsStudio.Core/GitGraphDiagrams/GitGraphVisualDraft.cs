@@ -10,7 +10,7 @@ public sealed record GitSourceAttribute(SourceField Field, int Start, int Length
 public sealed record GitSourceCommand(string Identity, string Kind, string BranchBefore, string BranchAfter, string? Reference, string? Label, int Lane, IReadOnlyList<GitSourceAttribute> Attributes, bool Simple)
 {
     public bool Mark => Kind is "commit" or "merge" or "cherry-pick";
-    public string Value(string name) => Attributes.FirstOrDefault(a => a.Field.Name == name)?.Field.Value ?? (name == "type" ? "NORMAL" : "");
+    public string Value(string name) => name == "type" ? (Attributes.FirstOrDefault(a => a.Field.Name == name)?.Field.Value ?? "NORMAL").ToUpperInvariant() : Attributes.FirstOrDefault(a => a.Field.Name == name)?.Field.Value ?? "";
 }
 public sealed record GitSourceLink(string From, string To, string Kind);
 public sealed record GitGraphSourceModel(string HeaderIdentity, IReadOnlyList<GitSourceCommand> Commands, IReadOnlyList<string> Branches, IReadOnlyDictionary<string, string> Heads, IReadOnlyList<GitSourceLink> Links, IReadOnlyList<string> Protected, string CurrentBranch)
@@ -28,7 +28,7 @@ public sealed class GitGraphVisualDraft : SourceDraft<GitGraphSourceModel>
     private static readonly Regex Checkout = SourceText.Pattern("^[ \\t]*(?:checkout|switch)\\s+\"?(?<name>[^\"]+?)\"?[ \\t]*$");
     private static readonly Regex Merge = SourceText.Pattern("^[ \\t]*merge\\s+\"?(?<name>[^\"]+?)\"?(?:\\s+(?<rest>.+))?$");
     private static readonly Regex Commit = SourceText.Pattern(@"^[ \t]*commit(?:\s+(?<rest>.+))?$"), Cherry = SourceText.Pattern(@"^[ \t]*cherry-pick\s+(?<rest>.+)$");
-    private static readonly Regex Attribute = SourceText.Pattern("(?<name>id|tag|parent):\\s*(?<value>\"[^\"]+\")|(?<name>type):\\s*(?<value>(?i:NORMAL|HIGHLIGHT|REVERSE))");
+    private static readonly Regex Attribute = SourceText.Pattern("(?<name>id|tag|parent):\\s*(?<value>\"[^\"]+\")|(?<name>(?i:type)):\\s*(?<value>(?i:NORMAL|HIGHLIGHT|REVERSE))");
     private static readonly Regex NewBranch = SourceText.Pattern(@"^[A-Za-z_][A-Za-z0-9_./-]*$");
     public static bool IsGitGraph(string source) => Header.IsMatch(ChartSource.Header(source));
     public GitGraphVisualDraft(string source, DiagramService? diagrams = null) : base(source, diagrams) { }
@@ -53,7 +53,7 @@ public sealed class GitGraphVisualDraft : SourceDraft<GitGraphSourceModel>
                 foreach (Match attr in Attribute.Matches(line.Body, rest.Success ? rest.Index : line.Body.Length))
                 {
                     if (line.Body[at..attr.Index].Any(c => !char.IsWhiteSpace(c))) simple = false;
-                    fields.Add(new(WorkflowSource.Field(line, attr.Groups["name"].Value, attr.Groups["value"], true), attr.Index, attr.Length)); at = attr.Index + attr.Length;
+                    fields.Add(new(WorkflowSource.Field(line, attr.Groups["name"].Value.ToLowerInvariant(), attr.Groups["value"], true), attr.Index, attr.Length)); at = attr.Index + attr.Length;
                 }
                 if (rest.Success && line.Body[at..].Any(c => !char.IsWhiteSpace(c))) simple = false;
                 if (fields.GroupBy(f => f.Field.Name).Any(g => g.Count() > 1) || fields.Any(f => f.Field.Name == "parent")) simple = false;

@@ -98,7 +98,7 @@ public sealed class RequirementVisualDraft : SourceDraft<RequirementSourceModel>
     private static void Topology(RequirementSourceModel m) { if (!m.TopologySafe) throw new ArgumentException("Hidden/duplicate nodes, unknown text, missing references, malformed blocks, parallel/self/cyclic relations protect affected topology. Safe independent fields remain available."); }
     private static void Name(string name) { SourceDeclarations.PlainLabel(name, "\"{}\r\n"); if (name.Contains(" ->", StringComparison.Ordinal) || name.Contains(" <-", StringComparison.Ordinal) || name.StartsWith("%%", StringComparison.Ordinal)) throw new ArgumentException("This symbolic name contains an unrepresentable relation/comment delimiter."); }
     private static RequirementBlock Editable(RequirementSourceModel m, string id)
-    { var b = m.Blocks.Single(b => b.Identity == id); if (!b.Complete || !m.Unique(b.Name)) throw new ArgumentException("This hidden/duplicate or malformed block is protected. Inspect its original source."); return b; }
+    { var b = m.Blocks.SingleOrDefault(b => b.Identity == id) ?? throw new ArgumentException("Select a requirement or element block occurrence."); if (!b.Complete || !m.Unique(b.Name)) throw new ArgumentException("This hidden/duplicate or malformed block is protected. Inspect its original source."); return b; }
     public Task<SourceAuthoringResult> SetHeadingAsync(string title, string direction, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
         var changed = t; if (title != (m.Title?.Value ?? "")) { var value = WorkflowSource.Quoted(title, m.Title?.Tokens.Groups["label"].Value); changed = SourceDeclarations.SetTitle(changed, m.HeaderIdentity, m.Title, value); }
@@ -139,7 +139,7 @@ public sealed class RequirementVisualDraft : SourceDraft<RequirementSourceModel>
     public Task<SourceAuthoringResult> UpdateRelationAsync(string identity, string source, string target, string type, CancellationToken token = default) => ChangeAsync((t, m) =>
     {
         Topology(m); Endpoints(m with { Relations = m.Relations.Where(r => r.Identity != identity).ToArray() }, source, target, type); var r = m.Relations.Single(r => r.Identity == identity); var changed = t;
-        foreach (var (field, value) in new[] { (r.SourceToken, source), (r.TargetToken, target), (r.TypeToken, type) }.OrderByDescending(p => p.Item1.Start)) if (field.Value != value) changed = field.Set(changed, field.Name == "type" ? value : WorkflowSource.Quoted(value, field.Raw));
+        foreach (var (field, value) in new[] { (r.SourceToken, source), (r.TargetToken, target), (r.TypeToken, type) }.OrderByDescending(p => p.Item1.Start)) if ((field.Name == "type" ? r.Type : field.Value) != value) changed = field.Set(changed, field.Name == "type" ? value : WorkflowSource.Quoted(value, field.Raw));
         if (!Scan(changed).TopologySafe) throw new ArgumentException("This relationship would create an unproved cycle or dependency."); return changed;
     }, token);
     public Task<SourceAuthoringResult> DeleteAsync(string identity, CancellationToken token = default) => ChangeAsync((t, m) =>

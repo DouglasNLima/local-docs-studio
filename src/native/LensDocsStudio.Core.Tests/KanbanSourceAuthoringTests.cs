@@ -66,4 +66,8 @@ public class KanbanSourceAuthoringTests
         Assert.False((await d.UpdateAsync(r.Identity, r.Id, r.Label, "New", "", "")).Success); Assert.Equal(d.OriginalSource, d.Source);
         Pass(await d.UpdateAsync(r.Identity, r.Id, "Safe label", r.Meta("assigned"), r.Meta("ticket"), r.Meta("priority"))); Assert.Contains(metadata, d.Source);
     }
+    [Fact] public async Task New_comment_like_IDs_cannot_silently_create_ignored_columns_or_cards()
+    {
+        var d = new KanbanVisualDraft(KanbanVisualDraft.Starter); Assert.False((await d.AddColumnAsync("%%hidden", "Column")).Success); Assert.False((await d.AddCardAsync(d.Model.Columns[0].Identity, "%%hidden", "Card")).Success); Assert.Equal(d.OriginalSource, d.Source);
+    }
 }

@@ -20,7 +20,7 @@ public static class WorkflowSource
     {
         if (value.Length > 0 || !empty) SourceText.Label(value);
         if (value.IndexOfAny(['"', '\r', '\n']) >= 0 || value.Any(char.IsControl)) throw new ArgumentException("Double quotes and line breaks have no proved escape here. Pending input is retained.");
-        return original?.StartsWith('"') == true || value.Length == 0 || value != value.Trim() ? "\"" + value + "\"" : value;
+        return original?.StartsWith('"') == true || value.StartsWith("%%", StringComparison.Ordinal) || value.Length == 0 || value != value.Trim() ? "\"" + value + "\"" : value;
     }
     public static void Rendered(SourceText text, DiagramResult result)
     { if (!result.Success || result.Source != text.Source) throw new ArgumentException(result.Error ?? "Exact draft source did not render."); }

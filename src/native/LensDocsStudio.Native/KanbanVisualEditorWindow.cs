@@ -26,6 +26,7 @@ public sealed class KanbanVisualEditorWindow : ChartVisualEditorWindow
         ActionButton("Move card to selected column", "MoveCard", () => kanban.MoveCardAsync(kanban.Selection ?? "", (destination.SelectedItem as Choice)?.Identity ?? "", Lifetime.Token), InspectorFields);
         ActionButton("Remove column and all cards", "RemoveCompleteColumn", async () =>
         {
+            if (Row is not { Column: null }) return Protected("Select a column occurrence for complete column removal.");
             if (MessageBox.Show(this, "Remove this column and every card in its complete source group? Private Undo can restore them.", "Remove complete column", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return Protected("Complete column removal cancelled.");
             return await kanban.DeleteAsync(kanban.Selection ?? "", true, Lifetime.Token);
         }, InspectorFields);
