@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory)][string]$Installer,
     [string]$UpgradeInstaller,
-    [string]$HistoricalValidationProject
+    [string]$HistoricalValidationProject,
+    [switch]$NoFileAssociations
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
@@ -93,9 +94,18 @@ if ($UpgradeInstaller) {
         throw 'Historical upgrades require an original branch-source package from a different revision.'
     }
 }
+function Assert-NoFileAssociations {
+    if (Test-Path 'HKCU:\Software\Classes\LensDocsStudio.Native.Document') { throw 'The excluded native association registration exists.' }
+    foreach ($extension in '.md', '.markdown', '.mmd', '.mermaid') {
+        $key = Get-Item -LiteralPath ("HKCU:\Software\Classes\$extension\OpenWithProgids") -ErrorAction SilentlyContinue
+        if ($key -and $key.GetValueNames() -contains 'LensDocsStudio.Native.Document') { throw "An excluded Open with registration exists for $extension." }
+    }
+}
+if ($NoFileAssociations) { Assert-NoFileAssociations }
 function Run-Installer([string]$Path, [string]$Phase) {
     $expectedIdentity = Get-PackageIdentity $Path
-    $process = Start-Process -FilePath $Path -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),'/TASKS="fileassoc,desktopicon"',('/LOG="' + (Join-Path $root ($Phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
+    $tasks = if ($NoFileAssociations) { '/TASKS="desktopicon"' } else { '/TASKS="fileassoc,desktopicon"' }
+    $process = Start-Process -FilePath $Path -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),$tasks,('/LOG="' + (Join-Path $root ($Phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
     if ($process.ExitCode -ne 0) { throw "$Phase failed with exit code $($process.ExitCode)." }
     if (-not (Test-Path -LiteralPath $uninstallKey)) { throw 'The native uninstall registration is missing.' }
     if (-not (Test-Path -LiteralPath $shortcut) -or -not (Test-Path -LiteralPath $desktopShortcut)) { throw 'Installer shortcuts are missing.' }
@@ -113,8 +123,10 @@ function Run-Installer([string]$Path, [string]$Phase) {
             } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($link) }
         }
     } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($shortcutReader) }
-    $association = (Get-ItemProperty 'HKCU:\Software\Classes\LensDocsStudio.Native.Document\shell\open\command').'(default)'
-    if (-not $association.Contains($installDirectory)) { throw 'Open with does not target the isolated native installation.' }
+    if ($NoFileAssociations) { Assert-NoFileAssociations } else {
+        $association = (Get-ItemProperty 'HKCU:\Software\Classes\LensDocsStudio.Native.Document\shell\open\command').'(default)'
+        if (-not $association.Contains($installDirectory)) { throw 'Open with does not target the isolated native installation.' }
+    }
     $installedIdentity = Get-Content -LiteralPath (Join-Path $installDirectory 'version.json') -Raw | ConvertFrom-Json
     $registeredVersion = (Get-ItemProperty -LiteralPath $uninstallKey).DisplayVersion
     $binaryVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $installDirectory 'LensDocsStudio.Native.dll')).ProductVersion.Split('+')[0]
@@ -124,7 +136,7 @@ function Run-Installer([string]$Path, [string]$Phase) {
     }
     $installedVersions.Add(@{ phase=$Phase; expected=$expectedIdentity.version; metadata=$installedIdentity.version; registration=$registeredVersion; binary=$binaryVersion })
     Assert-InstalledPayload $Path $Phase
-    $checks.Add("${Phase}: installed self-contained application, shortcuts and Open with registration")
+    $checks.Add($(if ($NoFileAssociations) { "${Phase}: installed self-contained application and shortcuts; optional associations absent" } else { "${Phase}: installed self-contained application, shortcuts and Open with registration" }))
     Assert-PreservedState $Phase
 }
 function Run-NativeUi([string]$Phase) {
@@ -178,8 +190,10 @@ try {
     $defaultAfter = (Get-ItemProperty 'HKCU:\Software\Classes\.md' -ErrorAction SilentlyContinue).'(default)'
     $legacyAfter = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{E5D86651-4B27-4C59-B7D4-2EA98F2F8D26}_is1' -ErrorAction SilentlyContinue | ConvertTo-Json -Compress
     if ($defaultBefore -ne $defaultAfter -or $legacyBefore -ne $legacyAfter) { throw 'The legacy registration or Markdown default changed.' }
+    if ($NoFileAssociations) { Assert-NoFileAssociations }
     $checks.Add('Existing shell registration and Markdown default preserved')
     @{ passed=$true; checks=$checks; installedVersions=$installedVersions; shortcutIdentities=$shortcutIdentities; preservedStateFiles=$preservedStateSnapshot.Count; evidence=$root;
+        optionalAssociationsTested=(-not [bool]$NoFileAssociations); associationsExcluded=[bool]$NoFileAssociations;
         cleanMachineCertification=$false; upgradeTested=[bool]$UpgradeInstaller; productionSignedUpgrade=$false; sessionRestorationTested=$true;
         sameRevisionUpgrade=[bool]($UpgradeInstaller -and $upgradeIdentity.sourceRevision -eq $initialIdentity.sourceRevision);
         historicalSourceRevision=$initialIdentity.sourceRevision; candidateSourceRevision=$(if ($UpgradeInstaller) { $upgradeIdentity.sourceRevision } else { $initialIdentity.sourceRevision });

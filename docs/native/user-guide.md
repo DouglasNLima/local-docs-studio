@@ -125,7 +125,7 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Families other than Flowchart, Sequence, State and ER keep their existing
+than four connections per node. Families outside the eight visual editors keep their existing
 [rendering and export commands](#mermaid-diagrams-and-maths).
 
 ## Desktop workspace and synchronisation
@@ -412,7 +412,7 @@ revision-specific hosted acceptance and internal-preview certification.
 
 ### Shared Mermaid editor workspace
 
-All five native editors retain exact element selection in their navigation lists.
+All eight native editors retain exact element selection in their navigation lists.
 Long descriptions are available in full through tooltips and accessible names.
 Drag a panel divider, or focus it and use the arrow keys, to resize navigation,
 properties or expanded source. The selected identity and Update/Reset actions stay
@@ -429,3 +429,39 @@ in Mermaid source. Expand source to validate, copy or inspect the original draft
 In Flowchart, **Home** resets the viewport when focus is outside the navigation
 list or a selector. Focused lists and selectors retain native Home/End and arrow
 key navigation, including extended selection where supported.
+
+
+## Gantt, Mind map and Pie visual authoring
+
+Use **Visual Edit** on these native Mermaid previews, or choose the matching
+**Insert → Gantt chart / Mind map / Pie chart visually…** starter. Markdown fences
+and standalone `.mmd`/`.mermaid` documents use the same native editor. Select exact
+source occurrences in the navigation list to use the persistent inspector.
+
+**Gantt:** edit title, section names and task labels. Independent tasks support an
+explicit ISO `yyyy-MM-dd` start (with a native calendar picker) and a positive
+whole-day duration. Add/remove/move tasks within a section or move complete section
+groups. Existing IDs stay unchanged. Dependencies, implicit starts, statuses,
+milestones, incompatible dateFormat, calendars and unknown directives protect date
+and structural operations; safe local labels remain editable. Empty section rows
+stay in source until populated; the renderer omits empty sections.
+
+**Mind map:** edit the single root and nested branches. Add a child or sibling,
+remove a complete subtree, move siblings, indent/outdent or choose a new parent.
+Root removal, cycles and a second root are prohibited. Duplicate text identifies
+separate source occurrences. Recognised shape delimiters and IDs remain unchanged;
+unproved metadata attachment or mixed indentation protects local structural edits.
+
+**Pie:** edit title, category labels and values; add/remove/move separate categories.
+The selected category highlights its actual canonical wedge. Values display the
+current decimal separator and save in invariant decimal notation. Untouched number
+precision stays exact. Zero rows stay in source and have no slice. At least one
+positive value and a finite total are required to Apply. Label line breaks are safely encoded as `\n`. Embedded double quotes cannot be
+encoded by this pinned parser; rejected input stays in the inspector for correction. Percentages come only from canonical rendering.
+
+Update or reset pending properties before selecting another occurrence. Private
+Undo/Redo restores exact source and selection; Apply commits one owner-document
+Undo step, and Save persists portable Mermaid. Cancel keeps the owning document.
+Stale owner changes are rejected with the draft retained. Source panels support
+validation, original-source inspection and copy. The [supported/protected matrix](gantt-mindmap-pie-editors.md)
+records this first scope and the source attachment rule.

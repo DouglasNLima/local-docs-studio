@@ -15,7 +15,7 @@ internal static partial class NativeUiChecks
     private const string LegacyUninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\{E5D86651-4B27-4C59-B7D4-2EA98F2F8D26}_is1";
     private const string WizardProduct = "Lens Docs Studio Native Preview";
 
-    public static int RunInstallerWizard(string installer, string output)
+    public static int RunInstallerWizard(string installer, string output, bool noFileAssociations = false)
     {
         // This command changes foreground focus and installs a disposable fixture.
         // Never use it on the developer's active desktop or an existing installation.
@@ -26,14 +26,14 @@ internal static partial class NativeUiChecks
         var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thread = new Thread(() =>
         {
-            try { completion.SetResult(CheckInstallerWizard(installer, output)); }
+            try { completion.SetResult(CheckInstallerWizard(installer, output, noFileAssociations)); }
             catch (Exception ex) { Console.Error.WriteLine(ex); completion.SetResult(1); }
         }) { IsBackground = true, Name = "Installer wizard automation" };
         thread.SetApartmentState(ApartmentState.MTA); thread.Start();
         return completion.Task.GetAwaiter().GetResult();
     }
 
-    private static int CheckInstallerWizard(string installer, string output)
+    private static int CheckInstallerWizard(string installer, string output, bool noFileAssociations)
     {
         installer = Path.GetFullPath(installer); output = Path.GetFullPath(output);
         if (!File.Exists(installer)) throw new FileNotFoundException("The native installer is missing.", installer);
@@ -47,6 +47,7 @@ internal static partial class NativeUiChecks
         if (RegistrySnapshot(NativeUninstallKey) is not null || RegistrySnapshot(@"Software\Classes\LensDocsStudio.Native.Document") is not null
             || File.Exists(startShortcut) || File.Exists(desktopShortcut) || Directory.Exists(originalDestination) || File.Exists(originalDestination))
             throw new IOException("An existing native installation or shortcut must be preserved; use a fresh runner.");
+        if (noFileAssociations) AssertNoWizardAssociations();
         var legacyBefore = RegistrySnapshot(LegacyUninstallKey);
         var markdownBefore = DefaultMarkdownAssociation();
         var root = Path.Combine(output, "wizard-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
@@ -91,6 +92,7 @@ internal static partial class NativeUiChecks
                 {
                     var choice = Choice(task);
                     if (Checked(choice)) throw new IOException("An optional wizard task was selected without consent: " + task);
+                    if (noFileAssociations && task.StartsWith("Add Native Preview", StringComparison.Ordinal)) continue;
                     choice.Focus(); Keyboard.Type(VirtualKeyShort.SPACE);
                     Wait(() => Checked(Choice(task)), "Keyboard selection did not enable the optional task: " + task);
                 }
@@ -101,7 +103,7 @@ internal static partial class NativeUiChecks
                 if (cancel)
                 {
                     Next("Back");
-                    if (!Checked(Choice("Create a Desktop shortcut")) || !Checked(Choice("Add Native Preview to Open with for Markdown and Mermaid files")))
+                    if (!Checked(Choice("Create a Desktop shortcut")) || Checked(Choice("Add Native Preview to Open with for Markdown and Mermaid files")) == noFileAssociations)
                         throw new IOException("Back navigation discarded the selected tasks.");
                     Next("Back");
                     if (DestinationEdit().Text != destination) throw new IOException("Back navigation discarded the chosen destination.");
@@ -149,10 +151,13 @@ internal static partial class NativeUiChecks
                         || installed.RootElement.GetProperty("sourceRevision").GetString() != identity.RootElement.GetProperty("sourceRevision").GetString()
                         || FileVersionInfo.GetVersionInfo(installedDll).ProductVersion?.Split('+')[0] != version
                         || registration?.GetValue("DisplayVersion")?.ToString() != version
-                        || association?.GetValue("")?.ToString()?.Contains(destination, StringComparison.OrdinalIgnoreCase) != true
+                        || (noFileAssociations ? association is not null : association?.GetValue("")?.ToString()?.Contains(destination, StringComparison.OrdinalIgnoreCase) != true)
                         || !File.Exists(startShortcut) || !File.Exists(desktopShortcut))
                         throw new IOException("Interactive installation lost its version, files, chosen shortcuts or Open with registration.");
-                    checks.Add("Visible Install and Finish produce matching native files/version, selected shortcuts and Open with registration");
+                    if (noFileAssociations) AssertNoWizardAssociations();
+                    checks.Add(noFileAssociations
+                        ? "Visible Install and Finish produce matching native files/version and selected shortcuts; optional associations absent"
+                        : "Visible Install and Finish produce matching native files/version, selected shortcuts and Open with registration");
                 }
                 wizard = null; wizardProcess.Dispose(); wizardProcess = null; launcher.Dispose(); launcher = null;
             }
@@ -203,9 +208,10 @@ internal static partial class NativeUiChecks
             || Directory.Exists(originalDestination) || RegistrySnapshot(LegacyUninstallKey) != legacyBefore
             || !File.ReadAllBytes(source).AsSpan().SequenceEqual(sourceBytes))
             throw new IOException("Wizard cleanup did not preserve prior registration and source.");
+        if (noFileAssociations) AssertNoWizardAssociations();
         checks.Add("Cleanup removes only the test installation and retains prior default associations and source");
         File.WriteAllText(Path.Combine(root, "installer-wizard.json"), JsonSerializer.Serialize(new
-        { passed = true, version, checks, sourcePreserved = true, cleanMachineCertification = false,
+        { passed = true, version, checks, sourcePreserved = true, associationsExcluded = noFileAssociations, cleanMachineCertification = false,
             limitation = "GitHub-hosted Windows GUI and keyboard validation; physical screen-reader/DPI and SDK-free certification remain separate." }, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine("Native installer wizard: " + checks.Count + " checks passed."); return 0;
 
@@ -254,6 +260,18 @@ internal static partial class NativeUiChecks
                 State = element.Patterns.LegacyIAccessible.IsSupported ? element.Patterns.LegacyIAccessible.Pattern.State.Value.ToString() : null
             });
             File.WriteAllText(Path.Combine(root, name + "-controls.json"), JsonSerializer.Serialize(elements, new JsonSerializerOptions { WriteIndented = true }));
+        }
+    }
+
+    private static void AssertNoWizardAssociations()
+    {
+        if (RegistrySnapshot(@"Software\Classes\LensDocsStudio.Native.Document") is not null)
+            throw new IOException("The excluded native association registration exists.");
+        foreach (var extension in new[] { ".md", ".markdown", ".mmd", ".mermaid" })
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\" + extension + @"\OpenWithProgids");
+            if (key?.GetValueNames().Contains("LensDocsStudio.Native.Document", StringComparer.OrdinalIgnoreCase) == true)
+                throw new IOException("An excluded Open with registration exists for " + extension);
         }
     }
 

@@ -67,7 +67,7 @@ public sealed class DiagramService
                 LayoutProvider = layout,
                 Limits = new ResourceLimits { MaxInputLength = 100_000, MaxElements = 500, RenderDeadline = TimeSpan.FromSeconds(3) }
             };
-            var prepared = SequenceActivationSource.Prepare(source);
+            var prepared = SequenceActivationSource.Prepare(SourceAuthoring.SourceText.PrepareRendererSource(source));
             if (MermaidDiagnostics.Activities.HasListeners() && !Sequence.SequenceSourceParser.IsSequence(source))
             {
                 // The existing provider marks the actual parser/layout boundary. No second layout.

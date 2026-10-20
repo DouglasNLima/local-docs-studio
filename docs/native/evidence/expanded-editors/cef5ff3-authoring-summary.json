@@ -1,0 +1,394 @@
+{
+  "runId": 39368154592,
+  "Results": [
+    {
+      "Family": "Gantt",
+      "Appearance": "Normal including Light/Dark",
+      "Status": "PASS",
+      "SourceRevision": "0.1.0-preview.1+cef5ff3429579f85cff5bc41fb5962295efb2c39",
+      "Checks": [
+        "Independent UIA clients agree on semantic selection and inspector text",
+        "Actual canonical native pointer target reports selected occurrence",
+        "Rejected input retains pending text and exact validated draft",
+        "Private edits preserve owner source and saved bytes",
+        "Apply visible at 880x600",
+        "Apply visible at 1280x800",
+        "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass",
+        "Reopen starts from exact applied source",
+        "Cancel retains owner and saved source",
+        "Stale-owner rejection preserves private and external source",
+        "Standalone Mermaid uses its native editor",
+        "Actual dependent scheduling exposes read-only dates and an accessible protection reason",
+        "Rejected structural command retains exact source and history",
+        "Mixed supported/protected source keeps untouched metadata and numeric spelling",
+        "Off-screen full-name navigation scrolls the selected row into view",
+        "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised"
+      ],
+      "Observations": [
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 991.4884,
+          "WorkingSetBytes": 183246848,
+          "SourceCharacters": 229
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 919.7745,
+          "WorkingSetBytes": 185159680,
+          "SourceCharacters": 282
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 338.8305,
+          "WorkingSetBytes": 198512640,
+          "SourceCharacters": 282
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1075.7205,
+          "WorkingSetBytes": 183758848,
+          "SourceCharacters": 229
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1005.4163,
+          "WorkingSetBytes": 181817344,
+          "SourceCharacters": 60
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1209.0158,
+          "WorkingSetBytes": 193712128,
+          "SourceCharacters": 1927
+        }
+      ]
+    },
+    {
+      "Family": "Gantt",
+      "Appearance": "High Contrast",
+      "Status": "PASS",
+      "SourceRevision": "0.1.0-preview.1+cef5ff3429579f85cff5bc41fb5962295efb2c39",
+      "Checks": [
+        "Actual Windows High Contrast is active",
+        "Independent UIA clients agree on semantic selection and inspector text",
+        "Actual canonical native pointer target reports selected occurrence",
+        "Rejected input retains pending text and exact validated draft",
+        "Private edits preserve owner source and saved bytes",
+        "Apply visible at 880x600",
+        "Apply visible at 1280x800",
+        "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass",
+        "Reopen starts from exact applied source",
+        "Cancel retains owner and saved source",
+        "Stale-owner rejection preserves private and external source",
+        "Standalone Mermaid uses its native editor",
+        "Actual dependent scheduling exposes read-only dates and an accessible protection reason",
+        "Rejected structural command retains exact source and history",
+        "Mixed supported/protected source keeps untouched metadata and numeric spelling",
+        "Off-screen full-name navigation scrolls the selected row into view",
+        "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised"
+      ],
+      "Observations": [
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 2308.909,
+          "WorkingSetBytes": 235749376,
+          "SourceCharacters": 229
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1241.0236,
+          "WorkingSetBytes": 218853376,
+          "SourceCharacters": 282
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 575.1852,
+          "WorkingSetBytes": 259780608,
+          "SourceCharacters": 282
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1269.2221,
+          "WorkingSetBytes": 204320768,
+          "SourceCharacters": 229
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1233.2725,
+          "WorkingSetBytes": 197636096,
+          "SourceCharacters": 60
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1705.6645,
+          "WorkingSetBytes": 252628992,
+          "SourceCharacters": 1927
+        }
+      ]
+    },
+    {
+      "Family": "Mindmap",
+      "Appearance": "Normal including Light/Dark",
+      "Status": "PASS",
+      "SourceRevision": "0.1.0-preview.1+cef5ff3429579f85cff5bc41fb5962295efb2c39",
+      "Checks": [
+        "Independent UIA clients agree on semantic selection and inspector text",
+        "Actual canonical native pointer target reports selected occurrence",
+        "Private edits preserve owner source and saved bytes",
+        "Apply visible at 880x600",
+        "Apply visible at 1280x800",
+        "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass",
+        "Reopen starts from exact applied source",
+        "Cancel retains owner and saved source",
+        "Stale-owner rejection preserves private and external source",
+        "Standalone Mermaid uses its native editor",
+        "Unsupported attached metadata remains exact after rejected subtree deletion",
+        "Mixed supported/protected source keeps untouched metadata and numeric spelling",
+        "Off-screen full-name navigation scrolls the selected row into view",
+        "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised"
+      ],
+      "Observations": [
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1972.0314,
+          "WorkingSetBytes": 187973632,
+          "SourceCharacters": 132
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1492.3673,
+          "WorkingSetBytes": 185049088,
+          "SourceCharacters": 152
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 769.3672,
+          "WorkingSetBytes": 197341184,
+          "SourceCharacters": 152
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1685.9669,
+          "WorkingSetBytes": 182190080,
+          "SourceCharacters": 132
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1715.5016,
+          "WorkingSetBytes": 184512512,
+          "SourceCharacters": 58
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 2119.0241,
+          "WorkingSetBytes": 196923392,
+          "SourceCharacters": 845
+        }
+      ]
+    },
+    {
+      "Family": "Mindmap",
+      "Appearance": "High Contrast",
+      "Status": "PASS",
+      "SourceRevision": "0.1.0-preview.1+cef5ff3429579f85cff5bc41fb5962295efb2c39",
+      "Checks": [
+        "Actual Windows High Contrast is active",
+        "Independent UIA clients agree on semantic selection and inspector text",
+        "Actual canonical native pointer target reports selected occurrence",
+        "Private edits preserve owner source and saved bytes",
+        "Apply visible at 880x600",
+        "Apply visible at 1280x800",
+        "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass",
+        "Reopen starts from exact applied source",
+        "Cancel retains owner and saved source",
+        "Stale-owner rejection preserves private and external source",
+        "Standalone Mermaid uses its native editor",
+        "Unsupported attached metadata remains exact after rejected subtree deletion",
+        "Mixed supported/protected source keeps untouched metadata and numeric spelling",
+        "Off-screen full-name navigation scrolls the selected row into view",
+        "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised"
+      ],
+      "Observations": [
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1857.779,
+          "WorkingSetBytes": 187379712,
+          "SourceCharacters": 132
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 2621.6961,
+          "WorkingSetBytes": 193363968,
+          "SourceCharacters": 152
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 827.0118,
+          "WorkingSetBytes": 199000064,
+          "SourceCharacters": 152
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1847.9014,
+          "WorkingSetBytes": 185622528,
+          "SourceCharacters": 132
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1888.8093,
+          "WorkingSetBytes": 184610816,
+          "SourceCharacters": 58
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 3134.649,
+          "WorkingSetBytes": 201789440,
+          "SourceCharacters": 845
+        }
+      ]
+    },
+    {
+      "Family": "Pie",
+      "Appearance": "Normal including Light/Dark",
+      "Status": "PASS",
+      "SourceRevision": "0.1.0-preview.1+cef5ff3429579f85cff5bc41fb5962295efb2c39",
+      "Checks": [
+        "Independent UIA clients agree on semantic selection and inspector text",
+        "Independent canonical wedge has a real pointer interior",
+        "Actual canonical Pie wedge pointer selects its exact source occurrence",
+        "Rejected input retains pending text and exact validated draft",
+        "Private edits preserve owner source and saved bytes",
+        "Apply visible at 880x600",
+        "Apply visible at 1280x800",
+        "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass",
+        "Reopen starts from exact applied source",
+        "Cancel retains owner and saved source",
+        "Stale-owner rejection preserves private and external source",
+        "Standalone Mermaid uses its native editor",
+        "Zero-valued duplicate remains selectable in the actual category list",
+        "Mixed supported/protected source keeps untouched metadata and numeric spelling",
+        "Off-screen full-name navigation scrolls the selected row into view",
+        "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised"
+      ],
+      "Observations": [
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1814.5856,
+          "WorkingSetBytes": 186454016,
+          "SourceCharacters": 102
+        },
+        {
+          "Operation": "Actual Pie wedge pointer coordinates",
+          "SourcePointX": 177.08509368896483,
+          "SourcePointY": 316.8,
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 1,
+          "ScreenX": 659.0850936889649,
+          "ScreenY": 464.8
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1846.0171,
+          "WorkingSetBytes": 188026880,
+          "SourceCharacters": 104
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 601.4417,
+          "WorkingSetBytes": 200855552,
+          "SourceCharacters": 104
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1687.9422,
+          "WorkingSetBytes": 183799808,
+          "SourceCharacters": 102
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1695.1539,
+          "WorkingSetBytes": 185159680,
+          "SourceCharacters": 64
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 2980.4211,
+          "WorkingSetBytes": 232370176,
+          "SourceCharacters": 1194
+        }
+      ]
+    },
+    {
+      "Family": "Pie",
+      "Appearance": "High Contrast",
+      "Status": "PASS",
+      "SourceRevision": "0.1.0-preview.1+cef5ff3429579f85cff5bc41fb5962295efb2c39",
+      "Checks": [
+        "Actual Windows High Contrast is active",
+        "Independent UIA clients agree on semantic selection and inspector text",
+        "Independent canonical wedge has a real pointer interior",
+        "Actual canonical Pie wedge pointer selects its exact source occurrence",
+        "Rejected input retains pending text and exact validated draft",
+        "Private edits preserve owner source and saved bytes",
+        "Apply visible at 880x600",
+        "Apply visible at 1280x800",
+        "Multiple identical fences retain ownership; Apply, one-step owner Undo/Redo and Save pass",
+        "Reopen starts from exact applied source",
+        "Cancel retains owner and saved source",
+        "Stale-owner rejection preserves private and external source",
+        "Standalone Mermaid uses its native editor",
+        "Zero-valued duplicate remains selectable in the actual category list",
+        "Mixed supported/protected source keeps untouched metadata and numeric spelling",
+        "Off-screen full-name navigation scrolls the selected row into view",
+        "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised"
+      ],
+      "Observations": [
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1834.3398,
+          "WorkingSetBytes": 188497920,
+          "SourceCharacters": 102
+        },
+        {
+          "Operation": "Actual Pie wedge pointer coordinates",
+          "SourcePointX": 177.08509368896483,
+          "SourcePointY": 316.8,
+          "Viewport": "{X=482,Y=148,Width=706,Height=495}",
+          "Scale": 1,
+          "ScreenX": 659.0850936889649,
+          "ScreenY": 464.8
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1888.5285,
+          "WorkingSetBytes": 187916288,
+          "SourceCharacters": 104
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 652.3557,
+          "WorkingSetBytes": 196079616,
+          "SourceCharacters": 104
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1665.6998,
+          "WorkingSetBytes": 185745408,
+          "SourceCharacters": 102
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 1739.2663,
+          "WorkingSetBytes": 185692160,
+          "SourceCharacters": 64
+        },
+        {
+          "Operation": "Open native editor with canonical rendering and independent UIA transport",
+          "Milliseconds": 2771.4285,
+          "WorkingSetBytes": 227192832,
+          "SourceCharacters": 1194
+        }
+      ]
+    }
+  ]
+}

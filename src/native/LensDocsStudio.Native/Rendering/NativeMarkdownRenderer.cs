@@ -185,7 +185,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             || Core.Sequence.SequenceSourceParser.IsSequence(diagram.Source)
                             || Core.StateDiagrams.StateDiagramSourceParser.IsState(diagram.Source)
                             || Core.ErDiagrams.ErDiagramSourceParser.IsEr(diagram.Source)
-                            || Core.ClassDiagrams.ClassDiagramSourceParser.IsClass(diagram.Source)))
+                            || Core.ClassDiagrams.ClassDiagramSourceParser.IsClass(diagram.Source)
+                            || Core.PieDiagrams.PieVisualDraft.IsPie(diagram.Source)
+                            || Core.Mindmaps.MindmapVisualDraft.IsMindmap(diagram.Source)
+                            || Core.GanttDiagrams.GanttVisualDraft.IsGantt(diagram.Source)))
                     {
                         var visual = new Button { Content = "Visual Edit", ToolTip = "Open this diagram in its native visual editor.", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
                         System.Windows.Automation.AutomationProperties.SetAutomationId(visual, "DiagramEditVisually" + code.Span.Start);

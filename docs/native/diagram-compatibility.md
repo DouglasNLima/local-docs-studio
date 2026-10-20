@@ -14,6 +14,10 @@ implementation alone does not imply readiness.
 | State | States, transitions and supported scoped markers; exact source patches | [State report](mermaid-state-visual-editor.md) |
 | Entity relationship | Entities, ordered attributes, keys and endpoint cardinalities | [ER report](mermaid-er-visual-editor.md) |
 | Class | Classes, distinct attribute/method occurrences, six relationship types and endpoint-owned markers/cardinalities; classifiers and ambiguous syntax protected | [Class report](mermaid-class-visual-editor.md) |
+| Gantt | Title, sections, labels, explicit ISO starts and whole-day durations; advanced scheduling protected | [Expansion report](gantt-mindmap-pie-editors.md) |
+| Mind map | One root, labels, complete subtree operations, recognised shape/ID preservation | [Expansion report](gantt-mindmap-pie-editors.md) |
+| Pie | Title, separate category occurrences, invariant decimal values and canonical wedge selection | [Expansion report](gantt-mindmap-pie-editors.md) |
+
 
 The [ER visual editor report](mermaid-er-visual-editor.md) records the fourth native
 authoring family: exact source entities, ordered attribute occurrences, PK/FK/UK,

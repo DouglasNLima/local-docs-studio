@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(15, NativeHelpGuide.Topics.Count);
-        Assert.Equal(15, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(16, NativeHelpGuide.Topics.Count);
+        Assert.Equal(16, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -16,6 +16,13 @@ public sealed class NativeHelpGuideTests
             Assert.Equal(topic.Title, heading.Title); Assert.Equal(topic.Anchor, heading.Anchor);
             Assert.True(topic.Source.Length > 400);
         }
+    }
+    [Fact] public void Expanded_editor_topic_explains_source_ownership_and_pinned_family_limits()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Gantt, Mind map and Pie visual authoring"));
+        Assert.Equal("gantt-mind-map-and-pie-visual-authoring", topic.Anchor);
+        foreach (var phrase in new[] { "native calendar", "Duplicate", "Zero rows", "Embedded double quotes", "one owner-document", "Cancel", "stale", "protected" })
+            Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Mermaid_visual_authoring_has_an_independent_searchable_source_preservation_topic()
     {

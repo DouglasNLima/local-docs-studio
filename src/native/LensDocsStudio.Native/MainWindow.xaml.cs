@@ -649,6 +649,7 @@ public partial class MainWindow : Window
         foreach (var editor in OwnedWindows.OfType<StateVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<ErVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<ClassVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
+        foreach (var editor in OwnedWindows.OfType<SourceVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
@@ -742,6 +743,8 @@ public partial class MainWindow : Window
                       if (!stateEditor.CloseForOwner()) return;
                   foreach (var erEditor in OwnedWindows.OfType<ErVisualEditorWindow>().ToArray())
                       if (!erEditor.CloseForOwner()) return;
+                  foreach (var sourceEditor in OwnedWindows.OfType<SourceVisualEditorWindow>().ToArray())
+                      if (!sourceEditor.CloseForOwner()) return;
                   foreach (var classEditor in OwnedWindows.OfType<ClassVisualEditorWindow>().ToArray())
                       if (!classEditor.CloseForOwner()) return;
                 SaveViewport();

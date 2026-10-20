@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)][string]$Installer,
     [Parameter(Mandatory)][string]$UpgradeInstaller,
     [Parameter(Mandatory)][string]$ExpectedSourceRevision,
-    [ValidateSet("Class", "Sequence", "Flowchart")][string]$Family = "Class"
+    [ValidateSet("Class", "Sequence", "Flowchart", "Gantt", "Mindmap", "Pie")][string]$Family = "Class"
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
@@ -70,8 +70,10 @@ try {
         $versions.Add(@{ phase=$phase; version=$identity.version; source=$identity.sourceRevision; binary=$binary; registered=$registered })
         Push-Location $repo
         try {
-            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } default { '--class-ui' } }
-            $arguments = @('run', '--project', 'src/native/LensDocsStudio.Native.Validation', '-c', 'Release', '--no-build', '--', $mode, (Join-Path $installDirectory 'LensDocsStudio.Native.exe'), (Join-Path $root $phase), '--normal')
+            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } { $_ -in 'Gantt','Mindmap','Pie' } { '--source-editor-ui' } default { '--class-ui' } }
+            $arguments = @('run', '--project', 'src/native/LensDocsStudio.Native.Validation', '-c', 'Release', '--no-build', '--', $mode, (Join-Path $installDirectory 'LensDocsStudio.Native.exe'), (Join-Path $root $phase))
+            if ($Family -in 'Gantt','Mindmap','Pie') { $arguments += $Family }
+            $arguments += '--normal'
             if ($Family -eq 'Flowchart') { $arguments += '--polish' }
             & dotnet @arguments
             if ($LASTEXITCODE -ne 0) { throw "${phase}: installed $Family native authoring failed." }
