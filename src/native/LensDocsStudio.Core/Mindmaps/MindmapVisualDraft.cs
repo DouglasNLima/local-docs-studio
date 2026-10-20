@@ -7,7 +7,7 @@ namespace LensDocsStudio.Core.Mindmaps;
 
 public sealed record MindmapSourceNode(string Identity, string Label, string Indentation, string? Parent, int Depth,
     int LabelStart, int LabelLength, string Shape, string? Protection);
-public sealed record MindmapSourceModel(string HeaderIdentity, IReadOnlyList<MindmapSourceNode> Nodes, IReadOnlyList<string> Errors);
+public sealed record MindmapSourceModel(string HeaderIdentity, IReadOnlyList<MindmapSourceNode> Nodes, IReadOnlyList<string> Errors, IReadOnlyList<string> Protected);
 
 public sealed class MindmapVisualDraft : SourceDraft<MindmapSourceModel>
 {
@@ -20,10 +20,11 @@ public sealed class MindmapVisualDraft : SourceDraft<MindmapSourceModel>
     public MindmapVisualDraft(string source, DiagramService? diagrams = null) : base(source, diagrams) { }
     protected override MindmapSourceModel Scan(SourceText text)
     {
-        var nodes = new List<MindmapSourceNode>(); var errors = new List<string>(); string header = ""; var stack = new List<MindmapSourceNode>();
+        var nodes = new List<MindmapSourceNode>(); var errors = new List<string>(); var protect = new List<string>(); string header = ""; var stack = new List<MindmapSourceNode>();
         foreach (var line in text.Lines)
         {
             if (line.Content.Length == 0 || line.Comment) continue;
+            if (line.InitDirective) { protect.Add(line.Key); continue; }
             if (header.Length == 0) { header = line.Key; if (!line.Content.Equals("mindmap", StringComparison.OrdinalIgnoreCase)) errors.Add("Mind map requires a mindmap header."); continue; }
             var raw = line.Body; var indent = line.Indent; var content = line.Content;
             while (stack.Count > 0 && stack[^1].Indentation.Length >= indent.Length) stack.RemoveAt(stack.Count - 1);
@@ -47,9 +48,9 @@ public sealed class MindmapVisualDraft : SourceDraft<MindmapSourceModel>
         }
         if (nodes.Count == 0) errors.Add("Mind map requires one root; add it in source before applying.");
         if (nodes.Count > 500) errors.Add("Mind map exceeds the 500-element rendering budget.");
-        return new(header, nodes, errors);
+        return new(header, nodes, errors, protect);
     }
-    protected override bool Contains(MindmapSourceModel model, string identity) => model.Nodes.Any(node => node.Identity == identity);
+    protected override bool Contains(MindmapSourceModel model, string identity) => model.Nodes.Any(node => node.Identity == identity) || model.Protected.Contains(identity);
     protected override void Validate(SourceText text, MindmapSourceModel model, DiagramResult rendered)
     {
         if (model.Errors.Count > 0) throw new ArgumentException(model.Errors[0]);
@@ -146,6 +147,11 @@ public sealed class MindmapVisualDraft : SourceDraft<MindmapSourceModel>
     private static void Editable(MindmapSourceNode node) { if (node.Protection is { } reason) throw new ArgumentException(reason); }
     private static void Structural(SourceText text, MindmapSourceModel model, IReadOnlyList<MindmapSourceNode> nodes)
     {
+        if (nodes.Count > 0)
+        {
+            var first = nodes.Min(node => text.Index(node.Identity)); var last = nodes.Max(node => text.Index(node.Identity));
+            if (text.Lines.Skip(first).Take(last - first + 1).Any(line => line.InitDirective)) throw new ArgumentException("An initialisation directive inside this subtree protects its structural source group.");
+        }
         foreach (var node in nodes)
         {
             Editable(node);

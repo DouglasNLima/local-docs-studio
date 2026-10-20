@@ -6,6 +6,13 @@ namespace LensDocsStudio.Core.Tests;
 
 public class ExpandedSourceProtectionTests
 {
+    [Fact] public async Task Pinned_initialisation_directives_remain_exact_while_safe_local_labels_are_editable()
+    {
+        const string prefix = "%% retained\r\n%%{init: {'theme': 'base'}}%%\r\n";
+        var pie = new PieVisualDraft(prefix + PieVisualDraft.Starter.ReplaceLineEndings("\r\n")); var entry = pie.Model.Entries[0]; Assert.True((await pie.UpdateAsync(entry.Identity, "Updated", entry.Number)).Success); Assert.StartsWith(prefix, pie.Source);
+        var gantt = new GanttVisualDraft(prefix + GanttVisualDraft.Starter.ReplaceLineEndings("\r\n")); var task = gantt.Model.Tasks[0]; Assert.True((await gantt.UpdateAsync(task.Identity, "Updated", task.Start, task.Duration)).Success); Assert.StartsWith(prefix, gantt.Source); Assert.NotNull(GanttVisualDraft.TemporalReason(gantt.Model, task));
+        var mindmap = new MindmapVisualDraft(prefix + MindmapVisualDraft.Starter.ReplaceLineEndings("\r\n")); Assert.True((await mindmap.UpdateAsync(mindmap.Model.Nodes[1].Identity, "Updated")).Success); Assert.StartsWith(prefix, mindmap.Source);
+    }
     [Fact] public async Task Ambiguously_trailing_comments_protect_flat_row_removal_without_losing_bytes()
     {
         var pie = new PieVisualDraft("pie\n  \"A\" : 1\n%% trailing or next?\n\n  \"B\" : 2\n"); var original = pie.Source;

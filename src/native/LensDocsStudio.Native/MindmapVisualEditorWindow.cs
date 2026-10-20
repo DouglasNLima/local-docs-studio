@@ -35,7 +35,7 @@ public sealed class MindmapVisualEditorWindow : SourceVisualEditorWindow
         var result = await mindmap.AddAsync(mindmap.Selection ?? mindmap.Model.Nodes.FirstOrDefault()?.Identity ?? "", child, token: Lifetime.Token);
         if (result.Success) mindmap.Select(mindmap.Model.Nodes.Single(node => !keys.Contains(node.Identity)).Identity); return result;
     }
-    protected override IEnumerable<Choice> Choices() => mindmap.Model.Nodes.Select((node, index) => new Choice(node.Identity, new string(' ', node.Depth * 2) + (node.Depth == 0 ? "Root" : "Node " + (index + 1)) + " · " + node.Label + " · depth " + node.Depth + (node.Protection is null ? "" : " · protected")));
+    protected override IEnumerable<Choice> Choices() => mindmap.Model.Nodes.Select((node, index) => new Choice(node.Identity, new string(' ', node.Depth * 2) + (node.Depth == 0 ? "Root" : "Node " + (index + 1)) + " · " + node.Label + " · depth " + node.Depth + (node.Protection is null ? "" : " · protected"))).Concat(mindmap.Model.Protected.Select(key => new Choice(key, "Preserved directive · " + mindmap.Text.Line(key).Content)));
     protected override void ShowProperties()
     {
         var node = mindmap.Model.Nodes.FirstOrDefault(item => item.Identity == mindmap.Selection);

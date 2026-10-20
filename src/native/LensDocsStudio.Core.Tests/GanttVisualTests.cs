@@ -65,4 +65,18 @@ public class GanttVisualTests
         var draft = new GanttVisualDraft("gantt\n  First : a, 2026-02-30, 1d\n"); Assert.False((await draft.ValidateAsync()).Success); var task = draft.Model.Tasks[0];
         Success(await draft.UpdateAsync(task.Identity, task.Label, "2026-02-28", "1"));
     }
+    [Fact] public async Task An_unreferenced_explicit_suffix_task_can_change_dates_without_rewriting_earlier_dependencies()
+    {
+        var source = "gantt\n  First : a, 2026-10-20, 1d\n  Dependent : after a, 1d\n  Independent : free, 2026-10-23, 2d\n"; var draft = new GanttVisualDraft(source); var task = draft.Model.Tasks[^1];
+        Assert.Null(GanttVisualDraft.TemporalReason(draft.Model, task));
+        Success(await draft.UpdateAsync(task.Identity, task.Label, "2026-10-24", "3")); Assert.Equal(source.Replace("2026-10-23, 2d", "2026-10-24, 3d", StringComparison.Ordinal), draft.Source);
+        Assert.False((await draft.DeleteAsync(draft.Model.Tasks[0].Identity)).Success);
+    }
+    [Theory, InlineData("YYYY-MM-DD"), InlineData("yyyy-MM-dd")]
+    public async Task Compatible_dateFormat_tokens_remain_unchanged_and_use_the_same_pinned_dates(string format)
+    {
+        var source = "gantt\n  dateFormat " + format + "\n  First : a, 2026-10-20, 1d\n"; var draft = new GanttVisualDraft(source); var task = draft.Model.Tasks[0];
+        Success(await draft.UpdateAsync(task.Identity, task.Label, "2026-10-21", "2")); Assert.Contains("dateFormat " + format, draft.Source);
+        Assert.Equal(new LensDocsStudio.Core.Rendering.DiagramService().Render(draft.Source.Replace(format, "YYYY-MM-DD", StringComparison.Ordinal)).Svg, new LensDocsStudio.Core.Rendering.DiagramService().Render(draft.Source).Svg);
+    }
 }

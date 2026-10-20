@@ -25,6 +25,7 @@ public sealed class PieVisualDraft : SourceDraft<PieSourceModel>
         foreach (var line in text.Lines)
         {
             if (line.Content.Length == 0 || line.Comment) continue;
+            if (line.InitDirective) { protect.Add(line.Key); continue; }
             if (header.Length == 0)
             {
                 header = line.Key; var match = Header.Match(line.Content);

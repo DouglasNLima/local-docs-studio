@@ -49,6 +49,20 @@ internal static class NativeSourceEditorChecks
             Check(hits.Count == expected && hits.Select(hit => hit.Identity).Distinct().Count() == expected, family + ": every supported occurrence has distinct canonical geometry");
             var svg = new NativeSvgService(); var canonical = (DrawingImage)typeof(NativeSvgService).GetMethod("RenderCanonical", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(svg, [render, svg.Prepare(render.Svg!), false, CancellationToken.None])!;
             foreach (var hit in hits) Check(new Rect(0, 0, canonical.Width, canonical.Height).Contains(hit.Bounds), family + ": actual SVG hit bounds stay inside canonical canvas");
+            if (family == "Pie")
+            {
+                var canvas = new Canvas { Width = canonical.Width, Height = canonical.Height };
+                foreach (var hit in hits) canvas.Children.Add(new System.Windows.Shapes.Path { Data = hit.Shape, Fill = Brushes.Transparent, Stroke = Brushes.Transparent, StrokeThickness = 2, Tag = hit.Identity });
+                canvas.Measure(new Size(canonical.Width, canonical.Height)); canvas.Arrange(new Rect(0, 0, canonical.Width, canonical.Height)); canvas.UpdateLayout();
+                foreach (var hit in hits)
+                {
+                    var shape = canvas.Children.OfType<System.Windows.Shapes.Path>().Single(path => (string)path.Tag == hit.Identity);
+                    Check(shape.RenderedGeometry.Bounds == hit.Shape!.Bounds, "Pie: WPF pointer path retains actual canonical geometry coordinates");
+                    Point? inside = null;
+                    for (var x = 1; x < 10 && inside is null; x++) for (var y = 1; y < 10 && inside is null; y++) { var point = new Point(hit.Bounds.X + hit.Bounds.Width * x / 10, hit.Bounds.Y + hit.Bounds.Height * y / 10); if (hit.Shape.FillContains(point)) inside = point; }
+                    Check(inside is not null && ReferenceEquals(System.Windows.Media.VisualTreeHelper.HitTest(canvas, inside.Value)?.VisualHit, shape), "Pie: actual WPF hit testing resolves the exact canonical wedge occurrence");
+                }
+            }
             var markdown = "Before\n\n```mermaid\n" + source + "```\n\nAfter"; var parsed = new MarkdownService().Parse(markdown); var code = parsed.Syntax.OfType<FencedCodeBlock>().Single(); var selected = -1;
             var ordinary = new NativeMarkdownRenderer(svg).Render(parsed, dark, new Dictionary<FencedCodeBlock, DiagramResult> { [code] = render }, _ => { }, (_, _) => { }, editDiagramVisually: offset => selected = offset);
             ((Panel)ordinary.Media.Single().Actions!).Children.OfType<Button>().Single(button => (string?)button.Content == "Visual Edit").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

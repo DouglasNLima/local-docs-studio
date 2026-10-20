@@ -48,6 +48,8 @@ internal static partial class NativeUiChecks
                 for (var x = 1; x < 10 && point is null; x++) for (var y = 1; y < 10 && point is null; y++) { var candidate = new System.Windows.Point(bounds.X + bounds.Width * x / 10, bounds.Y + bounds.Height * y / 10); if (geometry.FillContains(candidate)) point = candidate; }
                 Check(point is not null, "Independent canonical wedge has a real pointer interior");
                 var viewport = Find(visual!, family + "Viewport").BoundingRectangle; var scale = Find(visual!, family + "Zoom").Patterns.RangeValue.Pattern.Value.Value / 100;
+                observations.Add(new { Operation = "Actual Pie wedge pointer coordinates", SourcePointX = point!.Value.X, SourcePointY = point.Value.Y, Viewport = viewport.ToString(), Scale = scale, ScreenX = viewport.Left + point.Value.X * scale, ScreenY = viewport.Top + point.Value.Y * scale });
+                FocusWindow(visual!);
                 Mouse.MoveTo((int)Math.Round(viewport.Left + point!.Value.X * scale), (int)Math.Round(viewport.Top + point.Value.Y * scale)); Mouse.Click(MouseButton.Left);
                 Wait(() => Find(visual!, "PieLabel").AsTextBox().Text == "Guides", "Actual wedge pointer did not select the corresponding category occurrence.");
                 Check(true, "Actual canonical Pie wedge pointer selects its exact source occurrence");
@@ -108,7 +110,7 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(output, "authoring-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", Family = family, SourceRevision = typeof(PieVisualEditorWindow).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
         catch (Exception error)
-        { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "authoring-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Family = family, Checks = checks, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); Console.Error.WriteLine(error); return 1; }
+        { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "authoring-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Family = family, Checks = checks, Observations = observations, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); Console.Error.WriteLine(error); return 1; }
         finally { Stop(); }
 
         void Launch(string fixture)
@@ -142,7 +144,7 @@ internal static partial class NativeUiChecks
             var fixture = Path.Combine(root, "protected.mmd"); File.WriteAllText(fixture, mixed); Launch(fixture); Open(0); Select(1);
             if (family == "Gantt")
             {
-                Check(!Find(visual!, "GanttStartDate").IsEnabled && !Find(visual!, "GanttDuration").IsEnabled && Find(visual!, "GanttCapabilities").Name.Contains("scheduling", StringComparison.OrdinalIgnoreCase), "Actual dependent scheduling exposes read-only dates and an accessible protection reason");
+                Check(!Find(visual!, "GanttStartDate").IsEnabled && !Find(visual!, "GanttDuration").IsEnabled && Find(visual!, "GanttCapabilities").Name.Contains("referenced by a dependency", StringComparison.OrdinalIgnoreCase), "Actual dependent scheduling exposes read-only dates and an accessible protection reason");
                 Click("Delete"); Wait(() => Find(visual!, "GanttStatus").Name.Contains("protect", StringComparison.OrdinalIgnoreCase), "Protected dependency deletion did not explain its rejection."); Check(Draft() == mixed && !Find(visual!, "GanttUndo").IsEnabled, "Rejected structural command retains exact source and history");
             }
             else if (family == "Mindmap")

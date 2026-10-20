@@ -29,6 +29,7 @@ public sealed class GanttVisualDraft : SourceDraft<GanttSourceModel>
         foreach (var line in text.Lines)
         {
             if (line.Content.Length == 0 || line.Comment) continue;
+            if (line.InitDirective) { temporal = true; directives.Add(line.Key); continue; }
             if (header.Length == 0)
             {
                 header = line.Key; var match = Header.Match(line.Body); if (!match.Success) errors.Add("Unsupported Gantt header. Use gantt and an optional title.");
@@ -103,7 +104,10 @@ public sealed class GanttVisualDraft : SourceDraft<GanttSourceModel>
     {
         if (!task.Simple) return task.Protection;
         if (model.TemporalProtection) return "Calendar rules, incompatible dateFormat, duplicate IDs or unknown directives protect temporal and structural operations. Task/section labels remain editable.";
-        if (model.Tasks.Any(item => !item.Simple)) return "Dependencies or implicit scheduling are present. Temporal and structural operations are protected to avoid changing referenced or default scheduling; local labels remain editable.";
+        if (task.Id is { } id && model.Tasks.Any(item => item.Identity != task.Identity && item.Tokens.Groups["meta"].Value.Split(',').Select(value => value.Trim()).Any(value => value.StartsWith("after ", StringComparison.OrdinalIgnoreCase) && value[6..].Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Contains(id, StringComparer.OrdinalIgnoreCase))))
+            return "This task ID is referenced by a dependency. Its temporal fields are protected; its label remains editable.";
+        var at = model.Tasks.ToList().IndexOf(task);
+        if (model.Tasks.Skip(at + 1).Any(item => !item.Simple)) return "Later dependencies or implicit scheduling may consume this task's end or chart origin. Its temporal fields are protected; local labels remain editable.";
         return null;
     }
     private static void Structure(GanttSourceModel model)

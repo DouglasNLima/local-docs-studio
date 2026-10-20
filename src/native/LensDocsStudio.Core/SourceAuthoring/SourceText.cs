@@ -11,6 +11,7 @@ public sealed record SourceLine(string Key, string Text)
     public string Indent => Body[..(Body.Length - Body.TrimStart(' ', '\t').Length)];
     public string Content => Body.Trim();
     public bool Comment => Content.StartsWith("%%", StringComparison.Ordinal) && !Content.StartsWith("%%{", StringComparison.Ordinal);
+    public bool InitDirective => Content.StartsWith("%%{", StringComparison.Ordinal) && Content.EndsWith("}%%", StringComparison.Ordinal);
     public SourceLine Replace(int start, int length, string value) => this with { Text = Text[..start] + value + Text[(start + length)..] };
 }
 
