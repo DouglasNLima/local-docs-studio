@@ -262,7 +262,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Flowchart, Sequence]
+        family: [Flowchart, Sequence, Gantt, Mindmap, Pie]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -285,6 +285,9 @@ jobs:
           path: |
             artifacts/native/flowchart-install-smoke/
             artifacts/native/sequence-install-smoke/
+            artifacts/native/gantt-install-smoke/
+            artifacts/native/mindmap-install-smoke/
+            artifacts/native/pie-install-smoke/
           retention-days: 14
   historical-upgrade:
     name: Historical upgrade (${{ matrix.preview }})

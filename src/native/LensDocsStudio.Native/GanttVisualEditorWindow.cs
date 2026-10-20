@@ -29,7 +29,7 @@ public sealed class GanttVisualEditorWindow : SourceVisualEditorWindow
         calendar.SelectedDatesChanged += (_, _) => { if (calendar.SelectedDate is { } chosen) date.Text = chosen.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture); };
         duration = Field("Duration (whole days)", "Duration"); gantt = new(source, diagrams); gantt.ValidatePresentation = (text, _, token) => ValidateNative(text, token);
         ActionButton("Add task", "AddTask", AddTask); ActionButton("Add section", "AddSection", async () =>
-        { var result = await gantt.AddSectionAsync(Lifetime.Token); if (result.Success) gantt.Select(gantt.Model.Sections[^1].Identity); return result; }); Start(gantt);
+        { var keys = gantt.Model.Sections.Select(section => section.Identity).ToHashSet(); var result = await gantt.AddSectionAsync(Lifetime.Token); if (result.Success) gantt.Select(gantt.Model.Sections.Single(section => !keys.Contains(section.Identity)).Identity); return result; }); Start(gantt);
     }
     private async Task<SourceAuthoringResult> AddTask()
     {

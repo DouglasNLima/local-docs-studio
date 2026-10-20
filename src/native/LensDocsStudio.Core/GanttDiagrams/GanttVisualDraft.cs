@@ -125,10 +125,10 @@ public sealed class GanttVisualDraft : SourceDraft<GanttSourceModel>
     public Task<SourceAuthoringResult> DeleteAsync(string identity, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         Structure(model); var start = text.AttachedStart(identity);
-        if (model.Tasks.Any(task => task.Identity == identity)) return text.Splice(start, text.Index(identity) + 1 - start, []);
+        if (model.Tasks.Any(task => task.Identity == identity)) { SourceRowMoves.CheckTrailingAttachment(text, identity); return text.Splice(start, text.Index(identity) + 1 - start, []); }
         var section = model.Sections.SingleOrDefault(item => item.Identity == identity) ?? throw new ArgumentException("Select a task or section to remove.");
         var rows = model.Tasks.Where(task => task.Section == section.Identity).ToArray(); var end = rows.Length == 0 ? text.Index(identity) + 1 : text.Index(rows[^1].Identity) + 1;
-        ProtectGroup(text, model, start, end); return text.Splice(start, end - start, []);
+        SourceRowMoves.CheckTrailingAttachment(text, text.Lines[end - 1].Key); ProtectGroup(text, model, start, end); return text.Splice(start, end - start, []);
     }, token);
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default) => ChangeAsync((text, model) =>
     {

@@ -1,5 +1,16 @@
 # Windows internal preview release notes
 
+
+## Eight native Mermaid editors — current expansion
+
+Gantt, Mind map and Pie join Flowchart, Sequence, State, ER and Class in the
+ordinary native application. Each family uses its own source adapter, canonical
+Mermaider 0.15.1 output, private history and the existing owner-document Apply
+session. See the [supported/protected syntax and engineering record](gantt-mindmap-pie-editors.md).
+Final-source qualification and the fresh unsigned internal preview are in progress;
+implementation commits and historical receipts do not certify this source.
+
+
 This consolidation accepts the five-editor UX and bounded stock Continuous
 improvements from PRs #36/#37. All five editors gain consistent toolbars,
 full-name navigation, persistent inspector context, source panels and viewport/focus

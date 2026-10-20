@@ -2,6 +2,14 @@ namespace LensDocsStudio.Core.SourceAuthoring;
 
 public static class SourceRowMoves
 {
+    public static void CheckTrailingAttachment(SourceText text, string identity)
+    {
+        var start = text.Index(identity) + 1; var next = start;
+        while (next < text.Lines.Count && (text.Lines[next].Comment || text.Lines[next].Content.Length == 0)) next++;
+        var attached = next < text.Lines.Count ? text.AttachedStart(text.Lines[next].Key) : next;
+        if (text.Lines.Skip(start).Take(attached - start).Any(line => line.Comment))
+            throw new ArgumentException("A trailing comment has ambiguous attachment. Removal is protected; inspect its original source.");
+    }
     public static SourceText Swap(SourceText text, string first, string second, int firstEnd = -1, int secondEnd = -1)
     {
         var a = text.AttachedStart(first); var b = text.AttachedStart(second);

@@ -149,7 +149,7 @@ public partial class SourceVisualEditorWindow : Window
                     Identify(shape, "Preview" + hit.Identity, hit.Description); shape.MouseLeftButtonDown += (_, args) => { Select(hit.Identity); args.Handled = true; };
                     Surface.Children.Add(shape); hits[hit.Identity] = shape; continue;
                 }
-                var button = new Button { Width = hit.Bounds.Width, Height = hit.Bounds.Height, Background = Brushes.Transparent, BorderThickness = new Thickness(1), Style = (Style)FindResource("Mermaid.CanonicalElement"), ToolTip = hit.Description };
+                var button = new ToggleButton { Width = hit.Bounds.Width, Height = hit.Bounds.Height, Background = Brushes.Transparent, BorderThickness = new Thickness(1), Style = (Style)FindResource("Mermaid.CanonicalElement"), ToolTip = hit.Description };
                 Identify(button, "Preview" + hit.Identity, hit.Description); button.Click += (_, _) => Select(hit.Identity);
                 Canvas.SetLeft(button, hit.Bounds.X); Canvas.SetTop(button, hit.Bounds.Y); Surface.Children.Add(button); hits[hit.Identity] = button;
             }
@@ -170,7 +170,7 @@ public partial class SourceVisualEditorWindow : Window
         foreach (var (key, element) in hits)
         {
             var colour = key == Draft.Selection ? (Brush)FindResource("AccentBrush") : Brushes.Transparent;
-            if (element is Button button) button.BorderBrush = colour; else if (element is System.Windows.Shapes.Path shape) shape.Stroke = colour;
+            if (element is ToggleButton button) { button.BorderBrush = colour; button.IsChecked = key == Draft.Selection; } else if (element is System.Windows.Shapes.Path shape) shape.Stroke = colour;
         }
         if (Draft.Selection is { } selected && hits.TryGetValue(selected, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport);
     }

@@ -49,7 +49,7 @@ try {
         if ($entry.FullName.EndsWith('/')) { continue }
         $name = $entry.FullName.Replace('\','/')
         if ($name.StartsWith('/') -or $name.Contains(':') -or $name.Split('/') -contains '..' -or $files.ContainsKey($name) -or
-            $name -match '(?i)WebView2|ContinuousViewer|(^|/)(spikes|tests|acceptance|obj|bin|node_modules)/|chrome|node\.exe|\.(pfx|pem|key|pdb|cs|csproj|slnx?|ps1|html)$' -or
+            $name -match '(?i)WebView2|ContinuousViewer|LayoutExperiment|(^|/)(spikes|tests|acceptance|obj|bin|node_modules)/|chrome|node\.exe|\.(pfx|pem|key|pdb|cs|csproj|slnx?|ps1|html)$' -or
             ($name.EndsWith('.md') -and -not $name.StartsWith('licences/', [StringComparison]::OrdinalIgnoreCase) -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
         $stream = $entry.Open()
         try { $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)).ToLowerInvariant() } finally { $stream.Dispose() }

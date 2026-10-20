@@ -84,7 +84,8 @@ public sealed class PieVisualDraft : SourceDraft<PieSourceModel>
     }, token);
     public Task<SourceAuthoringResult> DeleteAsync(string identity, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
-        _ = model.Entries.Single(item => item.Identity == identity); var start = text.AttachedStart(identity);
+        _ = model.Entries.SingleOrDefault(item => item.Identity == identity) ?? throw new ArgumentException("Only category rows can be removed. The title and preserved directives use source inspection.");
+        SourceRowMoves.CheckTrailingAttachment(text, identity); var start = text.AttachedStart(identity);
         return text.Splice(start, text.Index(identity) + 1 - start, []);
     }, token);
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default) => ChangeAsync((text, model) =>
