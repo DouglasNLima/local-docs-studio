@@ -239,6 +239,7 @@ public partial class SourceVisualEditorWindow : Window
     private void EndPan() { pan = null; if (Viewport.IsMouseCaptured) Viewport.ReleaseMouseCapture(); Viewport.Cursor = Cursors.Arrow; }
     private void Shortcut(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Escape && InspectorFields.Children.OfType<ComboBox>().Any(combo => combo.IsDropDownOpen)) return;
         if (e.Key == Key.Escape) { Close(); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Enter) { Apply(sender, new()); e.Handled = true; return; }
         if (e.OriginalSource is TextBoxBase || SourceEditor.IsKeyboardFocusWithin) return;

@@ -73,6 +73,9 @@ public partial class MainWindow
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
     private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
     {
+        if ((GanttVisualDraft.IsGantt(source) || MindmapVisualDraft.IsMindmap(source) || PieVisualDraft.IsPie(source))
+            && (source.Length > 100_000 || source.Count(character => character == '\n') > 1500))
+        { model.Status = "This diagram exceeds the 100,000-character or 1,500-line visual source budget. Use Edit source; the document is unchanged."; return; }
         async Task<string?> ApplyDraft(string draft, CancellationToken cancellationToken)
         {
             try

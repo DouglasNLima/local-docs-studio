@@ -32,6 +32,26 @@ internal static partial class NativeUiChecks
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active");
             Launch(path); var owner = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(owner) == original, "Fixture did not load exactly.");
             Open(original.LastIndexOf("```mermaid", StringComparison.Ordinal)); Select(family == "Gantt" ? 3 : 1); Capture("selected");
+            // A second independent UIA connection reads the same native occurrence selection.
+            using (var independent = new UIA3Automation())
+            {
+                var second = independent.FromHandle(visual!.Properties.NativeWindowHandle.Value).AsWindow();
+                Check(Find(second, family + "Elements").AsListBox().SelectedItem is not null && Find(second, family + "Label").AsTextBox().Text == Find(visual!, family + "Label").AsTextBox().Text,
+                    "Independent UIA clients agree on semantic selection and inspector text");
+            }
+            if (family == "Pie")
+            {
+                Select(2); Click("Fit");
+                var canonical = new LensDocsStudio.Core.Rendering.DiagramService().Render(Draft()); var svgRoot = System.Xml.Linq.XDocument.Parse(canonical.Svg!).Root!;
+                var slice = svgRoot.Descendants().First(element => (string?)element.Attribute("class") == "pie-slice");
+                var geometry = LensDocsStudio.Native.Rendering.NativeSourceHit.ShapeGeometry(slice, svgRoot)!; var bounds = geometry.Bounds; System.Windows.Point? point = null;
+                for (var x = 1; x < 10 && point is null; x++) for (var y = 1; y < 10 && point is null; y++) { var candidate = new System.Windows.Point(bounds.X + bounds.Width * x / 10, bounds.Y + bounds.Height * y / 10); if (geometry.FillContains(candidate)) point = candidate; }
+                Check(point is not null, "Independent canonical wedge has a real pointer interior");
+                var viewport = Find(visual!, family + "Viewport").BoundingRectangle; var scale = Find(visual!, family + "Zoom").Patterns.RangeValue.Pattern.Value.Value / 100;
+                Mouse.MoveTo((int)Math.Round(viewport.Left + point!.Value.X * scale), (int)Math.Round(viewport.Top + point.Value.Y * scale)); Mouse.Click(MouseButton.Left);
+                Wait(() => Find(visual!, "PieLabel").AsTextBox().Text == "Guides", "Actual wedge pointer did not select the corresponding category occurrence.");
+                Check(true, "Actual canonical Pie wedge pointer selects its exact source occurrence");
+            }
             Set("Label", "Edited Ω"); Click("Update"); Await(() => Draft().Contains("Edited Ω", StringComparison.Ordinal)); var edited = Draft();
             Click("Undo"); Await(() => Draft() == source); Click("Redo"); Await(() => Draft() == edited);
             // Actual keyboard input can remain incomplete without resetting the inspector or selection.
@@ -76,6 +96,7 @@ internal static partial class NativeUiChecks
             Wait(() => Find(visual!, family + "Status").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Stale-owner Apply was not rejected."); Check(Draft() == privateSource && ReadEditorText(Find(main!, "MarkdownEditor")) == external, "Stale-owner rejection preserves private and external source"); Capture("owner-conflict"); Click("Cancel"); Discard(); WaitClosed(); Stop();
             // Standalone documents use the same normal preview entry point and current source.
             var standalone = Path.Combine(root, family + ".mmd"); File.WriteAllText(standalone, source); Launch(standalone); Open(0); Check(Draft() == source, "Standalone Mermaid uses its native editor"); Click("Cancel"); WaitClosed(); Stop();
+            RunProtectedAndNavigation();
             Check(true, "Real UIA list selection, native field input, structural commands, private Undo/Redo, Apply/Cancel, owner Undo, Save/reopen and stale rejection exercised");
             File.WriteAllText(Path.Combine(output, "authoring-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", Family = family, SourceRevision = typeof(PieVisualEditorWindow).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
@@ -88,10 +109,13 @@ internal static partial class NativeUiChecks
         void Stop() { if (app is null) return; if (!app.HasExited) app.Kill(); app.Dispose(); app = null; main = visual = null; }
         void Open(int offset)
         {
+            var timer = Stopwatch.StartNew();
             FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + offset)) is not null, "Exact diagram action missing."); Find(main!, "DiagramEditVisually" + offset).AsButton().Invoke();
             Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(family + "VisualEditor")))?.AsWindow()) is not null, "Native family editor did not open.");
             Wait(() => Find(visual!, family + "Apply").IsEnabled, "Canonical native draft did not become valid: " + Find(visual!, family + "Status").Name);
             Find(visual!, family + "SourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); Click("Fit");
+            using var process = Process.GetProcessById(app!.ProcessId);
+            observations.Add(new { Operation = "Open native editor with canonical rendering and independent UIA transport", Milliseconds = timer.Elapsed.TotalMilliseconds, WorkingSetBytes = process.WorkingSet64, SourceCharacters = Draft().Length });
         }
         void Select(int index) { var list = Find(visual!, family + "Elements").AsListBox(); list.Select(index); Wait(() => list.SelectedItem is not null && Find(visual!, family + "Label").IsEnabled, "Semantic selection did not reach inspector."); }
         string Draft() => ReadEditorText(Find(visual!, family + "SourceEditor"));
@@ -102,5 +126,32 @@ internal static partial class NativeUiChecks
         void Discard() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Discard confirmation missing."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
         void Capture(string name) { if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Native editor remained busy before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
+        void RunProtectedAndNavigation()
+        {
+            var mixed = family switch {
+                "Gantt" => "gantt\n  First : a, 2026-10-20, 2d\n  Dependent : after a, 1d\n",
+                "Mindmap" => "mindmap\n  Root\n    Same\n      ::icon(fa fa-book)\n    Same\n",
+                _ => "pie showData\n  \"Same\" : 0.000\n  \"Same\" : 2.500000\n  \"Other\" : 1\n" };
+            var fixture = Path.Combine(root, "protected.mmd"); File.WriteAllText(fixture, mixed); Launch(fixture); Open(0); Select(1);
+            if (family == "Gantt")
+            {
+                Check(!Find(visual!, "GanttStartDate").IsEnabled && !Find(visual!, "GanttDuration").IsEnabled && Find(visual!, "GanttCapabilities").Name.Contains("scheduling", StringComparison.OrdinalIgnoreCase), "Actual dependent scheduling exposes read-only dates and an accessible protection reason");
+                Click("Delete"); Wait(() => Find(visual!, "GanttStatus").Name.Contains("protect", StringComparison.OrdinalIgnoreCase), "Protected dependency deletion did not explain its rejection."); Check(Draft() == mixed && !Find(visual!, "GanttUndo").IsEnabled, "Rejected structural command retains exact source and history");
+            }
+            else if (family == "Mindmap")
+            {
+                Click("Delete"); Wait(() => Find(visual!, "MindmapStatus").Name.Contains("protect", StringComparison.OrdinalIgnoreCase), "Metadata subtree deletion did not explain protection."); Check(Draft() == mixed, "Unsupported attached metadata remains exact after rejected subtree deletion");
+            }
+            else Check(Find(visual!, "PieValue").AsTextBox().Text.StartsWith("0", StringComparison.Ordinal), "Zero-valued duplicate remains selectable in the actual category list");
+            Set("Label", "Safe local label"); Click("Update"); Await(() => Draft().Contains("Safe local label", StringComparison.Ordinal)); Check(Draft().Contains(family == "Gantt" ? "after a" : family == "Mindmap" ? "::icon" : "2.500000", StringComparison.Ordinal), "Mixed supported/protected source keeps untouched metadata and numeric spelling"); Capture("protected-local-edit"); Click("Cancel"); Discard(); WaitClosed(); Stop();
+            var many = family switch {
+                "Gantt" => "gantt\n  section Navigation\n" + string.Concat(Enumerable.Range(0, 60).Select(index => "  Task " + index + " : t" + index + ", 2026-10-20, 1d\n")),
+                "Mindmap" => "mindmap\n  Root\n" + string.Concat(Enumerable.Range(0, 60).Select(index => "    Branch " + index + "\n")),
+                _ => "pie\n" + string.Concat(Enumerable.Range(0, 60).Select(index => "  \"Category " + index + "\" : 1\n")) };
+            fixture = Path.Combine(root, "navigation.mmd"); File.WriteAllText(fixture, many); Launch(fixture); Open(0);
+            var list = Find(visual!, family + "Elements").AsListBox(); list.Focus(); Keyboard.Type(VirtualKeyShort.END);
+            Wait(() => list.SelectedItem is not null && Find(visual!, family + "Label").AsTextBox().Text.EndsWith("59", StringComparison.Ordinal), "Native End did not reach the off-screen semantic entry.");
+            Check(!list.SelectedItem!.IsOffscreen, "Off-screen full-name navigation scrolls the selected row into view"); Capture("off-screen-navigation"); Click("Cancel"); WaitClosed(); Stop();
+        }
     }).GetAwaiter().GetResult();
 }
