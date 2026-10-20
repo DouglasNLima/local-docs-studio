@@ -141,3 +141,18 @@ Package identity is taken from compiled source/version/resources and independent
 payload inspection, never inferred from a later merge or documentation commit.
 The final receipt is completed after those immutable outputs exist, without
 changing their source attribution. No merge or public publication is authorised.
+
+### Package inspection gate
+
+The existing read-only PE/resource verifier now requires all fourteen editor families,
+including the new XY/Radar/Sankey windows and Core drafts/token helpers. Its local
+metadata-only proof over committed `2b1d53a` binaries finds 23 required native types
+and 56 required Core types with no execution. Three additional negative controls
+remove each new editor's metadata name while retaining binary version/resources and
+recomputing the ZIP checksum; each must fail independently. Existing package, hash,
+forbidden-payload, ER and Class resource controls are unchanged. Final downloaded
+packages must pass this strengthened gate and all fourteen installed lifecycle suites.
+
+Local committed-source `2b1d53a` native build passed with zero warnings/errors and
+all **1,840 Core tests passed**, zero skipped. The full corpus and final CI results
+are recorded in the final PR delivery receipt after completion.

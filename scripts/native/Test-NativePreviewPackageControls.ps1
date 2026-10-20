@@ -98,6 +98,29 @@ $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Ob
 }
 $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
 Reject 'missing-class-resource-with-recomputed-checksum' @{PackageDirectory=$copy} 'compiled native Class editor resource is missing'
+# Retain version/resources and remove one new metadata type at a time. No package is executed.
+foreach ($family in 'Xy','Radar','Sankey') {
+    $originalArchive = [IO.Compression.ZipFile]::OpenRead((Join-Path $PackageDirectory $zip.Name))
+    try {
+        $input = $originalArchive.GetEntry('LensDocsStudio.Native.dll').Open(); $buffer = [IO.MemoryStream]::new()
+        try { $input.CopyTo($buffer); $nativeBytes = $buffer.ToArray() } finally { $input.Dispose(); $buffer.Dispose() }
+    } finally { $originalArchive.Dispose() }
+    $typeName = $family + 'VisualEditorWindow'
+    $typeKey = [Text.Encoding]::UTF8.GetBytes($typeName + [char]0)
+    $offset = [Convert]::ToHexString($nativeBytes).IndexOf([Convert]::ToHexString($typeKey), [StringComparison]::Ordinal)
+    if ($offset -lt 0 -or $offset % 2 -ne 0) { throw "The exact compiled $family metadata type was not found for the negative control." }
+    $nativeBytes[$offset / 2] = [byte][char]'Z'
+    $archive = [IO.Compression.ZipFile]::Open($zip.FullName, [IO.Compression.ZipArchiveMode]::Update)
+    try {
+        $archive.GetEntry('LensDocsStudio.Native.dll').Delete(); $replacement = $archive.CreateEntry('LensDocsStudio.Native.dll').Open()
+        try { $replacement.Write($nativeBytes, 0, $nativeBytes.Length) } finally { $replacement.Dispose() }
+    } finally { $archive.Dispose() }
+    $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Object {
+        if ($_.EndsWith($zip.Name)) { "{0}  {1}" -f (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $zip.Name } else { $_ }
+    }
+    $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
+    Reject ('missing-' + $family.ToLowerInvariant() + '-type-with-recomputed-checksum') @{PackageDirectory=$copy} ('native Mermaid editor type is missing: LensDocsStudio.Native.' + $typeName)
+}
 @{ status='PASS'; checks=$checks; sourceRevision=$metadata.sourceRevision; originalPackageUnchanged=$true } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'negative-controls.json') -Encoding utf8NoBOM
 "Native preview package negative controls PASS: $($checks.Count)"
