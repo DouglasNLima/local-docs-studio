@@ -1,0 +1,9 @@
+C4Component
+title Documentation components
+Boundary(core, "Core", "Library") {
+  Component(parser, "Parser", ".NET", "Portable Markdown")
+  ComponentDb(catalogue, "Catalogue", "JSON", "Local content")
+  ComponentQueue(queue, "Render queue", "Memory", "Bounded work")
+}
+Rel(parser, catalogue, "Looks up", "Local")
+Rel(parser, queue, "Schedules")

@@ -1,0 +1,7 @@
+block-beta title Documentation grid
+columns 3
+reader["Reader"] space editor("Editor")
+source["Markdown"]:2 preview["Preview"]
+reader --> editor
+editor -- "Saves" --> source
+editor -->|Renders| preview
