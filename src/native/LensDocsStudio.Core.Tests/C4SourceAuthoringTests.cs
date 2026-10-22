@@ -39,6 +39,32 @@ public class C4SourceAuthoringTests
         Pass(await draft.UpdateNodeAsync(node.Identity, "a", "A", "", "Details")); Assert.Equal("C4Component\nComponent(a, \"A\", \"\", \"Details\")\n", draft.Source);
         Pass(await draft.UpdateNodeAsync(node.Identity, "a", "A", "", "")); Assert.Contains("\"\", \"\"", draft.Source);
     }
+    [Theory]
+    [InlineData("C4Context", "Person"), InlineData("C4Container", "Person"), InlineData("C4Component", "Person")]
+    [InlineData("C4Context", "Container"), InlineData("C4Container", "Container"), InlineData("C4Component", "Container")]
+    [InlineData("C4Context", "Component"), InlineData("C4Container", "Component"), InlineData("C4Component", "Component")]
+    [InlineData("C4Context", "Boundary"), InlineData("C4Container", "Boundary"), InlineData("C4Component", "Boundary")]
+    public async Task Alias_only_calls_keep_their_visible_default_label_when_later_positional_fields_are_added(string variant, string kind)
+    {
+        var source = variant + "\r\n  " + kind + "(original_alias)  \r\n"; var draft = new C4VisualDraft(source); var node = draft.Model.Nodes[0];
+        var boundary = kind == "Boundary"; var technology = boundary ? "Type Ω" : ""; var description = boundary ? "" : "Details Ω";
+        Pass(await draft.UpdateNodeAsync(node.Identity, node.Alias, node.Label, technology, description));
+        var arguments = kind == "Person" ? "\"original_alias\", \"Details Ω\"" : boundary ? "\"original_alias\", \"Type Ω\"" : "\"original_alias\", \"\", \"Details Ω\"";
+        Assert.Equal(source.Replace("(original_alias)", "(original_alias, " + arguments + ")", StringComparison.Ordinal), draft.Source);
+        Assert.Equal("original_alias", draft.Model.Nodes[0].Label);
+        var rendered = new DiagramService().Render(draft.Source); Assert.True(rendered.Success, rendered.Error);
+        Assert.Single(SourceDeclarations.Groups(rendered.Svg!, boundary ? "c4-boundary" : "c4-element"));
+        // The pinned renderer paints boundary header text after edges, as a sibling of the container body.
+        Assert.Single(System.Xml.Linq.XElement.Parse(rendered.Svg!).Descendants(), element => element.Name.LocalName == "text" && element.Value == "original_alias");
+        draft.Undo(); Assert.Equal(source, draft.Source); draft.Redo(); Assert.Equal("original_alias", draft.Model.Nodes[0].Label);
+    }
+    [Theory, InlineData("C4Context"), InlineData("C4Container"), InlineData("C4Component")]
+    public async Task Explicit_label_clear_takes_precedence_over_alias_fallback_when_later_slots_are_added(string variant)
+    {
+        var draft = new C4VisualDraft(variant + "\nContainer(original_alias)\n"); var node = draft.Model.Nodes[0];
+        Pass(await draft.UpdateNodeAsync(node.Identity, node.Alias, "", "WPF", "Details"));
+        Assert.Equal(variant + "\nContainer(original_alias, \"\", \"WPF\", \"Details\")\n", draft.Source); Assert.Equal("", draft.Model.Nodes[0].Label);
+    }
     [Fact]
     public async Task Complete_boundary_moves_preserve_brace_form_comment_groups_line_keys_and_children()
     {

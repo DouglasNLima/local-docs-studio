@@ -121,6 +121,8 @@ public sealed class C4VisualDraft : SourceDraft<C4SourceModel>
         if (label != node.Label) values[1] = SourceCall.Quote(label);
         if (node.TechnologyIndex >= 0 && technology != node.Technology) values[node.TechnologyIndex] = SourceCall.Quote(technology);
         if (node.DescriptionIndex >= 0 && description != node.Description) values[node.DescriptionIndex] = SourceCall.Quote(description);
+        // Extending positional arity must retain the parser's alias-derived label; an explicit label edit still takes precedence.
+        if (node.Call.Positional.Count < 2 && !values.ContainsKey(1) && values.Keys.Any(index => index > 1)) values[1] = SourceCall.Quote(node.Label);
         return node.Call.Set(text, values);
     }, token);
     public Task<SourceAuthoringResult> AddNodeAsync(string kind, string alias, string label, string technology = "", string description = "", CancellationToken token = default) => ChangeAsync((text, model) =>
