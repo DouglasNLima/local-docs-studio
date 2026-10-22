@@ -23,6 +23,8 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Restore pinned native dependencies
         run: dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
+      - name: Assert all previous source fixtures remain unchanged
+        run: pwsh -NoProfile -File scripts/native/Test-NativeEditorBaseline.ps1
       - name: Build native solution
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore
       - name: Check native dynamic theme resources and independent owners
@@ -50,6 +52,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify source editor canonical pixels geometry and owner sessions
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --source-editor-fidelity artifacts/native/source-editor-fidelity
+      - name: Prove topology preview exports canonical pixels geometry and exact owner sessions
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --topology-compatibility artifacts/native/topology-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --topology-editor-fidelity artifacts/native/topology-editor-fidelity .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Probe production Unicode and malformed-input safety in isolated processes
         timeout-minutes: 4
         run: |
@@ -118,6 +126,7 @@ jobs:
           name: native-validation
           path: |
             artifacts/native/tests/
+            artifacts/native/editor-baseline.json
             artifacts/native/input-safety/
             artifacts/native/package-controls/*.json
             artifacts/native/authenticode/**/*.json
@@ -130,6 +139,8 @@ jobs:
             artifacts/native/chart-editor-fidelity/
             artifacts/native/workflow-compatibility/
             artifacts/native/workflow-editor-fidelity/
+            artifacts/native/topology-compatibility/
+            artifacts/native/topology-editor-fidelity/
             artifacts/native/ui/
             artifacts/native/interrupted-save/
             artifacts/native/site-browser/
@@ -282,7 +293,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Flowchart, Sequence, Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph]
+        family: [Flowchart, Sequence, Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block]
     steps:
       - uses: actions/checkout@v4
         with:

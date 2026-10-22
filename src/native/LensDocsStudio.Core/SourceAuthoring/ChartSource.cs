@@ -28,10 +28,10 @@ public static class ChartSource
         return lines.Skip(at).FirstOrDefault(l => l.Length > 0 && !l.StartsWith("%%", StringComparison.Ordinal)) ?? "";
     }
     public static bool IsChart(string source) => ChartHeader.IsMatch(Header(source));
-    public static string Prepare(string source)
+    public static string Prepare(string source, int lineLimit = 1500)
     {
         // Keep configuration for the public preprocessor. Remove only inert trivia before detection.
-        var text = SourceText.Read(source); var header = Body(text).FirstOrDefault(); if (header is null) return source;
+        var text = SourceText.Read(source, lineLimit); var header = Body(text).FirstOrDefault(); if (header is null) return source;
         var at = text.Index(header.Key); var leading = text.Lines.Take(at).ToList();
         return string.Concat(leading.Where(l => l.Content.Length > 0 && !l.Comment).Select(l => l.Text)) + string.Concat(text.Lines.Skip(at).Select(l => l.Text));
     }

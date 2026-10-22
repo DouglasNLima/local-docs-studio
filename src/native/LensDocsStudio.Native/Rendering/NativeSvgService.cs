@@ -202,9 +202,11 @@ public sealed partial class NativeSvgService
     {
         if (!double.IsFinite(source.Width) || !double.IsFinite(source.Height) || source.Width <= 0 || source.Height <= 0)
             throw new InvalidDataException("The diagram dimensions are invalid.");
-        var width = (int)Math.Ceiling(source.Width * scale);
-        var height = (int)Math.Ceiling(source.Height * scale);
-        if (width > 16000 || height > 16000 || (long)width * height > 64_000_000) throw new IOException("This diagram is too large to export as one image.");
+        var scaledWidth = Math.Ceiling(source.Width * scale); var scaledHeight = Math.Ceiling(source.Height * scale);
+        // Check doubles before narrowing: a flat grid can have an enormous positive column count.
+        if (!double.IsFinite(scaledWidth) || !double.IsFinite(scaledHeight) || scaledWidth <= 0 || scaledHeight <= 0 || scaledWidth > 16000 || scaledHeight > 16000 || scaledWidth * scaledHeight > 64_000_000)
+            throw new IOException("This diagram is too large to export as one image, or its image scale is invalid.");
+        var width = (int)scaledWidth; var height = (int)scaledHeight;
         var drawing = new DrawingVisual();
         using (var context = drawing.RenderOpen()) context.DrawImage(source, new Rect(0, 0, width, height));
         var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);

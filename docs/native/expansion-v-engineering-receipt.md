@@ -1,6 +1,6 @@
 # Native Mermaid expansion V engineering receipt
 
-Status: compatibility implementation in progress; editor and acceptance gates pending.
+Status: three bounded editor slices implemented; final clean-source Windows UIA, acceptance and package delivery remain pending.
 
 ## Source and baseline
 
@@ -16,6 +16,20 @@ Status: compatibility implementation in progress; editor and acceptance gates pe
 Inspected existing upstream checkout `artifacts/pinned-mermaider` in the expansion IV worktree; its actual HEAD is `71b64845570d633a94d29e85579c0a02786fece8`. Inspection includes Architecture/C4/Block parsers and public models, Architecture layout, C4/Block renderer-owned geometry, icon registry, preprocessing/header dispatch, resource checks and matching upstream tests. Mermaider 0.15.1 and official .NET 10/WPF remain unchanged.
 
 Added five representative fixtures: Architecture, each of C4Context/C4Container/C4Component, and flat Block. The independent `--topology-compatibility` harness exercises the ordinary application renderer, trusted SVG conversion, ordinary document preview, PNG and HTML/DOCX/PDF exports in Light and Dark. Its raw receipt records the compiled source revision and per-input hashes, including failures.
+
+The independent [hosted compatibility run 39818515472](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39818515472) passed **397 checks / 153 inputs** at clean `e94da769afae2e87b00fa6ba4a617e272585e4dc`, before editor UI implementation. Downloaded raw results are preserved under `artifacts/native/expansion-v/hosted-compatibility-e94da76`. This is compatibility-milestone evidence, not final-source acceptance.
+
+## Editor milestone
+
+Architecture, C4 and Block reuse `SourceDraft`, the shared inspector/source shell and the existing atomic `MermaidDocumentEditSession`. Shared `SourceCall` preserves exact C4 tokens through both pinned quote stages; shared token patching retains untouched source bytes and stable occurrences. Block token keys travel through intra-line/cross-line movement, deletion and private Undo/Redo. Topology hit priority uses actual shape area so enclosing group rectangles cannot intercept service/element selection.
+
+All three families have Markdown/context, standalone Mermaid and Insert routes. C4 Dynamic/Deployment and unproved Architecture headers route to protected source access. The [grammar/protection guide](architecture-c4-block-editors.md) describes exact limits. The native catalogue names all three supported C4 levels explicitly; twenty editor families therefore have twenty-two Mermaid templates.
+
+Candidate local gates before the editor milestone commit: **65 focused Core tests passed**, locked native build **zero warnings/errors**, and **160 complete-canvas fidelity/owner checks passed**. These working-tree runs are development evidence, not relabelled as clean final-source acceptance. Raw logs and TRX files remain under `artifacts/native/expansion-v/`. An initial test compilation recorded xUnit2031 for predicate assertions; the predicate overload corrected the analyser diagnostic while retaining both original conditions.
+
+The 24 existing shared-source appearance runs remain in the existing harness. Six Architecture/C4/Block normal/actual High Contrast runs extend it, including Light/Dark owner changes under actual High Contrast, explicit-ID pending validation, canonical pointer selection, keyboard spacers/junctions, off-screen navigation and source/inspector scrolling. The installed-authoring matrix extends from seventeen to twenty families (sixty install/upgrade/reinstall phases); execution is still pending. The fifteen existing package negative controls remain and three new editor-type controls extend them to eighteen.
+
+The pinned C4/Block pipeline omits upstream element checks. Bounded application guards now retain the existing 500-element budget and C4's existing default 64-level recursion bound. PNG scaled dimensions are checked before narrowing to integers, preserving the existing image budgets. No renderer, runtime, layout, deadline or dependency was changed.
 
 Audit expectations to verify with actual output:
 
@@ -40,8 +54,10 @@ Before that hosted run, the explicit-membership geometry control connects its gr
 
 The four preserved `.847` installer/portable hashes were independently rechecked against PR #43 and all match: `9e1dfe97dd87b8b3781189a4f516b09a5619365e3d4f91a2c872e6d309109adf`, `ca390641ceb1449754fd09c2a8e5140efba34b1a4069751f275041b66c5a430c`, `4be9b68cd27748fef6831ef786c8af068e2eb6097a529fcc97096f6eb7e4182a`, `528bd067820400c9fbbb2e0f70492eecfbeaea6e1baac8e21f1795b43b4fe79d`.
 
+The [first PR native run 39818567910](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39818567910), source `e94da76`, passed build/Core/ordinary corpus/export/previous-fidelity gates but failed the visible installer-wizard gate: the wizard did not appear within its unchanged forty-second observation deadline. Raw failure is retained in `logs/native-e94da76-failed.log`. Its `.849` packages are historical compatibility-candidate packages, do not contain the new editors and are not final-source delivery or installed acceptance. No retry or observation deadline increase was applied.
+
 ## Outstanding delivery gates
 
-Compatibility execution, source-preserving authoring, grammar/capability documentation, all previous-family regressions, new-family normal/actual High Contrast UIA, owner/history/recovery, final clean-source ordinary/export/fidelity/browser/static gates, sixty installed authoring phases, fresh unsigned packages, independent payload/type/control inspection and final captures remain pending. No new package, screenshot, final-source acceptance or twenty-family implementation is claimed yet.
+Final clean-source all-family regressions, normal/actual High Contrast UIA, owner/history/recovery, ordinary/export/fidelity/browser/static gates, sixty installed authoring phases, fresh unsigned packages, independent payload/type/control inspection and final captures remain pending. No new package, screenshot or final-source acceptance is claimed yet. Twenty bounded families are implemented; broader grammar remains explicitly protected.
 
 Installer execution and actual OS appearance mutation are restricted to disposable hosted Windows runners, with optional associations disabled. No merge, release, signing, updater publication, tag movement, Pages deployment or ordinary desktop installation is authorised.

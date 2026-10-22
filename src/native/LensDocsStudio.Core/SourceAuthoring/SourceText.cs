@@ -23,7 +23,7 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
 {
     public string Source => string.Concat(Lines.Select(line => line.Text));
     public string NewLine => Lines.Select(line => line.Ending).FirstOrDefault(value => value.Length > 0) ?? "\n";
-    public static SourceText Read(string source)
+    public static SourceText Read(string source, int lineLimit = 1500)
     {
         if (source.Length > 100_000) throw new ArgumentException("Visual source exceeds the 100,000-character rendering budget. Use Edit source.");
         var lines = new List<SourceLine>();
@@ -32,7 +32,7 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
             var end = source.IndexOf('\n', start); var next = end < 0 ? source.Length : end + 1;
             lines.Add(new(Guid.NewGuid().ToString("N"), source[start..next])); start = next;
         }
-        if (lines.Count > 1500) throw new ArgumentException("Visual source exceeds the 1,500-line source budget. Use Edit source.");
+        if (lines.Count > lineLimit) throw new ArgumentException("Source exceeds the " + lineLimit.ToString("N0", System.Globalization.CultureInfo.InvariantCulture) + "-line source budget. Use Edit source.");
         return new(lines);
     }
     public int Index(string key) => Lines.ToList().FindIndex(line => line.Key == key) is var index && index >= 0 ? index : throw new ArgumentException("Select an existing source occurrence.");
@@ -62,7 +62,9 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
     public static string Header(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) ?? "";
     public static string PrepareRendererSource(string source)
     {
-        if (source.Length <= 100_000 && (ChartSource.IsChart(source) || WorkflowSource.IsWorkflow(source) || TopologySource.IsTopology(source))) return ChartSource.Prepare(source);
+        // The renderer counts non-blank/non-comment lines. Its raw trivia must not acquire the editor's line limit.
+        if (source.Length <= 100_000 && TopologySource.IsTopology(source)) return ChartSource.Prepare(source, int.MaxValue);
+        if (source.Length <= 100_000 && (ChartSource.IsChart(source) || WorkflowSource.IsWorkflow(source))) return ChartSource.Prepare(source);
         if (!Pattern(@"^(?:pie|gantt|timeline|journey|quadrantChart)(?:\s|$)|^mindmap$", RegexOptions.IgnoreCase).IsMatch(Header(source))) return source;
         // The pinned detector examines the first raw line, although its parsers skip comments.
         // Adapt only leading inert trivia for these families; DiagramResult retains authoritative source.

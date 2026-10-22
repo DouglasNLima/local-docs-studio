@@ -23,7 +23,7 @@ internal static class NativeTopologyCompatibilityChecks
         var checks = new List<string>(); var observations = new List<object>(); var diagrams = new DiagramService();
         try
         {
-            foreach (var fixture in new[] { "architecture", "c4-context", "c4-container", "c4-component", "block" })
+            foreach (var fixture in new[] { "architecture", "architecture-icons", "c4-context", "c4-container", "c4-component", "c4-context-elements", "c4-container-elements", "c4-component-elements", "block" })
             foreach (var dark in new[] { false, true })
             {
                 var source = File.ReadAllText(Path.Combine(repository, "tests/fixtures/native-mermaid/expansion-v", fixture + ".mmd"));
@@ -129,6 +129,10 @@ internal static class NativeTopologyCompatibilityChecks
             Check(G(spaces, "node").Length == 2 && Box(G(spaces, "node")[1]).X > Box(G(spaces, "node")[0]).X + 3 * Box(G(spaces, "node")[0]).W, "Block: repeated invisible spacers retain distinct ordered cells");
             Check(Geometry(Render("block\ncolumns 2\na:99 b\n", "block-clamped-span")) == Geometry(Render("block\ncolumns 2\na:2 b\n", "block-span-control")), "Block: over-wide span is visually clamped without proof that its source is valid editor input");
             Check(G(Render("block\na b\na --> a\na --> missing\n", "block-hidden-links"), "block-edge").Length == 0, "Block: self and missing links are hidden rather than invented");
+            var enormous = Render("block\ncolumns 2147483647\na[A]\n", "block-enormous-columns");
+            var enormousDrawing = new NativeSvgService().Render(enormous.Svg!); var imageRejected = false;
+            try { NativeSvgService.ToPng(enormousDrawing); } catch (IOException error) { imageRejected = error.Message.Contains("too large", StringComparison.Ordinal); }
+            Check(imageRejected && enormous.Source.Contains("2147483647", StringComparison.Ordinal), "Block: enormous native grid dimensions fail before integer narrowing/image allocation and retain original source");
             Receipt("PASS", null);
         }
         catch (Exception error) { Receipt("FAIL", error.ToString()); throw; }

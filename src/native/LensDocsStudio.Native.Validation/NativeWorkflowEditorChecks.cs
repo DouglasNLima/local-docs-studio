@@ -22,16 +22,19 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeWorkflowEditorChecks
 {
-    public static void Run(string output, string repository)
+    public static void Run(string output, string repository, bool topology = false)
     {
         Directory.CreateDirectory(output); var checks = new List<string>();
-        foreach (var family in new[] { "kanban", "requirement", "gitgraph" })
+        foreach (var family in topology ? new[] { "architecture", "c4-context", "c4-container", "c4-component", "block" } : new[] { "kanban", "requirement", "gitgraph" })
         foreach (var dark in new[] { false, true })
         {
-            var source = File.ReadAllText(Path.Combine(repository, "tests/fixtures/native-mermaid/expansion-iv", family + ".mmd"));
+            var source = File.ReadAllText(Path.Combine(repository, "tests/fixtures/native-mermaid", topology ? "expansion-v" : "expansion-iv", family + ".mmd"));
             var diagrams = new DiagramService(); SourceVisualEditorWindow window = family switch {
                 "kanban" => new KanbanVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "requirement" => new RequirementVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
+                "architecture" => new ArchitectureVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
+                "c4-context" or "c4-container" or "c4-component" => new C4VisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
+                "block" => new BlockVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 _ => new GitGraphVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark) };
             ThemeService.Apply(window.Resources, dark ? "Dark" : "Light");
             var draft = (ISourceDraft)typeof(SourceVisualEditorWindow).GetField("Draft", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
@@ -43,6 +46,9 @@ internal static class NativeWorkflowEditorChecks
             if (draft is KanbanVisualDraft board) Check(hits.Count == board.Model.Rows.Count, "Kanban: every duplicate card and column has distinct canonical correspondence");
             if (draft is RequirementVisualDraft req) Check(hits.Count == req.Model.Visible.Count + req.Model.Relations.Count, "Requirement: visible boxes and proved native relationship paths map separately");
             if (draft is GitGraphVisualDraft git) Check(hits.Count == git.Model.Marks.Count, "GitGraph: actual commit marks map by command occurrence; non-mark commands remain in the list");
+            if (draft is Core.ArchitectureDiagrams.ArchitectureVisualDraft architecture) Check(hits.Count == architecture.Model.Nodes.Count + architecture.Model.Edges.Count, "Architecture: actual services, group boxes, junctions and connection paths have complete occurrence correspondence");
+            if (draft is Core.C4Diagrams.C4VisualDraft c4) Check(hits.Count == c4.Model.Nodes.Count + c4.Model.Relations.Count, family + ": every actual element, boundary and relationship maps separately at this architecture level");
+            if (draft is Core.BlockDiagrams.BlockVisualDraft blockDraft) Check(hits.Count == blockDraft.Model.Visible.Count + blockDraft.Model.Edges.Count && blockDraft.Model.Tokens.Any(t => t.Space), "Block: actual boxes/links map exactly while spacers retain keyboard-only source occurrences");
             if (draft is GitGraphVisualDraft history)
             {
                 var appended = history.AppendAsync("commit").GetAwaiter().GetResult(); Check(appended.Success, "GitGraph: anonymous commit can be appended through the actual editor draft"); history.Select(history.Model.Commands[^1].Identity);
@@ -75,7 +81,7 @@ internal static class NativeWorkflowEditorChecks
                 var body = source.ReplaceLineEndings(nl); var block = "```mermaid" + nl + body.TrimEnd('\r', '\n') + nl + "```" + nl;
                 var original = "Before café Ω" + nl + block + "Between" + nl + block + "After" + nl;
                 var owner = new DocumentViewModel(original) { DisplayName = family + ".md" }; var target = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1];
-                var change = family switch { "kanban" => body.Replace("Write guide", "Edited guide", StringComparison.Ordinal), "requirement" => body.Replace("DOC-17", "DOC-18", StringComparison.Ordinal), _ => body.Replace("Start", "Edited start", StringComparison.Ordinal) };
+                var change = family switch { "kanban" => body.Replace("Write guide", "Edited guide", StringComparison.Ordinal), "requirement" => body.Replace("DOC-17", "DOC-18", StringComparison.Ordinal), "architecture" => body.Replace("Gateway", "Edited gateway", StringComparison.Ordinal), "c4-context" or "block" => body.Replace("Reader", "Edited reader", StringComparison.Ordinal), "c4-container" => body.Replace("Editor", "Edited editor", StringComparison.Ordinal), "c4-component" => body.Replace("Parser", "Edited parser", StringComparison.Ordinal), _ => body.Replace("Start", "Edited start", StringComparison.Ordinal) };
                 new MermaidDocumentEditSession(owner, target).Apply(change, true);
                 Check(owner.EditorDocument.Text == original[..target.Body.Start] + change + original[target.Body.End..], family + ": exact second identical fence patch preserves neighbours and " + (nl == "\n" ? "LF" : "CRLF"));
                 owner.EditorDocument.UndoStack.Undo(); Check(owner.EditorDocument.Text == original, family + ": owner Apply is one exact Undo step");
@@ -85,7 +91,7 @@ internal static class NativeWorkflowEditorChecks
                 Check(conflict.EditorDocument.Text == current, family + ": asynchronous final owner-version conflict preserves both sources");
             }
         }
-        File.WriteAllText(Path.Combine(output, "workflow-editor-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", SourceRevision = typeof(KanbanVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, Checks = checks }, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(Path.Combine(output, topology ? "topology-editor-fidelity.json" : "workflow-editor-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", SourceRevision = typeof(KanbanVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, Checks = checks }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
     }
     private static void RenderActual(SourceVisualEditorWindow window)

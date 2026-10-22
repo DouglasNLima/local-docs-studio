@@ -99,7 +99,7 @@ $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Ob
 $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
 Reject 'missing-class-resource-with-recomputed-checksum' @{PackageDirectory=$copy} 'compiled native Class editor resource is missing'
 # Retain version/resources and remove one new metadata type at a time. No package is executed.
-foreach ($family in 'Xy','Radar','Sankey','Kanban','Requirement','GitGraph') {
+foreach ($family in 'Xy','Radar','Sankey','Kanban','Requirement','GitGraph','Architecture','C4','Block') {
     $originalArchive = [IO.Compression.ZipFile]::OpenRead((Join-Path $PackageDirectory $zip.Name))
     try {
         $input = $originalArchive.GetEntry('LensDocsStudio.Native.dll').Open(); $buffer = [IO.MemoryStream]::new()
