@@ -19,10 +19,11 @@ public sealed record C4SourceNode(string Identity, string EndIdentity, SourceCal
 public sealed record C4SourceRelation(string Identity, SourceCall Call)
 {
     public bool Back => Call.Keyword.Value.Equals("Rel_Back", StringComparison.OrdinalIgnoreCase);
-    public string Source => Call.Positional.Count > 1 ? Call.Positional[Back ? 1 : 0].SplitValue : "";
-    public string Target => Call.Positional.Count > 1 ? Call.Positional[Back ? 0 : 1].SplitValue : "";
-    public string Label => Call.Value(2);
-    public string Technology => Call.Value(3);
+    private int Offset => Call.Keyword.Value.Equals("RelIndex", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+    public string Source => Call.Positional.Count > Offset + 1 ? Call.Positional[Offset + (Back ? 1 : 0)].SplitValue : "";
+    public string Target => Call.Positional.Count > Offset + 1 ? Call.Positional[Offset + (Back ? 0 : 1)].SplitValue : "";
+    public string Label => Call.Value(Offset + 2);
+    public string Technology => Call.Value(Offset + 3);
     public bool Simple => Call.Balanced && new[] { "Rel", "BiRel", "Rel_Back" }.Contains(Call.Keyword.Value, StringComparer.OrdinalIgnoreCase) && Call.Positional.Count is >= 2 and <= 4 && !Call.Arguments.Any(a => a.Named || a.Ignored);
 }
 public sealed record C4SourceModel(string HeaderIdentity, string Variant, SourceDeclaration? Title, IReadOnlyList<C4SourceNode> Nodes, IReadOnlyList<C4SourceRelation> Relations, IReadOnlyList<string> Protected, int MaximumDepth)
@@ -128,14 +129,14 @@ public sealed class C4VisualDraft : SourceDraft<C4SourceModel>
         var boundary = BoundaryKinds.Contains(kind); if (!boundary && !ElementKinds.Contains(kind)) throw new ArgumentException("Choose a verified C4 element or boundary kind; levels are never converted.");
         var declaration = kind + "(" + alias + ", " + SourceCall.Quote(label);
         if (!boundary) declaration += kind.StartsWith("Person", StringComparison.Ordinal) || kind.StartsWith("System", StringComparison.Ordinal) ? ", " + SourceCall.Quote(description) : ", " + SourceCall.Quote(technology) + ", " + SourceCall.Quote(description);
-        text = text.Insert(text.Lines.Count, declaration + ")" + (boundary ? " {" : "")); return boundary ? text.Insert(text.Lines.Count, "}") : text;
+        text = TopologySource.Append(text, declaration + ")" + (boundary ? " {" : "")); return boundary ? TopologySource.Append(text, "}") : text;
     }, token);
     private static void Endpoints(C4SourceModel model, string source, string target)
     { if (source == target || !model.Nodes.Any(n => n.Alias == source && !n.Boundary) || !model.Nodes.Any(n => n.Alias == target && !n.Boundary)) throw new ArgumentException("Choose two existing distinct C4 elements, keeping boundary aliases separate."); }
     public Task<SourceAuthoringResult> AddRelationAsync(string kind, string source, string target, string label = "", string technology = "", CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         Topology(model); Endpoints(model, source, target); if (!new[] { "Rel", "BiRel", "Rel_Back" }.Contains(kind)) throw new ArgumentException("Choose Rel, BiRel or Rel_Back.");
-        var back = kind == "Rel_Back"; var changed = text.Insert(text.Lines.Count, kind + "(" + (back ? target : source) + ", " + (back ? source : target) + ", " + SourceCall.Quote(label) + ", " + SourceCall.Quote(technology) + ")");
+        var back = kind == "Rel_Back"; var changed = TopologySource.Append(text, kind + "(" + (back ? target : source) + ", " + (back ? source : target) + ", " + SourceCall.Quote(label) + ", " + SourceCall.Quote(technology) + ")");
         if (!Read(changed).TopologySafe) throw new ArgumentException("This relationship would introduce an unproved parallel or cyclic topology."); return changed;
     }, token);
     public Task<SourceAuthoringResult> UpdateRelationAsync(string identity, string source, string target, string label, string technology, CancellationToken token = default) => ChangeAsync((text, model) =>
@@ -157,8 +158,8 @@ public sealed class C4VisualDraft : SourceDraft<C4SourceModel>
     {
         Topology(model); if (model.Relations.Any(r => r.Identity == identity)) return ChartSource.MoveRow(text, model.Relations.Select(r => r.Identity).ToArray(), identity, direction);
         var node = model.Nodes.Single(n => n.Identity == identity); var peers = model.Nodes.Where(n => n.ParentIdentity == node.ParentIdentity).ToArray(); var at = Array.IndexOf(peers, node); var next = at + Math.Sign(direction);
-        if (next < 0 || next >= peers.Length) throw new ArgumentException("There is no peer in that direction."); var a = peers[Math.Min(at, next)]; var b = peers[Math.Max(at, next)];
-        SourceRowMoves.CheckTrailingAttachment(text, a.EndIdentity); SourceRowMoves.CheckTrailingAttachment(text, b.EndIdentity); return SourceRowMoves.Swap(text, a.Identity, b.Identity, text.Index(a.EndIdentity) + 1, text.Index(b.EndIdentity) + 1);
+        if (next < 0 || next >= peers.Length) throw new ArgumentException("There is no peer in that direction."); var peer = peers[next];
+        return TopologySource.MoveGroup(text, node.Identity, node.EndIdentity, peer.Identity, peer.EndIdentity, direction, model.Relations.Select(r => r.Identity));
     }, token);
     public Task<SourceAuthoringResult> MoveMembershipAsync(string identity, string boundaryIdentity, CancellationToken token = default) => ChangeAsync((text, model) =>
     {

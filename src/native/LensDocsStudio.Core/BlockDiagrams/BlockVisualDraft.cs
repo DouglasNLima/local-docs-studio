@@ -116,7 +116,7 @@ public sealed class BlockVisualDraft : SourceDraft<BlockSourceModel>
     private static string Label(string value, string shape, bool quoted)
     {
         if (value.Length > 0) SourceText.Label(value);
-        if (value.Contains(shape == "rounded" ? ')' : ']') || quoted && value.Contains('"') || !quoted && value.StartsWith('"')) throw new ArgumentException("This label has an unproved quote or delimiter for its existing Block source form. Pending input is retained.");
+        if (quoted ? value.Contains('"') : value.Contains(shape == "rounded" ? ')' : ']') || value.StartsWith('"')) throw new ArgumentException("This label has an unproved quote or delimiter for its existing Block source form. Pending input is retained.");
         return value;
     }
     public Task<SourceAuthoringResult> SetHeadingAsync(string title, string columns, CancellationToken token = default) => ChangeAsync((text, model) =>
@@ -148,7 +148,7 @@ public sealed class BlockVisualDraft : SourceDraft<BlockSourceModel>
         {
             if (item.Space || !new[] { "bare", "rectangle", "rounded" }.Contains(shape)) throw new ArgumentException("Choose an explicit rectangle or rounded conversion for a real block.");
             if (shape == "bare" && label != id) throw new ArgumentException("A bare block couples its label to its ID. Set matching text before requesting that conversion.");
-            var quoted = item.LabelSource.StartsWith('"'); var labelSource = label == item.Label && item.LabelToken is not null ? item.LabelSource : (quoted ? "\"" : "") + Label(label, shape, quoted) + (quoted ? "\"" : "");
+            var quoted = item.LabelSource.StartsWith('"'); Label(label, shape, quoted); var labelSource = label == item.Label && item.LabelToken is not null ? item.LabelSource : (quoted ? "\"" : "") + label + (quoted ? "\"" : "");
             var raw = text.Line(item.LineIdentity).Body.Substring(item.Start, item.Length); var converted = id + (shape == "bare" ? "" : shape == "rounded" ? "(" + labelSource + ")" : "[" + labelSource + "]") + (span == item.SpanText ? item.SpanToken is null ? "" : ":" + item.SpanToken.Raw : ":" + span);
             patches.RemoveAll(p => p.Item1.Identity == item.LineIdentity); patches.Add((new(item.LineIdentity, "block", "", item.Start, item.Length, raw), converted));
         }
@@ -164,16 +164,17 @@ public sealed class BlockVisualDraft : SourceDraft<BlockSourceModel>
     {
         Topology(model); Integer(span, model.Columns); TopologySource.Identifier(id); if (id.Equals("space", StringComparison.OrdinalIgnoreCase) || model.Tokens.Any(t => t.Id == id)) throw new ArgumentException("Choose a new real block ID; space is reserved.");
         if (shape is not ("rectangle" or "rounded")) throw new ArgumentException("Choose a rectangle or rounded block.");
-        return text.Insert(text.Lines.Count, id + (shape == "rounded" ? "(" : "[") + "\"" + Label(label, shape, true) + "\"" + (shape == "rounded" ? ")" : "]") + (span == "1" ? "" : ":" + span));
+        return TopologySource.Append(text, id + (shape == "rounded" ? "(" : "[") + "\"" + Label(label, shape, true) + "\"" + (shape == "rounded" ? ")" : "]") + (span == "1" ? "" : ":" + span));
     }, token);
     public Task<SourceAuthoringResult> AddSpaceAsync(string span = "1", CancellationToken token = default) => ChangeAsync((text, model) =>
-    { Topology(model); Integer(span, model.Columns); return text.Insert(text.Lines.Count, "space" + (span == "1" ? "" : ":" + span)); }, token);
+    { Topology(model); Integer(span, model.Columns); return TopologySource.Append(text, "space" + (span == "1" ? "" : ":" + span)); }, token);
     private static void Endpoints(BlockSourceModel model, string source, string target)
-    { if (source == target || !model.Unique(source) || !model.Unique(target)) throw new ArgumentException("Choose two existing distinct real block IDs. Spacers are never endpoints."); }
+    { if (source == target || !model.Unique(source) || !model.Unique(target) || !SourceText.Pattern(@"^[A-Za-z_][\w-]*$").IsMatch(source) || !SourceText.Pattern(@"^[A-Za-z_][\w-]*$").IsMatch(target)) throw new ArgumentException("Choose two existing distinct real block IDs representable by the pinned link grammar (begin with an ASCII letter or underscore). Spacers are never endpoints."); }
     public Task<SourceAuthoringResult> AddEdgeAsync(string source, string target, string label = "", CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         Topology(model); Endpoints(model, source, target); if (label.IndexOfAny(['|', '\r', '\n']) >= 0) throw new ArgumentException("A new pipe-label link cannot contain a pipe or line break.");
-        var changed = text.Insert(text.Lines.Count, source + " -->" + (label.Length > 0 ? "|" + label + "|" : "") + " " + target); if (!Read(changed).TopologySafe) throw new ArgumentException("This link would introduce unproved parallel or cyclic topology."); return changed;
+        if (label.Length > 0) SourceText.Label(label);
+        var changed = TopologySource.Append(text, source + " -->" + (label.Length > 0 ? "|" + label + "|" : "") + " " + target); if (!Read(changed).TopologySafe) throw new ArgumentException("This link would introduce unproved parallel or cyclic topology."); return changed;
     }, token);
     public Task<SourceAuthoringResult> UpdateEdgeAsync(string identity, string source, string target, string label, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
@@ -200,7 +201,7 @@ public sealed class BlockVisualDraft : SourceDraft<BlockSourceModel>
         var rows = model.Tokens.ToArray(); var at = Array.FindIndex(rows, t => t.Identity == identity); var next = at + Math.Sign(direction); if (at < 0 || next < 0 || next >= rows.Length) throw new ArgumentException("There is no grid occurrence in that direction.");
         var a = rows[Math.Min(at, next)]; var b = rows[Math.Max(at, next)]; var lineA = text.Line(a.LineIdentity); var lineB = text.Line(b.LineIdentity);
         var peersA = rows.Where(t => t.LineIdentity == a.LineIdentity).Select(t => t.Identity).ToArray(); var peersB = rows.Where(t => t.LineIdentity == b.LineIdentity).Select(t => t.Identity).ToArray();
-        if (a.LineIdentity != b.LineIdentity && peersA.Length == 1 && peersB.Length == 1) return ChartSource.MoveRow(text, [a.LineIdentity, b.LineIdentity], direction < 0 ? b.LineIdentity : a.LineIdentity, direction);
+        if (a.LineIdentity != b.LineIdentity && peersA.Length == 1 && peersB.Length == 1) return TopologySource.MoveRows(text, [a.LineIdentity, b.LineIdentity], direction < 0 ? b.LineIdentity : a.LineIdentity, direction, model.Edges.Select(e => e.Identity));
         if (a.LineIdentity != b.LineIdentity && (text.AttachedStart(a.LineIdentity) != text.Index(a.LineIdentity) || text.AttachedStart(b.LineIdentity) != text.Index(b.LineIdentity))) throw new ArgumentException("Comments attached to a multi-token line protect cross-line token movement.");
         var rawA = lineA.Body.Substring(a.Start, a.Length); var rawB = lineB.Body.Substring(b.Start, b.Length);
         if (a.LineIdentity == b.LineIdentity)

@@ -105,6 +105,7 @@ internal static class NativeTopologyCompatibilityChecks
                 var forward = Render(variant + pair + "Rel(a,b,\"Label\",\"Protocol\")\n", variant + "-forward");
                 Check(Geometry(forward) == Geometry(Render(variant + pair + "Rel_Back(b,a,\"Label\",\"Protocol\")\n", variant + "-back")), variant + ": Rel_Back reverses actual endpoints without rewriting argument order");
                 Check(Geometry(forward) == Geometry(Render(variant + pair + "Rel_D(a,b,\"Label\",\"Protocol\")\n", variant + "-ignored-direction")), variant + ": direction hint is ignored by native layout");
+                Check(Geometry(forward) == Geometry(Render(variant + pair + "RelIndex(9,a,b,\"Label\",\"Protocol\")\n", variant + "-ignored-index")), variant + ": RelIndex discards its index but retains the actual positional endpoints");
                 Check(G(Render(variant + pair + "BiRel(a,b)\n", variant + "-bidirectional"), "c4-relation").Single().Attribute("marker-start") is not null, variant + ": BiRel retains both arrowheads");
                 var empty = Render(variant + "\nContainer(a,\"A\",\"\",\"Description\",$tags=\"kept\")\n", variant + "-explicit-empty");
                 Check(G(empty, "c4-element").Single().Value.Contains("Description", StringComparison.Ordinal), variant + ": explicit empty technology retains following description and ignores named token");

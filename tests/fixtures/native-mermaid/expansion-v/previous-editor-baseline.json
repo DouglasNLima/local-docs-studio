@@ -505,5 +505,55 @@
       "path": "tests/fixtures/scroll-sync.md",
       "gitBlob": "2915ce6a8900e1a2a4ba09cb774b1a45a27825d3"
     }
+  ],
+  "snippets": [
+    {
+      "id": "mermaid-snippet/subgraph",
+      "sha256": "8938014cb08330d778593b08c11c03ad5d8e4e6d78a56ced7276a7653c348d6d"
+    },
+    {
+      "id": "mermaid-snippet/decision",
+      "sha256": "3d70a33372ef208aa5aff501e2a2a6bf2d319ef377bd0042241ab619dd6a39ee"
+    },
+    {
+      "id": "mermaid-snippet/sequenceNote",
+      "sha256": "8531eb9a277bc3720999206ea279a042af50461b12281e92609b474e3fceeaf7"
+    },
+    {
+      "id": "mermaid-snippet/style",
+      "sha256": "e40ef92a4173b29a7f601720824f5c1f9f3345c83b5ff51408788838d8eca9ab"
+    },
+    {
+      "id": "mermaid-snippet/classDef",
+      "sha256": "d7bcc0385fc9102d471d9f089175ce0dfd042573624083a1627a693c6ae426da"
+    },
+    {
+      "id": "mermaid-snippet/linkStyle",
+      "sha256": "ea023ead2d8328f72c0589576ba1e3186d16090a45dd931c25eb98b98264fd40"
+    },
+    {
+      "id": "mermaid-snippet/xychart",
+      "sha256": "37cc5b6eef3d7b22087b451184c023def9db4b5f3527873d6286533681949b9b"
+    },
+    {
+      "id": "mermaid-snippet/radar",
+      "sha256": "96a86f13bfc4c96ffb907ca58a4c9c4a7c8ae7aa40627db8fe02fec62c6b3e75"
+    },
+    {
+      "id": "mermaid-snippet/sankey",
+      "sha256": "a56ac9a8fa3d1749a4fd4105083e373eb1872ef7d69992620d13803a3ef2d17d"
+    },
+    {
+      "id": "mermaid-snippet/kanban-native",
+      "sha256": "54358d75882ebc698a98821883b8d5a9232da6e15e2799825bfc0a61b7f56e2b"
+    },
+    {
+      "id": "mermaid-snippet/requirement-native",
+      "sha256": "f245da23614e4cce021183e16ac3c8d93beb95e2ef252d1c6a5806f55caac9d3"
+    },
+    {
+      "id": "mermaid-snippet/gitgraph-native",
+      "sha256": "08b5519c98d893ffa1ac3cc7c086d7a728b411cb6a7e3bb9acaeeb25898ffb57"
+    }
   ]
 }

@@ -63,6 +63,20 @@ public class BlockSourceAuthoringTests
         var source = draft.Source; Assert.False((await draft.DeleteAsync(draft.Model.Tokens[0].Identity)).Success); Assert.Equal(source, draft.Source); Pass(await draft.DeleteAsync(edge.Identity)); Pass(await draft.DeleteAsync(draft.Model.Tokens[0].Identity)); Assert.Contains(" b[B]", draft.Source);
     }
     [Fact]
+    public async Task Explicit_shape_conversion_never_reinterprets_a_delimiter_as_an_extra_block()
+    {
+        var plain = new BlockVisualDraft("block\ncolumns 2\na[First) literal] b[B]\n"); var token = plain.Model.Tokens[0];
+        Assert.False((await plain.UpdateTokenAsync(token.Identity, "a", token.Label, "rounded", "1")).Success); Assert.Equal(plain.OriginalSource, plain.Source);
+        var quoted = new BlockVisualDraft("block\ncolumns 2\na[\"First) literal\"] b[B]\n"); token = quoted.Model.Tokens[0];
+        Pass(await quoted.UpdateTokenAsync(token.Identity, "a", token.Label, "rounded", "1")); Assert.Equal("block\ncolumns 2\na(\"First) literal\") b[B]\n", quoted.Source); Assert.Equal(2, quoted.Model.Tokens.Count);
+    }
+    [Fact]
+    public async Task Quoted_Block_labels_accept_literal_closing_delimiters_without_C4_escaping()
+    {
+        var draft = new BlockVisualDraft("block\na[\"A\"]\n"); Pass(await draft.UpdateTokenAsync(draft.Model.Tokens[0].Identity, "a", "Literal ] and )", "rectangle", "1"));
+        Assert.Equal("block\na[\"Literal ] and )\"]\n", draft.Source); Assert.Single(draft.Model.Tokens); Assert.Equal("Literal ] and )", draft.Model.Tokens[0].Label);
+    }
+    [Fact]
     public async Task Spacers_are_repeatable_occurrences_and_never_real_IDs_or_endpoints()
     {
         var draft = new BlockVisualDraft("block\ncolumns 3\na[A] b[B]\n"); Pass(await draft.AddSpaceAsync("2")); Pass(await draft.AddSpaceAsync("1")); Assert.Equal(2, draft.Model.Tokens.Count(t => t.Space));

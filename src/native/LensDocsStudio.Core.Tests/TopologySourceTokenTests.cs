@@ -36,4 +36,24 @@ public class TopologySourceTokenTests
         Assert.Equal("block\r\na[A]\r\n", SourceText.PrepareRendererSource(source));
         Assert.Throws<ArgumentException>(() => SourceText.Read(source));
     }
+    [Theory, InlineData("architecture"), InlineData("c4"), InlineData("block")]
+    public async Task Appending_never_silently_attaches_an_existing_trailing_comment(string family)
+    {
+        var source = (family == "architecture" ? "architecture-beta" : family == "c4" ? "C4Context" : "block") + "\n%% trailing Ω\n";
+        ISourceDraft draft; SourceAuthoringResult result;
+        if (family == "architecture") { var typed = new Core.ArchitectureDiagrams.ArchitectureVisualDraft(source); draft = typed; result = await typed.AddNodeAsync("service", "a", "A"); }
+        else if (family == "c4") { var typed = new Core.C4Diagrams.C4VisualDraft(source); draft = typed; result = await typed.AddNodeAsync("Person", "a", "A"); }
+        else { var typed = new Core.BlockDiagrams.BlockVisualDraft(source); draft = typed; result = await typed.AddSpaceAsync(); }
+        Assert.False(result.Success); Assert.Contains("trailing comment", result.Error); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+    }
+    [Theory, InlineData("architecture"), InlineData("c4"), InlineData("block")]
+    public async Task Configuration_comments_Unicode_and_CRLF_survive_independent_native_field_edits(string family)
+    {
+        const string prefix = "---\r\ntitle: Preserved configuration Ω\r\n---\r\n%%{init: {\"theme\":\"dark\"}}%%\r\n%% retained comment\r\n";
+        string source; ISourceDraft draft; SourceAuthoringResult result;
+        if (family == "architecture") { source = prefix + "architecture-beta\r\nservice a[A]\r\n"; var typed = new Core.ArchitectureDiagrams.ArchitectureVisualDraft(source); draft = typed; result = await typed.UpdateNodeAsync(typed.Model.Nodes[0].Identity, "a", "Edited Ω", "", ""); }
+        else if (family == "c4") { source = prefix + "C4Context\r\nPerson(a,\"A\",\"Details\")\r\n"; var typed = new Core.C4Diagrams.C4VisualDraft(source); draft = typed; result = await typed.UpdateNodeAsync(typed.Model.Nodes[0].Identity, "a", "Edited Ω", "", "Details"); }
+        else { source = prefix + "block\r\na[A]:01\r\n"; var typed = new Core.BlockDiagrams.BlockVisualDraft(source); draft = typed; result = await typed.UpdateTokenAsync(typed.Model.Tokens[0].Identity, "a", "Edited Ω", "rectangle", "01"); }
+        Assert.True(result.Success, result.Error); Assert.Equal(source.Replace(family == "c4" ? "\"A\"" : "[A]", family == "c4" ? "\"Edited Ω\"" : "[Edited Ω]", StringComparison.Ordinal), draft.Source);
+    }
 }

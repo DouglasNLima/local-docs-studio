@@ -43,6 +43,11 @@ public static class TopologySource
         }
         return text;
     }
+    public static SourceText Append(SourceText text, string declaration)
+    {
+        SourceSections.CheckTail(text, 0, text.Lines.Count);
+        return text.Insert(text.Lines.Count, declaration);
+    }
     public static bool Acyclic(IEnumerable<string> ids, IEnumerable<(string Source, string Target)> connections)
     {
         var edges = connections.ToArray(); var done = new HashSet<string>(); var active = new HashSet<string>();
@@ -53,5 +58,29 @@ public static class TopologySource
             active.Remove(id); return true;
         }
         return ids.All(Visit);
+    }
+    public static IReadOnlySet<string> ProvedRows(SourceText text, IEnumerable<string> identities)
+    {
+        var keys = new HashSet<string>();
+        foreach (var identity in identities)
+            foreach (var line in text.Lines.Skip(text.AttachedStart(identity)).Take(text.Index(identity) - text.AttachedStart(identity) + 1)) keys.Add(line.Key);
+        return keys;
+    }
+    public static SourceText MoveRows(SourceText text, IReadOnlyList<string> rows, string identity, int direction, IEnumerable<string> independent)
+    {
+        var index = rows.ToList().IndexOf(identity); var next = index + Math.Sign(direction);
+        if (index < 0 || next < 0 || next >= rows.Count) throw new ArgumentException("There is no occurrence in that direction.");
+        return MoveGroup(text, rows[index], rows[index], rows[next], rows[next], direction, independent);
+    }
+    public static SourceText MoveGroup(SourceText text, string identity, string endIdentity, string peer, string peerEnd, int direction, IEnumerable<string> independent)
+    {
+        var start = text.AttachedStart(identity); var end = text.Index(endIdentity) + 1; var otherStart = text.AttachedStart(peer); var otherEnd = text.Index(peerEnd) + 1;
+        if (start < otherEnd && otherStart < end) throw new ArgumentException("Source groups overlap; this move is protected.");
+        SourceRowMoves.CheckTrailingAttachment(text, endIdentity); SourceRowMoves.CheckTrailingAttachment(text, peerEnd);
+        var gapStart = Math.Min(end, otherEnd); var gapEnd = Math.Max(start, otherStart); var proved = ProvedRows(text, independent);
+        if (text.Lines.Skip(gapStart).Take(gapEnd - gapStart).Any(l => l.Content.Length > 0 && !proved.Contains(l.Key))) throw new ArgumentException("An unproved intervening directive or comment protects this move.");
+        if (text.Lines[end - 1].Ending.Length == 0 || text.Lines[otherEnd - 1].Ending.Length == 0) throw new ArgumentException("An unterminated source group protects this move.");
+        // Move only the chosen complete group. Independent middle rows retain their bytes and relative order.
+        return SourceSections.MoveTo(text, start, end, direction < 0 ? otherStart : otherEnd);
     }
 }

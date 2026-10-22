@@ -44,6 +44,12 @@ public class ArchitectureSourceAuthoringTests
         var original = draft.Source; Assert.False((await draft.DeleteAsync(draft.Model.Nodes[0].Identity)).Success); Assert.False((await draft.DeleteAsync(draft.Model.Nodes[1].Identity)).Success); Assert.Equal(original, draft.Source);
         Pass(await draft.DeleteAsync(draft.Model.Edges[0].Identity)); Pass(await draft.DeleteAsync(draft.Model.Nodes[2].Identity)); Pass(await draft.DeleteAsync(draft.Model.Nodes[1].Identity)); Pass(await draft.DeleteAsync(draft.Model.Nodes[0].Identity)); Assert.Equal("architecture-beta\n", draft.Source);
     }
+    [Fact]
+    public async Task Node_order_crosses_only_proved_independent_connections_without_rewriting_the_middle()
+    {
+        var draft = new ArchitectureVisualDraft(ArchitectureVisualDraft.Starter); Pass(await draft.AddNodeAsync("service", "added", "Added")); var added = draft.Source; var key = draft.Model.Nodes[^1].Identity;
+        var edges = draft.Model.Edges.Select(e => draft.Text.Line(e.Identity).Text).ToArray(); Pass(await draft.MoveAsync(key, -1)); Assert.Equal(edges, draft.Model.Edges.Select(e => draft.Text.Line(e.Identity).Text)); draft.Undo(); Assert.Equal(added, draft.Source); draft.Redo(); Pass(await draft.DeleteAsync(key)); Assert.Equal(ArchitectureVisualDraft.Starter, draft.Source);
+    }
     [Theory, InlineData("Bad]label"), InlineData("A<br>B"), InlineData("bad\nline")]
     public async Task Unproved_label_encoding_keeps_the_last_valid_private_source(string label)
     { var draft = new ArchitectureVisualDraft("architecture-beta\nservice a[A]\n"); Assert.False((await draft.UpdateNodeAsync(draft.Model.Nodes[0].Identity, "a", label, "", "")).Success); Assert.Equal(draft.OriginalSource, draft.Source); Assert.False(draft.CanUndo); }

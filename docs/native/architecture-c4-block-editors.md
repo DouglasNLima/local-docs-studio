@@ -8,7 +8,7 @@ The [engineering receipt](expansion-v-engineering-receipt.md) owns source-labell
 
 The existing source/inspector shell supplies an adjustable source panel, independently scrolling inspector, persistent selection, focus and small-window behaviour. Every declaration, relationship and invisible spacer/routing occurrence remains in the keyboard list. Pointer targets use actual canonical native geometry; labels and renderer IDs are never the sole source identity. Smaller actual topology shapes receive pointer priority over enclosing group boxes.
 
-Edits replace exact token spans or complete proved source groups. Untouched Unicode, LF/CRLF, comments, blank lines, indentation, configuration, quoting, ignored text and numeric spelling remain exact. Block occurrence keys travel with tokens through swaps and private history, including several tokens on one line. Comment attachment ambiguity protects movement; no command reformats the entire diagram.
+Edits replace exact token spans or complete proved source groups. Untouched Unicode, LF/CRLF, comments, blank lines, indentation, configuration, quoting, ignored text and numeric spelling remain exact. Block occurrence keys travel with tokens through swaps and private history, including several tokens on one line. Complete groups may move across proved independent connection rows without moving those rows. Comment attachment ambiguity protects movement and appending after ambiguous trailing comments; no command reformats the entire diagram.
 
 Invalid pending fields stay visible with an explanation, preserve the last valid private draft and disable Apply. Update/reset resolves pending properties. Private Undo/Redo is bounded by the existing snapshot and character budgets. Apply reparses and natively renders the exact draft, then commits through the existing owner/source/version guard as one owner Undo action. Cancel and stale-owner rejection retain both sources. Save persists only an applied owning document. New IDs are explicitly entered by the user.
 
@@ -36,7 +36,7 @@ Rel, BiRel and Rel_Back retain exact label/technology arguments. Rel_Back revers
 
 ## Flat Block
 
-The supported headers are `block` and `block-beta`, with an effective header/body title and positive representable columns. Ordered simple blocks retain bare, rectangle or rounded forms. Bare blocks couple label and ID; changing only the label requires an explicit shape conversion. Existing quote and delimiter rules follow the pinned Block parser, without C4/CSV escaping.
+The supported headers are `block` and `block-beta`, with an effective header/body title and positive representable columns. Ordered simple blocks retain bare, rectangle or rounded forms. Bare blocks couple label and ID; changing only the label requires an explicit shape conversion. Existing quote and delimiter rules follow the pinned Block parser, without C4/CSV escaping. Quoted labels may contain literal closing delimiters, but embedded quotes remain protected. Explicit shape conversion validates the label against the destination form before preserving its original spelling.
 
 Several declarations may occupy one line. Exact token spans and original inter-token whitespace survive edits, moves and deletion; the editor does not split the line into separate declarations. Repeated `space` occurrences have distinct identities and spans. A spacer is never a real endpoint or renameable ID.
 

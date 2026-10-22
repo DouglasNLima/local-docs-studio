@@ -20,6 +20,14 @@ public sealed class BuiltInContentCatalogueTests
         }
     }
 
+    [Fact] public void All_twelve_previous_Mermaid_snippets_retain_their_exact_pinned_source()
+    {
+        using var baseline = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures/native-editor-baseline.json")));
+        var snippets = baseline.RootElement.GetProperty("snippets").EnumerateArray().ToArray(); Assert.Equal(12, snippets.Length);
+        foreach (var snippet in snippets)
+            Assert.Equal(snippet.GetProperty("sha256").GetString(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Entry(snippet.GetProperty("id").GetString()!).ContentPattern))).ToLowerInvariant());
+    }
+
     [Fact] public void Bundled_inventory_covers_examples_diagrams_and_all_three_document_studios()
     {
         var entries = BuiltInContentCatalogue.Entries;

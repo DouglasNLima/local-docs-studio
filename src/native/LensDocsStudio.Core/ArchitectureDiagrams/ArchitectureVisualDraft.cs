@@ -127,7 +127,7 @@ public sealed class ArchitectureVisualDraft : SourceDraft<ArchitectureSourceMode
         if (kind is not ("service" or "group" or "junction")) throw new ArgumentException("Choose service, junction or group.");
         if (parent.Length > 0 && (kind == "group" || !model.Nodes.Any(n => n.Id == parent && n.Kind == "group" && n.Parent.Length == 0))) throw new ArgumentException("Choose a root group for the new service or junction.");
         if (icon.Length > 0 && !Icons.Contains(icon)) throw new ArgumentException("Choose a verified bundled pictogram.");
-        return text.Insert(text.Lines.Count, kind + " " + id + (kind == "junction" ? "" : (icon.Length > 0 ? "(" + icon + ")" : "") + "[" + Label(label) + "]") + (parent.Length > 0 ? " in " + parent : ""));
+        return TopologySource.Append(text, kind + " " + id + (kind == "junction" ? "" : (icon.Length > 0 ? "(" + icon + ")" : "") + "[" + Label(label) + "]") + (parent.Length > 0 ? " in " + parent : ""));
     }, token);
     private static void Endpoints(ArchitectureSourceModel model, string source, string target, string sourceSide, string targetSide, string arrow)
     {
@@ -135,7 +135,7 @@ public sealed class ArchitectureVisualDraft : SourceDraft<ArchitectureSourceMode
         if (!new[] { "", "L", "R", "T", "B" }.Contains(sourceSide) || !new[] { "", "L", "R", "T", "B" }.Contains(targetSide) || !new[] { "--", "-->", "<--", "<-->" }.Contains(arrow)) throw new ArgumentException("Choose L/R/T/B or an omitted side, and none/source/target/both arrowheads.");
     }
     public Task<SourceAuthoringResult> AddEdgeAsync(string source, string target, string sourceSide = "R", string targetSide = "L", string arrow = "-->", CancellationToken token = default) => ChangeAsync((text, model) =>
-    { Topology(model); Endpoints(model, source, target, sourceSide, targetSide, arrow); return text.Insert(text.Lines.Count, source + (sourceSide.Length > 0 ? ":" + sourceSide : "") + " " + arrow + " " + (targetSide.Length > 0 ? targetSide + ":" : "") + target); }, token);
+    { Topology(model); Endpoints(model, source, target, sourceSide, targetSide, arrow); return TopologySource.Append(text, source + (sourceSide.Length > 0 ? ":" + sourceSide : "") + " " + arrow + " " + (targetSide.Length > 0 ? targetSide + ":" : "") + target); }, token);
     public Task<SourceAuthoringResult> UpdateEdgeAsync(string identity, string source, string target, string sourceSide, string targetSide, string arrow, CancellationToken token = default) => ChangeAsync((text, model) =>
     {
         Topology(model); Endpoints(model, source, target, sourceSide, targetSide, arrow); var edge = model.Edges.Single(e => e.Identity == identity);
@@ -149,5 +149,5 @@ public sealed class ArchitectureVisualDraft : SourceDraft<ArchitectureSourceMode
         return ChartSource.DeleteRow(text, identity);
     }, token);
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default) => ChangeAsync((text, model) =>
-    { Topology(model); var rows = model.Nodes.Any(n => n.Identity == identity) ? model.Nodes.Select(n => n.Identity).ToArray() : model.Edges.Select(e => e.Identity).ToArray(); return ChartSource.MoveRow(text, rows, identity, direction); }, token);
+    { Topology(model); var node = model.Nodes.Any(n => n.Identity == identity); var rows = node ? model.Nodes.Select(n => n.Identity).ToArray() : model.Edges.Select(e => e.Identity).ToArray(); return TopologySource.MoveRows(text, rows, identity, direction, node ? model.Edges.Select(e => e.Identity) : model.Nodes.Select(n => n.Identity)); }, token);
 }

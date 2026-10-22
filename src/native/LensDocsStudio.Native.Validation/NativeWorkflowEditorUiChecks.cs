@@ -163,7 +163,7 @@ internal static partial class NativeUiChecks
         void Click(string id) { Wait(() => Find(visual!, prefix + id).IsEnabled, "Command unavailable: " + prefix + id + "; " + Find(visual!, prefix + "Status").Name); Find(visual!, prefix + id).AsButton().Invoke(); }
         void Await(Func<bool> condition) => Wait(() => condition() && Find(visual!, prefix + "Apply").IsEnabled, "Expected draft did not validate: " + Find(visual!, prefix + "Status").Name);
         void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor"))) is null, "Editor did not close."); visual = null; }
-        void Discard() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Discard confirmation missing."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
+        void Discard() { AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Discard confirmation missing."); yes!.AsButton().Invoke(); }
         void Capture(string name) { if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Editor remained busy before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
         void AddTopology()

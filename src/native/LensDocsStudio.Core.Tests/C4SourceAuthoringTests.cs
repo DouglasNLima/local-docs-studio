@@ -74,6 +74,13 @@ public class C4SourceAuthoringTests
     [Fact]
     public async Task Effective_title_edit_keeps_earlier_header_and_body_declarations_exact()
     { const string source = "C4Context title \"Earlier\"\ntitle \"Older\"\ntitle \"Effective\"\nPerson(a,\"A\")\n"; var draft = new C4VisualDraft(source); Pass(await draft.SetTitleAsync("New Ω")); Assert.Equal(source.Replace("\"Effective\"", "\"New Ω\"", StringComparison.Ordinal), draft.Source); }
+    [Fact]
+    public async Task C4_ordering_preserves_proved_relationship_rows_and_protected_index_inspection_uses_actual_slots()
+    {
+        var draft = new C4VisualDraft(C4VisualDraft.Starter); Pass(await draft.AddNodeAsync("System", "added", "Added")); var added = draft.Source; var key = draft.Model.Nodes[^1].Identity;
+        var relations = draft.Model.Relations.Select(r => draft.Text.Line(r.Identity).Text).ToArray(); Pass(await draft.MoveAsync(key, -1)); Assert.Equal(relations, draft.Model.Relations.Select(r => draft.Text.Line(r.Identity).Text)); draft.Undo(); Assert.Equal(added, draft.Source); draft.Redo(); Pass(await draft.DeleteAsync(key)); Assert.Equal(C4VisualDraft.Starter, draft.Source);
+        var indexed = new C4VisualDraft("C4Context\nPerson(a,\"A\")\nSystem(b,\"B\")\nRelIndex(9,a,b,\"Label\",\"Protocol\")\n"); Assert.Equal("a", indexed.Model.Relations[0].Source); Assert.Equal("b", indexed.Model.Relations[0].Target); Assert.Equal("Label", indexed.Model.Relations[0].Label); Assert.False(indexed.Model.TopologySafe);
+    }
     [Theory, InlineData("A, B Ω"), InlineData("A \"quoted\" value")]
     public async Task New_C4_escaping_is_proved_against_actual_public_native_renderer_text(string label)
     {
