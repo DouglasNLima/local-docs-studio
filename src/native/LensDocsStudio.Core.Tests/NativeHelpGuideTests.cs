@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(19, NativeHelpGuide.Topics.Count);
-        Assert.Equal(19, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(20, NativeHelpGuide.Topics.Count);
+        Assert.Equal(20, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -16,6 +16,12 @@ public sealed class NativeHelpGuideTests
             Assert.Equal(topic.Title, heading.Title); Assert.Equal(topic.Anchor, heading.Anchor);
             Assert.True(topic.Source.Length > 400);
         }
+    }
+    [Fact] public void Topology_topic_explains_three_C4_levels_explicit_membership_exact_tokens_and_protected_source()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Architecture, C4 and Block visual authoring"));
+        foreach (var phrase in new[] { "C4Context", "C4Container", "C4Component", "explicit `in`", "Rel_Back", "positional", "inter-token whitespace", "First-wins", "source-only", "pending", "Cancel", "stale-owner" })
+            Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Workflow_topic_explains_indentation_symbolic_references_and_stateful_history_protection()
     {

@@ -328,6 +328,9 @@ jobs:
             artifacts/native/kanban-install-smoke/
             artifacts/native/requirement-install-smoke/
             artifacts/native/gitgraph-install-smoke/
+            artifacts/native/architecture-install-smoke/
+            artifacts/native/c4-install-smoke/
+            artifacts/native/block-install-smoke/
           retention-days: 14
   historical-upgrade:
     name: Historical upgrade (${{ matrix.preview }})

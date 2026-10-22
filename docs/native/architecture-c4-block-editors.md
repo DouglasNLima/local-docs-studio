@@ -51,3 +51,19 @@ The existing limits remain: 100,000 diagram characters, 1,500 visual-source line
 PNG conversion checks scaled dimensions as finite doubles before integer conversion, retaining the existing 16,000-pixel edge and 64-million-pixel budgets. This prevents enormous Block column counts from wrapping the image allocation dimensions. Source remains available with a clear error.
 
 Installer execution and actual Windows appearance mutation are limited to disposable hosted Windows runners. Optional associations are excluded. Higher-DPI interactive GUI, physical screen-reader and SDK-free clean-Windows certification remain unavailable unless separately demonstrated. Offscreen DPI or UIA evidence does not establish those certifications. No merge, public release, production signing, updater publication, tag movement, Pages deployment or ordinary desktop installation is part of this goal.
+
+## Actual Windows captures
+
+These unchanged Windows captures come from clean candidate `295dcb7a13660632b9ee59eff7591a5df721df17` in [appearance run 39829430053](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39829430053). Each pictured family/appearance passed its independent UIA job. They show canonical native geometry, source occurrences and inspector fields; they retain their candidate provenance when later source is delivered. The [capture receipt](evidence/expansion-v-captures.json) records source, checks, appearance observations, artefact expiry and exact PNG hashes. Final-source captures are also retained with the delivery evidence.
+
+Architecture, normal Windows appearance:
+
+![Architecture native editor with an explicit group, bundled icons, routing junction and inspector](images/expansion-v/architecture-normal-295dcb7.png)
+
+C4 Context, actual Windows High Contrast:
+
+![C4 native editor under actual Windows High Contrast, with a boundary and exact positional fields](images/expansion-v/c4-high-contrast-295dcb7.png)
+
+Flat Block, normal Windows appearance:
+
+![Block native editor with multiple declarations on one source line, a spacer and a spanning block](images/expansion-v/block-normal-295dcb7.png)
