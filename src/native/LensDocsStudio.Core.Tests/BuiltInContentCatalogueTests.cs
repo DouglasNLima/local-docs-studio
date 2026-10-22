@@ -9,11 +9,30 @@ public sealed class BuiltInContentCatalogueTests
     private static readonly DateOnly Date = new(2026, 10, 12);
     private static CatalogueEntry Entry(string id) => BuiltInContentCatalogue.Entries.Single(entry => entry.Id == id);
 
+    [Fact] public void All_seventeen_previous_Mermaid_templates_retain_their_exact_pinned_source()
+    {
+        using var baseline = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures/native-editor-baseline.json")));
+        var templates = baseline.RootElement.GetProperty("templates").EnumerateArray().ToArray(); Assert.Equal(17, templates.Length);
+        foreach (var template in templates)
+        {
+            var entry = Entry(template.GetProperty("id").GetString()!);
+            Assert.Equal(template.GetProperty("sha256").GetString(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(entry.ContentPattern))).ToLowerInvariant());
+        }
+    }
+
+    [Fact] public void All_twelve_previous_Mermaid_snippets_retain_their_exact_pinned_source()
+    {
+        using var baseline = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures/native-editor-baseline.json")));
+        var snippets = baseline.RootElement.GetProperty("snippets").EnumerateArray().ToArray(); Assert.Equal(12, snippets.Length);
+        foreach (var snippet in snippets)
+            Assert.Equal(snippet.GetProperty("sha256").GetString(), Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Entry(snippet.GetProperty("id").GetString()!).ContentPattern))).ToLowerInvariant());
+    }
+
     [Fact] public void Bundled_inventory_covers_examples_diagrams_and_all_three_document_studios()
     {
         var entries = BuiltInContentCatalogue.Entries;
-        Assert.Equal(39, entries.Count(entry => !entry.IsSnippet)); Assert.Equal(31, entries.Count(entry => entry.IsSnippet));
-        Assert.Equal(17, entries.Count(entry => !entry.IsSnippet && entry.Format == "mermaid"));
+        Assert.Equal(44, entries.Count(entry => !entry.IsSnippet)); Assert.Equal(34, entries.Count(entry => entry.IsSnippet));
+        Assert.Equal(22, entries.Count(entry => !entry.IsSnippet && entry.Format == "mermaid")); // Twenty families; C4 has three explicitly named variants.
         foreach (var family in new[] { "xychart", "radar", "sankey" })
         {
             Assert.Contains(entries, entry => entry.Id == "mermaid/" + family && entry.Format == "mermaid");
@@ -24,6 +43,10 @@ public sealed class BuiltInContentCatalogueTests
             Assert.Contains(entries, e => e.Id == "mermaid/" + family && e.Format == "mermaid");
             Assert.Contains(entries, e => e.Id == "mermaid-snippet/" + family + "-native" && e.IsSnippet);
         }
+        foreach (var variant in new[] { "architecture", "c4-context", "c4-container", "c4-component", "block" })
+            Assert.Contains(entries, entry => entry.Id == "mermaid/" + variant && entry.Format == "mermaid");
+        foreach (var family in new[] { "architecture", "c4", "block" })
+            Assert.Contains(entries, entry => entry.Id == "mermaid-snippet/" + family + "-native" && entry.IsSnippet);
         Assert.Equal(new[] { "Examples", "Mermaid", "Project Docs", "Release Notes", "Requirements" }, entries.Select(entry => entry.Group).Distinct());
         foreach (var entry in entries)
         {

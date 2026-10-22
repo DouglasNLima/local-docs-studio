@@ -1,5 +1,19 @@
 # Windows internal preview release notes
 
+## Twenty native Mermaid editors - Expansion V
+
+Architecture, C4 and flat Block extend the seventeen existing families through the
+shared native source/inspector/history and atomic owner Apply infrastructure.
+C4Context, C4Container and C4Component are separately supported views within one
+C4 family; Dynamic/Deployment remain source-only. The [grammar/protection guide](architecture-c4-block-editors.md)
+and [engineering receipt](expansion-v-engineering-receipt.md) identify exact scope,
+source-labelled compatibility proof, Windows captures and retained failures; final-source gates and package hashes belong to the PR delivery receipt.
+Reviewable work is in [Draft PR #44](https://github.com/DouglasNLima/local-docs-studio/pull/44).
+Mermaider 0.15.1, official .NET 10/WPF and stock Continuous remain unchanged.
+Exact-source Windows acceptance is recorded separately in the delivery receipt. Stock Continuous timing
+stays paused, `.749` unresolved, and earlier records below retain their original sources.
+No production signing, public release or ordinary desktop installation is authorised.
+
 ## Seventeen native Mermaid editors - Expansion IV
 
 Kanban, Requirement and basic GitGraph extend the fourteen existing families. Use
@@ -16,7 +30,7 @@ source and package attribution. Stock Continuous timing is paused; .749 remains
 unresolved. No production signing or public release is authorised.
 
 
-## Fourteen native Mermaid editors — Expansion III
+## Fourteen native Mermaid editors ï¿½ Expansion III
 
 XY Chart, Radar and Sankey extend the eleven existing native families. Use Visual
 Edit or Insert for category-based comparisons, positional profiles and weighted

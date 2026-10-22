@@ -868,6 +868,86 @@
       "namePattern": null,
       "contentPattern": "commit tag: \"Draft\"\n",
       "fields": []
+    },
+    {
+      "id": "mermaid/architecture",
+      "group": "Mermaid",
+      "label": "Architecture",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "architecture.mmd",
+      "contentPattern": "%% Source-preserving service topology\narchitecture-beta\ngroup platform(cloud)[Platform]\nservice gateway(internet)[Gateway] in platform\nservice api(server)[API] in platform\nservice records(database)[Records]\njunction route in platform\ngateway:R --> L:api\napi:B -- T:route\nroute:R --> L:records\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/c4-context",
+      "group": "Mermaid",
+      "label": "C4 Context",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "c4-context.mmd",
+      "contentPattern": "C4Context title Documentation context\nPerson(reader, \"Reader\", \"Reads local documentation\")\nSystem_Boundary(studio, \"Studio\") {\n  System(docs, \"Documents\", \"Local Markdown and Mermaid\")\n}\nSystem_Ext(archive, \"Archive\", \"Existing files\")\nRel(reader, docs, \"Reads\", \"Local\")\nRel_Back(archive, docs, \"Exports\", \"Files\")\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/c4-container",
+      "group": "Mermaid",
+      "label": "C4 Container",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "c4-container.mmd",
+      "contentPattern": "C4Container\ntitle Documentation containers\nPerson(reader, \"Reader\", \"Authors documentation\")\nContainer_Boundary(studio, \"Studio\")\n{\n  Container(editor, \"Editor\", \"WPF\", \"Local authoring\")\n  ContainerDb(store, \"Workspace\", \"Files\", \"Portable source\")\n}\nRel(reader, editor, \"Authors\")\nBiRel(editor, store, \"Reads and saves\", \"UTF-8\")\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/c4-component",
+      "group": "Mermaid",
+      "label": "C4 Component",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "c4-component.mmd",
+      "contentPattern": "C4Component\ntitle Documentation components\nBoundary(core, \"Core\", \"Library\") {\n  Component(parser, \"Parser\", \".NET\", \"Portable Markdown\")\n  ComponentDb(catalogue, \"Catalogue\", \"JSON\", \"Local content\")\n  ComponentQueue(queue, \"Render queue\", \"Memory\", \"Bounded work\")\n}\nRel(parser, catalogue, \"Looks up\", \"Local\")\nRel(parser, queue, \"Schedules\")\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/block",
+      "group": "Mermaid",
+      "label": "Block",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "block.mmd",
+      "contentPattern": "block-beta title Documentation grid\ncolumns 3\nreader[\"Reader\"] space editor(\"Editor\")\nsource[\"Markdown\"]:2 preview[\"Preview\"]\nreader --> editor\neditor -- \"Saves\" --> source\neditor -->|Renders| preview\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/architecture-native",
+      "group": "Mermaid",
+      "label": "Architecture service",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "service new_service(server)[New service]\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/c4-native",
+      "group": "Mermaid",
+      "label": "C4 element",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "Person(new_person, \"New person\", \"Description\")\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/block-native",
+      "group": "Mermaid",
+      "label": "Block grid cell",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "new_block[\"New block\"]\n",
+      "fields": []
     }
   ]
 }

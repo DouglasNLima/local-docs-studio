@@ -19,6 +19,10 @@ using LensDocsStudio.Core.SankeyDiagrams;
 using LensDocsStudio.Core.KanbanDiagrams;
 using LensDocsStudio.Core.RequirementDiagrams;
 using LensDocsStudio.Core.GitGraphDiagrams;
+using LensDocsStudio.Core.ArchitectureDiagrams;
+using LensDocsStudio.Core.C4Diagrams;
+using LensDocsStudio.Core.BlockDiagrams;
+using LensDocsStudio.Core.SourceAuthoring;
 
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
@@ -68,7 +72,10 @@ public partial class MainWindow
     private void InsertKanban(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, kanban: true);
     private void InsertRequirement(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, requirement: true);
     private void InsertGitGraph(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, gitgraph: true);
-    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false, bool mindmap = false, bool gantt = false, bool quadrant = false, bool timeline = false, bool journey = false, bool xy = false, bool radar = false, bool sankey = false, bool kanban = false, bool requirement = false, bool gitgraph = false)
+    private void InsertArchitecture(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Architecture");
+    private void InsertC4(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "C4");
+    private void InsertBlock(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Block");
+    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false, bool mindmap = false, bool gantt = false, bool quadrant = false, bool timeline = false, bool journey = false, bool xy = false, bool radar = false, bool sankey = false, bool kanban = false, bool requirement = false, bool gitgraph = false, string? topology = null)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
         if (tab.EditorDocument.TextLength > MermaidDocumentEditSession.MaximumDocumentCharacters)
@@ -87,11 +94,23 @@ public partial class MainWindow
             var suffix = span.End == current.Length || current[span.End..].StartsWith(newline + newline, StringComparison.Ordinal) ? "" : current[span.End..].StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
             return prefix + "```mermaid" + newline + draft.TrimEnd('\r', '\n') + newline + "```" + suffix;
         });
+        if (topology is not null)
+        {
+            var starter = topology switch { "Architecture" => ArchitectureVisualDraft.Starter, "C4" => C4VisualDraft.Starter, _ => BlockVisualDraft.Starter };
+            OpenVisualDraft(tab, session, starter.Replace("\n", newline, StringComparison.Ordinal), null); return;
+        }
         OpenVisualDraft(tab, session, kanban ? KanbanVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : requirement ? RequirementVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gitgraph ? GitGraphVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : xy ? XyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : radar ? RadarVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : sankey ? SankeyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : journey ? JourneyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : timeline ? TimelineVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : quadrant ? QuadrantVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gantt ? GanttVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : mindmap ? MindmapVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : pie ? PieVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
     }
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
     private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
     {
+        if (TopologySource.IsTopology(source))
+        {
+            if (!ArchitectureVisualDraft.IsArchitecture(source) && !C4VisualDraft.IsC4(source) && !BlockVisualDraft.IsBlock(source))
+            { model.Status = "This native topology variant remains protected source-only. C4 authoring covers Context, Container and Component."; editSource?.Invoke(); return; }
+            if (source.Length > 100_000 || source.Count(character => character == '\n') + (source.Length > 0 && !source.EndsWith('\n') ? 1 : 0) > 1500)
+            { model.Status = "This diagram exceeds the 100,000-character or 1,500-line visual source budget. Use Edit source; the document is unchanged."; return; }
+        }
         if ((KanbanVisualDraft.IsKanban(source) || RequirementVisualDraft.IsRequirement(source) || GitGraphVisualDraft.IsGitGraph(source) || XyVisualDraft.IsXy(source) || RadarVisualDraft.IsRadar(source) || SankeyVisualDraft.IsSankey(source) || GanttVisualDraft.IsGantt(source) || MindmapVisualDraft.IsMindmap(source) || PieVisualDraft.IsPie(source) || QuadrantVisualDraft.IsQuadrant(source) || TimelineVisualDraft.IsTimeline(source) || JourneyVisualDraft.IsJourney(source))
             && (source.Length > 100_000 || source.Count(character => character == '\n') + (source.Length > 0 && !source.EndsWith('\n') ? 1 : 0) > 1500))
         { model.Status = "This diagram exceeds the 100,000-character or 1,500-line visual source budget. Use Edit source; the document is unchanged."; return; }
@@ -109,7 +128,13 @@ public partial class MainWindow
             catch (ArgumentException error) { return error.Message; }
         }
         Window window;
-        try { window = KanbanVisualDraft.IsKanban(source)
+        try { window = ArchitectureVisualDraft.IsArchitecture(source)
+            ? new ArchitectureVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : C4VisualDraft.IsC4(source)
+            ? new C4VisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : BlockVisualDraft.IsBlock(source)
+            ? new BlockVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : KanbanVisualDraft.IsKanban(source)
             ? new KanbanVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : RequirementVisualDraft.IsRequirement(source)
             ? new RequirementVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)

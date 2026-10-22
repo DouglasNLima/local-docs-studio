@@ -47,13 +47,16 @@ internal static class NativeHelpChecks
                 throw new IOException("Empty help search retained an unrelated topic.");
             if (preview.Document.Foreground is not SolidColorBrush foreground || surface.Background is not SolidColorBrush background
                 || NativeSyntaxChecks.Contrast(foreground.Color, background.Color) < 4.5) throw new IOException("Empty help results lost readable contrast.");
-            query.Clear(); if (topics.Items.Count != 19 || topics.SelectedItem is null) throw new IOException("Clearing help search did not restore all nineteen bundled topics.");
+            query.Clear(); if (topics.Items.Count != 20 || topics.SelectedItem is null) throw new IOException("Clearing help search did not restore all twenty bundled topics.");
             query.Text = "XY Chart, Radar and Sankey visual authoring"; Layout();
             if (topics.Items.Count != 1 || topics.SelectedItem is not HelpTopic { Title: "XY Chart, Radar and Sankey visual authoring" }
                 || !new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Rename node across proved", StringComparison.Ordinal))
                 throw new IOException("The new chart help topic lost native search or source ownership guidance.");
             query.Text = "Kanban, Requirement and GitGraph visual authoring"; Layout();
             if (topics.Items.Count != 1 || !new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("non-empty heads", StringComparison.Ordinal)) throw new IOException("Workflow help lost reference and ownership guidance.");
+            query.Text = "Architecture, C4 and Block visual authoring"; Layout();
+            var topologyHelp = new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text;
+            if (topics.Items.Count != 1 || !new[] { "C4Context", "C4Container", "C4Component", "Rel_Back", "First-wins", "stale-owner" }.All(value => topologyHelp.Contains(value, StringComparison.Ordinal))) throw new IOException("Topology help lost supported variants, exact source or ownership guidance.");
             window.ApplyTheme(dark ? "Light" : "Dark");
             if (!SystemParameters.HighContrast && (preview.Document.Foreground is not SolidColorBrush changed || changed.Color == foreground.Color)) throw new IOException("An open guide did not follow native theme changes.");
             host.RootVisual = null; surface.Child = null; window.Close();

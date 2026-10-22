@@ -1,7 +1,7 @@
 name: Validate expanded native Mermaid editors
 on:
   push:
-    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors, feature/native-mermaid-kanban-requirement-gitgraph-editors]
+    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors, feature/native-mermaid-kanban-requirement-gitgraph-editors, feature/native-mermaid-architecture-c4-block-editors]
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph]
+        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block]
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +40,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --workflow-editor-fidelity artifacts/native/workflow-editor-fidelity .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Prove all topology variants and complete canonical editor pixels
+        run: |
+          src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --topology-compatibility artifacts/native/topology-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --topology-editor-fidelity artifacts/native/topology-editor-fidelity .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise complete native authoring through normal application routes
+        # The original 24 appearance runs remain; six topology runs extend the same harness.
         shell: pwsh
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
@@ -57,4 +64,6 @@ jobs:
             artifacts/native/chart-editor-fidelity/
             artifacts/native/workflow-compatibility/
             artifacts/native/workflow-editor-fidelity/
+            artifacts/native/topology-compatibility/
+            artifacts/native/topology-editor-fidelity/
           retention-days: 30

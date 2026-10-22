@@ -82,6 +82,14 @@ add("mermaid/requirement", "Mermaid", "Requirement", "template", "mermaid", "req
 add("mermaid-snippet/requirement-native", "Mermaid", "Requirement native authoring", "snippet", "mermaid", null, "requirement new_requirement {\n    id: \"DOC-1\"\n}\n");
 add("mermaid/gitgraph", "Mermaid", "GitGraph", "template", "mermaid", "gitgraph.mmd", "%% This is diagram source; no repository operations.\ngitGraph LR:\n    commit id: \"Start \u03a9\"\n    branch docs\n    commit tag: \"Draft\" type: HIGHLIGHT\n    checkout main\n    commit type: REVERSE\n    merge docs id: \"Reviewed\" tag: \"v1\"\n    commit\n");
 add("mermaid-snippet/gitgraph-native", "Mermaid", "GitGraph native authoring", "snippet", "mermaid", null, "commit tag: \"Draft\"\n");
+// Native topology examples name each supported C4 variant explicitly; these are one editor family.
+for (const [key, label] of [['architecture', 'Architecture'], ['c4-context', 'C4 Context'], ['c4-container', 'C4 Container'], ['c4-component', 'C4 Component'], ['block', 'Block']]) {
+  const content = (await readFile(new URL(`../../tests/fixtures/native-mermaid/expansion-v/${key}.mmd`, import.meta.url), 'utf8')).replaceAll('\r\n', '\n');
+  add(`mermaid/${key}`, 'Mermaid', label, 'template', 'mermaid', `${key}.mmd`, content);
+}
+add('mermaid-snippet/architecture-native', 'Mermaid', 'Architecture service', 'snippet', 'mermaid', null, 'service new_service(server)[New service]\n');
+add('mermaid-snippet/c4-native', 'Mermaid', 'C4 element', 'snippet', 'mermaid', null, 'Person(new_person, "New person", "Description")\n');
+add('mermaid-snippet/block-native', 'Mermaid', 'Block grid cell', 'snippet', 'mermaid', null, 'new_block["New block"]\n');
 const output = JSON.stringify({ version: 1, entries }, null, 2) + '\n';
 const target = new URL('../../src/native/LensDocsStudio.Core/Content/built-in-catalogue.json', import.meta.url);
 if (process.argv.includes('--check')) {

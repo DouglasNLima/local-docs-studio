@@ -26,6 +26,9 @@ implementation alone does not imply readiness.
 | Kanban | Ordered columns/cards, effective title, coupled/bare and explicit IDs, simple metadata and proved membership moves | [Expansion IV grammar/protection guide](kanban-requirement-gitgraph-editors.md); final-source certification in the Expansion IV PR delivery receipt |
 | Requirement | Six kinds, elements, property tokens, seven relation types, four directions and atomic symbolic rename | [Expansion IV grammar/protection guide](kanban-requirement-gitgraph-editors.md); hidden/malformed/unproved topology protected |
 | GitGraph | Basic ordered command history, commit IDs/tags/types, branch/checkout/merge and independent tail edits | [Expansion IV grammar/protection guide](kanban-requirement-gitgraph-editors.md); stateful references proved against native links |
+| Architecture | `architecture-beta`: simple service/group labels and IDs, bundled pictograms, explicit membership, junctions and actual native ports/arrowheads | [Expansion V grammar/protections](architecture-c4-block-editors.md); provider artwork and group endpoints remain protected; source-labelled gates in the [engineering receipt](expansion-v-engineering-receipt.md) |
+| C4 | One family with separately tested C4Context, C4Container and C4Component; exact positional fields, complete simple boundaries and Rel/BiRel/Rel_Back | [Expansion V grammar/protections](architecture-c4-block-editors.md); Dynamic/Deployment and unproved arguments/topology remain source-only |
+| Block | Flat `block`/`block-beta`: exact ordered token occurrences, coupled/bare and rectangle/rounded blocks, spacers, spans and directed links | [Expansion V grammar/protections](architecture-c4-block-editors.md); first-wins and partial-line protection; canonical grid geometry |
 
 
 

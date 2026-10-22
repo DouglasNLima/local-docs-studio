@@ -128,6 +128,9 @@
     <MenuItem Header="Kanban visually…" Click="InsertKanban" AutomationProperties.AutomationId="InsertKanban"/>
     <MenuItem Header="Requirement visually…" Click="InsertRequirement" AutomationProperties.AutomationId="InsertRequirement"/>
     <MenuItem Header="GitGraph visually…" Click="InsertGitGraph" AutomationProperties.AutomationId="InsertGitGraph"/>
+    <MenuItem Header="Architecture visually…" Click="InsertArchitecture" AutomationProperties.AutomationId="InsertArchitecture"/>
+    <MenuItem Header="C4 visually…" Click="InsertC4" AutomationProperties.AutomationId="InsertC4"/>
+    <MenuItem Header="Block visually…" Click="InsertBlock" AutomationProperties.AutomationId="InsertBlock"/>
 
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>

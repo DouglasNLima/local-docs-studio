@@ -1,0 +1,10 @@
+%% Source-preserving service topology
+architecture-beta
+group platform(cloud)[Platform]
+service gateway(internet)[Gateway] in platform
+service api(server)[API] in platform
+service records(database)[Records]
+junction route in platform
+gateway:R --> L:api
+api:B -- T:route
+route:R --> L:records

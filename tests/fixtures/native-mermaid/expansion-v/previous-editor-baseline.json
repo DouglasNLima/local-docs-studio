@@ -1,0 +1,559 @@
+{
+  "schema": 1,
+  "sourceRevision": "06a7d868d1b58c82f29c7c655dcc972f1ca77282",
+  "sourceTree": "3c3de58afee4fbb410c4b60a9ec051694d2df0c5",
+  "templates": [
+    {
+      "id": "mermaid/flowchart",
+      "sha256": "3708960229d083e2db44d2c6326983b58a0967f2cb374a1200e42a265038203f"
+    },
+    {
+      "id": "mermaid/sequence",
+      "sha256": "3ff441cdfe942c2021e7e3f7676355acb9fcb1831cd1aa758aeab109904b1ef0"
+    },
+    {
+      "id": "mermaid/gantt",
+      "sha256": "16ca6bb10a33fd5c3318e25b3b7e2cdbe6615e8973d445aa717c03556ab35c18"
+    },
+    {
+      "id": "mermaid/class",
+      "sha256": "eb52e65f03246ba84bd6943bd5e7a057588575d7ed5195185ae5d20b67ebfc7d"
+    },
+    {
+      "id": "mermaid/state",
+      "sha256": "0505d412f3fec37f36121acb23379f894d228bbf5f3e7b623c7eac7f46b7c364"
+    },
+    {
+      "id": "mermaid/er",
+      "sha256": "b27f9e08d8b639595a60ba9e89b02cb989e75914dd219dbe58fd93448481ff75"
+    },
+    {
+      "id": "mermaid/journey",
+      "sha256": "96c51651be29c02875f3225eaa71d6d3534efaa464ed0ec9e14388637cef6f9e"
+    },
+    {
+      "id": "mermaid/mindmap",
+      "sha256": "1cd1447ab94038ce3ed785b3b68425f8ff55a7a4b0a053648f61870c677a0f19"
+    },
+    {
+      "id": "mermaid/pie",
+      "sha256": "edc8fe2bc1dd86e967b93bff876ef67d082d9cabbb40d35ac2d064ae3dfdebad"
+    },
+    {
+      "id": "mermaid/timeline",
+      "sha256": "891d2f2e711b54ee1e8faa101d00ddcc9d06b3160513e66145976d42b85ce113"
+    },
+    {
+      "id": "mermaid/quadrant",
+      "sha256": "cc8a40fd1e5b2a697fada383daa5b5a2edac44a4eb31a9f000e15f15799d4b2e"
+    },
+    {
+      "id": "mermaid/xychart",
+      "sha256": "7a75a00e4a5ea1952abd13c435b3ca028d44f67c5d02de564778fd3098ce773b"
+    },
+    {
+      "id": "mermaid/radar",
+      "sha256": "9fedd8d30e150c3e9915588d02d7327ee7870a91d96ae76e42e5b2f2e630b194"
+    },
+    {
+      "id": "mermaid/sankey",
+      "sha256": "363df431f7d765909c0af8b9038979357815e98076161a240f48c152f82dcb51"
+    },
+    {
+      "id": "mermaid/kanban",
+      "sha256": "11a561072f166464ccd1a4a657cec45e398b714459a63d5a5e6ada1a28895c79"
+    },
+    {
+      "id": "mermaid/requirement",
+      "sha256": "e070fe768b3324e4876d05fa888b461b48ab36c15509a9fa404dda328d0711f3"
+    },
+    {
+      "id": "mermaid/gitgraph",
+      "sha256": "e43783ae455fd2386cdc152f982a596dd89bb26597bfe5d19d14b76a1128d47b"
+    }
+  ],
+  "files": [
+    {
+      "path": "tests/fixtures/artifact-bundles/front-matter-precedence/README.md",
+      "gitBlob": "f998a343e536a1a14eea32fd1ee52c0c7e3cf794"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/front-matter-precedence/findings/security-summary.md",
+      "gitBlob": "6d29637e736abb05aae87e25dacdf1b25db940d8"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/front-matter-precedence/lens-artifact-bundle.json",
+      "gitBlob": "1850674cbba3edd12849b1e8ee89c0dab549647b"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/generic-zip/__MACOSX/ignored.txt",
+      "gitBlob": "6098cbc32942e94bd678906ebcdbb8409c39ddf3"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/generic-zip/docs/README.md",
+      "gitBlob": "6beeb68d00a0b5eb259a5bcc381e53afc648bcfc"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/generic-zip/docs/images/blocked.svg",
+      "gitBlob": "155b3b19c1cfec9e7aa0ba99605565bad76cd228"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/generic-zip/docs/images/logo.png",
+      "gitBlob": "e878d92e3720c7a0ec6760c9beaad33d8c06f977"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/generic-zip/docs/story.mmd",
+      "gitBlob": "62a5665ff574f3c118f4824dfc03672e8e569021"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/invalid-manifest/README.md",
+      "gitBlob": "35538e6e33ebe5c7df030c5d88bfa02c80225021"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/invalid-manifest/lens-artifact-bundle.json",
+      "gitBlob": "5991140adf4877a7f50ff4668532693d9a8eff6a"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/invalid-manifest/notes.md",
+      "gitBlob": "b9c2cb00a5b1889de7e722d4c78469d3d6189eb0"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/unsafe-paths/README.md",
+      "gitBlob": "45a8ff1a31d49dd5c8bd11b6b371ba8e4b360c80"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/unsafe-paths/lens-artifact-bundle.json",
+      "gitBlob": "636ec14c65c6bba8b3cf7c14babcbf9ff1ec53be"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/unsafe-paths/safe/visible.md",
+      "gitBlob": "2c60413f778b852970c17dc630bc09f625cf7b58"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-basic/README.md",
+      "gitBlob": "494711995522bae848b1018353d73a32219f6e00"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-basic/diagrams/basic-flow.mmd",
+      "gitBlob": "46067acfcbec79537d0a81b02609d5929acec6d8"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-basic/findings/basic-finding.md",
+      "gitBlob": "069716358b3d28e9dbd1bff9808f39597218412d"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-basic/lens-artifact-bundle.json",
+      "gitBlob": "800148f88ad4d937de1531fd894026eafb5dfe61"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/README.md",
+      "gitBlob": "75569f0ba4848a9c05f44f245571e298bf3c0579"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/adr/adr-001.md",
+      "gitBlob": "d6dcc3b3c461755853bc3e007998b9820289014b"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/assets/tiny.png",
+      "gitBlob": "fc3d85963d1862ba492104083eb964dd8bb8ddfc"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/diagrams/trigger-timeline.mmd",
+      "gitBlob": "e6a7b7a24645f4f1df2a5ea10fe0354cb7ef15a7"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/docs/runbook.md",
+      "gitBlob": "35ca686d5324c923659adb9903eb008a67a86280"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/findings/candidate-risk.md",
+      "gitBlob": "9bf657d9002c36f4c1a5467ce19baa92ecaf1660"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/findings/confirmed-control.md",
+      "gitBlob": "24e55c71e8301f84aeb113e4889a8d4efdbf028a"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/lens-artifact-bundle.json",
+      "gitBlob": "1960cd4aa361e8d68d0f3b59a856353efdfc0975"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/release-notes/v1.md",
+      "gitBlob": "59caf9429d7a6c3cb98d644a566893c26f5ba569"
+    },
+    {
+      "path": "tests/fixtures/artifact-bundles/valid-rich/summary/executive-summary.md",
+      "gitBlob": "b565b84aa8b085513afc2542284387bfc11fed57"
+    },
+    {
+      "path": "tests/fixtures/autocomplete.mmd",
+      "gitBlob": "191d384f601995a99bfd24034a76654d3d99c578"
+    },
+    {
+      "path": "tests/fixtures/azure-devops-markdown-fidelity.md",
+      "gitBlob": "9ea1aa15131f14442a7ad38b0fd21483aeae9b4e"
+    },
+    {
+      "path": "tests/fixtures/broken-mermaid.md",
+      "gitBlob": "4cd465267c13a1a2a90e5e1936ea21564281d4f8"
+    },
+    {
+      "path": "tests/fixtures/devops-mermaid.md",
+      "gitBlob": "203c8acd13429b2ba9e48f81f0e577bcd4386074"
+    },
+    {
+      "path": "tests/fixtures/docs-site/README.md",
+      "gitBlob": "997c6c6ccd981650041acd44711b0ba00177ae5b"
+    },
+    {
+      "path": "tests/fixtures/docs-site/large.md",
+      "gitBlob": "fa15a4b2834638bb4c24acbc98a42eff23f2312d"
+    },
+    {
+      "path": "tests/fixtures/docs-site/mixed.md",
+      "gitBlob": "4e38d71c3956a358ddb81c21167fcc87450e6cd4"
+    },
+    {
+      "path": "tests/fixtures/docs-site/plain.md",
+      "gitBlob": "b9bb626572e56854818b91fe4a44d207382bf392"
+    },
+    {
+      "path": "tests/fixtures/document-ux.md",
+      "gitBlob": "561613fe6d650d89c404a1d4661989fb4e66b03a"
+    },
+    {
+      "path": "tests/fixtures/large.md",
+      "gitBlob": "fa15a4b2834638bb4c24acbc98a42eff23f2312d"
+    },
+    {
+      "path": "tests/fixtures/mixed.md",
+      "gitBlob": "4e38d71c3956a358ddb81c21167fcc87450e6cd4"
+    },
+    {
+      "path": "tests/fixtures/native-class/aggregation.mmd",
+      "gitBlob": "12cc911e7371d0ac7f6e77da24eec2fda7f5d3b5"
+    },
+    {
+      "path": "tests/fixtures/native-class/annotations-generics.mmd",
+      "gitBlob": "c943c892f471379712ef4066e256282a4c5b21d1"
+    },
+    {
+      "path": "tests/fixtures/native-class/association.mmd",
+      "gitBlob": "7b83034aa06ce6b532f27e4698a33fb29c3163cc"
+    },
+    {
+      "path": "tests/fixtures/native-class/attributes.mmd",
+      "gitBlob": "cff7bf07cd5f35513f26d874763d35df112cd334"
+    },
+    {
+      "path": "tests/fixtures/native-class/composition.mmd",
+      "gitBlob": "dfe37d79c417f78f68ebcf64949738ff41622633"
+    },
+    {
+      "path": "tests/fixtures/native-class/dependency.mmd",
+      "gitBlob": "74ac903ba79103d8d3c4b2feec560db162c11c8f"
+    },
+    {
+      "path": "tests/fixtures/native-class/formatted-protected.mmd",
+      "gitBlob": "1ef5f28ef729bb81c10dc73ac30b41ae897f51d7"
+    },
+    {
+      "path": "tests/fixtures/native-class/inheritance.mmd",
+      "gitBlob": "9962d833b0201e3b87eb70bbc07e56a055bbec41"
+    },
+    {
+      "path": "tests/fixtures/native-class/methods.mmd",
+      "gitBlob": "88281dbbdf86323a15945adb50ddfbb190ff455a"
+    },
+    {
+      "path": "tests/fixtures/native-class/minimal.mmd",
+      "gitBlob": "01e278bba6b3bdea97d1af27a4a5af773e9d1b9e"
+    },
+    {
+      "path": "tests/fixtures/native-class/namespaces-notes.mmd",
+      "gitBlob": "42d7d425b67fa2c75d817b7d4bc20bdeb416116e"
+    },
+    {
+      "path": "tests/fixtures/native-class/occurrences.mmd",
+      "gitBlob": "e4de930ee7e41944bc3f70922fe18aee88632c5c"
+    },
+    {
+      "path": "tests/fixtures/native-class/protected.mmd",
+      "gitBlob": "4dce0e8f141d6eb09f45a6f38976f0f0173c8b42"
+    },
+    {
+      "path": "tests/fixtures/native-class/quoted-labels.mmd",
+      "gitBlob": "ffc72588f0a12445ba20466ee6cc2b57a332170e"
+    },
+    {
+      "path": "tests/fixtures/native-class/realisation.mmd",
+      "gitBlob": "5a34c364101fa2cd9e7acea3167fc2b3970f1508"
+    },
+    {
+      "path": "tests/fixtures/native-class/software-documentation.mmd",
+      "gitBlob": "55a2b4f5f63e9f1445c8a3738e287a525f879dc4"
+    },
+    {
+      "path": "tests/fixtures/native-er/database-documentation.mmd",
+      "gitBlob": "935eb6a991d4b4391db3e2daba7a1fb32124e0b7"
+    },
+    {
+      "path": "tests/fixtures/native-er/empty-final.mmd",
+      "gitBlob": "afc89ddf459af7f23404a65735801f1d7bb26a64"
+    },
+    {
+      "path": "tests/fixtures/native-er/identical-attributes.mmd",
+      "gitBlob": "4124d185716f082d7a47ca89ed23f00b3bda9e6f"
+    },
+    {
+      "path": "tests/fixtures/native-er/occurrences.mmd",
+      "gitBlob": "b1b7a0bde1543feb5663121ed93d7b71fd0b1b6a"
+    },
+    {
+      "path": "tests/fixtures/native-er/portable-keys.mmd",
+      "gitBlob": "f8f502054ac2d2aeeada40973ec39806a4e771f1"
+    },
+    {
+      "path": "tests/fixtures/native-er/unknown-protected.mmd",
+      "gitBlob": "5aa910a6094fe883ad5f746ce7bbe62fdabc174a"
+    },
+    {
+      "path": "tests/fixtures/native-historical-previews.json",
+      "gitBlob": "62a8b50a87885f5cc6a6fe07797cc3a98f873edb"
+    },
+    {
+      "path": "tests/fixtures/native-local-library.json",
+      "gitBlob": "4327c75dcc9e7bc84f021849776028b2bd668fa6"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-fidelity/complex.mmd",
+      "gitBlob": "f09b4d88b0b7e641a4d06f0905b501c5b6ce4207"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-fidelity/flow-error-log-lab.mmd",
+      "gitBlob": "1443d90ee9e3d5bf206b79ca9cfb59ba5aa0eb6d"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-fidelity/parallel.mmd",
+      "gitBlob": "aa1b8afaa5803ec2f547b3a4332c18792a3ecdec"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-fidelity/shapes.mmd",
+      "gitBlob": "a1d3f38c54206e258c96be3e0dac8f9896da17d7"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-fidelity/simple.mmd",
+      "gitBlob": "b037dabbcccea9f2fd9c8d484498804eafd787ac"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/MermaidPartialBaselineTests.cs",
+      "gitBlob": "f1a6afb973e7662d3598e62d00e462cfd8ec7f85"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/advanced-flow-error-log-lab.mmd",
+      "gitBlob": "06e6dc641c03471782e0c429202c874c078a07fc"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/branching.mmd",
+      "gitBlob": "17a27922681e464822486fd09cb12d748cfe7d1f"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/complex.mmd",
+      "gitBlob": "7ee3b4c25d7a26ba60511aaa71ebc7e13f70c38b"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/duplicate-declarations.mmd",
+      "gitBlob": "19b7e662a4f0fb579f5c0575aadb4981f41cf5c8"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/malformed.mmd",
+      "gitBlob": "9650d77f95d32439248b69d7cc823da8dedce092"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/nested.mmd",
+      "gitBlob": "0522a5d45e05e9818c2bf1e8b178e096bbeb9ee6"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/protected.mmd",
+      "gitBlob": "b62ed4561e8fe18bce078929666d7fe387ee166c"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/repeated-labels.mmd",
+      "gitBlob": "793846fd79b383d15abda3c56f913535682538d8"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/simple.mmd",
+      "gitBlob": "ca96386a8e24495ca1ed1fa791962e73dd99ae15"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/styled.mmd",
+      "gitBlob": "a221383589de00ef1308f857909acf652a7e14e5"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid-visual/unicode.mmd",
+      "gitBlob": "9e9e4ff8eee632557876b04737c71f22bb3c8c7d"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/compatibility.md",
+      "gitBlob": "411b4ab3f5702357980a07d4cd90cca0673c2007"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/expansion-iv/gitgraph.mmd",
+      "gitBlob": "20e05f30be3e82cfdd479704143297db5db1023b"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/expansion-iv/kanban.mmd",
+      "gitBlob": "da7b02fa87b25f74172f4ce6da4d563e83ca931b"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/expansion-iv/requirement.mmd",
+      "gitBlob": "8435bac8af69927851e0dc6ad348074dd8a550b1"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/quadrant.mmd",
+      "gitBlob": "fad214f3f4c84d444a4f926df5f32aa2e3e991fe"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/radar.mmd",
+      "gitBlob": "8923268354ee2c7db7530b7678e2614c4a7135ba"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/sankey.mmd",
+      "gitBlob": "24fc2e70b6ef679f42256ec31531683770b17e4e"
+    },
+    {
+      "path": "tests/fixtures/native-mermaid/xychart.mmd",
+      "gitBlob": "ff4aebfb9def3b7693e555bb958744d5b7497693"
+    },
+    {
+      "path": "tests/fixtures/native-sequence/blocks.mmd",
+      "gitBlob": "c21c16b6007d8c473055800225665765ca1535c7"
+    },
+    {
+      "path": "tests/fixtures/native-sequence/implicit.mmd",
+      "gitBlob": "f76f1a48fae3ff306f1403fbfc3f65ce4ef06e96"
+    },
+    {
+      "path": "tests/fixtures/native-sequence/literal-labels.mmd",
+      "gitBlob": "014125b437337ebc0b2455a6ba23f99513fd5532"
+    },
+    {
+      "path": "tests/fixtures/native-sequence/local-document.mmd",
+      "gitBlob": "5c87fd68706186fd440109b970e8ae5466417df9"
+    },
+    {
+      "path": "tests/fixtures/native-sequence/repeated-blocks-activations.mmd",
+      "gitBlob": "7eaea1db61ac3c0e6fe0e09ea23a833ef90a012d"
+    },
+    {
+      "path": "tests/fixtures/native-sequence/repeated.mmd",
+      "gitBlob": "8d189e4ce35fbf0567c1a2ff370b443274aa3e68"
+    },
+    {
+      "path": "tests/fixtures/native-state/advanced-protected.mmd",
+      "gitBlob": "4b5c657f58ac5ee9a29b6c3aa9851ba1e9846c44"
+    },
+    {
+      "path": "tests/fixtures/native-state/document-review.mmd",
+      "gitBlob": "dc737e8245fa34e52654b2a6b72d5899438215ee"
+    },
+    {
+      "path": "tests/fixtures/native-state/unknown-protected.mmd",
+      "gitBlob": "b91a6315749ea819d5a9589772df57c55a5c7f97"
+    },
+    {
+      "path": "tests/fixtures/native-word-template/[Content_Types].xml",
+      "gitBlob": "b47a2822a993746afa2a4e2d56a248b5688b14f9"
+    },
+    {
+      "path": "tests/fixtures/native-word-template/_rels/.rels",
+      "gitBlob": "610628fcd617cace61c5141300e048d892935c94"
+    },
+    {
+      "path": "tests/fixtures/native-word-template/word/_rels/document.xml.rels",
+      "gitBlob": "98807d32f0e06961f06ceaaeac5fa9a0737cf029"
+    },
+    {
+      "path": "tests/fixtures/native-word-template/word/document.xml",
+      "gitBlob": "fd8f4cdc5bdc5b68382d2424bb818952da416020"
+    },
+    {
+      "path": "tests/fixtures/native-word-template/word/header1.xml",
+      "gitBlob": "6a7d816ee840f5f05ccb07e61dd9a14e3bd7b999"
+    },
+    {
+      "path": "tests/fixtures/native-word-template/word/styles.xml",
+      "gitBlob": "30896122a193ee20f5ac3a1a77e03f420685a324"
+    },
+    {
+      "path": "tests/fixtures/native/markdown-semantics.md",
+      "gitBlob": "674a73f3fa8a3bc83a67d20d42f694b338528e9c"
+    },
+    {
+      "path": "tests/fixtures/native/pdf-lists.md",
+      "gitBlob": "eca88896ab3c55cf8f551a9970561726cfb773a6"
+    },
+    {
+      "path": "tests/fixtures/no-h1.md",
+      "gitBlob": "a4ec9bc51650b06bc59d629ccf6949aaa3e6eb38"
+    },
+    {
+      "path": "tests/fixtures/plain.md",
+      "gitBlob": "b9bb626572e56854818b91fe4a44d207382bf392"
+    },
+    {
+      "path": "tests/fixtures/scroll-sync.md",
+      "gitBlob": "2915ce6a8900e1a2a4ba09cb774b1a45a27825d3"
+    }
+  ],
+  "snippets": [
+    {
+      "id": "mermaid-snippet/subgraph",
+      "sha256": "8938014cb08330d778593b08c11c03ad5d8e4e6d78a56ced7276a7653c348d6d"
+    },
+    {
+      "id": "mermaid-snippet/decision",
+      "sha256": "3d70a33372ef208aa5aff501e2a2a6bf2d319ef377bd0042241ab619dd6a39ee"
+    },
+    {
+      "id": "mermaid-snippet/sequenceNote",
+      "sha256": "8531eb9a277bc3720999206ea279a042af50461b12281e92609b474e3fceeaf7"
+    },
+    {
+      "id": "mermaid-snippet/style",
+      "sha256": "e40ef92a4173b29a7f601720824f5c1f9f3345c83b5ff51408788838d8eca9ab"
+    },
+    {
+      "id": "mermaid-snippet/classDef",
+      "sha256": "d7bcc0385fc9102d471d9f089175ce0dfd042573624083a1627a693c6ae426da"
+    },
+    {
+      "id": "mermaid-snippet/linkStyle",
+      "sha256": "ea023ead2d8328f72c0589576ba1e3186d16090a45dd931c25eb98b98264fd40"
+    },
+    {
+      "id": "mermaid-snippet/xychart",
+      "sha256": "37cc5b6eef3d7b22087b451184c023def9db4b5f3527873d6286533681949b9b"
+    },
+    {
+      "id": "mermaid-snippet/radar",
+      "sha256": "96a86f13bfc4c96ffb907ca58a4c9c4a7c8ae7aa40627db8fe02fec62c6b3e75"
+    },
+    {
+      "id": "mermaid-snippet/sankey",
+      "sha256": "a56ac9a8fa3d1749a4fd4105083e373eb1872ef7d69992620d13803a3ef2d17d"
+    },
+    {
+      "id": "mermaid-snippet/kanban-native",
+      "sha256": "54358d75882ebc698a98821883b8d5a9232da6e15e2799825bfc0a61b7f56e2b"
+    },
+    {
+      "id": "mermaid-snippet/requirement-native",
+      "sha256": "f245da23614e4cce021183e16ac3c8d93beb95e2ef252d1c6a5806f55caac9d3"
+    },
+    {
+      "id": "mermaid-snippet/gitgraph-native",
+      "sha256": "08b5519c98d893ffa1ac3cc7c086d7a728b411cb6a7e3bb9acaeeb25898ffb57"
+    }
+  ]
+}

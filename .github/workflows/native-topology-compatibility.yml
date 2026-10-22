@@ -1,0 +1,35 @@
+name: Validate pinned native topology compatibility
+on:
+  push:
+    branches: [feature/native-mermaid-architecture-c4-block-editors]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compatibility:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source ordinary application and compatibility client
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify unchanged previous editor source fixtures
+        run: pwsh -NoProfile -File scripts/native/Test-NativeEditorBaseline.ps1
+      - name: Prove ordinary Architecture C4 Context Container Component and Block preview and exports
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --topology-compatibility artifacts/native/topology-compatibility .
+      - name: Verify complete canonical editor pixels and atomic owner sessions
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --topology-editor-fidelity artifacts/native/topology-editor-fidelity .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-topology-compatibility
+          path: |
+            artifacts/native/topology-compatibility/
+            artifacts/native/topology-editor-fidelity/
+            artifacts/native/editor-baseline.json
+          retention-days: 30

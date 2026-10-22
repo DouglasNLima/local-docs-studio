@@ -52,6 +52,11 @@ function Test-NativeMermaidResources {
     $requiredNative += @('LensDocsStudio.Native.TimelineVisualEditorWindow', 'LensDocsStudio.Native.JourneyVisualEditorWindow', 'LensDocsStudio.Native.QuadrantVisualEditorWindow')
     $requiredNative += @('LensDocsStudio.Native.ChartVisualEditorWindow', 'LensDocsStudio.Native.XyVisualEditorWindow', 'LensDocsStudio.Native.RadarVisualEditorWindow', 'LensDocsStudio.Native.SankeyVisualEditorWindow')
     $requiredNative += @('LensDocsStudio.Native.KanbanVisualEditorWindow', 'LensDocsStudio.Native.RequirementVisualEditorWindow', 'LensDocsStudio.Native.GitGraphVisualEditorWindow')
+    $requiredNative += @('LensDocsStudio.Native.ArchitectureVisualEditorWindow', 'LensDocsStudio.Native.C4VisualEditorWindow', 'LensDocsStudio.Native.BlockVisualEditorWindow', 'LensDocsStudio.Native.TopologyVisualEditorWindow')
+    foreach ($family in 'Architecture','C4','Block') {
+        $requiredCore += @("LensDocsStudio.Core.${family}Diagrams.${family}VisualDraft", "LensDocsStudio.Core.${family}Diagrams.${family}SourceModel")
+    }
+    $requiredCore += @('LensDocsStudio.Core.ArchitectureDiagrams.ArchitectureSourceNode','LensDocsStudio.Core.ArchitectureDiagrams.ArchitectureSourceEdge','LensDocsStudio.Core.C4Diagrams.C4SourceNode','LensDocsStudio.Core.C4Diagrams.C4SourceRelation','LensDocsStudio.Core.BlockDiagrams.BlockSourceToken','LensDocsStudio.Core.BlockDiagrams.BlockSourceEdge','LensDocsStudio.Core.SourceAuthoring.TopologySource','LensDocsStudio.Core.SourceAuthoring.SourceCall','LensDocsStudio.Core.SourceAuthoring.SourceArgument')
     $requiredCore += @('LensDocsStudio.Core.KanbanDiagrams.KanbanVisualDraft', 'LensDocsStudio.Core.RequirementDiagrams.RequirementVisualDraft', 'LensDocsStudio.Core.GitGraphDiagrams.GitGraphVisualDraft', 'LensDocsStudio.Core.SourceAuthoring.WorkflowSource')
     $requiredCore += @('LensDocsStudio.Core.XyCharts.XyVisualDraft', 'LensDocsStudio.Core.RadarCharts.RadarVisualDraft', 'LensDocsStudio.Core.SankeyDiagrams.SankeyVisualDraft', 'LensDocsStudio.Core.SourceAuthoring.SourceVector', 'LensDocsStudio.Core.SourceAuthoring.SourceToken', 'LensDocsStudio.Core.SourceAuthoring.ChartSource')
     $requiredCore += @('LensDocsStudio.Core.TimelineDiagrams.TimelineVisualDraft', 'LensDocsStudio.Core.JourneyDiagrams.JourneyVisualDraft', 'LensDocsStudio.Core.QuadrantDiagrams.QuadrantVisualDraft')

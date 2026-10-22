@@ -43,7 +43,7 @@ jobs:
           retention-days: 30
   controlled-comparison:
     # These editor expansions explicitly leave the stock Continuous investigation paused.
-    if: github.head_ref != 'feature/native-mermaid-gantt-mindmap-pie-editors' && github.ref != 'refs/heads/feature/native-mermaid-gantt-mindmap-pie-editors' && github.head_ref != 'feature/native-mermaid-timeline-journey-quadrant-editors' && github.ref != 'refs/heads/feature/native-mermaid-timeline-journey-quadrant-editors' && github.head_ref != 'feature/native-mermaid-xy-radar-sankey-editors' && github.ref != 'refs/heads/feature/native-mermaid-xy-radar-sankey-editors' && github.head_ref != 'feature/native-mermaid-kanban-requirement-gitgraph-editors' && github.ref != 'refs/heads/feature/native-mermaid-kanban-requirement-gitgraph-editors'
+    if: github.head_ref != 'feature/native-mermaid-gantt-mindmap-pie-editors' && github.ref != 'refs/heads/feature/native-mermaid-gantt-mindmap-pie-editors' && github.head_ref != 'feature/native-mermaid-timeline-journey-quadrant-editors' && github.ref != 'refs/heads/feature/native-mermaid-timeline-journey-quadrant-editors' && github.head_ref != 'feature/native-mermaid-xy-radar-sankey-editors' && github.ref != 'refs/heads/feature/native-mermaid-xy-radar-sankey-editors' && github.head_ref != 'feature/native-mermaid-kanban-requirement-gitgraph-editors' && github.ref != 'refs/heads/feature/native-mermaid-kanban-requirement-gitgraph-editors' && github.head_ref != 'feature/native-mermaid-architecture-c4-block-editors' && github.ref != 'refs/heads/feature/native-mermaid-architecture-c4-block-editors'
     name: Controlled 250 ms acceptance (replication ${{ matrix.replication }})
     runs-on: windows-latest
     timeout-minutes: 35

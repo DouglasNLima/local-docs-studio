@@ -1,0 +1,8 @@
+C4Context title Documentation context
+Person(reader, "Reader", "Reads local documentation")
+System_Boundary(studio, "Studio") {
+  System(docs, "Documents", "Local Markdown and Mermaid")
+}
+System_Ext(archive, "Archive", "Existing files")
+Rel(reader, docs, "Reads", "Local")
+Rel_Back(archive, docs, "Exports", "Files")

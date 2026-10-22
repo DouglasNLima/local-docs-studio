@@ -23,6 +23,8 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Restore pinned native dependencies
         run: dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
+      - name: Assert all previous source fixtures remain unchanged
+        run: pwsh -NoProfile -File scripts/native/Test-NativeEditorBaseline.ps1
       - name: Build native solution
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore
       - name: Check native dynamic theme resources and independent owners
@@ -50,6 +52,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify source editor canonical pixels geometry and owner sessions
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --source-editor-fidelity artifacts/native/source-editor-fidelity
+      - name: Prove topology preview exports canonical pixels geometry and exact owner sessions
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --topology-compatibility artifacts/native/topology-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --topology-editor-fidelity artifacts/native/topology-editor-fidelity .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Probe production Unicode and malformed-input safety in isolated processes
         timeout-minutes: 4
         run: |
@@ -99,7 +107,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate visible installer wizard
         timeout-minutes: 4
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard ${{ contains(fromJSON('["feature/native-mermaid-gantt-mindmap-pie-editors","feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors"]'), (github.head_ref || github.ref_name)) && '--no-file-associations' || '' }}
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard ${{ contains(fromJSON('["feature/native-mermaid-gantt-mindmap-pie-editors","feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '--no-file-associations' || '' }}
       - name: Independently verify preview packages and negative controls
         run: |
           foreach ($base in '0.1.0','0.1.1') {
@@ -110,7 +118,7 @@ jobs:
           pwsh -NoProfile -File scripts/native/Test-NativePreviewPackageControls.ps1 -PackageDirectory "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}" -OutputDirectory artifacts/native/package-controls
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate installation upgrade and uninstall lifecycle
-        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" ${{ contains(fromJSON('["feature/native-mermaid-gantt-mindmap-pie-editors","feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" ${{ contains(fromJSON('["feature/native-mermaid-gantt-mindmap-pie-editors","feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -118,6 +126,7 @@ jobs:
           name: native-validation
           path: |
             artifacts/native/tests/
+            artifacts/native/editor-baseline.json
             artifacts/native/input-safety/
             artifacts/native/package-controls/*.json
             artifacts/native/authenticode/**/*.json
@@ -130,6 +139,8 @@ jobs:
             artifacts/native/chart-editor-fidelity/
             artifacts/native/workflow-compatibility/
             artifacts/native/workflow-editor-fidelity/
+            artifacts/native/topology-compatibility/
+            artifacts/native/topology-editor-fidelity/
             artifacts/native/ui/
             artifacts/native/interrupted-save/
             artifacts/native/site-browser/
@@ -214,7 +225,7 @@ jobs:
       - name: Build exact-head native State validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify installed, upgraded and reinstalled State authoring independently
-        run: pwsh -NoProfile -File scripts/native/Test-NativeStateInstaller.ps1 -Installer "artifacts/state-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/state-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeStateInstaller.ps1 -Installer "artifacts/state-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/state-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -240,7 +251,7 @@ jobs:
       - name: Build exact-head native ER validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify installed, upgraded and reinstalled ER authoring independently
-        run: pwsh -NoProfile -File scripts/native/Test-NativeErInstaller.ps1 -Installer "artifacts/er-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/er-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeErInstaller.ps1 -Installer "artifacts/er-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/er-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -266,7 +277,7 @@ jobs:
       - name: Build exact-head native Class validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify installed, upgraded and reinstalled Class authoring independently
-        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Installer "artifacts/class-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/class-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Installer "artifacts/class-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/class-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -282,7 +293,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Flowchart, Sequence, Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph]
+        family: [Flowchart, Sequence, Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -297,7 +308,7 @@ jobs:
       - name: Build exact-source installed authoring harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify install, upgrade and reinstall with exact portable payload parity
-        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Family '${{ matrix.family }}' -Installer "artifacts/suite-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/suite-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Family '${{ matrix.family }}' -Installer "artifacts/suite-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/suite-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -317,6 +328,9 @@ jobs:
             artifacts/native/kanban-install-smoke/
             artifacts/native/requirement-install-smoke/
             artifacts/native/gitgraph-install-smoke/
+            artifacts/native/architecture-install-smoke/
+            artifacts/native/c4-install-smoke/
+            artifacts/native/block-install-smoke/
           retention-days: 14
   historical-upgrade:
     name: Historical upgrade (${{ matrix.preview }})

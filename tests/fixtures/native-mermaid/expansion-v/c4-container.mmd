@@ -1,0 +1,10 @@
+C4Container
+title Documentation containers
+Person(reader, "Reader", "Authors documentation")
+Container_Boundary(studio, "Studio")
+{
+  Container(editor, "Editor", "WPF", "Local authoring")
+  ContainerDb(store, "Workspace", "Files", "Portable source")
+}
+Rel(reader, editor, "Authors")
+BiRel(editor, store, "Reads and saves", "UTF-8")
