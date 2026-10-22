@@ -34,6 +34,12 @@ src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocs
 
 Initial managed worktree creation failed with `No space left on device` while checking out tracked screenshots; C: had approximately 36 MB free. The tool removed its failed checkout. A separate sparse checkout allowed source inspection without altering earlier worktrees; sparse checkout was disabled once free space increased. No earlier artefacts or caches were deleted by this task.
 
+Clean `16ffdeea3eda79220eaa1fcc7433bf69c78e3ccc` locked local build passed with zero warnings/errors in 4:09.84. Its first cold ordinary Architecture render failed the unchanged three-second resource deadline on this shared workstation. Raw failure remains at `artifacts/native/expansion-v/compatibility-16ffdee/`, including the exact source and compiled revision, and `logs/compatibility-16ffdee.log`. It is not a compatibility pass. No deadline, retry or fixture reduction was applied. A separately source-labelled disposable hosted compatibility workflow will establish the native result.
+
+Before that hosted run, the explicit-membership geometry control connects its group junction to the member service: an unconnected junction could make the group bounding rectangle surround the unrelated service. The control now proves membership with unambiguous actual extents and retains both intended real connections; no rendered geometry is substituted.
+
+The four preserved `.847` installer/portable hashes were independently rechecked against PR #43 and all match: `9e1dfe97dd87b8b3781189a4f516b09a5619365e3d4f91a2c872e6d309109adf`, `ca390641ceb1449754fd09c2a8e5140efba34b1a4069751f275041b66c5a430c`, `4be9b68cd27748fef6831ef786c8af068e2eb6097a529fcc97096f6eb7e4182a`, `528bd067820400c9fbbb2e0f70492eecfbeaea6e1baac8e21f1795b43b4fe79d`.
+
 ## Outstanding delivery gates
 
 Compatibility execution, source-preserving authoring, grammar/capability documentation, all previous-family regressions, new-family normal/actual High Contrast UIA, owner/history/recovery, final clean-source ordinary/export/fidelity/browser/static gates, sixty installed authoring phases, fresh unsigned packages, independent payload/type/control inspection and final captures remain pending. No new package, screenshot, final-source acceptance or twenty-family implementation is claimed yet.

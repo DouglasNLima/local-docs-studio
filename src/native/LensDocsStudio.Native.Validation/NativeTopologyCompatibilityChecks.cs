@@ -59,13 +59,13 @@ internal static class NativeTopologyCompatibilityChecks
                 Render(header + "\n" + body, "simple-" + header);
             }
 
-            const string architecture = "architecture-beta\ngroup g[Group]\nservice a(server)[Same] in g\n  service b[Same]\njunction j in g\na:R --> L:b\n";
+            const string architecture = "architecture-beta\ngroup g[Group]\nservice a(server)[Same] in g\n  service b[Same]\njunction j in g\na:R --> L:b\na:B -- T:j\n";
             var topology = Render(architecture, "architecture-membership");
             Check(G(topology, "architecture-service").Select(e => A(e, "data-id")).SequenceEqual(new[] { "a", "b" }), "Architecture: duplicate labels retain distinct IDs and declaration order");
             Check(Inside(Box(G(topology, "architecture-service")[0]), Box(G(topology, "architecture-group").Single())) && !Inside(Box(G(topology, "architecture-service")[1]), Box(G(topology, "architecture-group").Single())), "Architecture: explicit in membership controls actual group geometry; indentation does not");
             Check(G(topology, "architecture-junction").Single().Name.LocalName == "circle", "Architecture: canonical junction is retained as its actual routing point");
-            Check(G(Render(architecture.Replace(" in g", "", StringComparison.Ordinal) + "a:R -- L:unknown\n", "architecture-unknown"), "architecture-edge").Length == 1, "Architecture: missing endpoint is omitted without minting a service");
-            Check(G(Render(architecture + "{g}:R -- L:b\n", "architecture-group-endpoint"), "architecture-edge").Length == 1, "Architecture limitation: brace group endpoint is stripped by the parser but absent from native edge box lookup");
+            Check(G(Render(architecture.Replace(" in g", "", StringComparison.Ordinal) + "a:R -- L:unknown\n", "architecture-unknown"), "architecture-edge").Length == 2, "Architecture: missing endpoint is omitted without minting a service");
+            Check(G(Render(architecture + "{g}:R -- L:b\n", "architecture-group-endpoint"), "architecture-edge").Length == 2, "Architecture limitation: brace group endpoint is stripped by the parser but absent from native edge box lookup");
             foreach (var side in new[] { "L", "R", "T", "B" })
             {
                 var r = Render("architecture-beta\nservice a[A]\nservice b[B]\na:" + side + " -- " + side + ":b\n", "architecture-port-" + side);
