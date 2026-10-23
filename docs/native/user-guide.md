@@ -125,8 +125,8 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Families outside the twenty visual editors keep their existing
-[rendering and export commands](#mermaid-diagrams-and-maths).
+than four connections per node. Grammar outside the bounded native visual slices keeps its existing
+[rendering and export commands](#mermaid-diagrams-and-maths), subject to native safety and resource checks.
 
 ## XY Chart, Radar and Sankey visual authoring
 
@@ -571,3 +571,17 @@ Use **Visual Edit** in a Markdown preview, open a standalone Mermaid file, or ch
 **Block:** flat `block`/`block-beta` supports the effective title, positive columns, ordered real blocks, repeated spacer occurrences, positive spans and simple directed links. Several declarations on one line retain their exact token spans and inter-token whitespace. Bare blocks couple ID and label; rectangle and rounded forms separate them. Shape conversion is explicit and checks the destination delimiter rules. Quoted closing delimiters are literal; embedded quotes have no CSV escape. First-wins/hidden declarations and malformed suffixes protect operations that could expose or discard source. Raw leading zeroes and historical coerced spans stay exact through unrelated edits. Changing columns does not normalise other spans. A spacer is never an endpoint. Nested groups and composite shapes remain source-only.
 
 Enter new IDs explicitly. Complete proved source groups can move across independent connection rows; ambiguous comments protect movement and appending. Invalid pending input stays visible with feedback, retains the last valid private draft and disables Apply. Private Undo/Redo stays within the editor. Apply reparses and renders exact source, then creates one owner Undo step; Cancel preserves the owner and stale-owner rejection preserves both versions. Save and reopen persist applied portable source. The [grammar and protection guide](architecture-c4-block-editors.md) records the bounded syntax and resource limits. Mermaider 0.15.1 supplies all layout and routing.
+
+## Packet, TreeView, Treemap and Venn visual authoring
+
+Use **Visual Edit** on a document diagram or standalone Mermaid file, or **Insert → Packet / TreeView / Treemap / Venn visually…**. These four bounded implementations extend the previous twenty families. Final-source Windows and package acceptance is recorded separately in the [Expansion VI receipt](expansion-vi-engineering-receipt.md); the [grammar/protection guide](packet-treeview-treemap-venn-editors.md) explains exact supported forms.
+
+**Packet:** edit the effective title, literal field labels and existing absolute range, one-bit or relative-count tokens. Inclusive indices remain 0..4095. Actual native 32-bit-row segments select one exact occurrence. Gaps/overlaps are reported; nothing is automatically packed or renumbered. Only accepted fields advance the cursor. An edit/removal/move that changes another relative interpretation is protected and must be made explicitly through source.
+
+**TreeView:** the first nonblank body line fixes indentation or box-drawing mode. Indentation TABs expand to four spaces. Labels, directory slashes, proved descriptions/classes and default/hidden icons retain exact source. Complete simple indentation subtrees can move after membership proof. Box structural re-encoding, ambiguous trivia and explicit custom-icon SVG images remain protected source-only. Default folder/file glyphs are native vectors.
+
+**Treemap:** edit quoted section/leaf labels and explicit non-negative decimal tokens. Each space/TAB counts as one indentation character. Parent totals stay derived; zero-value or omitted tiles remain in the keyboard list. Native squarification owns geometry. Fallback labels and mixed/tab structural re-encoding remain source-only. New decimals allow at most 15 significant digits and 15 decimal places; untouched historical lexemes remain exact.
+
+**Venn:** unique safe IDs and proved union references rename atomically. Display labels are separate: make an absent label explicit before preserving its display text during rename, or explicitly elect to rename the default display with the ID. Connected deletion rejects remaining unions unless explicit complete atomic removal is chosen. Size fields are stored metadata and **do not change fixed native circle/overlap geometry**. Unions have no invented hit regions; circle overlap ambiguity uses keyboard selection. Missing/duplicate IDs, comma-containing quoted IDs and unproved escapes remain protected.
+
+All four use the shared adjustable source pane, independently scrolling inspector, complete occurrence list, Locate/original source, private Undo/Redo and guarded owner Apply/Cancel. Invalid pending fields/source remain visible, preserve the last valid draft and disable Apply. Apply is one owner Undo action; Cancel and stale-owner rejection preserve owner data. No browser/WebView, renderer fork, layout replacement, new runtime dependency, file-association default change or experimental Continuous renderer is introduced.

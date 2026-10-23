@@ -119,7 +119,7 @@ public sealed class VennVisualDraft : SourceDraft<VennSourceModel>
         foreach (var key in connected.Append(identity).OrderByDescending(text.Index)) text = ChartSource.DeleteRow(text, key); return text;
     }, token);
     public Task<SourceAuthoringResult> MoveAsync(string identity, int direction, CancellationToken token = default) => ChangeAsync((text, model) =>
-    { Structure(model); return ChartSource.MoveRow(text, model.Sets.Any(s => s.Identity == identity) ? model.Sets.Select(s => s.Identity).ToArray() : model.Unions.Select(u => u.Identity).ToArray(), identity, direction); }, token);
+    { Structure(model); var set = model.Sets.Any(s => s.Identity == identity); return TopologySource.MoveRows(text, set ? model.Sets.Select(s => s.Identity).ToArray() : model.Unions.Select(u => u.Identity).ToArray(), identity, direction, set ? model.Unions.Select(u => u.Identity) : model.Sets.Select(s => s.Identity)); }, token);
     private static void Metadata(SourceField? field, string size, List<(SourceField, string)> patches)
     { if (field is null) { if (size.Length > 0) throw new ArgumentException("Size metadata is absent. Add its explicit source token first."); } else if (size != field.Raw) { TreemapVisualDraft.Decimal(size); patches.Add((field, size)); } }
     private static void Structure(VennSourceModel model)

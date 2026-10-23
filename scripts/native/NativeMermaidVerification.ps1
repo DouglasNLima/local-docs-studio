@@ -53,6 +53,11 @@ function Test-NativeMermaidResources {
     $requiredNative += @('LensDocsStudio.Native.ChartVisualEditorWindow', 'LensDocsStudio.Native.XyVisualEditorWindow', 'LensDocsStudio.Native.RadarVisualEditorWindow', 'LensDocsStudio.Native.SankeyVisualEditorWindow')
     $requiredNative += @('LensDocsStudio.Native.KanbanVisualEditorWindow', 'LensDocsStudio.Native.RequirementVisualEditorWindow', 'LensDocsStudio.Native.GitGraphVisualEditorWindow')
     $requiredNative += @('LensDocsStudio.Native.ArchitectureVisualEditorWindow', 'LensDocsStudio.Native.C4VisualEditorWindow', 'LensDocsStudio.Native.BlockVisualEditorWindow', 'LensDocsStudio.Native.TopologyVisualEditorWindow')
+    foreach ($family in 'Packet','TreeView','Treemap','Venn') {
+        $requiredNative += "LensDocsStudio.Native.${family}VisualEditorWindow"
+        $requiredCore += @("LensDocsStudio.Core.${family}Diagrams.${family}VisualDraft", "LensDocsStudio.Core.${family}Diagrams.${family}SourceModel")
+    }
+    $requiredCore += @('LensDocsStudio.Core.TreeViewDiagrams.TreeViewSourceNode','LensDocsStudio.Core.TreemapDiagrams.TreemapSourceNode','LensDocsStudio.Core.PacketDiagrams.PacketSourceField','LensDocsStudio.Core.VennDiagrams.VennSourceSet','LensDocsStudio.Core.VennDiagrams.VennSourceUnion','LensDocsStudio.Core.SourceAuthoring.ExpansionViSource','LensDocsStudio.Core.SourceAuthoring.SourceHierarchy')
     foreach ($family in 'Architecture','C4','Block') {
         $requiredCore += @("LensDocsStudio.Core.${family}Diagrams.${family}VisualDraft", "LensDocsStudio.Core.${family}Diagrams.${family}SourceModel")
     }

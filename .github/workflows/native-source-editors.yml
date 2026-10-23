@@ -1,7 +1,7 @@
 name: Validate expanded native Mermaid editors
 on:
   push:
-    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors, feature/native-mermaid-kanban-requirement-gitgraph-editors, feature/native-mermaid-architecture-c4-block-editors]
+    branches: [feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors, feature/native-mermaid-kanban-requirement-gitgraph-editors, feature/native-mermaid-architecture-c4-block-editors, feature/native-mermaid-packet-treeview-treemap-venn-editors]
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block]
+        family: [Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block, Packet, TreeView, Treemap, Venn]
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
@@ -46,8 +46,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --topology-editor-fidelity artifacts/native/topology-editor-fidelity .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Prove four bounded Expansion VI families through complete canonical pixels and ordinary exports
+        run: |
+          src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --expansion-vi-compatibility artifacts/native/expansion-vi-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --expansion-vi-editor-fidelity artifacts/native/expansion-vi-editor-fidelity .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise complete native authoring through normal application routes
-        # The original 24 appearance runs remain; six topology runs extend the same harness.
+        # Retain all 30 earlier appearances and add eight bounded Expansion VI appearances.
         shell: pwsh
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
@@ -66,4 +72,6 @@ jobs:
             artifacts/native/workflow-editor-fidelity/
             artifacts/native/topology-compatibility/
             artifacts/native/topology-editor-fidelity/
+            artifacts/native/expansion-vi-compatibility/
+            artifacts/native/expansion-vi-editor-fidelity/
           retention-days: 30

@@ -77,6 +77,34 @@ try {
     }
     if ((Get-AuthenticodeSignature -LiteralPath (Join-Path $inspection 'LensDocsStudio.Native.exe')).Status -ne 'NotSigned') { throw 'Apphost signature differs from the declared unsigned package.' }
     $mermaidEditor = Test-NativeMermaidResources -NativeAssemblyPath (Join-Path $inspection 'LensDocsStudio.Native.dll') -CoreAssemblyPath (Join-Path $inspection 'LensDocsStudio.Core.dll')
+    $stream = [IO.File]::OpenRead((Join-Path $inspection 'LensDocsStudio.Core.dll'))
+    try {
+        $pe = [System.Reflection.PortableExecutable.PEReader]::new($stream)
+        try {
+            $reader = [System.Reflection.Metadata.PEReaderExtensions]::GetMetadataReader($pe, [System.Reflection.Metadata.MetadataReaderOptions]::Default, $null)
+            [byte[]]$resourceData = $pe.GetSectionData($pe.PEHeaders.CorHeader.ResourcesDirectory.RelativeVirtualAddress).GetContent()
+            $catalogueText = $null
+            foreach ($handle in $reader.ManifestResources) {
+                $entry = $reader.GetManifestResource($handle)
+                if (-not $entry.Implementation.IsNil -or -not $reader.GetString($entry.Name).EndsWith('.built-in-catalogue.json', [StringComparison]::Ordinal)) { continue }
+                $offset = [int]$entry.Offset
+                if ($offset -lt 0 -or $offset -gt $resourceData.Length - 4) { throw 'Invalid native catalogue resource offset.' }
+                $length = [BitConverter]::ToInt32($resourceData, $offset)
+                if ($length -le 0 -or $length -gt 4MB -or [long]$offset + 4 + $length -gt $resourceData.Length) { throw 'Invalid native catalogue resource length.' }
+                $catalogueText = [Text.Encoding]::UTF8.GetString($resourceData, $offset + 4, $length)
+            }
+            if (-not $catalogueText) { throw 'The compiled native catalogue is missing.' }
+            $catalogue = $catalogueText | ConvertFrom-Json
+            foreach ($family in 'packet','treeview','treemap','venn') {
+                $template = @($catalogue.entries | Where-Object { $_.id -ceq "mermaid/$family" -and $_.format -ceq 'mermaid' -and $_.kind -ceq 'template' })
+                if ($template.Count -ne 1) { throw "The compiled native $family catalogue entry is missing or duplicated." }
+                $expectedFixture = [IO.File]::ReadAllText((Join-Path $PSScriptRoot "../../tests/fixtures/native-mermaid/expansion-vi/$family.mmd")).Replace("`r`n", "`n")
+                if ($template[0].contentPattern -cne $expectedFixture) { throw "The compiled native $family catalogue source differs from the exact-source fixture." }
+            }
+        } finally { $pe.Dispose() }
+    } finally { $stream.Dispose() }
+    $dependencies = Read-ZipText 'LensDocsStudio.Native.deps.json' | ConvertFrom-Json -AsHashtable
+    if (-not $dependencies.libraries.ContainsKey('Mermaider/0.15.1') -or -not $dependencies.libraries.ContainsKey('Sugiyama/0.15.1') -or @($dependencies.libraries.Keys | Where-Object { $_ -like 'Mermaider/*' }).Count -ne 1) { throw 'The native Venn renderer manifest differs from pinned Mermaider/Sugiyama 0.15.1.' }
     $applicationIcon = Test-NativeIconResources -BinaryPath (Join-Path $inspection 'LensDocsStudio.Native.exe') -SourceIcon $sourceIcon
     $installerIcon = Test-NativeIconResources -BinaryPath $installer -SourceIcon $sourceIcon
     $runtime = Read-ZipText 'LensDocsStudio.Native.runtimeconfig.json' | ConvertFrom-Json

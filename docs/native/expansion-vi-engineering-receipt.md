@@ -31,6 +31,23 @@ Upstream Packet, TreeView and Treemap omit element checks. Application preflight
 
 Candidate focused resource tests: **19 PASS**, zero failures/skips; raw TRX and log under `artifacts/native/expansion-vi/tests/` and `resource-candidate.log`. This result is a candidate check, not final-source acceptance.
 
+## Implementation milestones and combined acceptance work
+
+| Milestone | Source | Status and boundary |
+|---|---|---|
+| Ordinary compatibility harness before controls | `ad3f1ce5945633c4f318c2dfbed04d000e20425c` | BASELINE_GAPS retained; six leading-trivia failures |
+| Leading-trivia adapter and resource guards | `a6d00ef40ef368bd636118d48e5cb77443bafeff` | Local ordinary compatibility/2,028 Core PASS; hosted compatibility run 40011612138 SUCCESS, attempt 1 |
+| Packet | `5c2c1030cdc365c0607e4f0dcfb13b31af3ff652` | Exact token/range authoring, accepted-only cursor and downstream guards; 21 focused candidate tests PASS |
+| TreeView | `bbaf93f082650b2889e65e4dd27b61ea26bd90d9` | Exact fields and complete simple indentation subtrees; box structure/custom artwork protected; 15 focused candidate tests PASS |
+| Treemap | `ba52075d400d7fe56684548f358aafe0df31574f` | Quoted source hierarchy/decimals, derived totals/zero keyboard access; 17 focused candidate tests PASS |
+| Venn and pending-source safeguards | `39d6ab2` | Unique IDs/references, explicit absent-label rename semantics, stored sizes/fixed native geometry; 17 Venn and five cross-family pending-source candidate tests PASS |
+
+At clean committed implementation milestone `39d6ab2`, all **2,103 Core tests PASS** (zero failures/skips), all four ordinary compatibility paths PASS, and the existing full native editor fidelity/owner-session harness PASS in Light/Dark for Packet, indentation TreeView, box TreeView, Treemap and Venn. Complete actual WPF editor/preview canvases use identical source/theme/scale/options and zero pixel tolerance, without masks. Raw source-labelled outputs are `artifacts/native/expansion-vi/39d6ab2/`, `39d6ab2-*-fidelity.log`, `39d6ab2-compatibility.log` and `tests/four-slice-core.trx`. Later combined-acceptance code changes require their own clean-source rerun; this is not final-source certification.
+
+An early TreeView candidate test found missing mixed-syntax branch-glyph protection. Its original failed result (14 PASS, one FAIL) remains in `treeview-candidate.log` and `tests/treeview-candidate.trx`; the corrected independent run is `treeview-branch-protection-candidate.log`/TRX (15 PASS). Do not erase or relabel the first failure.
+
+Combined work extends the existing 30 hosted appearances to 38, retains the 25-second single-resize owner readiness gate and existing deadlines, and adds four families to the ordinary installed harness for 72 lifecycle phases. The original eighteen package-negative controls remain; four independently targeted controls cover Packet's native type, TreeView's Core node type, Treemap's actual embedded catalogue resource and Venn's pinned dependency manifest. Each mutates/rechecks its own target with recomputed ZIP checksum, without executing package code. Their acceptance remains pending until run against final packages. The verifier also inspects all four embedded catalogue sources against exact fixtures and requires Mermaider/Sugiyama 0.15.1 in the actual compiled dependency manifest.
+
 ## Outstanding work
 
 Draft PR [#46](https://github.com/DouglasNLima/local-docs-studio/pull/46) targets develop. Post-adapter clean source `a6d00ef40ef368bd636118d48e5cb77443bafeff` passes all **2,028 Core tests** and ordinary four-family compatibility locally. Raw receipt: `artifacts/native/expansion-vi/a6d00ef-compatibility/expansion-vi-compatibility.json`. Independent hosted compatibility: [run 40011612138](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40011612138), pending when recorded.
@@ -39,4 +56,4 @@ Packet candidate slice passes **21 focused tests** and the existing complete nat
 
 The initial Draft-PR event queued the controlled Continuous workflow before this new branch was added to the established expansion exclusion. Run `40011645398` was explicitly cancelled to preserve #38's paused scope; its original run metadata is saved in `precondition/early-performance-workflow.json`. The branch exclusion changes only the controlled comparison; ordinary visible Continuous correctness/interaction jobs remain enabled on subsequent events. This cancellation is not a pass or a benchmark result.
 
-Post-adapter committed compatibility proof, four editor slices, source/owner/history regressions, all final-source acceptance, 38 hosted appearances, 72 installed lifecycle phases, 22 independent negative controls, fresh unsigned version-pair packages, independent downloaded-package inspection, documentation/captures and one Draft PR to develop remain outstanding. No installer has been executed on the ordinary desktop. Internal acceptance retains `internal-no-associations` and its seven-site contract. No merge, release, signing, updater, tags, Pages deployment or optional association change is authorised.
+Four slices and committed-source compatibility/fidelity are implemented. Final combined-source acceptance, 38 hosted appearances, 72 installed lifecycle phases, 22 package-negative controls, fresh unsigned version-pair packages, independent downloaded-package inspection, actual Windows captures and the completed Draft-PR handoff remain outstanding. No installer has been executed on the ordinary desktop. Internal acceptance retains `internal-no-associations` and its seven-site contract. No merge, release, signing, updater, tags, Pages deployment or optional association change is authorised.

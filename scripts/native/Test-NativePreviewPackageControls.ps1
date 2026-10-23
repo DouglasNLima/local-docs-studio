@@ -121,6 +121,41 @@ foreach ($family in 'Xy','Radar','Sankey','Kanban','Requirement','GitGraph','Arc
     $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
     Reject ('missing-' + $family.ToLowerInvariant() + '-type-with-recomputed-checksum') @{PackageDirectory=$copy} ('native Mermaid editor type is missing: LensDocsStudio.Native.' + $typeName)
 }
+# Four independently targeted Expansion VI contracts: native type, Core type, embedded catalogue and pinned dependency manifest.
+foreach ($control in @(
+    @{ name='packet-native-type'; entry='LensDocsStudio.Native.dll'; needle=('PacketVisualEditorWindow' + [char]0); error='native Mermaid editor type is missing: LensDocsStudio.Native.PacketVisualEditorWindow' },
+    @{ name='treeview-core-node-type'; entry='LensDocsStudio.Core.dll'; needle=('TreeViewSourceNode' + [char]0); error='Core Mermaid editor type is missing: LensDocsStudio.Core.TreeViewDiagrams.TreeViewSourceNode' },
+    @{ name='treemap-embedded-catalogue'; entry='LensDocsStudio.Core.dll'; needle='mermaid/treemap'; error='compiled native treemap catalogue entry is missing or duplicated' },
+    @{ name='venn-pinned-renderer-manifest'; entry='LensDocsStudio.Native.deps.json'; needle='Mermaider/0.15.1'; error='native Venn renderer manifest differs from pinned Mermaider/Sugiyama 0.15.1' }
+)) {
+    $originalArchive = [IO.Compression.ZipFile]::OpenRead((Join-Path $PackageDirectory $zip.Name))
+    $archive = [IO.Compression.ZipFile]::Open($zip.FullName, [IO.Compression.ZipArchiveMode]::Update)
+    try {
+        foreach ($name in 'LensDocsStudio.Native.dll','LensDocsStudio.Core.dll','LensDocsStudio.Native.deps.json') {
+            $input = $originalArchive.GetEntry($name).Open(); $buffer = [IO.MemoryStream]::new()
+            try { $input.CopyTo($buffer); $bytes = $buffer.ToArray() } finally { $input.Dispose(); $buffer.Dispose() }
+            if ($name -eq $control.entry) {
+                if ($name.EndsWith('.json')) {
+                    $value = [Text.Encoding]::UTF8.GetString($bytes)
+                    if (-not $value.Contains($control.needle, [StringComparison]::Ordinal)) { throw 'The exact pinned renderer manifest identity was not found.' }
+                    $bytes = [Text.Encoding]::UTF8.GetBytes($value.Replace($control.needle, 'Mermaider/0.15.2'))
+                } else {
+                    $key = [Text.Encoding]::UTF8.GetBytes($control.needle)
+                    $offset = [Convert]::ToHexString($bytes).IndexOf([Convert]::ToHexString($key), [StringComparison]::Ordinal)
+                    if ($offset -lt 0 -or $offset % 2 -ne 0) { throw "The independent $($control.name) mutation target was not found." }
+                    $bytes[$offset / 2] = [byte][char]'Z'
+                }
+            }
+            $archive.GetEntry($name).Delete(); $replacement = $archive.CreateEntry($name).Open()
+            try { $replacement.Write($bytes, 0, $bytes.Length) } finally { $replacement.Dispose() }
+        }
+    } finally { $archive.Dispose(); $originalArchive.Dispose() }
+    $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Object {
+        if ($_.EndsWith($zip.Name)) { "{0}  {1}" -f (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $zip.Name } else { $_ }
+    }
+    $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
+    Reject ($control.name + '-with-recomputed-checksum') @{PackageDirectory=$copy} ([regex]::Escape($control.error))
+}
 @{ status='PASS'; checks=$checks; sourceRevision=$metadata.sourceRevision; originalPackageUnchanged=$true } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'negative-controls.json') -Encoding utf8NoBOM
 "Native preview package negative controls PASS: $($checks.Count)"

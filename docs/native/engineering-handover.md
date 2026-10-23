@@ -1,11 +1,19 @@
 # Native Windows engineering handover
 
+## Expansion VI implementation and accepted precondition — 23 October 2026
+
+PR #45 was merged and accepted on current develop `7b21fa62f58b10e79c74302b4b9e887be3aceadc`, tree `604fb3f6abfb6fae200166e53148eb354679cea7`. Native push run 39991049058 and web push run 39991048987 both succeeded on attempt 1. That prerequisite is satisfied. The earlier .853 PDF/Journey/intermediate ER root causes remain INCONCLUSIVE, with original failure evidence retained. PR #38 stays open/draft/paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; stock Continuous remains ordinary default.
+
+[Draft PR #46](https://github.com/DouglasNLima/local-docs-studio/pull/46) implements bounded Packet, TreeView, Treemap and Venn authoring. Clean implementation milestone `39d6ab2` passes 2,103 Core tests, ordinary four-family native preview/exports and full zero-tolerance native editor fidelity locally. Hosted final-source appearance/lifecycle and package acceptance are still pending. The [Expansion VI receipt](expansion-vi-engineering-receipt.md) owns current source-labelled status; [grammar/protections](packet-treeview-treemap-venn-editors.md) and the [24-family matrix](diagram-compatibility.md) distinguish bounded implementation from comprehensive grammar or certification.
+
+The historical checkpoint below retains its chronology and does not reopen the accepted precondition.
+
 ## Post-merge .853 prerequisite repair - 23 October 2026
 
 Develop's [original native run 39856703884](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39856703884)
 failed after upgrade. The [source-labelled repair/RCA receipt](native-853-postmerge-pdf-repair.md)
 records proved observations, remaining unknowns, separate internal association policy
-and unchanged-deadline diagnostics. Expansion VI remains blocked pending separate
+and unchanged-deadline diagnostics. At that earlier checkpoint, Expansion VI was blocked pending separate
 user-authorised merge and native **and** web push acceptance at the new develop SHA.
 PR #38 stays PAUSED; its original 250 ms deadline and stock Continuous are unchanged.
 The exact repair-source checks and package hashes belong to the Draft PR's final receipt.
