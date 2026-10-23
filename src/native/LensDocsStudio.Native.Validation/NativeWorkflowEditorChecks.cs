@@ -22,14 +22,15 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeWorkflowEditorChecks
 {
-    public static void Run(string output, string repository, bool topology = false)
+    public static void Run(string output, string repository, bool topology = false, string? expansionFamily = null)
     {
         Directory.CreateDirectory(output); var checks = new List<string>();
-        foreach (var family in topology ? new[] { "architecture", "c4-context", "c4-container", "c4-component", "block" } : new[] { "kanban", "requirement", "gitgraph" })
+        foreach (var family in expansionFamily is not null ? new[] { expansionFamily } : topology ? new[] { "architecture", "c4-context", "c4-container", "c4-component", "block" } : new[] { "kanban", "requirement", "gitgraph" })
         foreach (var dark in new[] { false, true })
         {
-            var source = File.ReadAllText(Path.Combine(repository, "tests/fixtures/native-mermaid", topology ? "expansion-v" : "expansion-iv", family + ".mmd"));
+            var source = File.ReadAllText(Path.Combine(repository, "tests/fixtures/native-mermaid", expansionFamily is not null ? "expansion-vi" : topology ? "expansion-v" : "expansion-iv", family + ".mmd"));
             var diagrams = new DiagramService(); SourceVisualEditorWindow window = family switch {
+                "packet" => new PacketVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "kanban" => new KanbanVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "requirement" => new RequirementVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "architecture" => new ArchitectureVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
@@ -44,6 +45,7 @@ internal static class NativeWorkflowEditorChecks
             var hits = (IReadOnlyList<NativeSourceHit>)window.GetType().GetMethod("Correspondence", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, [source, result])!;
             Check(hits.Count > 0 && hits.Select(h => h.Identity).Distinct().Count() == hits.Count && hits.All(h => h.Shape is not null), family + ": every native hit uses a distinct source identity and real SVG shape");
             if (draft is KanbanVisualDraft board) Check(hits.Count == board.Model.Rows.Count, "Kanban: every duplicate card and column has distinct canonical correspondence");
+            if (draft is Core.PacketDiagrams.PacketVisualDraft packet) Check(hits.Count == packet.Model.Fields.Count && packet.Model.Fields.Count < Core.PacketDiagrams.PacketVisualDraft.Segments(packet.Model).Count(), "Packet: every split native segment belongs to its exact field occurrence, with combined actual geometry");
             if (draft is RequirementVisualDraft req) Check(hits.Count == req.Model.Visible.Count + req.Model.Relations.Count, "Requirement: visible boxes and proved native relationship paths map separately");
             if (draft is GitGraphVisualDraft git) Check(hits.Count == git.Model.Marks.Count, "GitGraph: actual commit marks map by command occurrence; non-mark commands remain in the list");
             if (draft is Core.ArchitectureDiagrams.ArchitectureVisualDraft architecture) Check(hits.Count == architecture.Model.Nodes.Count + architecture.Model.Edges.Count, "Architecture: actual services, group boxes, junctions and connection paths have complete occurrence correspondence");
@@ -82,6 +84,7 @@ internal static class NativeWorkflowEditorChecks
                 var original = "Before café Ω" + nl + block + "Between" + nl + block + "After" + nl;
                 var owner = new DocumentViewModel(original) { DisplayName = family + ".md" }; var target = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1];
                 var change = family switch { "kanban" => body.Replace("Write guide", "Edited guide", StringComparison.Ordinal), "requirement" => body.Replace("DOC-17", "DOC-18", StringComparison.Ordinal), "architecture" => body.Replace("Gateway", "Edited gateway", StringComparison.Ordinal), "c4-context" or "block" => body.Replace("Reader", "Edited reader", StringComparison.Ordinal), "c4-container" => body.Replace("Editor", "Edited editor", StringComparison.Ordinal), "c4-component" => body.Replace("Parser", "Edited parser", StringComparison.Ordinal), _ => body.Replace("Start", "Edited start", StringComparison.Ordinal) };
+                if (family == "packet") change = body.Replace("Source", "Edited source", StringComparison.Ordinal);
                 new MermaidDocumentEditSession(owner, target).Apply(change, true);
                 Check(owner.EditorDocument.Text == original[..target.Body.Start] + change + original[target.Body.End..], family + ": exact second identical fence patch preserves neighbours and " + (nl == "\n" ? "LF" : "CRLF"));
                 owner.EditorDocument.UndoStack.Undo(); Check(owner.EditorDocument.Text == original, family + ": owner Apply is one exact Undo step");
@@ -91,7 +94,7 @@ internal static class NativeWorkflowEditorChecks
                 Check(conflict.EditorDocument.Text == current, family + ": asynchronous final owner-version conflict preserves both sources");
             }
         }
-        File.WriteAllText(Path.Combine(output, topology ? "topology-editor-fidelity.json" : "workflow-editor-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", SourceRevision = typeof(KanbanVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, Checks = checks }, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(Path.Combine(output, expansionFamily is not null ? expansionFamily + "-editor-fidelity.json" : topology ? "topology-editor-fidelity.json" : "workflow-editor-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", SourceRevision = typeof(KanbanVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, Checks = checks }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
     }
     private static void RenderActual(SourceVisualEditorWindow window)

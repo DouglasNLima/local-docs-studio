@@ -199,6 +199,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             || Core.ArchitectureDiagrams.ArchitectureVisualDraft.IsArchitecture(diagram.Source)
                             || Core.C4Diagrams.C4VisualDraft.IsC4(diagram.Source)
                             || Core.BlockDiagrams.BlockVisualDraft.IsBlock(diagram.Source)
+                            || Core.PacketDiagrams.PacketVisualDraft.IsPacket(diagram.Source)
 
                             || Core.Mindmaps.MindmapVisualDraft.IsMindmap(diagram.Source)
                             || Core.GanttDiagrams.GanttVisualDraft.IsGantt(diagram.Source)))
