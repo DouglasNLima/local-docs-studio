@@ -1,0 +1,424 @@
+{
+  "Status": "BASELINE_GAPS",
+  "Error": null,
+  "Baseline": true,
+  "SourceRevision": "0.1.0-preview.1\u002Bad3f1ce5945633c4f318c2dfbed04d000e20425c",
+  "Renderer": "Mermaider 0.15.1",
+  "RendererSource": "71b64845570d633a94d29e85579c0a02786fece8",
+  "Checks": [
+    "packet-light: exact authoritative source renders",
+    "packet-light: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "packet-light: standalone Mermaid uses the ordinary canonical export route",
+    "packet-light: HTML embeds exact canonical pixels",
+    "packet-light: DOCX validates",
+    "packet-light: DOCX embeds exact canonical pixels",
+    "packet-light: ordinary PDF contains an actual image",
+    "packet-light: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "packet-light: actual Docs Site archive embeds canonical pixels",
+    "packet-dark: exact authoritative source renders",
+    "packet-dark: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "packet-dark: standalone Mermaid uses the ordinary canonical export route",
+    "packet-dark: HTML embeds exact canonical pixels",
+    "packet-dark: DOCX validates",
+    "packet-dark: DOCX embeds exact canonical pixels",
+    "packet-dark: ordinary PDF contains an actual image",
+    "packet-dark: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "packet-dark: actual Docs Site archive embeds canonical pixels",
+    "treeview-light: exact authoritative source renders",
+    "treeview-light: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "treeview-light: standalone Mermaid uses the ordinary canonical export route",
+    "treeview-light: HTML embeds exact canonical pixels",
+    "treeview-light: DOCX validates",
+    "treeview-light: DOCX embeds exact canonical pixels",
+    "treeview-light: ordinary PDF contains an actual image",
+    "treeview-light: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "treeview-light: actual Docs Site archive embeds canonical pixels",
+    "treeview-dark: exact authoritative source renders",
+    "treeview-dark: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "treeview-dark: standalone Mermaid uses the ordinary canonical export route",
+    "treeview-dark: HTML embeds exact canonical pixels",
+    "treeview-dark: DOCX validates",
+    "treeview-dark: DOCX embeds exact canonical pixels",
+    "treeview-dark: ordinary PDF contains an actual image",
+    "treeview-dark: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "treeview-dark: actual Docs Site archive embeds canonical pixels",
+    "treeview-box-light: exact authoritative source renders",
+    "treeview-box-light: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "treeview-box-light: standalone Mermaid uses the ordinary canonical export route",
+    "treeview-box-light: HTML embeds exact canonical pixels",
+    "treeview-box-light: DOCX validates",
+    "treeview-box-light: DOCX embeds exact canonical pixels",
+    "treeview-box-light: ordinary PDF contains an actual image",
+    "treeview-box-light: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "treeview-box-light: actual Docs Site archive embeds canonical pixels",
+    "treeview-box-dark: exact authoritative source renders",
+    "treeview-box-dark: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "treeview-box-dark: standalone Mermaid uses the ordinary canonical export route",
+    "treeview-box-dark: HTML embeds exact canonical pixels",
+    "treeview-box-dark: DOCX validates",
+    "treeview-box-dark: DOCX embeds exact canonical pixels",
+    "treeview-box-dark: ordinary PDF contains an actual image",
+    "treeview-box-dark: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "treeview-box-dark: actual Docs Site archive embeds canonical pixels",
+    "treemap-light: exact authoritative source renders",
+    "treemap-light: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "treemap-light: standalone Mermaid uses the ordinary canonical export route",
+    "treemap-light: HTML embeds exact canonical pixels",
+    "treemap-light: DOCX validates",
+    "treemap-light: DOCX embeds exact canonical pixels",
+    "treemap-light: ordinary PDF contains an actual image",
+    "treemap-light: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "treemap-light: actual Docs Site archive embeds canonical pixels",
+    "treemap-dark: exact authoritative source renders",
+    "treemap-dark: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "treemap-dark: standalone Mermaid uses the ordinary canonical export route",
+    "treemap-dark: HTML embeds exact canonical pixels",
+    "treemap-dark: DOCX validates",
+    "treemap-dark: DOCX embeds exact canonical pixels",
+    "treemap-dark: ordinary PDF contains an actual image",
+    "treemap-dark: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "treemap-dark: actual Docs Site archive embeds canonical pixels",
+    "venn-light: exact authoritative source renders",
+    "venn-light: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "venn-light: standalone Mermaid uses the ordinary canonical export route",
+    "venn-light: HTML embeds exact canonical pixels",
+    "venn-light: DOCX validates",
+    "venn-light: DOCX embeds exact canonical pixels",
+    "venn-light: ordinary PDF contains an actual image",
+    "venn-light: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "venn-light: actual Docs Site archive embeds canonical pixels",
+    "venn-dark: exact authoritative source renders",
+    "venn-dark: ordinary preview equals trusted native PNG at zero pixel tolerance",
+    "venn-dark: standalone Mermaid uses the ordinary canonical export route",
+    "venn-dark: HTML embeds exact canonical pixels",
+    "venn-dark: DOCX validates",
+    "venn-dark: DOCX embeds exact canonical pixels",
+    "venn-dark: ordinary PDF contains an actual image",
+    "venn-dark: ordinary bundle/import preserves all Markdown and standalone source bytes",
+    "venn-dark: actual Docs Site archive embeds canonical pixels",
+    "empty-packet: exact authoritative source renders",
+    "simple-packet: exact authoritative source renders",
+    "empty-packet-beta: exact authoritative source renders",
+    "simple-packet-beta: exact authoritative source renders",
+    "empty-treeView: exact authoritative source renders",
+    "simple-treeView: exact authoritative source renders",
+    "empty-treeView-beta: exact authoritative source renders",
+    "simple-treeView-beta: exact authoritative source renders",
+    "empty-treemap-beta: exact authoritative source renders",
+    "simple-treemap-beta: exact authoritative source renders",
+    "empty-venn-beta: exact authoritative source renders",
+    "simple-venn-beta: exact authoritative source renders",
+    "packet-cursor: exact authoritative source renders",
+    "Packet: accepted cursor only, inclusive ends and every actual multirow segment",
+    "Packet: later effective title overrides header",
+    "Packet: actual native rows, widths and visible inclusive numbering",
+    "packet-duplicate-skipped: exact authoritative source renders",
+    "Packet: identical ranges retain duplicate native segments; overflow and unknown text are ignored",
+    "packet-hard-cap: exact authoritative source renders",
+    "Packet: 4095 is inclusive and cursor past cap is skipped",
+    "tree-tabs: exact authoritative source renders",
+    "TreeView: TAB expands to four spaces; exact native root/preorder hierarchy",
+    "TreeView: default folder/file are actual native vector glyphs",
+    "tree-box: exact authoritative source renders",
+    "TreeView: first nonblank body line chooses box mode, including mixed light/heavy native prefixes",
+    "tree-mode-first-line: exact authoritative source renders",
+    "TreeView: later branch glyph cannot change indentation mode",
+    "tree-annotations: exact authoritative source renders",
+    "TreeView: quotes/slash, class/description and explicit empty/none icons retain distinct semantics",
+    "tree-explicit-icon-0: exact authoritative source renders",
+    "TreeView: explicit icon file remains protected by existing image sanitisation",
+    "tree-explicit-icon-1: exact authoritative source renders",
+    "TreeView: explicit icon server remains protected by existing image sanitisation",
+    "tree-explicit-icon-2: exact authoritative source renders",
+    "TreeView: explicit icon unknown-provider:remote remains protected by existing image sanitisation",
+    "tree-explicit-icon-3: exact authoritative source renders",
+    "TreeView: explicit icon https://invalid.example/icon remains protected by existing image sanitisation",
+    "treemap-aggregation: exact authoritative source renders",
+    "Treemap: derived parent total uses exact explicit descendants",
+    "Treemap: tabs and spaces each count one; zero child/root has no invented tile",
+    "Treemap: actual native squarified geometry reflects positive values",
+    "treemap-fallback-duplicates: exact authoritative source renders",
+    "Treemap: fallback raw section and duplicate visible labels are not unique source identities",
+    "venn-semantics: exact authoritative source renders",
+    "Venn: ordered set IDs remain separate from display labels",
+    "venn-size-metadata: exact authoritative source renders",
+    "Venn: set/union size metadata does not change any actual circle geometry",
+    "Venn: fixed 130 radius; unresolved and absent union labels have no pointer region",
+    "venn-duplicates-unknown: exact authoritative source renders",
+    "Venn: duplicate IDs remain separate circles but reference lookup is ambiguous"
+  ],
+  "Gaps": [
+    "packet: leading inert trivia dispatch fails before adapter",
+    "packet-beta: leading inert trivia dispatch fails before adapter",
+    "treeView: leading inert trivia dispatch fails before adapter",
+    "treeView-beta: leading inert trivia dispatch fails before adapter",
+    "treemap-beta: leading inert trivia dispatch fails before adapter",
+    "venn-beta: leading inert trivia dispatch fails before adapter"
+  ],
+  "Observations": [
+    {
+      "Name": "packet-light",
+      "SourceSha256": "3ac74b4372ddb685fdbf2a9650c298f674d0a2632d87e106a22b7c186ae9c021",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "packet-dark",
+      "SourceSha256": "3ac74b4372ddb685fdbf2a9650c298f674d0a2632d87e106a22b7c186ae9c021",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treeview-light",
+      "SourceSha256": "76b7da230b7fc4ee8ec8c487bf3f460620dfbea7b17f2d3e2f68e7e35826f208",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treeview-dark",
+      "SourceSha256": "76b7da230b7fc4ee8ec8c487bf3f460620dfbea7b17f2d3e2f68e7e35826f208",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treeview-box-light",
+      "SourceSha256": "4dcf4eed509be82dc5ba3e5c047a0b6c4383b61656446443aebc8ea018446096",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treeview-box-dark",
+      "SourceSha256": "4dcf4eed509be82dc5ba3e5c047a0b6c4383b61656446443aebc8ea018446096",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treemap-light",
+      "SourceSha256": "b6c33fe3be7c0cd7d24827e790cc3bb4860e494469bbbb0abf7104fa737c4b17",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treemap-dark",
+      "SourceSha256": "b6c33fe3be7c0cd7d24827e790cc3bb4860e494469bbbb0abf7104fa737c4b17",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "venn-light",
+      "SourceSha256": "2baa9f43e4104f9caab115fbfcbef73a5f0aed44b8557520d3810401236bcd6b",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "venn-dark",
+      "SourceSha256": "2baa9f43e4104f9caab115fbfcbef73a5f0aed44b8557520d3810401236bcd6b",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "empty-packet",
+      "SourceSha256": "68d68c74f6cf22edab9fcb536f2680630f8c473e57e35d5150ab98974cdc84a6",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "simple-packet",
+      "SourceSha256": "d3f869b0ec98ffc9593c0602bd97d5f495a4faef8ce6334093f1b2a53410403b",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "leading-trivia-packet",
+      "SourceSha256": "63320c4d9f0c91b4d14d6dc21761c7d9248b248c6a5f917cf3ccc02f6a729362",
+      "Success": false,
+      "Error": "Diagram could not be rendered: Invalid mermaid header: \u0022packet\u0022. Expected \u0022graph TD\u0022, \u0022flowchart LR\u0022, etc."
+    },
+    {
+      "Name": "empty-packet-beta",
+      "SourceSha256": "b56f1af80f2b37d3a7269563fc9c0b0fd18c3c3dbd7cc56a82c50a8733d1fc99",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "simple-packet-beta",
+      "SourceSha256": "bd0665e56c9367bedc910ffc607b323b426155de863b49ca3299ea6135bd4cd0",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "leading-trivia-packet-beta",
+      "SourceSha256": "878d505e872090ca51674660d8447797833b626860f441cdf399de6bf673e57f",
+      "Success": false,
+      "Error": "Diagram could not be rendered: Invalid mermaid header: \u0022packet-beta\u0022. Expected \u0022graph TD\u0022, \u0022flowchart LR\u0022, etc."
+    },
+    {
+      "Name": "empty-treeView",
+      "SourceSha256": "cb867757b055a1deae4f5009d9a598c823c674dcc51059b91113c14cee7e4df0",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "simple-treeView",
+      "SourceSha256": "b7c61058ce9f937056a03fa3602280a2ea0b6f53a3193fd937f7650c6bcf5165",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "leading-trivia-treeView",
+      "SourceSha256": "641b7b4429107c96ee31308082297af1d0d37b9a79ebf778bf2b23711b356ee1",
+      "Success": false,
+      "Error": "Diagram could not be rendered: Invalid mermaid header: \u0022treeView\u0022. Expected \u0022graph TD\u0022, \u0022flowchart LR\u0022, etc."
+    },
+    {
+      "Name": "empty-treeView-beta",
+      "SourceSha256": "f449c9da1d6b97f85c5cec4f14c4b1b8183495522eefa5d430bba08d53a99f70",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "simple-treeView-beta",
+      "SourceSha256": "d70b247da7b04c137eb58739b24aa99c5b1206429ad53e260f4ae4a6f3b8343e",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "leading-trivia-treeView-beta",
+      "SourceSha256": "abc24a9f77990bbaa9a861749c4b69d6e5998e33929004dca0055ac8f85f0efb",
+      "Success": false,
+      "Error": "Diagram could not be rendered: Invalid mermaid header: \u0022treeView-beta\u0022. Expected \u0022graph TD\u0022, \u0022flowchart LR\u0022, etc."
+    },
+    {
+      "Name": "empty-treemap-beta",
+      "SourceSha256": "0b27e1147b6528ea1e847698213ec39c87260f30e04a6a6bb84897a1b008856f",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "simple-treemap-beta",
+      "SourceSha256": "c46c02ecb907cc55835d52181f6d7c4ab7044f0b5b7de8370bcc1bdf63e5b048",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "leading-trivia-treemap-beta",
+      "SourceSha256": "a5eb7150864cfb7697741bca1ad4f2945fd0a1e311b64e0be648c3d2ce32a19b",
+      "Success": false,
+      "Error": "Diagram could not be rendered: Invalid mermaid header: \u0022treemap-beta\u0022. Expected \u0022graph TD\u0022, \u0022flowchart LR\u0022, etc."
+    },
+    {
+      "Name": "empty-venn-beta",
+      "SourceSha256": "fe65e29b28d41831fa9bc77afdf1764cf459bfde28748e53c9fcb8eccd875c24",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "simple-venn-beta",
+      "SourceSha256": "c00c7a5e5358597978e477c8a69e7f14f78de7a5e200b3ade588f1b8f2cb7d2d",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "leading-trivia-venn-beta",
+      "SourceSha256": "0d8751d5a1e4e23a8a76c7660a5c813a08b2dc6af79c02ef6771973fa41c2f2b",
+      "Success": false,
+      "Error": "Diagram could not be rendered: Invalid mermaid header: \u0022venn-beta\u0022. Expected \u0022graph TD\u0022, \u0022flowchart LR\u0022, etc."
+    },
+    {
+      "Name": "packet-cursor",
+      "SourceSha256": "6ade31d6d399bb4bb9ec61afdb424f4702fa50c40761dac90579a917b9d2ef83",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "packet-duplicate-skipped",
+      "SourceSha256": "62a4ecff764a9d201cd00243779f369448e0365f764efe6e65c1654805121803",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "packet-hard-cap",
+      "SourceSha256": "693b4eb0c73f047b6f3f99c0d61ddbd3326558bb41d4b20d3e4b5c1305d00384",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-tabs",
+      "SourceSha256": "317a16324d7fc7229af078af44f7828a85c16cdcf5060d65d0624e4f906385d0",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-box",
+      "SourceSha256": "0f767669217fd6c10be859d7e17e1605dbb338553a0420be5cb95f3b9d6cf09c",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-mode-first-line",
+      "SourceSha256": "b6a9ce821f557cba90efa9e3f041a2ae4fda5410a4222f97596194af2cf5d6ad",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-annotations",
+      "SourceSha256": "a1c3fdf366af264935b53bc5405cde3109a9ee6950fa19f5050702d6326d156d",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-explicit-icon-0",
+      "SourceSha256": "96f32094f0f521c8052369a32ba2048e8918c04ec7e53d7a0a5575b69ce10d5e",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-explicit-icon-1",
+      "SourceSha256": "2229808e65185662bded932f71393946d2fac2c88de19fac095d966f5adb9536",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-explicit-icon-2",
+      "SourceSha256": "fd902e4ae02c5dec805d32878a3bd2a095dd036f73f7b361996ed78f410a30e5",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "tree-explicit-icon-3",
+      "SourceSha256": "e335097c321308f2cea069830fbf828643ac7d2d8bf983340116635f95628105",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treemap-aggregation",
+      "SourceSha256": "43210e549fd46d3d0bb1a71e7ef00dc45f5f20f824adeeb21c4f3a600b4bf23b",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "treemap-fallback-duplicates",
+      "SourceSha256": "08e605a0951778e3cf7ec1447cb30b3f6c3b27129916ad59b798f794b9acc3bb",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "venn-semantics",
+      "SourceSha256": "f4839c36f3d3e59aec78c0ce43e5480c7c766169727bfd919034940f04eaccc3",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "venn-size-metadata",
+      "SourceSha256": "dcb6af07e5be77c87b2e90e41fc55b35c79fda2c80088ead0b1ba3e7dc1c01c7",
+      "Success": true,
+      "Error": null
+    },
+    {
+      "Name": "venn-duplicates-unknown",
+      "SourceSha256": "e962d46ee9f79a13a537164a41d46cce70b62bab417d554ef96d746f1dc9c43f",
+      "Success": true,
+      "Error": null
+    }
+  ]
+}
