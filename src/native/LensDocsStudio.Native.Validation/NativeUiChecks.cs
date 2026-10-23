@@ -1749,7 +1749,7 @@ internal static partial class NativeUiChecks
                 }
                 catch (Exception) { /* Diagnostic capture must not mask the original failure. */ }
             }
-            (saveWindow.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
+            (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
             try
             {
                 saveDialogueChecks.Add(new { Title = title, Destination = Path.GetFullPath(destination), EnteredFilename = enteredFilename,
