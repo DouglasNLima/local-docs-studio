@@ -52,7 +52,7 @@ internal static class NativeExpansionLaunch
             if (!passed) NativeUiFailureDiagnostics.Capture(process, output);
             File.WriteAllText(Path.Combine(output, $"launch-{ordinal}.json"), JsonSerializer.Serialize(new
             {
-                Status = passed ? "PASS" : "FAIL", Phase = "Expansion owner launch", RestartOrdinal = ordinal,
+                Status = passed ? "PASS" : "FAIL", Phase = "Native owner launch", RestartOrdinal = ordinal,
                 SourceRevision = typeof(NativeExpansionLaunch).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                     .Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion,
                 Pid = app.ProcessId, Hwnd = handle.ToInt64(), Process = process is null

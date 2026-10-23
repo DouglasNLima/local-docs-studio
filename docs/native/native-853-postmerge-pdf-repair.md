@@ -216,7 +216,8 @@ inferred.
 
 ### Narrow harness correction and fail-closed controls
 
-Only the existing Timeline/Journey/Quadrant owner-launch path changes. Native
+The existing Timeline/Journey/Quadrant owner-launch path changes; the later
+source-labelled ER launch failure below uses the same observer. Native
 process enumeration identifies the actual main HWND; independent Win32 PID,
 top-level ownership, visibility/enabled state and bounded WM_NULL responsiveness
 must agree with UIA HWND/PID and the enabled, visible editor's exact saved source.
@@ -249,13 +250,43 @@ budget, Resize count and expected/observed owner and saved-file SHA-256. Each
 attempts the existing native window/stack diagnostics. This evidence contains no
 document source text and makes no external telemetry call.
 
-Twenty deterministic controls exercise the same orchestration: transient and
+Twenty-one deterministic controls exercise the same orchestration: transient and
 persistent acquisition, genuine unsupported patterns, unrelated errors,
 PID/HWND/owner mismatch, process exit, missing/invisible/unresponsive windows,
 expired budget, failed/uncertain Resize, and stale or wrong post-action bounds.
 They count at most one mutation and retain timeout errors. Their injected
 observations never establish actual installed/HC success. They run through the
 existing observation-validation/corpus entry points.
+
+### Additional observed ER first-launch blocker
+
+Candidate `ac2806bcd2e62ebece136e880d135bf096371f67` independently failed
+[ER actual High Contrast, job 120446741197](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39963212178/job/120446741197),
+run `39963212178`, attempt 1. `NativeErUiChecks.cs:180` threw "The native ER
+fixture did not open" on the first Launch at line 30: GetMainWindow returned
+null before Transform acquisition or Resize. The UI step lasted approximately
+32.3 seconds; no per-launch duration or process state was retained. This is a
+different observation from the original Journey GetCurrentPattern timeout.
+
+The original [ER archive 12506326681](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39963212178/artifacts/12506326681)
+was downloaded and member-hashed before changing that path: 282,283 bytes,
+32 members, SHA-256 `65c016dd309bdf771ea65361408feb710b4e7137f78742190dc3b00989e21acc`,
+expiry **2026-11-06 13:48:55 UTC**. It proves actual HC at the initial check,
+but retains no process/HWND state or screenshot; `failure-controls.txt` is empty.
+The ER normal run at `ac2806b` passed 40 checks, and ER HC at reviewed `08171f0`
+passed 41. All three logs record Windows image `20261021.278.1`. Their original
+archives/logs and hashes are preserved under the same local evidence root.
+No process crash, provider failure or product defect is established: **ER cause
+remains INCONCLUSIVE**.
+
+The narrow follow-up routes only ER's existing Launch through the same bounded
+native/UIA observer, using its unchanged 25-second budget and 1280×800 target.
+Every original ER action, fixture and assertion remains. It makes the owner
+identity, readiness, single real Resize and any subsequent failure observable;
+it does not assert why the old opaque wait returned null. A further deterministic
+control rejects an unloaded/different owner source before any resize. This is a
+new source candidate, never a rerun/relabel of the failed ER job. That failure and
+the original Journey/PDF failures remain authoritative at their own sources.
 
 ### Candidate and final-source acceptance receipt
 

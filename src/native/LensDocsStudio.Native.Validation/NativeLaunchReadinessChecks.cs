@@ -34,6 +34,7 @@ internal static class NativeLaunchReadinessChecks
         Case("Exited process fails before pattern acquisition", _ => ready with { Exited = true, ExitCode = 5 }, null, null, typeof(InvalidOperationException), 0, 0);
         Case("Persistent unresponsive window fails within shared budget", _ => ready with { Responding = false }, null, null, typeof(InvalidOperationException), 0, 0);
         Case("Persistent invisible window fails within shared budget", _ => ready with { Visible = false }, null, null, typeof(InvalidOperationException), 0, 0);
+        Case("Unloaded or different owner source cannot resize", _ => ready with { EditorReady = false }, null, null, typeof(InvalidOperationException), 0, 0);
         Case("Persistent missing window fails within shared budget", _ => ready with { ProcessHandle = 0, UiaHandle = 0 }, null, null, typeof(InvalidOperationException), 0, 0);
         Case("Persistent Transform timeout fails closed without resize", null, _ => timeout, null, typeof(InvalidOperationException), 0);
         Case("Timed-out resize action is never repeated", null, null, timeout, timeout, 1, 1);
