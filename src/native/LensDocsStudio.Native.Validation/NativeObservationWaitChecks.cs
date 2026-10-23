@@ -11,6 +11,8 @@ internal static class NativeObservationWaitChecks
     {
         Directory.CreateDirectory(output);
         var checks = new List<string>();
+        NativeExportObservationChecks.Run(output);
+        checks.Add("Real PDF bytes and separate file/UI observations reject missing, wrong, incomplete, empty, error, cancelled and stale-provider outcomes");
         NativeUiChecks.CheckWorkspaceContextObservation(output);
         checks.Add("Transient session read locks do not imply lost roots; persistent root mismatches still fail without changing bytes or input actions");
         NativeUiChecks.CheckDesktopStateObservation(output);

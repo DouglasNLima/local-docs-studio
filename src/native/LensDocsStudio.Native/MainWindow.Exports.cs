@@ -46,7 +46,8 @@ public partial class MainWindow
         var picker = new SaveFileDialog { Title = "Export " + format, Filter = format + " document|*." + extension,
             FileName = Path.GetFileNameWithoutExtension(tab.FilePath ?? "document") + "." + extension,
             AddExtension = true, DefaultExt = "." + extension };
-        if (picker.ShowDialog(this) != true) { model.Status = format + " export cancelled."; return; }
+        if (picker.ShowDialog(this) != true) { model.Status = format + " export cancelled."; TraceExport("dialogue-cancelled", format, null); return; }
+        TraceExport("destination-accepted", format, picker.FileName);
         if (!Path.GetExtension(picker.FileName).Equals("." + extension, StringComparison.OrdinalIgnoreCase))
         { dialogs.Error("Use the ." + extension + " extension for this export."); return; }
         var source = tab.EditorDocument.Text;
@@ -56,12 +57,21 @@ public partial class MainWindow
 
         await model.RunAsync(async () =>
         {
-            var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
-            model.Status = "Preparing " + format + " export…";
-            var bytes = await exports.ExportAsync(format, source, sourcePath, workspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken, diagramTheme);
-            await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
-            await model.CompleteExportAsync(picker.FileName, bytes);
+            try
+            {
+                var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
+                model.Status = "Preparing " + format + " export…";
+                TraceExport("preparing", format, picker.FileName);
+                var bytes = await exports.ExportAsync(format, source, sourcePath, workspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken, diagramTheme);
+                TraceExport("prepared", format, picker.FileName, bytes.LongLength);
+                await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
+                TraceExport("written", format, picker.FileName, bytes.LongLength);
+                await model.CompleteExportAsync(picker.FileName, bytes);
+                TraceExport("completed", format, picker.FileName, bytes.LongLength);
+            }
+            catch (Exception error) { TraceExport("exception", format, picker.FileName, error: error); throw; }
         });
+        TraceExport("settled", format, picker.FileName);
     }
 
     private Task WriteExportAsync(string path, byte[] bytes, byte[]? expected, CancellationToken cancellationToken) =>

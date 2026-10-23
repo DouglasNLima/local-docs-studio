@@ -197,6 +197,10 @@ jobs:
             artifacts/native/install-smoke/**/native-outline-*
             artifacts/native/install-smoke/**/native-save-dialogue-failure.png
             artifacts/native/install-smoke/**/native-save-dialogues.json
+            artifacts/native/install-smoke/**/native-export-observation-*.json
+            artifacts/native/install-smoke/**/export-lifecycle.jsonl
+            artifacts/native/install-smoke/**/coloured-code.pdf
+            artifacts/native/install-smoke/**/coloured-code.docx
             artifacts/native/install-smoke/**/native-artefact-folder-failure.png
             artifacts/native/install-smoke/**/native-artefact-folder-controls.txt
             artifacts/native/install-smoke/**/native-preview-selection.json

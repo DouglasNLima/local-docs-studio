@@ -2,12 +2,35 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Win32.SafeHandles;
 
 namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeUiFailureDiagnostics
 {
+    public static object ObserveDialogue(IntPtr handle)
+    {
+        var title = new StringBuilder(512); GetWindowText(handle, title, title.Capacity);
+        return new { Handle = handle.ToInt64(), Exists = IsWindow(handle), Visible = IsWindowVisible(handle), Title = title.ToString() };
+    }
+    public static object ObserveWindows(int processId)
+    {
+        var windows = new List<object>();
+        var foreground = GetForegroundWindow();
+        GetWindowThreadProcessId(foreground, out var foregroundProcess);
+        EnumWindows((handle, _) =>
+        {
+            GetWindowThreadProcessId(handle, out var ownerProcess);
+            if (ownerProcess != processId) return true;
+            var title = new StringBuilder(512); GetWindowText(handle, title, title.Capacity);
+            windows.Add(new { Handle = handle.ToInt64(), Title = title.ToString(), Visible = IsWindowVisible(handle),
+                Enabled = IsWindowEnabled(handle), Owner = GetWindow(handle, 4).ToInt64(), Foreground = handle == foreground });
+            return true;
+        }, IntPtr.Zero);
+        return new { Foreground = foreground.ToInt64(), ForegroundProcessId = foregroundProcess, ProcessWindows = windows };
+    }
+
     // Only the test-owned fixture process is passed here. Avoid UIA when its provider is unresponsive.
     public static void Capture(Process? process, string output)
     {
@@ -37,4 +60,13 @@ internal static class NativeUiFailureDiagnostics
     [DllImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool GetWindowRect(IntPtr window, out NativeRectangle rectangle);
     [DllImport("dbghelp.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool MiniDumpWriteDump(SafeProcessHandle process, uint processId, SafeFileHandle file, uint type, IntPtr exception, IntPtr streams, IntPtr callback);
+    private delegate bool EnumWindowCallback(IntPtr window, IntPtr parameter);
+    [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowCallback callback, IntPtr parameter);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowText(IntPtr window, StringBuilder text, int count);
+    [DllImport("user32.dll")] private static extern IntPtr GetWindow(IntPtr window, uint command);
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint process);
+    [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")] private static extern bool IsWindowEnabled(IntPtr window);
+    [DllImport("user32.dll")] private static extern bool IsWindow(IntPtr window);
 }
