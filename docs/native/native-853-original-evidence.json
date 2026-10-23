@@ -1,0 +1,107 @@
+{
+  "originalRun": 39856703884,
+  "attempt": 1,
+  "job": 120096656823,
+  "artifact": 12460044301,
+  "sourceRevision": "358147cd6da2265efb49e4922698796f9399fcf6",
+  "sourceTree": "d37a5701bd01ed52d07f7ab1a8e85eacff5d3f7b",
+  "archiveBytes": 339027263,
+  "archiveSha256": "1249e817e676e3fba9fa996587fa8c6e4f49bfba05f371e5d1c092a7aa6be49f",
+  "expiresAt": "2026-11-05T21:44:58Z",
+  "rawJobLogSha256": "626283e056c6cec25eaab95b1740758dcb007e9c953a922050f5e394dce6a023",
+  "preservedLocalEvidence": "C:\\Code\\lens-native-853-evidence\\original-run-39856703884-attempt-1",
+  "memberCount": 3421,
+  "selectedMembers": [
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-save-dialogues.json",
+      "bytes": 3610,
+      "sha256": "93b5c4d2df654572cf17510991238249a9de2b5383fc8793c959aec34837e8c0"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure-controls.txt",
+      "bytes": 60,
+      "sha256": "3bb7099b76e3300fca2704de415712667cef0def5530cc42f82bd62c4362a876"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure-desktop.png",
+      "bytes": 78187,
+      "sha256": "d2845b1bc59c8d8f06fb957fb8ce505c52c4424bd2b41cab7d050efc67ffc536"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure-threads.dmp",
+      "bytes": 3474284,
+      "sha256": "9c55efd2cf6e5bc29c95b06b1ab3c951327957dfb9f851a5067acf0be5ffdc4a"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure-window-0.png",
+      "bytes": 78184,
+      "sha256": "6780a31680105e26cbfa45d09ddc382989a36f20086d4e359cd9fb42e775c8ac"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure-window-0.txt",
+      "bytes": 60,
+      "sha256": "3bb7099b76e3300fca2704de415712667cef0def5530cc42f82bd62c4362a876"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure-windows.txt",
+      "bytes": 86,
+      "sha256": "284232fe5bb0a76724edeb832db1e69434e8d6c015e87ce830f9e6580c661fec"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui-failure.png",
+      "bytes": 78184,
+      "sha256": "6780a31680105e26cbfa45d09ddc382989a36f20086d4e359cd9fb42e775c8ac"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/native-ui.json",
+      "bytes": 6400,
+      "sha256": "d995058625992bd3e778a31a9e9117f7a2e5b014a165ea5f4ec4530360dead29"
+    },
+    {
+      "path": "install-smoke/02b34f518c9f4616a780dcf4c9d17f9d/after-upgrade/ui-620a8e61fe9f41b3b794a062e5f66fdd/native-ui.json",
+      "bytes": 6400,
+      "sha256": "d995058625992bd3e778a31a9e9117f7a2e5b014a165ea5f4ec4530360dead29"
+    }
+  ],
+  "acceptedFeatureArchive": {
+    "run": 39836641315,
+    "attempt": 1,
+    "artifact": 12453122541,
+    "sourceRevision": "2cd7e41938e98a05dcf3f73e7934c224a06591f8",
+    "archiveBytes": 340830444,
+    "archiveSha256": "3da036ae01893ca83bda859d3578519e47ada8db5cddb1cb9a4cce2345939d64",
+    "expiresAt": "2026-11-05T19:37:28Z"
+  },
+  "payloadComparison": {
+    "852Count": 528,
+    "853Count": 528,
+    "identical": 523,
+    "changed": [
+      {
+        "path": "LensDocsStudio.Core.dll",
+        "852": "6e58296b8f8fcbb679aa609158eb19cceff31f9fd6751fa6aad798cdda65d588",
+        "853": "f1d488d98e7b8476a8bba3ac720bbef07891f4c54b5383bb33577983b5845323"
+      },
+      {
+        "path": "LensDocsStudio.Native.deps.json",
+        "852": "b0cf91bae52a86bdb1fe992639fef8fb9bee96ad3c49c782e73941783c96f98d",
+        "853": "2221475b7ac9fa5f90e63ca5f7f0f9c1bfdd43bc5c96c67315157a8c81501895"
+      },
+      {
+        "path": "LensDocsStudio.Native.dll",
+        "852": "e878f44486c1f12b6894f9a81b7b0e20fa6b4baecc5d35e4d12367fd7931c2ef",
+        "853": "8f623956baa3134683e4d7ffb935d333ca475eb1f18a907603f5700730d0b154"
+      },
+      {
+        "path": "LensDocsStudio.Native.exe",
+        "852": "bae2a6820fff746a8ed35e9f8a02e6e4cc5fc1c57ad20ce56a0e1359454495ab",
+        "853": "0c791a9257e2475d49de527ab36b786f1a7815c30e8f5b15135cdc59849c5485"
+      },
+      {
+        "path": "version.json",
+        "852": "ce37c91e4c9e87e590d453bca586a6224255414ae1facfcb688c29d392efb041",
+        "853": "90cf4331b5baef122fb21ee081275d1f708b2fc8f78cf923514fc19a96853863"
+      }
+    ]
+  }
+}
