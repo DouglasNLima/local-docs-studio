@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--expansion-vi-compatibility")
+        {
+            try { NativeExpansionViCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), args.Contains("--baseline")); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--topology-editor-fidelity")
         {
             try { NativeWorkflowEditorChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), true); return 0; }
