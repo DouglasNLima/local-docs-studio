@@ -5,12 +5,17 @@ on:
   pull_request:
     branches: ['feature/native-continuous-preview-performance', 'feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
+    inputs:
+      replay_original_853:
+        description: 'Diagnostic replay of pinned original .853 binaries; not repair-source acceptance'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
   group: native-${{ github.ref }}
   cancel-in-progress: true
-# Every job here validates unsigned internal previews, including develop pushes.
+# Every acceptance job here validates unsigned internal previews, including develop pushes.
 # Installer policy follows that job purpose, never the source branch name.
 env:
   LENS_NATIVE_ACCEPTANCE_POLICY: internal-no-associations
@@ -18,6 +23,7 @@ env:
   LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
 jobs:
   native:
+    if: ${{ !inputs.replay_original_853 }}
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
@@ -215,6 +221,80 @@ jobs:
             artifacts/native/packages/*/*.zip
             artifacts/native/packages/*/*.json
             artifacts/native/packages/*/SHA256SUMS.txt
+          retention-days: 14
+
+  original-853-replay:
+    name: Original .853 diagnostic replay (${{ matrix.associations }})
+    if: github.event_name == 'workflow_dispatch' && inputs.replay_original_853
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        associations: [included, excluded]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build instrumented harness without rebuilding original packages
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Retrieve original failed attempt evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          run-id: 39856703884
+          github-token: ${{ github.token }}
+          path: artifacts/original-853
+      - name: Verify pinned original package bytes and record distinct sources
+        shell: pwsh
+        run: |
+          $pins = @{
+            '0.1.0-preview.853/LensDocsStudio.Native-0.1.0-preview.853-win-x64-Setup.exe' = '95b2c94b2dcebdd5d76f01e610f2a6ddda9b0991cf7e94e33ae0ca1e9a0db710'
+            '0.1.0-preview.853/LensDocsStudio.Native-0.1.0-preview.853-win-x64.zip' = '5a0e53a7c2a7f73861ad75ea2ac8c00c1652f55658270c7719b706aa37e6c156'
+            '0.1.1-preview.853/LensDocsStudio.Native-0.1.1-preview.853-win-x64-Setup.exe' = '4a0d1d58621aed669d131cc66d2cee6e7ea53ddbfe9d7f0b2f65f6641a1ca8a3'
+            '0.1.1-preview.853/LensDocsStudio.Native-0.1.1-preview.853-win-x64.zip' = 'fbd18dfe705d79657037047f4acb0e0b1d4365d1d53ec960fb8eaae082441650'
+          }
+          foreach ($pin in $pins.GetEnumerator()) {
+            if ((Get-FileHash -LiteralPath (Join-Path artifacts/original-853/packages $pin.Key) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $pin.Value) { throw "Original .853 package hash differs: $($pin.Key)" }
+          }
+          foreach ($version in '0.1.0-preview.853','0.1.1-preview.853') {
+            pwsh -NoProfile -File scripts/native/Test-NativePreviewPackage.ps1 -PackageDirectory "artifacts/original-853/packages/$version" -ExpectedVersion $version -ExpectedSourceRevision '358147cd6da2265efb49e4922698796f9399fcf6' -OutputPath "artifacts/native/original-853-$version-verification.json"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          @{ originalRun=39856703884; originalAttempt=1; originalArtifact=12460044301; productSource='358147cd6da2265efb49e4922698796f9399fcf6'; harnessSource=(git rev-parse HEAD); associations='${{ matrix.associations }}'; syntheticSameSourceVersionPair=$true; historicalPreviewMigration=$false } | ConvertTo-Json | Set-Content artifacts/native/original-853-replay-source.json
+      - name: Replay actual wizard and full synthetic lifecycle on disposable Windows
+        shell: pwsh
+        run: |
+          # The included path is a narrowly scoped reproduction control for the failed develop policy.
+          # Ordinary acceptance always uses the workflow's excluded-association contract.
+          $wizardArguments = if ('${{ matrix.associations }}' -eq 'excluded') { @('--no-file-associations') } else { @() }
+          $lifecycleArguments = if ('${{ matrix.associations }}' -eq 'excluded') { @{ NoFileAssociations=$true } } else { @{} }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard artifacts/original-853/packages/0.1.0-preview.853/LensDocsStudio.Native-0.1.0-preview.853-win-x64-Setup.exe artifacts/native/original-853-wizard @wizardArguments
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & scripts/native/Test-NativeInstaller.ps1 -Installer artifacts/original-853/packages/0.1.0-preview.853/LensDocsStudio.Native-0.1.0-preview.853-win-x64-Setup.exe -UpgradeInstaller artifacts/original-853/packages/0.1.1-preview.853/LensDocsStudio.Native-0.1.1-preview.853-win-x64-Setup.exe @lifecycleArguments
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Retain replay observations without republishing original packages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-853-replay-${{ matrix.associations }}
+          path: |
+            artifacts/native/original-853-*.json
+            artifacts/native/original-853-wizard/
+            artifacts/native/install-smoke/**/*.json
+            artifacts/native/install-smoke/**/*.jsonl
+            artifacts/native/install-smoke/**/*.png
+            artifacts/native/install-smoke/**/*.txt
+            artifacts/native/install-smoke/**/*.log
+            artifacts/native/install-smoke/**/*.dmp
+            artifacts/native/install-smoke/**/*.pdf
+            artifacts/native/install-smoke/**/*.docx
           retention-days: 14
 
   state-installed-authoring:
