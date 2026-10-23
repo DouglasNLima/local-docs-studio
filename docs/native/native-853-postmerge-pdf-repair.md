@@ -190,8 +190,9 @@ The archive retains selected and 880×600/1280×800 editor screenshots, display
 restoration, saved fixture and state bytes. The 1280×800 screenshot shows the
 actual High Contrast editor before Apply. **There is no `failure.png`, timed
 launch observation, PID/HWND ownership record, window/control dump or thread
-dump.** An attempted capture of the already-closed visual editor retained no
-failure screenshot. Missing evidence cannot establish what the restarted process
+dump.** The catch block only uses `visual?.CaptureToFile`; `WaitClosed` had
+cleared that editor reference after Apply, so it supplies no restarted-owner
+capture. Missing evidence cannot establish what the restarted process
 or its provider was doing. Journey's underlying cause therefore remains
 **INCONCLUSIVE beyond the observed UIA acquisition timeout**.
 
