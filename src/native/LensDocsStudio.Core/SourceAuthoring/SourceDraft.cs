@@ -43,6 +43,7 @@ public abstract class SourceDraft<T> : ISourceDraft where T : class
     protected abstract void Validate(SourceText text, T model, DiagramResult rendered);
     protected abstract bool Contains(T model, string identity);
     protected virtual string? SourceProblem(T model) => null;
+    protected virtual void ValidateSourceChange(SourceText before, T previous, SourceText after, T current) { }
     public void Select(string? identity) { Selection = identity; history[index] = history[index] with { Selection = identity }; }
     public async Task<SourceAuthoringResult> ChangeAsync(Func<SourceText, T, SourceText> edit, CancellationToken cancellationToken = default, string? select = null)
     {
@@ -72,7 +73,8 @@ public abstract class SourceDraft<T> : ISourceDraft where T : class
         catch (Exception error) when (error is not OutOfMemoryException) { return new(false, error is OperationCanceledException ? "Validation cancelled; the draft is unchanged." : error.Message); }
     }
     public Task<SourceAuthoringResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
-        => source == Source ? ValidateAsync(cancellationToken) : ChangeAsync((_, _) => SourceText.Read(source), cancellationToken);
+        => source == Source ? ValidateAsync(cancellationToken) : ChangeAsync((before, previous) =>
+        { var after = before.ReadEdit(source); ValidateSourceChange(before, previous, after, Scan(after)); return after; }, cancellationToken);
     public async Task<SourceAuthoringResult> ValidateAsync(CancellationToken cancellationToken = default)
     {
         var version = generation; var current = Text; var model = Model;

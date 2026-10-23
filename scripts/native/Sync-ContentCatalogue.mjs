@@ -90,6 +90,14 @@ for (const [key, label] of [['architecture', 'Architecture'], ['c4-context', 'C4
 add('mermaid-snippet/architecture-native', 'Mermaid', 'Architecture service', 'snippet', 'mermaid', null, 'service new_service(server)[New service]\n');
 add('mermaid-snippet/c4-native', 'Mermaid', 'C4 element', 'snippet', 'mermaid', null, 'Person(new_person, "New person", "Description")\n');
 add('mermaid-snippet/block-native', 'Mermaid', 'Block grid cell', 'snippet', 'mermaid', null, 'new_block["New block"]\n');
+for (const [key, label] of [['packet', 'Packet'], ['treeview', 'TreeView'], ['treemap', 'Treemap'], ['venn', 'Venn']]) {
+  const content = (await readFile(new URL(`../../tests/fixtures/native-mermaid/expansion-vi/${key}.mmd`, import.meta.url), 'utf8')).replaceAll('\r\n', '\n');
+  add(`mermaid/${key}`, 'Mermaid', label, 'template', 'mermaid', `${key}.mmd`, content);
+}
+add('mermaid-snippet/packet-native', 'Mermaid', 'Packet explicit bit range', 'snippet', 'mermaid', null, '64-71: "New field"\n');
+add('mermaid-snippet/treeview-native', 'Mermaid', 'TreeView node (indentation mode)', 'snippet', 'mermaid', null, '    "New node"\n');
+add('mermaid-snippet/treemap-native', 'Mermaid', 'Treemap decimal leaf', 'snippet', 'mermaid', null, '  "New leaf": 0\n');
+add('mermaid-snippet/venn-native', 'Mermaid', 'Venn explicit set', 'snippet', 'mermaid', null, 'set new_set["New set"]\n');
 const output = JSON.stringify({ version: 1, entries }, null, 2) + '\n';
 const target = new URL('../../src/native/LensDocsStudio.Core/Content/built-in-catalogue.json', import.meta.url);
 if (process.argv.includes('--check')) {

@@ -36,6 +36,15 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
         return new(lines);
     }
     public int Index(string key) => Lines.ToList().FindIndex(line => line.Key == key) is var index && index >= 0 ? index : throw new ArgumentException("Select an existing source occurrence.");
+    public SourceText ReadEdit(string source)
+    {
+        var changed = Read(source); var rows = changed.Lines.ToArray(); var prefix = 0;
+        while (prefix < Lines.Count && prefix < rows.Length && Lines[prefix].Text == rows[prefix].Text) { rows[prefix] = Lines[prefix]; prefix++; }
+        var oldEnd = Lines.Count - 1; var newEnd = rows.Length - 1;
+        while (oldEnd >= prefix && newEnd >= prefix && Lines[oldEnd].Text == rows[newEnd].Text) { rows[newEnd] = Lines[oldEnd]; oldEnd--; newEnd--; }
+        // Changed/ambiguous source receives new occurrences. Never infer an identity from a repeated label.
+        return new(rows);
+    }
     public SourceLine Line(string key) => Lines[Index(key)];
     public SourceText Replace(SourceLine line) => new(Lines.Select(item => item.Key == line.Key ? line : item).ToArray());
     public SourceText Patch(string key, Group token, string value) => Replace(Line(key).Replace(token.Index, token.Length, value));
@@ -63,7 +72,7 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
     public static string PrepareRendererSource(string source)
     {
         // The renderer counts non-blank/non-comment lines. Its raw trivia must not acquire the editor's line limit.
-        if (source.Length <= 100_000 && TopologySource.IsTopology(source)) return ChartSource.Prepare(source, int.MaxValue);
+        if (source.Length <= 100_000 && (TopologySource.IsTopology(source) || ExpansionViSource.IsFamily(source))) return ChartSource.Prepare(source, int.MaxValue);
         if (source.Length <= 100_000 && (ChartSource.IsChart(source) || WorkflowSource.IsWorkflow(source))) return ChartSource.Prepare(source);
         if (!Pattern(@"^(?:pie|gantt|timeline|journey|quadrantChart)(?:\s|$)|^mindmap$", RegexOptions.IgnoreCase).IsMatch(Header(source))) return source;
         // The pinned detector examines the first raw line, although its parsers skip comments.

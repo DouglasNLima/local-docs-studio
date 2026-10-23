@@ -29,6 +29,7 @@ public sealed class DiagramService
         cancellationToken.ThrowIfCancellationRequested();
         var resolvedTheme = DiagramThemes.ResolveName(theme, dark);
         if (source.Length > 100_000) return new(source, null, "The diagram exceeds the 100,000-character rendering limit.");
+        if (SourceAuthoring.ExpansionViSource.ResourceProblem(source) is { } expansionProblem) return new(source, null, expansionProblem);
         if (SourceAuthoring.TopologySource.ResourceProblem(source) is { } topologyProblem) return new(source, null, topologyProblem);
         if (SourceAuthoring.ChartSource.Header(source).Equals("radar-beta", StringComparison.OrdinalIgnoreCase))
         {
@@ -59,7 +60,7 @@ public sealed class DiagramService
     {
         using var diagnosticPhase = MermaidDiagnostics.Measure("renderer.pipeline");
         IDisposable? parsingPhase = null, svgPhase = null;
-        if (!SourceAuthoring.ChartSource.IsChart(source) && !SourceAuthoring.WorkflowSource.IsWorkflow(source) && !SourceAuthoring.TopologySource.IsTopology(source) && System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
+        if (!SourceAuthoring.ChartSource.IsChart(source) && !SourceAuthoring.WorkflowSource.IsWorkflow(source) && !SourceAuthoring.TopologySource.IsTopology(source) && !SourceAuthoring.ExpansionViSource.IsFamily(source) && System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try
         {

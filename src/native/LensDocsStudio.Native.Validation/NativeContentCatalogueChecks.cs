@@ -57,12 +57,14 @@ internal static class NativeContentCatalogueChecks
             if (!preview.Text.Contains("Native Café requirements", StringComparison.Ordinal)) throw new IOException("Filtering discarded generator field edits.");
             filter.Clear(); ((ComboBox)window.FindName("Kind")).SelectedIndex = 1;
             ((ComboBox)window.FindName("Category")).SelectedItem = "Mermaid";
-            if (entries.Items.Count != 15 || (string)use.Content != "Insert snippet" || !((TextBlock)window.FindName("Status")).Text.Contains("matching type", StringComparison.Ordinal))
+            if (entries.Items.Count != 19 || (string)use.Content != "Insert snippet" || !((TextBlock)window.FindName("Status")).Text.Contains("matching type", StringComparison.Ordinal))
                 throw new IOException("Mermaid snippets lost category filtering or insertion guidance.");
             foreach (var family in new[] { "xychart", "radar", "sankey" })
                 if (!entries.Items.Cast<CatalogueEntry>().Any(entry => entry.Id == "mermaid-snippet/" + family)) throw new IOException("The chart snippet is missing from its actual native category: " + family);
             foreach (var family in new[] { "architecture", "c4", "block" })
                 if (!entries.Items.Cast<CatalogueEntry>().Any(entry => entry.Id == "mermaid-snippet/" + family + "-native")) throw new IOException("The topology snippet is missing from its actual native category: " + family);
+            foreach (var family in new[] { "packet", "treeview", "treemap", "venn" })
+                if (!entries.Items.Cast<CatalogueEntry>().Any(entry => entry.Id == "mermaid-snippet/" + family + "-native")) throw new IOException("The Expansion VI snippet is missing from its actual native category: " + family);
             host.RootVisual = null; surface.Child = null; window.Close();
         }
 
@@ -85,6 +87,10 @@ internal static class NativeContentCatalogueChecks
                     "mermaid-snippet/architecture-native" => "architecture-beta\n",
                     "mermaid-snippet/c4-native" => "C4Context\n",
                     "mermaid-snippet/block-native" => "block-beta\n",
+                    "mermaid-snippet/packet-native" => "packet-beta\n",
+                    "mermaid-snippet/treeview-native" => "treeView-beta\nproject/\n",
+                    "mermaid-snippet/treemap-native" => "treemap-beta\n\"Root\"\n",
+                    "mermaid-snippet/venn-native" => "venn-beta\n",
                     _ => "flowchart LR\nA[Source] --> B[Preview]\n" }) + source;
             var blocks = parser.Parse(source, entry.Format == "mermaid").Syntax.Descendants<FencedCodeBlock>()
                 .Where(block => string.Equals(block.Info, "mermaid", StringComparison.OrdinalIgnoreCase)).ToArray();

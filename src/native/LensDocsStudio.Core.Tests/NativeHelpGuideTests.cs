@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(20, NativeHelpGuide.Topics.Count);
-        Assert.Equal(20, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(21, NativeHelpGuide.Topics.Count);
+        Assert.Equal(21, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -16,6 +16,12 @@ public sealed class NativeHelpGuideTests
             Assert.Equal(topic.Title, heading.Title); Assert.Equal(topic.Anchor, heading.Anchor);
             Assert.True(topic.Source.Length > 400);
         }
+    }
+    [Fact] public void Expansion_VI_topic_explains_cursor_modes_hidden_values_and_non_geometric_size_metadata()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Packet, TreeView, Treemap and Venn visual authoring"));
+        foreach (var phrase in new[] { "relative", "first nonblank", "four spaces", "one indentation character", "zero-value", "do not change", "union", "pending", "Cancel", "stale-owner" })
+            Assert.Contains(phrase, topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Topology_topic_explains_three_C4_levels_explicit_membership_exact_tokens_and_protected_source()
     {

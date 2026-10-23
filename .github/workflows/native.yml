@@ -70,6 +70,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --topology-editor-fidelity artifacts/native/topology-editor-fidelity .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Prove Expansion VI ordinary exports and complete native editor fidelity independently
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --expansion-vi-compatibility artifacts/native/expansion-vi-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --expansion-vi-editor-fidelity artifacts/native/expansion-vi-editor-fidelity .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Probe production Unicode and malformed-input safety in isolated processes
         timeout-minutes: 4
         run: |
@@ -383,7 +389,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        family: [Flowchart, Sequence, Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block]
+        family: [Flowchart, Sequence, Gantt, Mindmap, Pie, Timeline, Journey, Quadrant, Xy, Radar, Sankey, Kanban, Requirement, GitGraph, Architecture, C4, Block, Packet, TreeView, Treemap, Venn]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -421,6 +427,10 @@ jobs:
             artifacts/native/architecture-install-smoke/
             artifacts/native/c4-install-smoke/
             artifacts/native/block-install-smoke/
+            artifacts/native/packet-install-smoke/
+            artifacts/native/treeview-install-smoke/
+            artifacts/native/treemap-install-smoke/
+            artifacts/native/venn-install-smoke/
           retention-days: 14
   historical-upgrade:
     name: Historical upgrade (${{ matrix.preview }})

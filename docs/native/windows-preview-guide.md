@@ -1,5 +1,10 @@
 # Windows internal preview guide
 
+## Four additional bounded native families — Expansion VI
+
+Packet, TreeView, Treemap and Venn use exact source occurrences, canonical native geometry and guarded owner Apply. Packet relative cursor impacts, TreeView's two modes and custom artwork, Treemap zero-value invisibility/fallbacks, and Venn size metadata without proportional geometry have explicit protections. See the [grammar/protection guide](packet-treeview-treemap-venn-editors.md) and [source-labelled acceptance receipt](expansion-vi-engineering-receipt.md). Hosted final-source acceptance is tracked separately from the twenty-four bounded implementations. This unsigned internal preview does not certify SDK-free clean Windows, physical screen readers, higher-DPI interactive use or historical migration. No production publication or ordinary desktop installation is authorised.
+
+
 ## Twenty native Mermaid editors - Expansion V
 
 Architecture, C4 and flat Block extend the seventeen existing families through the

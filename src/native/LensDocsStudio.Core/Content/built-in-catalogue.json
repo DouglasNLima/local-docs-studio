@@ -948,6 +948,86 @@
       "namePattern": null,
       "contentPattern": "new_block[\"New block\"]\n",
       "fields": []
+    },
+    {
+      "id": "mermaid/packet",
+      "group": "Mermaid",
+      "label": "Packet",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "packet.mmd",
+      "contentPattern": "packet-beta title Protocol Ω\n%% Exact range forms, including a row crossing\n0-15: \"Source\"\n+20: \"Destination Ω\"\n36: \"Flag\"\n40-47: \"Options\"\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/treeview",
+      "group": "Mermaid",
+      "label": "TreeView",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "treeview.mmd",
+      "contentPattern": "treeView-beta\nproject/\n    \"source files\"/ :::highlight ## Local code\n        main.cs\n    README.md\n    hidden.txt icon(none)\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/treemap",
+      "group": "Mermaid",
+      "label": "Treemap",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "treemap.mmd",
+      "contentPattern": "treemap-beta\n\"Documentation Ω\"\n  \"Guides\": 030.50\n  \"Reference\": 20\n  \"Planned\": 0\n\"Tests\"\n  \"Native\": 40\n  \"Browser\": 10\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/venn",
+      "group": "Mermaid",
+      "label": "Venn",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "venn.mmd",
+      "contentPattern": "venn-beta\nset A[\"Authors Ω\"]: 100\nset \"B\"[\"Reviewers\"]: 50\nset C[\"Readers\"]\nunion A, \"B\"[\"Shared\"]: 20\nunion A, C\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/packet-native",
+      "group": "Mermaid",
+      "label": "Packet explicit bit range",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "64-71: \"New field\"\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/treeview-native",
+      "group": "Mermaid",
+      "label": "TreeView node (indentation mode)",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "    \"New node\"\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/treemap-native",
+      "group": "Mermaid",
+      "label": "Treemap decimal leaf",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "  \"New leaf\": 0\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/venn-native",
+      "group": "Mermaid",
+      "label": "Venn explicit set",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "set new_set[\"New set\"]\n",
+      "fields": []
     }
   ]
 }
