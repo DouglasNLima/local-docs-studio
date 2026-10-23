@@ -25,6 +25,8 @@ public sealed class TreeViewVisualDraft : SourceDraft<TreeViewSourceModel>
     public static bool IsTreeView(string source) => Header.IsMatch(ChartSource.Header(source));
     public TreeViewVisualDraft(string source, DiagramService? diagrams = null) : base(source, diagrams) { }
     protected override TreeViewSourceModel Scan(SourceText text) => Read(text);
+    protected override void ValidateSourceChange(SourceText before, TreeViewSourceModel previous, SourceText after, TreeViewSourceModel current)
+        => ExpansionViSource.PreserveProtected(before, previous.Nodes.Where(n => !n.Proved).Select(n => n.Identity), after, current.Nodes.Where(n => !n.Proved).Select(n => n.Identity));
     public static TreeViewSourceModel Read(SourceText text)
     {
         var body = ChartSource.Body(text); if (body.Count == 0 || !Header.IsMatch(body[0].Content)) throw new ArgumentException("This editor requires treeView or treeView-beta source.");

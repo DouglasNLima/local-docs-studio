@@ -26,6 +26,8 @@ public sealed class PacketVisualDraft : SourceDraft<PacketSourceModel>
     public static bool IsPacket(string source) => Header.IsMatch(ChartSource.Header(source));
     public PacketVisualDraft(string source, DiagramService? diagrams = null) : base(source, diagrams) { }
     protected override PacketSourceModel Scan(SourceText text) => Read(text);
+    protected override void ValidateSourceChange(SourceText before, PacketSourceModel previous, SourceText after, PacketSourceModel current)
+        => ExpansionViSource.PreserveProtected(before, previous.Protected.Concat(previous.Fields.Where(f => !f.Accepted).Select(f => f.Identity)), after, current.Protected.Concat(current.Fields.Where(f => !f.Accepted).Select(f => f.Identity)));
     public static PacketSourceModel Read(SourceText text)
     {
         var body = ChartSource.Body(text); if (body.Count == 0 || !Header.IsMatch(body[0].Body)) throw new ArgumentException("This editor requires packet or packet-beta source.");

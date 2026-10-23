@@ -12,6 +12,15 @@ public static class ExpansionViSource
     public static readonly Regex VennSet = SourceText.Pattern("^[ \\t]*set\\s+(?:\"(?<quoted>[^\"]+)\"|(?<id>[^\\s\\[]+))(?:\\s*\\[\"(?<label>[^\"]+)\"\\])?\\s*(?::\\s*(?<value>\\d+(?:\\.\\d+)?))?[ \\t]*$");
     public static readonly Regex VennUnion = SourceText.Pattern("^[ \\t]*union\\s+(?<members>.+?)\\s*(?:\\[\"(?<label>[^\"]+)\"\\])?\\s*(?::\\s*(?<value>\\d+(?:\\.\\d+)?))?[ \\t]*$");
     public static bool IsFamily(string source) => FamilyHeader.IsMatch(ChartSource.Header(source));
+    public static void PreserveProtected(SourceText before, IEnumerable<string> previous, SourceText after, IEnumerable<string> current)
+    {
+        var retained = previous.Distinct().Select(key => before.Line(key).Text).GroupBy(s => s, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
+        foreach (var row in current.Distinct().Select(key => after.Line(key).Text))
+        {
+            if (!retained.TryGetValue(row, out var count) || count == 0) throw new ArgumentException("Pending source introduces malformed, skipped or unproved grammar. Correct the highlighted source text or restore the last valid draft; Apply remains disabled.");
+            retained[row] = count - 1;
+        }
+    }
     public static bool PacketRange(Match match, int cursor, out int start, out int end)
     {
         start = end = 0;

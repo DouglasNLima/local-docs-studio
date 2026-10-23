@@ -46,6 +46,7 @@ public partial class SourceVisualEditorWindow : Window
     protected virtual Task<SourceAuthoringResult> MoveSelection(int direction) => Task.FromResult(new SourceAuthoringResult(false, "Select a movable occurrence."));
     protected virtual IReadOnlyList<NativeSourceHit> Correspondence(string source, DiagramResult render) => [];
     protected virtual string SourceIdentity(string identity) => identity;
+    protected virtual bool RejectOverlappingPointer => false;
     protected SourceVisualEditorWindow(string family, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> apply,
         bool dark, string diagramTheme, Action? editSource, FontFamily? sourceFont, double sourceFontSize)
     {
@@ -61,6 +62,8 @@ public partial class SourceVisualEditorWindow : Window
         Surface.PreviewMouseLeftButtonDown += (_, args) =>
         {
             var point = args.GetPosition(Surface);
+            if (RejectOverlappingPointer && sourceShapes.Values.Count(geometry => geometry.FillContains(point)) > 1)
+            { Status.Text = "Several native occurrences overlap here. Select the exact occurrence in the keyboard list."; args.Handled = true; return; }
             foreach (var (identity, geometry) in sourceShapes)
                 if (geometry.FillContains(point)) { Select(identity); args.Handled = true; break; }
         };

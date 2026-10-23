@@ -36,6 +36,15 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
         return new(lines);
     }
     public int Index(string key) => Lines.ToList().FindIndex(line => line.Key == key) is var index && index >= 0 ? index : throw new ArgumentException("Select an existing source occurrence.");
+    public SourceText ReadEdit(string source)
+    {
+        var changed = Read(source); var rows = changed.Lines.ToArray(); var prefix = 0;
+        while (prefix < Lines.Count && prefix < rows.Length && Lines[prefix].Text == rows[prefix].Text) { rows[prefix] = Lines[prefix]; prefix++; }
+        var oldEnd = Lines.Count - 1; var newEnd = rows.Length - 1;
+        while (oldEnd >= prefix && newEnd >= prefix && Lines[oldEnd].Text == rows[newEnd].Text) { rows[newEnd] = Lines[oldEnd]; oldEnd--; newEnd--; }
+        // Changed/ambiguous source receives new occurrences. Never infer an identity from a repeated label.
+        return new(rows);
+    }
     public SourceLine Line(string key) => Lines[Index(key)];
     public SourceText Replace(SourceLine line) => new(Lines.Select(item => item.Key == line.Key ? line : item).ToArray());
     public SourceText Patch(string key, Group token, string value) => Replace(Line(key).Replace(token.Index, token.Length, value));

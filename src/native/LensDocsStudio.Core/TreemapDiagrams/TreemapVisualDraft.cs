@@ -19,6 +19,8 @@ public sealed class TreemapVisualDraft : SourceDraft<TreemapSourceModel>
     public static bool IsTreemap(string source) => ChartSource.Header(source).Equals("treemap-beta", StringComparison.OrdinalIgnoreCase);
     public TreemapVisualDraft(string source, DiagramService? diagrams = null) : base(source, diagrams) { }
     protected override TreemapSourceModel Scan(SourceText text) => Read(text);
+    protected override void ValidateSourceChange(SourceText before, TreemapSourceModel previous, SourceText after, TreemapSourceModel current)
+        => ExpansionViSource.PreserveProtected(before, previous.Nodes.Where(n => !n.Proved).Select(n => n.Identity), after, current.Nodes.Where(n => !n.Proved).Select(n => n.Identity));
     public static TreemapSourceModel Read(SourceText text)
     {
         var body = ChartSource.Body(text); if (body.Count == 0 || !IsTreemap(text.Source)) throw new ArgumentException("This editor requires treemap-beta source.");
