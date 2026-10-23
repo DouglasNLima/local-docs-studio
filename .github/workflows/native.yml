@@ -10,6 +10,12 @@ permissions:
 concurrency:
   group: native-${{ github.ref }}
   cancel-in-progress: true
+# Every job here validates unsigned internal previews, including develop pushes.
+# Installer policy follows that job purpose, never the source branch name.
+env:
+  LENS_NATIVE_ACCEPTANCE_POLICY: internal-no-associations
+  LENS_NATIVE_WIZARD_ARGUMENTS: --no-file-associations
+  LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
 jobs:
   native:
     runs-on: windows-latest
@@ -107,7 +113,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate visible installer wizard
         timeout-minutes: 4
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard ${{ contains(fromJSON('["feature/native-mermaid-gantt-mindmap-pie-editors","feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '--no-file-associations' || '' }}
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard ${{ env.LENS_NATIVE_WIZARD_ARGUMENTS }}
       - name: Independently verify preview packages and negative controls
         run: |
           foreach ($base in '0.1.0','0.1.1') {
@@ -118,7 +124,7 @@ jobs:
           pwsh -NoProfile -File scripts/native/Test-NativePreviewPackageControls.ps1 -PackageDirectory "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}" -OutputDirectory artifacts/native/package-controls
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate installation upgrade and uninstall lifecycle
-        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" ${{ contains(fromJSON('["feature/native-mermaid-gantt-mindmap-pie-editors","feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -225,7 +231,7 @@ jobs:
       - name: Build exact-head native State validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify installed, upgraded and reinstalled State authoring independently
-        run: pwsh -NoProfile -File scripts/native/Test-NativeStateInstaller.ps1 -Installer "artifacts/state-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/state-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeStateInstaller.ps1 -Installer "artifacts/state-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/state-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -251,7 +257,7 @@ jobs:
       - name: Build exact-head native ER validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify installed, upgraded and reinstalled ER authoring independently
-        run: pwsh -NoProfile -File scripts/native/Test-NativeErInstaller.ps1 -Installer "artifacts/er-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/er-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeErInstaller.ps1 -Installer "artifacts/er-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/er-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -277,7 +283,7 @@ jobs:
       - name: Build exact-head native Class validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify installed, upgraded and reinstalled Class authoring independently
-        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Installer "artifacts/class-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/class-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Installer "artifacts/class-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/class-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -308,7 +314,7 @@ jobs:
       - name: Build exact-source installed authoring harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify install, upgrade and reinstall with exact portable payload parity
-        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Family '${{ matrix.family }}' -Installer "artifacts/suite-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/suite-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ contains(fromJSON('["feature/native-mermaid-timeline-journey-quadrant-editors","feature/native-mermaid-xy-radar-sankey-editors","feature/native-mermaid-kanban-requirement-gitgraph-editors","feature/native-mermaid-architecture-c4-block-editors"]'), (github.head_ref || github.ref_name)) && '-NoFileAssociations' || '' }}
+        run: pwsh -NoProfile -File scripts/native/Test-NativeClassInstaller.ps1 -Family '${{ matrix.family }}' -Installer "artifacts/suite-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/suite-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD) ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -385,7 +391,7 @@ jobs:
           dotnet build artifacts/integration/original-source/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise real cross-revision installation and state restoration
-        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer 'artifacts/integration/original/packages/0.1.1-preview.${{ matrix.preview }}/LensDocsStudio.Native-0.1.1-preview.${{ matrix.preview }}-win-x64-Setup.exe' -UpgradeInstaller 'artifacts/integration/candidate/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe' -HistoricalValidationProject 'artifacts/integration/original-source/src/native/LensDocsStudio.Native.Validation'
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer 'artifacts/integration/original/packages/0.1.1-preview.${{ matrix.preview }}/LensDocsStudio.Native-0.1.1-preview.${{ matrix.preview }}-win-x64-Setup.exe' -UpgradeInstaller 'artifacts/integration/candidate/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe' -HistoricalValidationProject 'artifacts/integration/original-source/src/native/LensDocsStudio.Native.Validation' ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
       - name: Retain synthetic migration evidence without republishing historical binaries
         if: always()
         uses: actions/upload-artifact@v4

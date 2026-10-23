@@ -1,5 +1,21 @@
 # Native update trust and packaging
 
+## Internal Windows acceptance association policy
+
+Every job in `native.yml` builds or consumes unsigned internal preview packages.
+Its `internal-no-associations` policy therefore applies to pull requests, develop
+pushes and manual runs alike. Workflow-level arguments pass
+`--no-file-associations` to the visible wizard and `-NoFileAssociations` to each
+install/upgrade/reinstall harness, including all twenty authoring families.
+Branch names do not select installer tasks. The existing absence checks verify
+that the excluded registrations remain absent throughout these hosted cycles.
+The installer product's optional tasks and user defaults are unchanged.
+
+The original develop [.853 failure](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39856703884)
+used the association-enabled path. That coverage divergence is independently
+proved; it is not established as the cause of its PDF observation failure.
+
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 ## Current delivery record

@@ -3,6 +3,9 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkServiceWorkerInstall } from './check-service-worker-install.mjs';
+import { checkNativeAcceptancePolicy } from './check-native-acceptance-policy.mjs';
+
+checkNativeAcceptancePolicy(new URL('../../', import.meta.url));
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const productName = 'Lens Docs Studio';
