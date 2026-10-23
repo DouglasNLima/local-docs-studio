@@ -1,6 +1,6 @@
 # Expansion VI engineering receipt
 
-Implementation is in progress. The retained native authoring count is **twenty** until Packet, TreeView, Treemap and Venn independently pass bounded authoring and final-source acceptance. Preview compatibility is not editor or installation acceptance.
+Four bounded native authoring slices are implemented. The accepted count remains **twenty** until Packet, TreeView, Treemap and Venn independently pass final-source acceptance. Preview compatibility is not editor or installation acceptance. This committed receipt preserves the implementation chronology; the source-labelled delivery receipt and final verdict are attached to Draft PR #46 after its exact clean source completes the gates.
 
 ## Accepted starting source
 
@@ -49,6 +49,18 @@ An early TreeView candidate test found missing mixed-syntax branch-glyph protect
 Combined work extends the existing 30 hosted appearances to 38, retains the 25-second single-resize owner readiness gate and existing deadlines, and adds four families to the ordinary installed harness for 72 lifecycle phases. The original eighteen package-negative controls remain; four independently targeted controls cover Packet's native type, TreeView's Core node type, Treemap's actual embedded catalogue resource and Venn's pinned dependency manifest. Each mutates/rechecks its own target with recomputed ZIP checksum, without executing package code. Their acceptance remains pending until run against final packages. The verifier also inspects all four embedded catalogue sources against exact fixtures and requires Mermaider/Sugiyama 0.15.1 in the actual compiled dependency manifest.
 
 ## Outstanding work
+
+### Clean combined candidate and catalogue validation correction
+
+Clean candidate `1cb4d343968da576a3ac785709e3521e92f9723d`, tree `fc0ccd28f1cf2029c4189d98c9a0d588abc3af6c`, passed all **2,114 Core tests**, local four-family compatibility/fidelity, hosted compatibility run `40019864210`, hosted Chromium/Edge/aggregate run `40019869109`, stock Continuous normal/actual High Contrast run `40019869287` (controlled measurement skipped), original desktop UX run `40019869324` and consolidation run `40020149499`. Local unsigned preflight package `.10046` and all **22** independent negative controls passed without executing an installer. These results retain this candidate's source; they do not certify a subsequent commit.
+
+Full native run `40019869560`, attempt 1, retained **176 corpus/export cases with two failures**: its separate native catalogue/help UI harnesses still asserted the previous 15 Mermaid snippets and 20 guide topics. Packaging and installed phases were skipped. The correction asserts exact new inventories of 19 Mermaid snippets and 21 guide topics, checks every new snippet in its actual category, supplies each new snippet's actual parser header/context and searches/renders the new help topic with explicit parser/geometry caveats. No assertion, deadline or fixture is relaxed. Raw logs, job records and the complete failed native artefact are retained under `artifacts/native/expansion-vi/1cb4d34-native-failure*`.
+
+The first uncommitted correction run retained 176 corpus/export cases with one help failure: the new semantic assertion exposed that the guide described relative counts without spelling the literal `+count` token. The guide now includes it. Its original log/artefacts remain under `catalogue-correction-full-validation*`; a fresh complete run uses a separate output. The final clean-source acceptance and downloaded package receipts belong to the delivery record, never to these earlier candidate results.
+
+The same `1cb4d34` appearance run `40019864182` retained a Gantt normal failure after successful Apply/Undo/Redo/Save. On the second owner launch, the old three-family harness acquired Transform immediately after `GetMainWindow`; that provider call timed out. The original raw job log and full artefact are preserved under `1cb4d34-gantt-normal-failure*`. This is the observed failing call, not a proved root cause or an explanation of historical .853/Journey/ER failures. Gantt/Mindmap/Pie's owner launches now use the already accepted `NativeExpansionLaunch.Prepare` gate: the same 25-second total budget, actual PID/HWND/source/readiness proof, one Resize only and full failure observations. No product code, timeout, assertion or retry policy is changed. The original failed workflow is not rerun; the new source receives independent gates.
+
+The fresh uncommitted `catalogue-correction-2-full-validation` run passes all **176 corpus/export cases with zero failures**, including 114 native catalogue diagram appearances and the searchable rendered help topic. Its raw output stays candidate-labelled. The subsequent committed delivery source must pass all required gates independently.
 
 ### First combined candidate and bounded corrections
 

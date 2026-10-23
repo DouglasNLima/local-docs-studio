@@ -26,7 +26,7 @@ internal static partial class NativeUiChecks
         var starter = family switch { "Gantt" => GanttVisualDraft.Starter, "Mindmap" => MindmapVisualDraft.Starter, "Pie" => PieVisualDraft.Starter, _ => throw new ArgumentException("Unknown authoring family.") };
         var source = starter.ReplaceLineEndings("\r\n"); var block = "```mermaid\r\n" + source + "```\r\n";
         var original = "# Eight-family authoring\r\n\r\n" + block + "\r\nBetween identical diagrams.\r\n\r\n" + block + "\r\nAfter.\r\n";
-        File.WriteAllText(path, original); Application? app = null; Window? main = null, visual = null;
+        File.WriteAllText(path, original); Application? app = null; Window? main = null, visual = null; var launchOrdinal = 0;
         try
         {
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active");
@@ -136,7 +136,7 @@ internal static partial class NativeUiChecks
         finally { Stop(); }
 
         void Launch(string fixture)
-        { var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; foreach (var argument in new[] { "--state-directory", state, root, fixture }) info.ArgumentList.Add(argument); app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Native application did not open."); main.Patterns.Transform.Pattern.Resize(1280, 800); }
+        { var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; foreach (var argument in new[] { "--state-directory", state, root, fixture }) info.ArgumentList.Add(argument); var timer = Stopwatch.StartNew(); app = Application.Launch(info); main = NativeExpansionLaunch.Prepare(app, automation, timer, fixture, output, ++launchOrdinal, highContrast); }
         void Stop() { if (app is null) return; if (!app.HasExited) app.Kill(); app.Dispose(); app = null; main = visual = null; }
         void Open(int offset)
         {
