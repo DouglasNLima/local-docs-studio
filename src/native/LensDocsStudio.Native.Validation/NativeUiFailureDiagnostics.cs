@@ -9,6 +9,16 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeUiFailureDiagnostics
 {
+    public static object ObserveProcess(Process process)
+    {
+        try
+        {
+            process.Refresh(); var exited = process.HasExited;
+            return new { Id = process.Id, Exited = exited, ExitCode = exited ? (int?)process.ExitCode : null,
+                Responding = exited ? (bool?)null : process.Responding };
+        }
+        catch (Exception error) when (error is not OutOfMemoryException) { return new { Error = error.ToString() }; }
+    }
     public static object ObserveDialogue(IntPtr handle)
     {
         var title = new StringBuilder(512); GetWindowText(handle, title, title.Capacity);

@@ -88,8 +88,6 @@ internal static partial class NativeUiChecks
                     }
                     catch (Exception error) when (error is IOException or UnauthorizedAccessException) { hashError = error.ToString(); }
                 }
-                process.Refresh();
-                var exited = process.HasExited;
                 File.WriteAllText(Path.Combine(output, "native-export-observation-" + Path.GetFileName(path) + ".json"),
                     JsonSerializer.Serialize(new
                     {
@@ -98,16 +96,22 @@ internal static partial class NativeUiChecks
                         FinalFile = finalFile, Sha256 = hash, HashError = hashError,
                         CompletedDestination = last?.Completion?.OpenPath,
                         CompletedDestinationFile = last?.Completion?.OpenPath is { } actual ? ExportFileObservation.Read(actual) : null,
-                        ProcessId = process.Id, ProcessExited = exited, ExitCode = exited ? (int?)process.ExitCode : null,
-                        ProcessResponding = exited ? (bool?)null : process.Responding,
+                        Process = NativeUiFailureDiagnostics.ObserveProcess(process),
                         Windows = NativeUiFailureDiagnostics.ObserveWindows(process.Id),
-                        Directory = Directory.EnumerateFiles(Path.GetDirectoryName(path)!).Take(256)
-                            .Select(file => new { Path = file, File = ExportFileObservation.Read(file) }).ToArray(),
+                        Directory = ObserveExportDirectory(Path.GetDirectoryName(path)!),
+                        ApplicationDiagnosticLog = Path.Combine(Path.GetDirectoryName(path)!, "state", "export-lifecycle.jsonl"),
+                        Scope = "File and completion UI assertion only; PDF header, selectable text and unchanged source are checked afterwards.",
                         Limitation = "UIA status/actions are observations, not a model call. Unavailable UIA cannot establish status, cancellation or absence of an error. Win32 windows are sampled after the original wait."
                     }, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch (Exception error) when (error is not OutOfMemoryException)
             { Console.Error.WriteLine("PDF observation evidence could not be retained: " + error); }
         }
+    }
+
+    private static object ObserveExportDirectory(string directory)
+    {
+        try { return Directory.EnumerateFiles(directory).Take(256).Select(file => new { Path = file, File = ExportFileObservation.Read(file) }).ToArray(); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return new { Error = error.ToString() }; }
     }
 }

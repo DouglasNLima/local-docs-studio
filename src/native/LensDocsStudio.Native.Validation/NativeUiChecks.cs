@@ -1708,6 +1708,8 @@ internal static partial class NativeUiChecks
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
             FocusWindow(saveWindow!);
             TextBox? fileName = null;
+            string? enteredFilename = null;
+            IntPtr dialogueHandle = IntPtr.Zero;
             var suggested = ""; var expected = absolutePath ? Path.GetFullPath(destination) : Path.GetFileName(destination);
             try
             {
@@ -1740,18 +1742,19 @@ internal static partial class NativeUiChecks
             {
                 try
                 {
-                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName?.Text, Name = fileName?.Name, AutomationId = fileName?.AutomationId, KeyboardFocus = fileName?.Properties.HasKeyboardFocus.Value });
+                    enteredFilename = fileName?.Text;
+                    dialogueHandle = saveWindow!.Properties.NativeWindowHandle.Value;
+                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = enteredFilename, Name = fileName?.Name, AutomationId = fileName?.AutomationId, KeyboardFocus = fileName?.Properties.HasKeyboardFocus.Value });
                     File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
                 }
                 catch (Exception) { /* Diagnostic capture must not mask the original failure. */ }
             }
-            var enteredFilename = fileName!.Text;
-            var dialogueHandle = saveWindow!.Properties.NativeWindowHandle.Value;
             (saveWindow.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
             try
             {
                 saveDialogueChecks.Add(new { Title = title, Destination = Path.GetFullPath(destination), EnteredFilename = enteredFilename,
-                    SaveClicked = true, DialogueAfterClick = NativeUiFailureDiagnostics.ObserveDialogue(dialogueHandle) });
+                    AtUtc = DateTimeOffset.UtcNow, SaveClicked = true,
+                    DialogueAfterClick = dialogueHandle == IntPtr.Zero ? null : NativeUiFailureDiagnostics.ObserveDialogue(dialogueHandle) });
                 File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch (Exception) { /* Diagnostic capture must not mask an export failure. */ }
