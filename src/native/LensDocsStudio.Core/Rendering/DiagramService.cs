@@ -60,7 +60,7 @@ public sealed class DiagramService
     {
         using var diagnosticPhase = MermaidDiagnostics.Measure("renderer.pipeline");
         IDisposable? parsingPhase = null, svgPhase = null;
-        if (!SourceAuthoring.ChartSource.IsChart(source) && !SourceAuthoring.WorkflowSource.IsWorkflow(source) && !SourceAuthoring.TopologySource.IsTopology(source) && System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
+        if (!SourceAuthoring.ChartSource.IsChart(source) && !SourceAuthoring.WorkflowSource.IsWorkflow(source) && !SourceAuthoring.TopologySource.IsTopology(source) && !SourceAuthoring.ExpansionViSource.IsFamily(source) && System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try
         {

@@ -31,9 +31,11 @@ internal static class NativeExpansionViCompatibilityChecks
         {
             foreach (var fixture in new[] { "packet", "treeview", "treeview-box", "treemap", "venn" })
             foreach (var dark in new[] { false, true })
+            foreach (var configured in baseline ? new[] { false } : new[] { false, true })
             {
                 var source = File.ReadAllText(Path.Combine(repository, "tests/fixtures/native-mermaid/expansion-vi", fixture + ".mmd"));
-                var name = fixture + (dark ? "-dark" : "-light"); var result = Render(source, name, dark);
+                if (configured) source = "---\r\ntitle: Preserved metadata Ω\r\n---\r\n%%{init: {\"theme\":\"dark\"}}%%\r\n%% untouched configuration comment\r\n" + source;
+                var name = fixture + (dark ? "-dark" : "-light") + (configured ? "-configured" : ""); var result = Render(source, name, dark);
                 var png = NativeSvgService.ToPng(native.Render(result.Svg!)); File.WriteAllBytes(Path.Combine(output, name + ".png"), png);
                 var markdown = "# Pinned native compatibility Ω\r\n\r\n```mermaid\r\n" + source + "\r\n```\r\n\r\nNeighbour remains exact.\r\n";
                 var parsed = new MarkdownService().Parse(markdown); var code = parsed.Syntax.OfType<FencedCodeBlock>().Single();
@@ -88,7 +90,11 @@ internal static class NativeExpansionViCompatibilityChecks
             var segments = G(packet, "packet-field"); var a = Rect(segments[1]); var b = Rect(segments[2]);
             Check(b.Y > a.Y && a.X > b.X && b.W > a.W && segments[1].Value.Contains("31", StringComparison.Ordinal) && segments[2].Value.Contains("34", StringComparison.Ordinal), "Packet: actual native rows, widths and visible inclusive numbering");
             Check(G(Render("packet\n0-7: \"Same\"\n0-7: \"Same\"\n+99999999999999: \"Skipped\"\n\"bad\"\n", "packet-duplicate-skipped"), "packet-field").Length == 2, "Packet: identical ranges retain duplicate native segments; overflow and unknown text are ignored");
-            Check(G(Render("packet\n4095: \"Last\"\n+1: \"Skipped\"\n", "packet-hard-cap"), "packet-field").Length == 1, "Packet: 4095 is inclusive and cursor past cap is skipped");
+            var lastBit = Render("packet\n4095: \"Last\"\n+1: \"Skipped\"\n", "packet-hard-cap");
+            Check(G(lastBit, "packet-field").Length == 1, "Packet: 4095 is inclusive and cursor past cap is skipped");
+            var rasterRejected = false;
+            try { NativeSvgService.ToPng(native.Render(lastBit.Svg!)); } catch (IOException error) { rasterRejected = error.Message.Contains("too large", StringComparison.Ordinal); }
+            Check(rasterRejected && lastBit.Source.Contains("4095", StringComparison.Ordinal), "Packet: sparse highest-bit native rows exceed the unchanged PNG dimension budget and fail closed without source loss");
             var tree = Render("treeView\nroot/\n\tchild.txt\n    peer.txt\nsecond/\n", "tree-tabs");
             Check(G(tree, "treeview-node").Select(e => A(e, "data-depth")).SequenceEqual(new[] { "0", "1", "1", "0" }), "TreeView: TAB expands to four spaces; exact native root/preorder hierarchy");
             Check(G(tree, "treeview-node").All(e => e.Descendants().Any(x => A(x, "class") == "treeview-icon")), "TreeView: default folder/file are actual native vector glyphs");

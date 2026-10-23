@@ -37,8 +37,8 @@ public sealed class TreeViewVisualDraft : SourceDraft<TreeViewSourceModel>
             var prefix = line.Body[..prefixLength]; var content = line.Body[prefixLength..].TrimEnd(); var match = Content.Match(content);
             var expanded = line.Body.Replace("\t", "    ", StringComparison.Ordinal); var branch = Branch.Match(expanded); var indent = box ? branch.Success ? branch.Index / 4 : 0 : line.Indent.Sum(c => c == '\t' ? 4 : 1);
             rows.Add((line.Key, indent));
-            SourceField Field(string name, Group group, string? value = null) => new(line.Key, name, value ?? group.Value, prefixLength + group.Index, group.Length, group.Value);
-            var label = match.Groups["label"]; var quoted = label.Value.StartsWith('"') && label.Value.EndsWith('"'); var value = quoted ? label.Value[1..^1] : label.Value;
+            SourceField Field(string name, Group group, string? value = null) => new(line.Key, name, (value ?? group.Value).Replace("\t", "    ", StringComparison.Ordinal), prefixLength + group.Index, group.Length, group.Value);
+            var label = match.Groups["label"]; var quoted = label.Value.StartsWith('"') && label.Value.EndsWith('"'); var value = (quoted ? label.Value[1..^1] : label.Value).Replace("\t", "    ", StringComparison.Ordinal);
             var token = match.Success ? Field("label", label, value) : new SourceField(line.Key, "label", content, prefixLength, content.Length, content);
             var directory = match.Groups["directory"]; var slash = directory.Success ? Field("directory", directory) : new SourceField(line.Key, "directory", "", prefixLength + label.Index + label.Length, 0, "");
             var icon = match.Groups["icon"]; var className = match.Groups["class"]; var desc = match.Groups["description"];
@@ -117,7 +117,7 @@ public sealed class TreeViewVisualDraft : SourceDraft<TreeViewSourceModel>
         var changed = SourceHierarchy.Reparent(text, model.Hierarchy, identity, parent, indent); SourceHierarchy.ProveMembership(model.Hierarchy, Read(changed).Hierarchy, identity, parent); return changed;
     }, token);
     private static void Structure(TreeViewSourceModel model)
-    { if (!model.StructureSafe) throw new ArgumentException(model.BoxMode ? "Box-drawing field edits retain their exact glyphs. Structural prefix re-encoding has not been independently proved; use Edit source." : "Ambiguous mixed annotations or prefixes protect complete subtree structure. Inspect source."); }
+    { if (!model.StructureSafe) throw new ArgumentException(model.BoxMode ? "Box-drawing field edits retain their exact glyphs. Structural prefix re-encoding is protected because it has not been independently proved; use Edit source." : "Ambiguous mixed annotations or prefixes protect complete subtree structure. Inspect source."); }
     private static void Label(string value)
     { SourceText.Label(value); if (value.IndexOfAny(['"', '/', '<', '>']) >= 0 || value.Contains("icon(", StringComparison.Ordinal) || value.Contains(":::", StringComparison.Ordinal) || value.Contains("##", StringComparison.Ordinal) || value.StartsWith("%%", StringComparison.Ordinal) || Branch.IsMatch(value)) throw new ArgumentException("This label contains unproved TreeView quote, slash, prefix or annotation syntax. Pending input is retained."); }
     private static SourceText Annotation(SourceText text, string identity, string kind, string value)

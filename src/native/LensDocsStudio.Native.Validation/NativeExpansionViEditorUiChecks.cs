@@ -111,7 +111,21 @@ internal static partial class NativeUiChecks
         void Await(Func<bool> condition) => Wait(() => condition() && Find(visual!, family + "Apply").IsEnabled, "Expected draft did not validate: " + Find(visual!, family + "Status").Name);
         void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(family + "VisualEditor"))) is null, "Editor did not close."); visual = null; }
         void Discard() { AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Discard confirmation missing."); yes!.AsButton().Invoke(); }
-        void Capture(string name) { if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Editor remained busy before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
+        void Capture(string name)
+        {
+            if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Editor remained busy before capture.");
+            var before = Draft(); var imagePath = Path.Combine(output, name + ".png"); _ = DwmFlush(); visual!.CaptureToFile(imagePath);
+            if (Draft() != before) throw new IOException("The exact private source changed during screenshot capture.");
+            File.WriteAllText(Path.Combine(output, name + ".mmd"), before, new System.Text.UTF8Encoding(false));
+            File.WriteAllText(Path.Combine(output, name + "-capture.json"), JsonSerializer.Serialize(new
+            {
+                Family = family, SourceRevision = typeof(PacketVisualEditorWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                SourceSha256 = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(before))),
+                ImageSha256 = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(imagePath))),
+                ActualWindowsHighContrast = NativeTestHighContrast.IsEnabledNow, Appearance = visual.Properties.ItemStatus.ValueOrDefault,
+                Bounds = visual.BoundingRectangle.ToString(), Limitation = "Actual hosted Windows capture and UIA; no physical screen-reader, higher-DPI interactive or SDK-free clean-Windows certification."
+            }, new JsonSerializerOptions { WriteIndented = true }));
+        }
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
         void Add()
         {
@@ -130,6 +144,29 @@ internal static partial class NativeUiChecks
             Check(point is not null, "Actual native geometry has an unambiguous pointer interior"); var viewport = Find(visual!, family + "Viewport").BoundingRectangle; var scale = Find(visual!, family + "Zoom").Patterns.RangeValue.Pattern.Value.Value / 100;
             var sx = viewport.Left + point!.Value.X * scale; var sy = viewport.Top + point.Value.Y * scale; observations.Add(new { Operation = "Canonical pointer", Bounds = bounds.ToString(), Scale = scale, ScreenX = sx, ScreenY = sy }); FocusWindow(visual!); Mouse.MoveTo((int)Math.Round(sx), (int)Math.Round(sy)); Mouse.Click(MouseButton.Left);
             Wait(() => Find(visual!, family + "Label").AsTextBox().Text == (family == "Packet" ? "Source" : family == "TreeView" ? "project" : family == "Treemap" ? "Guides" : "Authors"), "Real pointer did not select the exact native source occurrence."); Check(true, "Real pointer selection uses actual native geometry, guarding overlapping Venn circles");
+            if (family == "Packet")
+            {
+                var segments = shapes.Where(s => s.Elements().FirstOrDefault(e => e.Name.LocalName == "text")?.Value == "Destination").ToArray(); Check(segments.Length == 2, "Packet fixture has two actual native segments for one relative field");
+                foreach (var segment in segments)
+                {
+                    Select("Packet ·"); var shape = NativeSourceHit.ShapeGeometry(segment, svgRoot)!; var centre = shape.Bounds.Location + new System.Windows.Vector(shape.Bounds.Width / 2, shape.Bounds.Height / 2);
+                    ClickPoint(centre); Wait(() => Find(visual!, family + "Label").AsTextBox().Text == "Destination" && Find(visual!, family + "Identifier").AsTextBox().Text == "20", "A physical multirow segment failed to select its exact relative source occurrence.");
+                }
+                Check(true, "Every actual row-crossing Packet segment selects the same exact source field through a real pointer");
+            }
+            else if (family == "Venn")
+            {
+                var geometries = shapes.Select(s => NativeSourceHit.ShapeGeometry(s, svgRoot)!).ToArray(); System.Windows.Point? overlap = null;
+                for (var x = 1; x < 40 && overlap is null; x++) for (var y = 1; y < 40 && overlap is null; y++) { var candidate = new System.Windows.Point(bounds.X + bounds.Width * x / 40, bounds.Y + bounds.Height * y / 40); if (geometries.Count(g => g.FillContains(candidate)) > 1) overlap = candidate; }
+                Check(overlap is not null, "Venn fixture contains actual overlapping native circles"); Select("Set 2 ·"); var selected = Find(visual!, family + "Elements").AsListBox().SelectedItem!.Name; ClickPoint(overlap!.Value);
+                Wait(() => Find(visual!, family + "Status").Name.Contains("overlap", StringComparison.OrdinalIgnoreCase), "Ambiguous Venn pointer did not expose keyboard guidance."); Check(Find(visual!, family + "Elements").AsListBox().SelectedItem!.Name == selected, "Venn overlap pointer preserves explicit source selection instead of guessing an intersection owner");
+            }
+            else
+            {
+                Select(family == "TreeView" ? "Node 5 ·" : "Node 4 ·"); Click("Locate"); Check(Draft() == source && Find(visual!, family + "Label").AsTextBox().Text == (family == "TreeView" ? "hidden.txt" : "Planned"), "Hidden icon/zero-area occurrence has complete keyboard and direct-source access");
+            }
+            void ClickPoint(System.Windows.Point candidate)
+            { FocusWindow(visual!); Mouse.MoveTo((int)Math.Round(viewport.Left + candidate.X * scale), (int)Math.Round(viewport.Top + candidate.Y * scale)); Mouse.Click(MouseButton.Left); }
         }
         void NavigationAndProtection()
         {

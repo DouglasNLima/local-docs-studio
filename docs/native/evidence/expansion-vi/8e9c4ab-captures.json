@@ -1,0 +1,56 @@
+{
+  "scope": "Candidate captures only; never final-source or installed certification",
+  "captures": [
+    {
+      "family": "Packet",
+      "appearance": "normal",
+      "sourceRevision": "8e9c4ab6cb5736d479fcd779e87ad085702dfa1c",
+      "runId": "40015836510",
+      "screenshot": "docs/native/images/expansion-vi/packet-normal-8e9c4ab.png",
+      "imageSha256": "684da71615e90af25b7070db7bf301173b16c03767fa44cce5dece89f9f399a1",
+      "source": "docs/native/evidence/expansion-vi/8e9c4ab-packet-selected.mmd",
+      "sourceSha256": "5a85a01a10577a3efa16b0afb6981b0ce3048d73c04a4731c4fd47ffae5dcef5",
+      "sourceBasis": "Initial selected capture precedes private mutation; retained standalone fixture equals that exact starter source under the same UI harness.",
+      "overallFamilyAppearanceStatus": "PASS"
+    },
+    {
+      "family": "TreeView",
+      "appearance": "normal",
+      "sourceRevision": "8e9c4ab6cb5736d479fcd779e87ad085702dfa1c",
+      "runId": "40015836510",
+      "screenshot": "docs/native/images/expansion-vi/treeview-normal-8e9c4ab.png",
+      "imageSha256": "2b9ec777631da823f995fc89d6113c223a7dd10b5af2c328cd67cb2e2cd3aa47",
+      "source": "docs/native/evidence/expansion-vi/8e9c4ab-treeview-selected.mmd",
+      "sourceSha256": "4762082d5ebd460080454d88bca43b6232e40b9a18acd188b04a38fff0581025",
+      "sourceBasis": "Initial selected capture precedes private mutation; retained standalone fixture equals that exact starter source under the same UI harness.",
+      "overallFamilyAppearanceStatus": "FAIL: later protection diagnostic omitted the asserted word; source was preserved"
+    },
+    {
+      "family": "Treemap",
+      "appearance": "normal",
+      "sourceRevision": "8e9c4ab6cb5736d479fcd779e87ad085702dfa1c",
+      "runId": "40015836510",
+      "screenshot": "docs/native/images/expansion-vi/treemap-normal-8e9c4ab.png",
+      "imageSha256": "516dab95977b8a119ede7856ee50399f81aa78aaeade8a15f00c3d1d617d9333",
+      "source": "docs/native/evidence/expansion-vi/8e9c4ab-treemap-selected.mmd",
+      "sourceSha256": "40e6d39bbef3e07a0a4d4f5c4e6f17c6b442f795cd75c4b24c31569d2d01ef0b",
+      "sourceBasis": "Initial selected capture precedes private mutation; retained standalone fixture equals that exact starter source under the same UI harness.",
+      "overallFamilyAppearanceStatus": "PASS"
+    },
+    {
+      "family": "Venn",
+      "appearance": "normal",
+      "sourceRevision": "8e9c4ab6cb5736d479fcd779e87ad085702dfa1c",
+      "runId": "40015836510",
+      "screenshot": "docs/native/images/expansion-vi/venn-normal-8e9c4ab.png",
+      "imageSha256": "19a5593e27a59626ba38ff5ffee2dc0320cb7fbd6b20a8b6d59bfb122e8a6fab",
+      "source": "docs/native/evidence/expansion-vi/8e9c4ab-venn-selected.mmd",
+      "sourceSha256": "c49737c7cfe701a56d605dcc131ccd156ec4c118434366760e59b5fe545e1367",
+      "sourceBasis": "Initial selected capture precedes private mutation; retained standalone fixture equals that exact starter source under the same UI harness.",
+      "overallFamilyAppearanceStatus": "PASS"
+    }
+  ],
+  "rawEvidenceRoot": "artifacts/native/expansion-vi/8e9c4ab-*",
+  "retainedAppearanceVerdict": "36 PASS, 2 TreeView diagnostic FAIL; no retries",
+  "limitation": "Actual Windows screenshots and UIA, not higher-DPI, physical screen-reader or SDK-free clean-Windows certification."
+}

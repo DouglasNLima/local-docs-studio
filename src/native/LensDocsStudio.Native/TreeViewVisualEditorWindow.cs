@@ -19,7 +19,7 @@ public sealed class TreeViewVisualEditorWindow : TopologyVisualEditorWindow
         : base("TreeView", diagrams, apply, dark, diagramTheme, editSource, sourceFont, sourceFontSize)
     {
         tree = new(source, diagrams); tree.ValidatePresentation = (text, _, token) => ValidateNative(text, token);
-        directory = Selector("Directory state (trailing slash)", "Directory", ["file", "directory"]); icon = Selector("Native icon state", "Icon", ["default", "hidden", "protected"]);
+        directory = Selector("Directory state (trailing slash)", "Directory", ["file", "directory"]); icon = Selector("Native icon state", "Icon", ["default", "hidden"]);
         parent = Selector("Destination parent (complete subtree)", "Parent");
         ActionButton("Move to parent", "Reparent", () => tree.ReparentAsync(tree.Selection ?? "", (parent.SelectedItem as Choice)?.Identity is { Length: > 0 } key ? key : null, Lifetime.Token), InspectorFields);
         ActionButton("Add root…", "AddRoot", () => Add(null)); ActionButton("Add child…", "AddChild", () => Node is null ? Task.FromResult(Protected("Select a parent node.")) : Add(Node.Identity));
@@ -46,10 +46,12 @@ public sealed class TreeViewVisualEditorWindow : TopologyVisualEditorWindow
     }
     protected override void ShowProperties()
     {
-        var node = Node; Captions("Literal node label", "Class annotation (blank removes)", "Description (blank removes)");
-        Properties(node?.Label ?? "", node?.ClassToken?.Value ?? "", node?.DescriptionToken?.Value ?? "", editLabel: node?.Proved == true, editIdentifier: node?.Proved == true, editValue: node?.Proved == true);
-        directory.SelectedItem = node?.Directory == true ? "directory" : "file"; icon.SelectedItem = node?.Icon is null ? "default" : node.Icon == "" ? "hidden" : "protected";
-        directory.IsEnabled = icon.IsEnabled = node?.Proved == true;
+        var node = Node; var nativeIcon = node?.Icon is null or ""; Captions("Literal node label", "Class annotation (blank removes)", "Description (blank removes)");
+        Properties(node?.Label ?? "", node?.ClassToken?.Value ?? "", node?.DescriptionToken?.Value ?? "", editLabel: node?.Proved == true && nativeIcon, editIdentifier: node?.Proved == true && nativeIcon, editValue: node?.Proved == true && nativeIcon);
+        directory.SelectedItem = node?.Directory == true ? "directory" : "file";
+        icon.ItemsSource = nativeIcon ? new[] { "default", "hidden" } : new[] { "Explicit artwork · source-only" };
+        icon.SelectedItem = node?.Icon is null ? "default" : node.Icon == "" ? "hidden" : "Explicit artwork · source-only";
+        directory.IsEnabled = icon.IsEnabled = node?.Proved == true && nativeIcon;
         parent.ItemsSource = new[] { new Choice("", "Root · no parent") }.Concat(tree.Model.Nodes.Select((n, i) => new Choice(n.Identity, "Node " + (i + 1) + " · " + n.Label))).ToArray();
         var current = tree.Model.Hierarchy.FirstOrDefault(r => r.Identity == node?.Identity)?.Parent; parent.SelectedItem = parent.Items.OfType<Choice>().First(c => c.Identity == (current ?? "")); parent.IsEnabled = tree.Model.StructureSafe;
         Describe("TreeView · " + (tree.Model.BoxMode ? "native box-drawing hierarchy" : "native indentation hierarchy"),

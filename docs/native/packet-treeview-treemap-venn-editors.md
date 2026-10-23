@@ -32,7 +32,7 @@ Complete simple indentation subtrees support add/remove/sibling order, parent mo
 
 The header is `treemap-beta`. Editable grammar is a quoted section (`"Section"`) or a quoted leaf and non-negative decimal (`"Leaf": 030.50`). Raw trimmed-label fallback forms remain source-only. **Each space and TAB counts as one indentation character**, independently of TreeView's rules.
 
-The inspector separates an explicit leaf token from read-only `ComputedValue`. Parent totals remain derived; the editor never writes them into source. Label/value edits retain untouched decimal spelling and exact source occurrences, including duplicates. New decimal tokens allow at most 15 significant digits and 15 decimal places, without signs, exponents, incomplete forms, overflow or non-finite values. Existing lexemes remain exact through unrelated field edits.
+The inspector separates an explicit leaf token from read-only `ComputedValue`. Parent totals remain derived; the editor never writes them into source. Label/value edits retain untouched decimal spelling and exact source occurrences, including duplicates. New decimal tokens allow at most 15 significant digits and 15 decimal places, without signs, exponents, incomplete forms, overflow or non-finite values. The pinned tile/section display rounds to at most two decimal places; source tokens and computed numeric values retain their own precision. Existing lexemes remain exact through unrelated field edits.
 
 Simple complete quoted subtrees support add/remove/order and section membership moves after all retained parent relationships are proved. Mixed/tab indentation and ambiguous comments/blank lines protect structural re-encoding. Explicit-value leaves cannot be chosen as new derived parents. Positive values retain the native squarified geometry. Zero-value roots/leaves and tiles omitted for lack of space have **no invented tile** and remain in the keyboard list. Duplicate labels never grant guessed rectangle identity. No freeform area/position editing is offered.
 
@@ -49,3 +49,15 @@ A unique rename patches every proved union reference atomically, retaining quoti
 The existing limits remain: 100,000 renderer source characters, 1,500 editor lines, 500 elements, a three-second render deadline, existing bounded private history, upstream 64-level hierarchy recursion and PNG 16,000-pixel/64-million-pixel budgets. Narrow preflight closes upstream missing element checks, counts Packet split segments and bounds Treemap depth/finite aggregation before recursive calculations. Unsafe source remains available with a diagnostic. SVG sanitisation, remote-resource blocking, package checks, CSP, stock Continuous and installer defaults are unchanged.
 
 Hosted appearance acceptance retains all 30 previous runs and adds eight new normal/actual Windows High Contrast runs at 880×600 and 1280×800. Installed acceptance requires 24 families × install/upgrade/reinstall = 72 independently recorded phases on disposable hosted Windows, with optional associations excluded. A source-identical version-pair upgrade is **SYNTHETIC**, not historical migration certification. Higher-DPI interactive, physical screen-reader and SDK-free clean-Windows certification remain unavailable unless separately demonstrated. Actual hosted screenshots and exact source labels are retained with the receipt; offscreen compatibility images do not replace them.
+
+## Source-labelled actual Windows captures
+
+These are real normal-Windows **candidate** captures from `8e9c4ab6cb5736d479fcd779e87ad085702dfa1c`, [run 40015836510](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40015836510). They retain that source label when later fixes are delivered. The [capture index](evidence/expansion-vi/8e9c4ab-captures.json) records image/source hashes and exact limitations. Packet, Treemap and Venn passed both normal/actual HC jobs at that source. TreeView passed its authoring/ownership sequence but both appearance jobs subsequently failed the exact protection-diagnostic assertion; the screenshot below precedes that failure and does not relabel the overall run PASS. Final-source raw captures belong to the engineering delivery receipt.
+
+![Packet actual native row segments, inclusive indices and exact source inspector](images/expansion-vi/packet-normal-8e9c4ab.png)
+
+![TreeView actual native hierarchy and independent source/inspector panels, candidate before the retained diagnostic failure](images/expansion-vi/treeview-normal-8e9c4ab.png)
+
+![Treemap actual native tiles, derived totals and keyboard-only zero-value occurrence](images/expansion-vi/treemap-normal-8e9c4ab.png)
+
+![Venn actual fixed native circles, union occurrences and explicitly labelled stored size metadata](images/expansion-vi/venn-normal-8e9c4ab.png)

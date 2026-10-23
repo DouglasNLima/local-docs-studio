@@ -4,6 +4,14 @@ namespace LensDocsStudio.Core.Tests;
 
 public class TreeViewVisualDraftTests
 {
+    [Fact]
+    public async Task Native_tab_expansion_inside_labels_and_descriptions_preserves_raw_token_bytes_when_untouched()
+    {
+        const string source = "treeView\n\"File\tname\" ## Note\tdetails\nother\n"; var draft = new TreeViewVisualDraft(source);
+        Assert.Equal("File    name", draft.Model.Nodes[0].Label); Assert.Equal("Note    details", draft.Model.Nodes[0].DescriptionToken?.Value);
+        var result = await draft.UpdateAsync(draft.Model.Nodes[1].Identity, "Edited Ω", false, "", "", "default"); Assert.True(result.Success, result.Error); Assert.Equal(source.Replace("other", "Edited Ω", StringComparison.Ordinal), draft.Source);
+        result = await draft.UpdateAsync(draft.Model.Nodes[0].Identity, "File    name", false, "Note    details", "", "default"); Assert.True(result.Success, result.Error); Assert.Contains("\"File\tname\" ## Note\tdetails", draft.Source);
+    }
     [Theory, InlineData("\n"), InlineData("\r\n")]
     public async Task Quoted_labels_directory_slashes_tabs_annotations_and_comments_keep_exact_untouched_bytes(string nl)
     {
