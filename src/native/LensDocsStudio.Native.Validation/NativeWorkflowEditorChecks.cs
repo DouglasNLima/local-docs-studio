@@ -32,6 +32,7 @@ internal static class NativeWorkflowEditorChecks
             var diagrams = new DiagramService(); SourceVisualEditorWindow window = family switch {
                 "packet" => new PacketVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "treeview" or "treeview-box" => new TreeViewVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
+                "treemap" => new TreemapVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "kanban" => new KanbanVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "requirement" => new RequirementVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
                 "architecture" => new ArchitectureVisualEditorWindow(source, diagrams, (_, _) => Task.FromResult<string?>(null), dark),
@@ -48,6 +49,7 @@ internal static class NativeWorkflowEditorChecks
             if (draft is KanbanVisualDraft board) Check(hits.Count == board.Model.Rows.Count, "Kanban: every duplicate card and column has distinct canonical correspondence");
             if (draft is Core.PacketDiagrams.PacketVisualDraft packet) Check(hits.Count == packet.Model.Fields.Count && packet.Model.Fields.Count < Core.PacketDiagrams.PacketVisualDraft.Segments(packet.Model).Count(), "Packet: every split native segment belongs to its exact field occurrence, with combined actual geometry");
             if (draft is Core.TreeViewDiagrams.TreeViewVisualDraft tree) Check(hits.Count == tree.Model.Nodes.Count(n => n.Icon is null), "TreeView: actual default glyph/highlight targets map exactly; hidden icons remain keyboard-only");
+            if (draft is Core.TreemapDiagrams.TreemapVisualDraft map) Check(hits.Count == map.Model.Nodes.Count(n => n.ComputedValue > 0) && map.Model.Nodes.Any(n => n.ComputedValue == 0), "Treemap: all actual positive section/tile rectangles map; zero-value source has no invented tile");
             if (draft is RequirementVisualDraft req) Check(hits.Count == req.Model.Visible.Count + req.Model.Relations.Count, "Requirement: visible boxes and proved native relationship paths map separately");
             if (draft is GitGraphVisualDraft git) Check(hits.Count == git.Model.Marks.Count, "GitGraph: actual commit marks map by command occurrence; non-mark commands remain in the list");
             if (draft is Core.ArchitectureDiagrams.ArchitectureVisualDraft architecture) Check(hits.Count == architecture.Model.Nodes.Count + architecture.Model.Edges.Count, "Architecture: actual services, group boxes, junctions and connection paths have complete occurrence correspondence");
@@ -88,6 +90,7 @@ internal static class NativeWorkflowEditorChecks
                 var change = family switch { "kanban" => body.Replace("Write guide", "Edited guide", StringComparison.Ordinal), "requirement" => body.Replace("DOC-17", "DOC-18", StringComparison.Ordinal), "architecture" => body.Replace("Gateway", "Edited gateway", StringComparison.Ordinal), "c4-context" or "block" => body.Replace("Reader", "Edited reader", StringComparison.Ordinal), "c4-container" => body.Replace("Editor", "Edited editor", StringComparison.Ordinal), "c4-component" => body.Replace("Parser", "Edited parser", StringComparison.Ordinal), _ => body.Replace("Start", "Edited start", StringComparison.Ordinal) };
                 if (family == "packet") change = body.Replace("Source", "Edited source", StringComparison.Ordinal);
                 if (family.StartsWith("treeview", StringComparison.Ordinal)) change = body.Replace("main.cs", "edited.cs", StringComparison.Ordinal);
+                if (family == "treemap") change = body.Replace("Guides", "Edited guides", StringComparison.Ordinal);
                 new MermaidDocumentEditSession(owner, target).Apply(change, true);
                 Check(owner.EditorDocument.Text == original[..target.Body.Start] + change + original[target.Body.End..], family + ": exact second identical fence patch preserves neighbours and " + (nl == "\n" ? "LF" : "CRLF"));
                 owner.EditorDocument.UndoStack.Undo(); Check(owner.EditorDocument.Text == original, family + ": owner Apply is one exact Undo step");
