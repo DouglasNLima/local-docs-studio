@@ -1,5 +1,11 @@
 # Native Mermaid expansion V engineering receipt
 
+Post-merge prerequisite: the accepted feature source does not certify merged develop.
+Its [.853 native push failed](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39856703884);
+the [repair/RCA receipt](native-853-postmerge-pdf-repair.md) preserves that failure and
+the Expansion VI post-merge gate. The earlier .852 records below retain their source attribution.
+
+
 Status: three bounded editor slices implemented. This source-controlled record retains implementation and candidate milestones. The source-freeze delivery receipt at `C:/Code/artifacts/LensDocsStudio-Expansion-V/final/DELIVERY.md`, delivered with [Draft PR #44](https://github.com/DouglasNLima/local-docs-studio/pull/44), owns the exact final source, gate results, installer/portable hashes, artefact links/expiry and preserved evidence. Candidate results below must not be substituted for that final-source record.
 
 ## Source and baseline

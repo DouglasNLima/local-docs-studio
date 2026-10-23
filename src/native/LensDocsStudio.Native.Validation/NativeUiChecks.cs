@@ -802,7 +802,12 @@ internal static partial class NativeUiChecks
                 }
                 Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
                 var codePdf = Path.Combine(runRoot, "coloured-code.pdf"); SaveThroughDialogue(codePdf, "Export PDF");
-                Wait(() => File.Exists(codePdf) && ExportCompleted(window, codePdf), "Coloured PDF export did not complete.");
+                WaitForPdfExport(window, codePdf, output, launchedProcess!);
+                using (var header = File.OpenRead(codePdf))
+                {
+                    Span<byte> signature = stackalloc byte[5]; header.ReadExactly(signature);
+                    if (!signature.SequenceEqual("%PDF-"u8)) throw new IOException("The actual PDF export has no PDF header.");
+                }
                 using (var inspectedCode = UglyToad.PdfPig.PdfDocument.Open(codePdf))
                 {
                     var selectable = string.Concat(inspectedCode.GetPages().SelectMany(page => page.Letters).Select(letter => letter.Value));
@@ -1557,6 +1562,7 @@ internal static partial class NativeUiChecks
         {
             var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
             info.Environment["LENS_NATIVE_PREVIEW_DIAGNOSTICS"] = "1";
+            info.Environment["LENS_NATIVE_EXPORT_DIAGNOSTICS"] = "1";
             info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state);
             if (path is not null) { info.ArgumentList.Add(runRoot); info.ArgumentList.Add(path); }
             launchedProcess = Process.Start(info) ?? throw new IOException("Could not launch the native validation fixture.");
@@ -1702,6 +1708,8 @@ internal static partial class NativeUiChecks
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
             FocusWindow(saveWindow!);
             TextBox? fileName = null;
+            string? enteredFilename = null;
+            IntPtr dialogueHandle = IntPtr.Zero;
             var suggested = ""; var expected = absolutePath ? Path.GetFullPath(destination) : Path.GetFileName(destination);
             try
             {
@@ -1734,12 +1742,22 @@ internal static partial class NativeUiChecks
             {
                 try
                 {
-                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName?.Text, Name = fileName?.Name, AutomationId = fileName?.AutomationId, KeyboardFocus = fileName?.Properties.HasKeyboardFocus.Value });
+                    enteredFilename = fileName?.Text;
+                    dialogueHandle = saveWindow!.Properties.NativeWindowHandle.Value;
+                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = enteredFilename, Name = fileName?.Name, AutomationId = fileName?.AutomationId, KeyboardFocus = fileName?.Properties.HasKeyboardFocus.Value });
                     File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
                 }
                 catch (Exception) { /* Diagnostic capture must not mask the original failure. */ }
             }
             (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
+            try
+            {
+                saveDialogueChecks.Add(new { Title = title, Destination = Path.GetFullPath(destination), EnteredFilename = enteredFilename,
+                    AtUtc = DateTimeOffset.UtcNow, SaveClicked = true,
+                    DialogueAfterClick = dialogueHandle == IntPtr.Zero ? null : NativeUiFailureDiagnostics.ObserveDialogue(dialogueHandle) });
+                File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
+            }
+            catch (Exception) { /* Diagnostic capture must not mask an export failure. */ }
         }
     }
 
@@ -1784,20 +1802,31 @@ internal static partial class NativeUiChecks
         catch (ExternalException) { }
     }
     internal static void Wait(Func<bool> condition, string failure, int seconds = 20)
+        => WaitCore(condition, failure, Stopwatch.StartNew(), TimeSpan.FromSeconds(seconds), false);
+
+    // Callers with several readiness observations share one clock, never nested full waits.
+    internal static void Wait(Func<bool> condition, string failure, Stopwatch timer, TimeSpan budget)
+        => WaitCore(condition, failure, timer, budget, true);
+
+    private static void WaitCore(Func<bool> condition, string failure, Stopwatch timer, TimeSpan budget, bool sharedDeadline)
     {
-        var timer = Stopwatch.StartNew();
         Exception? lastObservationError = null;
-        while (timer.Elapsed < TimeSpan.FromSeconds(seconds))
+        while (timer.Elapsed < budget)
         {
             // Retry a transient UIA observation within the original deadline, never the user action.
-            try { if (condition()) return; }
-            catch (Exception ex) when (ex is IOException or FlaUI.Core.Exceptions.ElementNotAvailableException
-                || ex is COMException { HResult: unchecked((int)0x80040201) }
-                || IsObservationTimeout(ex)) { lastObservationError = ex; }
-            Thread.Sleep(100);
+            try { if (condition() && (!sharedDeadline || timer.Elapsed < budget)) return; }
+            catch (Exception ex) when (IsRetryableObservation(ex)) { lastObservationError = ex; }
+            if (!sharedDeadline) Thread.Sleep(100); // Preserve all existing callers' observation semantics.
+            else
+            {
+                var remaining = budget - timer.Elapsed;
+                if (remaining > TimeSpan.Zero) Thread.Sleep(remaining < TimeSpan.FromMilliseconds(100) ? remaining : TimeSpan.FromMilliseconds(100));
+            }
         }
         throw new InvalidOperationException(failure, lastObservationError);
     }
+    internal static bool IsRetryableObservation(Exception error) => error is IOException or FlaUI.Core.Exceptions.ElementNotAvailableException
+        || error is COMException { HResult: unchecked((int)0x80040201) } || IsObservationTimeout(error);
     private static bool IsObservationTimeout(Exception error) => error is COMException && TimeoutCode(error.HResult)
         || error is System.ComponentModel.Win32Exception { NativeErrorCode: 1460 }
         || error is TimeoutException { InnerException: COMException timeout } && TimeoutCode(timeout.HResult)

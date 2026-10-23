@@ -23,7 +23,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
         var source = File.ReadAllText("tests/fixtures/native-er/database-documentation.mmd").ReplaceLineEndings("\r\n"); if (!source.EndsWith("\r\n", StringComparison.Ordinal)) source += "\r\n";
         var block = "```mermaid\r\n" + source + "```\r\n"; var original = "# Synthetic database documentation\r\n\r\n" + block + "\r\nBetween identical diagrams.\r\n\r\n" + block + "\r\nAfter.\r\n";
-        File.WriteAllText(path, original); var checks = new List<string>(); var observations = new List<object>(); Application? app = null; Window? main = null; Window? visual = null;
+        File.WriteAllText(path, original); var checks = new List<string>(); var observations = new List<object>(); Application? app = null; Window? main = null; Window? visual = null; var launchOrdinal = 0;
         try
         {
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active during ER authoring");
@@ -177,7 +177,9 @@ internal static partial class NativeUiChecks
             var fixtureState = fixturePath is null ? state : Path.Combine(root, "state-" + Path.GetFileNameWithoutExtension(fixturePath)); Directory.CreateDirectory(fixtureState);
             if (fixturePath is not null) File.WriteAllText(Path.Combine(fixtureState, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
             var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(fixtureState); info.ArgumentList.Add(root); info.ArgumentList.Add(fixturePath ?? path);
-            app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native ER fixture did not open."); main.Patterns.Transform.Pattern.Resize(1280, 800);
+            var timer = Stopwatch.StartNew(); app = Application.Launch(info); main = visual = null;
+            try { main = NativeExpansionLaunch.Prepare(app, automation, timer, fixturePath ?? path, output, ++launchOrdinal, highContrast); }
+            finally { automation.TransactionTimeout = automation.ConnectionTimeout = TimeSpan.FromSeconds(3); }
         }
         void WaitVisual()
         {

@@ -31,7 +31,7 @@ internal static partial class NativeUiChecks
         var source = starter.ReplaceLineEndings("\r\n"); var block = "```mermaid\r\n" + source + "```\r\n";
         var original = "# Eleven-family authoring\r\n\r\n" + block + "\r\nBetween identical diagrams.\r\n\r\n" + block + "\r\nAfter.\r\n";
         var first = family == "Quadrant" ? 7 : 3;
-        File.WriteAllText(path, original); Application? app = null; Window? main = null, visual = null;
+        File.WriteAllText(path, original); Application? app = null; Window? main = null, visual = null; var launchOrdinal = 0;
         try
         {
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active");
@@ -111,7 +111,15 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error) { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "authoring-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Family = family, Checks = checks, Observations = observations, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); Console.Error.WriteLine(error); return 1; }
         finally { Stop(); }
-        void Launch(string fixture) { var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; foreach (var argument in new[] { "--state-directory", state, root, fixture }) info.ArgumentList.Add(argument); app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Native application did not open."); main.Patterns.Transform.Pattern.Resize(1280, 800); }
+        void Launch(string fixture)
+        {
+            var timer = Stopwatch.StartNew();
+            var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
+            foreach (var argument in new[] { "--state-directory", state, root, fixture }) info.ArgumentList.Add(argument);
+            app = Application.Launch(info); main = visual = null;
+            try { main = NativeExpansionLaunch.Prepare(app, automation, timer, fixture, output, ++launchOrdinal, highContrast); }
+            finally { automation.TransactionTimeout = automation.ConnectionTimeout = TimeSpan.FromSeconds(3); }
+        }
         void Stop() { if (app is null) return; if (!app.HasExited) app.Kill(); app.Dispose(); app = null; main = visual = null; }
         void Open(int offset) { var watch = Stopwatch.StartNew(); FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + offset)) is not null, "Exact diagram action missing."); Find(main!, "DiagramEditVisually" + offset).AsButton().Invoke(); WaitVisual(); using var process = Process.GetProcessById(app!.ProcessId); observations.Add(new { Operation = "Open canonical editor and UIA", Milliseconds = watch.Elapsed.TotalMilliseconds, WorkingSetBytes = process.WorkingSet64, SourceCharacters = Draft().Length }); }
         void WaitVisual() { Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(family + "VisualEditor")))?.AsWindow()) is not null, "Family editor missing."); Wait(() => Find(visual!, family + "Apply").IsEnabled, "Canonical draft invalid: " + Find(visual!, family + "Status").Name); Find(visual!, family + "SourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); Click("Fit"); }

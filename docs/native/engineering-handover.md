@@ -1,5 +1,16 @@
 # Native Windows engineering handover
 
+## Post-merge .853 prerequisite repair - 23 October 2026
+
+Develop's [original native run 39856703884](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39856703884)
+failed after upgrade. The [source-labelled repair/RCA receipt](native-853-postmerge-pdf-repair.md)
+records proved observations, remaining unknowns, separate internal association policy
+and unchanged-deadline diagnostics. Expansion VI remains blocked pending separate
+user-authorised merge and native **and** web push acceptance at the new develop SHA.
+PR #38 stays PAUSED; its original 250 ms deadline and stock Continuous are unchanged.
+The exact repair-source checks and package hashes belong to the Draft PR's final receipt.
+
+
 ## Accepted consolidation — 19 October 2026
 
 The product decision accepts the bounded production improvements in PRs #36/#37
