@@ -23,6 +23,7 @@ using LensDocsStudio.Core.ArchitectureDiagrams;
 using LensDocsStudio.Core.C4Diagrams;
 using LensDocsStudio.Core.BlockDiagrams;
 using LensDocsStudio.Core.PacketDiagrams;
+using LensDocsStudio.Core.TreeViewDiagrams;
 using LensDocsStudio.Core.SourceAuthoring;
 
 using LensDocsStudio.Native.Editor;
@@ -77,6 +78,7 @@ public partial class MainWindow
     private void InsertC4(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "C4");
     private void InsertBlock(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Block");
     private void InsertPacket(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Packet");
+    private void InsertTreeView(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "TreeView");
     private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false, bool mindmap = false, bool gantt = false, bool quadrant = false, bool timeline = false, bool journey = false, bool xy = false, bool radar = false, bool sankey = false, bool kanban = false, bool requirement = false, bool gitgraph = false, string? topology = null)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
@@ -98,7 +100,7 @@ public partial class MainWindow
         });
         if (topology is not null)
         {
-            var starter = topology switch { "Architecture" => ArchitectureVisualDraft.Starter, "C4" => C4VisualDraft.Starter, "Packet" => PacketVisualDraft.Starter, _ => BlockVisualDraft.Starter };
+            var starter = topology switch { "Architecture" => ArchitectureVisualDraft.Starter, "C4" => C4VisualDraft.Starter, "Packet" => PacketVisualDraft.Starter, "TreeView" => TreeViewVisualDraft.Starter, _ => BlockVisualDraft.Starter };
             OpenVisualDraft(tab, session, starter.Replace("\n", newline, StringComparison.Ordinal), null); return;
         }
         OpenVisualDraft(tab, session, kanban ? KanbanVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : requirement ? RequirementVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gitgraph ? GitGraphVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : xy ? XyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : radar ? RadarVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : sankey ? SankeyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : journey ? JourneyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : timeline ? TimelineVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : quadrant ? QuadrantVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gantt ? GanttVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : mindmap ? MindmapVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : pie ? PieVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
@@ -108,7 +110,7 @@ public partial class MainWindow
     {
         if (ExpansionViSource.IsFamily(source))
         {
-            if (!PacketVisualDraft.IsPacket(source)) { model.Status = "This native family has no accepted authoring slice yet. Use Edit source."; editSource?.Invoke(); return; }
+            if (!PacketVisualDraft.IsPacket(source) && !TreeViewVisualDraft.IsTreeView(source)) { model.Status = "This native family has no accepted authoring slice yet. Use Edit source."; editSource?.Invoke(); return; }
             if (source.Length > 100_000 || source.Count(character => character == '\n') + (source.Length > 0 && !source.EndsWith('\n') ? 1 : 0) > 1500)
             { model.Status = "This diagram exceeds the 100,000-character or 1,500-line visual source budget. Use Edit source; the document is unchanged."; return; }
         }
@@ -138,6 +140,8 @@ public partial class MainWindow
         Window window;
         try { window = PacketVisualDraft.IsPacket(source)
             ? new PacketVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : TreeViewVisualDraft.IsTreeView(source)
+            ? new TreeViewVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : ArchitectureVisualDraft.IsArchitecture(source)
             ? new ArchitectureVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : C4VisualDraft.IsC4(source)

@@ -132,6 +132,7 @@
     <MenuItem Header="C4 visually…" Click="InsertC4" AutomationProperties.AutomationId="InsertC4"/>
     <MenuItem Header="Block visually…" Click="InsertBlock" AutomationProperties.AutomationId="InsertBlock"/>
     <MenuItem Header="Packet visually…" Click="InsertPacket" AutomationProperties.AutomationId="InsertPacket"/>
+    <MenuItem Header="TreeView visually…" Click="InsertTreeView" AutomationProperties.AutomationId="InsertTreeView"/>
 
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>

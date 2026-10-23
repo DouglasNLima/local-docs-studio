@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--treeview-editor-fidelity")
+        {
+            try { NativeWorkflowEditorChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), expansionFamily: "treeview"); NativeWorkflowEditorChecks.Run(Path.Combine(Path.GetFullPath(args[1]), "box-mode"), Path.GetFullPath(args[2]), expansionFamily: "treeview-box"); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--packet-editor-fidelity")
         {
             try { NativeWorkflowEditorChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), expansionFamily: "packet"); return 0; }
