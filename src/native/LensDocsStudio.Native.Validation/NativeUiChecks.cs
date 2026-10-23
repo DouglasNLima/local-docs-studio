@@ -1802,19 +1802,26 @@ internal static partial class NativeUiChecks
         catch (ExternalException) { }
     }
     internal static void Wait(Func<bool> condition, string failure, int seconds = 20)
-        => Wait(condition, failure, Stopwatch.StartNew(), TimeSpan.FromSeconds(seconds));
+        => WaitCore(condition, failure, Stopwatch.StartNew(), TimeSpan.FromSeconds(seconds), false);
 
     // Callers with several readiness observations share one clock, never nested full waits.
     internal static void Wait(Func<bool> condition, string failure, Stopwatch timer, TimeSpan budget)
+        => WaitCore(condition, failure, timer, budget, true);
+
+    private static void WaitCore(Func<bool> condition, string failure, Stopwatch timer, TimeSpan budget, bool sharedDeadline)
     {
         Exception? lastObservationError = null;
         while (timer.Elapsed < budget)
         {
             // Retry a transient UIA observation within the original deadline, never the user action.
-            try { if (condition() && timer.Elapsed < budget) return; }
+            try { if (condition() && (!sharedDeadline || timer.Elapsed < budget)) return; }
             catch (Exception ex) when (IsRetryableObservation(ex)) { lastObservationError = ex; }
-            var remaining = budget - timer.Elapsed;
-            if (remaining > TimeSpan.Zero) Thread.Sleep(remaining < TimeSpan.FromMilliseconds(100) ? remaining : TimeSpan.FromMilliseconds(100));
+            if (!sharedDeadline) Thread.Sleep(100); // Preserve all existing callers' observation semantics.
+            else
+            {
+                var remaining = budget - timer.Elapsed;
+                if (remaining > TimeSpan.Zero) Thread.Sleep(remaining < TimeSpan.FromMilliseconds(100) ? remaining : TimeSpan.FromMilliseconds(100));
+            }
         }
         throw new InvalidOperationException(failure, lastObservationError);
     }
