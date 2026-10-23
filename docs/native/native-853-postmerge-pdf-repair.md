@@ -155,3 +155,121 @@ and merge must the new actual develop SHA pass both native and web push workflow
 including the full installed lifecycle and all family gates. Expansion VI stays
 blocked until that evidence is inspected. The final decision must also preserve
 the historical RCA's remaining unknowns; a green branch badge cannot resolve them.
+
+## PR #45 final acceptance: Journey launch observation
+
+The reviewed source `08171f0d90315dca9db75a812c1d3b1849524b84`, tree
+`8a672e3927153958942bd97263d17d8816eaafa9`, finished with 80 successful checks,
+one failure and 12 explicit skips. The independently successful .854 PDF and
+association-policy evidence above remains valid at that source. Historical .853
+PDF RCA remains **INCONCLUSIVE**; its successful replay does not establish cause.
+
+The additional blocker was [Journey actual Windows High Contrast, job
+120402325422](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39950139759/job/120402325422),
+run `39950139759`, attempt 1. Its original [archive
+12499959746](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39950139759/artifacts/12499959746)
+was freshly downloaded before remediation and independently verified: 19,177,739
+bytes, SHA-256 `443effe2adff9d3dc4bfd7f5429f6c45b8f64e697bbaa8255744b0686a266fcc`,
+674 hashed members, expiry **2026-11-22 12:13:01 UTC**. Original compressed bytes,
+full job log, raw API metadata, member inventory and comparative archives are
+preserved at `C:/Code/lens-native-journey-evidence/`; the previous preserved copy
+under `C:/Code/lens-native-853-evidence/repair-source-08171f0/` is untouched.
+
+`source-editors/authoring-ui.json` (SHA-256
+`449b226f619d412b8d4c28949d12bfed59a30739f353526cca2ec773d80d6897`)
+records ten successful checks, including owner Apply/Undo/Redo/Save. The full log
+then reports `PatternNotSupportedException` wrapping COM `0x80131505`, at
+`IUIAutomationElement.GetCurrentPattern`, unchanged
+`NativeExpansionEditorUiChecks.cs:114`, called by the second `Launch(path)` at
+line 101. The complete UI step lasted approximately 33.9 seconds; the individual
+launch/acquisition duration was not recorded. The exception precedes evidence of
+any Resize invocation. No process crash, permanently unsupported pattern, failed
+Resize action, stale resized observation or product/editor malfunction is proved.
+
+The archive retains selected and 880×600/1280×800 editor screenshots, display
+restoration, saved fixture and state bytes. The 1280×800 screenshot shows the
+actual High Contrast editor before Apply. **There is no `failure.png`, timed
+launch observation, PID/HWND ownership record, window/control dump or thread
+dump.** An attempted capture of the already-closed visual editor retained no
+failure screenshot. Missing evidence cannot establish what the restarted process
+or its provider was doing. Journey's underlying cause therefore remains
+**INCONCLUSIVE beyond the observed UIA acquisition timeout**.
+
+Before editing, all twelve original/comparative archives were independently
+downloaded and member-hashed. The detailed local `forensic-receipt.json` and
+`comparison.json` retain their source, job, artefact, digest, expiry and log labels.
+
+| Source/run | Timeline normal/HC | Journey normal/HC | Quadrant normal/HC |
+| --- | --- | --- | --- |
+| `08171f0`, `39950139759`, attempt 1 | PASS/PASS | PASS/**FAIL** | PASS/PASS |
+| #44 feature `2cd7e41938e98a05dcf3f73e7934c224a06591f8`, `39836632380`, attempt 1 | PASS/PASS | PASS/PASS | PASS/PASS |
+
+The failing job records Windows image `20261021.278.1`; same-source Journey normal
+and #44 Journey HC record `20261007.264.1`. Same-run Timeline/Quadrant HC pass on
+`20261021.278.1`. These are recorded versions of the `windows-latest` runner,
+not an image pin or proof of image causation. The failed check itself verifies
+actual HC; no per-restart HC/process/window observations were available for any
+of those old runs. The Launch source is unchanged between merged develop and
+reviewed PR #45. No upstream FlaUI defect or installer-association causation is
+inferred.
+
+### Narrow harness correction and fail-closed controls
+
+Only the existing Timeline/Journey/Quadrant owner-launch path changes. Native
+process enumeration identifies the actual main HWND; independent Win32 PID,
+top-level ownership, visibility/enabled state and bounded WM_NULL responsiveness
+must agree with UIA HWND/PID and the enabled, visible editor's exact saved source.
+Current Windows HC is sampled, and required HC must remain active. This is a
+readiness correction supported by the previously unguarded acquisition site,
+not a retrospective explanation of the provider's timeout.
+
+`NativeLaunchReadiness` uses the existing Wait observation filter and polling
+cadence with **one shared 25-second clock starting before process launch**.
+There is no outer full wait or additional GetMainWindow budget. Each UIA call is
+capped at the lesser of the existing three-second provider limit and remaining
+time. Known provider timeout observations may be sampled again before mutation;
+genuine unsupported Transform, wrong ownership and process exit propagate. A
+persistent unavailable/hung provider fails at the shared deadline. Late success
+does not satisfy that deadline. No new sleep or larger timeout is introduced.
+
+After acquiring the **real** UIA Transform and confirming CanResize/readiness,
+the harness sends `Resize(1280, 800)` once, outside the observation loop. Exact
+Win32/UIA resulting bounds and the same owner/source must then agree within the
+remaining budget. A timeout of the mutation is a failure, with no reissue. All
+original real authoring, geometry, visual-editor viewport, restart/reopen,
+Cancel, conflict, standalone/Insert, protected-source and keyboard tests remain.
+No product renderer, parser, exporter, WPF UX/style, fixture, pixel tolerance or
+appearance matrix assertion is changed.
+
+Each `launch-N.json` records source revision, restart ordinal, PID/HWND, process
+state, bounded responsiveness, HC, observation/provider errors, bounds, elapsed
+budget, Resize count and expected/observed owner and saved-file SHA-256. Each
+`launch-N.png` captures only the test-owned real fixture window. Failure also
+attempts the existing native window/stack diagnostics. This evidence contains no
+document source text and makes no external telemetry call.
+
+Twenty deterministic controls exercise the same orchestration: transient and
+persistent acquisition, genuine unsupported patterns, unrelated errors,
+PID/HWND/owner mismatch, process exit, missing/invisible/unresponsive windows,
+expired budget, failed/uncertain Resize, and stale or wrong post-action bounds.
+They count at most one mutation and retain timeout errors. Their injected
+observations never establish actual installed/HC success. They run through the
+existing observation-validation/corpus entry points.
+
+### Candidate and final-source acceptance receipt
+
+Local development logs are retained separately, including an initial build
+failure while new source files were still being added and an unchanged Core
+workspace-map render failure (2,008 PASS, one FAIL). The complete-source locked
+build subsequently passed with zero warnings/errors; all twenty controls and
+static integrity passed. These uncommitted development observations are not
+final-source hosted acceptance. Local full appearance testing is unavailable
+because its existing display/HC harness requires disposable hosted Windows.
+
+The existing Draft PR #45 receipt must record the immutable final commit/tree,
+every attempted candidate, all individual final-source jobs, 30 appearances,
+60 installed phases, package/artefact digests/expiry and explicit skips after
+new hosted runs finish. Until those gates are green, acceptance is **BLOCKED**.
+No historical failed job is rerun or relabelled. New success cannot erase either
+the original Journey failure or the historical .853 uncertainty. PR #38 remains
+Draft/PAUSED. Packet, TreeView, Treemap and Venn remain untouched and unstarted.

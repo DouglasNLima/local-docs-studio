@@ -1802,15 +1802,19 @@ internal static partial class NativeUiChecks
         catch (ExternalException) { }
     }
     internal static void Wait(Func<bool> condition, string failure, int seconds = 20)
+        => Wait(condition, failure, Stopwatch.StartNew(), TimeSpan.FromSeconds(seconds));
+
+    // Callers with several readiness observations share one clock, never nested full waits.
+    internal static void Wait(Func<bool> condition, string failure, Stopwatch timer, TimeSpan budget)
     {
-        var timer = Stopwatch.StartNew();
         Exception? lastObservationError = null;
-        while (timer.Elapsed < TimeSpan.FromSeconds(seconds))
+        while (timer.Elapsed < budget)
         {
             // Retry a transient UIA observation within the original deadline, never the user action.
-            try { if (condition()) return; }
+            try { if (condition() && timer.Elapsed < budget) return; }
             catch (Exception ex) when (IsRetryableObservation(ex)) { lastObservationError = ex; }
-            Thread.Sleep(100);
+            var remaining = budget - timer.Elapsed;
+            if (remaining > TimeSpan.Zero) Thread.Sleep(remaining < TimeSpan.FromMilliseconds(100) ? remaining : TimeSpan.FromMilliseconds(100));
         }
         throw new InvalidOperationException(failure, lastObservationError);
     }

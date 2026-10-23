@@ -11,6 +11,8 @@ internal static class NativeObservationWaitChecks
     {
         Directory.CreateDirectory(output);
         var checks = new List<string>();
+        NativeLaunchReadinessChecks.Run(output);
+        checks.Add("Shared launch budget distinguishes transient Transform reads from unsupported patterns, wrong owners, exited/unresponsive processes and uncertain actions; Resize is sent at most once");
         NativeExportObservationChecks.Run(output);
         checks.Add("Real PDF bytes and separate file/UI observations reject missing, wrong, incomplete, empty, error, cancelled and stale-provider outcomes");
         NativeUiChecks.CheckWorkspaceContextObservation(output);

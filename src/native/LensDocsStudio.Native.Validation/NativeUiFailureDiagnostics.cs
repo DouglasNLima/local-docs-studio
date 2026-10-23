@@ -42,6 +42,16 @@ internal static class NativeUiFailureDiagnostics
     }
 
     // Only the test-owned fixture process is passed here. Avoid UIA when its provider is unresponsive.
+    public static void CaptureWindow(IntPtr handle, string destination)
+    {
+        if (!GetWindowRect(handle, out var rectangle) || rectangle.Right <= rectangle.Left || rectangle.Bottom <= rectangle.Top)
+            throw new IOException("The owned window has no capturable bounds.");
+        using var image = new Bitmap(rectangle.Right - rectangle.Left, rectangle.Bottom - rectangle.Top);
+        using var graphics = Graphics.FromImage(image);
+        graphics.CopyFromScreen(rectangle.Left, rectangle.Top, 0, 0, image.Size);
+        image.Save(destination, ImageFormat.Png);
+    }
+
     public static void Capture(Process? process, string output)
     {
         if (process is null || process.HasExited) return;
