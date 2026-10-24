@@ -19,12 +19,15 @@ internal static partial class NativeUiChecks
 {
     public static int RunDevelopmentHost(string sandbox, string revision, string tree, string executableSha256, bool shellOnly = false) => Task.Run(() =>
     {
+        if (!System.Text.RegularExpressions.Regex.IsMatch(revision, "^[0-9a-f]{40}$") || !System.Text.RegularExpressions.Regex.IsMatch(tree, "^[0-9a-f]{40}$") ||
+            !System.Text.RegularExpressions.Regex.IsMatch(executableSha256, "^[0-9a-f]{64}$")) throw new IOException("Independent full source/tree/SHA-256 pins are mandatory.");
         sandbox = Path.GetFullPath(sandbox);
         WorkspacePath.RejectReparsePoints(sandbox);
         var allowed = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../../artifacts/native/development-host", revision)) + Path.DirectorySeparatorChar;
         if (!sandbox.StartsWith(allowed, StringComparison.OrdinalIgnoreCase)) throw new IOException("Only this worktree's source-labelled ignored host sandbox is allowed.");
         using var marker = JsonDocument.Parse(File.ReadAllText(Path.Combine(sandbox, "host-sandbox.json")));
         var identity = marker.RootElement;
+        var age = DateTimeOffset.UtcNow - identity.GetProperty("preparedAtUtc").GetDateTimeOffset();
         var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
         if (principal.IsInRole(WindowsBuiltInRole.Administrator) || !Environment.UserInteractive ||
             Process.GetCurrentProcess().SessionId != HostActiveConsoleSession() ||
@@ -33,12 +36,17 @@ internal static partial class NativeUiChecks
             identity.GetProperty("sourceRevision").GetString() != revision || identity.GetProperty("sourceTree").GetString() != tree ||
             identity.GetProperty("executableSha256").GetString() != executableSha256 ||
             !sandbox.Contains(Path.DirectorySeparatorChar + "development-host" + Path.DirectorySeparatorChar + revision + Path.DirectorySeparatorChar, StringComparison.Ordinal) ||
-            DateTimeOffset.UtcNow - identity.GetProperty("preparedAtUtc").GetDateTimeOffset() > TimeSpan.FromHours(24))
+            age < TimeSpan.Zero || age > TimeSpan.FromHours(24))
             throw new IOException("Normal active console and fresh independently pinned development-host sandbox required.");
         var executable = Path.Combine(sandbox, "payload", "LensDocsStudio.Native.exe");
         if (Hash(executable) != executableSha256 || !FileVersionInfo.GetVersionInfo(executable).ProductVersion!.EndsWith("+" + revision, StringComparison.Ordinal))
             throw new IOException("Portable app bytes/source differ from the independent pins.");
         using var verification = JsonDocument.Parse(File.ReadAllText(Path.Combine(sandbox, "package-verification.json")));
+        using var packageIdentity = JsonDocument.Parse(File.ReadAllText(Path.Combine(sandbox, "payload", "version.json")));
+        if (verification.RootElement.GetProperty("status").GetString() != "PASS" || verification.RootElement.GetProperty("sourceRevision").GetString() != revision ||
+            verification.RootElement.GetProperty("sourceTree").GetString() != tree || packageIdentity.RootElement.GetProperty("sourceRevision").GetString() != revision ||
+            packageIdentity.RootElement.GetProperty("sourceTree").GetString() != tree || packageIdentity.RootElement.GetProperty("sourceDirty").GetBoolean() ||
+            Hash(Path.Combine(sandbox, "package-verification.json")) != identity.GetProperty("packageReceiptSha256").GetString()) throw new IOException("Prepared package/source/tree receipt binding differs.");
         var payload = verification.RootElement.GetProperty("payload").EnumerateArray().ToArray();
         if (payload.Length != 528 || Directory.GetFiles(Path.Combine(sandbox, "payload"), "*", SearchOption.AllDirectories).Length != 528)
             throw new IOException("Complete 528-file portable inventory required.");

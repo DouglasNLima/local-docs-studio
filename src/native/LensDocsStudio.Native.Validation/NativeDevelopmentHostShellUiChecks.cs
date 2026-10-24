@@ -90,7 +90,7 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(main, "Status").Name.Contains("Saved", StringComparison.Ordinal) && Find(main, "Status").Name.Contains(name, StringComparison.Ordinal), "Synthetic library item was not saved.");
             }
             var library = new LensDocsStudio.Core.State.LocalLibraryStore(Path.Combine(state, "content-library")).ReadAsync().GetAwaiter().GetResult();
-            if (library.State.Active.Templates.Count != 1 || library.State.Active.Snippets.Count != 1 || ReadEditorText(editor) != source)
+            if (library.State.Active.Templates.Length != 1 || library.State.Active.Snippets.Length != 1 || ReadEditorText(editor) != source)
                 throw new IOException("Actual template/snippet writes did not remain in the synthetic state library or changed the owner.");
             Capture(main, "isolated-library");
             checks.Add("Actual app template/snippet saves use only the explicit synthetic content-library state and retain source");
