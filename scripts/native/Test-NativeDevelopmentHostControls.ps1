@@ -109,6 +109,10 @@ foreach ($specialist in @(@('Mermaid','MermaidElements','MermaidDraftSource','Me
     foreach ($id in $specialist[1..3]) { if (-not $xaml.Contains('AutomationId="' + $id + '"')) { throw "Specialist automation contract missing: $id" } }
 }
 $checks.Add(@{name='Five specialist navigation/source/validation contracts remain independently mapped';status='PASS'})
+$continuous=Get-Content -LiteralPath (Join-Path $repo '.github/workflows/native-continuous-performance.yml') -Raw
+if (-not $continuous.Contains("if: github.head_ref != 'feature/native-windows-development-host-acceptance' && github.ref != 'refs/heads/feature/native-windows-development-host-acceptance'") -or
+    -not $continuous.Contains('Visible Continuous interactions')) { throw 'Goal VIII must skip controlled comparisons while retaining stock interaction checks.' }
+$checks.Add(@{name='Goal VIII leaves controlled comparisons paused and retains stock interactions';status='PASS'})
 Test-Rejection 'Direct local UI route refuses missing pins before launch' {
     $client=Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'
     if (Test-Path -LiteralPath $client) {
@@ -118,7 +122,7 @@ Test-Rejection 'Direct local UI route refuses missing pins before launch' {
     }
     # The static route guard also runs before the solution has been built.
     $program=Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/Program.cs') -Raw
-    if ($program.Contains('if (args.Length != 5)')) { throw 'Expected mandatory-pin guard present' }
+    if ($program.Contains('args.Length is not (5 or 6)')) { throw 'Expected mandatory-pin guard present' }
 }
 Write-NativeHostReceipt (Join-Path $safe 'host-controls.json') @{ status='PASS'; checks=@($checks); count=$checks.Count; qualification='DETERMINISTIC GUARD TESTS'; guiAcceptance='NOT RUN' }
 "PASS: $($checks.Count) development-host guard controls. Evidence: $root"
