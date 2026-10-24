@@ -118,7 +118,10 @@ A[Write] --> B[Review]
     return
 }
 $marker = Get-Content -LiteralPath $markerPath -Raw | ConvertFrom-Json
-$age = ([DateTime]::UtcNow - [DateTime]::Parse($marker.preparedAtUtc).ToUniversalTime()).TotalHours
+$prepared = if ($marker.preparedAtUtc -is [DateTime]) { [DateTimeOffset]$marker.preparedAtUtc } else {
+    [DateTimeOffset]::Parse($marker.preparedAtUtc, [Globalization.CultureInfo]::InvariantCulture)
+}
+$age = ([DateTimeOffset]::UtcNow - $prepared).TotalHours
 if ($marker.schemaVersion -ne 1 -or $marker.qualification -cne 'DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION' -or
     $marker.cleanMachineCertified -ne $false -or $marker.sourceRevision -cne $folderRevision -or
     $age -lt 0 -or $age -gt 24) {
@@ -153,6 +156,7 @@ if ($Mode -eq 'RunUi') {
     $process = [Diagnostics.Process]::Start($info)
     Write-NativeHostReceipt (Join-Path $root ('launch-' + [guid]::NewGuid().ToString('N') + '.json')) @{
         status='NOT RUN'; scope='Process launch only; no GUI assertion'; processId=$process.Id; startTimeUtc=$process.StartTime.ToUniversalTime().ToString('o');
+        harnessRevision=(& git -C $repo rev-parse HEAD).Trim();
         sourceRevision=$marker.sourceRevision; executableSha256=$marker.executableSha256; arguments=@('--state-directory','<sandbox>/state','<sandbox>/workspace','<sandbox>/workspace/acceptance-lf.md') }
     "Portable test process started: $($process.Id). Observe its actual window; launch alone is not acceptance."
 } else {
