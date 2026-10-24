@@ -5,7 +5,8 @@ param(
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedSourceRevision,
     [Parameter(Mandatory)][string]$OutputPath,
     [ValidatePattern('^[0-9a-fA-F]{64}$')][string]$ExpectedInstallerSha256,
-    [ValidatePattern('^[0-9a-fA-F]{64}$')][string]$ExpectedZipSha256
+    [ValidatePattern('^[0-9a-fA-F]{64}$')][string]$ExpectedZipSha256,
+    [ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedSourceTree
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'NativeIconVerification.ps1')
@@ -20,6 +21,10 @@ if ($metadata.schemaVersion -ne 1 -or $metadata.product -ne 'LensDocsStudio.Nati
     $metadata.internalPreview -ne $true -or $metadata.channel -ne 'Preview' -or $metadata.architecture -ne 'x64' -or
     $metadata.minimumWindowsVersion -ne '10.0.17763' -or $metadata.signingRequested -ne $false -or $metadata.signingProvider -ne 'Unsigned' -or
     $metadata.sourceKind -notin 'branch-source','pull-request-merge-checkout','local-source') { throw 'Preview version, source, target or unsigned identity does not match the expected package.' }
+# Historical immutable packages predate this field; current acceptance supplies an independent tree pin.
+if (($metadata.sourceTree -and $metadata.sourceTree -cnotmatch '^[0-9a-f]{40}$') -or ($ExpectedSourceTree -and $metadata.sourceTree -cne $ExpectedSourceTree)) {
+    throw 'Preview source tree does not match the expected committed tree.'
+}
 $prefix = "LensDocsStudio.Native-$ExpectedVersion-win-x64"
 $installer = Join-Path $PackageDirectory "$prefix-Setup.exe"
 $portable = Join-Path $PackageDirectory "$prefix.zip"
@@ -109,9 +114,11 @@ try {
     $installerIcon = Test-NativeIconResources -BinaryPath $installer -SourceIcon $sourceIcon
     $runtime = Read-ZipText 'LensDocsStudio.Native.runtimeconfig.json' | ConvertFrom-Json
     if ($runtime.runtimeOptions.tfm -ne 'net10.0' -or $runtime.runtimeOptions.framework -or $runtime.runtimeOptions.frameworks -or
-        @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App' -and $_.version -match '^10\.' }).Count -ne 1) { throw 'Portable package does not declare its included .NET 10 WPF runtime.' }
+        @($runtime.runtimeOptions.includedFrameworks).Count -ne 2 -or
+        @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -ceq 'Microsoft.NETCore.App' -and $_.version -ceq '10.0.13' }).Count -ne 1 -or
+        @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -ceq 'Microsoft.WindowsDesktop.App' -and $_.version -ceq '10.0.13' }).Count -ne 1) { throw 'Portable package must declare exactly the included Core/WPF 10.0.13 runtimes.' }
 } finally { $archive.Dispose() }
-$report = [ordered]@{ status='PASS'; version=$ExpectedVersion; sourceRevision=$ExpectedSourceRevision; sourceKind=$metadata.sourceKind;
+$report = [ordered]@{ status='PASS'; version=$ExpectedVersion; sourceRevision=$ExpectedSourceRevision; sourceTree=$metadata.sourceTree; sourceKind=$metadata.sourceKind;
     ciRunId=$metadata.ciRunId; installerSha256=$installerHash; portableSha256=$zipHash; signature='NotSigned';
     trustedUpdates='BLOCKED: no production signing identity'; cleanMachineCertification='BLOCKED: separate clean image required';
     executionPerformed=$false; binaryVersions=$binaryVersions; applicationIcon=$applicationIcon; installerIcon=$installerIcon; mermaidEditor=$mermaidEditor; payload=@($files.Values | Sort-Object path) }

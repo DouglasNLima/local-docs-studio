@@ -156,6 +156,27 @@ foreach ($control in @(
     $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
     Reject ($control.name + '-with-recomputed-checksum') @{PackageDirectory=$copy} ([regex]::Escape($control.error))
 }
+# Restore the original bytes independently for each runtime declaration mutation.
+Reject 'wrong-tree-pin' @{ExpectedSourceTree=('0' * 40)} 'source tree does not match'
+foreach ($framework in 'Microsoft.NETCore.App','Microsoft.WindowsDesktop.App') {
+    Copy-Item -LiteralPath (Join-Path $PackageDirectory $zip.Name) -Destination $zip.FullName -Force
+    $archive = [IO.Compression.ZipFile]::Open($zip.FullName, [IO.Compression.ZipArchiveMode]::Update)
+    try {
+        $entry = $archive.GetEntry('LensDocsStudio.Native.runtimeconfig.json')
+        $reader = [IO.StreamReader]::new($entry.Open())
+        try { $runtime = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+        $target = @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -ceq $framework })
+        if ($target.Count -ne 1 -or $target[0].version -cne '10.0.13') { throw 'Exact runtime mutation target missing.' }
+        $target[0].version = '10.0.12'
+        $entry.Delete(); $writer = [IO.StreamWriter]::new($archive.CreateEntry('LensDocsStudio.Native.runtimeconfig.json').Open())
+        try { $writer.Write(($runtime | ConvertTo-Json -Depth 8)) } finally { $writer.Dispose() }
+    } finally { $archive.Dispose() }
+    $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Object {
+        if ($_.EndsWith($zip.Name)) { "{0}  {1}" -f (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $zip.Name } else { $_ }
+    }
+    $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
+    Reject ('wrong-runtime-' + $framework) @{PackageDirectory=$copy} 'exactly the included Core/WPF 10.0.13'
+}
 @{ status='PASS'; checks=$checks; sourceRevision=$metadata.sourceRevision; originalPackageUnchanged=$true } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'negative-controls.json') -Encoding utf8NoBOM
 "Native preview package negative controls PASS: $($checks.Count)"

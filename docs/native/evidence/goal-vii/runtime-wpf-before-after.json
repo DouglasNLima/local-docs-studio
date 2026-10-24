@@ -1,0 +1,14 @@
+{
+  "afterVerifierSha256": "6bcd9b2e90ffc45fd6d9104d68dc9035eeb989e6729e906c3522b7714e6b2814",
+  "beforeVerifierSha256": "89603fc45cc4efd7191b865ebf0a376b07e004f72178f0b06e0abe485f5b238c",
+  "after": "REJECTED same bytes",
+  "executionPerformed": false,
+  "before": "ACCEPTED incorrect 10.0.12 declaration",
+  "framework": "Microsoft.WindowsDesktop.App",
+  "status": "PASS",
+  "beforeVerifierSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+  "diagnostic": "Portable package must declare exactly the included Core/WPF 10.0.13 runtimes.",
+  "scenario": "Read-only runtime declaration validation, not product execution",
+  "sourceRevision": "33a751c60886a364102c45cb43e36af1e7f13517",
+  "mutatedPortableSha256": "8289315c3aab8db9434b5e4d0a626a155e1611e6b728f1d3e05c95345f93eaf8"
+}
