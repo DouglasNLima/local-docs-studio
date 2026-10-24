@@ -44,9 +44,12 @@ if ($Mode -eq 'Prepare') {
     Assert-NativeHostQualification $before
     [void][IO.Directory]::CreateDirectory($root)
     Write-NativeHostReceipt (Join-Path $root 'host-before.json') $before
-    & (Join-Path $PSScriptRoot 'Test-NativePreviewPackage.ps1') -PackageDirectory $package -ExpectedVersion $metadata.version `
+    # Run the existing verifier in its own supported PowerShell scope. Its optional
+    # JSON fields intentionally do not inherit this harness's StrictMode policy.
+    & (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File (Join-Path $PSScriptRoot 'Test-NativePreviewPackage.ps1') -PackageDirectory $package -ExpectedVersion $metadata.version `
         -ExpectedSourceRevision $ExpectedSourceRevision -ExpectedSourceTree $ExpectedSourceTree `
         -ExpectedInstallerSha256 $ExpectedInstallerSha256 -ExpectedZipSha256 $ExpectedZipSha256 -OutputPath (Join-Path $root 'package-verification.json')
+    if ($LASTEXITCODE -ne 0) { throw 'Independent package verification failed; preserve this incomplete sandbox and use a new session after diagnosis.' }
     $verified = Get-Content -LiteralPath (Join-Path $root 'package-verification.json') -Raw | ConvertFrom-Json
     if ($verified.status -cne 'PASS' -or $verified.payload.Count -ne 528) { throw 'Incomplete package inspection.' }
     $payload = Join-Path $root 'payload'; [void][IO.Directory]::CreateDirectory($payload)
