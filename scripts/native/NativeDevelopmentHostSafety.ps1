@@ -16,8 +16,11 @@ function Assert-NativeHostPath([string]$Path, [string]$Within = '') {
     }
     $part = $full
     while ($part) {
-        if (Test-Path -LiteralPath $part) {
-            if ((Get-Item -Force -LiteralPath $part).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+        $existing = $null
+        try { $existing = Get-Item -Force -LiteralPath $part -ErrorAction Stop }
+        catch [Management.Automation.ItemNotFoundException] { }
+        if ($null -ne $existing) {
+            if ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint) {
                 throw 'Reparse points, junctions and symbolic links are forbidden in host evidence paths.'
             }
         }

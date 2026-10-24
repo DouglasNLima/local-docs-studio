@@ -31,6 +31,15 @@ $junction=Join-Path $root 'junction'
 New-Item -ItemType Junction -Path $junction -Target $target | Out-Null
 Test-Rejection 'Junction ancestor escape' { Assert-NativeHostPath (Join-Path $junction 'file') $root }
 Test-Rejection 'Junction inside manifest tree' { Get-NativeHostManifest $root }
+$dangling=Join-Path $root 'dangling'
+$danglingTarget=Assert-NativeHostPath (Join-Path $root 'dangling-target') $root
+$relocatedTarget=Assert-NativeHostPath (Join-Path $root 'relocated-empty-target') $root
+[void][IO.Directory]::CreateDirectory($danglingTarget)
+New-Item -ItemType Junction -Path $dangling -Target $danglingTarget | Out-Null
+# Both absolute paths were checked inside this fresh test root; only our new empty fixture moves.
+if (@(Get-ChildItem -Force -LiteralPath $danglingTarget).Count) { throw 'Dangling-link fixture must be empty.' }
+[IO.Directory]::Move($danglingTarget,$relocatedTarget)
+Test-Rejection 'Dangling junction is rejected before its target exists' { Assert-NativeHostPath (Join-Path $dangling 'file') $root }
 $safe=Join-Path $root 'safe'; [void][IO.Directory]::CreateDirectory($safe)
 $receipt=Join-Path $safe 'receipt.json'
 Write-NativeHostReceipt $receipt @{ status='FAIL'; retained=$true }
