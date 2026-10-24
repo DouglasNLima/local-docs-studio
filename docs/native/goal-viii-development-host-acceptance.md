@@ -88,13 +88,15 @@ New C# belongs only to the existing independent validation project.
 | Quick Open | PASS: Ctrl+P, `relative` filtering, one real result and Enter opened exact `relative.md`; actual modal/tree receipts retained |
 | Command Palette | PASS: Ctrl+Shift+P exposes 54 real commands; cancellation returns to owner; actual modal screenshot/tree retained |
 | Close cancellation/save | PASS: actual synthetic dirty-close dialog cancelled once, retaining the edit; later Yes saved the synthetic buffer and closed normally. A manually delivered Return had inserted a leading LF in this synthetic buffer; its saved delta is retained, not attributed to a product defect |
-| DPI and real sizes | PASS observation: 144-DPI HWND. Source-labelled native UIA captures show 1320×900 and 1920×1200 physical window bounds, corresponding to requested 880×600 and 1280×800 logical sizes |
+| DPI and real sizes | PASS measurement: 144-DPI HWND; UIA bounds 1320×900 and 1920×1200 physical, corresponding to 880×600 and 1280×800 logical. Venn's actual pair was visually reviewed. Full visual matrix is NOT RUN: ten large captures have incomplete frames and cannot certify appearance |
 | Complete local family run | PASS: `s06` has 27 completed entry cases across all 24 families, including C4's extra views and TreeView box mode; portable source is the frozen SHA, client `6075adbf54aae4eae69b912118b202f459cc715a`, tree `4c98136dfcf83da568410b8ad39c579a97d9cb25`. The later shell failure does not erase or promote these individual entry receipts |
-| Complete shell/owner/export run | NOT RUN as accepted complete coverage at drafting stage; new bounded path is separate from hosted suites. Use its exact completion record; do not infer from a successful ZIP inspection or process launch |
-| Host preservation | PASS after completed sessions `s02`, `s03`, `s04`: observed associations, registrations, shortcuts and all four default private-state file hashes unchanged. Synthetic state/source changes retained |
-| Guard tests | PASS: 45 deterministic controls before the additional paused-comparison selector guard; the final source-labelled receipt records its complete count. Includes wrapped registry-name round trips, real junction rejection, stale/missing evidence, wrong source/tree/PID/HWND, changed defaults, specialist ID contracts and certification relabelling |
+| Shell acceptance | BLOCKED pending an accepted complete run: `s08` passed folder/image/Unicode, exact Quick Open, pointer relative link and palette, then FAILED exact Unicode selection after Find/Enter. `s07`/`s11` stopped at the foreground guard. Later runs must have their own receipts; no unperformed owner/viewport/restart step is counted |
+| Native export APIs | PASS in `s11`, API source `1de34f87b92b101398e62922e8c7f6bc8e269130`: real DOCX/PDF/HTML, canonical `.mmd`/SVG/PNG and four-page/two-diagram Docs Site; zero site warnings. Independent PDF text/colour/page, DOCX image, PNG dimensions and ZIP inspection retained. Portable export dialogues NOT RUN |
+| Host preservation | PASS after completed sessions `s02`–`s09` and `s11`: observed associations, registrations, shortcuts and all four default private-state file hashes unchanged. Synthetic state/source changes retained. `s10` refused transient uncommitted preparation before creating its sandbox |
+| Guard tests | PASS: 52 controls at the recorded candidate, including fresh/expired/future timestamps, private-output refusal, wrapped registry-name round trips, real/dangling junction rejection, wrong source/tree/PID/HWND, changed defaults, specialist IDs and certification relabelling. Final exact-source CI retains its own count |
 | Local build/Core | PASS: committed harness build zero warnings/errors; sequential Core 2114/2114 at `da6e623a7fc592d121fa8928102e744a81a6d7e7`. Final-head CI remains independently required |
 | Static web integrity | PASS: 50 modules, 57 shell assets, 150 vendor assets and 56 dependency scans; original service-worker/offline contract retained |
+| Local Chromium / Edge | PASS: 135/135 each, 270 total in 25.2 minutes; `web-local-f508b82.log`, web assets unchanged from client source `f508b82b556e18dff4f0bc0dc2610b9293b608ec`. Final feature workflows remain separately required |
 
 Local matrix cases are **24 families plus two extra C4 views and TreeView box mode**,
 not 27 families. Original five specialist windows remain distinct from nineteen
@@ -120,6 +122,18 @@ the downloaded portable app's source. This is **HOST_LOCAL_NATIVE_EXPORT_API**, 
 portable GUI export-dialog acceptance. Independent DOCX/PDF/PNG/HTML/ZIP inspection
 must accompany it. Hosted GUI export/wizard/lifecycle gates remain mandatory.
 
+The `s11` PDF is one real page, SHA-256
+`8109f99b0f8e53f396d42a5338fc716bbf74a87bab9995270b35c697b32e5220`.
+Independent parsers recover exact `Café😀🚀` and code text, with four character
+colours. The saved diagram PNG is 471×149 pixels; DOCX relationships contain two
+images, with exact canonical diagram bytes and matching fixture-image pixels.
+The initial diagnostic looked only under `word/media/`; its zero count is preserved
+and superseded by the actual package-root `media/` relationship inspection.
+
+Inspected, privacy-safe local screenshots and the redacted receipt are in
+[`evidence/goal-viii/`](evidence/goal-viii/host-summary.json). These are actual local
+desktop/API observations. They are not hosted screenshots or offscreen UI renders.
+
 ## Retained failures and classification
 
 No shipping product defect has been established and no shipping fix is included.
@@ -139,6 +153,10 @@ No shipping product defect has been established and no shipping fix is included.
 | Sequence navigation lookup | TEST HARNESS: the specialist uses `SequenceInteractions`, rather than the shared-shell `Elements` suffix. Retain the failed actual Sequence screenshot; explicitly map its existing contract and guard all five specialist navigation/source/validation IDs |
 | Quick Open fuzzy matches | TEST HARNESS: `acceptance-lf.md` correctly also returns nearby fuzzy match `acceptance-crlf.md`. Retained actual two-result screenshot; require exactly one matching file identity, select it explicitly and still require exact opened source. No product search semantics change |
 | Foreground focus refused | ENVIRONMENT LIMIT: `s07` stopped before keyboard input because the native window could not acquire foreground focus within the unchanged deadline. Retain failure; a fresh session may use explicit Computer Use activation of its verified real HWND. Never bypass policy or count unperformed shell checks |
+| First image UIA lookup in `s12` | ENVIRONMENT / observation, cause UNPROVED: one direct read-only lookup timed out before the first accepted shell check. Source/exports and raw COM failure remain. Put this pure lookup inside the existing bounded observation routine, retaining its original deadline; no action is replayed |
+| Find/Enter in `s08` | UNPROVED: exact selection assertion failed. Actual pointer Find Next selected `Café`; keyboard delivery/focus has not yet established the requested result. Preserve raw failure and manual observation. The new harness observes query/focus and avoids reactivating the owner while Find's separate focus scope is active; a later run must prove the outcome before acceptance |
+| Incomplete resized screenshots | TEST HARNESS / capture limit: ten `s06` 1280×800 frames contain large unpainted regions (Class, ER, Flowchart, Gantt, Journey, Mind map, Pie, Sequence, State, Timeline). Retain them unchanged. UIA entry/source checks remain attributable, but visual acceptance is NOT RUN for those frames. Observe controls before capture and label all new frames as requiring separate visual review |
+| HTML export assertion in `s09` | TEST HARNESS: the existing `HtmlExporter` emits native diagram PNGs, not literal Mermaid source. Preserve real files/failure. Correct the new check to verify exact independently rendered canonical PNG bytes and separate `.mmd` source; no shipping exporter change |
 | Intermediate C# compile errors | TEST HARNESS: retained exact candidate logs, including nullable diagnostics; corrected before accepted execution. No dropped warnings or relaxed compiler settings |
 | Initial PR Continuous selector | GOVERNANCE: the existing exclusion list did not include the new Goal VIII branch, so run `40118136936` queued controlled comparisons. Cancelled while its jobs were observed queued; retained API receipts. Add only this branch to the established comparison exclusion; normal/High Contrast interaction checks remain required, and the 250 ms goal stays INCOMPLETE |
 
@@ -148,6 +166,9 @@ failed screenshots remain under ignored task evidence. Completed sessions cannot
 be relaunched; choose a new source-labelled session. Raw paths/registry/state receipts
 can contain personal identifiers and must **never be committed or uploaded**.
 Only inspected privacy-safe screenshots and redacted summaries may be shared.
+An occluded or incomplete frame does not prove the target app's appearance; exclude
+unrelated surfaces from published evidence. The three shared images were inspected
+individually and contain only the synthetic native scenario/export.
 
 ## Safe operator path and interruption
 

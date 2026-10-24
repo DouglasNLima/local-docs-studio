@@ -109,3 +109,55 @@ They are not silently rewritten or promoted into new-source certification.
 `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`. It is not edited, resumed, merged,
 cherry-picked or closed. Its experimental architecture and the historical 250 ms
 comparison are outside this goal.
+
+## CURRENT — Goal VIII existing development-host evidence, 24 October 2026
+
+This appended section supersedes only the present testing qualification; all
+historical sections above retain their original source and scope. The accepted
+integrated `develop` is now `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`, tree
+`1fb777317ad6e5c8531eebcb565fefae4227e354`, verified PR #47 merge. Exact-merge
+[native 40108034236](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034236)
+has 25 successful jobs and two historical skips; exact-merge
+[web 40108034406](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034406)
+has three successful jobs and Pages skipped. Both are push, attempt 1, at that SHA.
+
+The user explicitly authorised isolated portable tests on the existing development
+computer. Its SDKs do not block **DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION**.
+The unchanged clean-machine preflight still reports BLOCKED. This is Windows 11
+Home x64 `26300.9711`, normal active-console token, actual native window DPI 144
+(150%). No scale/theme/default-app/security setting was changed.
+
+| Current decision surface | Status and evidence boundary |
+|---|---|
+| Verified frozen portable `.871` | PASS: original archive/API digest, exact source/tree, unsigned self-contained Core/WPF 10.0.13, 528 independent payload hashes before execution |
+| Local 24-family entry matrix | PASS: 27 exact-source/keyboard/private-validation/Cancel/reopen cases, including three C4 views and TreeView box mode; `s06` client `6075adbf54aae4eae69b912118b202f459cc715a` |
+| Local appearance | NOT RUN as full appearance acceptance: actual 880×600/1280×800 logical bounds at 150%; inspected Venn pair. Ten incomplete large capture frames remain invalid visual evidence |
+| Local shell/owner/restart | BLOCKED until a complete accepted receipt: exact Find/Enter selection failed in `s08`; separate foreground refusals prevented later keyboard input. Passed independent substeps remain attributed; later unperformed steps are NOT RUN |
+| Local native export APIs | PASS: real DOCX/PDF/PNG/HTML/Docs Site plus canonical source/SVG, API source `1de34f87b92b101398e62922e8c7f6bc8e269130`. Independent Unicode, PDF colours/page, image bytes/dimensions and ZIP checks. GUI export dialogues NOT RUN |
+| Host preservation | PASS in completed sessions: observed associations, registration/shortcuts and four existing private-state file hashes unchanged; bounded observation, not a system-wide write trace |
+| HOST INSTALLER | NOT RUN — UNSAFE SHARED REGISTRATION. Fixed per-user AppId/uninstall/Start Menu/default-state surfaces cannot be isolated by choosing another install directory; original hosted-only installer guard retained |
+| Clean Windows / 100% / 125% / multi-monitor | NOT RUN / NOT CERTIFIED; no feature activation, VM creation, scale change, log-off or restart |
+| Physical reader / local OS High Contrast | NOT RUN. Hosted actual OS High Contrast and UIA remain separately labelled |
+| INTERNAL BETA | BLOCKED while a critical local smoke or mandatory final feature gate lacks acceptance. Green hosted CI cannot resolve a local failure |
+| PUBLIC PRODUCTION | BLOCKED pending separate release certification, historical migration, signing/trust and updater decisions |
+
+The [Goal VIII host report/operator path](goal-viii-development-host-acceptance.md)
+contains the exact baseline hashes, local scenario attribution, retained failures,
+read-only DPI observer, synthetic state routing, interruption behaviour and safe
+commands. The [later clean-Windows mini-checklist](goal-viii-clean-windows-mini-checklist.md)
+is **NOT RUN now** and complements the unchanged Goal VII detailed runbooks.
+
+[Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48) targets
+`develop` and stays Draft. Its post-commit engineering receipt names the distinct
+final feature SHA/tree, exact-source push/PR runs and attempts, every job conclusion
+and skip, preview hashes/expiry, independent 528-path inspection/full payload delta
+and any later source-labelled local completion. That feature head is not silently
+substituted for the frozen integrated source or earlier local client source.
+
+Production code, dependency pins, private state format, original fixtures and
+protective contracts are unchanged. PR #38 remains OPEN / DRAFT / PAUSED at
+`31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; 250 ms remains INCOMPLETE. Historical
+`.749`/`.853` PDF/Journey/intermediate ER causes remain INCONCLUSIVE, and the hosted
+two-version install/upgrade/reinstall remains SYNTHETIC. No installer was invoked
+on this host, and no merge, release, signing, update feed or production deployment
+is authorised.
