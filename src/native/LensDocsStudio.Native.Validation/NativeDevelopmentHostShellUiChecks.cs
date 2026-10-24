@@ -115,7 +115,7 @@ internal static partial class NativeUiChecks
             stage = "cancel-stale-owner";
             OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Cancelled private edit"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
             Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private Cancel fixture did not validate.");
-            Find(visual, "MermaidCancel").AsButton().Invoke(); DiscardPrivate(); WaitModalClosed("MermaidVisualEditor");
+            Find(visual, "MermaidCancel").AsButton().Invoke(); WaitModalClosed("MermaidVisualEditor");
             if (ReadEditorText(editor) != source || File.ReadAllText(sourcePath) != source) throw new IOException("Cancel changed the exact owner or saved source.");
             OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Private conflict"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
             Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private conflict fixture did not validate.");
@@ -123,7 +123,7 @@ internal static partial class NativeUiChecks
             FocusWindow(main); editor.Patterns.Value.Pattern.SetValue(external); FocusWindow(visual); Find(visual, "MermaidApply").AsButton().Invoke();
             Wait(() => Find(visual, "MermaidStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Stale-owner replacement was not rejected.");
             if (ReadEditorText(Find(visual, "MermaidDraftSource")) != privateSource || ReadEditorText(editor) != external || File.ReadAllText(sourcePath) != source) throw new IOException("Stale rejection changed the private/external/saved source.");
-            Capture(visual, "stale-owner"); Find(visual, "MermaidCancel").AsButton().Invoke(); DiscardPrivate(); WaitModalClosed("MermaidVisualEditor");
+            Capture(visual, "stale-owner"); Find(visual, "MermaidCancel").AsButton().Invoke(); WaitModalClosed("MermaidVisualEditor");
             editor.Patterns.Value.Pattern.SetValue(source); FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => ReadObservedText(sourcePath) == source, "Synthetic owner did not return to its saved baseline.");
             checks.Add("Dirty private Cancel and stale-owner Apply rejection retain exact private, external and saved source");
@@ -171,11 +171,6 @@ internal static partial class NativeUiChecks
                 main.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramEditVisually", StringComparison.Ordinal)).AsButton().Invoke();
                 visual = Modal("MermaidVisualEditor"); Wait(() => Find(visual, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal), "Reopened Flowchart is not ready.");
                 Find(visual, "MermaidElements").AsListBox().Select(0);
-            }
-            void DiscardPrivate()
-            {
-                AutomationElement? yes = null; Wait(() => (yes = HostWindows(automation, app!.ProcessId).Select(window => window.FindFirstDescendant(cf => cf.ByName("Yes"))).FirstOrDefault(element => element is not null)) is not null, "Synthetic private discard confirmation missing.");
-                yes!.AsButton().Invoke();
             }
         }
         catch (Exception error)
