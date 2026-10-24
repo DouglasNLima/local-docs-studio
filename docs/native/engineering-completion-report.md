@@ -1,5 +1,21 @@
 # Native Windows preview acceptance and engineering delivery
 
+## Current status - 24 October 2026
+
+The authoritative [Current Windows readiness](current-windows-readiness.md) records
+the accepted 24-family develop baseline, internal-preview restrictions and
+[Goal VII Draft PR #47](https://github.com/DouglasNLima/local-docs-studio/pull/47).
+PR #46 is merged and its post-merge native/web runs succeeded at
+`33a751c60886a364102c45cb43e36af1e7f13517`. Higher-DPI, physical-reader, clean-Windows,
+historical-upgrade and production-trust certifications remain separately blocked.
+
+## Historical source-labelled records
+
+The original chapters below retain their dates, revisions, package hashes, counts
+and then-pending decisions. Their present-tense milestone wording is historical;
+use the canonical summary and exact-source PR delivery receipt for current status.
+
+
 ## Expansion VI implementation and accepted precondition — 23 October 2026
 
 PR #45 was merged and accepted on current develop `7b21fa62f58b10e79c74302b4b9e887be3aceadc`, tree `604fb3f6abfb6fae200166e53148eb354679cea7`. Native push run 39991049058 and web push run 39991048987 both succeeded on attempt 1. That prerequisite is satisfied. The earlier .853 PDF/Journey/intermediate ER root causes remain INCONCLUSIVE, with original failure evidence retained. PR #38 stays open/draft/paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; stock Continuous remains ordinary default.

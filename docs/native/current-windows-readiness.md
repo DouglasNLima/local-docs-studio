@@ -70,7 +70,8 @@ The verified baseline package pair is `0.1.0-preview.865` /
 These are baseline bytes, not Goal VII packages. Actions retention is temporary,
 not a permanent distribution channel.
 
-The Goal VII Draft PR's final engineering receipt identifies the **one final
+The [Goal VII Draft PR #47](https://github.com/DouglasNLima/local-docs-studio/pull/47)
+final engineering receipt identifies the **one final
 committed feature SHA/tree**, run URLs/events/attempts/conclusions/skips, package
 version pair, hashes, artefact IDs/expiry, failed candidates, independently checked
 528-file payload manifests and the complete baseline delta. Results are attached

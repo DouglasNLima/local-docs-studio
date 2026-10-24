@@ -2,7 +2,7 @@
 
 Recorded 24 October 2026. The [current-status entry point](current-windows-readiness.md)
 owns the capability decisions. This source-controlled receipt freezes the audit
-and candidate observations; the Draft PR's **final delivery receipt**, attached
+and candidate observations; [Draft PR #47](https://github.com/DouglasNLima/local-docs-studio/pull/47)'s **final delivery receipt**, attached
 after the final commit, records the actual feature SHA/tree, final runs/packages,
 all raw diagnostics and the final verdict. No document claims to contain its own
 commit hash or to validate a later source automatically.

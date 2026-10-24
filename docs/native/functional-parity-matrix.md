@@ -1,5 +1,21 @@
 # Functional parity matrix
 
+## Current status - 24 October 2026
+
+The authoritative [Current Windows readiness](current-windows-readiness.md) records
+the accepted 24-family develop baseline, internal-preview restrictions and
+[Goal VII Draft PR #47](https://github.com/DouglasNLima/local-docs-studio/pull/47).
+PR #46 is merged and its post-merge native/web runs succeeded at
+`33a751c60886a364102c45cb43e36af1e7f13517`. Higher-DPI, physical-reader, clean-Windows,
+historical-upgrade and production-trust certifications remain separately blocked.
+
+## Historical source-labelled records
+
+The original chapters below retain their dates, revisions, package hashes, counts
+and then-pending decisions. Their present-tense milestone wording is historical;
+use the canonical summary and exact-source PR delivery receipt for current status.
+
+
 ## Post-merge .853 prerequisite repair - 23 October 2026
 
 Develop's [original native run 39856703884](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39856703884)
