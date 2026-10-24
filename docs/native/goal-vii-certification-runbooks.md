@@ -44,12 +44,18 @@ must run before adding any optional tool.
    the Windows-reported effective DPI of the actual top-level app HWND and monitor,
    plus process awareness. Expected effective window DPI is 120 at 125%, 144 at
    150%, 192 at 200%; record actual values, never infer them from a screenshot.
-3. Query `GetDpiForWindow(HWND)`, `MonitorFromWindow(HWND, MONITOR_DEFAULTTONEAREST)`,
-   `GetDpiForMonitor(HMONITOR, MDT_EFFECTIVE_DPI, ...)` and
-   `GetProcessDpiAwareness(processHandle, ...)` via a read-only Win32 probe. Record
-   probe process/thread awareness as well: virtualised monitor DPI from an unaware
-   probe is not independent proof. Use the actual app process/window identity,
-   not the PowerShell window, another process or an offscreen WPF surface.
+3. Run the read-only collector against the **already running** app on that VM:
+
+   ```powershell
+   powershell -NoProfile -File .\Get-NativeDisplayEvidence.ps1 -NativeProcessId <app-pid> -VmIdentity '<image-id>' -SnapshotIdentity '<snapshot-id>' -ExpectedSourceRevision <40-character-source> -OutputPath C:\Evidence\scale-125-before.json -DisposableEnvironmentAuthorised
+   ```
+
+   It records `GetDpiForWindow`, `MonitorFromWindow`, `GetDpiForMonitor`, process/
+   window/probe-thread awareness and actual app/source/hash. It does not launch
+   the product or change settings. Repeat into new files after each scale change
+   and monitor transition. Virtualised monitor DPI from an unaware probe is not
+   independent proof; retain Settings and actual window-DPI evidence. Compile-only
+   `-ValidateProbeOnly` validates declarations and explicitly reports scaling NOT RUN.
 4. At 880×600 and 1280×800 logical window sizes, exercise all 24 matrix families.
    Tab/Shift+Tab from occurrence list through inspector/Update/Reset, history and
    Apply/Cancel. Retain real focused element and source caret/selection. Scroll
