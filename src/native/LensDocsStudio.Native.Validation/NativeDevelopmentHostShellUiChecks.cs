@@ -22,6 +22,7 @@ internal static partial class NativeUiChecks
         try
         {
             Launch();
+            if (main is null) throw new IOException("The actual synthetic shell HWND is unavailable.");
             var editor = Find(main!, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == source, "Synthetic Markdown did not open exactly.");
             Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramActionPNG")) is not null, "Synthetic image/diagram preview was not ready.");
