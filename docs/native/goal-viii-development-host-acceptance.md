@@ -93,7 +93,7 @@ New C# belongs only to the existing independent validation project.
 | Shell acceptance | BLOCKED pending an accepted complete run: `s08` passed folder/image/Unicode, exact Quick Open, pointer relative link and palette, then FAILED exact Unicode selection after Find/Enter. `s07`/`s11` stopped at the foreground guard. Later runs must have their own receipts; no unperformed owner/viewport/restart step is counted |
 | Native export APIs | PASS in `s11`, API source `1de34f87b92b101398e62922e8c7f6bc8e269130`: real DOCX/PDF/HTML, canonical `.mmd`/SVG/PNG and four-page/two-diagram Docs Site; zero site warnings. Independent PDF text/colour/page, DOCX image, PNG dimensions and ZIP inspection retained. Portable export dialogues NOT RUN |
 | Host preservation | PASS after completed sessions `s02`–`s09` and `s11`: observed associations, registrations, shortcuts and all four default private-state file hashes unchanged. Synthetic state/source changes retained. `s10` refused transient uncommitted preparation before creating its sandbox |
-| Guard tests | PASS: 52 controls at the recorded candidate, including fresh/expired/future timestamps, private-output refusal, wrapped registry-name round trips, real/dangling junction rejection, wrong source/tree/PID/HWND, changed defaults, specialist IDs and certification relabelling. Final exact-source CI retains its own count |
+| Guard tests | PASS: 54 controls at `84fc659c8059a1c422edb6d33dab0950d099df95`, including fresh/expired/future timestamps, private-output refusal, wrapped registry-name round trips, real/dangling junction rejection, wrong source/tree/PID/HWND, changed defaults, specialist IDs, direct-client bindings and retained required failures. Final exact-source CI retains its own count |
 | Local build/Core | PASS: committed harness build zero warnings/errors; sequential Core 2114/2114 at `da6e623a7fc592d121fa8928102e744a81a6d7e7`. Final-head CI remains independently required |
 | Static web integrity | PASS: 50 modules, 57 shell assets, 150 vendor assets and 56 dependency scans; original service-worker/offline contract retained |
 | Local Chromium / Edge | PASS: 135/135 each, 270 total in 25.2 minutes; `web-local-f508b82.log`, web assets unchanged from client source `f508b82b556e18dff4f0bc0dc2610b9293b608ec`. Final feature workflows remain separately required |
@@ -121,6 +121,13 @@ assembly source/version and Native/Core binary hashes are recorded separately fr
 the downloaded portable app's source. This is **HOST_LOCAL_NATIVE_EXPORT_API**, not
 portable GUI export-dialog acceptance. Independent DOCX/PDF/PNG/HTML/ZIP inspection
 must accompany it. Hosted GUI export/wizard/lifecycle gates remain mandatory.
+
+The export API client is framework-dependent: `s15` records actual **.NET 10.0.12 /
+WPF 10.0.12**, client source `68b20fe78ba913dbb2034d7f029049b2b29ebdf1`, PID 86112,
+with Native/Core binary hashes. This is additional local API evidence, not a claim
+that the portable runtime was used for those API calls. Actual portable processes
+load the independently verified bundled Core/WPF **10.0.13**; `s06` module receipts
+prove their paths and bytes. No SDK/runtime was installed or upgraded on this host.
 
 The `s11` PDF is one real page, SHA-256
 `8109f99b0f8e53f396d42a5338fc716bbf74a87bab9995270b35c697b32e5220`.
@@ -155,6 +162,8 @@ No shipping product defect has been established and no shipping fix is included.
 | Foreground focus refused | ENVIRONMENT LIMIT: `s07` stopped before keyboard input because the native window could not acquire foreground focus within the unchanged deadline. Retain failure; a fresh session may use explicit Computer Use activation of its verified real HWND. Never bypass policy or count unperformed shell checks |
 | First image UIA lookup in `s12` | ENVIRONMENT / observation, cause UNPROVED: one direct read-only lookup timed out before the first accepted shell check. Source/exports and raw COM failure remain. Put this pure lookup inside the existing bounded observation routine, retaining its original deadline; no action is replayed |
 | Find/Enter in `s08` | UNPROVED: exact selection assertion failed. Actual pointer Find Next selected `Café`; keyboard delivery/focus has not yet established the requested result. Preserve raw failure and manual observation. The new harness observes query/focus and avoids reactivating the owner while Find's separate focus scope is active; a later run must prove the outcome before acceptance |
+| Find rechecks `s14` / `s15` | FAIL / cause UNPROVED: exact Find/Enter acceptance still failed; `s14` additionally retained a UIA TextPattern timeout. No shipping defect or fix is claimed. The source-preserving independent continuation retains this required failure and cannot report an overall shell PASS |
+| `s15` diagnostic receipt collision | TEST HARNESS: the failure result and its screenshot metadata both requested `find-failure.json`; CreateNew refused the second write and stopped before independent owner scenarios. Preserve both the original failure and collision trace; use distinct result/capture names. No owner mutation occurred |
 | Incomplete resized screenshots | TEST HARNESS / capture limit: ten `s06` 1280×800 frames contain large unpainted regions (Class, ER, Flowchart, Gantt, Journey, Mind map, Pie, Sequence, State, Timeline). Retain them unchanged. UIA entry/source checks remain attributable, but visual acceptance is NOT RUN for those frames. Observe controls before capture and label all new frames as requiring separate visual review |
 | HTML export assertion in `s09` | TEST HARNESS: the existing `HtmlExporter` emits native diagram PNGs, not literal Mermaid source. Preserve real files/failure. Correct the new check to verify exact independently rendered canonical PNG bytes and separate `.mmd` source; no shipping exporter change |
 | Intermediate C# compile errors | TEST HARNESS: retained exact candidate logs, including nullable diagnostics; corrected before accepted execution. No dropped warnings or relaxed compiler settings |
