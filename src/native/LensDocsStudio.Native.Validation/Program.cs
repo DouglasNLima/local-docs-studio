@@ -21,8 +21,8 @@ internal static class Program
         {
             try
             {
-                if (args.Length != 5) throw new ArgumentException("Use the guarded Invoke-NativePortableHostSmoke.ps1 RunUi path with independent source/tree/executable pins.");
-                return NativeUiChecks.RunDevelopmentHost(args[1], args[2], args[3], args[4]);
+                if (args.Length is not (5 or 6) || args.Length == 6 && args[5] != "--shell-only") throw new ArgumentException("Use the guarded Invoke-NativePortableHostSmoke.ps1 RunUi path with independent source/tree/executable pins.");
+                return NativeUiChecks.RunDevelopmentHost(args[1], args[2], args[3], args[4], args.Length == 6);
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }

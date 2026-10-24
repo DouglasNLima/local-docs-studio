@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Plan','Prepare','Launch','RunUi','Complete')][string]$Mode = 'Plan',
+    [ValidateSet('All','Shell')][string]$ScenarioGroup = 'All',
     [Parameter(Mandatory)][string]$SandboxRoot,
     [string]$PackageDirectory,
     [ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedSourceRevision,
@@ -144,7 +145,9 @@ if ($Mode -eq 'RunUi') {
     $client = Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'
     $version = [Diagnostics.FileVersionInfo]::GetVersionInfo($client).ProductVersion
     if (-not $version.EndsWith('+' + $marker.harnessRevision, [StringComparison]::Ordinal)) { throw 'UI client must be built from the clean committed preparation source.' }
-    & $client --development-host-ui $root $marker.sourceRevision $marker.sourceTree $marker.executableSha256
+    $clientArguments=@('--development-host-ui',$root,$marker.sourceRevision,$marker.sourceTree,$marker.executableSha256)
+    if ($ScenarioGroup -eq 'Shell') { $clientArguments += '--shell-only' }
+    & $client @clientArguments
     if ($LASTEXITCODE -ne 0) { throw 'Host UI acceptance failed. Preserve the sandbox and inspect the actual test process; no uncertain retry.' }
 } elseif ($Mode -eq 'Launch') {
     if (Test-Path -LiteralPath (Join-Path $root 'complete.json')) { throw 'Completed evidence cannot be reused for another launch.' }

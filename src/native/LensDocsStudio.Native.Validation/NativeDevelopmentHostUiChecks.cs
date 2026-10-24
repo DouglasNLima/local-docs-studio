@@ -17,7 +17,7 @@ namespace LensDocsStudio.Native.Validation;
 // installer, trust, account or default-application mutation. Only synthetic files and test HWNDs.
 internal static partial class NativeUiChecks
 {
-    public static int RunDevelopmentHost(string sandbox, string revision, string tree, string executableSha256) => Task.Run(() =>
+    public static int RunDevelopmentHost(string sandbox, string revision, string tree, string executableSha256, bool shellOnly = false) => Task.Run(() =>
     {
         sandbox = Path.GetFullPath(sandbox);
         WorkspacePath.RejectReparsePoints(sandbox);
@@ -59,7 +59,7 @@ internal static partial class NativeUiChecks
         WriteNew(Path.Combine(output, "fixtures-before.json"), sources.Select(row => new { row.Family, sha256 = Hash(Path.Combine(fixtures, row.Family + ".mmd")), source = row.Source }));
         var outcomes = new List<object>();
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
-        foreach (var (family, prefix, source) in sources)
+        foreach (var (family, prefix, source) in shellOnly ? sources.Take(0) : sources)
         {
             Application? app = null; Window? main = null, visual = null;
             var checks = new List<string>(); var watch = Stopwatch.StartNew();
@@ -160,9 +160,14 @@ internal static partial class NativeUiChecks
                 WriteNew(Path.Combine(folder, name + ".json"), new { scope = "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, processId = process.Id, processStartUtc = process.StartTime.ToUniversalTime(), hwnd = handle.ToInt64(), dpi = HostWindowDpi(handle), bounds = window.BoundingRectangle.ToString(), selection, controls });
             }
         }
-        RunDevelopmentHostShell(executable, sandbox, automation, revision, tree);
-        RunDevelopmentHostExports(sandbox, revision);
-        WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, harness = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, outcomes,
+        WriteNew(Path.Combine(output, "entry-matrix-completion.json"), new { status = shellOnly ? "NOT RUN" : "PASS", scope = "DEVELOPMENT_HOST_ENTRY_MATRIX", revision, tree, executableSha256, outcomes });
+        try { RunDevelopmentHostShell(executable, sandbox, automation, revision, tree); RunDevelopmentHostExports(sandbox, revision); }
+        catch (Exception error)
+        {
+            WriteNew(Path.Combine(output, "completion.json"), new { status = "FAIL", scope = shellOnly ? "DEVELOPMENT_HOST_SHELL_UI_ONLY" : "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, outcomes, error = error.ToString() });
+            throw;
+        }
+        WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = shellOnly ? "DEVELOPMENT_HOST_SHELL_UI_ONLY" : "DEVELOPMENT_HOST_UI", entryMatrix = shellOnly ? "NOT RUN in this session" : "27 cases across 24 families", revision, tree, executableSha256, harness = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, outcomes,
             limitations = new[] { "Bounded entry/keyboard/validation/Cancel/reopen only. Full hosted mutation/protection suites remain separate.", "Existing OS scale only; no physical screen-reader, High Contrast, clean-machine or alternate-scale certification." } });
         return 0;
     }).GetAwaiter().GetResult();

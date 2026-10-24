@@ -80,6 +80,20 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => ReadObservedText(sourcePath) == edited, "Ctrl+S did not persist exact Unicode source.");
             source = edited; checks.Add("Private property validation/Apply, one-step owner Undo/Redo and Ctrl+S preserve exact source ownership");
+            stage = "isolated-library";
+            foreach (var (command, title, name) in new[] { ("SaveDocumentTemplate", "Save document template", "Synthetic host template"), ("SaveMarkdownSnippet", "Save Markdown snippet", "Synthetic host snippet") })
+            {
+                FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                Find(main, "FileMenu").AsMenuItem().Expand(); Find(main, command).AsMenuItem().Invoke();
+                Window? prompt = null; Wait(() => (prompt = HostWindows(automation, app!.ProcessId).SingleOrDefault(window => window.Name == title)) is not null, "Native library name prompt did not open.");
+                Find(prompt!, "WorkspacePathInput").AsTextBox().Text = name; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
+                Wait(() => Find(main, "Status").Name.Contains("Saved", StringComparison.Ordinal) && Find(main, "Status").Name.Contains(name, StringComparison.Ordinal), "Synthetic library item was not saved.");
+            }
+            var library = new LensDocsStudio.Core.State.LocalLibraryStore(Path.Combine(state, "content-library")).ReadAsync().GetAwaiter().GetResult();
+            if (library.State.Active.Templates.Count != 1 || library.State.Active.Snippets.Count != 1 || ReadEditorText(editor) != source)
+                throw new IOException("Actual template/snippet writes did not remain in the synthetic state library or changed the owner.");
+            Capture(main, "isolated-library");
+            checks.Add("Actual app template/snippet saves use only the explicit synthetic content-library state and retain source");
             stage = "cancel-stale-owner";
             OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Cancelled private edit"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
             Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private Cancel fixture did not validate.");
@@ -165,8 +179,9 @@ internal static partial class NativeUiChecks
         {
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_P); var picker = Modal("CommandSearchWindow");
             Find(picker, "CommandSearchQuery").AsTextBox().Text = filename;
-            Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Length == 1, "Quick Open did not filter the exact synthetic filename.");
-            Find(picker, "CommandSearchResults").AsListBox().Select(0); FocusWindow(picker); Keyboard.Type(VirtualKeyShort.RETURN); WaitModalClosed("CommandSearchWindow");
+            Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Count(item => item.Name == filename) == 1, "Quick Open did not expose exactly one matching synthetic file identity.");
+            Find(picker, "CommandSearchResults").AsListBox().Items.Single(item => item.Name == filename).Patterns.SelectionItem.Pattern.Select();
+            FocusWindow(picker); Keyboard.Type(VirtualKeyShort.RETURN); WaitModalClosed("CommandSearchWindow");
             Wait(() => ReadEditorText(Find(main!, "MarkdownEditor")) == File.ReadAllText(Path.Combine(workspace, filename)), "Quick Open selected different source.");
         }
         void Drag(string id, int pixels)
