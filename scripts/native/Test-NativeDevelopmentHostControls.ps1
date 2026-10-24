@@ -75,6 +75,7 @@ Test-Acceptance 'Dry-run does not create sandbox or launch app' {
     if (Test-Path -LiteralPath $plan) { throw 'Dry-run mutated sandbox' }
 }
 Test-Rejection 'Missing independent package pins' { & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot $plan -Mode Prepare }
+Test-Rejection 'Long path cannot silently lose Windows binary identity' { & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot ($plan + ('x'*100)) -DryRun }
 [void][IO.Directory]::CreateDirectory($plan)
 Test-Rejection 'Stale/nonempty evidence cannot be reused' { & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot $plan -DryRun }
 Write-NativeHostReceipt (Join-Path $plan 'host-sandbox.json') @{ schemaVersion=1; qualification='DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION'; cleanMachineCertified=$false; sourceRevision=$revision; preparedAtUtc='2000-01-01T00:00:00Z' }

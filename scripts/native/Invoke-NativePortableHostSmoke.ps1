@@ -14,6 +14,11 @@ $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $allowed = Join-Path $repo 'artifacts/native/development-host'
 $root = Assert-NativeHostPath $SandboxRoot $allowed
+# Windows version-resource inspection returns no identity beyond MAX_PATH, even when
+# ordinary file reads succeed. Reserve room for the existing independent verifier.
+if (($root.Length + '/binary-inspection-'.Length + 32 + '/LensDocsStudio.Native.dll'.Length) -ge 260) {
+    throw 'Sandbox path is too long for independent Windows version-resource inspection. Use a shorter fresh session name/worktree path; no identity check is relaxed.'
+}
 if ($root -notmatch '[\\/]([0-9a-f]{40})[\\/]([A-Za-z0-9-]+)$') { throw 'Use development-host/<package-source-SHA>/<fresh-session-name>.' }
 $folderRevision = $Matches[1]
 $markerPath = Join-Path $root 'host-sandbox.json'
