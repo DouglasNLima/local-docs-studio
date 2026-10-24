@@ -25,7 +25,7 @@ internal static partial class NativeUiChecks
             var editor = Find(main!, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == source, "Synthetic Markdown did not open exactly.");
             Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramActionPNG")) is not null, "Synthetic image/diagram preview was not ready.");
-            if (main!.FindFirstDescendant(cf => cf.ByName("Synthetic orange square")) is null) throw new IOException("The actual relative image is missing from native preview.");
+            Wait(() => ObserveWindow(main!).FindFirstDescendant(cf => cf.ByName("Synthetic orange square")) is not null, "The actual relative image is missing from native preview.");
             Capture(main, "first-launch"); checks.Add("Explicit synthetic folder/file, Unicode, relative image and native diagram render in the actual process");
             stage = "quick-open"; QuickOpen("acceptance-crlf.md");
             if (ReadEditorText(Find(main, "MarkdownEditor")) != File.ReadAllText(Path.Combine(workspace, "acceptance-crlf.md"))) throw new IOException("CRLF file did not retain its exact source.");
