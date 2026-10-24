@@ -31,6 +31,14 @@ internal static partial class NativeUiChecks
             if (ReadEditorText(Find(main, "MarkdownEditor")) != File.ReadAllText(Path.Combine(workspace, "acceptance-crlf.md"))) throw new IOException("CRLF file did not retain its exact source.");
             QuickOpen("relative.md"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
             checks.Add("Quick Open keyboard filtering/Enter opens CRLF and relative synthetic files with exact source");
+            stage = "relative-link";
+            var link = Find(main, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("Relative document", false, false) ?? throw new IOException("Relative document link is missing from preview.");
+            link.ScrollIntoView(false);
+            var linkBounds = link.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+            FocusWindow(main); Mouse.Click(new System.Drawing.Point((int)(linkBounds.Left + linkBounds.Width / 2), (int)(linkBounds.Top + linkBounds.Height / 2)));
+            Wait(() => ReadEditorText(Find(main, "MarkdownEditor")) == File.ReadAllText(Path.Combine(workspace, "relative.md")), "Actual relative-link pointer did not open the synthetic target.");
+            Capture(main, "relative-link"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
+            checks.Add("Actual pointer activation of the rendered relative link opens its exact synthetic document");
             stage = "palette"; FocusWindow(main); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_P);
             var palette = Modal("CommandSearchWindow"); Capture(palette, "command-palette");
             Find(palette, "CommandSearchQuery").AsTextBox().Text = "Close workspace";
@@ -72,6 +80,21 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => ReadObservedText(sourcePath) == edited, "Ctrl+S did not persist exact Unicode source.");
             source = edited; checks.Add("Private property validation/Apply, one-step owner Undo/Redo and Ctrl+S preserve exact source ownership");
+            stage = "cancel-stale-owner";
+            OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Cancelled private edit"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
+            Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private Cancel fixture did not validate.");
+            Find(visual, "MermaidCancel").AsButton().Invoke(); DiscardPrivate(); WaitModalClosed("MermaidVisualEditor");
+            if (ReadEditorText(editor) != source || File.ReadAllText(sourcePath) != source) throw new IOException("Cancel changed the exact owner or saved source.");
+            OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Private conflict"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
+            Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private conflict fixture did not validate.");
+            var privateSource = ReadEditorText(Find(visual, "MermaidDraftSource")); var external = source + "\nExternal synthetic owner\n";
+            FocusWindow(main); editor.Patterns.Value.Pattern.SetValue(external); FocusWindow(visual); Find(visual, "MermaidApply").AsButton().Invoke();
+            Wait(() => Find(visual, "MermaidStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Stale-owner replacement was not rejected.");
+            if (ReadEditorText(Find(visual, "MermaidDraftSource")) != privateSource || ReadEditorText(editor) != external || File.ReadAllText(sourcePath) != source) throw new IOException("Stale rejection changed the private/external/saved source.");
+            Capture(visual, "stale-owner"); Find(visual, "MermaidCancel").AsButton().Invoke(); DiscardPrivate(); WaitModalClosed("MermaidVisualEditor");
+            editor.Patterns.Value.Pattern.SetValue(source); FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            Wait(() => ReadObservedText(sourcePath) == source, "Synthetic owner did not return to its saved baseline.");
+            checks.Add("Dirty private Cancel and stale-owner Apply rejection retain exact private, external and saved source");
             stage = "panes";
             Drag("SidebarSplitter", 24); Drag("EditorSplitter", 24); Drag("OutlineSplitter", -20); Capture(main, "resized-panes");
             checks.Add("Actual pointer drags resize workspace/editor/outline panes");
@@ -79,8 +102,22 @@ internal static partial class NativeUiChecks
             Find(diagram, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(175);
             Wait(() => Find(diagram, "DiagramZoomLabel").Name == "175%", "Actual diagram zoom did not change.");
             Find(diagram, "DiagramFit").AsButton().Invoke(); Capture(diagram, "diagram-fit");
+            var scale = HostWindowDpi(diagram.Properties.NativeWindowHandle.Value) / 96.0;
+            diagram.Patterns.Transform.Pattern.Resize(560 * scale, 400 * scale);
+            Find(diagram, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(400);
+            var viewport = Find(diagram, "DiagramViewport"); var scroll = viewport.Patterns.Scroll.Pattern;
+            Wait(() => scroll.HorizontallyScrollable.Value, "Enlarged native drawing did not expose horizontal pan.");
+            var viewportBounds = viewport.BoundingRectangle; var panBefore = scroll.HorizontalScrollPercent.Value;
+            FocusWindow(diagram); Mouse.DragHorizontally(new System.Drawing.Point((int)(viewportBounds.Left + viewportBounds.Width * .7), (int)(viewportBounds.Top + viewportBounds.Height / 2)), -80, MouseButton.Middle);
+            Wait(() => scroll.HorizontalScrollPercent.Value > panBefore, "Actual middle-button pointer drag did not pan the native diagram.");
+            Capture(diagram, "diagram-pan"); Find(diagram, "DiagramReset").AsButton().Invoke();
             FocusWindow(diagram); diagram.Close(); WaitModalClosed("DiagramWindow");
-            checks.Add("Actual native diagram window accepts 175% zoom and Fit");
+            checks.Add("Actual native diagram window accepts 175% zoom, Fit, middle-button pan and Reset at the existing scale");
+            stage = "invalid-source"; QuickOpen("invalid.mmd");
+            Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramError0")) is not null, "Invalid diagram did not show its source-preserving error.");
+            if (ReadEditorText(Find(main, "MarkdownEditor")) != File.ReadAllText(Path.Combine(workspace, "invalid.mmd"))) throw new IOException("Invalid diagram source was rewritten.");
+            Find(main, "MarkdownEditor").Focus(); Capture(main, "invalid-source"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
+            checks.Add("Invalid standalone source remains exact and directly editable beside its native error");
             stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); main.Close(); Wait(() => app!.HasExited, "Synthetic shell did not close normally."); app!.Dispose(); app = null;
             using var preferencesBefore = JsonDocument.Parse(File.ReadAllText(Path.Combine(state, "preferences.json")));
             var desktopBefore = preferencesBefore.RootElement.GetProperty("Desktop").GetRawText();
@@ -94,7 +131,19 @@ internal static partial class NativeUiChecks
             Capture(main!, "closed-workspace"); checks.Add("Close workspace retains the open document and source");
             FocusWindow(main!); main!.Close(); Wait(() => app!.HasExited, "Final synthetic shell did not close normally.");
             WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, checks, observations,
-                notRun = new[] { "Personal-host shell Open/Save dialogues: shared Windows recent-folder history cannot be isolated; no dialogue invoked", "Actual relative-link pointer activation", "Inspector drag persistence and diagram pan", "Stale-owner/invalid-source UI in this additional shell run; see separately labelled hosted suites", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
+                notRun = new[] { "Personal-host shell Open/Save dialogues: shared Windows recent-folder history cannot be isolated; no dialogue invoked", "Inspector drag persistence", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
+
+            void OpenDraft()
+            {
+                main.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramEditVisually", StringComparison.Ordinal)).AsButton().Invoke();
+                visual = Modal("MermaidVisualEditor"); Wait(() => Find(visual, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal), "Reopened Flowchart is not ready.");
+                Find(visual, "MermaidElements").AsListBox().Select(0);
+            }
+            void DiscardPrivate()
+            {
+                AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Synthetic private discard confirmation missing.");
+                yes!.AsButton().Invoke();
+            }
         }
         catch (Exception error)
         {

@@ -72,12 +72,14 @@ internal static partial class NativeUiChecks
                 WriteNew(Path.Combine(familyOutput, "before.json"), new { sourceSha256 = Hash(fixture), preferencesSha256 = Hash(Path.Combine(state, "preferences.json")), revision, tree });
                 var start = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = fixtures };
                 foreach (var arg in new[] { "--state-directory", state, Path.Combine(sandbox, "workspace"), fixture }) start.ArgumentList.Add(arg);
-                app = Application.Launch(start);
-                using var actualProcess = Process.GetProcessById(app.ProcessId);
+                using var actualProcess = Process.Start(start) ?? throw new IOException("Could not start the synthetic portable process.");
+                actualProcess.EnableRaisingEvents = true;
+                app = Application.Attach(actualProcess.Id);
                 main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Actual owner HWND did not appear within the unchanged 25-second owner deadline.");
                 var owner = Find(main, "MarkdownEditor");
                 Wait(() => ReadEditorText(owner) == source, "Standalone source did not load exactly.");
                 Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Normal Visual Edit entry did not render.");
+                CaptureHostRuntime(actualProcess, executable, familyOutput, revision, tree);
                 checks.Add("Standalone source and normal Visual Edit entry correspond exactly");
                 Open();
                 var sourceId = prefix == "Mermaid" ? "MermaidDraftSource" : prefix + (family is "Sequence" or "State" or "Er" or "Class" ? "Source" : "SourceEditor");
@@ -166,6 +168,18 @@ internal static partial class NativeUiChecks
     }).GetAwaiter().GetResult();
 
     private static string Hash(string path) { using var stream = File.OpenRead(path); return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant(); }
+    private static void CaptureHostRuntime(Process process, string executable, string output, string revision, string tree)
+    {
+        var payload = Path.GetDirectoryName(executable)!;
+        var modules = process.Modules.Cast<ProcessModule>().ToArray();
+        var runtime = new[] { "coreclr.dll", "wpfgfx_cor3.dll" }.Select(name =>
+        {
+            var found = modules.Where(module => module.ModuleName.Equals(name, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (found.Length != 1 || !Path.GetDirectoryName(found[0].FileName)!.Equals(payload, StringComparison.OrdinalIgnoreCase)) throw new IOException("Actual CoreCLR/WPF module is not loaded from the verified portable payload.");
+            return new { name, path = "<sandbox>/payload/" + name, sha256 = Hash(found[0].FileName), version = FileVersionInfo.GetVersionInfo(found[0].FileName).ProductVersion };
+        }).ToArray();
+        WriteNew(Path.Combine(output, "runtime.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_LOADED_MODULES", processId = process.Id, revision, tree, runtime, cleanMachineCertified = false });
+    }
     private static void WriteNew(string path, object value) { using var stream = new FileStream(path, FileMode.CreateNew); JsonSerializer.Serialize(stream, value, new JsonSerializerOptions { WriteIndented = true }); stream.Flush(true); }
     [DllImport("kernel32.dll", EntryPoint = "WTSGetActiveConsoleSessionId")] private static extern uint HostActiveConsoleSession();
     [DllImport("user32.dll", EntryPoint = "IsWindowVisible")] private static extern bool HostVisibleWindow(IntPtr window);
