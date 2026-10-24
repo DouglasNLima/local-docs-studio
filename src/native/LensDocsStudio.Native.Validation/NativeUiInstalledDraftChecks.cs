@@ -114,14 +114,15 @@ internal static partial class NativeUiChecks
         for (var index = 0; index < dirtyDocuments; index++)
         {
             Window? prompt = null;
-            Wait(() => (prompt = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process.Id)
-                .And(cf.ByName("Unsaved document")))?.AsWindow()) is not null, "The expected unsaved-document prompt did not appear.");
+            // Resolve only this test process's native dialogue before asking its provider.
+            // An unrelated or closing desktop provider must not decide draft retention.
+            Wait(() => (prompt = NativeWindowDiscovery.FindTopLevelWindows("#32770", "Unsaved document", process.Id)
+                .Select(handle => automation.FromHandle(handle).AsWindow()).SingleOrDefault()) is not null, "The expected unsaved-document prompt did not appear.");
             var handle = prompt!.Properties.NativeWindowHandle.Value;
             var decline = prompt.FindFirstDescendant(cf => cf.ByName("No").And(cf.ByControlType(ControlType.Button)))
                 ?? throw new IOException("The unsaved-document prompt has no decline-save action.");
             decline.AsButton().Invoke();
-            Wait(() => automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(process.Id).And(cf.ByName("Unsaved document")))
-                .All(element => element.Properties.NativeWindowHandle.Value != handle), "The answered draft prompt did not close.");
+            Wait(() => !NativeWindowDiscovery.Exists(handle), "The answered draft prompt did not close.");
         }
         Wait(() => process.HasExited, "The application did not persist drafts and close safely.");
         if (process.ExitCode != 0) throw new IOException("The draft-preserving application shutdown failed.");

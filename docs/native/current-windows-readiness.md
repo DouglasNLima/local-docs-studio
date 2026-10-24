@@ -154,6 +154,16 @@ and skip, preview hashes/expiry, independent 528-path inspection/full payload de
 and any later source-labelled local completion. That feature head is not silently
 substituted for the frozen integrated source or earlier local client source.
 
+Candidate `.876`, source `6a6d13505e3babe58b7a9c2e2ebdbdec6b883c3e`, failed the
+hosted push lifecycle after 75 desktop checks at a whole-desktop UIA closure
+observation (`E_UNEXPECTED`). The original archive/log/screenshot are retained; its
+dependent installed-family checks were skipped and are not 72 successful phases.
+The bounded harness correction uses native PID/real-HWND discovery and preserves
+the action count, original deadline and exact persisted-draft/source checks. The
+post-commit engineering receipt must record the final AFTER gates independently.
+No product defect, historical RCA or successful draft retention is inferred from
+the failed observation.
+
 Production code, dependency pins, private state format, original fixtures and
 protective contracts are unchanged. PR #38 remains OPEN / DRAFT / PAUSED at
 `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; 250 ms remains INCOMPLETE. Historical

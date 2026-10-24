@@ -166,6 +166,7 @@ No shipping product defect has been established and no shipping fix is included.
 | Find rechecks `s14` / `s15` | FAIL / cause UNPROVED: exact Find/Enter acceptance still failed; `s14` additionally retained a UIA TextPattern timeout. No shipping defect or fix is claimed. The source-preserving independent continuation retains this required failure and cannot report an overall shell PASS |
 | `s15` diagnostic receipt collision | TEST HARNESS: the failure result and its screenshot metadata both requested `find-failure.json`; CreateNew refused the second write and stopped before independent owner scenarios. Preserve both the original failure and collision trace; use distinct result/capture names. No owner mutation occurred |
 | Explicit Cancel in `s16` | TEST HARNESS: `MermaidVisualEditorWindow.Cancel` sets `discard = true` and closes intentionally, so no confirmation is expected. The retained window list has only the owner. The new harness's Yes-dialogue expectation was false (the separate window-close confirmation uses OK/Cancel). Correct only that expectation, retaining actual modal closure and exact owner/saved-source checks; no product change |
+| Hosted `.876` lifecycle at `6a6d13505e3babe58b7a9c2e2ebdbdec6b883c3e` | FAIL: [push run 40125540371](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40125540371), attempt 1, failed after 75 desktop checks while a read-only whole-desktop UIA query observed an answered save prompt. `E_UNEXPECTED` arose in `CloseRetainingDrafts`; dependent installed-family jobs were skipped. This is a harness observation failure; its OS/provider cause and actual draft-retention outcome remain UNPROVED. Preserve original archive `12573267920`, 337,443,525 bytes, SHA-256 `10773171aa14aef4e4cf650f6a6508918ecd41fa9f77fcf97d4d3419e4da66fe`, expiry 7 November 2026 19:46:12 UTC, raw log and seeded-draft screenshot. Scope the lookup to the test PID before UIA and observe closure through the captured real HWND; retain one decline action, original deadlines and exact recovery/source assertions. A later exact-source hosted run must prove AFTER |
 | Incomplete resized screenshots | TEST HARNESS / capture limit: ten `s06` 1280×800 frames contain large unpainted regions (Class, ER, Flowchart, Gantt, Journey, Mind map, Pie, Sequence, State, Timeline). Retain them unchanged. UIA entry/source checks remain attributable, but visual acceptance is NOT RUN for those frames. Observe controls before capture and label all new frames as requiring separate visual review |
 | HTML export assertion in `s09` | TEST HARNESS: the existing `HtmlExporter` emits native diagram PNGs, not literal Mermaid source. Preserve real files/failure. Correct the new check to verify exact independently rendered canonical PNG bytes and separate `.mmd` source; no shipping exporter change |
 | Intermediate C# compile errors | TEST HARNESS: retained exact candidate logs, including nullable diagnostics; corrected before accepted execution. No dropped warnings or relaxed compiler settings |
@@ -220,6 +221,13 @@ native process and unchanged observed host snapshots. An existing native process
 locked desktop, stale receipt, unsupported policy or unsafe path is BLOCKED; do not
 spoof GitHub runner markers, elevate, install certificates or bypass protections.
 The original `Test-NativeInstaller.ps1` and VM-authorised display protocol remain intact.
+
+The targeted `--window-discovery <fresh-unit-directory>` validation route tests
+native class/caption/PID matching, wrong/invalid owners and live/destroyed owned
+handles without UIA input. Its hidden owned fixture is **unit evidence only**, never
+local interactive GUI, installer, screen-reader or DPI certification. Hosted
+installed-draft discovery uses that native filter before attaching the one expected
+prompt provider; answering a prompt is not retried.
 
 If interrupted, stop input, retain the PID/start-time/receipt, and inspect the actual
 test window. Close that app normally, saving only synthetic work if prompted.

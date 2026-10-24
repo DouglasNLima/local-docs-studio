@@ -7,12 +7,18 @@ namespace LensDocsStudio.Native.Validation;
 /// <summary>Locates the known test window before requesting any UI Automation provider.</summary>
 internal static class NativeWindowDiscovery
 {
-    public static IReadOnlyList<nint> FindTopLevelWindows(string className, string captionFragment)
+    public static IReadOnlyList<nint> FindTopLevelWindows(string className, string captionFragment, int? processId = null)
     {
+        if (processId is <= 0) throw new ArgumentOutOfRangeException(nameof(processId));
         var matches = new List<nint>();
         var windowClass = new StringBuilder(256); var caption = new StringBuilder(4096);
         if (!EnumWindows((window, _) =>
         {
+            if (processId is { } expected)
+            {
+                GetWindowThreadProcessId(window, out var owner);
+                if (owner != (uint)expected) return true;
+            }
             windowClass.Clear();
             if (GetClassName(window, windowClass, windowClass.Capacity) == 0
                 || !windowClass.ToString().Equals(className, StringComparison.Ordinal)) return true;
@@ -24,6 +30,8 @@ internal static class NativeWindowDiscovery
         return matches;
     }
 
+    public static bool Exists(nint window) => IsWindow(window);
+
     [return: MarshalAs(UnmanagedType.Bool)]
     private delegate bool WindowCallback(nint window, nint parameter);
     [DllImport("user32.dll", SetLastError = true)]
@@ -33,4 +41,9 @@ internal static class NativeWindowDiscovery
     private static extern int GetClassName(nint window, StringBuilder name, int capacity);
     [DllImport("user32.dll", EntryPoint = "GetWindowTextW", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern int GetWindowText(nint window, StringBuilder text, int capacity);
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(nint window, out uint processId);
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsWindow(nint window);
 }
