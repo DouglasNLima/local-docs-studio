@@ -158,6 +158,7 @@ internal static partial class NativeUiChecks
             }
         }
         RunDevelopmentHostShell(executable, sandbox, automation, revision, tree);
+        RunDevelopmentHostExports(sandbox, revision);
         WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, harness = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, outcomes,
             limitations = new[] { "Bounded entry/keyboard/validation/Cancel/reopen only. Full hosted mutation/protection suites remain separate.", "Existing OS scale only; no physical screen-reader, High Contrast, clean-machine or alternate-scale certification." } });
         return 0;

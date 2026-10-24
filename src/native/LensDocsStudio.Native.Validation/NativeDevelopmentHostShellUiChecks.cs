@@ -80,17 +80,6 @@ internal static partial class NativeUiChecks
             Find(diagram, "DiagramFit").AsButton().Invoke(); Capture(diagram, "diagram-fit");
             FocusWindow(diagram); diagram.Close(); WaitModalClosed("DiagramWindow");
             checks.Add("Actual native diagram window accepts 175% zoom and Fit");
-            stage = "exports";
-            foreach (var (id, extension, title) in new[] { ("ExportWord", "docx", "Export DOCX"), ("ExportPdf", "pdf", "Export PDF"), ("ExportHtml", "html", "Export HTML") })
-            {
-                Find(main, "ExportMenu").AsMenuItem().Expand(); Find(main, id).AsMenuItem().Invoke();
-                Save(Path.Combine(sandbox, "exports", "host." + extension), title);
-            }
-            Find(main, "DiagramActionPNG").AsButton().Invoke(); Save(Path.Combine(sandbox, "exports", "host-diagram.png"), null);
-            Find(main, "ExportMenu").AsMenuItem().Expand(); Find(main, "ExportDocsSite").AsMenuItem().Invoke();
-            var site = ModalByName("Export Docs Site"); Find(site, "DocsSiteTitle").AsTextBox().Text = "Synthetic host documentation";
-            Find(site, "ConfirmDocsSite").AsButton().Invoke(); Save(Path.Combine(sandbox, "exports", "host-site.zip"), "Save Docs Site");
-            checks.Add("Actual native UI exports DOCX/PDF/HTML/PNG/Docs Site into explicit fresh sandbox destinations");
             stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); main.Close(); Wait(() => app!.HasExited, "Synthetic shell did not close normally."); app!.Dispose(); app = null;
             using var preferencesBefore = JsonDocument.Parse(File.ReadAllText(Path.Combine(state, "preferences.json")));
             var desktopBefore = preferencesBefore.RootElement.GetProperty("Desktop").GetRawText();
@@ -104,7 +93,7 @@ internal static partial class NativeUiChecks
             Capture(main!, "closed-workspace"); checks.Add("Close workspace retains the open document and source");
             FocusWindow(main!); main!.Close(); Wait(() => app!.HasExited, "Final synthetic shell did not close normally.");
             WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, checks, observations,
-                notRun = new[] { "Actual relative-link pointer activation", "Inspector drag persistence and diagram pan", "Stale-owner/invalid-source UI in this additional shell run; see separately labelled hosted suites", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
+                notRun = new[] { "Personal-host shell Open/Save dialogues: shared Windows recent-folder history cannot be isolated; no dialogue invoked", "Actual relative-link pointer activation", "Inspector drag persistence and diagram pan", "Stale-owner/invalid-source UI in this additional shell run; see separately labelled hosted suites", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
         }
         catch (Exception error)
         {
@@ -121,7 +110,6 @@ internal static partial class NativeUiChecks
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Shell owner did not open within 25 seconds.");
         }
         Window Modal(string id) { Window? found = null; Wait(() => (found = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(id)))?.AsWindow()) is not null, "Native modal missing: " + id); return found!; }
-        Window ModalByName(string name) { Window? found = null; Wait(() => (found = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(name)))?.AsWindow()) is not null, "Native modal missing: " + name); return found!; }
         void WaitModalClosed(string id) => Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(id))) is null, "Native modal did not close: " + id);
         void QuickOpen(string filename)
         {
@@ -137,22 +125,6 @@ internal static partial class NativeUiChecks
             var point = new System.Drawing.Point((int)(bounds.Left + bounds.Width / 2), (int)(bounds.Top + bounds.Height / 2));
             Mouse.MoveTo(point); Mouse.Down(MouseButton.Left); Mouse.MoveTo(new System.Drawing.Point(point.X + pixels, point.Y)); Mouse.Up(MouseButton.Left);
             observations.Add(new { operation = "Pointer splitter drag", id, pixels, before = bounds.ToString(), after = Find(main!, id).BoundingRectangle.ToString() });
-        }
-        void Save(string destination, string? title)
-        {
-            if (!destination.StartsWith(Path.Combine(sandbox, "exports") + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) || File.Exists(destination)) throw new IOException("Only a fresh sandbox export destination is allowed.");
-            Window? dialogue = null;
-            Wait(() => (dialogue = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(title is null ? cf.ByClassName("#32770") : cf.ByName(title)))?.AsWindow()) is not null, "Actual Save dialogue did not open.");
-            TextBox? field = null;
-            Wait(() => (field = dialogue!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))?.AsTextBox())?.IsEnabled == true, "Labelled export filename field is missing.");
-            field!.Text = destination;
-            if (field.Text != destination) throw new IOException("Export destination was not accepted exactly.");
-            // A shell picker can list unrelated recent folders. Retain only its
-            // exact labelled synthetic destination, never its private navigation tree.
-            observations.Add(new { operation = "Save dialogue destination", file = Path.GetFileName(destination), hwnd = dialogue!.Properties.NativeWindowHandle.Value.ToInt64(), field = field.Name, exactDestination = field.Text == destination });
-            dialogue!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save")))!.AsButton().Invoke();
-            Wait(() => File.Exists(destination) && new FileInfo(destination).Length > 0, "Export did not produce the chosen file.");
-            observations.Add(new { operation = "Real UI export", file = Path.GetFileName(destination), bytes = new FileInfo(destination).Length, sha256 = Hash(destination) });
         }
         void Capture(Window window, string name)
         {

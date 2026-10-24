@@ -106,7 +106,7 @@ A[Write] --> B[Review]
     $baseline = @{ workspace=@(Get-NativeHostManifest $workspace); state=@(Get-NativeHostManifest $state) }
     Write-NativeHostReceipt (Join-Path $root 'synthetic-before.json') $baseline
     $marker = [ordered]@{ schemaVersion=1; qualification='DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION'; cleanMachineCertified=$false;
-        preparedAtUtc=[DateTime]::UtcNow.ToString('o'); harnessRevision=$harnessRevision;
+        preparedAtUtc=[DateTime]::UtcNow.ToString('o'); harnessRevision=$harnessRevision; harnessTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();
         sourceRevision=$ExpectedSourceRevision; sourceTree=$ExpectedSourceTree; portableSha256=$ExpectedZipSha256;
         executableSha256=(Get-FileHash -LiteralPath (Join-Path $payload 'LensDocsStudio.Native.exe')).Hash.ToLowerInvariant();
         baselineSha256=(Get-FileHash -LiteralPath (Join-Path $root 'synthetic-before.json')).Hash.ToLowerInvariant();
