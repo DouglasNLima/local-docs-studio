@@ -17,6 +17,7 @@ internal static partial class NativeUiChecks
         var state = Path.Combine(sandbox, "state", "ui-shell"); Directory.CreateDirectory(state);
         WriteNew(Path.Combine(state, "preferences.json"), new { AutomaticUpdateChecks = false, Theme = "Light" });
         var source = File.ReadAllText(sourcePath); var checks = new List<string>(); var observations = new List<object>();
+        WriteNew(Path.Combine(output, "before.json"), new { sourceSha256 = Hash(sourcePath), preferencesSha256 = Hash(Path.Combine(state, "preferences.json")), revision, tree });
         Application? app = null; Window? main = null; var stage = "launch";
         try
         {

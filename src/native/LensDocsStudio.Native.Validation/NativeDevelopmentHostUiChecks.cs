@@ -69,6 +69,7 @@ internal static partial class NativeUiChecks
                 var state = Path.Combine(sandbox, "state", "ui-" + family); Directory.CreateDirectory(state);
                 WriteNew(Path.Combine(state, "preferences.json"), new { AutomaticUpdateChecks = false, Theme = "Light" });
                 var fixture = Path.Combine(fixtures, family + ".mmd");
+                WriteNew(Path.Combine(familyOutput, "before.json"), new { sourceSha256 = Hash(fixture), preferencesSha256 = Hash(Path.Combine(state, "preferences.json")), revision, tree });
                 var start = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = fixtures };
                 foreach (var arg in new[] { "--state-directory", state, Path.Combine(sandbox, "workspace"), fixture }) start.ArgumentList.Add(arg);
                 app = Application.Launch(start);

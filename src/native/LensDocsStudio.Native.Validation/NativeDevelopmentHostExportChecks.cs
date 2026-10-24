@@ -29,7 +29,7 @@ internal static partial class NativeUiChecks
         }
         using (var document = WordprocessingDocument.Open(Path.Combine(output, "host.docx"), false))
         {
-            if (new OpenXmlValidator().Validate(document).Any() || document.MainDocumentPart?.Document.InnerText.Contains("Café😀🚀", StringComparison.Ordinal) != true)
+            if (new OpenXmlValidator().Validate(document).Any() || document.MainDocumentPart?.Document?.InnerText.Contains("Café😀🚀", StringComparison.Ordinal) != true)
                 throw new IOException("DOCX schema/Unicode inspection failed.");
         }
         var html = System.Net.WebUtility.HtmlDecode(File.ReadAllText(Path.Combine(output, "host.html")));
