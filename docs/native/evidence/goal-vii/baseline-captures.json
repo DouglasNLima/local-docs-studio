@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "scope": "Current accepted baseline actual Windows captures; not final-feature source or interactive scaling certification",
+  "captures": [
+    {
+      "image": "docs/native/images/goal-vii/packet-baseline-normal-880x600.png",
+      "family": "Packet",
+      "capture": {
+        "Family": "Packet",
+        "SourceRevision": "0.1.0-preview.1+33a751c60886a364102c45cb43e36af1e7f13517",
+        "SourceSha256": "b3cf378c9986b1bf109f6ef04978c80624a97dd4028a1a9b4c11404100590708",
+        "ImageSha256": "3d0d3b8264916138f8ac81f48224a2ccf42e1c61f940be0a71891259b96592b4",
+        "ActualWindowsHighContrast": false,
+        "Appearance": "Light",
+        "Bounds": "{X=0,Y=0,Width=880,Height=600}",
+        "Limitation": "Actual hosted Windows capture and UIA; no physical screen-reader, higher-DPI interactive or SDK-free clean-Windows certification."
+      },
+      "appearance": "normal",
+      "attempt": 1,
+      "sourceRevision": "33a751c60886a364102c45cb43e36af1e7f13517",
+      "runId": 40096678650
+    },
+    {
+      "image": "docs/native/images/goal-vii/packet-baseline-hc-1280x800.png",
+      "family": "Packet",
+      "capture": {
+        "Family": "Packet",
+        "SourceRevision": "0.1.0-preview.1+33a751c60886a364102c45cb43e36af1e7f13517",
+        "SourceSha256": "b3cf378c9986b1bf109f6ef04978c80624a97dd4028a1a9b4c11404100590708",
+        "ImageSha256": "305c81764d423b4f44f470388be62b0a9bcfc7aa3f8cbe44f935e850c3fac67c",
+        "ActualWindowsHighContrast": true,
+        "Appearance": "High Contrast",
+        "Bounds": "{X=0,Y=0,Width=1280,Height=800}",
+        "Limitation": "Actual hosted Windows capture and UIA; no physical screen-reader, higher-DPI interactive or SDK-free clean-Windows certification."
+      },
+      "appearance": "high-contrast",
+      "attempt": 1,
+      "sourceRevision": "33a751c60886a364102c45cb43e36af1e7f13517",
+      "runId": 40096678650
+    }
+  ]
+}
