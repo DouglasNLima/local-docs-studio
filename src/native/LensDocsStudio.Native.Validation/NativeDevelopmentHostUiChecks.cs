@@ -91,12 +91,15 @@ internal static partial class NativeUiChecks
                 var privateSource = Find(visual!, sourceId);
                 Wait(() => ReadEditorText(privateSource) == source, "Private source does not exactly match standalone bytes.");
                 Find(visual!, validateId).AsButton().Invoke();
-                Wait(() => Find(visual!, prefix + "Apply").IsEnabled, "Private draft validation did not permit Apply.");
+                Wait(() => prefix == "Mermaid" ? Find(visual!, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal) : Find(visual!, prefix + "Apply").IsEnabled,
+                    "Private draft validation did not return its family-specific ready state.");
+                if (prefix == "Mermaid" && Find(visual!, "MermaidApply").IsEnabled) throw new IOException("Unchanged Flowchart draft unexpectedly permits an owner mutation.");
                 if (ReadEditorText(privateSource) != source) throw new IOException("Validation changed private source.");
                 checks.Add("Actual keyboard occurrence selection and private validation retain exact source");
                 foreach (var size in new[] { (880, 600), (1280, 800) })
                 {
-                    visual!.Patterns.Transform.Pattern.Resize(size.Item1, size.Item2);
+                    var scale = HostWindowDpi(visual!.Properties.NativeWindowHandle.Value) / 96.0;
+                    visual.Patterns.Transform.Pattern.Resize(size.Item1 * scale, size.Item2 * scale);
                     Find(visual, prefix + "Fit").AsButton().Invoke();
                     Capture(visual, familyOutput, $"viewport-{size.Item1}x{size.Item2}", selected);
                 }
@@ -130,7 +133,8 @@ internal static partial class NativeUiChecks
             {
                 Find(main!, "DiagramEditVisually0").AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor")))?.AsWindow()) is not null, "Actual native family HWND did not open.");
-                Wait(() => Find(visual!, prefix + "Apply").IsEnabled, "Initial native draft did not validate.");
+                Wait(() => prefix == "Mermaid" ? Find(visual!, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal) : Find(visual!, prefix + "Apply").IsEnabled,
+                    "Initial native draft did not reach its family-specific ready state.");
             }
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor"))) is null, "Native editor did not close."); visual = null; }
             void Capture(Window window, string folder, string name, string[] selection)
@@ -140,10 +144,11 @@ internal static partial class NativeUiChecks
                 if (handle == IntPtr.Zero || process.SessionId != Process.GetCurrentProcess().SessionId || !HostVisibleWindow(handle)) throw new IOException("A real visible HWND in this console session is required.");
                 FocusWindow(window); _ = DwmFlush();
                 window.CaptureToFile(Path.Combine(folder, name + ".png"));
-                var controls = window.FindAllDescendants().Select(element => new { id = element.AutomationId, name = element.Name, focused = element.Properties.HasKeyboardFocus.ValueOrDefault, offscreen = element.IsOffscreen, bounds = element.BoundingRectangle.ToString() }).ToArray();
+                var controls = window.FindAllDescendants().Select(element => new { id = element.Properties.AutomationId.ValueOrDefault, name = element.Properties.Name.ValueOrDefault, focused = element.Properties.HasKeyboardFocus.ValueOrDefault, offscreen = element.Properties.IsOffscreen.ValueOrDefault, bounds = element.Properties.BoundingRectangle.ValueOrDefault.ToString() }).ToArray();
                 WriteNew(Path.Combine(folder, name + ".json"), new { scope = "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, processId = process.Id, processStartUtc = process.StartTime.ToUniversalTime(), hwnd = handle.ToInt64(), dpi = HostWindowDpi(handle), bounds = window.BoundingRectangle.ToString(), selection, controls });
             }
         }
+        RunDevelopmentHostShell(executable, sandbox, automation, revision, tree);
         WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, harness = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion, outcomes,
             limitations = new[] { "Bounded entry/keyboard/validation/Cancel/reopen only. Full hosted mutation/protection suites remain separate.", "Existing OS scale only; no physical screen-reader, High Contrast, clean-machine or alternate-scale certification." } });
         return 0;
