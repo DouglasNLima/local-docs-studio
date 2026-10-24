@@ -121,6 +121,8 @@ foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboa
 $checks.Add(@{name='Local UI client cannot change display contrast clipboard registry or kill processes';status='PASS'})
 if (-not $localClient.Contains('failures.Count != 0') -or -not $localClient.Contains('Search changed owner/saved source; independent scenarios cannot continue.')) { throw 'Independent shell checks must retain a required search failure and exact-source guard.' }
 $checks.Add(@{name='A failed read-only Find cannot become a shell PASS or permit continuation after source changes';status='PASS'})
+if (-not $localClient.Contains('RejectHostTree(sandbox);') -or -not $localClient.Contains('FileAttributes.ReparsePoint') -or -not $localClient.Contains('Direct client source or prepared baseline binding differs.')) { throw 'Direct UI entry must reject linked evidence and mismatched client/baseline bindings before reading test content.' }
+$checks.Add(@{name='Direct UI entry rejects reparse content and binds the clean client and prepared source receipts';status='PASS'})
 foreach ($specialist in @(@('Mermaid','MermaidElements','MermaidDraftSource','MermaidValidateSource'), @('Sequence','SequenceInteractions','SequenceSource','SequenceValidate'),
     @('State','StateElements','StateSource','StateValidate'), @('Er','ErElements','ErSource','ErValidate'), @('Class','ClassElements','ClassSource','ClassValidate'))) {
     $xaml=Get-Content -LiteralPath (Join-Path $repo ("src/native/LensDocsStudio.Native/$($specialist[0])VisualEditorWindow.xaml")) -Raw

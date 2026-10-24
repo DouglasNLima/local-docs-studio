@@ -74,7 +74,7 @@ internal static partial class NativeUiChecks
                 // Preserve the required failure, then run only independent scenarios after
                 // proving this read-only search left both owner and saved source exact.
                 var failure = new { status = "FAIL", stage, error = error.ToString() }; failures.Add(failure);
-                WriteNew(Path.Combine(output, "find-failure.json"), failure); Capture(main, "find-failure");
+                WriteNew(Path.Combine(output, "find-failure-result.json"), failure); Capture(main, "find-failure");
                 if (ReadEditorText(editor) != source || File.ReadAllText(sourcePath) != source) throw new IOException("Search changed owner/saved source; independent scenarios cannot continue.");
                 stage = "close-failed-find"; Find(main, "CloseFind").AsButton().Invoke();
                 Wait(() => editor.Properties.HasKeyboardFocus.Value, "Find close did not return focus to the unchanged owner; stop input.");

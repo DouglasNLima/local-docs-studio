@@ -134,7 +134,9 @@ if ($Mode -eq 'Complete') { Write-NativeHostReceipt (Join-Path $root ('host-afte
 Assert-NativeHostQualification $current
 Assert-NativeHostUnchanged $before $current
 $payload = Join-Path $root 'payload'; $state = Join-Path $root 'state'; $workspace = Join-Path $root 'workspace'
-foreach ($path in $payload,$state,$workspace) { [void](Assert-NativeHostPath $path $root); @(Get-NativeHostFiles $path) | Out-Null }
+$observedRoots = @($payload,$state,$workspace)
+if (Test-Path -LiteralPath (Join-Path $root 'workspace-site')) { $observedRoots += Join-Path $root 'workspace-site' }
+foreach ($path in $observedRoots) { [void](Assert-NativeHostPath $path $root); @(Get-NativeHostFiles $path) | Out-Null }
 Assert-NativeHostPayload $verified.payload $payload
 if ($Mode -eq 'RunUi') {
     if (Test-Path -LiteralPath (Join-Path $root 'complete.json')) { throw 'Completed evidence cannot be reused.' }
@@ -161,7 +163,7 @@ if ($Mode -eq 'RunUi') {
 } else {
     $final = @{ status='PASS'; scope='Observed associations, registrations, shortcuts and default private-state bytes unchanged; not an exhaustive system-write trace.';
         sourceRevision=$marker.sourceRevision; sourceTree=$marker.sourceTree; portableSha256=$marker.portableSha256;
-        host=$current; synthetic=@{ workspace=@(Get-NativeHostManifest $workspace); state=@(Get-NativeHostManifest $state); exports=@(Get-NativeHostManifest (Join-Path $root 'exports')) };
+        host=$current; synthetic=@{ workspace=@(Get-NativeHostManifest $workspace); siteWorkspace=@(if (Test-Path -LiteralPath (Join-Path $root 'workspace-site')) { Get-NativeHostManifest (Join-Path $root 'workspace-site') }); state=@(Get-NativeHostManifest $state); exports=@(Get-NativeHostManifest (Join-Path $root 'exports')) };
         guiAcceptance='Use separate source-labelled UI completion records; never infer from this receipt.'; cleanMachineCertified=$false }
     Write-NativeHostReceipt (Join-Path $root 'complete.json') $final
     'PASS: bounded host preservation checks complete. Review separate GUI outcomes and synthetic file deltas.'

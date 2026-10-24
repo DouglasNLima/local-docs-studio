@@ -25,8 +25,13 @@ internal static partial class NativeUiChecks
         WorkspacePath.RejectReparsePoints(sandbox);
         var allowed = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../../artifacts/native/development-host", revision)) + Path.DirectorySeparatorChar;
         if (!sandbox.StartsWith(allowed, StringComparison.OrdinalIgnoreCase)) throw new IOException("Only this worktree's source-labelled ignored host sandbox is allowed.");
+        RejectHostTree(sandbox);
         using var marker = JsonDocument.Parse(File.ReadAllText(Path.Combine(sandbox, "host-sandbox.json")));
         var identity = marker.RootElement;
+        var harnessVersion = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+        if (!harnessVersion.EndsWith("+" + identity.GetProperty("harnessRevision").GetString(), StringComparison.Ordinal) ||
+            Hash(Path.Combine(sandbox, "synthetic-before.json")) != identity.GetProperty("baselineSha256").GetString() ||
+            Hash(Path.Combine(sandbox, "host-before.json")) != identity.GetProperty("hostBeforeSha256").GetString()) throw new IOException("Direct client source or prepared baseline binding differs.");
         var age = DateTimeOffset.UtcNow - identity.GetProperty("preparedAtUtc").GetDateTimeOffset();
         var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
         if (principal.IsInRole(WindowsBuiltInRole.Administrator) || !Environment.UserInteractive ||
@@ -189,6 +194,17 @@ internal static partial class NativeUiChecks
     }).GetAwaiter().GetResult();
 
     private static string Hash(string path) { using var stream = File.OpenRead(path); return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant(); }
+    private static void RejectHostTree(string root)
+    {
+        var pending = new Stack<string>(); pending.Push(root);
+        while (pending.TryPop(out var directory))
+            foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+            {
+                var attributes = File.GetAttributes(entry);
+                if ((attributes & FileAttributes.ReparsePoint) != 0) throw new IOException("Host evidence contains a reparse entry; no content is read or followed.");
+                if ((attributes & FileAttributes.Directory) != 0) pending.Push(entry);
+            }
+    }
     private static void CaptureHostRuntime(Process process, string executable, string output, string revision, string tree)
     {
         var payload = Path.GetDirectoryName(executable)!;

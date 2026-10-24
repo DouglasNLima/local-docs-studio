@@ -48,7 +48,9 @@ internal static partial class NativeUiChecks
         if (!html.Contains("data:image/png;base64," + Convert.ToBase64String(diagramPng), StringComparison.Ordinal)) throw new IOException("HTML diagram image differs from the independently rendered canonical source.");
         // The deliberately invalid editor fixture belongs to source-protection acceptance,
         // not a successful whole-workspace export. Preserve it and use a fresh valid site fixture.
-        var siteWorkspace = Path.Combine(sandbox, "workspace-site"); Directory.CreateDirectory(Path.Combine(siteWorkspace, "assets"));
+        var siteWorkspace = Path.Combine(sandbox, "workspace-site");
+        if (Directory.EnumerateFileSystemEntries(sandbox).Any(entry => Path.GetFileName(entry).Equals("workspace-site", StringComparison.OrdinalIgnoreCase))) throw new IOException("Site fixture already exists; preserve it and prepare a new sandbox.");
+        Directory.CreateDirectory(Path.Combine(siteWorkspace, "assets"));
         var siteFiles = new[] { "acceptance-lf.md", "acceptance-crlf.md", "relative.md", "standalone.mmd", "assets/square.png" };
         foreach (var file in siteFiles) File.Copy(Path.Combine(workspace, file), Path.Combine(siteWorkspace, file), false);
         var siteBaseline = siteFiles.ToDictionary(file => file, file => Hash(Path.Combine(siteWorkspace, file)));
