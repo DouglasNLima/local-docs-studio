@@ -118,6 +118,8 @@ internal static partial class NativeUiChecks
             // An unrelated or closing desktop provider must not decide draft retention.
             Wait(() => (prompt = NativeWindowDiscovery.FindTopLevelWindows("#32770", "Unsaved document", process.Id)
                 .Select(handle => automation.FromHandle(handle).AsWindow()).SingleOrDefault()) is not null, "The expected unsaved-document prompt did not appear.");
+            if (prompt!.Name != "Unsaved document" || prompt.Properties.ProcessId.Value != process.Id)
+                throw new IOException("The native draft prompt has an unexpected exact title or owner.");
             var handle = prompt!.Properties.NativeWindowHandle.Value;
             var decline = prompt.FindFirstDescendant(cf => cf.ByName("No").And(cf.ByControlType(ControlType.Button)))
                 ?? throw new IOException("The unsaved-document prompt has no decline-save action.");
