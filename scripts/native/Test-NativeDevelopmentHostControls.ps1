@@ -94,6 +94,9 @@ Test-Acceptance 'Dry-run does not create sandbox or launch app' {
     if (Test-Path -LiteralPath $plan) { throw 'Dry-run mutated sandbox' }
 }
 Test-Rejection 'Missing independent package pins' { & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot $plan -Mode Prepare }
+Test-Rejection 'Preflight cannot write a receipt into private profile storage' {
+    & (Join-Path $PSScriptRoot 'Test-NativeDevelopmentHost.ps1') -OutputDirectory (Join-Path $env:LOCALAPPDATA 'LensDocsStudio.Native/unacceptable-host-evidence') -DryRun
+}
 Test-Rejection 'Long path cannot silently lose Windows binary identity' { & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot ($plan + ('x'*100)) -DryRun }
 [void][IO.Directory]::CreateDirectory($plan)
 Test-Rejection 'Stale/nonempty evidence cannot be reused' { & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot $plan -DryRun }
