@@ -141,7 +141,7 @@ internal static partial class NativeUiChecks
             }
             void DiscardPrivate()
             {
-                AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Synthetic private discard confirmation missing.");
+                AutomationElement? yes = null; Wait(() => (yes = HostWindows(automation, app!.ProcessId).Select(window => window.FindFirstDescendant(cf => cf.ByName("Yes"))).FirstOrDefault(element => element is not null)) is not null, "Synthetic private discard confirmation missing.");
                 yes!.AsButton().Invoke();
             }
         }
@@ -159,8 +159,8 @@ internal static partial class NativeUiChecks
             foreach (var arg in new[] { "--state-directory", state, workspace, sourcePath }) info.ArgumentList.Add(arg);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Shell owner did not open within 25 seconds.");
         }
-        Window Modal(string id) { Window? found = null; Wait(() => (found = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(id)))?.AsWindow()) is not null, "Native modal missing: " + id); return found!; }
-        void WaitModalClosed(string id) => Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(id))) is null, "Native modal did not close: " + id);
+        Window Modal(string id) { Window? found = null; Wait(() => (found = HostWindowById(automation, app!.ProcessId, id)) is not null, "Native modal missing: " + id); return found!; }
+        void WaitModalClosed(string id) => Wait(() => HostWindowById(automation, app!.ProcessId, id) is null, "Native modal did not close: " + id);
         void QuickOpen(string filename)
         {
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_P); var picker = Modal("CommandSearchWindow");

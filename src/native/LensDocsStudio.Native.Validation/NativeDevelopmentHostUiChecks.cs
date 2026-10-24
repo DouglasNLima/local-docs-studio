@@ -144,11 +144,11 @@ internal static partial class NativeUiChecks
             void Open()
             {
                 Find(main!, "DiagramEditVisually0").AsButton().Invoke();
-                Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor")))?.AsWindow()) is not null, "Actual native family HWND did not open.");
+                Wait(() => (visual = HostWindowById(automation, app!.ProcessId, prefix + "VisualEditor")) is not null, "Actual native family HWND did not open.");
                 Wait(() => prefix == "Mermaid" ? Find(visual!, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal) : Find(visual!, prefix + "Apply").IsEnabled,
                     "Initial native draft did not reach its family-specific ready state.");
             }
-            void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor"))) is null, "Native editor did not close."); visual = null; }
+            void WaitClosed() { var handle = visual!.Properties.NativeWindowHandle.Value; Wait(() => !HostIsWindow(handle), "Native editor HWND did not close."); visual = null; }
             void Capture(Window window, string folder, string name, string[] selection)
             {
                 using var process = Process.GetProcessById(app!.ProcessId);
@@ -184,6 +184,17 @@ internal static partial class NativeUiChecks
     [DllImport("kernel32.dll", EntryPoint = "WTSGetActiveConsoleSessionId")] private static extern uint HostActiveConsoleSession();
     [DllImport("user32.dll", EntryPoint = "IsWindowVisible")] private static extern bool HostVisibleWindow(IntPtr window);
     [DllImport("user32.dll", EntryPoint = "GetDpiForWindow")] private static extern uint HostWindowDpi(IntPtr window);
+    [DllImport("user32.dll", EntryPoint = "IsWindow")] private static extern bool HostIsWindow(IntPtr window);
+    private delegate bool HostEnumWindow(IntPtr window, IntPtr parameter);
+    [DllImport("user32.dll", EntryPoint = "EnumWindows")] private static extern bool HostEnumWindows(HostEnumWindow callback, IntPtr parameter);
+    private static Window[] HostWindows(UIA3Automation automation, int processId)
+    {
+        var handles = new List<IntPtr>();
+        HostEnumWindows((handle, _) => { GetWindowThreadProcessId(handle, out var owner); if (owner == processId && HostVisibleWindow(handle)) handles.Add(handle); return true; }, IntPtr.Zero);
+        return handles.Select(handle => automation.FromHandle(handle).AsWindow()).ToArray();
+    }
+    private static Window? HostWindowById(UIA3Automation automation, int processId, string id) =>
+        HostWindows(automation, processId).SingleOrDefault(window => window.Properties.AutomationId.ValueOrDefault == id);
 
     private static IEnumerable<(string Family, string Prefix, string Source)> HostSources()
     {
