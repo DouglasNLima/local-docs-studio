@@ -1,5 +1,21 @@
 # Native architecture decisions
 
+## Current status - 24 October 2026
+
+See [Current native Windows readiness](current-windows-readiness.md) for the
+verified 24-family integrated baseline, internal-preview decision, certification
+blockers and Goal VII final-source receipt. PR #46 is merged; the post-merge native
+and web runs succeeded at `33a751c60886a364102c45cb43e36af1e7f13517`.
+This does not certify a subsequent feature head or a production release.
+
+## Historical milestone records
+
+The chapters below retain their original recording sources, dates, package hashes,
+Draft/pending statements and family counts. They are historical evidence, not the
+current-status summary. When reading a copied package, use
+[the repository readiness page](https://github.com/DouglasNLima/local-docs-studio/blob/develop/docs/native/current-windows-readiness.md).
+
+
 ## Expansion VI implementation and accepted precondition — 23 October 2026
 
 PR #45 was merged and accepted on current develop `7b21fa62f58b10e79c74302b4b9e887be3aceadc`, tree `604fb3f6abfb6fae200166e53148eb354679cea7`. Native push run 39991049058 and web push run 39991048987 both succeeded on attempt 1. That prerequisite is satisfied. The earlier .853 PDF/Journey/intermediate ER root causes remain INCONCLUSIVE, with original failure evidence retained. PR #38 stays open/draft/paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; stock Continuous remains ordinary default.

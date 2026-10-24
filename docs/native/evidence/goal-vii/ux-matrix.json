@@ -1,0 +1,2167 @@
+{
+  "schemaVersion": 1,
+  "recordedDate": "2026-10-24",
+  "baseline": {
+    "revision": "33a751c60886a364102c45cb43e36af1e7f13517",
+    "tree": "51912afe438f085bcfbebd33b52e90eb91a7ba33",
+    "nativeRun": 40040943523,
+    "webRun": 40040943517
+  },
+  "scope": "24 bounded families; source inspection and existing test coverage distinguished from observed results. Final-source runtime receipts are attached to the Goal VII Draft PR after its final commit.",
+  "sharedControls": [
+    "src/native/LensDocsStudio.Native/Controls/MermaidWorkspace.cs",
+    "src/native/LensDocsStudio.Native/Resources/MermaidEditorStyles.xaml",
+    "src/native/LensDocsStudio.Native/SourceVisualEditorWindow.xaml",
+    "src/native/LensDocsStudio.Native/SourceVisualEditorWindow.xaml.cs"
+  ],
+  "rows": [
+    {
+      "family": "Flowchart",
+      "prefix": "Mermaid",
+      "implementation": "specialist",
+      "window": "src/native/LensDocsStudio.Native/MermaidVisualEditorWindow.xaml.cs",
+      "protectionGuide": "docs/native/mermaid-advanced-flowchart-partial-editing.md",
+      "sourceProtections": "Chains, repeated declarations, shared linkStyle and unknown dependencies protect topology/identity operations; unknown source retained.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSuiteUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096681728,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "original-five specialist/shared workspace suite",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Sequence",
+      "prefix": "Sequence",
+      "implementation": "specialist",
+      "window": "src/native/LensDocsStudio.Native/SequenceVisualEditorWindow.xaml.cs",
+      "protectionGuide": "docs/native/mermaid-sequence-visual-editor.md",
+      "sourceProtections": "Unsupported control blocks/activation/ambiguous source stay protected; exact ordered occurrences; no inferred interaction.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSuiteUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096681728,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "original-five specialist/shared workspace suite",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "State",
+      "prefix": "State",
+      "implementation": "specialist",
+      "window": "src/native/LensDocsStudio.Native/StateVisualEditorWindow.xaml.cs",
+      "protectionGuide": "docs/native/mermaid-state-visual-editor.md",
+      "sourceProtections": "Scoped markers and exact supported transitions; unproved composite/unknown dependencies protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSuiteUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096681728,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "original-five specialist/shared workspace suite",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Entity relationship (ER)",
+      "prefix": "Er",
+      "implementation": "specialist",
+      "window": "src/native/LensDocsStudio.Native/ErVisualEditorWindow.xaml.cs",
+      "protectionGuide": "docs/native/mermaid-er-visual-editor.md",
+      "sourceProtections": "Entity/attribute/key and endpoint cardinality spans; ignored suffixes and ambiguous topology protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSuiteUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096681728,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "original-five specialist/shared workspace suite",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Class",
+      "prefix": "Class",
+      "implementation": "specialist",
+      "window": "src/native/LensDocsStudio.Native/ClassVisualEditorWindow.xaml.cs",
+      "protectionGuide": "docs/native/mermaid-class-visual-editor.md",
+      "sourceProtections": "Distinct attribute/method occurrences; classifiers, ambiguous namespace/note and unknown dependencies protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSuiteUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096681728,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "original-five specialist/shared workspace suite",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Gantt",
+      "prefix": "Gantt",
+      "implementation": "shared",
+      "window": "src/native/LensDocsStudio.Native/GanttVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/gantt-mindmap-pie-editors.md",
+      "sourceProtections": "Explicit ISO starts and whole-day durations; dependency scheduling/calendar directives protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSourceEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Mindmap",
+      "prefix": "Mindmap",
+      "implementation": "shared",
+      "window": "src/native/LensDocsStudio.Native/MindmapVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/gantt-mindmap-pie-editors.md",
+      "sourceProtections": "One root and proved complete subtrees; recognised shapes/IDs retained; ambiguous structure/trivia protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSourceEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Pie",
+      "prefix": "Pie",
+      "implementation": "shared",
+      "window": "src/native/LensDocsStudio.Native/PieVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/gantt-mindmap-pie-editors.md",
+      "sourceProtections": "Separate category occurrences, finite invariant decimals; actual native wedge correspondence; unsupported tokens protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeSourceEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Timeline",
+      "prefix": "Timeline",
+      "implementation": "shared",
+      "window": "src/native/LensDocsStudio.Native/TimelineVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/timeline-journey-quadrant-editors.md",
+      "sourceProtections": "Effective title, sections, periods, individual events; unknown syntax and ambiguous source groups protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Journey",
+      "prefix": "Journey",
+      "implementation": "shared",
+      "window": "src/native/LensDocsStudio.Native/JourneyVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/timeline-journey-quadrant-editors.md",
+      "sourceProtections": "Ordered tasks/actors and bounded scores; unproved source/structure protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Quadrant",
+      "prefix": "Quadrant",
+      "implementation": "shared",
+      "window": "src/native/LensDocsStudio.Native/QuadrantVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/timeline-journey-quadrant-editors.md",
+      "sourceProtections": "Distinct points and proved labels/coordinates; renderer coordinates authoritative; unproved source protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "XY Chart",
+      "prefix": "Xy",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/XyVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/xy-radar-sankey-editors.md",
+      "sourceProtections": "Aligned category bar/line values; category operations atomic; unsupported numeric axes/unproved series protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeChartEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Radar",
+      "prefix": "Radar",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/RadarVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/xy-radar-sankey-editors.md",
+      "sourceProtections": "Positional axes/curves and finite range/values; aligned axis changes atomic; unproved forms protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeChartEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Sankey",
+      "prefix": "Sankey",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/SankeyVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/xy-radar-sankey-editors.md",
+      "sourceProtections": "Positive weighted link occurrences; explicit collision-protected node rename; no guessed duplicate identity.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeChartEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
+    },
+    {
+      "family": "Kanban",
+      "prefix": "Kanban",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/KanbanVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/kanban-requirement-gitgraph-editors.md",
+      "sourceProtections": "Proved column/card IDs and simple metadata/membership; hidden/ambiguous topology protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeWorkflowEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Requirement",
+      "prefix": "Requirement",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/RequirementVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/kanban-requirement-gitgraph-editors.md",
+      "sourceProtections": "Six kinds/seven relations/four directions; atomic symbolic rename; malformed/unproved topology protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeWorkflowEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "GitGraph",
+      "prefix": "GitGraph",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/GitGraphVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/kanban-requirement-gitgraph-editors.md",
+      "sourceProtections": "Ordered command history and independent tail edits; stateful branch/head references proved, otherwise protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeWorkflowEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Architecture",
+      "prefix": "Architecture",
+      "implementation": "shared/topology",
+      "window": "src/native/LensDocsStudio.Native/ArchitectureVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/architecture-c4-block-editors.md",
+      "sourceProtections": "Proved simple groups/services/junctions/ports; provider artwork/group endpoints source-only.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeWorkflowEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "C4",
+      "prefix": "C4",
+      "implementation": "shared/topology",
+      "window": "src/native/LensDocsStudio.Native/C4VisualEditorWindow.cs",
+      "protectionGuide": "docs/native/architecture-c4-block-editors.md",
+      "sourceProtections": "Context/Container/Component within one family; exact positional fields/simple boundaries; Dynamic/Deployment/unproved arguments source-only.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeWorkflowEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Block",
+      "prefix": "Block",
+      "implementation": "shared/topology",
+      "window": "src/native/LensDocsStudio.Native/BlockVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/architecture-c4-block-editors.md",
+      "sourceProtections": "Flat ordered blocks/spacers/spans/links; first-wins and partial-line protection; no inferred grid.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeWorkflowEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Packet",
+      "prefix": "Packet",
+      "implementation": "shared/chart",
+      "window": "src/native/LensDocsStudio.Native/PacketVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/packet-treeview-treemap-venn-editors.md",
+      "sourceProtections": "Inclusive absolute/relative ranges, accepted-only cursor; downstream interpretation changes protected; all native segments map together; ambiguous overlap keyboard-only.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "TreeView",
+      "prefix": "TreeView",
+      "implementation": "shared/topology",
+      "window": "src/native/LensDocsStudio.Native/TreeViewVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/packet-treeview-treemap-venn-editors.md",
+      "sourceProtections": "Mode chosen by first nonblank body line; indentation TAB expands to four spaces; complete proved subtrees only; box re-encoding/custom artwork source-only; hidden icons reachable.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Treemap",
+      "prefix": "Treemap",
+      "implementation": "shared/topology",
+      "window": "src/native/LensDocsStudio.Native/TreemapVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/packet-treeview-treemap-venn-editors.md",
+      "sourceProtections": "Quoted hierarchy and explicit finite decimal lexemes; derived totals read-only; TAB counts one character; zero/unrendered tiles keyboard-only; fallback/ambiguous indentation protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    },
+    {
+      "family": "Venn",
+      "prefix": "Venn",
+      "implementation": "shared/topology",
+      "window": "src/native/LensDocsStudio.Native/VennVisualEditorWindow.cs",
+      "protectionGuide": "docs/native/packet-treeview-treemap-venn-editors.md",
+      "sourceProtections": "Safe unique IDs and exact atomic references; fixed circles, sizes stored metadata; unions keyboard-only; overlapping pointer explains ambiguity; unresolved/repeated membership protected.",
+      "entryPoints": [
+        "preview Visual Edit",
+        "standalone .mmd/.mermaid",
+        "Insert",
+        "source-only fallback"
+      ],
+      "keyboardOccurrenceAccess": {
+        "status": "SOURCE INSPECTED",
+        "description": "Full occurrence descriptions; native list keyboard navigation; no label-based identity inference.",
+        "evidence": "src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs"
+      },
+      "accessibility": {
+        "status": "SOURCE INSPECTED",
+        "names": "Named toolbar/fields and full occurrence Name/HelpText in MermaidEditorStyles.xaml; per-family automation prefixes.",
+        "limitations": "No blanket claim that every control has a unique AutomationId/HelpText. UIA is not a screen-reader session."
+      },
+      "focus": {
+        "status": "PARTIAL",
+        "description": "Shared FocusSelectedRow/DeferNavigation and native field focus. Existing UIA covers selected-row focus and owner Undo/Redo; exhaustive Tab/Shift+Tab and caret recovery require manual protocol."
+      },
+      "inspectorSelection": {
+        "status": "SOURCE INSPECTED",
+        "description": "Persistent inspector; pending property selection rejected; exact source identities; ambiguous/unrendered occurrences retain list/source access."
+      },
+      "viewport": {
+        "status": "SOURCE INSPECTED",
+        "description": "Native canonical drawing, zoom, middle-mouse pan and Fit; no invented replacement layout."
+      },
+      "applyCancelHistory": {
+        "status": "SOURCE INSPECTED",
+        "description": "Private history and guarded owner/source/version Apply as one owner Undo action; Cancel preserves owner; stale-owner rejection preserves drafts."
+      },
+      "sourceValidation": {
+        "status": "SOURCE INSPECTED",
+        "description": "Invalid pending fields/source preserved; actionable diagnostic and Apply disabled; untouched LF/CRLF/Unicode retained."
+      },
+      "scroll": {
+        "status": "PARTIAL",
+        "description": "Adjustable source and independent inspector; existing resize/navigation assertions are narrower than exhaustive caret/selection/scroll combinations."
+      },
+      "appearance": {
+        "baselineRun": 40096678650,
+        "baselineSource": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "status": "PASS",
+        "sizes": [
+          {
+            "width": 880,
+            "height": 600
+          },
+          {
+            "width": 1280,
+            "height": 800
+          }
+        ],
+        "modes": [
+          "normal",
+          "actual OS High Contrast"
+        ],
+        "evidenceScope": "19 expanded families x 2 appearances = 38 jobs",
+        "attempt": 1
+      },
+      "installed": {
+        "baselineRun": 40040943523,
+        "source": "33a751c60886a364102c45cb43e36af1e7f13517",
+        "phases": [
+          "install",
+          "SAME-SOURCE synthetic upgrade",
+          "reinstall"
+        ],
+        "status": "BASELINE WORKFLOW SUCCESS; raw phase receipts reconciled separately",
+        "historicalUpgrade": "NOT CERTIFIED"
+      },
+      "interactiveHighDpi": "NOT RUN",
+      "physicalScreenReader": "NOT RUN",
+      "cleanSdkFreeWindows": "BLOCKED",
+      "newProductDefects": []
+    }
+  ]
+}

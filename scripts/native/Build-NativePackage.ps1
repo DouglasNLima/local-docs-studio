@@ -18,6 +18,8 @@ Push-Location $repo
 try {
     $revision = (& git rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0 -or $revision -notmatch '^[0-9a-f]{40}$') { throw 'An exact Git source revision is required.' }
+    $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim()
+    if ($LASTEXITCODE -ne 0 -or $sourceTree -notmatch '^[0-9a-f]{40}$') { throw 'An exact Git source tree is required.' }
     if (& git status --porcelain) { throw 'Preview packaging requires a clean source checkout. Commit changes before building.' }
 } finally { Pop-Location }
 $output = Join-Path $repo "artifacts/native/packages/$Version"
@@ -40,6 +42,7 @@ try {
     Invoke-NativeAuthenticodeSigning -FilePath $exe -Configuration $signing
     $metadata = [ordered]@{ schemaVersion=1; product='LensDocsStudio.Native'; version=$Version; channel='Preview'; architecture='x64'; minimumWindowsVersion='10.0.17763'; selfContained=$true; internalPreview=$true; signingRequested=($signing.Mode -ne 'Unsigned'); signingProvider=$signing.Mode; sourceRevision=(& git rev-parse HEAD).Trim(); sourceDirty=[bool](& git status --porcelain); builtAtUtc=[DateTimeOffset]::UtcNow.ToString('O') }
     if ($metadata.sourceRevision -ne $revision -or $metadata.sourceDirty) { throw 'Source changed while publishing; discard this incomplete output and use a new version.' }
+    $metadata.sourceTree = $sourceTree
     $mergeCheckout = $env:GITHUB_EVENT_NAME -eq 'pull_request' -and $metadata.sourceRevision -eq $env:GITHUB_SHA
     $metadata.sourceKind = if ($mergeCheckout) { 'pull-request-merge-checkout' } elseif ($env:GITHUB_ACTIONS -eq 'true') { 'branch-source' } else { 'local-source' }
     $metadata.ciRunId = $env:GITHUB_RUN_ID

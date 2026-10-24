@@ -107,8 +107,8 @@ internal static partial class NativeUiChecks
                 else
                 {
                     SelectState("Draft"); Find(visual!, "StateLabel").AsTextBox().Text = "Private cancellation"; Click("StateUpdate"); Await(text => text.Contains("Private cancellation", StringComparison.Ordinal)); Click("StateCancel");
-                    Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "State Cancel did not request private draft discard.");
-                    automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(rawPath) == raw, "Source-preserving State Cancel retains exact owner and disk source");
+                    AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "State Cancel did not request private draft discard.");
+                    yes!.AsButton().Invoke(); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(rawPath) == raw, "Source-preserving State Cancel retains exact owner and disk source");
                 }
                 if (visual is not null) { Click("StateCancel"); WaitClosed(); } Stop();
             }
@@ -209,7 +209,7 @@ internal static partial class NativeUiChecks
             _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png"));
         }
         void Discard()
-        { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Private State discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
+        { AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Private State discard confirmation did not appear."); yes!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
     }).GetAwaiter().GetResult();
 }

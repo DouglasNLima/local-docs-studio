@@ -6,6 +6,11 @@ Local Markdown, Mermaid, and documentation studio.
 
 ## Native Windows edition
 
+Start with [Current native Windows readiness](docs/native/current-windows-readiness.md)
+for the accepted 24 bounded editor families, exact integrated source, controlled
+internal-preview restrictions and production certification blockers. The earlier
+integration/editor reports below retain their original source-specific scope.
+
 The consolidated native candidate, original historical upgrade results and exact package identities are tracked in the [integration readiness report](docs/native/integration-readiness.md) and [Draft PR 29](https://github.com/DouglasNLima/local-docs-studio/pull/29). Integration review does not authorise a merge or production release.
 
 The browser-free Windows edition is implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. Its installer-based unsigned internal preview is validated in the documented scope; production certification remains incomplete. See the [engineering delivery report](docs/native/engineering-completion-report.md) for the 28-condition audit and exact evidence.

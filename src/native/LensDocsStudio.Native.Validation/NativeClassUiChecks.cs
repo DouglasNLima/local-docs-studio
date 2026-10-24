@@ -125,7 +125,7 @@ internal static partial class NativeUiChecks
         void Resize(int width, int height) { visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height); Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3 && FooterSettled(), "Class viewport did not settle."); }
         bool FooterSettled() { var window = visual!.BoundingRectangle; var footer = Find(visual, "ClassApply").BoundingRectangle; return window.Right - footer.Right is >= 4 and <= 32 && window.Bottom - footer.Bottom is >= 4 and <= 24; }
         void Capture(string name) { Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); Wait(FooterSettled, "Class client layout incomplete before capture."); if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Native Class app did not become idle before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
-        void Discard() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Class discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
+        void Discard() { AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Class discard confirmation did not appear."); yes!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
         void RunAdditionalCases()
         {

@@ -1,5 +1,21 @@
 # Native integration readiness
 
+## Current status - 24 October 2026
+
+The authoritative [Current Windows readiness](current-windows-readiness.md) records
+the accepted 24-family develop baseline, internal-preview restrictions and
+[Goal VII Draft PR #47](https://github.com/DouglasNLima/local-docs-studio/pull/47).
+PR #46 is merged and its post-merge native/web runs succeeded at
+`33a751c60886a364102c45cb43e36af1e7f13517`. Higher-DPI, physical-reader, clean-Windows,
+historical-upgrade and production-trust certifications remain separately blocked.
+
+## Historical source-labelled records
+
+The original chapters below retain their dates, revisions, package hashes, counts
+and then-pending decisions. Their present-tense milestone wording is historical;
+use the canonical summary and exact-source PR delivery receipt for current status.
+
+
 **READY WITH RESTRICTIONS** for the tested application/validation candidate `8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee` and immutable internal unsigned preview `.546`. All six candidate workflows pass: 24 required jobs succeed, including twelve real historical upgrade cases; two Pages deployment jobs are expected skips. This is review readiness, not merge, signing or production-release authorisation.
 
 This report is carried by a later integration-validation and documentation commit on `integration/native-wpf-candidate`. Consult [Draft PR 29](https://github.com/DouglasNLima/local-docs-studio/pull/29) and its [live checks](https://github.com/DouglasNLima/local-docs-studio/pull/29/checks) for the exact final handoff HEAD and CI conclusions. That final handoff gate must pass before handoff; it does not relabel the selected binaries. Historical reports keep their original source and environment labels. Inspectable counts, receipt hashes and performance observations are in the [machine-readable evidence](evidence/integration-readiness.json).
