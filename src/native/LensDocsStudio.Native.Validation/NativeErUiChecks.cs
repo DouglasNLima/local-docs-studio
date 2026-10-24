@@ -225,7 +225,7 @@ internal static partial class NativeUiChecks
             _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png"));
         }
         void Discard()
-        { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Private ER discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
+        { AutomationElement? yes = null; Wait(() => (yes = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))) is not null, "Private ER discard confirmation did not appear."); yes!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
         void SelectAttribute(string entityId, int row)
         {

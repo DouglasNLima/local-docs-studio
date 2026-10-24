@@ -97,12 +97,20 @@ expires **7 November 2026, 14:17:16 UTC**. Raw log, failed screenshot, UIA recei
 preserved-file hashes and installed provenance are retained without rerunning it.
 
 The bounded correction retains the button found by the existing PID/Yes wait,
-then invokes it once. Chart, Workflow and Expansion VI already use this pattern.
+then invokes it once. Workflow and Expansion VI already use this pattern.
 No product window, assertion, input, 20-second observation deadline, 25-second
 owner budget or fixture changes. The underlying reason a fresh UIA enumeration
 lost that button remains unproved; this fixes the redundant observation/null
 path, not the historical Journey/.853/.749 root causes. The new exact-source
 installed reinstall scenario and unrelated-family gates must pass independently.
+
+The complete source scan finds the identical two-query pattern in the Class,
+State, ER, Gantt/Mindmap/Pie and XY/Radar/Sankey harness wrappers. The same bounded
+correction is applied there, covering twelve families including Timeline/Journey/
+Quadrant. Only Journey reinstall has the actual before-failure in this goal;
+the other sites are explicitly source-equivalent copies, not invented runtime
+failures. Workflow and Expansion VI already retain the observed button. All
+families still require their unchanged final-source actual UIA/lifecycle gates.
 
 The same candidate's [PR web run 40099247242](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40099247242)
 retains **135 Chromium PASS; 134 Edge PASS / one FAIL**. Edge's stylesheet request
