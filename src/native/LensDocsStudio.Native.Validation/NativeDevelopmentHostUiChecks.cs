@@ -84,7 +84,7 @@ internal static partial class NativeUiChecks
                 Open();
                 var sourceId = prefix == "Mermaid" ? "MermaidDraftSource" : prefix + (family is "Sequence" or "State" or "Er" or "Class" ? "Source" : "SourceEditor");
                 var validateId = prefix == "Mermaid" ? "MermaidValidateSource" : prefix + "Validate";
-                var list = Find(visual!, prefix + "Elements").AsListBox();
+                var list = Find(visual!, family == "Sequence" ? "SequenceInteractions" : prefix + "Elements").AsListBox();
                 FocusWindow(visual!); list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
                 Wait(() => list.SelectedItems.Length > 0, "Keyboard Home did not select a source occurrence.");
                 Keyboard.Type(VirtualKeyShort.END);

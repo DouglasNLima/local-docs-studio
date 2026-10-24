@@ -103,6 +103,12 @@ foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboa
     if ($localClient.Contains($forbidden)) { throw "Local UI client contains forbidden host operation: $forbidden" }
 }
 $checks.Add(@{name='Local UI client cannot change display contrast clipboard registry or kill processes';status='PASS'})
+foreach ($specialist in @(@('Mermaid','MermaidElements','MermaidDraftSource','MermaidValidateSource'), @('Sequence','SequenceInteractions','SequenceSource','SequenceValidate'),
+    @('State','StateElements','StateSource','StateValidate'), @('Er','ErElements','ErSource','ErValidate'), @('Class','ClassElements','ClassSource','ClassValidate'))) {
+    $xaml=Get-Content -LiteralPath (Join-Path $repo ("src/native/LensDocsStudio.Native/$($specialist[0])VisualEditorWindow.xaml")) -Raw
+    foreach ($id in $specialist[1..3]) { if (-not $xaml.Contains('AutomationId="' + $id + '"')) { throw "Specialist automation contract missing: $id" } }
+}
+$checks.Add(@{name='Five specialist navigation/source/validation contracts remain independently mapped';status='PASS'})
 Test-Rejection 'Direct local UI route refuses missing pins before launch' {
     $client=Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'
     if (Test-Path -LiteralPath $client) {
