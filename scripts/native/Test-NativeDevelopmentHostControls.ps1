@@ -97,7 +97,8 @@ foreach ($name in 'Test-NativeDevelopmentHost.ps1','Invoke-NativePortableHostSmo
 $installer=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Test-NativeInstaller.ps1') -Raw
 if (-not $installer.Contains("`$env:RUNNER_ENVIRONMENT -ne 'github-hosted'")) { throw 'Hosted installer guard lost' }
 $checks.Add(@{name='Original hosted installer guard remains mandatory';status='PASS'})
-$localClient=Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostUiChecks.cs') -Raw
+$localClient=(Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostUiChecks.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostShellUiChecks.cs') -Raw)
 foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboard.', 'ChangeDisplaySettings(', 'SHAppBarMessage(', 'Registry.SetValue(', '.Kill(') {
     if ($localClient.Contains($forbidden)) { throw "Local UI client contains forbidden host operation: $forbidden" }
 }

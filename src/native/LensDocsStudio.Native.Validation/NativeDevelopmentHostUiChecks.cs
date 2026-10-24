@@ -86,6 +86,15 @@ internal static partial class NativeUiChecks
                 Wait(() => list.SelectedItems.Length > 0, "Keyboard Home did not select a source occurrence.");
                 Keyboard.Type(VirtualKeyShort.END);
                 Wait(() => list.SelectedItems.Length > 0 && !list.SelectedItems[^1].IsOffscreen, "Keyboard End did not reveal its selected source occurrence.");
+                if (family == "Treemap")
+                {
+                    var zero = Array.FindIndex(list.Items, item => item.Name.Contains("Planned", StringComparison.Ordinal));
+                    if (zero < 0) throw new IOException("Zero-area Treemap source occurrence is missing from the keyboard list.");
+                    list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
+                    for (var step = 0; step < zero; step++) Keyboard.Type(VirtualKeyShort.DOWN);
+                    Wait(() => list.SelectedItems.Any(item => item.Name.Contains("Planned", StringComparison.Ordinal)), "Keyboard navigation did not reach the zero-area Treemap source occurrence.");
+                    checks.Add("Zero-value Treemap occurrence remains an actual keyboard target");
+                }
                 var selected = list.SelectedItems.Select(item => item.Name).ToArray();
                 Find(visual!, prefix + "SourcePanel").Patterns.ExpandCollapse.Pattern.Expand();
                 var privateSource = Find(visual!, sourceId);

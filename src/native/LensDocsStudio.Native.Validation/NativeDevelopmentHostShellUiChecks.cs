@@ -91,7 +91,7 @@ internal static partial class NativeUiChecks
             var site = ModalByName("Export Docs Site"); Find(site, "DocsSiteTitle").AsTextBox().Text = "Synthetic host documentation";
             Find(site, "ConfirmDocsSite").AsButton().Invoke(); Save(Path.Combine(sandbox, "exports", "host-site.zip"), "Save Docs Site");
             checks.Add("Actual native UI exports DOCX/PDF/HTML/PNG/Docs Site into explicit fresh sandbox destinations");
-            stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); main.Close(); Wait(() => app.HasExited, "Synthetic shell did not close normally."); app.Dispose(); app = null;
+            stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); main.Close(); Wait(() => app!.HasExited, "Synthetic shell did not close normally."); app!.Dispose(); app = null;
             using var preferencesBefore = JsonDocument.Parse(File.ReadAllText(Path.Combine(state, "preferences.json")));
             var desktopBefore = preferencesBefore.RootElement.GetProperty("Desktop").GetRawText();
             Launch(); editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == source, "Saved source did not reopen after restart.");
