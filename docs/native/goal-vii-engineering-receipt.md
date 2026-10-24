@@ -82,6 +82,38 @@ helpers on disposable runners do not prove interactive scaling.
 
 ## Required final-source delivery record
 
+### Failed combined candidate retained at 54323d2
+
+Candidate `54323d2adc1b2dff368f7444e599130dba2a4f11`, tree
+`492c60855b4ef89b586bc3d5c13929c69282184b`, passed 2,114 Core tests,
+176 corpus cases, all 38 appearances, the original-five suite and ordinary
+installer lifecycle. Its separate installed Journey reinstall failed at the
+stale-owner Cancel/discard step with a NullReferenceException in the harness's
+unchecked second Yes lookup. Install and synthetic upgrade passed; three version
+entries do not turn the failed reinstall into a passed phase. Original artefact
+**12562584972**, SHA-256
+`20960b50401a6e6d54f0c2a291a4e90c0ae3023bc5ed9644b1f33e246a332be4`,
+expires **7 November 2026, 14:17:16 UTC**. Raw log, failed screenshot, UIA receipt,
+preserved-file hashes and installed provenance are retained without rerunning it.
+
+The bounded correction retains the button found by the existing PID/Yes wait,
+then invokes it once. Chart, Workflow and Expansion VI already use this pattern.
+No product window, assertion, input, 20-second observation deadline, 25-second
+owner budget or fixture changes. The underlying reason a fresh UIA enumeration
+lost that button remains unproved; this fixes the redundant observation/null
+path, not the historical Journey/.853/.749 root causes. The new exact-source
+installed reinstall scenario and unrelated-family gates must pass independently.
+
+The same candidate's [PR web run 40099247242](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40099247242)
+retains **135 Chromium PASS; 134 Edge PASS / one FAIL**. Edge's stylesheet request
+for `app.css` failed with `net::ERR_NO_BUFFER_SPACE`, yielding a real unstyled
+screenshot and `topbar display: block` at the unchanged 20-second assertion,
+before ZIP import. Its push web comparator passed 135+135. No socket/buffer
+counters were retained, so underlying resource causation is INCONCLUSIVE. No CSS,
+server, cache inventory, deadline or assertion is changed, and no failed job is
+retried. A later green source is separate evidence, not a correction of that
+original transport failure. The candidate remains failed.
+
 After committing all slices, keep the checkout clean and retain one immutable
 feature HEAD/tree. The final receipt must include:
 

@@ -769,7 +769,18 @@
       "interactiveHighDpi": "NOT RUN",
       "physicalScreenReader": "NOT RUN",
       "cleanSdkFreeWindows": "BLOCKED",
-      "newProductDefects": []
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
     },
     {
       "family": "Journey",
@@ -853,7 +864,18 @@
       "interactiveHighDpi": "NOT RUN",
       "physicalScreenReader": "NOT RUN",
       "cleanSdkFreeWindows": "BLOCKED",
-      "newProductDefects": []
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
     },
     {
       "family": "Quadrant",
@@ -937,7 +959,18 @@
       "interactiveHighDpi": "NOT RUN",
       "physicalScreenReader": "NOT RUN",
       "cleanSdkFreeWindows": "BLOCKED",
-      "newProductDefects": []
+      "newProductDefects": [],
+      "validationObservationFinding": {
+        "priority": "P1",
+        "id": "discard-observation-double-query",
+        "correction": "Retain the exact observed button and invoke once; same predicate, assertion and deadline",
+        "observed": "Installed Journey reinstall: unchecked second Yes lookup raises NullReferenceException after successful wait",
+        "beforeSource": "54323d2adc1b2dff368f7444e599130dba2a4f11",
+        "productUxChanged": false,
+        "beforeRun": 40099247169,
+        "beforeJob": 120894372211,
+        "after": "Exact-source final receipt required"
+      }
     },
     {
       "family": "XY Chart",
