@@ -52,6 +52,10 @@ function Get-NativeHostDigest($Value) {
 
 function ConvertTo-NativeHostCanonical($Value) {
     if ($null -eq $Value) { return $null }
+    # Pipeline commands may wrap strings with PSObject metadata. They remain
+    # scalar registry names/values, rather than custom objects to enumerate.
+    if ($Value -is [string]) { return [string]$Value }
+    if ($Value -is [ValueType]) { return $Value }
     if ($Value -is [Collections.IDictionary] -or $Value -is [pscustomobject]) {
         $result = [ordered]@{}
         $keys = if ($Value -is [Collections.IDictionary]) { @($Value.Keys) } else { @($Value.PSObject.Properties.Name) }

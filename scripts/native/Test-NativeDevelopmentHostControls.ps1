@@ -63,6 +63,12 @@ Test-Rejection 'Cannot relabel development host as clean certification' { Assert
 $before=[pscustomobject]@{ associations=@{UserChoice='initial'}; registrations=@(); shortcuts=@(); defaultState=@{exists=$false;files=@()} }
 $after=$before | ConvertTo-Json -Depth 10 | ConvertFrom-Json
 Test-Acceptance 'Snapshot canonicalisation survives JSON round trip' { Assert-NativeHostUnchanged $before $after }
+Test-Acceptance 'Wrapped registry names remain scalar across JSON round trip' {
+    $wrappedName=@('ProgId','') | Sort-Object
+    $original=@{ values=@(foreach ($name in $wrappedName) { @{name=$name;kind='String';value='Synthetic'} }) }
+    $roundtrip=$original | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+    if ((Get-NativeHostDigest $original) -cne (Get-NativeHostDigest $roundtrip)) { throw 'Wrapped string was misclassified as an object' }
+}
 $after.associations.UserChoice='changed'
 Test-Rejection 'Default application change' { Assert-NativeHostUnchanged $before $after }
 Test-Rejection 'Missing preservation snapshot data' { Assert-NativeHostUnchanged $before ([pscustomobject]@{}) }
