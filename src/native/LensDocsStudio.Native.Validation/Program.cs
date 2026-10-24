@@ -22,9 +22,9 @@ internal static class Program
             try
             {
                 if (args.Length != 2) throw new ArgumentException("A fresh unit-evidence directory is required.");
-                var output = Path.GetFullPath(args[1]);
-                if (Directory.Exists(output) || File.Exists(output)) throw new IOException("Unit evidence already exists; preserve it.");
-                Directory.CreateDirectory(output); NativeWindowDiscoveryChecks.Run(output); return 0;
+                var discoveryOutput = Path.GetFullPath(args[1]);
+                if (Directory.Exists(discoveryOutput) || File.Exists(discoveryOutput)) throw new IOException("Unit evidence already exists; preserve it.");
+                Directory.CreateDirectory(discoveryOutput); NativeWindowDiscoveryChecks.Run(discoveryOutput); return 0;
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
