@@ -16,9 +16,14 @@ $root = Assert-NativeHostPath $SandboxRoot (Join-Path $repo 'artifacts/native/de
 $destination = Assert-NativeHostPath $OutputPath $root
 if (Test-Path -LiteralPath $destination) { throw 'Display evidence exists; choose a new output.' }
 $marker = Get-Content -LiteralPath (Join-Path $root 'host-sandbox.json') -Raw | ConvertFrom-Json
+Assert-NativeHostFreshReceipt $marker
 if ($marker.sourceRevision -cne $ExpectedSourceRevision -or $marker.sourceTree -cne $ExpectedSourceTree -or
     $marker.executableSha256 -cne $ExpectedExecutableSha256 -or $marker.cleanMachineCertified -ne $false -or
     $marker.qualification -cne 'DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION') { throw 'Independent package pins or host qualification differ.' }
+if ((Get-FileHash -LiteralPath (Join-Path $root 'package-verification.json')).Hash -ine $marker.packageReceiptSha256) { throw 'Prepared package receipt changed.' }
+$verified = Get-Content -LiteralPath (Join-Path $root 'package-verification.json') -Raw | ConvertFrom-Json
+if ($verified.status -cne 'PASS' -or $verified.sourceRevision -cne $ExpectedSourceRevision -or $verified.sourceTree -cne $ExpectedSourceTree) { throw 'Independent package receipt source/tree differs.' }
+Assert-NativeHostPayload $verified.payload (Join-Path $root 'payload')
 $exe = Join-Path $root 'payload/LensDocsStudio.Native.exe'
 $app = Assert-NativeHostWindow $NativeProcessId $WindowHandle $exe $ExpectedExecutableSha256 $ExpectedSourceRevision
 $metadata = Get-Content -LiteralPath (Join-Path $root 'payload/version.json') -Raw | ConvertFrom-Json

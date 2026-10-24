@@ -119,13 +119,9 @@ A[Write] --> B[Review]
     return
 }
 $marker = Get-Content -LiteralPath $markerPath -Raw | ConvertFrom-Json
-$prepared = if ($marker.preparedAtUtc -is [DateTime]) { [DateTimeOffset]$marker.preparedAtUtc } else {
-    [DateTimeOffset]::Parse($marker.preparedAtUtc, [Globalization.CultureInfo]::InvariantCulture)
-}
-$age = ([DateTimeOffset]::UtcNow - $prepared).TotalHours
+Assert-NativeHostFreshReceipt $marker
 if ($marker.schemaVersion -ne 1 -or $marker.qualification -cne 'DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION' -or
-    $marker.cleanMachineCertified -ne $false -or $marker.sourceRevision -cne $folderRevision -or
-    $age -lt 0 -or $age -gt 24) {
+    $marker.cleanMachineCertified -ne $false -or $marker.sourceRevision -cne $folderRevision) {
     throw 'Missing, stale or incorrectly classified host sandbox. Prepare a new source-labelled session.'
 }
 foreach ($binding in @(@('synthetic-before.json','baselineSha256'),@('package-verification.json','packageReceiptSha256'),@('host-before.json','hostBeforeSha256'))) {

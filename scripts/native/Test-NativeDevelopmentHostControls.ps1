@@ -84,6 +84,10 @@ Test-Rejection 'Missing preservation snapshot data' { Assert-NativeHostUnchanged
 Test-Rejection 'Fake PID and HWND' { Assert-NativeHostWindow 0 0 (Join-Path $safe 'absent.exe') ('0'*64) $revision }
 Test-Rejection 'Wrong real PID/unknown HWND' { Assert-NativeHostWindow $PID 1 ([Diagnostics.Process]::GetCurrentProcess().MainModule.FileName) ('0'*64) $revision }
 Test-Rejection 'Missing/incomplete payload inventory' { Assert-NativeHostPayload @() $safe }
+Test-Acceptance 'Fresh receipt timestamp' { Assert-NativeHostFreshReceipt ([pscustomobject]@{ preparedAtUtc=[DateTime]::UtcNow.ToString('o') }) }
+Test-Rejection 'Expired observation receipt' { Assert-NativeHostFreshReceipt ([pscustomobject]@{ preparedAtUtc='2000-01-01T00:00:00Z' }) }
+Test-Rejection 'Future-dated observation receipt' { Assert-NativeHostFreshReceipt ([pscustomobject]@{ preparedAtUtc=[DateTime]::UtcNow.AddDays(1).ToString('o') }) }
+Test-Rejection 'Missing observation timestamp' { Assert-NativeHostFreshReceipt ([pscustomobject]@{}) }
 $plan=Join-Path $repo ('artifacts/native/development-host/' + $revision + '/t' + [guid]::NewGuid().ToString('N').Substring(0,7))
 Test-Acceptance 'Dry-run does not create sandbox or launch app' {
     & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot $plan -DryRun

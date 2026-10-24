@@ -199,6 +199,15 @@ public static class LensDevelopmentHostProbe {
     }
 }
 
+function Assert-NativeHostFreshReceipt($Marker) {
+    if (-not $Marker.preparedAtUtc) { throw 'Missing preparation time; a fresh receipt is required.' }
+    $prepared = if ($Marker.preparedAtUtc -is [DateTime]) { [DateTimeOffset]$Marker.preparedAtUtc } else {
+        [DateTimeOffset]::Parse($Marker.preparedAtUtc, [Globalization.CultureInfo]::InvariantCulture)
+    }
+    $age = ([DateTimeOffset]::UtcNow - $prepared).TotalHours
+    if ($age -lt 0 -or $age -gt 24) { throw 'Stale or future-dated receipt; prepare a new source-labelled session.' }
+}
+
 function Get-NativeHostRegistryTree([string]$Root) {
     if (-not (Test-Path -LiteralPath $Root)) { return @{ key=$Root; exists=$false } }
     $keys = @((Get-Item -LiteralPath $Root)) + @(Get-ChildItem -LiteralPath $Root -Recurse)
