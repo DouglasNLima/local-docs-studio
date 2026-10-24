@@ -64,6 +64,10 @@ internal static partial class NativeUiChecks
         if (Hash(path) != sourceHash) throw new IOException("Native export services changed synthetic source bytes.");
         WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_NATIVE_EXPORT_API", portableUiSourceRevision = portableRevision,
             apiAssembly = typeof(DocumentExportService).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+            processId = Environment.ProcessId, recordedAtUtc = DateTimeOffset.UtcNow,
+            validationRuntime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+            validationWpfVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(typeof(System.Windows.Window).Assembly.Location).ProductVersion,
+            runtimeScope = "Framework-dependent validation client; not the verified self-contained portable process runtime",
             apiNativeSha256 = Hash(typeof(DocumentExportService).Assembly.Location), apiCoreSha256 = Hash(typeof(DiagramService).Assembly.Location), sourceSha256 = sourceHash,
             exports, docsSite = new { site.SourcePages, site.Diagrams, site.Warnings },
             notRun = "Portable UI file dialogues: shared Windows shell history cannot be isolated. PDF text/colour and saved PNG dimensions require the independent inspection receipt." });

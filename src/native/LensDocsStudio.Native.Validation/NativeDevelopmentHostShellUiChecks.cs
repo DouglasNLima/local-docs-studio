@@ -16,7 +16,7 @@ internal static partial class NativeUiChecks
         var workspace = Path.Combine(sandbox, "workspace"); var sourcePath = Path.Combine(workspace, "acceptance-lf.md");
         var state = Path.Combine(sandbox, "state", "ui-shell"); Directory.CreateDirectory(state);
         WriteNew(Path.Combine(state, "preferences.json"), new { AutomaticUpdateChecks = false, Theme = "Light" });
-        var source = File.ReadAllText(sourcePath); var checks = new List<string>(); var observations = new List<object>();
+        var source = File.ReadAllText(sourcePath); var checks = new List<string>(); var observations = new List<object>(); var failures = new List<object>();
         WriteNew(Path.Combine(output, "before.json"), new { sourceSha256 = Hash(sourcePath), preferencesSha256 = Hash(Path.Combine(state, "preferences.json")), revision, tree });
         Application? app = null; Window? main = null; var stage = "launch";
         try
@@ -46,6 +46,8 @@ internal static partial class NativeUiChecks
             Wait(() => Find(palette, "CommandSearchResults").AsListBox().Items.Any(item => item.Name.Contains("Close workspace", StringComparison.Ordinal)), "Palette did not expose its actual workspace command.");
             FocusWindow(palette); Keyboard.Type(VirtualKeyShort.ESCAPE); WaitModalClosed("CommandSearchWindow");
             checks.Add("Command Palette opens, filters its real command and cancels without changing the owner");
+            try
+            {
             stage = "editor-find"; FocusWindow(main); editor.Focus();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in editor", "Ctrl+F did not target the editor.");
@@ -66,6 +68,17 @@ internal static partial class NativeUiChecks
             Keyboard.Type(VirtualKeyShort.RETURN);
             Capture(main, "preview-find"); Find(main, "CloseFind").AsButton().Invoke();
             checks.Add("Editor and preview Ctrl+F retain separate contexts, Unicode input, Enter and close/focus behaviour");
+            }
+            catch (Exception error) when (stage is "editor-find" or "preview-find")
+            {
+                // Preserve the required failure, then run only independent scenarios after
+                // proving this read-only search left both owner and saved source exact.
+                var failure = new { status = "FAIL", stage, error = error.ToString() }; failures.Add(failure);
+                WriteNew(Path.Combine(output, "find-failure.json"), failure); Capture(main, "find-failure");
+                if (ReadEditorText(editor) != source || File.ReadAllText(sourcePath) != source) throw new IOException("Search changed owner/saved source; independent scenarios cannot continue.");
+                stage = "close-failed-find"; Find(main, "CloseFind").AsButton().Invoke();
+                Wait(() => editor.Properties.HasKeyboardFocus.Value, "Find close did not return focus to the unchanged owner; stop input.");
+            }
             stage = "owner-edit";
             var action = main.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramEditVisually", StringComparison.Ordinal));
             action.AsButton().Invoke(); var visual = Modal("MermaidVisualEditor");
@@ -149,6 +162,7 @@ internal static partial class NativeUiChecks
             Wait(() => ReadEditorText(editor) == source && Find(main!, "Status").Name.Contains("closed", StringComparison.OrdinalIgnoreCase), "Close workspace did not retain the open document.");
             Capture(main!, "closed-workspace"); checks.Add("Close workspace retains the open document and source");
             FocusWindow(main!); main!.Close(); Wait(() => app!.HasExited, "Final synthetic shell did not close normally.");
+            if (failures.Count != 0) { stage = "complete-with-retained-find-failure"; throw new IOException("Required Find acceptance failed. Independent completed checks do not permit a shell PASS."); }
             WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, checks, observations,
                 notRun = new[] { "Personal-host shell Open/Save dialogues: shared Windows recent-folder history cannot be isolated; no dialogue invoked", "Inspector drag persistence", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
 
@@ -167,7 +181,7 @@ internal static partial class NativeUiChecks
         catch (Exception error)
         {
             try { if (main is not null) Capture(main, "failure"); } catch (Exception captureError) { File.WriteAllText(Path.Combine(output, "capture-error.txt"), captureError.ToString()); }
-            WriteNew(Path.Combine(output, "completion.json"), new { status = "FAIL", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, stage, checks, observations, error = error.ToString(), processId = app?.ProcessId });
+            WriteNew(Path.Combine(output, "completion.json"), new { status = "FAIL", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, stage, checks, observations, failures, error = error.ToString(), processId = app?.ProcessId });
             throw;
         }
         finally { app?.Dispose(); }

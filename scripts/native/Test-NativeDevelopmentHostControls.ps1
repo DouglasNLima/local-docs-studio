@@ -119,6 +119,8 @@ foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboa
     if ($localClient.Contains($forbidden)) { throw "Local UI client contains forbidden host operation: $forbidden" }
 }
 $checks.Add(@{name='Local UI client cannot change display contrast clipboard registry or kill processes';status='PASS'})
+if (-not $localClient.Contains('failures.Count != 0') -or -not $localClient.Contains('Search changed owner/saved source; independent scenarios cannot continue.')) { throw 'Independent shell checks must retain a required search failure and exact-source guard.' }
+$checks.Add(@{name='A failed read-only Find cannot become a shell PASS or permit continuation after source changes';status='PASS'})
 foreach ($specialist in @(@('Mermaid','MermaidElements','MermaidDraftSource','MermaidValidateSource'), @('Sequence','SequenceInteractions','SequenceSource','SequenceValidate'),
     @('State','StateElements','StateSource','StateValidate'), @('Er','ErElements','ErSource','ErValidate'), @('Class','ClassElements','ClassSource','ClassValidate'))) {
     $xaml=Get-Content -LiteralPath (Join-Path $repo ("src/native/LensDocsStudio.Native/$($specialist[0])VisualEditorWindow.xaml")) -Raw
