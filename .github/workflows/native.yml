@@ -1,7 +1,7 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: ['feature/native-continuous-preview-performance', 'feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-windows-development-host-acceptance', 'feature/native-continuous-preview-performance', 'feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
     branches: ['feature/native-continuous-preview-performance', 'feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
@@ -39,6 +39,8 @@ jobs:
         run: pwsh -NoProfile -File scripts/native/Test-NativeEditorBaseline.ps1
       - name: Check the 24-family UX audit and explicit certification boundaries
         run: pwsh -NoProfile -File scripts/native/Test-NativeUxAudit.ps1
+      - name: Reject unsafe development-host paths identities defaults and certification claims
+        run: pwsh -NoProfile -File scripts/native/Test-NativeDevelopmentHostControls.ps1 -OutputDirectory "${{ github.workspace }}/artifacts/native/host-controls"
       - name: Build native solution
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore
       - name: Check native dynamic theme resources and independent owners
@@ -146,6 +148,7 @@ jobs:
           name: native-validation
           path: |
             artifacts/native/tests/
+            artifacts/native/host-controls/**/host-controls.json
             artifacts/native/editor-baseline.json
             artifacts/native/input-safety/
             artifacts/native/package-controls/*.json
