@@ -39,6 +39,7 @@ public static class LensDevelopmentDisplayProbe {
     [DllImport("user32.dll")] public static extern int GetAwarenessFromDpiAwarenessContext(IntPtr context);
     [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr window, out Rect rect);
     [DllImport("user32.dll")] public static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
+    [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr window, int attribute, out Rect rect, int size);
     [DllImport("shcore.dll")] public static extern int GetDpiForMonitor(IntPtr monitor, int kind, out uint x, out uint y);
 }
 '@
@@ -47,11 +48,13 @@ $window = [IntPtr]::new($WindowHandle)
 $monitor = [LensDevelopmentDisplayProbe]::MonitorFromWindow($window, 0)
 $dpi = [LensDevelopmentDisplayProbe]::GetDpiForWindow($window)
 $rect = [LensDevelopmentDisplayProbe+Rect]::new()
+$physicalFrame = [LensDevelopmentDisplayProbe+Rect]::new()
 $info = [LensDevelopmentDisplayProbe+MonitorInfo]::new(); $info.Size=[Runtime.InteropServices.Marshal]::SizeOf($info)
 [uint32]$x=0; [uint32]$y=0
 $monitorResult = [LensDevelopmentDisplayProbe]::GetDpiForMonitor($monitor,0,[ref]$x,[ref]$y)
 if (-not $dpi -or $monitor -eq [IntPtr]::Zero -or -not [LensDevelopmentDisplayProbe]::GetWindowRect($window,[ref]$rect) -or
-    -not [LensDevelopmentDisplayProbe]::GetMonitorInfo($monitor,[ref]$info) -or $monitorResult -ne 0) { throw 'Incomplete live HWND/monitor DPI observation.' }
+    -not [LensDevelopmentDisplayProbe]::GetMonitorInfo($monitor,[ref]$info) -or $monitorResult -ne 0 -or
+    [LensDevelopmentDisplayProbe]::DwmGetWindowAttribute($window,9,[ref]$physicalFrame,[Runtime.InteropServices.Marshal]::SizeOf($physicalFrame)) -ne 0) { throw 'Incomplete live HWND/monitor DPI observation.' }
 $receipt = [ordered]@{ schemaVersion=1; status='PASS'; scope='DEVELOPMENT_HOST_OBSERVATION'; recordedAtUtc=[DateTime]::UtcNow.ToString('o');
     sourceRevision=$ExpectedSourceRevision; sourceTree=$ExpectedSourceTree; executableSha256=$ExpectedExecutableSha256;
     processId=$NativeProcessId; processStartUtc=$app.StartTime.ToUniversalTime().ToString('o'); windowHandle=$WindowHandle;
@@ -59,8 +62,9 @@ $receipt = [ordered]@{ schemaVersion=1; status='PASS'; scope='DEVELOPMENT_HOST_O
     dpi=@{ window=$dpi; effectiveScalePercent=($dpi/96.0*100); monitorX=$x; monitorY=$y;
         windowAwareness=[LensDevelopmentDisplayProbe]::GetAwarenessFromDpiAwarenessContext([LensDevelopmentDisplayProbe]::GetWindowDpiAwarenessContext($window));
         observerAwareness=[LensDevelopmentDisplayProbe]::GetAwarenessFromDpiAwarenessContext([LensDevelopmentDisplayProbe]::GetThreadDpiAwarenessContext()) };
-    windowRect=$rect; monitorRect=$info.Monitor; logicalSize=@{ width=($rect.Right-$rect.Left)*96.0/$dpi; height=($rect.Bottom-$rect.Top)*96.0/$dpi };
+    observerWindowRect=$rect; observerMonitorRect=$info.Monitor; physicalFrameRect=$physicalFrame;
+    logicalVisibleFrameSize=@{ width=($physicalFrame.Right-$physicalFrame.Left)*96.0/$dpi; height=($physicalFrame.Bottom-$physicalFrame.Top)*96.0/$dpi };
     systemSettingsChanged=$false; productLaunched=$false; cleanMachineCertified=$false; interactiveScalingCertified=$false;
-    limitations=@('GetDpiForMonitor/rectangles can be virtualised by observer awareness; HWND DPI is reported separately.', 'No scale change, multi-monitor transition, audible reader or alternate-scale acceptance is inferred.') }
+    limitations=@('GetDpiForMonitor/GetWindowRect/monitor rectangles can be virtualised by observer awareness. DWM visible-frame bounds are physical pixels; the frame can exclude invisible resize borders.', 'No scale change, multi-monitor transition, audible reader or alternate-scale acceptance is inferred.') }
 if (-not $DryRun) { Write-NativeHostReceipt $destination $receipt }
 $receipt | ConvertTo-Json -Depth 10
