@@ -66,6 +66,14 @@ internal static partial class NativeUiChecks
         foreach (var (family, _, source) in sources) File.WriteAllText(Path.Combine(fixtures, family + ".mmd"), source);
         WriteNew(Path.Combine(output, "fixtures-before.json"), sources.Select(row => new { row.Family, sha256 = Hash(Path.Combine(fixtures, row.Family + ".mmd")), source = row.Source }));
         var outcomes = new List<object>();
+        // Keep safe API export evidence independent of later interactive desktop availability.
+        // These real bytes have their own assembly identity and do not claim a GUI export.
+        try { RunDevelopmentHostExports(sandbox, revision); }
+        catch (Exception error)
+        {
+            WriteNew(Path.Combine(output, "export-api-failure.json"), new { status = "FAIL", scope = "DEVELOPMENT_HOST_NATIVE_EXPORT_API", revision, tree, error = error.ToString() });
+            throw;
+        }
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         foreach (var (family, prefix, source) in shellOnly ? sources.Take(0) : sources)
         {
@@ -169,7 +177,7 @@ internal static partial class NativeUiChecks
             }
         }
         WriteNew(Path.Combine(output, "entry-matrix-completion.json"), new { status = shellOnly ? "NOT RUN" : "PASS", scope = "DEVELOPMENT_HOST_ENTRY_MATRIX", revision, tree, executableSha256, outcomes });
-        try { RunDevelopmentHostShell(executable, sandbox, automation, revision, tree); RunDevelopmentHostExports(sandbox, revision); }
+        try { RunDevelopmentHostShell(executable, sandbox, automation, revision, tree); }
         catch (Exception error)
         {
             WriteNew(Path.Combine(output, "completion.json"), new { status = "FAIL", scope = shellOnly ? "DEVELOPMENT_HOST_SHELL_UI_ONLY" : "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, outcomes, error = error.ToString() });

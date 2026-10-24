@@ -48,7 +48,9 @@ internal static partial class NativeUiChecks
             stage = "editor-find"; FocusWindow(main); editor.Focus();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in editor", "Ctrl+F did not target the editor.");
-            Find(main, "FindText").AsTextBox().Text = "Café"; FocusWindow(main); Find(main, "FindText").Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
+            Find(main, "FindText").AsTextBox().Text = "Café"; FocusWindow(main); Find(main, "FindText").Focus();
+            Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Editor Find input did not acquire keyboard focus with its exact query.");
+            Capture(main, "editor-find-before-enter"); Keyboard.Type(VirtualKeyShort.RETURN);
             Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Editor Find/Enter did not select exact Unicode text.");
             Capture(main, "editor-find"); Find(main, "CloseFind").AsButton().Invoke();
             stage = "preview-find";
@@ -58,7 +60,9 @@ internal static partial class NativeUiChecks
             FocusWindow(main); Mouse.Click(new System.Drawing.Point((int)(bounds.Left + bounds.Width / 2), (int)(bounds.Top + bounds.Height / 2)));
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in preview", "Ctrl+F did not target the focused preview.");
-            Find(main, "FindText").AsTextBox().Text = "Café"; Find(main, "FindText").Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
+            Find(main, "FindText").AsTextBox().Text = "Café"; Find(main, "FindText").Focus();
+            Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Preview Find input did not acquire keyboard focus with its exact query.");
+            Keyboard.Type(VirtualKeyShort.RETURN);
             Capture(main, "preview-find"); Find(main, "CloseFind").AsButton().Invoke();
             checks.Add("Editor and preview Ctrl+F retain separate contexts, Unicode input, Enter and close/focus behaviour");
             stage = "owner-edit";
