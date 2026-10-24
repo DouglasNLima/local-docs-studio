@@ -69,7 +69,7 @@ Test-Rejection 'Missing preservation snapshot data' { Assert-NativeHostUnchanged
 Test-Rejection 'Fake PID and HWND' { Assert-NativeHostWindow 0 0 (Join-Path $safe 'absent.exe') ('0'*64) $revision }
 Test-Rejection 'Wrong real PID/unknown HWND' { Assert-NativeHostWindow $PID 1 ([Diagnostics.Process]::GetCurrentProcess().MainModule.FileName) ('0'*64) $revision }
 Test-Rejection 'Missing/incomplete payload inventory' { Assert-NativeHostPayload @() $safe }
-$plan=Join-Path $repo ('artifacts/native/development-host/' + $revision + '/dry-' + [guid]::NewGuid().ToString('N'))
+$plan=Join-Path $repo ('artifacts/native/development-host/' + $revision + '/t' + [guid]::NewGuid().ToString('N').Substring(0,7))
 Test-Acceptance 'Dry-run does not create sandbox or launch app' {
     & (Join-Path $PSScriptRoot 'Invoke-NativePortableHostSmoke.ps1') -SandboxRoot $plan -DryRun
     if (Test-Path -LiteralPath $plan) { throw 'Dry-run mutated sandbox' }
