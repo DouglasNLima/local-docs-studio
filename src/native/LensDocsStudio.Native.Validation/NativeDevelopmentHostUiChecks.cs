@@ -170,10 +170,10 @@ internal static partial class NativeUiChecks
                 using var process = Process.GetProcessById(app!.ProcessId);
                 var handle = window.Properties.NativeWindowHandle.Value;
                 if (handle == IntPtr.Zero || process.SessionId != Process.GetCurrentProcess().SessionId || !HostVisibleWindow(handle)) throw new IOException("A real visible HWND in this console session is required.");
-                FocusWindow(window); _ = DwmFlush();
-                window.CaptureToFile(Path.Combine(folder, name + ".png"));
+                FocusWindow(window);
                 var controls = window.FindAllDescendants().Select(element => new { id = element.Properties.AutomationId.ValueOrDefault, name = element.Properties.Name.ValueOrDefault, focused = element.Properties.HasKeyboardFocus.ValueOrDefault, offscreen = element.Properties.IsOffscreen.ValueOrDefault, bounds = element.Properties.BoundingRectangle.ValueOrDefault.ToString() }).ToArray();
-                WriteNew(Path.Combine(folder, name + ".json"), new { scope = "DEVELOPMENT_HOST_UI", revision, tree, executableSha256, processId = process.Id, processStartUtc = process.StartTime.ToUniversalTime(), hwnd = handle.ToInt64(), dpi = HostWindowDpi(handle), bounds = window.BoundingRectangle.ToString(), selection, controls });
+                _ = DwmFlush(); window.CaptureToFile(Path.Combine(folder, name + ".png"));
+                WriteNew(Path.Combine(folder, name + ".json"), new { scope = "DEVELOPMENT_HOST_UI", visualAcceptance = "NOT RUN: inspect the actual frame separately; UIA success cannot certify captured pixels", revision, tree, executableSha256, processId = process.Id, processStartUtc = process.StartTime.ToUniversalTime(), hwnd = handle.ToInt64(), dpi = HostWindowDpi(handle), bounds = window.BoundingRectangle.ToString(), selection, controls });
             }
         }
         WriteNew(Path.Combine(output, "entry-matrix-completion.json"), new { status = shellOnly ? "NOT RUN" : "PASS", scope = "DEVELOPMENT_HOST_ENTRY_MATRIX", revision, tree, executableSha256, outcomes });

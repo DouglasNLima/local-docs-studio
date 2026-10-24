@@ -33,8 +33,9 @@ internal static partial class NativeUiChecks
                 throw new IOException("DOCX schema/Unicode inspection failed.");
         }
         var html = System.Net.WebUtility.HtmlDecode(File.ReadAllText(Path.Combine(output, "host.html")));
-        if (!html.Contains("Café😀🚀", StringComparison.Ordinal) || !html.Contains("data:image/", StringComparison.Ordinal) || !html.Contains("flowchart LR", StringComparison.Ordinal))
-            throw new IOException("HTML Unicode, embedded image or canonical Mermaid source is missing.");
+        if (!html.Contains("Café😀🚀", StringComparison.Ordinal) || !html.Contains("alt=\"Synthetic orange square\" src=\"data:image/", StringComparison.Ordinal) ||
+            !html.Contains("alt=\"Mermaid diagram\" src=\"data:image/", StringComparison.Ordinal))
+            throw new IOException("HTML Unicode, embedded fixture image or native diagram image is missing.");
         if (!Encoding.ASCII.GetString(File.ReadAllBytes(Path.Combine(output, "host.pdf")), 0, 5).Equals("%PDF-", StringComparison.Ordinal)) throw new IOException("PDF bytes are missing their actual PDF header.");
         var match = Regex.Match(source, "```mermaid\\r?\\n(?<source>.*?)```", RegexOptions.Singleline | RegexOptions.CultureInvariant);
         if (!match.Success) throw new IOException("Synthetic canonical Mermaid source is missing.");
@@ -42,14 +43,24 @@ internal static partial class NativeUiChecks
         var canonical = new DiagramService().Render(diagramSource);
         if (canonical.Svg is null) throw new IOException("Synthetic native diagram did not render.");
         Save("host-diagram.mmd", Encoding.UTF8.GetBytes(diagramSource)); Save("host-diagram.svg", Encoding.UTF8.GetBytes(canonical.Svg));
-        Save("host-diagram.png", StaWorker.RunAsync(() => NativeSvgService.ToPng(new NativeSvgService().Render(canonical.Svg))).GetAwaiter().GetResult());
-        var site = new DocsSiteExportService().ExportAsync(workspace, new Dictionary<string, string>(), state, new DocsSiteOptions("Synthetic host documentation")).GetAwaiter().GetResult();
+        var diagramPng = StaWorker.RunAsync(() => NativeSvgService.ToPng(new NativeSvgService().Render(canonical.Svg))).GetAwaiter().GetResult();
+        Save("host-diagram.png", diagramPng);
+        if (!html.Contains("data:image/png;base64," + Convert.ToBase64String(diagramPng), StringComparison.Ordinal)) throw new IOException("HTML diagram image differs from the independently rendered canonical source.");
+        // The deliberately invalid editor fixture belongs to source-protection acceptance,
+        // not a successful whole-workspace export. Preserve it and use a fresh valid site fixture.
+        var siteWorkspace = Path.Combine(sandbox, "workspace-site"); Directory.CreateDirectory(Path.Combine(siteWorkspace, "assets"));
+        var siteFiles = new[] { "acceptance-lf.md", "acceptance-crlf.md", "relative.md", "standalone.mmd", "assets/square.png" };
+        foreach (var file in siteFiles) File.Copy(Path.Combine(workspace, file), Path.Combine(siteWorkspace, file), false);
+        var siteBaseline = siteFiles.ToDictionary(file => file, file => Hash(Path.Combine(siteWorkspace, file)));
+        WriteNew(Path.Combine(output, "site-before.json"), siteBaseline);
+        var site = new DocsSiteExportService().ExportAsync(siteWorkspace, new Dictionary<string, string>(), state, new DocsSiteOptions("Synthetic host documentation")).GetAwaiter().GetResult();
         Save("host-site.zip", site.Bytes);
         using (var archive = ZipFile.OpenRead(Path.Combine(output, "host-site.zip")))
         {
             if (archive.GetEntry("index.html") is null || archive.Entries.Any(entry => entry.FullName.Contains("LensDocsStudio.Native", StringComparison.Ordinal) || entry.FullName.Contains("preferences.json", StringComparison.Ordinal)))
                 throw new IOException("Docs Site shell is missing or contains private-state entries.");
         }
+        if (siteBaseline.Any(file => Hash(Path.Combine(siteWorkspace, file.Key)) != file.Value)) throw new IOException("Docs Site export changed synthetic source/asset bytes.");
         if (Hash(path) != sourceHash) throw new IOException("Native export services changed synthetic source bytes.");
         WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_NATIVE_EXPORT_API", portableUiSourceRevision = portableRevision,
             apiAssembly = typeof(DocumentExportService).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
