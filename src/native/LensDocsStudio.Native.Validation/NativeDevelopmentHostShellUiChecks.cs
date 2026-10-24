@@ -48,9 +48,9 @@ internal static partial class NativeUiChecks
             stage = "editor-find"; FocusWindow(main); editor.Focus();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in editor", "Ctrl+F did not target the editor.");
-            Find(main, "FindText").AsTextBox().Text = "Café"; FocusWindow(main); Find(main, "FindText").Focus();
+            Find(main, "FindText").AsTextBox().Text = "Café";
             Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Editor Find input did not acquire keyboard focus with its exact query.");
-            Capture(main, "editor-find-before-enter"); Keyboard.Type(VirtualKeyShort.RETURN);
+            Capture(main, "editor-find-before-enter", activate: false); Keyboard.Type(VirtualKeyShort.RETURN);
             Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Editor Find/Enter did not select exact Unicode text.");
             Capture(main, "editor-find"); Find(main, "CloseFind").AsButton().Invoke();
             stage = "preview-find";
@@ -60,7 +60,7 @@ internal static partial class NativeUiChecks
             FocusWindow(main); Mouse.Click(new System.Drawing.Point((int)(bounds.Left + bounds.Width / 2), (int)(bounds.Top + bounds.Height / 2)));
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in preview", "Ctrl+F did not target the focused preview.");
-            Find(main, "FindText").AsTextBox().Text = "Café"; Find(main, "FindText").Focus();
+            Find(main, "FindText").AsTextBox().Text = "Café";
             Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Preview Find input did not acquire keyboard focus with its exact query.");
             Keyboard.Type(VirtualKeyShort.RETURN);
             Capture(main, "preview-find"); Find(main, "CloseFind").AsButton().Invoke();
@@ -173,6 +173,7 @@ internal static partial class NativeUiChecks
 
         void Launch()
         {
+            Console.WriteLine("HOST LOCAL: launching the explicit synthetic shell; normal foreground focus is required.");
             var info = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = workspace };
             foreach (var arg in new[] { "--state-directory", state, workspace, sourcePath }) info.ArgumentList.Add(arg);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Shell owner did not open within 25 seconds.");
@@ -195,9 +196,11 @@ internal static partial class NativeUiChecks
             Mouse.MoveTo(point); Mouse.Down(MouseButton.Left); Mouse.MoveTo(new System.Drawing.Point(point.X + pixels, point.Y)); Mouse.Up(MouseButton.Left);
             observations.Add(new { operation = "Pointer splitter drag", id, pixels, before = bounds.ToString(), after = Find(main!, id).BoundingRectangle.ToString() });
         }
-        void Capture(Window window, string name)
+        void Capture(Window window, string name, bool activate = true)
         {
-            FocusWindow(window); _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png"));
+            if (activate) FocusWindow(window);
+            else Wait(() => { GetWindowThreadProcessId(GetForegroundWindow(), out var processId); return processId == app!.ProcessId; }, "The synthetic shell lost foreground focus before its read-only capture.");
+            _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png"));
             WriteNew(Path.Combine(output, name + ".json"), new { revision, tree, processId = app!.ProcessId, hwnd = window.Properties.NativeWindowHandle.Value.ToInt64(), dpi = HostWindowDpi(window.Properties.NativeWindowHandle.Value), bounds = window.BoundingRectangle.ToString(),
                 controls = window.FindAllDescendants().Select(element => new { id = element.Properties.AutomationId.ValueOrDefault, name = element.Properties.Name.ValueOrDefault, focused = element.Properties.HasKeyboardFocus.ValueOrDefault }).ToArray() });
         }
