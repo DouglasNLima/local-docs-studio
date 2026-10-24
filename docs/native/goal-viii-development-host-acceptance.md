@@ -89,10 +89,10 @@ New C# belongs only to the existing independent validation project.
 | Command Palette | PASS: Ctrl+Shift+P exposes 54 real commands; cancellation returns to owner; actual modal screenshot/tree retained |
 | Close cancellation/save | PASS: actual synthetic dirty-close dialog cancelled once, retaining the edit; later Yes saved the synthetic buffer and closed normally. A manually delivered Return had inserted a leading LF in this synthetic buffer; its saved delta is retained, not attributed to a product defect |
 | DPI and real sizes | PASS observation: 144-DPI HWND. Source-labelled native UIA captures show 1320×900 and 1920×1200 physical window bounds, corresponding to requested 880×600 and 1280×800 logical sizes |
-| Complete local family run | NOT RUN as an accepted complete matrix at this document's drafting stage; preceding partial runs and failures are retained. Use the final source-labelled engineering receipt and per-family completion records |
+| Complete local family run | PASS: `s06` has 27 completed entry cases across all 24 families, including C4's extra views and TreeView box mode; portable source is the frozen SHA, client `6075adbf54aae4eae69b912118b202f459cc715a`, tree `4c98136dfcf83da568410b8ad39c579a97d9cb25`. The later shell failure does not erase or promote these individual entry receipts |
 | Complete shell/owner/export run | NOT RUN as accepted complete coverage at drafting stage; new bounded path is separate from hosted suites. Use its exact completion record; do not infer from a successful ZIP inspection or process launch |
 | Host preservation | PASS after completed sessions `s02`, `s03`, `s04`: observed associations, registrations, shortcuts and all four default private-state file hashes unchanged. Synthetic state/source changes retained |
-| Guard tests | PASS: 45 deterministic controls, including wrapped registry-name round trips, real junction rejection, stale/missing evidence, wrong source/tree/PID/HWND, changed defaults, specialist ID contracts and certification relabelling |
+| Guard tests | PASS: 45 deterministic controls before the additional paused-comparison selector guard; the final source-labelled receipt records its complete count. Includes wrapped registry-name round trips, real junction rejection, stale/missing evidence, wrong source/tree/PID/HWND, changed defaults, specialist ID contracts and certification relabelling |
 | Local build/Core | PASS: committed harness build zero warnings/errors; sequential Core 2114/2114 at `da6e623a7fc592d121fa8928102e744a81a6d7e7`. Final-head CI remains independently required |
 | Static web integrity | PASS: 50 modules, 57 shell assets, 150 vendor assets and 56 dependency scans; original service-worker/offline contract retained |
 
@@ -137,7 +137,9 @@ No shipping product defect has been established and no shipping fix is included.
 | Exit metadata from an attached process | TEST HARNESS: UI completed, but exit code could not be obtained after the attached process closed. Use the existing separately owned started-process/Attach pattern |
 | RPC failure observing closed editor | ENVIRONMENT / UIA observation, cause UNPROVED: raw COM error and partial captures retained. New host path enumerates real HWNDs by test PID and observes closure through captured HWND; no desktop-wide UIA search or uncertain mutation replay |
 | Sequence navigation lookup | TEST HARNESS: the specialist uses `SequenceInteractions`, rather than the shared-shell `Elements` suffix. Retain the failed actual Sequence screenshot; explicitly map its existing contract and guard all five specialist navigation/source/validation IDs |
+| Quick Open fuzzy matches | TEST HARNESS: `acceptance-lf.md` correctly also returns nearby fuzzy match `acceptance-crlf.md`. Retained actual two-result screenshot; require exactly one matching file identity, select it explicitly and still require exact opened source. No product search semantics change |
 | Intermediate C# compile errors | TEST HARNESS: retained exact candidate logs, including nullable diagnostics; corrected before accepted execution. No dropped warnings or relaxed compiler settings |
+| Initial PR Continuous selector | GOVERNANCE: the existing exclusion list did not include the new Goal VIII branch, so run `40118136936` queued controlled comparisons. Cancelled while its jobs were observed queued; retained API receipts. Add only this branch to the established comparison exclusion; normal/High Contrast interaction checks remain required, and the 250 ms goal stays INCOMPLETE |
 
 Evidence is append-only. Aborted preparation directories `baseline-console-01` and
 `s01`, actual sessions `s02` onward, original archive/receipts, compile/test logs and
@@ -164,6 +166,10 @@ pwsh -NoProfile -File scripts/native/Invoke-NativePortableHostSmoke.ps1 -Mode Pr
 
 # The client must be a Release build of the clean committed preparation source.
 pwsh -NoProfile -File scripts/native/Invoke-NativePortableHostSmoke.ps1 -Mode RunUi -SandboxRoot $taskSandbox
+
+# A fresh prepared sandbox may run only a targeted shell recheck after a proved
+# harness correction. Its completion explicitly marks the entry matrix NOT RUN.
+pwsh -NoProfile -File scripts/native/Invoke-NativePortableHostSmoke.ps1 -Mode RunUi -ScenarioGroup Shell -SandboxRoot '<separate-fresh-prepared-sandbox>'
 
 # Optional manual companion: launch only, then use the actual native window.
 # Use a separate fresh prepared session when RunUi has already completed.
