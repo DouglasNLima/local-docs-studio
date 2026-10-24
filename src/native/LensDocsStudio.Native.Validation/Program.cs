@@ -17,6 +17,15 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--development-host-ui")
+        {
+            try
+            {
+                if (args.Length != 5) throw new ArgumentException("Use the guarded Invoke-NativePortableHostSmoke.ps1 RunUi path with independent source/tree/executable pins.");
+                return NativeUiChecks.RunDevelopmentHost(args[1], args[2], args[3], args[4]);
+            }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--expansion-vi-editor-fidelity")
         {
             try { foreach (var family in new[] { "packet", "treeview", "treeview-box", "treemap", "venn" }) NativeWorkflowEditorChecks.Run(Path.Combine(Path.GetFullPath(args[1]), family), Path.GetFullPath(args[2]), expansionFamily: family); return 0; }

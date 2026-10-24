@@ -90,5 +90,21 @@ foreach ($name in 'Test-NativeDevelopmentHost.ps1','Invoke-NativePortableHostSmo
 $installer=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Test-NativeInstaller.ps1') -Raw
 if (-not $installer.Contains("`$env:RUNNER_ENVIRONMENT -ne 'github-hosted'")) { throw 'Hosted installer guard lost' }
 $checks.Add(@{name='Original hosted installer guard remains mandatory';status='PASS'})
+$localClient=Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostUiChecks.cs') -Raw
+foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboard.', 'ChangeDisplaySettings(', 'SHAppBarMessage(', 'Registry.SetValue(', '.Kill(') {
+    if ($localClient.Contains($forbidden)) { throw "Local UI client contains forbidden host operation: $forbidden" }
+}
+$checks.Add(@{name='Local UI client cannot change display contrast clipboard registry or kill processes';status='PASS'})
+Test-Rejection 'Direct local UI route refuses missing pins before launch' {
+    $client=Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'
+    if (Test-Path -LiteralPath $client) {
+        & $client --development-host-ui 2>$null
+        if ($LASTEXITCODE -eq 0) { return }
+        throw 'Expected missing-pin rejection'
+    }
+    # The static route guard also runs before the solution has been built.
+    $program=Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/Program.cs') -Raw
+    if ($program.Contains('if (args.Length != 5)')) { throw 'Expected mandatory-pin guard present' }
+}
 Write-NativeHostReceipt (Join-Path $safe 'host-controls.json') @{ status='PASS'; checks=@($checks); count=$checks.Count; qualification='DETERMINISTIC GUARD TESTS'; guiAcceptance='NOT RUN' }
 "PASS: $($checks.Count) development-host guard controls. Evidence: $root"
