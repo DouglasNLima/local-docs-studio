@@ -1,5 +1,21 @@
 # Accepted native improvements consolidation
 
+## Current status - 24 October 2026
+
+See [Current native Windows readiness](current-windows-readiness.md) for the
+verified 24-family integrated baseline, internal-preview decision, certification
+blockers and Goal VII final-source receipt. PR #46 is merged; the post-merge native
+and web runs succeeded at `33a751c60886a364102c45cb43e36af1e7f13517`.
+This does not certify a subsequent feature head or a production release.
+
+## Historical milestone records
+
+The chapters below retain their original recording sources, dates, package hashes,
+Draft/pending statements and family counts. They are historical evidence, not the
+current-status summary. When reading a copied package, use
+[the repository readiness page](https://github.com/DouglasNLima/local-docs-studio/blob/develop/docs/native/current-windows-readiness.md).
+
+
 The 19 October 2026 product decision accepts the bounded production changes in
 PRs [#36](https://github.com/DouglasNLima/local-docs-studio/pull/36) and
 [#37](https://github.com/DouglasNLima/local-docs-studio/pull/37). It ends the active

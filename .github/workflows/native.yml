@@ -37,6 +37,8 @@ jobs:
         run: dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
       - name: Assert all previous source fixtures remain unchanged
         run: pwsh -NoProfile -File scripts/native/Test-NativeEditorBaseline.ps1
+      - name: Check the 24-family UX audit and explicit certification boundaries
+        run: pwsh -NoProfile -File scripts/native/Test-NativeUxAudit.ps1
       - name: Build native solution
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore
       - name: Check native dynamic theme resources and independent owners
@@ -130,7 +132,7 @@ jobs:
         run: |
           foreach ($base in '0.1.0','0.1.1') {
             $version = "$base-preview.${{ github.run_number }}"
-            pwsh -NoProfile -File scripts/native/Test-NativePreviewPackage.ps1 -PackageDirectory "artifacts/native/packages/$version" -ExpectedVersion $version -ExpectedSourceRevision (git rev-parse HEAD) -OutputPath "artifacts/native/packages/$version/package-verification.json"
+            pwsh -NoProfile -File scripts/native/Test-NativePreviewPackage.ps1 -PackageDirectory "artifacts/native/packages/$version" -ExpectedVersion $version -ExpectedSourceRevision (git rev-parse HEAD) -ExpectedSourceTree (git rev-parse 'HEAD^{tree}') -OutputPath "artifacts/native/packages/$version/package-verification.json"
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
           pwsh -NoProfile -File scripts/native/Test-NativePreviewPackageControls.ps1 -PackageDirectory "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}" -OutputDirectory artifacts/native/package-controls

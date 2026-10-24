@@ -1,5 +1,11 @@
 # Native diagram compatibility
 
+Current integrated status (24 October 2026): [Current Windows readiness](current-windows-readiness.md).
+There are 24 bounded native editor families. Dated expansion milestones below
+retain their original sources and counts; the [Goal VII audit](goal-vii-ux-audit.md)
+separates implementation, actual Windows acceptance and manual prerequisites.
+
+
 The [Class visual editor report](mermaid-class-visual-editor.md) tracks the fifth
 native family: dedicated source occurrences, bounded class/member authoring and
 endpoint-owned relationship markers/cardinalities. Method classifiers, unknown

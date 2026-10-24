@@ -1,5 +1,21 @@
 # Windows internal preview release notes
 
+## Current status - 24 October 2026
+
+See [Current native Windows readiness](current-windows-readiness.md) for the
+verified 24-family integrated baseline, internal-preview decision, certification
+blockers and Goal VII final-source receipt. PR #46 is merged; the post-merge native
+and web runs succeeded at `33a751c60886a364102c45cb43e36af1e7f13517`.
+This does not certify a subsequent feature head or a production release.
+
+## Historical milestone records
+
+The chapters below retain their original recording sources, dates, package hashes,
+Draft/pending statements and family counts. They are historical evidence, not the
+current-status summary. When reading a copied package, use
+[the repository readiness page](https://github.com/DouglasNLima/local-docs-studio/blob/develop/docs/native/current-windows-readiness.md).
+
+
 ## Four additional bounded native families — Expansion VI
 
 Packet, TreeView, Treemap and Venn use exact source occurrences, canonical native geometry and guarded owner Apply. Packet relative cursor impacts, TreeView's two modes and custom artwork, Treemap zero-value invisibility/fallbacks, and Venn size metadata without proportional geometry have explicit protections. See the [grammar/protection guide](packet-treeview-treemap-venn-editors.md) and [source-labelled acceptance receipt](expansion-vi-engineering-receipt.md). Hosted final-source acceptance is tracked separately from the twenty-four bounded implementations. This unsigned internal preview does not certify SDK-free clean Windows, physical screen readers, higher-DPI interactive use or historical migration. No production publication or ordinary desktop installation is authorised.

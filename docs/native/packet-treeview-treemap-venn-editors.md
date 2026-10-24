@@ -1,5 +1,11 @@
 # Packet, TreeView, Treemap and Venn native authoring
 
+Current integrated status (24 October 2026): [Current Windows readiness](current-windows-readiness.md).
+There are 24 bounded native editor families. Dated expansion milestones below
+retain their original sources and counts; the [Goal VII audit](goal-vii-ux-audit.md)
+separates implementation, actual Windows acceptance and manual prerequisites.
+
+
 Expansion VI implements four bounded slices alongside the previous twenty native editor families. Final-source hosted acceptance and package results belong to the [engineering receipt](expansion-vi-engineering-receipt.md); implementation and offscreen compatibility alone do not certify installed authoring. The renderer remains Mermaider **0.15.1**, upstream `71b64845570d633a94d29e85579c0a02786fece8`, on official .NET 10/WPF. This does not imply comprehensive Mermaid grammar support, newer Mermaid compatibility or an unpinned browser rendering path.
 
 Open **Visual Edit** from a document preview, open a standalone `.mmd`/`.mermaid` document, or use **Insert → Packet / TreeView / Treemap / Venn visually…**. The catalogue contains source templates and snippets for all four. Actual canonical SVG supplies native shapes; no replacement grids, tree layouts, tile packers or circle-overlap solvers are used.
