@@ -200,3 +200,13 @@ New clean-source CI and local sequential Core experiments receive separate recei
 HOST PORTABLE and INTERNAL BETA remain BLOCKED; HOST INSTALLER remains NOT RUN;
 PUBLIC PRODUCTION remains NO-GO. No foreground guard or original shell requirement
 is waived, and no old evidence is rewritten.
+
+The subsequent `694b9fa` actual HC experiment passed at 7.893:1 with matching
+requested/effective/WPF/Win32 colours; the original cause remains UNPROVED. Local
+sequential Core passed 3/3 focused and 2,117/2,117 full. The corrected read-only
+observer at `bb3a04a` proved that real Find Return arrived but native selection was
+absent, alongside empty UIA. Its separate Next control was blocked before input by
+the foreground guard. Local GUI work stopped; invalid/valid GUI and the entire
+shell remain NOT RUN. See the Goal VIII-C report for session attribution, normal
+exits, host preservation and the operator-assisted next step. No shipping Find fix
+or local acceptance PASS is claimed.

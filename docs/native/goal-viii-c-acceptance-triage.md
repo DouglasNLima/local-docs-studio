@@ -164,3 +164,70 @@ absent preparation marker before Prepare finished. Neither created a UI session
 or sent input. The actual d01 run began only after successful preparation, with a
 separate log. Completed d01 evidence is not reused.
 
+## Real input differential and mandatory local stop
+
+Clean observer correction `bb3a04ae2b95a3444094bde52abe819b732f83a4`, tree
+`dca33822167241ac49fff743229e259d96ec155c`, built with zero warnings/errors and
+passed static checks. Shipping application/Core source is unchanged.
+
+| Fresh .880 diagnostic session | Outcome |
+| --- | --- |
+| d02 / FindEnterObserved | FAIL: one Return delivered; native selection and UIA both empty |
+| d03 / FindNextObserved | BLOCKED at foreground guard before any input; stop local GUI phase |
+
+d02 attached before input at 07:33:09 UTC, PID 43036 / HWND 41881968, actual DPI
+144. Before the action, owner foreground and FindText focus were verified; native
+query was exactly `Café`, with source UTF-16 occurrences at 2, 384 and 544.
+At 07:33:26 Return reached window and FindText PreviewKeyDown with Handled=false;
+handled-events-too bubbling observations then had Handled=true. Native selection
+stayed start 0, length 0, selected text empty, caret 0; no selection-change event
+occurred. UIA independently reported empty text/start 0/length 0 after the action
+and after Close Find. Source SHA remained
+`990c0ec966d38842f5ab666c67c3d7a9d6c40f1a216d8cf450bc8701454fdb42`.
+
+This disproves a UIA-only omission for that action. It proves key delivery, not
+execution of FindNext. Interception before its ordinary bubbling handler versus
+another FindNext-path cause remains unresolved (A/B); no precise WPF class-handler
+cause is claimed. Foreground moved away during the later read-only wait; that is
+recorded, and no further keyboard/mouse input was sent. Source remained exact and
+the process closed normally.
+
+d03 attached at 07:37:06 UTC, PID 85680 / HWND 30677148. The unchanged 20-second
+foreground guard refused at 07:37:27 before Ctrl+F, query or Next input (outcome D).
+Its exact owned unmodified process closed normally at 07:39:39. No focus-policy
+bypass or second attempt occurred. Both completed sandboxes passed observed host
+preservation and all 528 unchanged payload-file checks; d01 is also preserved and
+normally closed. Probes ran inside actual portable Core/WPF 10.0.13, separately
+from the local framework-dependent .NET 10.0.12 validation client.
+
+No shipping Find fix is justified by a complete differential yet. Typed query,
+preview Find, ordinary editor Enter, portable invalid/error/valid reopening and
+the entire original shell are NOT RUN after the mandatory stop. HOST PORTABLE and
+INTERNAL BETA remain BLOCKED regardless of CI; HOST INSTALLER remains NOT RUN;
+PUBLIC PRODUCTION remains NO-GO.
+
+Next operator-assisted action: provide the normal unlocked console, close any Lens
+instance normally, prepare a fresh final-source verified sandbox and ensure its
+visible window can receive foreground focus before the guarded single-action
+test. Do not alter Windows focus policy or retry a completed sandbox. Obtain the
+separate Next control and any justified before/after Enter evidence before the
+invalid/valid GUI test and once-only complete original shell.
+
+## First new hosted contrast outcome
+
+At `694b9fa`, desktop UX run 40172266497 / baseline job 121105428009, attempt 1,
+completed successfully, including the immutable historical comparison and current
+actual High Contrast capture. OS and WPF HC=true, bindings active, pressed text
+`#FF263B50`, background `#FF8EE3F0`, ratio **7.893273424942036**.
+Requested/effective resources, WPF SystemColors and Win32 GetSysColor agree;
+the original foreground equality passes. Image remains 20261021.278.1 and runtime
+.NET 10.0.13. Screenshot labels correctly identify the checked-out feature head,
+with GitHub's merge SHA recorded separately.
+
+Artifact 12590274547 expires 2026-11-08T07:29:48Z. Published and downloaded ZIP
+SHA-256 both equal
+`da870edfd75d8ce8acf2e6bd7989b3554859d4618919053d167cfd96ddb5f24c`.
+Independent member hashes and diagnostic JSON are retained in the `694b9fa/a01`
+root. All original thresholds, equality, geometry/pixel rules, deadlines and skips
+are unchanged. The original failure's cause remains UNPROVED. Final-source CI and
+package evidence require their own post-commit receipt.
