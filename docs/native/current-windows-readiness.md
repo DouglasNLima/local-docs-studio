@@ -1,10 +1,18 @@
 # Current native Windows readiness
 
-PR #48's 25 October 2026 [Find routing continuation](goal-viii-d-operator-assisted-find.md)
-adds a bounded correction and guarded acceptance scenarios. New-source GUI/full
-shell acceptance remains pending its exact-source receipt; internal beta remains
-blocked and public production NO-GO. The dated integrated baseline below is
-historical and does not certify this continuation.
+PR #48's 25 October 2026 [Goal VIII-E handoff](goal-viii-e-owned-window-acceptance.md)
+records **HOST CLEANUP: BLOCKED pending manual operator action**. The exact f05
+process still owns an `Unsaved Mermaid draft` OK/Cancel confirmation. Read-only
+Win32 inspection proves the dialog → visual editor → main ownership chain; this
+modal state does not prove the safe pre-mutation boundary. No guard exception,
+new host test, process termination or further close request was performed.
+
+The corrected .891 portable Find/Enter and independent invalid/valid Mermaid GUI
+checks passed at their recorded source. Original f05 remains **BLOCKED** after
+seven groups, before the stale-owner mutation; the real stale-owner rejection and
+the fresh complete shell remain untested. **HOST PORTABLE and INTERNAL BETA remain
+BLOCKED; HOST INSTALLER is NOT RUN; PUBLIC PRODUCTION is NO-GO.** The dated
+integrated baseline below is historical and does not certify this continuation.
 
 Recorded 24 October 2026 for **Goal VII**, a review/internal-preview goal. This is
 the authoritative current-status entry point. Dated chapters in other native docs
