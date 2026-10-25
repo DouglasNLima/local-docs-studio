@@ -187,3 +187,16 @@ native-control fallback with a valid positive companion. Its portable GUI check
 and the complete shell sequence remain NOT RUN. Original failures are retained.
 HOST PORTABLE, INTERNAL BETA and PUBLIC PRODUCTION remain BLOCKED. New-head hosted
 CI is recorded separately after commit and cannot substitute for local acceptance.
+
+## Goal VIII-C — original required CI failure, 25 October 2026
+
+The completed original `75ab77e` inventory has seven successful workflows and one
+failed desktop UX workflow. See [the preserved-evidence triage](goal-viii-c-acceptance-triage.md).
+The `baseline` job passed its historical application steps, then failed the current
+validation process's pressed-colour assertion before current High Contrast capture.
+The original run remains FAILED; no contrast cause or product fix is established.
+Read-only diagnostics retain the unchanged equality and 4.5 contrast acceptance.
+New clean-source CI and local sequential Core experiments receive separate receipts.
+HOST PORTABLE and INTERNAL BETA remain BLOCKED; HOST INSTALLER remains NOT RUN;
+PUBLIC PRODUCTION remains NO-GO. No foreground guard or original shell requirement
+is waived, and no old evidence is rewritten.
