@@ -17,7 +17,7 @@ namespace LensDocsStudio.Native.Validation;
 // installer, trust, account or default-application mutation. Only synthetic files and test HWNDs.
 internal static partial class NativeUiChecks
 {
-    public static int RunDevelopmentHost(string sandbox, string revision, string tree, string executableSha256, bool shellOnly = false) => Task.Run(() =>
+    public static int RunDevelopmentHost(string sandbox, string revision, string tree, string executableSha256, bool shellOnly = false, string? diagnostic = null) => Task.Run(() =>
     {
         if (!System.Text.RegularExpressions.Regex.IsMatch(revision, "^[0-9a-f]{40}$") || !System.Text.RegularExpressions.Regex.IsMatch(tree, "^[0-9a-f]{40}$") ||
             !System.Text.RegularExpressions.Regex.IsMatch(executableSha256, "^[0-9a-f]{64}$")) throw new IOException("Independent full source/tree/SHA-256 pins are mandatory.");
@@ -66,6 +66,11 @@ internal static partial class NativeUiChecks
         var output = Path.Combine(sandbox, "ui");
         if (Directory.Exists(output)) throw new IOException("UI evidence already exists; prepare a new sandbox.");
         Directory.CreateDirectory(output);
+        if (diagnostic is not null)
+        {
+            if (diagnostic is not ("FindEnter" or "FindNext" or "FindTyped")) throw new ArgumentException("Unknown bounded diagnostic.");
+            return RunHostFindDiagnostic(executable, sandbox, revision, tree, diagnostic);
+        }
         var fixtures = Path.Combine(sandbox, "workspace", "families"); Directory.CreateDirectory(fixtures);
         var sources = HostSources().ToArray();
         foreach (var (family, _, source) in sources) File.WriteAllText(Path.Combine(fixtures, family + ".mmd"), source);

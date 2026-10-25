@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Plan','Prepare','Launch','RunUi','Complete')][string]$Mode = 'Plan',
-    [ValidateSet('All','Shell')][string]$ScenarioGroup = 'All',
+    [ValidateSet('All','Shell','FindEnter','FindNext','FindTyped')][string]$ScenarioGroup = 'All',
     [Parameter(Mandatory)][string]$SandboxRoot,
     [string]$PackageDirectory,
     [ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedSourceRevision,
@@ -145,6 +145,7 @@ if ($Mode -eq 'RunUi') {
     if (-not $version.EndsWith('+' + $marker.harnessRevision, [StringComparison]::Ordinal)) { throw 'UI client must be built from the clean committed preparation source.' }
     $clientArguments=@('--development-host-ui',$root,$marker.sourceRevision,$marker.sourceTree,$marker.executableSha256)
     if ($ScenarioGroup -eq 'Shell') { $clientArguments += '--shell-only' }
+    if ($ScenarioGroup -in @('FindEnter','FindNext','FindTyped')) { $clientArguments += '--diagnostic-' + $ScenarioGroup }
     & $client @clientArguments
     if ($LASTEXITCODE -ne 0) { throw 'Host UI acceptance failed. Preserve the sandbox and inspect the actual test process; no uncertain retry.' }
 } elseif ($Mode -eq 'Launch') {
