@@ -43,9 +43,11 @@ internal static partial class NativeUiChecks
             Wait(() => Find(picker!, "MermaidPickerCreate").IsEnabled, "Initial native example did not become ready.");
             foreach (var (width, height) in new[] { (880, 600), (1280, 800) })
             {
-                ResizePicker(width, height); Capture(picker!, "catalogue-all-" + width + "x" + height);
+                ResizePicker(width, height);
+                // Exercise actual focus/keyboard responses at each size before observing its
+                // presented surface. UIA geometry alone can precede WPF's rendered frame.
+                CheckTabNavigation(); Capture(picker!, "catalogue-all-" + width + "x" + height);
             }
-            CheckTabNavigation();
             var search = Find(picker!, "MermaidPickerSearch");
             search.AsTextBox().Text = "no matching xyz";
             Wait(() => Find(picker!, "MermaidPickerFamilies").AsListBox().Items.Length == 0 && !Find(picker!, "MermaidPickerCreate").IsEnabled, "Empty search did not disable Create.");
@@ -288,6 +290,7 @@ internal static partial class NativeUiChecks
         }
         void Capture(Window window, string name)
         {
+            if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("The picker did not become idle before capture.");
             _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png"));
             captures.Add(new { File = name + ".png", Dpi = CreationWindowDpi((nint)window.Properties.NativeWindowHandle.Value), PhysicalBounds = window.BoundingRectangle });
         }

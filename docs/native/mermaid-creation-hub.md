@@ -216,6 +216,18 @@ size, not merely the outer HWND dimensions, within the original 20-second action
 wait. No product geometry, colour threshold or baseline gate was changed. Fresh
 captures must be inspected independently before a picker UX verdict.
 
+At `63c9fef510d53b6038a3602e51ae9c8823725569`, push
+[40231990419](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40231990419)
+again passed all three automated appearances. The full-catalogue 1280×800 High
+Contrast capture was complete, but the initial 880×600 light capture still showed
+old content despite the new UIA footer bounds. That image remains rejected;
+geometry and process-idle observations alone did not prove a presented frame.
+The observer now performs the complete forward/reverse keyboard traversal at
+**each** requested size before capturing and checks the process-idle result.
+This adds actual 880×600 keyboard coverage without changing product layout,
+original action deadlines or any baseline threshold. Fresh pixels still require
+independent inspection; no automatic green result substitutes for it.
+
 
 ## Source-labelled captures and final receipt
 
