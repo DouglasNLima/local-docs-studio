@@ -37,7 +37,7 @@ internal static partial class NativeUiChecks
             Wait(() => ReadEditorText(editor) == source, "Exact synthetic editor source did not load.");
             if (variant.EndsWith("Observed", StringComparison.Ordinal))
                 Wait(() => File.Exists(Path.Combine(output, "native-observations.jsonl")) && ReadObservedText(Path.Combine(output, "native-observations.jsonl")).Contains("probe-attached", StringComparison.Ordinal), "Read-only native observer did not attach; no input sent.");
-            stage = "foreground"; FocusWindow(main); editor.Focus();
+            stage = "foreground"; AssertForeground(); editor.Focus();
             Wait(() => editor.Properties.HasKeyboardFocus.Value, "Actual MarkdownEditor did not acquire focus.");
             Observe("editor-focused");
             stage = "open-find"; AssertInputTarget(editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
@@ -52,29 +52,73 @@ internal static partial class NativeUiChecks
             AssertInputTarget(query);
             stage = "single-action"; sent = true;
             if (variant.StartsWith("FindNext", StringComparison.Ordinal)) Find(main, "FindNext").AsButton().Click(); else Keyboard.Type(VirtualKeyShort.RETURN);
-            try { Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Exact Unicode selection was not exposed after the single action."); }
-            catch (Exception error) { failure = error.ToString(); }
+            Wait(() => { AssertForeground(); return ExactSelection(); }, "Exact Unicode selection was not exposed after the single action.");
             Observe("after-action");
+            AssertForeground();
+            if (variant.EndsWith("Observed", StringComparison.Ordinal)) AssertNativeSelection();
             if (ReadEditorText(editor) != source || Hash(sourcePath) != sourceHash) throw new IOException("Source changed; stop without further input.");
-            stage = "close-find-observation"; Find(main, "CloseFind").AsButton().Invoke();
-            Wait(() => editor.Properties.HasKeyboardFocus.Value, "Close Find did not return editor focus.");
+            stage = "close-find-observation"; AssertForeground(); Find(main, "CloseFind").AsButton().Invoke();
+            Wait(() => { AssertForeground(); return editor.Properties.HasKeyboardFocus.Value; }, "Close Find did not return editor focus.");
             Observe("after-close-find");
+            if (!ExactSelection()) throw new IOException("Close Find changed the exact selected range.");
+            if (variant.EndsWith("Observed", StringComparison.Ordinal)) AssertNativeSelection();
             if (ReadEditorText(editor) != source || Hash(sourcePath) != sourceHash) throw new IOException("Source changed after closing Find.");
-            stage = "normal-close"; main.Close(); Wait(() => app.HasExited, "Owned synthetic app did not close normally.");
+            stage = "normal-close"; AssertForeground(); main.Close(); Wait(() => app.HasExited, "Owned synthetic app did not close normally.");
             WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = failure is null ? "PASS" : "FAIL", scope = "BOUNDED_FIND_DIAGNOSTIC_ONLY", revision, tree, variant, sent, failure, sourceHash, fullShell = "NOT RUN", nativeSelection = variant.EndsWith("Observed", StringComparison.Ordinal) ? "See native-observations.jsonl alongside UIA ranges; this result retains the independent UIA assertion" : "Not observed in-process; UIA alone cannot establish absence of native selection" });
             return failure is null ? 0 : 1;
         }
         catch (Exception error)
         {
-            WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = "BLOCKED", revision, tree, variant, stage, sent, failure, error = error.ToString(), processId = app.ProcessId, fullShell = "NOT RUN" });
+            try { if (main is not null && editor is not null) Observe("failure-observation"); }
+            catch (Exception observationError) { failure = observationError.ToString(); }
+            WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = error is HostFindInputBlockedException ? "BLOCKED" : "FAIL", revision, tree, variant, stage, sent, failure, error = error.ToString(), processId = app.ProcessId, fullShell = "NOT RUN" });
             throw;
         }
 
+        void AssertForeground()
+        {
+            var hwnd = main!.Properties.NativeWindowHandle.Value;
+            GetWindowThreadProcessId(hwnd, out var owner);
+            var desktop = HostFindOpenInputDesktop(0, false, 1);
+            var accessible = false;
+            if (desktop != IntPtr.Zero)
+            {
+                var buffer = Marshal.AllocHGlobal(1024);
+                try { if (HostFindGetUserObjectInformation(desktop, 2, buffer, 1024, out _)) accessible = Marshal.PtrToStringUni(buffer) == "Default"; }
+                finally { Marshal.FreeHGlobal(buffer); HostFindCloseDesktop(desktop); }
+            }
+            if (owner != app.ProcessId || GetForegroundWindow() != hwnd || !accessible || Process.GetCurrentProcess().SessionId != HostActiveConsoleSession())
+                throw new HostFindInputBlockedException("Exact candidate HWND must remain foreground on the unlocked Default console desktop; no activation or input retry is permitted.");
+        }
+        bool ExactSelection()
+        {
+            var ranges = editor!.Patterns.Text.Pattern.GetSelection();
+            if (ranges.Length != 1 || ranges[0].GetText(-1) != "Café") return false;
+            var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+            prefix.MoveEndpointByRange(FlaUI.Core.Definitions.TextPatternRangeEndpoint.End, ranges[0], FlaUI.Core.Definitions.TextPatternRangeEndpoint.Start);
+            return prefix.GetText(-1).Length == 2;
+        }
+        void AssertNativeSelection()
+        {
+            var records = ReadObservedText(Path.Combine(output, "native-observations.jsonl")).Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => System.Text.Json.JsonDocument.Parse(line)).ToArray();
+            try
+            {
+                var snapshots = records.Select(record => record.RootElement).Where(record => record.TryGetProperty("selectionStart", out _)).ToArray();
+                var last = snapshots.Last();
+                if (last.GetProperty("selectionStart").GetInt32() != 2 || last.GetProperty("selectionLength").GetInt32() != 4 || last.GetProperty("selectedText").GetString() != "Café" || last.GetProperty("caretOffset").GetInt32() != 6
+                    || last.GetProperty("query").GetString() != "Café" || last.GetProperty("sourceSha256").GetString() != sourceHash)
+                    throw new IOException("Native AvalonEdit selection/query/source does not match exact UIA acceptance.");
+                var returns = snapshots.Where(record => record.GetProperty("observation").GetString() == "window-preview-key" && record.GetProperty("key").GetString() == "Return").ToArray();
+                if (returns.Length != (variant.StartsWith("FindNext", StringComparison.Ordinal) ? 0 : 1)) throw new IOException("Expected exactly one Return, or zero for the independent Next control.");
+            }
+            finally { foreach (var record in records) record.Dispose(); }
+        }
         void AssertInputTarget(AutomationElement control)
         {
-            GetWindowThreadProcessId(GetForegroundWindow(), out var foreground);
-            if (foreground != app.ProcessId || !control.Properties.HasKeyboardFocus.Value)
-                throw new IOException("Input target changed; no action sent.");
+            AssertForeground();
+            if (!control.Properties.HasKeyboardFocus.Value)
+                throw new HostFindInputBlockedException("Input target changed; no action sent.");
         }
 
         void Observe(string name)
@@ -97,6 +141,10 @@ internal static partial class NativeUiChecks
             WriteNew(Path.Combine(output, name + ".json"), new { atUtc = DateTimeOffset.UtcNow, revision, tree, variant, processId = app.ProcessId, processStartUtc = Process.GetProcessById(app.ProcessId).StartTime.ToUniversalTime(), hwnd = handle.ToInt64(), owner, dpi = HostWindowDpi(handle), foreground = GetForegroundWindow().ToInt64(), gotGui, focusHwnd = gui.Focus.ToInt64(), caretHwnd = gui.Caret.ToInt64(), ranges, selectionError, sourceExact = ReadEditorText(editor!) == source, sourceHash = Hash(sourcePath), controls = main.FindAllDescendants().Where(e => e.Properties.HasKeyboardFocus.ValueOrDefault || e.Properties.AutomationId.ValueOrDefault is "FindText" or "FindContext" or "MarkdownEditor" or "CaretStatus").Select(e => new { id = e.Properties.AutomationId.ValueOrDefault, name = e.Name, focused = e.Properties.HasKeyboardFocus.ValueOrDefault, value = e.Patterns.Value.IsSupported ? e.Patterns.Value.Pattern.Value.Value : null }).ToArray() });
         }
     }
+    private sealed class HostFindInputBlockedException(string message) : InvalidOperationException(message);
+    [DllImport("user32.dll", EntryPoint = "OpenInputDesktop")] private static extern IntPtr HostFindOpenInputDesktop(uint flags, bool inherit, uint access);
+    [DllImport("user32.dll", EntryPoint = "CloseDesktop")] private static extern bool HostFindCloseDesktop(IntPtr desktop);
+    [DllImport("user32.dll", EntryPoint = "GetUserObjectInformationW")] private static extern bool HostFindGetUserObjectInformation(IntPtr handle, int index, IntPtr buffer, uint length, out uint needed);
     [StructLayout(LayoutKind.Sequential)] private struct FindGuiThreadInfo { public int Size, Flags; public IntPtr Active, Focus, Capture, MenuOwner, MoveSize, Caret; public int Left, Top, Right, Bottom; }
     [DllImport("user32.dll", EntryPoint = "GetGUIThreadInfo")] private static extern bool FindGetGUIThreadInfo(uint thread, ref FindGuiThreadInfo info);
 }

@@ -114,8 +114,11 @@ $installer=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Test-NativeInstall
 if (-not $installer.Contains("`$env:RUNNER_ENVIRONMENT -ne 'github-hosted'")) { throw 'Hosted installer guard lost' }
 $checks.Add(@{name='Original hosted installer guard remains mandatory';status='PASS'})
 $localClient=(Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostUiChecks.cs') -Raw) +
-    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostShellUiChecks.cs') -Raw)
-foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboard.', 'ChangeDisplaySettings(', 'SHAppBarMessage(', 'Registry.SetValue(', '.Kill(', '.GetDesktop(') {
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostShellUiChecks.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostFindDiagnostic.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostRoutingAcceptance.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostInputGuard.cs') -Raw)
+foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboard.', 'ChangeDisplaySettings(', 'SHAppBarMessage(', 'Registry.SetValue(', '.Kill(', '.GetDesktop(', '.SetForeground(') {
     if ($localClient.Contains($forbidden)) { throw "Local UI client contains forbidden host operation: $forbidden" }
 }
 $checks.Add(@{name='Local UI client cannot change display contrast clipboard registry or kill processes';status='PASS'})

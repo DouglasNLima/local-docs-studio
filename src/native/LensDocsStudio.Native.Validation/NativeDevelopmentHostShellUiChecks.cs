@@ -18,7 +18,7 @@ internal static partial class NativeUiChecks
         WriteNew(Path.Combine(state, "preferences.json"), new { AutomaticUpdateChecks = false, Theme = "Light" });
         var source = File.ReadAllText(sourcePath); var checks = new List<string>(); var observations = new List<object>(); var failures = new List<object>();
         WriteNew(Path.Combine(output, "before.json"), new { sourceSha256 = Hash(sourcePath), preferencesSha256 = Hash(Path.Combine(state, "preferences.json")), revision, tree });
-        Application? app = null; Window? main = null; var stage = "launch";
+        Application? app = null; Window? main = null; var stage = "launch"; var closingOwnedProcess = false;
         try
         {
             Launch();
@@ -66,18 +66,17 @@ internal static partial class NativeUiChecks
             Find(main, "FindText").AsTextBox().Text = "Café";
             Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Preview Find input did not acquire keyboard focus with its exact query.");
             Keyboard.Type(VirtualKeyShort.RETURN);
+            Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Preview Find/Enter did not select exact Unicode text.");
             Capture(main, "preview-find"); Find(main, "CloseFind").AsButton().Invoke();
             checks.Add("Editor and preview Ctrl+F retain separate contexts, Unicode input, Enter and close/focus behaviour");
             }
             catch (Exception error) when (stage is "editor-find" or "preview-find")
             {
-                // Preserve the required failure, then run only independent scenarios after
-                // proving this read-only search left both owner and saved source exact.
+                // Preserve the original failure and stop this full sequence without more input.
                 var failure = new { status = "FAIL", stage, error = error.ToString() }; failures.Add(failure);
-                WriteNew(Path.Combine(output, "find-failure-result.json"), failure); Capture(main, "find-failure");
+                WriteNew(Path.Combine(output, "find-failure-result.json"), failure);
                 if (ReadEditorText(editor) != source || File.ReadAllText(sourcePath) != source) throw new IOException("Search changed owner/saved source; independent scenarios cannot continue.");
-                stage = "close-failed-find"; Find(main, "CloseFind").AsButton().Invoke();
-                Wait(() => editor.Properties.HasKeyboardFocus.Value, "Find close did not return focus to the unchanged owner; stop input.");
+                throw;
             }
             stage = "owner-edit";
             var action = main.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramEditVisually", StringComparison.Ordinal));
@@ -156,7 +155,7 @@ internal static partial class NativeUiChecks
             Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramPreview0")) is not null && main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramError0")) is null, "Valid companion did not render normally after the rejected source.");
             Capture(main, "valid-after-invalid"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
             checks.Add("Invalid standalone source remains exact and directly editable beside its native error");
-            stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); main.Close(); Wait(() => app!.HasExited, "Synthetic shell did not close normally."); app!.Dispose(); app = null;
+            stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); closingOwnedProcess = true; main.Close(); Wait(() => app!.HasExited, "Synthetic shell did not close normally."); app!.Dispose(); app = null;
             using var preferencesBefore = JsonDocument.Parse(File.ReadAllText(Path.Combine(state, "preferences.json")));
             var desktopBefore = preferencesBefore.RootElement.GetProperty("Desktop").GetRawText();
             Launch(); editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == source, "Saved source did not reopen after restart.");
@@ -167,7 +166,7 @@ internal static partial class NativeUiChecks
             stage = "close-workspace"; Find(main!, "CloseWorkspace").AsButton().Invoke();
             Wait(() => ReadEditorText(editor) == source && Find(main!, "Status").Name.Contains("closed", StringComparison.OrdinalIgnoreCase), "Close workspace did not retain the open document.");
             Capture(main!, "closed-workspace"); checks.Add("Close workspace retains the open document and source");
-            FocusWindow(main!); main!.Close(); Wait(() => app!.HasExited, "Final synthetic shell did not close normally.");
+            FocusWindow(main!); closingOwnedProcess = true; main!.Close(); Wait(() => app!.HasExited, "Final synthetic shell did not close normally.");
             if (failures.Count != 0) { stage = "complete-with-retained-find-failure"; throw new IOException("Required Find acceptance failed. Independent completed checks do not permit a shell PASS."); }
             WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, checks, observations,
                 notRun = new[] { "Personal-host shell Open/Save dialogues: shared Windows recent-folder history cannot be isolated; no dialogue invoked", "Inspector drag persistence", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
@@ -181,19 +180,31 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error)
         {
-            try { if (main is not null) Capture(main, "failure"); } catch (Exception captureError) { File.WriteAllText(Path.Combine(output, "capture-error.txt"), captureError.ToString()); }
-            WriteNew(Path.Combine(output, "completion.json"), new { status = "FAIL", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, stage, checks, observations, failures, error = error.ToString(), processId = app?.ProcessId });
+            try { if (main is not null) Capture(main, "failure", activate: false); } catch (Exception captureError) { File.WriteAllText(Path.Combine(output, "capture-error.txt"), captureError.ToString()); }
+            WriteNew(Path.Combine(output, "completion.json"), new { status = error is HostFindInputBlockedException ? "BLOCKED" : "FAIL", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, stage, checks, observations, failures, error = error.ToString(), processId = app?.ProcessId });
             throw;
         }
         finally { app?.Dispose(); }
 
         void Launch()
         {
+            closingOwnedProcess = false;
             Console.WriteLine("HOST LOCAL: launching the explicit synthetic shell; normal foreground focus is required.");
             var info = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = workspace };
             foreach (var arg in new[] { "--state-directory", state, workspace, sourcePath }) info.ArgumentList.Add(arg);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Shell owner did not open within 25 seconds.");
+            AssertHostForeground(app.ProcessId, main);
         }
+        void FocusWindow(Window window) => AssertHostForeground(app!.ProcessId, window);
+        AutomationElement Find(Window window, string id)
+        {
+            AssertHostForeground(app!.ProcessId); return NativeUiChecks.Find(window, id);
+        }
+        void Wait(Func<bool> condition, string failure) => NativeUiChecks.Wait(() =>
+        {
+            if (!closingOwnedProcess) AssertHostForeground(app!.ProcessId);
+            return condition();
+        }, failure);
         Window Modal(string id) { Window? found = null; Wait(() => (found = HostWindowById(automation, app!.ProcessId, id)) is not null, "Native modal missing: " + id); return found!; }
         void WaitModalClosed(string id) => Wait(() => HostWindowById(automation, app!.ProcessId, id) is null, "Native modal did not close: " + id);
         void QuickOpen(string filename)
@@ -215,7 +226,7 @@ internal static partial class NativeUiChecks
         void Capture(Window window, string name, bool activate = true)
         {
             if (activate) FocusWindow(window);
-            else Wait(() => { GetWindowThreadProcessId(GetForegroundWindow(), out var processId); return processId == app!.ProcessId; }, "The synthetic shell lost foreground focus before its read-only capture.");
+            else AssertHostForeground(app!.ProcessId, window);
             _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png"));
             WriteNew(Path.Combine(output, name + ".json"), new { revision, tree, processId = app!.ProcessId, hwnd = window.Properties.NativeWindowHandle.Value.ToInt64(), dpi = HostWindowDpi(window.Properties.NativeWindowHandle.Value), bounds = window.BoundingRectangle.ToString(),
                 controls = window.FindAllDescendants().Select(element => new { id = element.Properties.AutomationId.ValueOrDefault, name = element.Properties.Name.ValueOrDefault, focused = element.Properties.HasKeyboardFocus.ValueOrDefault }).ToArray() });

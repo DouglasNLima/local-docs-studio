@@ -1,5 +1,61 @@
 # Goal VIII-D — operator-assisted Find differential
 
+## Corrected routing continuation — 25 October 2026
+
+The continuation retains the clean local observer commit
+`32017ffe611ba7f65515dc747f840b2dfc3b9be2`, directly based on reviewed remote
+`6ed1be931fbc74666b7968fda7a4287f91f291c4`. The refreshed remote tree is
+`6ad9a31f79c83819cbe6c0941c6529238c80149f`; develop and paused PR #38 still
+match the identities below. Eight existing attempt-1 workflows retain 113
+successful jobs and eight deliberate skips, attributable only to `6ed1be9`.
+
+The product correction changes only FindText's XAML event binding from
+`KeyDown="FindKeyDown"` to `PreviewKeyDown="FindKeyDown"`. The existing search,
+preview and Escape handlers are unchanged. Compiled-XAML synthetic event checks
+exercise exact Unicode selection, one invocation per Return, separate subsequent
+navigation, editor routing with Find visible, ordinary typing and Escape.
+These framework-dependent tests are not native portable GUI acceptance.
+
+The validation-only observer remains child-process opt-in and excluded from the
+portable payload. Additional read-only caret/source and preview-selection records
+support the separate editor-newline and preview scenarios. Only the explicitly
+selected synthetic newline variant permits its two known buffer forms; it never
+changes an input, source, selection, focus or handled flag.
+
+Focused portable modes now include `FindEditorEnterObserved`, `FindPreviewObserved`
+and independent `InvalidMermaid`. Each requires its own new source-labelled
+Plan → Prepare → RunUi → Complete session. Find Enter requires native and UIA
+`Café`, UTF-16 start 2, length 4, caret 6, one Return, exact query and source,
+and preserved selection after Close Find. Foreground guards require the actual
+candidate HWND and Default desktop without activation. The shell stops on a
+required Find failure and asserts real preview selection. Original 20-second
+observation and 25-second owner budgets remain unchanged.
+
+The first continuation preflight passed at 11:54:01 UTC: normal non-elevated
+active console, Default input desktop accessible, no existing native process.
+228 previously pinned evidence entries were rechecked without alteration.
+The working-source Core run passed 2,117 tests on installed .NET 10.0.12;
+working-source event tests also passed on 10.0.12. A helper-name compile failure
+and subsequent local compile failure remain in their original logs. These are
+pre-commit development checks, not results attributed to the observer commit or
+to a packaged 10.0.13 application.
+
+New-source portable, invalid-source GUI, complete shell and hosted CI results
+remain **PENDING** until the exact committed-source delivery receipt records
+them. A successful source-check push cannot establish local foreground access.
+Only a verified new self-contained Core/WPF 10.0.13 package may be executed.
+Internal beta remains BLOCKED pending acceptance and the separate owner decision;
+public production remains NO-GO. Installer, physical reader, other DPI, shared
+file pickers, inspector persistence, incomplete visual review and historical
+migration remain NOT RUN. Earlier `.749`/`.853`, High Contrast/regex hypotheses
+and the unaccepted 250 ms objective are not resolved by later green checks.
+
+Continuation preparation evidence:
+`artifacts/native/g8d/32017ffe611ba7f65515dc747f840b2dfc3b9be2/a02/`.
+Subsequent package/GUI/CI receipts must retain their own exact source identities.
+
+## Frozen earlier investigation
+
 PR #48 stays OPEN / DRAFT. Develop remains `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`.
 PR #38 remains paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`;
 its controlled 250 ms objective is INCOMPLETE. No merge or release is authorised.

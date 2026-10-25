@@ -1,5 +1,11 @@
 # Current native Windows readiness
 
+PR #48's 25 October 2026 [Find routing continuation](goal-viii-d-operator-assisted-find.md)
+adds a bounded correction and guarded acceptance scenarios. New-source GUI/full
+shell acceptance remains pending its exact-source receipt; internal beta remains
+blocked and public production NO-GO. The dated integrated baseline below is
+historical and does not certify this continuation.
+
 Recorded 24 October 2026 for **Goal VII**, a review/internal-preview goal. This is
 the authoritative current-status entry point. Dated chapters in other native docs
 remain historical evidence at their own sources; old Draft/pending/family-count
