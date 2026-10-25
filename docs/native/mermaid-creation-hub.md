@@ -155,3 +155,24 @@ Original logs and downloaded ZIPs are retained in the isolated ignored evidence
 root by full source SHA and run ID. Downloaded artifact SHA-256 values matched
 GitHub metadata. No failed artifacts or original fixtures were replaced. This
 record does not change PR #48's separate High Contrast, f05 or beta decisions.
+
+## Second picker attempt — selection restoration
+
+Source `83d3fdef1f0859b0ffeecdded060e9ba474bb1e5`, tree
+`81bbdfcee8b9e8736fbd8fadaf96f9b5fa36b4f8`, push
+[40229469019](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40229469019),
+attempt 1, failed all three appearances at Cancel's exact source-selection check.
+The TextPattern precondition, search, category, clear, arrows, Enter-in-search and
+Escape/source/disk checks had progressed successfully. No family authoring phase
+was reached; none is inferred from those earlier checks.
+
+The new cancellation code called AvalonEdit `Select`, which temporarily moved
+the caret to the selection end before restoring it. UIA selection can retain a
+different caret; that temporary move schedules AvalonEdit's selection validator
+and clears the restored selection. Cancellation now leaves an unchanged selection
+alone and retains the original selection object/direction, without the temporary
+caret move. The original assertion remains, with an additional pre-opening
+selection assertion. Actual light and High Contrast failure ZIPs were downloaded,
+hash-verified and retained. This correction still requires independent hosted
+verification. Local source checks at this head were 2,206 Core passes, no skips,
+zero build warnings/errors and 1,481 headless document-session assertions.

@@ -37,6 +37,7 @@ internal static partial class NativeUiChecks
 
             // Search, clear, categories and keyboard never author source. Cancellation restores the exact selected text.
             owner.Focus(); owner.Patterns.Text.Pattern.DocumentRange.FindText("selected text", false, false).Select();
+            Check(owner.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "selected text"), "Exact source selection exists before opening the picker");
             OpenPicker();
             var search = Find(picker!, "MermaidPickerSearch");
             search.AsTextBox().Text = "no matching xyz";

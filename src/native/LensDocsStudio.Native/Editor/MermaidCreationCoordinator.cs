@@ -1,4 +1,5 @@
 using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Native.ViewModels;
@@ -15,13 +16,15 @@ public sealed class MermaidCreationCoordinator
     public int SelectionStart { get; }
     public int SelectionLength { get; }
     public int CaretOffset { get; }
+    public Selection? SourceSelection { get; }
     public bool Standalone { get; }
     private readonly string? path, name;
 
-    public MermaidCreationCoordinator(DocumentViewModel owner, int selectionStart, int selectionLength, int caretOffset)
+    public MermaidCreationCoordinator(DocumentViewModel owner, int selectionStart, int selectionLength, int caretOffset, Selection? sourceSelection = null)
     {
         Owner = owner; Document = owner.EditorDocument; Version = Document.Version; Source = Document.Text;
         SelectionStart = selectionStart; SelectionLength = selectionLength; CaretOffset = caretOffset;
+        SourceSelection = sourceSelection;
         path = owner.EffectivePath; name = owner.DisplayName;
         Standalone = Path.GetExtension(path ?? name)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         if (Source.Length > MermaidDocumentEditSession.MaximumDocumentCharacters)

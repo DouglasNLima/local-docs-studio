@@ -18,7 +18,7 @@ public partial class MainWindow
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly || Editor.Document != tab.EditorDocument)
         { model.Status = "Open an editable document before creating a Mermaid diagram."; return null; }
-        try { return new(tab, Editor.SelectionStart, Editor.SelectionLength, Editor.CaretOffset); }
+        try { return new(tab, Editor.SelectionStart, Editor.SelectionLength, Editor.CaretOffset, Editor.TextArea.Selection); }
         catch (ArgumentException error) { model.Status = error.Message; return null; }
     }
     private void CaptureMermaidPointerTarget(object sender, MouseButtonEventArgs e) => capturedMermaidTarget = CaptureMermaidTarget();
@@ -61,6 +61,7 @@ public partial class MainWindow
         if (context is null) return;
         openingMermaid = true;
         var ownerGeneration = mermaidOwnerGeneration;
+        var sourceSelection = context.SourceSelection ?? Editor.TextArea.Selection;
         var vertical = Editor.VerticalOffset; var horizontal = Editor.HorizontalOffset;
         string? Problem() => closing || closePending ? "The owning window is closing. No Mermaid source was changed."
             : ownerGeneration != mermaidOwnerGeneration ? "The active document changed while Mermaid was open. Reopen it from the intended document."
@@ -68,7 +69,10 @@ public partial class MainWindow
         void RestoreSourceFocus()
         {
             if (Problem() is not null) return;
-            Editor.Select(context.SelectionStart, context.SelectionLength); Editor.CaretOffset = context.CaretOffset;
+            // Select() moves the caret to the selection end, which schedules AvalonEdit's
+            // selection validation. Leave an unchanged selection alone and retain its direction.
+            if (Editor.CaretOffset != context.CaretOffset) Editor.CaretOffset = context.CaretOffset;
+            if (!Equals(Editor.TextArea.Selection, sourceSelection)) Editor.TextArea.Selection = sourceSelection;
             Editor.ScrollToVerticalOffset(vertical); Editor.ScrollToHorizontalOffset(horizontal); Editor.Focus();
         }
         void SourceFallback(string explanation)
