@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using ICSharpCode.AvalonEdit;
 
@@ -62,6 +64,7 @@ public static class StartupHook
                     // Stop recording if the process is no longer displaying the prepared synthetic source.
                     if (editor.Document.Text != source) { Record(new { atUtc = DateTimeOffset.UtcNow, observation = "source-differs-probe-stopped" }); count = 200; return; }
                     Record(new { atUtc = DateTimeOffset.UtcNow, observation, key = key?.Key.ToString(), handled = key?.Handled,
+                        hwnd = new WindowInteropHelper(window).Handle.ToInt64(), foreground = GetForegroundWindow().ToInt64(),
                         originalSource = (key?.OriginalSource as FrameworkElement)?.Name, focus = (Keyboard.FocusedElement as FrameworkElement)?.Name,
                         query = query.Text, context = (window.FindName("FindContext") as TextBlock)?.Text,
                         selectionStart = editor.SelectionStart, selectionLength = editor.SelectionLength, selectedText = editor.SelectedText, caretOffset = editor.CaretOffset,
@@ -69,8 +72,20 @@ public static class StartupHook
                 }
                 window.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) => Snapshot("window-preview-key", e)), true);
                 query.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) => Snapshot("find-preview-key", e)), true);
+                // Class handlers run before instance handlers. This read-only observer is
+                // registered last at UIElement and filters to this synthetic FindText.
+                // It distinguishes already-handled input from the XAML handler's own result.
+                EventManager.RegisterClassHandler(typeof(UIElement), Keyboard.KeyDownEvent, new KeyEventHandler((sender, e) =>
+                {
+                    if (ReferenceEquals(sender, query)) Snapshot("find-after-class-before-instance", e);
+                }), true);
                 query.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) => Snapshot("find-bubbling-key", e)), true);
-                window.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) => Snapshot("window-bubbling-key", e)), true);
+                window.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) =>
+                {
+                    Snapshot("window-bubbling-key", e);
+                    if (e.Key == Key.Enter && ReferenceEquals(e.OriginalSource, query))
+                        window.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => Snapshot("find-post-dispatch", e)));
+                }), true);
                 editor.TextArea.SelectionChanged += (_, _) => Snapshot("native-selection-changed");
                 query.TextChanged += (_, _) => Snapshot("query-changed");
                 window.Closed += (_, _) => { Snapshot("window-closed"); stream.Dispose(); };
@@ -79,4 +94,5 @@ public static class StartupHook
         }));
     }
     private static string Digest(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
 }
