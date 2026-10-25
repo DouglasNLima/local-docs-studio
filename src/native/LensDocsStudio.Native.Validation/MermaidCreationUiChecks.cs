@@ -25,6 +25,7 @@ internal static partial class NativeUiChecks
         var path = Path.Combine(root, "creation.md"); const string original = "# Mermaid creation Ω😀\r\n\r\nKeep selected text intact.\r\n";
         File.WriteAllText(path, original); var checks = new List<string>(); var phases = new List<object>();
         Application? app = null; Window? main = null, picker = null, visual = null; var standaloneLaunch = 1;
+        var captures = new List<object>();
         try
         {
             if (highContrast) Check(NativeTestHighContrast.IsEnabledNow, "Actual OS High Contrast enabled on disposable Windows");
@@ -39,9 +40,16 @@ internal static partial class NativeUiChecks
             owner.Focus(); owner.Patterns.Text.Pattern.DocumentRange.FindText("selected text", false, false).Select();
             Check(owner.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "selected text"), "Exact source selection exists before opening the picker");
             OpenPicker();
+            Wait(() => Find(picker!, "MermaidPickerCreate").IsEnabled, "Initial native example did not become ready.");
+            foreach (var (width, height) in new[] { (880, 600), (1280, 800) })
+            {
+                ResizePicker(width, height); Capture(picker!, "catalogue-all-" + width + "x" + height);
+            }
+            CheckTabNavigation();
             var search = Find(picker!, "MermaidPickerSearch");
             search.AsTextBox().Text = "no matching xyz";
             Wait(() => Find(picker!, "MermaidPickerFamilies").AsListBox().Items.Length == 0 && !Find(picker!, "MermaidPickerCreate").IsEnabled, "Empty search did not disable Create.");
+            Capture(picker!, "empty-search-disabled-create");
             Check(ReadEditorText(owner) == original, "Empty search leaves source unchanged");
             Find(picker!, "MermaidPickerClear").AsButton().Invoke();
             Wait(() => Find(picker!, "MermaidPickerFamilies").AsListBox().Items.Length == 24, "Clear did not restore 24 families.");
@@ -80,7 +88,7 @@ internal static partial class NativeUiChecks
                 OpenPicker(); Choose(definition, variant);
                 foreach (var (width, height) in new[] { (880, 600), (1280, 800) })
                 {
-                    picker!.Patterns.Transform.Pattern.Move(0, 0); picker.Patterns.Transform.Pattern.Resize(width, height);
+                    ResizePicker(width, height);
                     var create = Find(picker, "MermaidPickerCreate");
                     Check(!create.IsOffscreen && picker.BoundingRectangle.Contains(create.BoundingRectangle), definition.Name + " footer visible at " + width + "×" + height);
                     Find(picker, "MermaidPickerSearch").Focus(); Keyboard.Type(VirtualKeyShort.TAB);
@@ -129,7 +137,7 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadObservedText(path) == original, "Fixture reset Save failed.");
                 phases.Add(new { Family = definition.Id, Variant = variant.Id, Editor = prefix + "VisualEditor", Status = "PASS" });
             }
-            foreach (var (source, selection) in new[] { ("```csharp\ncode\n```\n", "code"), ("```mermaid\nC4Deployment\n```\n", "C4Deployment"), ("```mermaid\nflowchart TD\n", "flowchart"), ("```mermaid\nflowchart TD\n```\n", "```mermaid") })
+            foreach (var (source, selection) in new[] { ("```csharp\ncode\n```\n", "code"), ("```mermaid\nC4Deployment\n```\n", "C4Deployment"), ("```mermaid\nflowchart TD\n", "flowchart"), ("```mermaid\nflowchart TD\n```\n", "```mermaid"), ("- List item\n    ```mermaid\n    flowchart TD\n    ```\n", "flowchart TD") })
             {
                 owner.Patterns.Value.Pattern.SetValue(source); FocusWindow(main); owner.Focus();
                 owner.Patterns.Text.Pattern.DocumentRange.FindText(selection, false, false).Select();
@@ -236,12 +244,52 @@ internal static partial class NativeUiChecks
             return ReadEditorText(Find(visual!, id));
         }
         string Prefix(MermaidDiagramFamily family) => family switch { MermaidDiagramFamily.Flowchart => "Mermaid", MermaidDiagramFamily.Xy => "XYChart", _ => family.ToString() };
-        void Capture(Window window, string name) { _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png")); }
+        void ResizePicker(int logicalWidth, int logicalHeight)
+        {
+            var dpi = CreationWindowDpi((nint)picker!.Properties.NativeWindowHandle.Value);
+            if (dpi == 0) throw new IOException("The picker DPI could not be observed.");
+            var width = logicalWidth * dpi / 96d; var height = logicalHeight * dpi / 96d;
+            picker.Patterns.Transform.Pattern.Move(0, 0); picker.Patterns.Transform.Pattern.Resize(width, height);
+            Wait(() => Math.Abs(picker.BoundingRectangle.Width - width) <= 1 && Math.Abs(picker.BoundingRectangle.Height - height) <= 1,
+                "Actual picker dimensions differ from the requested logical size.");
+        }
+        void CheckTabNavigation()
+        {
+            var expected = new[] { "MermaidPickerSearch", "MermaidPickerClear", "MermaidPickerCategory", "MermaidPickerFamilies", "MermaidPickerVariants", "MermaidPickerSourcePanel", "MermaidPickerCancel", "MermaidPickerCode", "MermaidPickerCreate" };
+            var walker = automation.TreeWalkerFactory.GetRawViewWalker();
+            foreach (var backwards in new[] { false, true })
+            {
+                var visited = new HashSet<string>(); FocusWindow(picker!); Find(picker!, "MermaidPickerSearch").Focus();
+                for (var step = 0; step < 32 && visited.Count < expected.Length; step++)
+                {
+                    var focused = automation.FocusedElement(); var inPicker = false;
+                    for (var depth = 0; focused is not null && depth < 20; depth++, focused = walker.GetParent(focused))
+                    {
+                        var id = focused.Properties.AutomationId.ValueOrDefault;
+                        if (id is not null && expected.Contains(id)) visited.Add(id);
+                        if (id == "MermaidDiagramPicker") { inPicker = true; break; }
+                    }
+                    Check(inPicker, "Keyboard focus remains inside the owned picker");
+                    if (backwards) Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
+                    else Keyboard.Type(VirtualKeyShort.TAB);
+                    app!.WaitWhileBusy(TimeSpan.FromSeconds(5));
+                }
+                Check(expected.All(visited.Contains), (backwards ? "Shift+Tab" : "Tab") + " reaches search, categories, families, variants, source and every footer action");
+            }
+        }
+        void Capture(Window window, string name)
+        {
+            _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png"));
+            captures.Add(new { File = name + ".png", Dpi = CreationWindowDpi((nint)window.Properties.NativeWindowHandle.Value), PhysicalBounds = window.BoundingRectangle });
+        }
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
         void Receipt(string status, string? error) => File.WriteAllText(Path.Combine(output, "creation-ui.json"), JsonSerializer.Serialize(new
         {
             Status = status, SourceRevision = typeof(MermaidDiagramPickerWindow).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion,
-            HighContrast = highContrast, Dark = dark, Checks = checks, Phases = phases, Error = error
+            HighContrast = highContrast, Dark = dark, Checks = checks, Phases = phases, Captures = captures, Error = error
         }, new JsonSerializerOptions { WriteIndented = true }));
     }).GetAwaiter().GetResult();
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "GetDpiForWindow")]
+    private static extern uint CreationWindowDpi(nint handle);
 }

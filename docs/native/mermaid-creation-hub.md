@@ -176,3 +176,30 @@ selection assertion. Actual light and High Contrast failure ZIPs were downloaded
 hash-verified and retained. This correction still requires independent hosted
 verification. Local source checks at this head were 2,206 Core passes, no skips,
 zero build warnings/errors and 1,481 headless document-session assertions.
+
+An additional source-level negative fixture placed the caret inside a Mermaid
+body nested in a Markdown list. The original Goal IX target planner recognised
+the raw body before checking its enclosing list. The focused pre-fix run retained
+six passes and one failure. The planner now checks protected container spans
+before authorising an existing occurrence; the matching hosted UIA case is added.
+The existing parser, source mapper and document-session post-check are unchanged.
+
+## Intermediate picker proof and remaining work
+
+At `e1834c742b6a15dbeb33cbc30f0a7742c252683f` (tree
+`78874fad690192f16e229506091b7b399bacf5ae`), push
+[40230100276](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40230100276)
+passed light, dark and actual OS High Contrast. Each appearance completed all 28
+real-editor variant phases; light/dark recorded 450 assertions and High Contrast
+451. The original Cancel assertion passed. The light 880×600 Flowchart and actual
+High Contrast 1280×800 C4 Component captures were inspected for content, selection,
+focus and footer visibility. This is intermediate evidence, not final-head
+acceptance. Subsequent validation adds full-catalogue/empty-state captures,
+forward/reverse Tab traversal and measured per-window DPI/physical bounds.
+
+The local full run following the nested-list regression reported 2,206 passes
+and one failure in an unchanged Class reverse/reconnection case. Its 48-case
+focused follow-up and the independent full 2,207-case rerun passed. Cause is
+unproved; no Class engine, assertion or timeout was changed. Both original and
+follow-up TRX files are retained. Pending jobs on superseded source heads can be
+cancelled by the existing workflow concurrency policy; cancellation is never PASS.

@@ -19,10 +19,6 @@ public sealed record MermaidCreationTarget(MermaidCreationRoute Route, MermaidBl
                 ? new(MermaidCreationRoute.NewDiagram, null, 0, "Apply creates raw Mermaid source. Save remains separate.")
                 : new(MermaidCreationRoute.ExistingDiagram, MermaidBlockSource.Find(document, true).Single(), 0, "Edit the existing standalone diagram; its family is preserved.");
 
-        var blocks = MermaidBlockSource.Find(document);
-        var inside = blocks.Where(block => selectionStart >= block.Body.Start && selectionStart < block.Body.End && end <= block.Body.End).ToArray();
-        if (inside.Length == 1) return new(MermaidCreationRoute.ExistingDiagram, inside[0], 0, "Edit this exact Mermaid source occurrence.");
-
         bool Touches(Block block)
         {
             // Markdig's unterminated fence span can end at its opening marker. It cannot authorise insertion after that marker.
@@ -30,11 +26,17 @@ public sealed record MermaidCreationTarget(MermaidCreationRoute Route, MermaidBl
             return selectionLength == 0 ? selectionStart >= block.Span.Start && selectionStart <= last
                 : selectionStart <= last && end > block.Span.Start;
         }
+        // A mapped raw body alone cannot authorise removal of Markdown container prefixes.
+        // Check its ancestors' source spans before considering the exact Mermaid occurrence.
+        if (document.Syntax.Descendants<Block>().Any(block => block is ListBlock or QuoteBlock or HtmlBlock && Touches(block)))
+            return SourceOnly("This nested Markdown or HTML position is protected. Choose a blank line outside the structure, or edit source.");
+        var blocks = MermaidBlockSource.Find(document);
+        var inside = blocks.Where(block => selectionStart >= block.Body.Start && selectionStart < block.Body.End && end <= block.Body.End).ToArray();
+        if (inside.Length == 1) return new(MermaidCreationRoute.ExistingDiagram, inside[0], 0, "Edit this exact Mermaid source occurrence.");
+
         // Include ordinary/unterminated fences and containers which cannot be mapped without stripping prefixes.
         if (document.Syntax.Descendants<Block>().Any(block => block is CodeBlock && Touches(block)))
             return SourceOnly("The selection touches a code fence, multiple blocks or protected code. Move into one Mermaid body, or edit source.");
-        if (document.Syntax.Descendants<Block>().Any(block => block is ListBlock or QuoteBlock or HtmlBlock && Touches(block)))
-            return SourceOnly("This nested Markdown or HTML position is protected. Choose a blank line outside the structure, or edit source.");
         var offset = end;
         if (offset == 0 && source.StartsWith('\uFEFF')) offset = 1;
         if (offset > 0 && offset < source.Length && (source[offset - 1] == '\r' && source[offset] == '\n'

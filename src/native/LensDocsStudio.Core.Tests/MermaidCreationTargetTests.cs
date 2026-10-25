@@ -40,6 +40,7 @@ public sealed class MermaidCreationTargetTests
     [InlineData("    ordinary code\n", 6)]
     [InlineData("> ```mermaid\n> flowchart TD\n> ```\n", 20)]
     [InlineData("- List item\n    ```mermaid\n    flowchart TD\n    ```\n", 3)]
+    [InlineData("- List item\n    ```mermaid\n    flowchart TD\n    ```\n", 36)]
     [InlineData("<div>protected</div>\n", 7)]
     public void Ordinary_unclosed_and_nested_structures_do_not_become_new_diagrams(string source, int at)
         {
