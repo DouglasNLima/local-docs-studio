@@ -30,7 +30,7 @@ public static class StartupHook
             || !typeof(StartupHook).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.EndsWith("+" + identity.GetProperty("harnessRevision").GetString(), StringComparison.Ordinal)
             || Digest(File.ReadAllBytes(Environment.ProcessPath!)) != identity.GetProperty("executableSha256").GetString()) throw new IOException("Find probe identity mismatch.");
         var source = File.ReadAllText(Path.Combine(root, "workspace", "acceptance-lf.md"));
-        var stream = new StreamWriter(new FileStream(Path.Combine(root, "ui", "native-observations.jsonl"), FileMode.CreateNew), new UTF8Encoding(false)) { AutoFlush = true };
+        var stream = new StreamWriter(new FileStream(Path.Combine(root, "ui", "native-observations.jsonl"), FileMode.CreateNew, FileAccess.Write, FileShare.Read), new UTF8Encoding(false)) { AutoFlush = true };
         var count = 0;
         void Record(object value) { if (count++ < 200) stream.WriteLine(JsonSerializer.Serialize(value)); }
         Record(new { atUtc = DateTimeOffset.UtcNow, observation = "probe-loaded", processId = Environment.ProcessId, sourceSha256 = Digest(Encoding.UTF8.GetBytes(source)), probeSha256 = Digest(File.ReadAllBytes(typeof(StartupHook).Assembly.Location)), runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription });
