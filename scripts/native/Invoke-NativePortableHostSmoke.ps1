@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Plan','Prepare','Launch','RunUi','Complete')][string]$Mode = 'Plan',
-    [ValidateSet('All','Shell','FindEnter','FindNext','FindTyped')][string]$ScenarioGroup = 'All',
+    [ValidateSet('All','Shell','FindEnter','FindNext','FindTyped','FindEnterObserved','FindNextObserved','FindTypedObserved')][string]$ScenarioGroup = 'All',
     [Parameter(Mandatory)][string]$SandboxRoot,
     [string]$PackageDirectory,
     [ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedSourceRevision,
@@ -98,7 +98,9 @@ A[Write] --> B[Review]
     [IO.File]::WriteAllText((Join-Path $workspace 'relative.md'), "# Relative synthetic document`n`nCafé😀🚀`n")
     [IO.File]::WriteAllText((Join-Path $workspace 'acceptance-crlf.md'), "# CRLF Café😀🚀`r`n`r`nSynthetic bytes.`r`n")
     [IO.File]::WriteAllText((Join-Path $workspace 'standalone.mmd'), "flowchart LR`nA[Write] --> B[Review]`n")
-    [IO.File]::WriteAllText((Join-Path $workspace 'invalid.mmd'), "flowchart LR`nA[unfinished`n")
+    # Independently proved through DiagramService and NativeMarkdownRenderer. The
+    # original A[unfinished fixture was recovered, and its failed receipts remain.
+    [IO.File]::WriteAllText((Join-Path $workspace 'invalid.mmd'), "flowchart TD`n  A -->`n")
     Add-Type -AssemblyName System.Drawing
     $image = [Drawing.Bitmap]::new(32,32)
     try { $graphics=[Drawing.Graphics]::FromImage($image); try { $graphics.Clear([Drawing.Color]::FromArgb(255,136,62)) } finally { $graphics.Dispose() }; $image.Save((Join-Path $workspace 'assets/square.png'), [Drawing.Imaging.ImageFormat]::Png) } finally { $image.Dispose() }
@@ -145,7 +147,7 @@ if ($Mode -eq 'RunUi') {
     if (-not $version.EndsWith('+' + $marker.harnessRevision, [StringComparison]::Ordinal)) { throw 'UI client must be built from the clean committed preparation source.' }
     $clientArguments=@('--development-host-ui',$root,$marker.sourceRevision,$marker.sourceTree,$marker.executableSha256)
     if ($ScenarioGroup -eq 'Shell') { $clientArguments += '--shell-only' }
-    if ($ScenarioGroup -in @('FindEnter','FindNext','FindTyped')) { $clientArguments += '--diagnostic-' + $ScenarioGroup }
+    if ($ScenarioGroup -in @('FindEnter','FindNext','FindTyped','FindEnterObserved','FindNextObserved','FindTypedObserved')) { $clientArguments += '--diagnostic-' + $ScenarioGroup }
     & $client @clientArguments
     if ($LASTEXITCODE -ne 0) { throw 'Host UI acceptance failed. Preserve the sandbox and inspect the actual test process; no uncertain retry.' }
 } elseif ($Mode -eq 'Launch') {

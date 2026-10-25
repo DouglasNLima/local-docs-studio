@@ -171,3 +171,19 @@ protective contracts are unchanged. PR #38 remains OPEN / DRAFT / PAUSED at
 two-version install/upgrade/reinstall remains SYNTHETIC. No installer was invoked
 on this host, and no merge, release, signing, update feed or production deployment
 is authorised.
+
+## Goal VIII-B — local remediation remains blocked, 25 October 2026
+
+See [the source-labelled investigation](goal-viii-b-local-remediation.md). A fresh
+verified .880 portable session reproduced Find/Enter's exact Unicode selection
+failure at the existing 150% DPI; the native cause remains UNPROVED. A separate
+Next differential stopped at the original foreground guard before input. Both
+synthetic apps closed normally and observed host preservation passed. No shipping
+product change is justified or included.
+
+The incorrect truncated-label expectation is independently disproved. A new
+incomplete-arrow fixture has a proved DiagramService pre-parser error and safe
+native-control fallback with a valid positive companion. Its portable GUI check
+and the complete shell sequence remain NOT RUN. Original failures are retained.
+HOST PORTABLE, INTERNAL BETA and PUBLIC PRODUCTION remain BLOCKED. New-head hosted
+CI is recorded separately after commit and cannot substitute for local acceptance.

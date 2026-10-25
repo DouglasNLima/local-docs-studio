@@ -20,6 +20,12 @@ internal static partial class NativeUiChecks
         WriteNew(Path.Combine(output, "diagnostic-before.json"), new { atUtc = DateTimeOffset.UtcNow, revision, tree, variant, sourceHash, occurrences, query = "Café", rangeUnits = "UTF-16 code units", fullShell = "NOT RUN" });
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         var info = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = Path.GetDirectoryName(sourcePath)! };
+        if (variant.EndsWith("Observed", StringComparison.Ordinal))
+        {
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_STARTUP_HOOKS"))) throw new IOException("Do not combine the isolated observer with inherited startup hooks.");
+            info.Environment["DOTNET_STARTUP_HOOKS"] = typeof(StartupHook).Assembly.Location;
+            info.Environment["LENS_FIND_OBSERVATION_ROOT"] = sandbox;
+        }
         foreach (var arg in new[] { "--state-directory", Path.Combine(sandbox, "state"), Path.GetDirectoryName(sourcePath)!, sourcePath }) info.ArgumentList.Add(arg);
         using var app = Application.Launch(info);
         Window? main = null; AutomationElement? editor = null; var stage = "owner-readiness"; var sent = false; string? failure = null;
@@ -29,6 +35,8 @@ internal static partial class NativeUiChecks
             CaptureHostRuntime(Process.GetProcessById(app.ProcessId), executable, output, revision, tree);
             editor = Find(main, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == source, "Exact synthetic editor source did not load.");
+            if (variant.EndsWith("Observed", StringComparison.Ordinal))
+                Wait(() => File.Exists(Path.Combine(output, "native-observations.jsonl")) && ReadObservedText(Path.Combine(output, "native-observations.jsonl")).Contains("probe-attached", StringComparison.Ordinal), "Read-only native observer did not attach; no input sent.");
             stage = "foreground"; FocusWindow(main); editor.Focus();
             Wait(() => editor.Properties.HasKeyboardFocus.Value, "Actual MarkdownEditor did not acquire focus.");
             Observe("editor-focused");
@@ -36,14 +44,14 @@ internal static partial class NativeUiChecks
             Wait(() => Find(main, "FindContext").Name == "Find in editor", "Ctrl+F did not open Find in editor.");
             var query = Find(main, "FindText");
             Wait(() => query.Properties.HasKeyboardFocus.Value, "FindText did not acquire keyboard focus.");
-            if (variant == "FindTyped") Keyboard.Type("Café"); else query.Patterns.Value.Pattern.SetValue("Café");
+            if (variant.StartsWith("FindTyped", StringComparison.Ordinal)) Keyboard.Type("Café"); else query.Patterns.Value.Pattern.SetValue("Café");
             Wait(() => query.Properties.HasKeyboardFocus.Value && query.Patterns.Value.Pattern.Value.Value == "Café", "Exact query and focus were not established.");
             Observe("before-action");
             // Observations cannot authorise input if foreground/focus has since moved.
             GetWindowThreadProcessId(GetForegroundWindow(), out var foreground);
             if (foreground != app.ProcessId || !query.Properties.HasKeyboardFocus.Value) throw new IOException("Input target changed; no action sent.");
             stage = "single-action"; sent = true;
-            if (variant == "FindNext") Find(main, "FindNext").AsButton().Click(); else Keyboard.Type(VirtualKeyShort.RETURN);
+            if (variant.StartsWith("FindNext", StringComparison.Ordinal)) Find(main, "FindNext").AsButton().Click(); else Keyboard.Type(VirtualKeyShort.RETURN);
             try { Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Exact Unicode selection was not exposed after the single action."); }
             catch (Exception error) { failure = error.ToString(); }
             Observe("after-action");

@@ -146,9 +146,15 @@ internal static partial class NativeUiChecks
             FocusWindow(diagram); diagram.Close(); WaitModalClosed("DiagramWindow");
             checks.Add("Actual native diagram window accepts 175% zoom, Fit, middle-button pan and Reset at the existing scale");
             stage = "invalid-source"; QuickOpen("invalid.mmd");
-            Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramError0")) is not null, "Invalid diagram did not show its source-preserving error.");
+            Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramError0"))?.Name == NativeHostMermaidFixtureChecks.Error, "Invalid diagram did not show its proved actionable error.");
+            if (main.FindAllDescendants().Any(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramPreview", StringComparison.Ordinal))) throw new IOException("Rejected diagram exposed accepted geometry.");
+            if (File.ReadAllText(Path.Combine(workspace, "invalid.mmd")) != NativeHostMermaidFixtureChecks.Invalid) throw new IOException("Invalid fixture differs from its independently proved exact source.");
             if (ReadEditorText(Find(main, "MarkdownEditor")) != File.ReadAllText(Path.Combine(workspace, "invalid.mmd"))) throw new IOException("Invalid diagram source was rewritten.");
-            Find(main, "MarkdownEditor").Focus(); Capture(main, "invalid-source"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
+            Find(main, "MarkdownEditor").Focus();
+            Wait(() => Find(main, "MarkdownEditor").Properties.HasKeyboardFocus.Value && !Find(main, "MarkdownEditor").Patterns.Value.Pattern.IsReadOnly.Value, "Invalid source is not directly editable.");
+            Capture(main, "invalid-source"); QuickOpen("standalone.mmd");
+            Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramPreview0")) is not null && main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramError0")) is null, "Valid companion did not render normally after the rejected source.");
+            Capture(main, "valid-after-invalid"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
             checks.Add("Invalid standalone source remains exact and directly editable beside its native error");
             stage = "close-restart"; Capture(main, "before-restart"); FocusWindow(main); main.Close(); Wait(() => app!.HasExited, "Synthetic shell did not close normally."); app!.Dispose(); app = null;
             using var preferencesBefore = JsonDocument.Parse(File.ReadAllText(Path.Combine(state, "preferences.json")));

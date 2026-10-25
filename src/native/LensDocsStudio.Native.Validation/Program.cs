@@ -37,7 +37,7 @@ internal static class Program
         {
             try
             {
-                if (args.Length is not (5 or 6) || args.Length == 6 && args[5] is not ("--shell-only" or "--diagnostic-FindEnter" or "--diagnostic-FindNext" or "--diagnostic-FindTyped")) throw new ArgumentException("Use the guarded Invoke-NativePortableHostSmoke.ps1 RunUi path with independent source/tree/executable pins.");
+                if (args.Length is not (5 or 6) || args.Length == 6 && args[5] is not ("--shell-only" or "--diagnostic-FindEnter" or "--diagnostic-FindNext" or "--diagnostic-FindTyped" or "--diagnostic-FindEnterObserved" or "--diagnostic-FindNextObserved" or "--diagnostic-FindTypedObserved")) throw new ArgumentException("Use the guarded Invoke-NativePortableHostSmoke.ps1 RunUi path with independent source/tree/executable pins.");
                 return NativeUiChecks.RunDevelopmentHost(args[1], args[2], args[3], args[4], args.Length == 6 && args[5] == "--shell-only", args.Length == 6 && args[5].StartsWith("--diagnostic-", StringComparison.Ordinal) ? args[5][13..] : null);
             }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }

@@ -68,7 +68,7 @@ internal static partial class NativeUiChecks
         Directory.CreateDirectory(output);
         if (diagnostic is not null)
         {
-            if (diagnostic is not ("FindEnter" or "FindNext" or "FindTyped")) throw new ArgumentException("Unknown bounded diagnostic.");
+            if (diagnostic is not ("FindEnter" or "FindNext" or "FindTyped" or "FindEnterObserved" or "FindNextObserved" or "FindTypedObserved")) throw new ArgumentException("Unknown bounded diagnostic.");
             return RunHostFindDiagnostic(executable, sandbox, revision, tree, diagnostic);
         }
         var fixtures = Path.Combine(sandbox, "workspace", "families"); Directory.CreateDirectory(fixtures);
