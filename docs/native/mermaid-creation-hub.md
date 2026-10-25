@@ -242,6 +242,32 @@ the canonical renderer or extending existing action/owner deadlines. The final
 receipt must report every incomplete frame and the independent observed outcome.
 
 
+## Retained package rejection — hosted runtime drift
+
+At `e004b76e2a0b3c38618d8d2c1a2eaac06a9d41c5`, native
+[push 40233566231](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40233566231)
+and [PR 40233571159](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40233571159),
+both attempt 1, failed the unchanged strict runtime verifier. The floating hosted
+SDK had advanced to 10.0.403; independent inspection of all four downloaded
+portable ZIPs (`.906`/`.907`, initial and same-source synthetic upgrade) confirmed
+Core/WPF **10.0.14**, with 528 payload files each. The dependent installed-authoring
+phases were skipped, not accepted. Original archives, hashes and logs are retained.
+
+Publication now explicitly requests the accepted Core/WPF **10.0.13** through
+`RuntimeFrameworkVersion`, whose self-contained behaviour selects the exact
+[runtime version](https://learn.microsoft.com/dotnet/core/project-sdk/msbuild-props#runtimeframeworkversion).
+This restores the existing package contract; it does not upgrade dependencies or
+change the verifier, negative controls, runtime thresholds or installer criteria.
+A new clean source and independent full-gate rerun are required. Framework-dependent
+CI tools use their hosted runtime; the installed authoring phases must independently
+exercise the package's own verified 10.0.13 runtime.
+
+Both picker events at this source passed all 28 real-editor variants in each of
+light, dark and actual OS High Contrast (491/491/492 assertions). The original and
+timed full-catalogue frames were retained. Independent inspection found complete
+880×600 and 1280×800 catalogue examples, readable empty states and visible footers.
+These results do not erase earlier incomplete captures or accept the failed packages.
+
 ## Source-labelled captures and final receipt
 
 [Representative light, dark and actual OS High Contrast screenshots](evidence/goal-ix/README.md)
