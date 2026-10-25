@@ -28,7 +28,7 @@ PR #38 remains open, Draft and paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67
 | Packages | 24 families × install/same-source synthetic upgrade/reinstall; package negatives; unsigned internal pair, full payload inventory/delta and runtime hashes | NOT RUN |
 | Web | Exact-head push/PR static and Chromium/Edge gates; Pages remains skipped | NOT RUN |
 
-Implementation and acceptance are pending. No merge, release, tag, signing, association change, Pages deployment or performance experiment is authorised. Physical-host, internal beta and public production decisions remain independent and blocked by their existing requirements.
+This table records the initial audit, not the final verdict. The post-commit engineering receipt in [Draft PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49) owns the exact final SHA/tree, every run/event/attempt/job, actual counts, package hashes and payload delta. Acceptance requires all mandatory gates on that head. No merge, release, tag, signing, association change, Pages deployment or performance experiment is authorised. Physical-host, internal beta and public production decisions remain independent and blocked by their existing requirements.
 
 
 ## Catalogue and dispatch
@@ -203,3 +203,37 @@ focused follow-up and the independent full 2,207-case rerun passed. Cause is
 unproved; no Class engine, assertion or timeout was changed. Both original and
 follow-up TRX files are retained. Pending jobs on superseded source heads can be
 cancelled by the existing workflow concurrency policy; cancellation is never PASS.
+
+At `40f9d3fe3a86a87ba72903681a7f9a0c58fac81c`, picker push
+[40230899131](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40230899131)
+passed 471 light/dark and 472 High Contrast assertions, 28 phases per appearance,
+including forward/reverse Tab traversal. Per-window DPI was 96. Nevertheless,
+inspection of the initial full-catalogue captures found clipped/stale content
+immediately after resizing; the later empty-state and family captures showed the
+completed layout. Those initial images are **not accepted visual evidence**.
+The observer now requires the actual footer's bottom/right anchors at the new
+size, not merely the outer HWND dimensions, within the original 20-second action
+wait. No product geometry, colour threshold or baseline gate was changed. Fresh
+captures must be inspected independently before a picker UX verdict.
+
+
+## Source-labelled captures and final receipt
+
+[Representative light, dark and actual OS High Contrast screenshots](evidence/goal-ix/README.md)
+are committed with their original source, artifact hashes and expiry. They do not
+replace fresh final-head full-catalogue and empty-state inspection. No image has
+been retouched. The source receipt in Draft PR #49 must distinguish implementation,
+picker UX, source preservation, regression, hosted internal preview, physical host,
+internal beta and public production. Physical-host GUI remains NOT RUN; beta and
+production remain BLOCKED by their independent trust, migration, DPI and physical
+accessibility requirements, irrespective of Goal IX's feature results.
+
+The independent accepted-base package inspection verified 528 payload files,
+self-contained Core/WPF 10.0.13 and pinned Mermaider 0.15.1, with no execution.
+Base preview `.871` installer SHA-256:
+`305fd6d8f6b95f38831f2f0b59599b0276add8fefd906a68594cf8df54900ee4`;
+portable ZIP SHA-256:
+`75d3a95b8f60e3d55b37c569e7e7a05b7b7208ed2d3b39387b5a585c3a11e358`.
+The final receipt must compare every actual final payload path/hash against this
+baseline and verify both unsigned package versions independently. A same-source
+synthetic upgrade remains distinct from historical migration.

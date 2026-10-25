@@ -249,9 +249,18 @@ internal static partial class NativeUiChecks
             var dpi = CreationWindowDpi((nint)picker!.Properties.NativeWindowHandle.Value);
             if (dpi == 0) throw new IOException("The picker DPI could not be observed.");
             var width = logicalWidth * dpi / 96d; var height = logicalHeight * dpi / 96d;
+            var footer = Find(picker, "MermaidPickerCreate");
             picker.Patterns.Transform.Pattern.Move(0, 0); picker.Patterns.Transform.Pattern.Resize(width, height);
-            Wait(() => Math.Abs(picker.BoundingRectangle.Width - width) <= 1 && Math.Abs(picker.BoundingRectangle.Height - height) <= 1,
-                "Actual picker dimensions differ from the requested logical size.");
+            Wait(() =>
+            {
+                var bounds = picker.BoundingRectangle; var action = footer.BoundingRectangle;
+                // Native HWND bounds can change before WPF arranges its content. Require the
+                // real bottom/right footer anchor at the new size, for growing and shrinking.
+                return Math.Abs(bounds.Width - width) <= 1 && Math.Abs(bounds.Height - height) <= 1
+                    && !footer.IsOffscreen && bounds.Contains(action)
+                    && bounds.Right - action.Right < 64 * dpi / 96d && bounds.Bottom - action.Bottom < 64 * dpi / 96d;
+            }, "The picker content did not reach its requested size and visible footer anchors.");
+            app!.WaitWhileBusy(TimeSpan.FromSeconds(5));
         }
         void CheckTabNavigation()
         {

@@ -11,8 +11,10 @@ remains historical at its own source.
 
 [Goal IX / Draft PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49)
 is a separate feature branch for the native 24-family Mermaid creation hub.
-[Its acceptance record](mermaid-creation-hub.md) retains failed attempts and pending
-gates. It is not yet an accepted internal preview. PR #48 is separate and its
+[Its acceptance record](mermaid-creation-hub.md) retains failed attempts and the
+validation contract. Use the exact-head post-commit receipt in Draft PR #49 for
+the feature/internal-preview verdict; no intermediate run certifies a later head.
+PR #48 is separate and its
 High Contrast, original f05 and beta blockers remain blocked. PR #38 remains
 paused; no controlled performance experiment is resumed. Physical-host GUI is
 not run for Goal IX, and existing beta/production certification limits remain.

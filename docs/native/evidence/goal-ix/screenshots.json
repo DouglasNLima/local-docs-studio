@@ -1,0 +1,50 @@
+[
+  {
+    "file": "light-flowchart-example-880x600.png",
+    "sourceRevision": "40f9d3fe3a86a87ba72903681a7f9a0c58fac81c",
+    "sourceTree": "d664a305be624f2ff642604beeb51d6400eec33a",
+    "run": 40230899131,
+    "event": "push",
+    "attempt": 1,
+    "appearance": "light",
+    "observedDpi": 96,
+    "sha256": "7ecadf32a221ce1d4fe0ea754dbb2ee1317ac7b6a7f2c33cf26be7cbd2f32c0b",
+    "artifactId": 12613151817,
+    "artifactDigest": "sha256:5feed6ae157ebd0db82e0ecfe6691ec128c96bc6a5f4aee26f9a22027dea4242",
+    "artifactExpiresAt": "2026-11-24T20:32:45Z",
+    "artifactUrl": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40230899131/artifacts/12613151817",
+    "review": "Inspected actual pixels: selected family, native example, text and footer visible. Intermediate source only; not final-head acceptance."
+  },
+  {
+    "file": "dark-treeview-box-1280x800.png",
+    "sourceRevision": "40f9d3fe3a86a87ba72903681a7f9a0c58fac81c",
+    "sourceTree": "d664a305be624f2ff642604beeb51d6400eec33a",
+    "run": 40230899131,
+    "event": "push",
+    "attempt": 1,
+    "appearance": "dark",
+    "observedDpi": 96,
+    "sha256": "64d98dd0c81fa71d34925b4992b3a1fcaf2f642fd45d6a04a312ee94b5c063c9",
+    "artifactId": 12612044991,
+    "artifactDigest": "sha256:5f8043ccb8dcab74c4e53f997e6ac20510d308040ab10471427f70dff1cc2f37",
+    "artifactExpiresAt": "2026-11-24T20:32:24Z",
+    "artifactUrl": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40230899131/artifacts/12612044991",
+    "review": "Inspected actual pixels: selected family, native example, text and footer visible. Intermediate source only; not final-head acceptance."
+  },
+  {
+    "file": "high-contrast-c4-component-1280x800.png",
+    "sourceRevision": "40f9d3fe3a86a87ba72903681a7f9a0c58fac81c",
+    "sourceTree": "d664a305be624f2ff642604beeb51d6400eec33a",
+    "run": 40230899131,
+    "event": "push",
+    "attempt": 1,
+    "appearance": "high-contrast",
+    "observedDpi": 96,
+    "sha256": "d1aa2d9609857fe7be8697970809a62af41b7a08b9972827533e4091b76f6a71",
+    "artifactId": 12613910306,
+    "artifactDigest": "sha256:6047c05a04de139a54edc3a441f29bbce5683726a62adeba6614da7b2c5de1d8",
+    "artifactExpiresAt": "2026-11-24T20:32:26Z",
+    "artifactUrl": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40230899131/artifacts/12613910306",
+    "review": "Inspected actual pixels: selected family, native example, text and footer visible. Intermediate source only; not final-head acceptance."
+  }
+]

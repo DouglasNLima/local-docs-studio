@@ -7,8 +7,9 @@ native contextual toolbar and searchable 24-family picker, with 28 validated
 starting points dispatched to the existing visual editors. Captured owner/version
 checks and `MermaidDocumentEditSession` retain private drafts and atomic Apply.
 See the [architecture, compatibility and retained failure record](mermaid-creation-hub.md).
-Implementation is under validation; hosted acceptance is **BLOCKED** until every
-mandatory gate passes on the final source. Personal-host GUI tests are **NOT RUN**.
+Use the exact-source engineering receipt in Draft PR #49 for the post-commit
+verdict. Hosted acceptance requires every mandatory gate on that same head;
+intermediate results cannot certify it. Personal-host GUI tests are **NOT RUN**.
 
 The accepted starting develop is `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`, tree
 `1fb777317ad6e5c8531eebcb565fefae4227e354`, after PR #47. PR #48's separate
