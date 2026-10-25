@@ -40,16 +40,16 @@ internal static partial class NativeUiChecks
             stage = "foreground"; FocusWindow(main); editor.Focus();
             Wait(() => editor.Properties.HasKeyboardFocus.Value, "Actual MarkdownEditor did not acquire focus.");
             Observe("editor-focused");
-            stage = "open-find"; Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            stage = "open-find"; AssertInputTarget(editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in editor", "Ctrl+F did not open Find in editor.");
             var query = Find(main, "FindText");
             Wait(() => query.Properties.HasKeyboardFocus.Value, "FindText did not acquire keyboard focus.");
+            AssertInputTarget(query);
             if (variant.StartsWith("FindTyped", StringComparison.Ordinal)) Keyboard.Type("Café"); else query.Patterns.Value.Pattern.SetValue("Café");
             Wait(() => query.Properties.HasKeyboardFocus.Value && query.Patterns.Value.Pattern.Value.Value == "Café", "Exact query and focus were not established.");
             Observe("before-action");
             // Observations cannot authorise input if foreground/focus has since moved.
-            GetWindowThreadProcessId(GetForegroundWindow(), out var foreground);
-            if (foreground != app.ProcessId || !query.Properties.HasKeyboardFocus.Value) throw new IOException("Input target changed; no action sent.");
+            AssertInputTarget(query);
             stage = "single-action"; sent = true;
             if (variant.StartsWith("FindNext", StringComparison.Ordinal)) Find(main, "FindNext").AsButton().Click(); else Keyboard.Type(VirtualKeyShort.RETURN);
             try { Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Exact Unicode selection was not exposed after the single action."); }
@@ -61,13 +61,20 @@ internal static partial class NativeUiChecks
             Observe("after-close-find");
             if (ReadEditorText(editor) != source || Hash(sourcePath) != sourceHash) throw new IOException("Source changed after closing Find.");
             stage = "normal-close"; main.Close(); Wait(() => app.HasExited, "Owned synthetic app did not close normally.");
-            WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = failure is null ? "PASS" : "FAIL", scope = "BOUNDED_FIND_DIAGNOSTIC_ONLY", revision, tree, variant, sent, failure, sourceHash, fullShell = "NOT RUN", nativeSelection = "Not observed in-process; UIA alone cannot establish absence of native selection" });
+            WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = failure is null ? "PASS" : "FAIL", scope = "BOUNDED_FIND_DIAGNOSTIC_ONLY", revision, tree, variant, sent, failure, sourceHash, fullShell = "NOT RUN", nativeSelection = variant.EndsWith("Observed", StringComparison.Ordinal) ? "See native-observations.jsonl alongside UIA ranges; this result retains the independent UIA assertion" : "Not observed in-process; UIA alone cannot establish absence of native selection" });
             return failure is null ? 0 : 1;
         }
         catch (Exception error)
         {
             WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = "BLOCKED", revision, tree, variant, stage, sent, failure, error = error.ToString(), processId = app.ProcessId, fullShell = "NOT RUN" });
             throw;
+        }
+
+        void AssertInputTarget(AutomationElement control)
+        {
+            GetWindowThreadProcessId(GetForegroundWindow(), out var foreground);
+            if (foreground != app.ProcessId || !control.Properties.HasKeyboardFocus.Value)
+                throw new IOException("Input target changed; no action sent.");
         }
 
         void Observe(string name)

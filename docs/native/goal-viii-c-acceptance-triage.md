@@ -130,3 +130,37 @@ Final experiment results belong in a post-commit receipt and PR #48's current
 acceptance summary, retaining this source-labelled pre-experiment record. No
 passing future outcome is claimed here.
 
+## First clean experiment and observer readiness
+
+Diagnostic commit `694b9fad0d4fd46c3ecf6f3e3680da69f4a46005`, tree
+`1b96d802939e66c6522bbcecafbe8d575591ec8a`, passed its local zero-warning/error
+build. Sequential local Core experiments passed all three focused variants
+(5,638 ms command elapsed), then 2,117/2,117 with zero skips (25,814 ms).
+Raw TRX, logs, source/workload inventory and .NET 10.0.12 identity are retained in
+`artifacts/native/g8c/694b9fad0d4fd46c3ecf6f3e3680da69f4a46005/a01/`.
+The historical Core failure and its unproved cause are unchanged.
+
+Fresh `.880` sandbox `development-host/11957e294a6f87b9729913b174b919ff23d176ed/d01`
+independently verified the original Actions package and all 528 payload files.
+Its `FindEnterObserved` process, PID 72568 / HWND 52696954, loaded the explicitly
+process-local observer at 07:24:16 UTC on 25 October, using actual .NET 10.0.13.
+At 07:24:20 the observer stopped because the editor had not yet loaded the exact
+synthetic source. The external client then observed exact source but timed out
+waiting for `probe-attached` at 07:24:42. **No input was sent**; the result is
+BLOCKED at observer readiness, not a product Find failure or a foreground result.
+The verified process closed normally through its exact owned HWND at 07:25:59.
+
+The observer's one ApplicationIdle callback could run before asynchronous document
+loading. The bounded correction listens for the existing editor TextChanged event
+and attaches only when text exactly equals the prepared synthetic source. It does
+not load, edit, focus or select anything. Pending handlers detach when the window
+closes; the external 20-second attach deadline is unchanged. After attachment,
+the original stop-on-source-change rule still applies. A new real-process test
+must verify this correction; no Enter/Next result is inferred from attachment.
+
+Two pre-launch invocation errors are also retained: an absolute-path guard rejected
+the first relative preflight output path; an early RunUi invocation rejected the
+absent preparation marker before Prepare finished. Neither created a UI session
+or sent input. The actual d01 run began only after successful preparation, with a
+separate log. Completed d01 evidence is not reused.
+

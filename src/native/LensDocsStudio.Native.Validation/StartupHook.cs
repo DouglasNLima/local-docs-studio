@@ -38,24 +38,44 @@ public static class StartupHook
         {
             if (Application.Current?.MainWindow is not Window window || window.FindName("Editor") is not TextEditor editor || window.FindName("FindText") is not TextBox query)
             { Record(new { atUtc = DateTimeOffset.UtcNow, observation = "probe-unavailable" }); return; }
-            void Snapshot(string observation, KeyEventArgs? key = null)
+            // ApplicationIdle can precede asynchronous command-line document loading.
+            // Observe that existing load; never set the document or extend the caller's
+            // unchanged attach-before-input deadline. Do not record other source text.
+            editor.TextChanged += AttachWhenSourceIsReady;
+            window.Closed += StopPendingObservation;
+            if (editor.Document.Text != source)
+                Record(new { atUtc = DateTimeOffset.UtcNow, observation = "probe-waiting-for-synthetic-source" });
+            AttachWhenSourceIsReady(null, EventArgs.Empty);
+
+            void StopPendingObservation(object? sender, EventArgs e)
             {
-                // Stop recording if the process is no longer displaying the prepared synthetic source.
-                if (editor.Document.Text != source) { Record(new { atUtc = DateTimeOffset.UtcNow, observation = "source-differs-probe-stopped" }); count = 200; return; }
-                Record(new { atUtc = DateTimeOffset.UtcNow, observation, key = key?.Key.ToString(), handled = key?.Handled,
-                    originalSource = (key?.OriginalSource as FrameworkElement)?.Name, focus = (Keyboard.FocusedElement as FrameworkElement)?.Name,
-                    query = query.Text, context = (window.FindName("FindContext") as TextBlock)?.Text,
-                    selectionStart = editor.SelectionStart, selectionLength = editor.SelectionLength, selectedText = editor.SelectedText, caretOffset = editor.CaretOffset,
-                    sourceSha256 = Digest(Encoding.UTF8.GetBytes(editor.Document.Text)) });
+                editor.TextChanged -= AttachWhenSourceIsReady;
+                Record(new { atUtc = DateTimeOffset.UtcNow, observation = "probe-closed-before-source-ready" }); stream.Dispose();
             }
-            window.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) => Snapshot("window-preview-key", e)), true);
-            query.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) => Snapshot("find-preview-key", e)), true);
-            query.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) => Snapshot("find-bubbling-key", e)), true);
-            window.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) => Snapshot("window-bubbling-key", e)), true);
-            editor.TextArea.SelectionChanged += (_, _) => Snapshot("native-selection-changed");
-            query.TextChanged += (_, _) => Snapshot("query-changed");
-            window.Closed += (_, _) => { Snapshot("window-closed"); stream.Dispose(); };
-            Snapshot("probe-attached");
+            void AttachWhenSourceIsReady(object? sender, EventArgs e)
+            {
+                if (editor.Document.Text != source) return;
+                editor.TextChanged -= AttachWhenSourceIsReady;
+                window.Closed -= StopPendingObservation;
+                void Snapshot(string observation, KeyEventArgs? key = null)
+                {
+                    // Stop recording if the process is no longer displaying the prepared synthetic source.
+                    if (editor.Document.Text != source) { Record(new { atUtc = DateTimeOffset.UtcNow, observation = "source-differs-probe-stopped" }); count = 200; return; }
+                    Record(new { atUtc = DateTimeOffset.UtcNow, observation, key = key?.Key.ToString(), handled = key?.Handled,
+                        originalSource = (key?.OriginalSource as FrameworkElement)?.Name, focus = (Keyboard.FocusedElement as FrameworkElement)?.Name,
+                        query = query.Text, context = (window.FindName("FindContext") as TextBlock)?.Text,
+                        selectionStart = editor.SelectionStart, selectionLength = editor.SelectionLength, selectedText = editor.SelectedText, caretOffset = editor.CaretOffset,
+                        sourceSha256 = Digest(Encoding.UTF8.GetBytes(editor.Document.Text)) });
+                }
+                window.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) => Snapshot("window-preview-key", e)), true);
+                query.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) => Snapshot("find-preview-key", e)), true);
+                query.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) => Snapshot("find-bubbling-key", e)), true);
+                window.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler((_, e) => Snapshot("window-bubbling-key", e)), true);
+                editor.TextArea.SelectionChanged += (_, _) => Snapshot("native-selection-changed");
+                query.TextChanged += (_, _) => Snapshot("query-changed");
+                window.Closed += (_, _) => { Snapshot("window-closed"); stream.Dispose(); };
+                Snapshot("probe-attached");
+            }
         }));
     }
     private static string Digest(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
