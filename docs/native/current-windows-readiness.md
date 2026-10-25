@@ -1,5 +1,26 @@
 # Current native Windows readiness
 
+## Goal IX execution update — 25 October 2026
+
+The rechecked accepted develop is `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`, tree
+`1fb777317ad6e5c8531eebcb565fefae4227e354`, after merged PR #47. Its
+[native push](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034236)
+and [web push](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034406)
+succeeded. This updates the integrated-source pin; the dated Goal VII record below
+remains historical at its own source.
+
+[Goal IX / Draft PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49)
+is a separate feature branch for the native 24-family Mermaid creation hub.
+[Its acceptance record](mermaid-creation-hub.md) retains failed attempts and the
+validation contract. Use the exact-head post-commit receipt in Draft PR #49 for
+the feature/internal-preview verdict; no intermediate run certifies a later head.
+PR #48 is separate and its
+High Contrast, original f05 and beta blockers remain blocked. PR #38 remains
+paused; no controlled performance experiment is resumed. Physical-host GUI is
+not run for Goal IX, and existing beta/production certification limits remain.
+
+## Historical Goal VII record
+
 Recorded 24 October 2026 for **Goal VII**, a review/internal-preview goal. This is
 the authoritative current-status entry point. Dated chapters in other native docs
 remain historical evidence at their own sources; old Draft/pending/family-count

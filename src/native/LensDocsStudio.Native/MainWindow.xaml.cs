@@ -67,6 +67,7 @@ public partial class MainWindow : Window
         Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
         Editor.TextArea.TextView.LineTransformers.Insert(0, editorHighlighting);
         Editor.TextArea.Caret.PositionChanged += (_, _) => { UpdateCaretStatus(); HighlightCurrentHeading(); };
+        Editor.GotKeyboardFocus += (_, _) => capturedMermaidTarget = null;
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
@@ -118,6 +119,7 @@ public partial class MainWindow : Window
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
+        mermaidOwnerGeneration++;
         CancelSynchronisation(); CancelPreview(); viewportGeneration++;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
         // The shared reader may still display the outgoing document while rendering.
@@ -650,6 +652,7 @@ public partial class MainWindow : Window
         foreach (var editor in OwnedWindows.OfType<ErVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<ClassVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<SourceVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
+        foreach (var picker in OwnedWindows.OfType<MermaidDiagramPickerWindow>()) picker.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];

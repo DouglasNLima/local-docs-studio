@@ -17,6 +17,18 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--mermaid-creation-ui")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Mermaid creation UI acceptance requires a disposable GitHub-hosted Windows runner."); return 1; }
+            return NativeUiChecks.RunMermaidCreation(args[1], args[2], args.Contains("--high-contrast"), args.Contains("--dark"));
+        }
+        if (args.FirstOrDefault() == "--mermaid-creation-sessions")
+        {
+            try { MermaidCreationSessionChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--expansion-vi-editor-fidelity")
         {
             try { foreach (var family in new[] { "packet", "treeview", "treeview-box", "treemap", "venn" }) NativeWorkflowEditorChecks.Run(Path.Combine(Path.GetFullPath(args[1]), family), Path.GetFullPath(args[2]), expansionFamily: family); return 0; }

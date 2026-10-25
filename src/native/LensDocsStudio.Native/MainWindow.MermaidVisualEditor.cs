@@ -54,63 +54,32 @@ public partial class MainWindow
             catch (ArgumentException error) { model.Status = error.Message; }
         });
     }
-    private void InsertFlowchart(object sender, RoutedEventArgs e)
-        => InsertMermaidVisually(false);
-    private void InsertSequence(object sender, RoutedEventArgs e)
-        => InsertMermaidVisually(true);
-    private void InsertState(object sender, RoutedEventArgs e)
-        => InsertMermaidVisually(false, true);
-    private void InsertEr(object sender, RoutedEventArgs e)
-        => InsertMermaidVisually(false, er: true);
-    private void InsertClass(object sender, RoutedEventArgs e)
-        => InsertMermaidVisually(false, classDiagram: true);
-    private void InsertPie(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, pie: true);
-    private void InsertMindmap(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, mindmap: true);
-    private void InsertGantt(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, gantt: true);
-    private void InsertQuadrant(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, quadrant: true);
-    private void InsertTimeline(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, timeline: true);
-    private void InsertJourney(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, journey: true);
-    private void InsertXy(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, xy: true);
-    private void InsertRadar(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, radar: true);
-    private void InsertSankey(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, sankey: true);
-    private void InsertKanban(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, kanban: true);
-    private void InsertRequirement(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, requirement: true);
-    private void InsertGitGraph(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, gitgraph: true);
-    private void InsertArchitecture(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Architecture");
-    private void InsertC4(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "C4");
-    private void InsertBlock(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Block");
-    private void InsertPacket(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Packet");
-    private void InsertTreeView(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "TreeView");
-    private void InsertTreemap(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Treemap");
-    private void InsertVenn(object sender, RoutedEventArgs e) => InsertMermaidVisually(false, topology: "Venn");
-    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false, bool classDiagram = false, bool pie = false, bool mindmap = false, bool gantt = false, bool quadrant = false, bool timeline = false, bool journey = false, bool xy = false, bool radar = false, bool sankey = false, bool kanban = false, bool requirement = false, bool gitgraph = false, string? topology = null)
-    {
-        if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
-        if (tab.EditorDocument.TextLength > MermaidDocumentEditSession.MaximumDocumentCharacters)
-        { model.Status = "Visual authoring supports documents up to 4 million characters. Insert Mermaid through the source editor for this document."; return; }
-        if (IsStandaloneMermaid(tab) && !string.IsNullOrWhiteSpace(tab.EditorDocument.Text))
-        {
-            OpenMermaidVisualEditor(tab, markdown.Parse(tab.EditorDocument.Text, true), tab.EditorDocument.Version, 0); return;
-        }
-        var source = tab.EditorDocument.Text; var standalone = IsStandaloneMermaid(tab);
-        var start = standalone ? 0 : Editor.SelectionStart; var length = standalone ? source.Length : Editor.SelectionLength;
-        var target = new MermaidBlockSource(new(start, length), new(start, length), source.Substring(start, length), standalone) { IsInsertion = true };
-        var newline = source.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
-        var session = new MermaidDocumentEditSession(tab, target, standalone ? null : (draft, current, span) =>
-        {
-            var prefix = span.Start == 0 || current[..span.Start].EndsWith(newline + newline, StringComparison.Ordinal) ? "" : current[..span.Start].EndsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
-            var suffix = span.End == current.Length || current[span.End..].StartsWith(newline + newline, StringComparison.Ordinal) ? "" : current[span.End..].StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
-            return prefix + "```mermaid" + newline + draft.TrimEnd('\r', '\n') + newline + "```" + suffix;
-        });
-        if (topology is not null)
-        {
-            var starter = topology switch { "Architecture" => ArchitectureVisualDraft.Starter, "C4" => C4VisualDraft.Starter, "Packet" => PacketVisualDraft.Starter, "TreeView" => TreeViewVisualDraft.Starter, "Treemap" => TreemapVisualDraft.Starter, "Venn" => VennVisualDraft.Starter, _ => BlockVisualDraft.Starter };
-            OpenVisualDraft(tab, session, starter.Replace("\n", newline, StringComparison.Ordinal), null); return;
-        }
-        OpenVisualDraft(tab, session, kanban ? KanbanVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : requirement ? RequirementVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gitgraph ? GitGraphVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : xy ? XyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : radar ? RadarVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : sankey ? SankeyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : journey ? JourneyVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : timeline ? TimelineVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : quadrant ? QuadrantVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : gantt ? GanttVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : mindmap ? MindmapVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : pie ? PieVisualDraft.Starter.Replace("\n", newline, StringComparison.Ordinal) : classDiagram ? ClassDiagramSourceParser.Starter.Replace("\n", newline, StringComparison.Ordinal) : er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
-    }
+    private void InsertFlowchart(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Flowchart);
+    private void InsertSequence(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Sequence);
+    private void InsertState(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.State);
+    private void InsertEr(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Er);
+    private void InsertClass(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Class);
+    private void InsertPie(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Pie);
+    private void InsertMindmap(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Mindmap);
+    private void InsertGantt(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Gantt);
+    private void InsertQuadrant(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Quadrant);
+    private void InsertTimeline(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Timeline);
+    private void InsertJourney(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Journey);
+    private void InsertXy(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Xy);
+    private void InsertRadar(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Radar);
+    private void InsertSankey(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Sankey);
+    private void InsertKanban(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Kanban);
+    private void InsertRequirement(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Requirement);
+    private void InsertGitGraph(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.GitGraph);
+    private void InsertArchitecture(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Architecture);
+    private void InsertC4(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.C4);
+    private void InsertBlock(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Block);
+    private void InsertPacket(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Packet);
+    private void InsertTreeView(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.TreeView);
+    private void InsertTreemap(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Treemap);
+    private void InsertVenn(object sender, RoutedEventArgs e) => InsertMermaidFamily(MermaidDiagramFamily.Venn);
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
-    private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
+    private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource, Func<string?>? canApply = null, Action? onClosed = null)
     {
         if (ExpansionViSource.IsFamily(source))
         {
@@ -132,66 +101,53 @@ public partial class MainWindow
         {
             try
             {
+                if (canApply?.Invoke() is { } problem) return problem;
                 if (model.ActiveDocument == tab && Editor.IsReadOnly) return "The owning document is read-only.";
                 var edit = await session.PrepareAsync(draft, cancellationToken);
-                cancellationToken.ThrowIfCancellationRequested(); session.Commit(edit, model.Documents.Contains(tab));
+                cancellationToken.ThrowIfCancellationRequested();
+                if (canApply?.Invoke() is { } changed) return changed;
+                session.Commit(edit, model.Documents.Contains(tab));
                 model.Status = edit.Expected == edit.Replacement ? "The Mermaid source is unchanged; no document Undo step was needed." : "Mermaid source applied as one undoable change. Save the document to persist it.";
                 if (model.ActiveDocument == tab) QueuePreview();
                 return null;
             }
             catch (ArgumentException error) { return error.Message; }
         }
+        var definition = MermaidDiagramCatalogue.Recognise(source);
+        if (definition is null) { model.Status = "This diagram family or header variant remains source-only. Use Edit source."; editSource?.Invoke(); return; }
         Window window;
-        try { window = PacketVisualDraft.IsPacket(source)
-            ? new PacketVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : TreeViewVisualDraft.IsTreeView(source)
-            ? new TreeViewVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : TreemapVisualDraft.IsTreemap(source)
-            ? new TreemapVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : VennVisualDraft.IsVenn(source)
-            ? new VennVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : ArchitectureVisualDraft.IsArchitecture(source)
-            ? new ArchitectureVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : C4VisualDraft.IsC4(source)
-            ? new C4VisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : BlockVisualDraft.IsBlock(source)
-            ? new BlockVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : KanbanVisualDraft.IsKanban(source)
-            ? new KanbanVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : RequirementVisualDraft.IsRequirement(source)
-            ? new RequirementVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : GitGraphVisualDraft.IsGitGraph(source)
-            ? new GitGraphVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : XyVisualDraft.IsXy(source)
-            ? new XyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : RadarVisualDraft.IsRadar(source)
-            ? new RadarVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : SankeyVisualDraft.IsSankey(source)
-            ? new SankeyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : JourneyVisualDraft.IsJourney(source)
-            ? new JourneyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : TimelineVisualDraft.IsTimeline(source)
-            ? new TimelineVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : QuadrantVisualDraft.IsQuadrant(source)
-            ? new QuadrantVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : GanttVisualDraft.IsGantt(source)
-            ? new GanttVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : MindmapVisualDraft.IsMindmap(source)
-            ? new MindmapVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : PieVisualDraft.IsPie(source)
-            ? new PieVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : ClassDiagramSourceParser.IsClass(source)
-            ? new ClassVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : ErDiagramSourceParser.IsEr(source)
-            ? new ErVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : StateDiagramSourceParser.IsState(source)
-            ? new StateVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : SequenceSourceParser.IsSequence(source)
-            ? new SequenceVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
-            : new MermaidVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize); }
+        try { window = definition.Family switch
+        {
+            MermaidDiagramFamily.Flowchart => new MermaidVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize),
+            MermaidDiagramFamily.Sequence => new SequenceVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.State => new StateVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Er => new ErVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Class => new ClassVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Pie => new PieVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Mindmap => new MindmapVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Gantt => new GanttVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Quadrant => new QuadrantVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Timeline => new TimelineVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Journey => new JourneyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Xy => new XyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Radar => new RadarVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Sankey => new SankeyVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Kanban => new KanbanVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Requirement => new RequirementVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.GitGraph => new GitGraphVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Architecture => new ArchitectureVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.C4 => new C4VisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Block => new BlockVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Packet => new PacketVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.TreeView => new TreeViewVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Treemap => new TreemapVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            MermaidDiagramFamily.Venn => new VennVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize),
+            _ => throw new ArgumentException("This visual diagram family is unavailable; use Edit source.")
+        }; }
         catch (Exception error) when (error is ArgumentException or System.Text.RegularExpressions.RegexMatchTimeoutException)
         { model.Status = "Visual authoring could not safely inspect this source. The document is unchanged; use Edit source. " + error.Message; return; }
         window.Owner = this;
+        if (onClosed is not null) window.Closed += (_, _) => onClosed();
         window.Show();
     }
 }

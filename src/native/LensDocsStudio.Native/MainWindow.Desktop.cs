@@ -158,6 +158,8 @@ public partial class MainWindow
             Add("Format: " + action.Replace('-', ' '), "", () => Format(new Button { Tag = action }, e), edit);
         Add("Insert workspace document link", "Ctrl+Shift+K", () => InsertDocumentLink(sender, e), edit);
         Add("Insert local image", "", () => InsertImage(sender, e), edit);
+        Add("Mermaid diagram", "Create or edit at the caret", () => OpenMermaidCreation(sender, e), edit);
+        Add("New visual Mermaid diagram", "", () => NewMermaidCreation(sender, e), edit);
         Add("Insert Flowchart visually", "", () => InsertFlowchart(sender, e), edit);
         Add("Insert Sequence diagram visually", "", () => InsertSequence(sender, e), edit);
         foreach (var format in new[] { "HTML", "DOCX", "PDF" })

@@ -1,0 +1,45 @@
+name: Validate native Mermaid creation hub
+on:
+  push:
+    branches: [feature/native-mermaid-creation-hub]
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mermaid-creation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  picker:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [light, dark, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore exact locked dependencies
+        run: dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
+      - name: Build exact-source application and independent UIA client
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore -warnaserror
+      - name: Verify captured targets and atomic document sessions without GUI
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-creation-sessions artifacts/native/mermaid-creation/sessions
+      - name: Exercise real picker and all existing editor dispatches on the disposable desktop
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } elseif ('${{ matrix.appearance }}' -eq 'dark') { '--dark' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-creation-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-creation/ui $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-mermaid-creation-${{ matrix.appearance }}
+          path: artifacts/native/mermaid-creation/
+          retention-days: 30

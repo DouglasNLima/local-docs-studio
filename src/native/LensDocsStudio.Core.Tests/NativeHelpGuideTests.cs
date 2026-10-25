@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(21, NativeHelpGuide.Topics.Count);
-        Assert.Equal(21, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(22, NativeHelpGuide.Topics.Count);
+        Assert.Equal(22, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);

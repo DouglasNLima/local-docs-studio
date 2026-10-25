@@ -366,7 +366,7 @@
      <Button Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}" ToolTip="Undo (Ctrl+Z)" AutomationProperties.Name="Undo (Ctrl+Z)"><ui:CommandIcon Kind="Undo"/></Button>
      <Button Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}" ToolTip="Redo (Ctrl+Y)" AutomationProperties.Name="Redo (Ctrl+Y)"><ui:CommandIcon Kind="Redo"/></Button>
 <Separator/>
-     <Button Tag="bold" Click="Format" ToolTip="Bold (Ctrl+B)" AutomationProperties.Name="Bold (Ctrl+B)" AutomationProperties.AutomationId="FormatBold"><ui:CommandIcon Kind="Bold"/></Button>
+     <Button Tag="bold" Click="Format" ToolBar.OverflowMode="Never" ToolTip="Bold (Ctrl+B)" AutomationProperties.Name="Bold (Ctrl+B)" AutomationProperties.AutomationId="FormatBold"><ui:CommandIcon Kind="Bold"/></Button>
      <Button Tag="italic" Click="Format" ToolTip="Italic (Ctrl+I)" AutomationProperties.Name="Italic (Ctrl+I)" AutomationProperties.AutomationId="FormatItalic"><ui:CommandIcon Kind="Italic"/></Button>
      <Button Tag="strike" Click="Format" ToolTip="Strikethrough" AutomationProperties.Name="Strikethrough" AutomationProperties.AutomationId="FormatStrike"><ui:CommandIcon Kind="Strike"/></Button>
      <Button Tag="inline-code" Click="Format" ToolTip="Inline code" AutomationProperties.Name="Inline code" AutomationProperties.AutomationId="FormatCode"><ui:CommandIcon Kind="Code"/></Button>
@@ -379,7 +379,20 @@
      <Button Tag="task" Click="Format" ToolTip="Checklist" AutomationProperties.Name="Checklist" AutomationProperties.AutomationId="Formattask"><ui:CommandIcon Kind="Checklist"/></Button>
      <Button Tag="quote" Click="Format" ToolTip="Quote" AutomationProperties.Name="Quote" AutomationProperties.AutomationId="Formatquote"><ui:CommandIcon Kind="Quote"/></Button>
      <Button Tag="code" Click="Format" ToolTip="Code block" AutomationProperties.Name="Code block" AutomationProperties.AutomationId="Formatcode"><ui:CommandIcon Kind="Code"/></Button>
-     <Button Tag="mermaid" Click="Format" ToolTip="Mermaid block" AutomationProperties.Name="Mermaid block" AutomationProperties.AutomationId="Formatmermaid"><ui:CommandIcon Kind="Mermaid"/></Button>
+     <Button Click="OpenMermaidCreation" Focusable="True" ToolBar.OverflowMode="Never" PreviewMouseDown="CaptureMermaidPointerTarget" PreviewGotKeyboardFocus="CaptureMermaidKeyboardTarget"
+      ToolTip="Create a Mermaid diagram, or edit the supported diagram at the caret" AutomationProperties.Name="Mermaid diagram" AutomationProperties.AutomationId="MermaidCreation">
+      <StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Mermaid"/><TextBlock Text="Mermaid diagram" Margin="5,0,0,0" VerticalAlignment="Center"/></StackPanel>
+     </Button>
+     <Button Click="OpenMermaidActions" Focusable="True" ToolBar.OverflowMode="Never" PreviewMouseDown="CaptureMermaidPointerTarget" PreviewGotKeyboardFocus="CaptureMermaidKeyboardTarget" Content="▾"
+      ToolTip="Mermaid diagram actions" AutomationProperties.Name="Mermaid diagram actions" AutomationProperties.AutomationId="MermaidCreationActions">
+      <Button.ContextMenu><ContextMenu>
+       <MenuItem Header="New visual Mermaid diagram…" Click="NewMermaidCreation" AutomationProperties.AutomationId="NewVisualMermaid"/>
+       <MenuItem Header="Edit current diagram visually" Tag="edit-current" Click="EditCurrentMermaid" IsEnabled="False" AutomationProperties.AutomationId="EditCurrentMermaid"/>
+       <MenuItem Header="Edit source" Click="FocusMermaidSource" AutomationProperties.AutomationId="MermaidEditSource"/>
+       <Separator/>
+       <MenuItem Header="Insert Mermaid as code" Tag="mermaid" Click="InsertMermaidCode" AutomationProperties.Name="Insert Mermaid as code" AutomationProperties.AutomationId="Formatmermaid"/>
+      </ContextMenu></Button.ContextMenu>
+     </Button>
      <Button Tag="table" Click="Format" ToolTip="Table" AutomationProperties.Name="Table" AutomationProperties.AutomationId="Formattable"><ui:CommandIcon Kind="Table"/></Button>
      <Button Tag="rule" Click="Format" ToolTip="Horizontal rule" AutomationProperties.Name="Horizontal rule" AutomationProperties.AutomationId="Formatrule"><ui:CommandIcon Kind="Rule"/></Button>
       </ToolBar>
