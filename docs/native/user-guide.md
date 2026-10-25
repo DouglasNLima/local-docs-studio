@@ -6,6 +6,45 @@ retain their original sources and counts; the [Goal VII audit](goal-vii-ux-audit
 separates implementation, actual Windows acceptance and manual prerequisites.
 
 
+## Mermaid creation hub
+
+Use **Mermaid diagram** on the source toolbar to create a diagram or edit the
+supported Mermaid body at the caret. The adjacent **Mermaid diagram actions**
+menu includes **New visual Mermaid diagram…**, **Edit current diagram visually**,
+**Edit source** and **Insert Mermaid as code**. The original Insert visual commands
+and Edit/Insert source commands remain available. Command Palette also offers
+**Mermaid diagram** and **New visual Mermaid diagram**.
+
+Search the native catalogue by name, description or alias, or choose one of four
+categories. There are **24 families**, with additional starting points for
+Flowchart, C4 Context/Container/Component and TreeView indentation/box drawing.
+Only the selected example is rendered. **Example source** shows its exact Mermaid.
+A failed preview has an explanation and a source alternative; it never substitutes
+another family. Box-drawing TreeView supports its existing field edits while
+structural changes remain protected. C4 Dynamic/Deployment remain source-only.
+
+Use Tab/Shift+Tab to move between controls, arrow keys in the family list, and
+**Create visually** (or Enter within that list) to open the existing editor. Enter
+in search does not create. Escape or Cancel closes the picker unchanged. Browsing,
+changing starting points and cancelling the visual editor leave source and Undo
+unchanged. The editor's explicit **Apply** is one document Undo step; **Save** is
+separate. Redo restores the exact applied source.
+
+For Markdown, the caret and selection are captured before the toolbar takes
+focus. A new diagram is inserted **after any selected text**, preserving it.
+Fence boundaries, overlapping selections, ordinary code and protected nested
+Markdown require a safe source position instead of guessing. Existing supported
+diagrams retain their exact source occurrence and family, including duplicates.
+Unsupported grammar returns focus to source with an explanation. A changed,
+closed, read-only, saving or renamed owner rejects the captured edit safely.
+
+Empty `.mmd`/`.mermaid` documents receive raw Mermaid without fences. Nonempty
+standalone files always open their current diagram or source inspection; choosing
+a new family cannot replace them. The explicit legacy **Insert Mermaid as code**
+command retains its ordinary source-formatting behaviour for hand authoring.
+
+See the [creation hub matrix and manual checklist](mermaid-creation-hub.md).
+
 ## Mermaid visual authoring
 
 **ER diagrams:** Visual Edit opens the native ER editor for `erDiagram`.
