@@ -291,8 +291,21 @@ internal static partial class NativeUiChecks
         void Capture(Window window, string name)
         {
             if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("The picker did not become idle before capture.");
-            _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, name + ".png"));
-            captures.Add(new { File = name + ".png", Dpi = CreationWindowDpi((nint)window.Properties.NativeWindowHandle.Value), PhysicalBounds = window.BoundingRectangle });
+            var observation = Stopwatch.StartNew();
+            SaveFrame(name);
+            if (name.StartsWith("catalogue-all-", StringComparison.Ordinal))
+            {
+                // Preserve the immediate frame and observe presentation independently. These
+                // are additional evidence, never replacements or a relaxed action deadline.
+                Thread.Sleep(250); SaveFrame(name + "-after-250ms");
+                Thread.Sleep(750); SaveFrame(name + "-after-1000ms");
+            }
+            void SaveFrame(string frame)
+            {
+                _ = DwmFlush(); window.CaptureToFile(Path.Combine(output, frame + ".png"));
+                captures.Add(new { File = frame + ".png", ObservedAfterMilliseconds = observation.ElapsedMilliseconds,
+                    Dpi = CreationWindowDpi((nint)window.Properties.NativeWindowHandle.Value), PhysicalBounds = window.BoundingRectangle });
+            }
         }
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
         void Receipt(string status, string? error) => File.WriteAllText(Path.Combine(output, "creation-ui.json"), JsonSerializer.Serialize(new

@@ -228,6 +228,19 @@ This adds actual 880×600 keyboard coverage without changing product layout,
 original action deadlines or any baseline threshold. Fresh pixels still require
 independent inspection; no automatic green result substitutes for it.
 
+At `251a94d602444ecd2167bd6f5608016aa4db32ac`, both picker events passed all
+28 phases in three appearances. Light/dark full-catalogue captures were complete
+at both sizes. The initial High Contrast 1280×800 capture showed a partial example
+in both [push](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40232639655)
+and [PR](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40232642929),
+while its 880×600 and later selected-family 1280×800 examples were complete.
+Cause is not established; neither initial image is accepted as complete preview
+evidence. Additional observations now retain the original frame plus frames after
+250 ms and a further 750 ms, recording actual elapsed time and physical bounds.
+They observe presentation without replacing captures, changing source, altering
+the canonical renderer or extending existing action/owner deadlines. The final
+receipt must report every incomplete frame and the independent observed outcome.
+
 
 ## Source-labelled captures and final receipt
 
