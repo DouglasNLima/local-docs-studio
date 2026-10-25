@@ -1,7 +1,7 @@
 name: Validate expanded native Mermaid editors
 on:
   push:
-    branches: [feature/native-windows-development-host-acceptance, feature/native-windows-ux-release-readiness, feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors, feature/native-mermaid-kanban-requirement-gitgraph-editors, feature/native-mermaid-architecture-c4-block-editors, feature/native-mermaid-packet-treeview-treemap-venn-editors]
+    branches: [feature/native-mermaid-creation-hub, feature/native-windows-development-host-acceptance, feature/native-windows-ux-release-readiness, feature/native-mermaid-gantt-mindmap-pie-editors, feature/native-mermaid-timeline-journey-quadrant-editors, feature/native-mermaid-xy-radar-sankey-editors, feature/native-mermaid-kanban-requirement-gitgraph-editors, feature/native-mermaid-architecture-c4-block-editors, feature/native-mermaid-packet-treeview-treemap-venn-editors]
   workflow_dispatch:
 permissions:
   contents: read

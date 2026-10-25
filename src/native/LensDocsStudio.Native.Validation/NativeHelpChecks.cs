@@ -47,7 +47,7 @@ internal static class NativeHelpChecks
                 throw new IOException("Empty help search retained an unrelated topic.");
             if (preview.Document.Foreground is not SolidColorBrush foreground || surface.Background is not SolidColorBrush background
                 || NativeSyntaxChecks.Contrast(foreground.Color, background.Color) < 4.5) throw new IOException("Empty help results lost readable contrast.");
-            query.Clear(); if (topics.Items.Count != 21 || topics.SelectedItem is null) throw new IOException("Clearing help search did not restore all twenty-one bundled topics.");
+            query.Clear(); if (topics.Items.Count != 22 || topics.SelectedItem is null) throw new IOException("Clearing help search did not restore all twenty-two bundled topics.");
             query.Text = "XY Chart, Radar and Sankey visual authoring"; Layout();
             if (topics.Items.Count != 1 || topics.SelectedItem is not HelpTopic { Title: "XY Chart, Radar and Sankey visual authoring" }
                 || !new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Rename node across proved", StringComparison.Ordinal))

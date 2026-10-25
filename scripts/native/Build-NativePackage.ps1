@@ -33,7 +33,8 @@ $payload = Join-Path $output 'app'
 New-Item -ItemType Directory -Path $payload -Force | Out-Null
 Push-Location $repo
 try {
-    & dotnet publish src/native/LensDocsStudio.Native -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:Version=$Version -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=false -p:PublishTrimmed=false -o $payload
+    # Keep the accepted preview runtime independent of the hosted SDK's latest patch.
+    & dotnet publish src/native/LensDocsStudio.Native -c Release -r win-x64 --self-contained true -p:RuntimeFrameworkVersion=10.0.13 -p:RestoreLockedMode=true -p:Version=$Version -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=false -p:PublishTrimmed=false -o $payload
     if ($LASTEXITCODE -ne 0) { throw 'Self-contained native publish failed.' }
     $exe = Join-Path $payload 'LensDocsStudio.Native.exe'
     if (-not (Test-Path (Join-Path $payload 'coreclr.dll'))) { throw 'The package is missing its self-contained .NET runtime.' }

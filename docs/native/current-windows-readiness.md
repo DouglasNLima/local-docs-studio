@@ -1,5 +1,36 @@
 # Current native Windows readiness
 
+## Goal VIII-F reconciliation — 25 October 2026
+
+Accepted Goal IX is **MERGED** through
+[PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49) into develop
+509ce10819a07ca75c1d637e681eb8181f56fb0c, tree
+e8509717f34d3ba057200da52d09fb7c7045a0a9. Exact-source
+[native postmerge 40241304147](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40241304147)
+and [web postmerge 40241304149](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40241304149)
+passed (25/3 successful jobs; 2 historical skips/1 Pages skip).
+Its 24-family, 28-variant creation hub is accepted for controlled preview within
+the existing restrictions. This does not certify PR #48 or local acceptance.
+
+[Goal VIII-F](goal-viii-f-reconciliation.md) reconciles that develop into existing
+Draft PR #48 using a normal merge. Both the creation hub and FindText
+PreviewKeyDown correction are retained. Final exact-source gates are recorded in
+the post-commit PR receipt; they are not inferred from either parent.
+
+The operator reports closing the original synthetic window. Read-only observation
+found PID 19116 absent and no Lens processes. The interaction sequence was not
+recorded; original f05 stays **BLOCKED permanently**. A newly observed Start Menu
+shortcut differs from f05's host snapshot. The operator confirms an installation;
+read-only identity shows Goal IX preview .909. Local GUI testing is stopped pending
+acceptance of the changed host baseline; no restoration or input was attempted.
+
+**HOST PORTABLE / INTERNAL BETA: BLOCKED. HOST INSTALLER: NOT RUN.
+PUBLIC PRODUCTION: NO-GO.** Original HC failure at 2.542596:1 remains FAILED,
+with cause UNPROVED. Stale-owner acceptance and a new complete shell are NOT RUN.
+PR #38 and the unaccepted 250 ms objective remain paused.
+
+## Historical Goal VIII-E record
+
 PR #48's 25 October 2026 [Goal VIII-E handoff](goal-viii-e-owned-window-acceptance.md)
 records **HOST CLEANUP: BLOCKED pending manual operator action**. The exact f05
 process still owns an `Unsaved Mermaid draft` OK/Cancel confirmation. Read-only
@@ -13,6 +44,27 @@ seven groups, before the stale-owner mutation; the real stale-owner rejection an
 the fresh complete shell remain untested. **HOST PORTABLE and INTERNAL BETA remain
 BLOCKED; HOST INSTALLER is NOT RUN; PUBLIC PRODUCTION is NO-GO.** The dated
 integrated baseline below is historical and does not certify this continuation.
+
+## Historical Goal IX premerge execution update — 25 October 2026
+
+The rechecked accepted develop is `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`, tree
+`1fb777317ad6e5c8531eebcb565fefae4227e354`, after merged PR #47. Its
+[native push](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034236)
+and [web push](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034406)
+succeeded. This updates the integrated-source pin; the dated Goal VII record below
+remains historical at its own source.
+
+[Goal IX / Draft PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49)
+is a separate feature branch for the native 24-family Mermaid creation hub.
+[Its acceptance record](mermaid-creation-hub.md) retains failed attempts and the
+validation contract. Use the exact-head post-commit receipt in Draft PR #49 for
+the feature/internal-preview verdict; no intermediate run certifies a later head.
+PR #48 is separate and its
+High Contrast, original f05 and beta blockers remain blocked. PR #38 remains
+paused; no controlled performance experiment is resumed. Physical-host GUI is
+not run for Goal IX, and existing beta/production certification limits remain.
+
+## Historical Goal VII record
 
 Recorded 24 October 2026 for **Goal VII**, a review/internal-preview goal. This is
 the authoritative current-status entry point. Dated chapters in other native docs

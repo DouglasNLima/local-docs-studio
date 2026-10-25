@@ -125,3 +125,15 @@ The pinned [sequence parser](https://github.com/nullean/mermaider/blob/71b648455
 Separate activation commands before any matching message, after notes/blocks, with conflicting existing markers, or stacked on the same message cannot be represented by this adapter. They produce an explicit diagram error and preserve source. One command/actor per line is required. These are compatibility limits, not successful partial rendering. Broader sequence lifecycles, additional diagram families, dense layouts and destination-specific zoom/clipboard behaviour still require further acceptance work.
 
 Six focused native cases cover inherited/explicit text colours, class fills, mid-grey fallback and declared-background pixels. Evidence is `native-diagram-contrast.json` and `native-contrast-*.png` under `artifacts/native/diagram-contrast` or the complete validation directory. The complete local suite passes 766 core tests and 40 diagram/export cases after these corrections. Both native CI runs at a827668 pass 766 core tests and all 55 desktop/installed/reinstalled workflows; both browser runs pass all 262 cases. The preceding allocation correction at 54b1392 also passes both native and both browser CI runs.
+
+
+## Mermaid creation hub
+
+The native creation catalogue routes exactly 24 existing bounded editor families;
+it adds no Mermaid grammar or renderer support. Its selected samples pass the same
+family draft validators, canonical Mermaider renderer and sanitised native SVG
+pipeline. Flowchart retains its legacy empty starter and offers the existing simple
+process fixture. C4 offers Context, Container and Component as one family;
+TreeView offers indentation and box drawing with existing structural protection.
+Rendering arbitrary syntax does not grant visual editing permission. See the
+[creation hub evidence and limits](mermaid-creation-hub.md).

@@ -1,0 +1,62 @@
+<Window x:Class="LensDocsStudio.Native.MermaidDiagramPickerWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+ Title="Create Mermaid diagram" Width="1080" Height="720" MinWidth="760" MinHeight="540" WindowStartupLocation="CenterOwner" UseLayoutRounding="True" SnapsToDevicePixels="True"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" Icon="Resources/Brand/application.ico"
+ PreviewKeyDown="PickerKeyDown" AutomationProperties.AutomationId="MermaidDiagramPicker">
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Resources/FormStyles.xaml"/></ResourceDictionary.MergedDictionaries>
+  <Style TargetType="Button" BasedOn="{StaticResource Form.Action}">
+   <Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="1"/><Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/></Trigger></Style.Triggers>
+  </Style>
+ </ResourceDictionary></Window.Resources>
+ <Grid Margin="20">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <StackPanel Margin="0,0,0,12">
+   <TextBlock Text="Create Mermaid diagram" FontSize="22" FontWeight="SemiBold"/>
+   <TextBlock Text="24 diagram families. Choose a starting point, then create in its visual editor." TextWrapping="Wrap" Margin="0,5,0,0"/>
+  </StackPanel>
+  <Grid Grid.Row="1" Margin="0,0,0,12">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
+   <DockPanel><Label Content="_Search" Target="{Binding ElementName=Search}"/><TextBox x:Name="Search" TextChanged="FilterChanged" Padding="7" MaxLength="200"
+    AutomationProperties.Name="Search diagram families" AutomationProperties.AutomationId="MermaidPickerSearch" AutomationProperties.HelpText="Search names, descriptions and aliases. Arrow down moves to the family list."/></DockPanel>
+   <Button Grid.Column="1" Content="Clear" Click="ClearSearch" Margin="8,0" Padding="10,5" AutomationProperties.AutomationId="MermaidPickerClear" AutomationProperties.Name="Clear diagram search"/>
+   <ComboBox x:Name="Category" Grid.Column="2" SelectionChanged="FilterChanged" AutomationProperties.Name="Diagram category" AutomationProperties.AutomationId="MermaidPickerCategory"/>
+  </Grid>
+  <Grid Grid.Row="2">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="2*" MinWidth="225"/><ColumnDefinition Width="16"/><ColumnDefinition Width="3*" MinWidth="300"/></Grid.ColumnDefinitions>
+   <ListBox x:Name="Families" SelectionChanged="FamilyChanged" MouseDoubleClick="FamilyDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+    AutomationProperties.Name="Mermaid diagram families" AutomationProperties.AutomationId="MermaidPickerFamilies">
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}">
+     <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/><Setter Property="AutomationProperties.AutomationId" Value="{Binding Id}"/><Setter Property="AutomationProperties.HelpText" Value="{Binding Description}"/>
+    </Style></ListBox.ItemContainerStyle>
+    <ListBox.ItemTemplate><DataTemplate><DockPanel Margin="2,5">
+     <ui:CommandIcon Kind="Mermaid" DockPanel.Dock="Left" Margin="0,3,10,0" VerticalAlignment="Top"/>
+     <StackPanel><TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,3,0,0"/></StackPanel>
+    </DockPanel></DataTemplate></ListBox.ItemTemplate>
+   </ListBox>
+   <Grid Grid.Column="2">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <StackPanel><TextBlock x:Name="FamilyName" FontSize="20" FontWeight="SemiBold"/><TextBlock x:Name="Description" TextWrapping="Wrap" Margin="0,5,0,8"/></StackPanel>
+    <DockPanel Grid.Row="1" Margin="0,0,0,10"><Label Content="_Starting point" Target="{Binding ElementName=Variants}"/><ComboBox x:Name="Variants" DisplayMemberPath="Name" SelectionChanged="VariantChanged"
+     AutomationProperties.Name="Diagram starting point" AutomationProperties.AutomationId="MermaidPickerVariants"/></DockPanel>
+    <Border Grid.Row="2" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="10" MinHeight="70">
+     <Image x:Name="Sample" Stretch="Uniform" AutomationProperties.Name="Canonical native diagram example" AutomationProperties.AutomationId="MermaidPickerPreview"/>
+    </Border>
+    <TextBlock x:Name="VariantNote" Grid.Row="3" TextWrapping="Wrap" Margin="0,8"/>
+    <Expander x:Name="SourcePanel" Grid.Row="4" Header="Example source" AutomationProperties.Name="Example source" AutomationProperties.AutomationId="MermaidPickerSourcePanel">
+     <TextBox x:Name="SampleSource" IsReadOnly="True" MaxHeight="110" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" Padding="6"
+      AutomationProperties.Name="Exact Mermaid example source" AutomationProperties.AutomationId="MermaidPickerSource"/>
+    </Expander>
+   </Grid>
+  </Grid>
+  <StackPanel Grid.Row="3" Margin="0,10">
+   <TextBlock x:Name="ResultStatus" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="MermaidPickerStatus"/>
+   <TextBlock x:Name="TargetStatus" TextWrapping="Wrap" Margin="0,4,0,0"/>
+  </StackPanel>
+  <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+   <Button Content="Cancel" IsCancel="True" Padding="14,6" AutomationProperties.AutomationId="MermaidPickerCancel"/>
+   <Button Content="Insert as code" Click="InsertCode" Padding="14,6" Margin="8,0" AutomationProperties.AutomationId="MermaidPickerCode"/>
+   <Button x:Name="CreateButton" Content="Create visually" Click="Create" Padding="14,6" BorderBrush="{DynamicResource AccentBrush}" FontWeight="SemiBold" IsEnabled="False" AutomationProperties.AutomationId="MermaidPickerCreate"/>
+  </StackPanel>
+ </Grid>
+</Window>
