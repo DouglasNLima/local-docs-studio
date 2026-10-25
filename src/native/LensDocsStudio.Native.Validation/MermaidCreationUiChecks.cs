@@ -24,7 +24,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(Theme: dark ? "Dark" : "Light", AutomaticUpdateChecks: false)));
         var path = Path.Combine(root, "creation.md"); const string original = "# Mermaid creation Ω😀\r\n\r\nKeep selected text intact.\r\n";
         File.WriteAllText(path, original); var checks = new List<string>(); var phases = new List<object>();
-        Application? app = null; Window? main = null, picker = null, visual = null;
+        Application? app = null; Window? main = null, picker = null, visual = null; var standaloneLaunch = 1;
         try
         {
             if (highContrast) Check(NativeTestHighContrast.IsEnabledNow, "Actual OS High Contrast enabled on disposable Windows");
@@ -33,6 +33,7 @@ internal static partial class NativeUiChecks
             var timer = Stopwatch.StartNew(); app = Application.Launch(info);
             main = NativeExpansionLaunch.Prepare(app, automation, timer, path, output, 1, highContrast);
             var owner = Find(main, "MarkdownEditor");
+            PrepareTextProvider(owner);
 
             // Search, clear, categories and keyboard never author source. Cancellation restores the exact selected text.
             owner.Focus(); owner.Patterns.Text.Pattern.DocumentRange.FindText("selected text", false, false).Select();
@@ -57,6 +58,20 @@ internal static partial class NativeUiChecks
             Check(ReadEditorText(owner) == original && File.ReadAllText(path) == original, "Escape preserves owner and disk");
             Check(owner.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "selected text"), "Picker Cancel restores the original source selection");
 
+            // Real pointer focus transfer must keep the captured nonempty source selection.
+            Find(main, "MermaidCreation").Click(); picker = WaitWindow("MermaidDiagramPicker");
+            var selectedPie = MermaidDiagramCatalogue.Get(MermaidDiagramFamily.Pie);
+            Choose(selectedPie, selectedPie.Variants[0]); CreateVisual(selectedPie);
+            Wait(() => Find(visual!, "PieApply").IsEnabled, "Selection insertion draft did not validate.");
+            var selectedDraft = Draft(MermaidDiagramFamily.Pie);
+            Find(visual!, "PieApply").AsButton().Invoke(); WaitGone("PieVisualEditor"); visual = null;
+            var selectedEnd = original.IndexOf("selected text", StringComparison.Ordinal) + "selected text".Length;
+            var afterSelection = original.Insert(selectedEnd, MermaidCreationTarget.FormatInsertion(selectedDraft, original, new(selectedEnd, 0)));
+            Wait(() => ReadEditorText(owner) == afterSelection, "Toolbar pointer lost the captured selection or replaced selected text.");
+            Check(File.ReadAllText(path) == original, "Insertion after selection does not save");
+            FocusWindow(main); owner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => ReadEditorText(owner) == original, "Selection-preserving insertion was not one Undo.");
+
             foreach (var definition in MermaidDiagramCatalogue.All)
             foreach (var variant in definition.Variants)
             {
@@ -72,7 +87,7 @@ internal static partial class NativeUiChecks
                     if (width == 1280 || definition.Family == MermaidDiagramFamily.Flowchart)
                         Capture(picker, definition.Id + "-" + variant.Id + "-" + width + "x" + height);
                 }
-                CreateVisual(definition); var prefix = Prefix(definition.Family);
+                CreateVisual(definition, keyboard: true); var prefix = Prefix(definition.Family);
                 var expectedStarter = variant.Source.ReplaceLineEndings("\r\n");
                 Check(Draft(definition.Family) == expectedStarter, definition.Name + "/" + variant.Id + " opens the exact source in the correct existing editor");
                 Check(ReadEditorText(owner) == original, "Create opens a private draft only");
@@ -128,6 +143,42 @@ internal static partial class NativeUiChecks
             Wait(() => (raw = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("Formatmermaid")))) is not null, "Legacy Formatmermaid action missing.");
             raw!.AsMenuItem().Invoke(); Wait(() => ReadEditorText(owner).Contains("```mermaid", StringComparison.Ordinal), "Legacy raw code insertion changed.");
             Check(true, "Formatmermaid remains an accessible source insertion command");
+
+            var pie = MermaidDiagramCatalogue.Get(MermaidDiagramFamily.Pie); var pieSource = pie.Variants[0].Source;
+            foreach (var extension in new[] { ".mmd", ".mermaid" })
+            {
+                var fixture = Path.Combine(root, "standalone" + extension); File.WriteAllText(fixture, "");
+                LaunchStandalone(fixture); owner = Find(main!, "MarkdownEditor");
+                OpenPicker(); Choose(pie, pie.Variants[0], ""); CreateVisual(pie);
+                Wait(() => Find(visual!, "PieApply").IsEnabled, "Standalone Pie did not validate.");
+                Find(visual!, "PieApply").AsButton().Invoke(); WaitGone("PieVisualEditor"); visual = null;
+                Wait(() => ReadEditorText(owner) == pieSource, "Standalone Apply inserted fences or changed source.");
+                Check(File.ReadAllText(fixture) == "", "Standalone Apply does not save " + extension);
+                FocusWindow(main!); owner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(owner) == "", "Standalone Apply is not one Undo.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+                Wait(() => ReadEditorText(owner) == pieSource, "Standalone Redo differs.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+                Wait(() => ReadObservedText(fixture) == pieSource, "Standalone Save differs.");
+                LaunchStandalone(fixture); owner = Find(main!, "MarkdownEditor");
+                Check(ReadEditorText(owner) == pieSource, "Saved standalone reopens exactly " + extension);
+                Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertC4").AsMenuItem().Invoke();
+                visual = WaitWindow("PieVisualEditor");
+                Check(Draft(MermaidDiagramFamily.Pie) == pieSource, "Choosing C4 cannot replace a nonempty standalone Pie");
+                Wait(() => Find(visual!, "PieApply").IsEnabled, "Existing standalone did not validate.");
+                FocusWindow(main!); owner.Patterns.Value.Pattern.SetValue("external standalone source\n"); FocusWindow(visual!);
+                Find(visual!, "PieApply").AsButton().Invoke();
+                Wait(() => Find(visual!, "PieStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Captured stale standalone owner was not rejected.");
+                Check(Draft(MermaidDiagramFamily.Pie) == pieSource && ReadEditorText(owner) == "external standalone source\n" && File.ReadAllText(fixture) == pieSource,
+                    "Stale-owner rejection retains private draft, external source and saved bytes");
+                Find(visual!, "PieCancel").AsButton().Invoke(); WaitGone("PieVisualEditor"); visual = null;
+                Find(main!, "MermaidCreation").AsButton().Invoke();
+                Wait(() => Find(main!, "Status").Name.Contains("source-only", StringComparison.Ordinal), "Unsupported standalone did not offer source inspection.");
+                Check(WindowNow("MermaidDiagramPicker") is null && ReadEditorText(owner) == "external standalone source\n", "Unsupported standalone is never replaced by a starter");
+                owner.Patterns.Value.Pattern.SetValue(""); OpenPicker(); Find(picker!, "MermaidPickerCode").AsButton().Invoke(); WaitGone("MermaidDiagramPicker"); picker = null;
+                Wait(() => ReadEditorText(owner) == "flowchart TD\n", "Standalone source alternative must stay raw Mermaid.");
+                Check(true, "Standalone source alternative retains raw format " + extension);
+            }
             Receipt("PASS", null); display.Complete(); return 0;
         }
         catch (Exception error)
@@ -141,20 +192,41 @@ internal static partial class NativeUiChecks
         Window WaitWindow(string id) { Window? result = null; Wait(() => (result = WindowNow(id)) is not null, "Missing owned window " + id); return result!; }
         void WaitGone(string id) => Wait(() => WindowNow(id) is null, "Window did not close: " + id);
         void OpenPicker() { Find(main!, "MermaidCreation").AsButton().Invoke(); picker = WaitWindow("MermaidDiagramPicker"); }
-        void Choose(MermaidDiagramDefinition definition, MermaidStarterVariant variant)
+        void PrepareTextProvider(AutomationElement editor)
+        {
+            // Pinned AvalonEdit's parent peer uses FromElement(TextArea), not CreatePeerForElement.
+            // Observing its actual descendants materialises the child provider before querying Text.
+            // Keep the real parent TextPattern and the existing action deadline; never infer selection.
+            _ = editor.FindAllDescendants();
+            Wait(() => editor.Patterns.Text.IsSupported, "The observed source editor has no TextPattern provider.");
+            Check(editor.Patterns.Text.Pattern.DocumentRange.GetText(-1) == ReadEditorText(editor), "Observed text provider belongs to the exact source editor");
+        }
+        void Choose(MermaidDiagramDefinition definition, MermaidStarterVariant variant, string expectedOwner = original)
         {
             Find(picker!, "MermaidPickerSearch").AsTextBox().Text = definition.Name;
             var list = Find(picker!, "MermaidPickerFamilies").AsListBox();
             Wait(() => list.Items.Any(item => item.Name == definition.Name), "Searched family missing."); list.Select(definition.Name);
             Find(picker!, "MermaidPickerVariants").AsComboBox().Select(variant.Name);
             Wait(() => Find(picker!, "MermaidPickerCreate").IsEnabled, "Selected example unavailable: " + Find(picker!, "MermaidPickerStatus").Name);
-            Check(ReadEditorText(Find(main!, "MarkdownEditor")) == original, "Browsing does not change source");
+            Check(ReadEditorText(Find(main!, "MarkdownEditor")) == expectedOwner, "Browsing does not change source");
         }
-        void CreateVisual(MermaidDiagramDefinition definition)
+        void CreateVisual(MermaidDiagramDefinition definition, bool keyboard = false)
         {
-            Find(picker!, "MermaidPickerCreate").AsButton().Invoke(); WaitGone("MermaidDiagramPicker"); picker = null;
+            if (keyboard) { FocusWindow(picker!); Find(picker!, "MermaidPickerFamilies").AsListBox().SelectedItem!.Focus(); Keyboard.Type(VirtualKeyShort.RETURN); }
+            else Find(picker!, "MermaidPickerCreate").AsButton().Invoke();
+            WaitGone("MermaidDiagramPicker"); picker = null;
             visual = WaitWindow(Prefix(definition.Family) + "VisualEditor");
             Check(WindowNow("MermaidDiagramPicker") is null, "Exactly one editor replaces the picker");
+        }
+        void LaunchStandalone(string fixture)
+        {
+            if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); }
+            var localState = Path.Combine(root, "standalone-state-" + ++standaloneLaunch); Directory.CreateDirectory(localState);
+            File.WriteAllText(Path.Combine(localState, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(Theme: dark ? "Dark" : "Light", AutomaticUpdateChecks: false)));
+            var start = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
+            foreach (var argument in new[] { "--state-directory", localState, root, fixture }) start.ArgumentList.Add(argument);
+            var timer = Stopwatch.StartNew(); app = Application.Launch(start);
+            main = NativeExpansionLaunch.Prepare(app, automation, timer, fixture, output, standaloneLaunch, highContrast); picker = visual = null;
         }
         string Draft(MermaidDiagramFamily family)
         {

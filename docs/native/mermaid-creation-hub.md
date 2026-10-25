@@ -41,30 +41,30 @@ increase the family count.
 
 | Family ID | Category | Starting points | Existing native editor |
 | --- | --- | --- | --- |
-| `flowchart` — Flowchart | Flows and systems | Empty canvas; Simple process | `MermaidVisualEditorWindow` |
-| `sequence` — Sequence | Flows and systems | Standard | `SequenceVisualEditorWindow` |
-| `state` — State | Flows and systems | Standard | `StateVisualEditorWindow` |
-| `er` — Entity relationship | Flows and systems | Standard | `ErVisualEditorWindow` |
-| `class` — Class | Flows and systems | Standard | `ClassVisualEditorWindow` |
-| `architecture` — Architecture | Flows and systems | Standard | `ArchitectureVisualEditorWindow` |
-| `c4` — C4 | Flows and systems | Context; Container; Component | `C4VisualEditorWindow` |
-| `block` — Block | Flows and systems | Standard | `BlockVisualEditorWindow` |
-| `pie` — Pie | Data and visualisation | Standard | `PieVisualEditorWindow` |
-| `xy` — XY Chart | Data and visualisation | Standard | `XyVisualEditorWindow` |
-| `radar` — Radar | Data and visualisation | Standard | `RadarVisualEditorWindow` |
-| `sankey` — Sankey | Data and visualisation | Standard | `SankeyVisualEditorWindow` |
-| `quadrant` — Quadrant | Data and visualisation | Standard | `QuadrantVisualEditorWindow` |
-| `treemap` — Treemap | Data and visualisation | Standard | `TreemapVisualEditorWindow` |
-| `venn` — Venn | Data and visualisation | Standard | `VennVisualEditorWindow` |
-| `gantt` — Gantt | Planning and work | Standard | `GanttVisualEditorWindow` |
-| `timeline` — Timeline | Planning and work | Standard | `TimelineVisualEditorWindow` |
-| `journey` — Journey | Planning and work | Standard | `JourneyVisualEditorWindow` |
-| `kanban` — Kanban | Planning and work | Standard | `KanbanVisualEditorWindow` |
-| `requirement` — Requirement | Planning and work | Standard | `RequirementVisualEditorWindow` |
-| `gitgraph` — GitGraph | Planning and work | Standard | `GitGraphVisualEditorWindow` |
-| `mindmap` — Mindmap | Structures and technical | Standard | `MindmapVisualEditorWindow` |
-| `treeview` — TreeView | Structures and technical | Indentation; Box drawing | `TreeViewVisualEditorWindow` |
-| `packet` — Packet | Structures and technical | Standard | `PacketVisualEditorWindow` |
+| `flowchart` â€” Flowchart | Flows and systems | Empty canvas; Simple process | `MermaidVisualEditorWindow` |
+| `sequence` â€” Sequence | Flows and systems | Standard | `SequenceVisualEditorWindow` |
+| `state` â€” State | Flows and systems | Standard | `StateVisualEditorWindow` |
+| `er` â€” Entity relationship | Flows and systems | Standard | `ErVisualEditorWindow` |
+| `class` â€” Class | Flows and systems | Standard | `ClassVisualEditorWindow` |
+| `architecture` â€” Architecture | Flows and systems | Standard | `ArchitectureVisualEditorWindow` |
+| `c4` â€” C4 | Flows and systems | Context; Container; Component | `C4VisualEditorWindow` |
+| `block` â€” Block | Flows and systems | Standard | `BlockVisualEditorWindow` |
+| `pie` â€” Pie | Data and visualisation | Standard | `PieVisualEditorWindow` |
+| `xy` â€” XY Chart | Data and visualisation | Standard | `XyVisualEditorWindow` |
+| `radar` â€” Radar | Data and visualisation | Standard | `RadarVisualEditorWindow` |
+| `sankey` â€” Sankey | Data and visualisation | Standard | `SankeyVisualEditorWindow` |
+| `quadrant` â€” Quadrant | Data and visualisation | Standard | `QuadrantVisualEditorWindow` |
+| `treemap` â€” Treemap | Data and visualisation | Standard | `TreemapVisualEditorWindow` |
+| `venn` â€” Venn | Data and visualisation | Standard | `VennVisualEditorWindow` |
+| `gantt` â€” Gantt | Planning and work | Standard | `GanttVisualEditorWindow` |
+| `timeline` â€” Timeline | Planning and work | Standard | `TimelineVisualEditorWindow` |
+| `journey` â€” Journey | Planning and work | Standard | `JourneyVisualEditorWindow` |
+| `kanban` â€” Kanban | Planning and work | Standard | `KanbanVisualEditorWindow` |
+| `requirement` â€” Requirement | Planning and work | Standard | `RequirementVisualEditorWindow` |
+| `gitgraph` â€” GitGraph | Planning and work | Standard | `GitGraphVisualEditorWindow` |
+| `mindmap` â€” Mindmap | Structures and technical | Standard | `MindmapVisualEditorWindow` |
+| `treeview` â€” TreeView | Structures and technical | Indentation; Box drawing | `TreeViewVisualEditorWindow` |
+| `packet` â€” Packet | Structures and technical | Standard | `PacketVisualEditorWindow` |
 
 
 ## Manual acceptance checklist
@@ -75,7 +75,7 @@ not establish physical screen-reader, alternate-DPI or personal-host acceptance.
 - Open Markdown and invoke Mermaid from mouse and keyboard. Search, clear, filter
   categories and select each family. Confirm the correct preview, full name,
   variant note and existing editor; inspect light, dark and actual High Contrast.
-- At 880×600 and 1280×800, check readable disabled/selected/focused states, list
+- At 880Ã—600 and 1280Ã—800, check readable disabled/selected/focused states, list
   scrolling, source expansion and the visible footer. Tab/Shift+Tab must remain
   usable. Enter in search must not create; Enter in the family list must create
   only once. Escape and Cancel must restore source selection and scroll.
@@ -108,3 +108,50 @@ not the accepted base or a final CI source.
 At this stage, hosted UIA, screenshots, installed phases, exact-head CI and package
 inspection remain pending. Final receipt must supersede these pending statuses
 with source-labelled evidence, without rewriting historical failed outcomes.
+
+## First hosted attempt â€” retained failures
+
+Draft [PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49) first tested
+`f68e1283a5fd06d25daff007692be5972bfc1c97` (tree
+`9b1bfbcf56c0ae5232799a8a97397f5c174f1d1c`, parent the accepted develop pin above).
+These outcomes remain failed even if a later source passes:
+
+- Native push [40227968212](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227968212)
+  and PR [40227995599](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227995599),
+  attempt 1: the 176-case corpus/export gate reported one Help assertion failure.
+  The new Help topic correctly made 22 topics; `NativeHelpChecks` still required
+  21 after clearing search. The correction requires exactly 22, retaining every
+  topic check. Dependent installer jobs were skipped, not passed.
+- Picker push [40227968305](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227968305)
+  and PR [40227995584](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227995584),
+  attempt 1: light, dark and actual OS High Contrast all failed before opening the
+  picker. The test queried the parent's TextPattern before observing its child.
+  The pinned [AvalonEdit peer implementation](https://github.com/icsharpcode/AvalonEdit/blob/862415d51eddc9eac93f462dbc522ffbf929cd52/ICSharpCode.AvalonEdit/TextEditorAutomationPeer.cs#L72)
+  returns an already-created TextArea peer. The new test observes descendants,
+  then requires that same parent TextPattern and exact document text within the
+  unchanged 20-second deadline. This is a harness precondition correction,
+  awaiting independent hosted confirmation, not a product accessibility verdict.
+  The original light screenshot was inspected: the normal owner was visible;
+  there was no picker capture to certify.
+- Web push [40227968211](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227968211),
+  attempt 1: Chromium passed; Edge reported 134 passes and one failure while the
+  existing page-ready assertion expected `.topbar` display `flex` but observed
+  `block`. No web source or threshold was changed. Cause remains unproved;
+  a green PR event does not replace this failed push event.
+- Desktop UX PR [40227995586](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227995586),
+  attempt 1: 13 jobs passed, the historical comparison was skipped, and the
+  baseline failed at the unchanged `FormatBold` selection/Undo regression.
+  Inspection of the actual 860Ã—540 screenshot showed the new pinned Mermaid
+  action displacing Bold into overflow. Bold now shares the visible priority;
+  the existing UIA action and assertions are unchanged. The independent full
+  baseline must confirm this correction. This failure was not the separate
+  PR #48 High Contrast/Find failure.
+
+The expanded-editor push [40227968230](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40227968230)
+completed all 38 original appearances successfully on this first source. Its
+success does not replace the failed picker or desktop baseline gates.
+
+Original logs and downloaded ZIPs are retained in the isolated ignored evidence
+root by full source SHA and run ID. Downloaded artifact SHA-256 values matched
+GitHub metadata. No failed artifacts or original fixtures were replaced. This
+record does not change PR #48's separate High Contrast, f05 or beta decisions.

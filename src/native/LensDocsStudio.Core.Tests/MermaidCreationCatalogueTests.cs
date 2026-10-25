@@ -13,6 +13,23 @@ public sealed class MermaidCreationCatalogueTests
         foreach (var phrase in new[] { "24 families", "after any selected text", "Cancel", "Save", "Redo", "C4", "box drawing", "source-only", "read-only", "Insert Mermaid as code" })
             Assert.Contains(phrase, topic.Source, StringComparison.Ordinal);
     }
+    [Theory]
+    [InlineData("C4Deployment\n")]
+    [InlineData("flowchart TD\n%%{init: {}}%%\nA --> B\n")]
+    [InlineData("unknownDiagram\n")]
+    public async Task Protected_or_unknown_source_cannot_gain_permission_from_rendering(string source)
+    {
+        var result = await MermaidDiagramCatalogue.InspectAsync(source, new());
+        Assert.NotNull(result.Error);
+    }
+    [Fact]
+    public async Task Existing_source_is_bounded_before_inspecting_any_family()
+    {
+        var characters = await MermaidDiagramCatalogue.InspectAsync("flowchart TD\n" + new string(' ', 100_000), new());
+        var lines = await MermaidDiagramCatalogue.InspectAsync("flowchart TD\n" + string.Concat(Enumerable.Repeat("%% comment\n", 1501)), new());
+        Assert.Null(characters.Definition); Assert.NotNull(characters.Error);
+        Assert.Null(lines.Definition); Assert.NotNull(lines.Error);
+    }
     public static IEnumerable<object[]> Starters => MermaidDiagramCatalogue.All.SelectMany(family => family.Variants.Select(variant => new object[] { family.Family, variant.Id }));
 
     [Fact]

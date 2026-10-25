@@ -12,7 +12,7 @@ public partial class MainWindow
 {
     private MermaidCreationCoordinator? capturedMermaidTarget;
     private long mermaidOwnerGeneration;
-    private bool openingMermaid;
+    private bool openingMermaid, inspectingMermaidActions;
 
     private MermaidCreationCoordinator? CaptureMermaidTarget()
     {
@@ -30,6 +30,7 @@ public partial class MainWindow
 
     private async void OpenMermaidActions(object sender, RoutedEventArgs e)
     {
+        if (openingMermaid || inspectingMermaidActions) return;
         if (sender is not Button button || button.ContextMenu is not { } menu) return;
         capturedMermaidTarget ??= CaptureMermaidTarget();
         var context = capturedMermaidTarget;
@@ -37,17 +38,20 @@ public partial class MainWindow
         edit.IsEnabled = false;
         menu.PlacementTarget = button; menu.Placement = PlacementMode.Bottom; menu.IsOpen = true;
         if (context is null) return;
+        inspectingMermaidActions = true;
         try
         {
             var target = await context.ResolveAsync();
-            if (target.Route == MermaidCreationRoute.ExistingDiagram && target.Block is { } block
-                && MermaidDiagramCatalogue.Recognise(block.Source) is { } definition
-                && await definition.ValidateAsync(block.Source, diagrams, CancellationToken.None) is null
-                && context.CurrentProblem(model.ActiveDocument, Editor.Document, Editor.IsReadOnly, model.Documents.Contains(context.Owner)) is null)
-                edit.IsEnabled = true;
+            if (target.Route == MermaidCreationRoute.ExistingDiagram && target.Block is { } block)
+            {
+                var inspection = await MermaidDiagramCatalogue.InspectAsync(block.Source, diagrams);
+                edit.IsEnabled = inspection.Definition is not null && inspection.Error is null
+                    && context.CurrentProblem(model.ActiveDocument, Editor.Document, Editor.IsReadOnly, model.Documents.Contains(context.Owner)) is null;
+            }
         }
         catch (Exception error) when (error is ArgumentException or System.Text.RegularExpressions.RegexMatchTimeoutException)
         { model.Status = "This occurrence remains source-only. " + error.Message; }
+        finally { inspectingMermaidActions = false; }
     }
 
     private async void StartMermaidCreation(MermaidDiagramFamily? requestedFamily = null, bool newOnly = false, bool editOnly = false)
@@ -83,11 +87,9 @@ public partial class MainWindow
             if (target.Route == MermaidCreationRoute.ExistingDiagram && target.Block is { } block)
             {
                 if (newOnly && !context.Standalone) { SourceFallback("Choose a position outside the existing Mermaid fence to create another diagram. Its source is unchanged."); return; }
-                var definition = MermaidDiagramCatalogue.Recognise(block.Source);
-                if (definition is null) { SourceFallback("This Mermaid family or header variant is source-only. Edit its existing source; no starter was inserted."); return; }
-                var validation = await definition.ValidateAsync(block.Source, diagrams, CancellationToken.None);
+                var (definition, validation) = await MermaidDiagramCatalogue.InspectAsync(block.Source, diagrams);
                 if (Problem() is { } stale) { model.Status = stale; return; }
-                if (validation is not null) { SourceFallback("Visual editing is protected for this source. " + validation); return; }
+                if (definition is null || validation is not null) { SourceFallback("Visual editing is protected for this source. " + validation); return; }
                 OpenVisualDraft(context.Owner, context.CreateSession(target), block.Source, RestoreSourceFocus, Problem, RestoreSourceFocus);
                 return;
             }

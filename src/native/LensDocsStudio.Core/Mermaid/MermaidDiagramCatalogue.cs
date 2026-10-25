@@ -131,6 +131,16 @@ public static class MermaidDiagramCatalogue
 
     public static MermaidDiagramDefinition Get(MermaidDiagramFamily family) => All.Single(item => item.Family == family);
     public static MermaidDiagramDefinition? Recognise(string source) => All.SingleOrDefault(item => item.Recognises(source));
+    public static Task<(MermaidDiagramDefinition? Definition, string? Error)> InspectAsync(string source, DiagramService diagrams, CancellationToken token = default) => Task.Run(async () =>
+    {
+        token.ThrowIfCancellationRequested();
+        if (source.Length > 100_000 || source.Count(character => character == '\n') + (source.EndsWith('\n') ? 0 : 1) > 1500)
+            return ((MermaidDiagramDefinition?)null, (string?)"This diagram exceeds the bounded visual source budget. Use Edit source.");
+        var definition = Recognise(source);
+        if (definition is null) return (definition, (string?)"This Mermaid family or header variant is source-only. Edit its existing source; no starter was inserted.");
+        var error = await definition.ValidateAsync(source, diagrams, token);
+        token.ThrowIfCancellationRequested(); return ((MermaidDiagramDefinition?)definition, error);
+    }, token);
     public static IReadOnlyList<MermaidDiagramDefinition> Search(string? query, string? category = null)
     {
         var words = (query ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);

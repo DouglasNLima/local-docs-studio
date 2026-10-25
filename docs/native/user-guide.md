@@ -10,7 +10,7 @@ separates implementation, actual Windows acceptance and manual prerequisites.
 
 Use **Mermaid diagram** on the source toolbar to create a diagram or edit the
 supported Mermaid body at the caret. The adjacent **Mermaid diagram actions**
-menu includes **New visual Mermaid diagram…**, **Edit current diagram visually**,
+menu includes **New visual Mermaid diagramâ€¦**, **Edit current diagram visually**,
 **Edit source** and **Insert Mermaid as code**. The original Insert visual commands
 and Edit/Insert source commands remain available. Command Palette also offers
 **Mermaid diagram** and **New visual Mermaid diagram**.
