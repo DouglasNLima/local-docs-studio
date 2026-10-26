@@ -4246,5 +4246,2435 @@
       "pr38State": "OPEN/DRAFT/PAUSED/UNMERGED",
       "status": "PASS"
     }
+  },
+  "goalXB": {
+    "observedAtUtc": "2026-10-26T19:19:27.044292+00:00",
+    "scope": "Goal X-B documentation-only failure attribution; all original top-level fields remain the original Goal X snapshot",
+    "initialPr50": {
+      "commit": "24616837b5289299466cf64e37952d61bc95df6b",
+      "tree": "b8d56f4c53a52c974d6a78cfd5f79d099ff87d3f",
+      "parents": [
+        "0df86ad2bdae005d49be68096c2f784b49de8109"
+      ],
+      "branch": "assessment/pr38-continuous-feasibility-2026-10",
+      "state": "OPEN/DRAFT",
+      "originalBody": "PR #38's historical layout milestone does not establish responsive Continuous preview or a safe integration into current develop. This documentation-only assessment recommends **ARCHIVE / HOLD**: preserve #38 OPEN/DRAFT/PAUSED and do not fund a migration or another broad implementation round now.\n\nThe study reconciles merged #36/#37 and accepted #48/#49, inventories all 341 historical paths, audits the two distinct acceptance contracts and compares three investment options. It independently matches 292 measurement rows to retained originals and verifies 4,136 archived members; 864 omitted members remain explicitly uninspected. The original stock **250 ms objective is INCOMPLETE** and strict v2 **Input remains FAIL**, including 148.88 ms paragraph selection, 228.87/192.51 ms appearance and 454.69/6,190.40 ms media Save/Cancel.\n\n### Review material\n\n- [Decision report](https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/docs/native/continuous-architecture-feasibility-2026-10.md)\n- [Audit and reproduction notes](https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/docs/native/evidence/continuous-feasibility-2026-10/README.md)\n- [Non-executable evidence/decision manifest](https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/docs/native/evidence/continuous-feasibility-2026-10/evidence-index.json)\n\n### Immutable delivery receipt\n\n| Role | Commit | Tree |\n|---|---|---|\n| Report | `24616837b5289299466cf64e37952d61bc95df6b` | `b8d56f4c53a52c974d6a78cfd5f79d099ff87d3f` |\n| Accepted develop / sole parent | `0df86ad2bdae005d49be68096c2f784b49de8109` | `05d534030761a7b68a8579bb33e4dfb50161ce90` |\n| Untouched experimental #38 | `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb` | `6da0d065d4c76dab2102ef9411761890c2da2441` |\n\nExactly three new documentation/JSON files; no product, script, workflow, dependency, test, gate or historical evidence changes. Live recheck at 2026-10-26T18:13:18Z still matched these pins and confirmed the report PR's exact head and three-file scope. #38 remains open, draft and unmerged; #36/#37/#48/#49 remain merged.\n\n### Validation\n\n- PASS: local `npm run test:static`, structured arithmetic/JSON and relative-link checks, all 48 reference definitions/source anchors, three-file staged scope and `git diff --check`.\n- URLs: 40 direct HTTP 200; eight initial HTTP 504 responses verified via connected GitHub reads (seven immutable blobs and one run/jobs). No unseen archive download is claimed.\n- Exact-head hosted validation is **PENDING at 2026-10-26T18:13:18Z**: [Native 40375067926](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926) and [Web 40375076102](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102), both attempt 1, `workflow_dispatch`, head `24616837b5289299466cf64e37952d61bc95df6b`. Neither has a final conclusion. Native job `121755784939` and Edge/Chromium jobs `121755806290`/`121755806585` remain in progress; the original .853 replay job `121755787598` is actually SKIPPED. Downstream jobs, including the Pages deployment condition, are not yet reported as completed/skipped. No full-suite success is claimed.\n- `[skip ci]` prevents broad automatic PR workflows from restarting the paused controlled-performance study. Unchanged `native.yml` and `pages.yml` are explicitly dispatched at this exact head. No failed required check is waived, renamed or rerun to green; other suites and fresh performance diagnostics are NOT RUN.\n- No Pages deployment on this assessment branch. Existing hosted validation may exercise unchanged disposable test-certificate/package lifecycle checks; no product release or production signing.\n\n### Decision boundaries\n\n**250 ms: INCOMPLETE. Strict v2 Input: FAIL. Integration into normal shipping product: NO-GO.** Current accepted stock correctness and prior tested-host portable acceptance remain separate facts; beta/public production approval is not granted.\n\nNo merge, Ready transition, experiment integration, PR38 source/base/title/status change, release/tag/updater, production signing or personal-host GUI/installation mutation. A future paragraph-selection attribution control is described only as an optional reopening proof if owner priorities change; it is not started or funded here.\n\nThe decision study is published; hosted CI remains pending as explicitly permitted by the Goal X brief. This is not a final green CI receipt or permission to merge. The optional cross-link comment on #38 is deferred while hosted validation remains pending; #38 has not been edited.\n\n\n",
+      "originalBodyFileSha256": "635b434560529c464b8d3c8203bb65d964047d174c734a3a7d6a3a524574f64a",
+      "commentsObserved": 0
+    },
+    "develop": {
+      "sha": "0df86ad2bdae005d49be68096c2f784b49de8109",
+      "tree": "05d534030761a7b68a8579bb33e4dfb50161ce90"
+    },
+    "pr38": {
+      "commit": "31fa3ad12f3e0c87f5e45cea6f97801af53b67cb",
+      "tree": "6da0d065d4c76dab2102ef9411761890c2da2441",
+      "state": "OPEN/DRAFT/PAUSED",
+      "mutated": false
+    },
+    "changedFiles": [
+      {
+        "path": "docs/native/continuous-architecture-feasibility-2026-10.md",
+        "reason": "Append failure attribution, causal matrix and report acceptance closure; preserve architecture recommendation"
+      },
+      {
+        "path": "docs/native/evidence/continuous-feasibility-2026-10/README.md",
+        "reason": "Append exact archive reproduction, offline method and evidence limitations"
+      },
+      {
+        "path": "docs/native/evidence/continuous-feasibility-2026-10/evidence-index.json",
+        "reason": "Append original receipts, complete job/step outcomes, source/member hashes, diagnostic and decision records"
+      }
+    ],
+    "nonDocumentationDelta": [],
+    "nativeOriginal": {
+      "run": 40375067926,
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "commit": "24616837b5289299466cf64e37952d61bc95df6b",
+      "tree": "b8d56f4c53a52c974d6a78cfd5f79d099ff87d3f",
+      "conclusion": "failure",
+      "jobCount": 7,
+      "failedJobs": 1,
+      "skippedJobs": 6,
+      "checkoutProofLogLines": [
+        39,
+        117
+      ],
+      "jobLogSha256": "abe7c6f54a09109b9f4bfa455e21d158681b0cd35d30f32ad86c55994a54c47d",
+      "jobLogLines": 740,
+      "invocation": "dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui",
+      "invocationLogLines": [
+        572,
+        573
+      ],
+      "firstTerminatingError": "System.InvalidOperationException: The workspace reopen dialogue did not appear.",
+      "errorLogLines": [
+        586,
+        587,
+        588,
+        589,
+        590,
+        591
+      ],
+      "failureStepNumber": 32,
+      "failureStep": "Validate native desktop workflows",
+      "jobs": [
+        {
+          "id": 121755784939,
+          "name": "native",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121755784939",
+          "classification": "Mandatory native UI failure; later steps 33-37 skipped",
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:29Z",
+              "completed_at": "2026-10-26T18:08:32Z"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:32Z",
+              "completed_at": "2026-10-26T18:08:41Z"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-dotnet@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:41Z",
+              "completed_at": "2026-10-26T18:09:22Z"
+            },
+            {
+              "number": 4,
+              "name": "Restore pinned native dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:09:22Z",
+              "completed_at": "2026-10-26T18:10:02Z"
+            },
+            {
+              "number": 5,
+              "name": "Assert all previous source fixtures remain unchanged",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:10:02Z",
+              "completed_at": "2026-10-26T18:10:06Z"
+            },
+            {
+              "number": 6,
+              "name": "Check the 24-family UX audit and explicit certification boundaries",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:10:06Z",
+              "completed_at": "2026-10-26T18:10:07Z"
+            },
+            {
+              "number": 7,
+              "name": "Reject unsafe development-host paths identities defaults and certification claims",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:10:07Z",
+              "completed_at": "2026-10-26T18:10:14Z"
+            },
+            {
+              "number": 8,
+              "name": "Build native solution",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:10:14Z",
+              "completed_at": "2026-10-26T18:10:57Z"
+            },
+            {
+              "number": 9,
+              "name": "Check native dynamic theme resources and independent owners",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:10:57Z",
+              "completed_at": "2026-10-26T18:10:59Z"
+            },
+            {
+              "number": 10,
+              "name": "Test document safety and parsing",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:10:59Z",
+              "completed_at": "2026-10-26T18:11:12Z"
+            },
+            {
+              "number": 11,
+              "name": "Verify compiled Find keyboard routing without OS input",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:11:12Z",
+              "completed_at": "2026-10-26T18:11:15Z"
+            },
+            {
+              "number": 12,
+              "name": "Prove host Mermaid fixture parser boundary and native fallback",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:11:15Z",
+              "completed_at": "2026-10-26T18:11:16Z"
+            },
+            {
+              "number": 13,
+              "name": "Reject unsafe nonmodal owner mutations before any input",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:11:16Z",
+              "completed_at": "2026-10-26T18:11:18Z"
+            },
+            {
+              "number": 14,
+              "name": "Validate pluggable signing policy",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:11:18Z",
+              "completed_at": "2026-10-26T18:11:21Z"
+            },
+            {
+              "number": 15,
+              "name": "Validate Windows signature trust with a disposable certificate",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:11:21Z",
+              "completed_at": "2026-10-26T18:11:25Z"
+            },
+            {
+              "number": 16,
+              "name": "Validate native diagram corpus",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:11:25Z",
+              "completed_at": "2026-10-26T18:12:30Z"
+            },
+            {
+              "number": 17,
+              "name": "Verify Quadrant canonical coordinates and ordinary document exports",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:12:30Z",
+              "completed_at": "2026-10-26T18:12:33Z"
+            },
+            {
+              "number": 18,
+              "name": "Prove pinned XY Radar Sankey compatibility through ordinary preview and exports",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:12:33Z",
+              "completed_at": "2026-10-26T18:12:38Z"
+            },
+            {
+              "number": 19,
+              "name": "Verify chart canonical editor fidelity and atomic owner sessions",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:12:38Z",
+              "completed_at": "2026-10-26T18:12:41Z"
+            },
+            {
+              "number": 20,
+              "name": "Prove pinned workflow preview exports and canonical editor correspondence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:12:41Z",
+              "completed_at": "2026-10-26T18:12:49Z"
+            },
+            {
+              "number": 21,
+              "name": "Verify source editor canonical pixels geometry and owner sessions",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:12:49Z",
+              "completed_at": "2026-10-26T18:12:52Z"
+            },
+            {
+              "number": 22,
+              "name": "Prove topology preview exports canonical pixels geometry and exact owner sessions",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:12:52Z",
+              "completed_at": "2026-10-26T18:13:15Z"
+            },
+            {
+              "number": 23,
+              "name": "Prove Expansion VI ordinary exports and complete native editor fidelity independently",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:13:15Z",
+              "completed_at": "2026-10-26T18:13:27Z"
+            },
+            {
+              "number": 24,
+              "name": "Probe production Unicode and malformed-input safety in isolated processes",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:13:27Z",
+              "completed_at": "2026-10-26T18:13:29Z"
+            },
+            {
+              "number": 25,
+              "name": "Record Continuous input-budget observations (250 ms acceptance reported separately)",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:13:29Z",
+              "completed_at": "2026-10-26T18:13:37Z"
+            },
+            {
+              "number": 26,
+              "name": "Set up export validation tools",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:13:37Z",
+              "completed_at": "2026-10-26T18:13:45Z"
+            },
+            {
+              "number": 27,
+              "name": "Install static export browser checks",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:13:45Z",
+              "completed_at": "2026-10-26T18:14:05Z"
+            },
+            {
+              "number": 28,
+              "name": "Check native catalogue against the web reference",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:05Z",
+              "completed_at": "2026-10-26T18:14:05Z"
+            },
+            {
+              "number": 29,
+              "name": "Set up the static export test runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:05Z",
+              "completed_at": "2026-10-26T18:14:06Z"
+            },
+            {
+              "number": 30,
+              "name": "Initialise the test-only HTTP runtime before its readiness deadline",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:06Z",
+              "completed_at": "2026-10-26T18:14:10Z"
+            },
+            {
+              "number": 31,
+              "name": "Validate exported Docs Site on disk and static hosting",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:10Z",
+              "completed_at": "2026-10-26T18:14:38Z"
+            },
+            {
+              "number": 32,
+              "name": "Validate native desktop workflows",
+              "status": "completed",
+              "conclusion": "failure",
+              "started_at": "2026-10-26T18:14:38Z",
+              "completed_at": "2026-10-26T18:15:56Z"
+            },
+            {
+              "number": 33,
+              "name": "Validate recovery after interrupted failed saves",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:15:56Z",
+              "completed_at": "2026-10-26T18:15:56Z"
+            },
+            {
+              "number": 34,
+              "name": "Build isolated self-contained preview versions",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:15:56Z",
+              "completed_at": "2026-10-26T18:15:56Z"
+            },
+            {
+              "number": 35,
+              "name": "Validate visible installer wizard",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:15:56Z",
+              "completed_at": "2026-10-26T18:15:56Z"
+            },
+            {
+              "number": 36,
+              "name": "Independently verify preview packages and negative controls",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:15:56Z",
+              "completed_at": "2026-10-26T18:15:56Z"
+            },
+            {
+              "number": 37,
+              "name": "Validate installation upgrade and uninstall lifecycle",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:15:56Z",
+              "completed_at": "2026-10-26T18:15:56Z"
+            },
+            {
+              "number": 38,
+              "name": "Upload validation evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:15:56Z",
+              "completed_at": "2026-10-26T18:16:03Z"
+            },
+            {
+              "number": 73,
+              "name": "Post Set up the static export test runtime",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:16:03Z",
+              "completed_at": "2026-10-26T18:16:03Z"
+            },
+            {
+              "number": 74,
+              "name": "Post Set up export validation tools",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:16:03Z",
+              "completed_at": "2026-10-26T18:16:03Z"
+            },
+            {
+              "number": 75,
+              "name": "Post Run actions/setup-dotnet@v4",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:16:03Z",
+              "completed_at": "2026-10-26T18:16:03Z"
+            },
+            {
+              "number": 76,
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:16:03Z",
+              "completed_at": "2026-10-26T18:16:05Z"
+            },
+            {
+              "number": 77,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:16:05Z",
+              "completed_at": "2026-10-26T18:16:06Z"
+            }
+          ]
+        },
+        {
+          "id": 121755787598,
+          "name": "Original .853 diagnostic replay (${{ matrix.associations }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121755787598",
+          "classification": "Planned opt-in diagnostic exclusion",
+          "steps": []
+        },
+        {
+          "id": 121759874328,
+          "name": "companion-installed-authoring",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121759874328",
+          "classification": "Blocked by failed native dependency; 21-family matrix not expanded",
+          "steps": []
+        },
+        {
+          "id": 121759874558,
+          "name": "Historical upgrade (${{ matrix.preview }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121759874558",
+          "classification": "Planned branch-condition exclusion; also needs native",
+          "steps": []
+        },
+        {
+          "id": 121759874700,
+          "name": "class-installed-authoring",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121759874700",
+          "classification": "Blocked by failed native dependency",
+          "steps": []
+        },
+        {
+          "id": 121759874943,
+          "name": "er-installed-authoring",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121759874943",
+          "classification": "Blocked by failed native dependency",
+          "steps": []
+        },
+        {
+          "id": 121759875533,
+          "name": "state-installed-authoring",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121759875533",
+          "classification": "Blocked by failed native dependency",
+          "steps": []
+        }
+      ],
+      "coverage": {
+        "releaseBuild": {
+          "warnings": 0,
+          "errors": 0
+        },
+        "core": {
+          "passed": 2210,
+          "failed": 0,
+          "skipped": 0
+        },
+        "corpusExport": {
+          "passed": 176
+        },
+        "hostControls": {
+          "passed": 54
+        },
+        "browserExportSmoke": {
+          "passed": 12
+        },
+        "nativeUi": "FAIL; eight earlier descriptions retained; full 75-check suite not passed",
+        "packageNegative25": "NOT RUN",
+        "installedFamilies24Times3": "NOT RUN; four dependent job groups skipped"
+      },
+      "continuousObservations": {
+        "causedJobFailure": false,
+        "stockObjective": "INCOMPLETE",
+        "listFirstLayoutMilliseconds": 842.57,
+        "tableFirstLayoutMilliseconds": 285.2,
+        "mixedFirstLayoutMilliseconds": 388.9
+      }
+    },
+    "webOriginal": {
+      "id": 40375076102,
+      "head_sha": "24616837b5289299466cf64e37952d61bc95df6b",
+      "head_branch": "assessment/pr38-continuous-feasibility-2026-10",
+      "tree": "b8d56f4c53a52c974d6a78cfd5f79d099ff87d3f",
+      "event": "workflow_dispatch",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-26T18:08:27Z",
+      "updated_at": "2026-10-26T18:15:22Z",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102",
+      "jobs": [
+        {
+          "id": 121755806290,
+          "name": "Test static app (edge)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102/job/121755806290",
+          "classification": null,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:32Z",
+              "completed_at": "2026-10-26T18:08:33Z"
+            },
+            {
+              "number": 2,
+              "name": "Check out repository",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:33Z",
+              "completed_at": "2026-10-26T18:08:43Z"
+            },
+            {
+              "number": 3,
+              "name": "Set up Node.js",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:43Z",
+              "completed_at": "2026-10-26T18:08:49Z"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:49Z",
+              "completed_at": "2026-10-26T18:08:54Z"
+            },
+            {
+              "number": 5,
+              "name": "Install Playwright browsers",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:54Z",
+              "completed_at": "2026-10-26T18:09:15Z"
+            },
+            {
+              "number": 6,
+              "name": "Set up the test-only Python runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:09:15Z",
+              "completed_at": "2026-10-26T18:09:15Z"
+            },
+            {
+              "number": 7,
+              "name": "Run checks",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:09:15Z",
+              "completed_at": "2026-10-26T18:14:24Z"
+            },
+            {
+              "number": 8,
+              "name": "Retain browser failure evidence",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:14:24Z",
+              "completed_at": "2026-10-26T18:14:24Z"
+            },
+            {
+              "number": 14,
+              "name": "Post Set up the test-only Python runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:24Z",
+              "completed_at": "2026-10-26T18:14:24Z"
+            },
+            {
+              "number": 15,
+              "name": "Post Set up Node.js",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:24Z",
+              "completed_at": "2026-10-26T18:14:27Z"
+            },
+            {
+              "number": 16,
+              "name": "Post Check out repository",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:27Z",
+              "completed_at": "2026-10-26T18:14:29Z"
+            },
+            {
+              "number": 17,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:29Z",
+              "completed_at": "2026-10-26T18:14:29Z"
+            }
+          ]
+        },
+        {
+          "id": 121755806585,
+          "name": "Test static app (chromium)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102/job/121755806585",
+          "classification": null,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:31Z",
+              "completed_at": "2026-10-26T18:08:32Z"
+            },
+            {
+              "number": 2,
+              "name": "Check out repository",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:32Z",
+              "completed_at": "2026-10-26T18:08:42Z"
+            },
+            {
+              "number": 3,
+              "name": "Set up Node.js",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:42Z",
+              "completed_at": "2026-10-26T18:08:48Z"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:48Z",
+              "completed_at": "2026-10-26T18:08:53Z"
+            },
+            {
+              "number": 5,
+              "name": "Install Playwright browsers",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:08:53Z",
+              "completed_at": "2026-10-26T18:09:13Z"
+            },
+            {
+              "number": 6,
+              "name": "Set up the test-only Python runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:09:13Z",
+              "completed_at": "2026-10-26T18:09:14Z"
+            },
+            {
+              "number": 7,
+              "name": "Run checks",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:09:14Z",
+              "completed_at": "2026-10-26T18:14:57Z"
+            },
+            {
+              "number": 8,
+              "name": "Retain browser failure evidence",
+              "status": "completed",
+              "conclusion": "skipped",
+              "started_at": "2026-10-26T18:14:57Z",
+              "completed_at": "2026-10-26T18:14:57Z"
+            },
+            {
+              "number": 14,
+              "name": "Post Set up the test-only Python runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:57Z",
+              "completed_at": "2026-10-26T18:14:57Z"
+            },
+            {
+              "number": 15,
+              "name": "Post Set up Node.js",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:14:57Z",
+              "completed_at": "2026-10-26T18:15:10Z"
+            },
+            {
+              "number": 16,
+              "name": "Post Check out repository",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:15:10Z",
+              "completed_at": "2026-10-26T18:15:14Z"
+            },
+            {
+              "number": 17,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:15:14Z",
+              "completed_at": "2026-10-26T18:15:14Z"
+            }
+          ]
+        },
+        {
+          "id": 121759402516,
+          "name": "Test static app",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102/job/121759402516",
+          "classification": null,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:15:19Z",
+              "completed_at": "2026-10-26T18:15:19Z"
+            },
+            {
+              "number": 2,
+              "name": "Require both browser projects",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:15:19Z",
+              "completed_at": "2026-10-26T18:15:19Z"
+            },
+            {
+              "number": 3,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-26T18:15:19Z",
+              "completed_at": "2026-10-26T18:15:19Z"
+            }
+          ]
+        },
+        {
+          "id": 121759460505,
+          "name": "Deploy to GitHub Pages",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102/job/121759460505",
+          "classification": null,
+          "steps": []
+        }
+      ],
+      "edge": {
+        "job": 121755806290,
+        "passed": 135
+      },
+      "chromium": {
+        "job": 121755806585,
+        "passed": 135
+      },
+      "staticPerBrowser": {
+        "modules": 50,
+        "shellAssets": 57,
+        "vendorAssets": 150,
+        "dependencyScans": 56
+      },
+      "pages": "SKIPPED deliberately by event/branch condition; no deployment",
+      "cacheWarning": "Chromium post-action cache reservation warning; job/test conclusion remains success"
+    },
+    "developComparison": {
+      "id": 40361576134,
+      "head_sha": "0df86ad2bdae005d49be68096c2f784b49de8109",
+      "head_branch": "develop",
+      "tree": "05d534030761a7b68a8579bb33e4dfb50161ce90",
+      "event": "push",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-26T16:41:48Z",
+      "updated_at": "2026-10-26T17:22:12Z",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134",
+      "jobs": [
+        {
+          "id": 121708139285,
+          "name": "native",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121708139285",
+          "classification": null
+        },
+        {
+          "id": 121708141646,
+          "name": "Original .853 diagnostic replay (${{ matrix.associations }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121708141646",
+          "classification": null
+        },
+        {
+          "id": 121723949522,
+          "name": "er-installed-authoring",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723949522",
+          "classification": null
+        },
+        {
+          "id": 121723949743,
+          "name": "state-installed-authoring",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723949743",
+          "classification": null
+        },
+        {
+          "id": 121723950139,
+          "name": "class-installed-authoring",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950139",
+          "classification": null
+        },
+        {
+          "id": 121723950339,
+          "name": "companion-installed-authoring (Pie)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950339",
+          "classification": null
+        },
+        {
+          "id": 121723950340,
+          "name": "companion-installed-authoring (Gantt)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950340",
+          "classification": null
+        },
+        {
+          "id": 121723950378,
+          "name": "companion-installed-authoring (Quadrant)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950378",
+          "classification": null
+        },
+        {
+          "id": 121723950381,
+          "name": "companion-installed-authoring (Flowchart)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950381",
+          "classification": null
+        },
+        {
+          "id": 121723950391,
+          "name": "companion-installed-authoring (Xy)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950391",
+          "classification": null
+        },
+        {
+          "id": 121723950410,
+          "name": "companion-installed-authoring (Sequence)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950410",
+          "classification": null
+        },
+        {
+          "id": 121723950460,
+          "name": "companion-installed-authoring (Mindmap)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950460",
+          "classification": null
+        },
+        {
+          "id": 121723950471,
+          "name": "companion-installed-authoring (Timeline)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950471",
+          "classification": null
+        },
+        {
+          "id": 121723950542,
+          "name": "companion-installed-authoring (Venn)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950542",
+          "classification": null
+        },
+        {
+          "id": 121723950543,
+          "name": "companion-installed-authoring (Radar)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950543",
+          "classification": null
+        },
+        {
+          "id": 121723950595,
+          "name": "companion-installed-authoring (GitGraph)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950595",
+          "classification": null
+        },
+        {
+          "id": 121723950612,
+          "name": "companion-installed-authoring (Journey)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950612",
+          "classification": null
+        },
+        {
+          "id": 121723950647,
+          "name": "companion-installed-authoring (Architecture)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950647",
+          "classification": null
+        },
+        {
+          "id": 121723950741,
+          "name": "companion-installed-authoring (Packet)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950741",
+          "classification": null
+        },
+        {
+          "id": 121723950789,
+          "name": "companion-installed-authoring (Kanban)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950789",
+          "classification": null
+        },
+        {
+          "id": 121723950883,
+          "name": "companion-installed-authoring (C4)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950883",
+          "classification": null
+        },
+        {
+          "id": 121723950885,
+          "name": "companion-installed-authoring (Requirement)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950885",
+          "classification": null
+        },
+        {
+          "id": 121723950892,
+          "name": "companion-installed-authoring (Block)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950892",
+          "classification": null
+        },
+        {
+          "id": 121723950902,
+          "name": "companion-installed-authoring (Sankey)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950902",
+          "classification": null
+        },
+        {
+          "id": 121723950935,
+          "name": "companion-installed-authoring (Treemap)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950935",
+          "classification": null
+        },
+        {
+          "id": 121723950989,
+          "name": "companion-installed-authoring (TreeView)",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723950989",
+          "classification": null
+        },
+        {
+          "id": 121723952580,
+          "name": "Historical upgrade (${{ matrix.preview }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/job/121723952580",
+          "classification": null
+        }
+      ],
+      "successfulJobs": 25,
+      "plannedSkippedJobs": 2,
+      "jobLogSha256": "1c02f438b0559e9274a3cb41a59d2af4d9521e8971851b53f540e26a31e9eb98",
+      "sameStepProof": {
+        "nativeUiChecks": 75,
+        "WorkspaceClosePreservesDraftRootsAndUndo": true,
+        "packageNegatives": 25,
+        "installedAuthoringFamilies": 24,
+        "source": "Develop original receipts and original jobs; never PR50 acceptance"
+      },
+      "runtime": {
+        "Passed": true,
+        "ProcessId": 10508,
+        "ExpectedExecutable": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+        "ActualExecutable": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+        "ExecutableMatches": true,
+        "BundledRuntimeRequired": false,
+        "Modules": [
+          {
+            "Name": "coreclr.dll",
+            "LoadedPaths": [
+              "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\coreclr.dll"
+            ],
+            "LoadedExactlyOnce": true,
+            "Bundled": false
+          },
+          {
+            "Name": "wpfgfx_cor3.dll",
+            "LoadedPaths": [
+              "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\wpfgfx_cor3.dll"
+            ],
+            "LoadedExactlyOnce": true,
+            "Bundled": false
+          }
+        ],
+        "CleanMachineCertification": false,
+        "Limitation": "Loaded-module snapshot after editor and diagram readiness. The hosted runner contains development tools; this does not certify SDK-free clean Windows."
+      },
+      "jobEvidenceScope": "All original job conclusions; same-check evidence inspected in the native log and native-validation archive. Per-family downstream payloads not independently re-audited."
+    },
+    "archives": [
+      {
+        "id": 12675087255,
+        "run": 40375067926,
+        "attempt": 1,
+        "commit": "24616837b5289299466cf64e37952d61bc95df6b",
+        "name": "native-validation",
+        "bytes": 45893301,
+        "sha256": "1a740a57c3df3bf6389c4704ab0c8e570b12121d9c7a334ab4e2d8c2eef17a54",
+        "matchesGitHubDigest": true,
+        "downloaded": true,
+        "members": 3147,
+        "expiresAtUtc": "2026-11-09T18:15:59Z",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/artifacts/12675087255",
+        "inspectedMembers": [
+          {
+            "path": "ui/native-ui.json",
+            "bytes": 2437,
+            "sha256": "4a006f5fc6a94d13dab55cb670cd075a6a248c232bfd6756e67f14beb9c858d1",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              54
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-runtime.json",
+            "bytes": 1140,
+            "sha256": "ab166289ef490500a41f4dec68aca465cdad16ecfc2c2cbfe403443237f316d6",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              14,
+              40
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-threading.json",
+            "bytes": 132,
+            "sha256": "9b05e7de86ac51318a289b0a0827f74af1d8ac8af2ede0ed5a07ceb548f62d6d",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              14,
+              38
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-performance.json",
+            "bytes": 676,
+            "sha256": "670fd76995f89cac525ebdebe024f24060cbceb2b0dc0624542ec40057dc19a8",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              14,
+              40
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-refinement-workspace-closed.png",
+            "bytes": 95573,
+            "sha256": "7c9df5c881808995b8b98f48d0be6dcf8bf94ebd54316df71809064d5af534ee",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              16
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure-controls.txt",
+            "bytes": 60,
+            "sha256": "3bb7099b76e3300fca2704de415712667cef0def5530cc42f82bd62c4362a876",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              54
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure-windows.txt",
+            "bytes": 85,
+            "sha256": "cf4be120592a1a85b53363f0e9e42d3a733a8faa187ac85d17c2c5eb36139935",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              54
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure-window-0.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              54
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure-window-0.png",
+            "bytes": 58772,
+            "sha256": "622960561f92c1f482a9f84ce68164be63d51a0d49ddbdacb5f977c86413d9f6",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              54
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure.png",
+            "bytes": 71502,
+            "sha256": "368d8494a9b6b5a719d317792ef9edc18ce256c52feba25c2d47427795ab576a",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              52
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure-desktop.png",
+            "bytes": 65262,
+            "sha256": "1950749974957a9263e7a5b64b2b229f0d412383609800faee98210847cbeb0b",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              36
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-failure-threads.dmp",
+            "bytes": 2424215,
+            "sha256": "cf229122b3d080c9fa988046a66e46fccc2d5eac0fe911a095653a7b97ca0745",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              50
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/refinement-display/display.json",
+            "bytes": 510,
+            "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              12
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/refinement-display/display-restoration.json",
+            "bytes": 54,
+            "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              36
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/ui-cd5fc7b573624068b31de39bc90e8c92/state/session.json",
+            "bytes": 1121,
+            "sha256": "de04182bf62475243d00cbc072b94975d3c2e8175157c0340e4c4ae0764ad313",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              15,
+              54
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/ui-cd5fc7b573624068b31de39bc90e8c92/fixture.md",
+            "bytes": 90,
+            "sha256": "0e381cde040f0c18f7315fccae5e8c474a78626ae29bf1baef0cfb570d902020",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              18,
+              14,
+              38
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          }
+        ]
+      },
+      {
+        "id": 12668699884,
+        "run": 40361576134,
+        "attempt": 1,
+        "commit": "0df86ad2bdae005d49be68096c2f784b49de8109",
+        "name": "native-validation",
+        "bytes": 342455972,
+        "sha256": "7c9c93d3b43825995c94e95e5f75e95c82aadbcb9cd531f1dad76698c0fbec7d",
+        "matchesGitHubDigest": true,
+        "downloaded": true,
+        "members": 3597,
+        "expiresAtUtc": "2026-11-09T17:09:45Z",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/artifacts/12668699884",
+        "inspectedMembers": [
+          {
+            "path": "ui/native-ui.json",
+            "bytes": 10390,
+            "sha256": "313664a3b86188420901cf90d1a19ac5b325ade3faa7b540cf999f9e232f7061",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              52,
+              20
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-ui-runtime.json",
+            "bytes": 1141,
+            "sha256": "43df27491c68be56d2ad48ff159ae215198d7d01fa39aaa8efd2129eec806370",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              47,
+              58
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-refinement.json",
+            "bytes": 18539,
+            "sha256": "881bf49006f8546a863958e20388206236735965de8e6f20daaf0903278f3bcf",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              48,
+              48
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-refinement-workspace-closed.png",
+            "bytes": 95554,
+            "sha256": "d71273b91058c3fc3cf678409fc7954cfabbe9651c906816c0a5beef64fe3800",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              48,
+              38
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/native-refinement-export-completed.png",
+            "bytes": 100481,
+            "sha256": "71e25ce4a466b01a5b3c2a6ce6796b34bded34b62056448a9a9def3d519a134a",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              48,
+              42
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/refinement-display/display.json",
+            "bytes": 510,
+            "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              48,
+              32
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          },
+          {
+            "path": "ui/refinement-display/display-restoration.json",
+            "bytes": 54,
+            "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21",
+            "zipMemberTime": [
+              2026,
+              10,
+              26,
+              16,
+              48,
+              48
+            ],
+            "timestampQualification": "Coarse archive member time, not a phase/event timestamp"
+          }
+        ]
+      }
+    ],
+    "failureProcess": {
+      "pid": 1952,
+      "processStartUtc": "2026-10-26T18:14:39Z",
+      "startEvidence": "MINIDUMP_MISC_INFO ProcessCreateTime",
+      "dumpUtc": "2026-10-26T18:15:50Z",
+      "capturedThread": 5800,
+      "runtime": {
+        "Passed": true,
+        "ProcessId": 1952,
+        "ExpectedExecutable": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+        "ActualExecutable": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+        "ExecutableMatches": true,
+        "BundledRuntimeRequired": false,
+        "Modules": [
+          {
+            "Name": "coreclr.dll",
+            "LoadedPaths": [
+              "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\coreclr.dll"
+            ],
+            "LoadedExactlyOnce": true,
+            "Bundled": false
+          },
+          {
+            "Name": "wpfgfx_cor3.dll",
+            "LoadedPaths": [
+              "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\wpfgfx_cor3.dll"
+            ],
+            "LoadedExactlyOnce": true,
+            "Bundled": false
+          }
+        ],
+        "CleanMachineCertification": false,
+        "Limitation": "Loaded-module snapshot after editor and diagram readiness. The hosted runner contains development tools; this does not certify SDK-free clean Windows."
+      },
+      "originalSourceSha256": "0e381cde040f0c18f7315fccae5e8c474a78626ae29bf1baef0cfb570d902020",
+      "retainedDraftSha256": "c2617a43e4670455246e407dec9a1b14e0003e9cf73175c6ea26891c869f4a02",
+      "retainedDraftCharacters": 116,
+      "sessionWorkspace": null,
+      "retainedDocumentRoot": true,
+      "caretOffset": 116,
+      "undoAfterReopen": "NOT RUN",
+      "mainHwnd": null,
+      "ownerChain": null,
+      "foregroundHwnd": null,
+      "focusedControlAtAction": null,
+      "binarySha256": null,
+      "loadedAssemblySha256": null,
+      "missingIdentityMeaning": "NOT OBSERVED in original evidence, not reconstructed"
+    },
+    "environment": {
+      "os": "Windows Server 2025 Datacenter 10.0.26100",
+      "image": "windows-2025-vs2026",
+      "imageVersion": "20261021.278.1",
+      "runnerVersion": "2.338.0",
+      "provisionerVersion": "20261021.618",
+      "sdk": "10.0.403",
+      "coreWpfLoadedPathsVersion": "10.0.14",
+      "logicalProcessors": 4,
+      "failureRegion": "westus3",
+      "comparisonRegion": "northcentralus",
+      "failureWorkerId": "0696477e-b7de-4738-a13b-249d5e6922f1",
+      "comparisonWorkerId": "98130c8e-fd4c-459a-a360-d90bb7f7aff5",
+      "cpuModel": "NOT OBSERVED",
+      "cacheTemperature": "NOT OBSERVED",
+      "scheduling": "NOT OBSERVED",
+      "matchingLoadedHashes": "NOT OBSERVED",
+      "displayReceiptsMatch": true,
+      "portableRuntimePinIsSeparate": "10.0.13"
+    },
+    "ordinaryAction": {
+      "keyboardOperation": "Ctrl+Shift+O",
+      "sourceActionCount": 1,
+      "eventTraceActionCount": null,
+      "normalWaitSeconds": 20,
+      "observationPollingMilliseconds": 100,
+      "focusGuard": "Foreground PID only; no action-time exact HWND/control receipt",
+      "keyboardSourceRoute": "MainWindow PreviewKeyDown -> WindowKeyDown -> shift Key.O -> OpenFolderCommand -> DesktopDialogs.OpenFolder -> ShowDialog(main owner)",
+      "actualHandledCanExecuteCallbackTrace": "NOT OBSERVED",
+      "selector": "UIA desktop descendant, same PID, exact name Open documentation workspace"
+    },
+    "hypotheses": [
+      {
+        "id": "H1",
+        "hypothesis": "Shortcut not delivered or wrong focus",
+        "finding": "INCONCLUSIVE",
+        "support": "PID-only guard; no exact key/focus event trace",
+        "contradiction": "Working source route and native dialogue construction in original PID contradict a blanket nothing-invoked account"
+      },
+      {
+        "id": "H2",
+        "hypothesis": "Command disabled or not invoked",
+        "finding": "INCONCLUSIVE",
+        "support": "Action-time CanExecute and callback entry not recorded",
+        "contradiction": "No custom OpenFolder CanExecute; native CFileOpenSave::Show observed",
+        "narrowDisprovenClaim": "No native common-dialogue invocation occurred at all"
+      },
+      {
+        "id": "H3",
+        "hypothesis": "Dialogue ready but locator too narrow",
+        "finding": "INCONCLUSIVE",
+        "support": "Same-PID/exact-name selector and process-filtered inventory cannot exclude foreign-process windows",
+        "contradiction": "No ready picker in captures; observed native initialisation stack; correct source title/owner; develop same-check PASS"
+      },
+      {
+        "id": "H4",
+        "hypothesis": "Asynchronous focus/readiness/timing",
+        "finding": "INCONCLUSIVE",
+        "support": "Native initialisation still sampled after timeout; UIA chrome-only capture",
+        "contradiction": "No duration or specific missing precondition; earlier unchanged check passed",
+        "provenBoundary": "Native common-dialogue initialisation in captured original process"
+      },
+      {
+        "id": "H5",
+        "hypothesis": "Other shell image/resource or runner scheduling cause",
+        "finding": "INCONCLUSIVE",
+        "support": "Explorer address toolbar image-loading chain; different worker/region",
+        "contradiction": "One sample, no counters/profile/scheduling trace; function membership is not exclusive causal attribution"
+      }
+    ],
+    "offlineDiagnostic": {
+      "status": "COMPLETED bounded original-data analysis; no live acceptance",
+      "method": "Offline native StackWalk64 with exact timestamp/size Microsoft images and exact PDB matching; stops at unregistered/JIT module; no managed unwind or before-action event reconstruction",
+      "scriptLocalSha256": "8511624da5bfb3c677abf30af8a016876ab88ed456d20d44e7a0c498280a0b4f",
+      "originalDumpSha256": "cf229122b3d080c9fa988046a66e46fccc2d5eac0fe911a095653a7b97ca0745",
+      "threads": 23,
+      "maximumFramesPerThread": 100,
+      "thread5800Frames": [
+        {
+          "address": "0x7ffab7d071e6",
+          "module": "user32.dll",
+          "symbol": "CopyDibHdr",
+          "displacement": 98,
+          "stack": "0x1f867eb820",
+          "kind": "captured instruction pointer"
+        },
+        {
+          "address": "0x7ffab7d071e6",
+          "module": "user32.dll",
+          "symbol": "CopyDibHdr",
+          "displacement": 98,
+          "stack": "0x1f867eb820",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7d06e43",
+          "module": "user32.dll",
+          "symbol": "ConvertDIBBitmap",
+          "displacement": 79,
+          "stack": "0x1f867ebcf0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7d08285",
+          "module": "user32.dll",
+          "symbol": "ObjectFromDIBResource",
+          "displacement": 265,
+          "stack": "0x1f867ebdc0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7cf038b",
+          "module": "user32.dll",
+          "symbol": "LoadBmp",
+          "displacement": 111,
+          "stack": "0x1f867ebe40",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7cee853",
+          "module": "user32.dll",
+          "symbol": "LoadImageInternal",
+          "displacement": 191,
+          "stack": "0x1f867ebf30",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa993e6bcf",
+          "module": "comctl32.dll",
+          "symbol": "ImageList_LoadImageW",
+          "displacement": 79,
+          "stack": "0x1f867ebf70",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa7397c86e",
+          "module": "explorerframe.dll",
+          "symbol": "ImageList_LoadImageW",
+          "displacement": 94,
+          "stack": "0x1f867ec000",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa738df7c9",
+          "module": "explorerframe.dll",
+          "symbol": "CAddressBand::_SetToolbarImageLists",
+          "displacement": 121,
+          "stack": "0x1f867ec050",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa7396680a",
+          "module": "explorerframe.dll",
+          "symbol": "CAddressBand::_UpdateToolbar",
+          "displacement": 262,
+          "stack": "0x1f867ec0a0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa73969565",
+          "module": "explorerframe.dll",
+          "symbol": "CAddressBand::_CreateAddressToolbar",
+          "displacement": 633,
+          "stack": "0x1f867ec0d0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa7396a684",
+          "module": "explorerframe.dll",
+          "symbol": "CAddressBand::_CreateAddressBand",
+          "displacement": 584,
+          "stack": "0x1f867ec270",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa7390a6cf",
+          "module": "explorerframe.dll",
+          "symbol": "CAddressBand::SetSite",
+          "displacement": 191,
+          "stack": "0x1f867ec370",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7476eea",
+          "module": "SHCore.dll",
+          "symbol": "IUnknown_SetSite",
+          "displacement": 90,
+          "stack": "0x1f867ec3b0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa738e9824",
+          "module": "explorerframe.dll",
+          "symbol": "CBandSite::_AddBandByID",
+          "displacement": 224,
+          "stack": "0x1f867ec3f0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa738e9949",
+          "module": "explorerframe.dll",
+          "symbol": "CBandSite::AddBand",
+          "displacement": 25,
+          "stack": "0x1f867ec430",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa738e4c3c",
+          "module": "explorerframe.dll",
+          "symbol": "CNavBar::_CreateBands",
+          "displacement": 176,
+          "stack": "0x1f867ec460",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa738e3917",
+          "module": "explorerframe.dll",
+          "symbol": "CNavBar::_CreateBar",
+          "displacement": 423,
+          "stack": "0x1f867ec550",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa738e443e",
+          "module": "explorerframe.dll",
+          "symbol": "CNavBar::ShowDW",
+          "displacement": 30,
+          "stack": "0x1f867ec690",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab84f92be",
+          "module": "comdlg32.dll",
+          "symbol": "CFileOpenSave::_CreateNavigationBar",
+          "displacement": 478,
+          "stack": "0x1f867ec6d0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab8500361",
+          "module": "comdlg32.dll",
+          "symbol": "CFileOpenSave::_InitOpenSaveDialog",
+          "displacement": 6289,
+          "stack": "0x1f867ec720",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab852a414",
+          "module": "comdlg32.dll",
+          "symbol": "CFileOpenSave::s_OpenSaveDlgProc",
+          "displacement": 580,
+          "stack": "0x1f867ecdf0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7ce91da",
+          "module": "user32.dll",
+          "symbol": "UserCallDlgProcCheckWow",
+          "displacement": 498,
+          "stack": "0x1f867ecef0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7ce9534",
+          "module": "user32.dll",
+          "symbol": "DefDlgProcWorker",
+          "displacement": 196,
+          "stack": "0x1f867ecfe0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7ce9456",
+          "module": "user32.dll",
+          "symbol": "DefDlgProcW",
+          "displacement": 54,
+          "stack": "0x1f867ed090",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7ce74f6",
+          "module": "user32.dll",
+          "symbol": "UserCallWinProcCheckWow",
+          "displacement": 854,
+          "stack": "0x1f867ed0d0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7ce6803",
+          "module": "user32.dll",
+          "symbol": "SendMessageWorker",
+          "displacement": 547,
+          "stack": "0x1f867ed230",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7cf1849",
+          "module": "user32.dll",
+          "symbol": "InternalCreateDialog",
+          "displacement": 2665,
+          "stack": "0x1f867ed2e0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7cf2a3d",
+          "module": "user32.dll",
+          "symbol": "InternalDialogBox",
+          "displacement": 117,
+          "stack": "0x1f867ed4c0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7d32fdc",
+          "module": "user32.dll",
+          "symbol": "DialogBoxIndirectParamAorW",
+          "displacement": 108,
+          "stack": "0x1f867ed520",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab7d32f58",
+          "module": "user32.dll",
+          "symbol": "DialogBoxIndirectParamW",
+          "displacement": 24,
+          "stack": "0x1f867ed560",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab8558dc2",
+          "module": "comdlg32.dll",
+          "symbol": "<lambda_a6d8b22ad5b097862bd7ad43826fec54>::operator()",
+          "displacement": 282,
+          "stack": "0x1f867ed5a0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffab8527847",
+          "module": "comdlg32.dll",
+          "symbol": "CFileOpenSave::Show",
+          "displacement": 3751,
+          "stack": "0x1f867ed5f0",
+          "kind": "StackWalk64"
+        },
+        {
+          "address": "0x7ffa1f44c5f9",
+          "module": null,
+          "symbol": null,
+          "displacement": null,
+          "stack": "0x1f867ed9a0",
+          "kind": "StackWalk64"
+        }
+      ],
+      "imageLoads": [
+        {
+          "name": "ntdll.dll",
+          "base": "0x7ffab96c0000",
+          "loadedBase": "0x7ffab96c0000",
+          "status": "loaded as data",
+          "lastError": 487
+        },
+        {
+          "name": "KERNELBASE.dll",
+          "base": "0x7ffab6aa0000",
+          "loadedBase": "0x7ffab6aa0000",
+          "status": "loaded as data",
+          "lastError": 487
+        },
+        {
+          "name": "shell32.dll",
+          "base": "0x7ffab8cf0000",
+          "loadedBase": "0x7ffab8cf0000",
+          "status": "loaded as data",
+          "lastError": 487
+        },
+        {
+          "name": "user32.dll",
+          "base": "0x7ffab7cd0000",
+          "loadedBase": "0x7ffab7cd0000",
+          "status": "loaded as data",
+          "lastError": 0
+        },
+        {
+          "name": "win32u.dll",
+          "base": "0x7ffab7410000",
+          "loadedBase": "0x7ffab7410000",
+          "status": "loaded as data",
+          "lastError": 0
+        },
+        {
+          "name": "uxtheme.dll",
+          "base": "0x7ffab4380000",
+          "loadedBase": "0x7ffab4380000",
+          "status": "loaded as data",
+          "lastError": 0
+        },
+        {
+          "name": "SHCore.dll",
+          "base": "0x7ffab7440000",
+          "loadedBase": "0x7ffab7440000",
+          "status": "loaded as data",
+          "lastError": 0
+        },
+        {
+          "name": "shlwapi.dll",
+          "base": "0x7ffab94d0000",
+          "loadedBase": "0x7ffab94d0000",
+          "status": "loaded as data",
+          "lastError": 487
+        },
+        {
+          "name": "oleacc.dll",
+          "base": "0x7ffa89560000",
+          "loadedBase": "0x7ffa89560000",
+          "status": "loaded as data",
+          "lastError": 0
+        },
+        {
+          "name": "comctl32.dll",
+          "base": "0x7ffa993c0000",
+          "loadedBase": "0x7ffa993c0000",
+          "status": "loaded as data",
+          "lastError": 0
+        },
+        {
+          "name": "comdlg32.dll",
+          "base": "0x7ffab84f0000",
+          "loadedBase": "0x7ffab84f0000",
+          "status": "loaded as data",
+          "lastError": 487
+        },
+        {
+          "name": "comctl32.dll",
+          "base": "0x7ffa8a5f0000",
+          "status": "REJECTED mismatched timestamp or image size"
+        },
+        {
+          "name": "explorerframe.dll",
+          "base": "0x7ffa73860000",
+          "loadedBase": "0x7ffa73860000",
+          "status": "loaded as data",
+          "lastError": 0
+        }
+      ],
+      "symbolIdentities": [
+        {
+          "pdb": "ntdll.pdb",
+          "expectedKey": "1DDBF17C9C5475D2BA48529CC231A3F41",
+          "observedKey": "1DDBF17C9C5475D2BA48529CC231A3F41",
+          "matched": true
+        },
+        {
+          "pdb": "kernelbase.pdb",
+          "expectedKey": "CABDAC12CA438C8B4DC4B60B7499C8041",
+          "observedKey": "CABDAC12CA438C8B4DC4B60B7499C8041",
+          "matched": true
+        },
+        {
+          "pdb": "shell32.pdb",
+          "expectedKey": "04F4E82AC13581ED1291FE79FD86242D1",
+          "observedKey": "04F4E82AC13581ED1291FE79FD86242D1",
+          "matched": true
+        },
+        {
+          "pdb": "user32.pdb",
+          "expectedKey": "3579F64F76E762424E445A0B4F3ACE411",
+          "observedKey": "3579F64F76E762424E445A0B4F3ACE411",
+          "matched": true
+        },
+        {
+          "pdb": "win32u.pdb",
+          "expectedKey": "CDA2DF7DC2F3E9714A13B74854D416CF1",
+          "observedKey": "CDA2DF7DC2F3E9714A13B74854D416CF1",
+          "matched": true
+        },
+        {
+          "pdb": "uxtheme.pdb",
+          "expectedKey": "14CD5951E70BB91A28F2B9399DD20E791",
+          "observedKey": "14CD5951E70BB91A28F2B9399DD20E791",
+          "matched": true
+        },
+        {
+          "pdb": "shcore.pdb",
+          "expectedKey": "71563305D34AB3A25C9C8ABFBAFE61A61",
+          "observedKey": "71563305D34AB3A25C9C8ABFBAFE61A61",
+          "matched": true
+        },
+        {
+          "pdb": "shlwapi.pdb",
+          "expectedKey": "B05500760930D4D20C35850EF1756B1A1",
+          "observedKey": "B05500760930D4D20C35850EF1756B1A1",
+          "matched": true
+        },
+        {
+          "pdb": "oleacc.pdb",
+          "expectedKey": "50ADFC35643C2F7B4D380CE8745078201",
+          "observedKey": "50ADFC35643C2F7B4D380CE8745078201",
+          "matched": true
+        },
+        {
+          "pdb": "comctl32.pdb",
+          "expectedKey": "1FF2BC9A3160F746D9052BFBC32F055A1",
+          "observedKey": "1FF2BC9A3160F746D9052BFBC32F055A1",
+          "matched": true
+        },
+        {
+          "pdb": "comdlg32.pdb",
+          "expectedKey": "34E04CB2488413FCEBC7B41164F6A6511",
+          "observedKey": "34E04CB2488413FCEBC7B41164F6A6511",
+          "matched": true
+        },
+        {
+          "pdb": "comctl32v582.pdb",
+          "expectedKey": "4492B1C63E87317B9DB115345DC49F5A1",
+          "observedKey": "4492B1C63E87317B9DB115345DC49F5A1",
+          "matched": true
+        },
+        {
+          "pdb": "ExplorerFrame.pdb",
+          "expectedKey": "C5DB5C19360249A023F00AF3D16DFBB41",
+          "observedKey": "C5DB5C19360249A023F00AF3D16DFBB41",
+          "matched": true
+        }
+      ],
+      "symbolDataDownloads": [
+        [
+          {
+            "file": "ntdll.dll",
+            "sha256": "160ef9b82e2895ef48fa031cb1cf683a8b123febf7cf7d5590cd3104864424b3",
+            "size": 2541720,
+            "status": "downloaded"
+          },
+          {
+            "file": "ntdll.pdb",
+            "sha256": "8a8f2bbf6f99195c9fa05424aa5beabaa8b1deb45ce90abce1bd340e3e55dabd",
+            "size": 1912832,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "KERNELBASE.dll",
+            "sha256": "96c0459f0d73d728e5c13a10d83d840f56913ef7281d17370a5e1eb197faa450",
+            "size": 4171392,
+            "status": "downloaded"
+          },
+          {
+            "file": "kernelbase.pdb",
+            "sha256": "d6f7579d05b03becff2be0e252097f2a6b6aa433943a66bece5700fd6d745730",
+            "size": 12234752,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "shell32.dll",
+            "sha256": "85f56aeda86949de8a2e15772e4fe49788f5eb703272dd6508793e4a2d72bee8",
+            "size": 7801848,
+            "status": "downloaded"
+          },
+          {
+            "file": "shell32.pdb",
+            "sha256": "909ff03ade36415bcc7cf8e8551702ac2f4af5e76607a948ea8a363c59a6662d",
+            "size": 12021760,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "user32.dll",
+            "sha256": "d2bcc3d2fc93d4c237eade68ea6a6599ed3db8afef1e8b9bf0dd4874e1ed1dff",
+            "size": 1899744,
+            "status": "downloaded"
+          },
+          {
+            "file": "user32.pdb",
+            "sha256": "539d03e208fb55a8c28d7b6a7b455f04b767b8fdfda6e6c1048c07e71135f46e",
+            "size": 1110016,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "win32u.dll",
+            "sha256": "d20254cde137fce512fb0b14e7ce57a196ba7c2e1e9d779cb8a8158197f86327",
+            "size": 182624,
+            "status": "downloaded"
+          },
+          {
+            "file": "win32u.pdb",
+            "sha256": "54dcfa837b38a4b8b2ed688e832a443c3fdc768d2ccb9d00c3dff2591cb2e632",
+            "size": 274432,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "uxtheme.dll",
+            "sha256": "01f68bf7aae3da9054dac4ce959afda89fd177959c8e7a1b3a0c48ebe43b4a38",
+            "size": 692224,
+            "status": "downloaded"
+          },
+          {
+            "file": "uxtheme.pdb",
+            "sha256": "4127a36987d73a7ca5153d559a0e1a77a3ff669391f6bd3a998daf35ecc0fe92",
+            "size": 970752,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "SHCore.dll",
+            "sha256": "6e85276b7b15fa438c3bbcfb9e35ccc06bcbe7e82faba02d0c2af7f65d3e5087",
+            "size": 1011984,
+            "status": "downloaded"
+          },
+          {
+            "file": "shcore.pdb",
+            "sha256": "a26d4debe054c48d5fbf761392ab4d06c481dcdd3614ded7ee6b176ce3dd4f81",
+            "size": 3272704,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "shlwapi.dll",
+            "sha256": "c4e3278b2ebac6045a16fa4ce3bb810c6454c50260e08696b4b5cb8f6166f715",
+            "size": 445144,
+            "status": "downloaded"
+          },
+          {
+            "file": "shlwapi.pdb",
+            "sha256": "c53e523aa906fba430a7f67f8660dc287e03b0097252dc848466d4b6ad668c94",
+            "size": 667648,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "oleacc.dll",
+            "sha256": "957915a0b89517a6b5ccac4aaa1b1305b0d525917fa57e2ca6f56b8037628d78",
+            "size": 491520,
+            "status": "downloaded"
+          },
+          {
+            "file": "oleacc.pdb",
+            "sha256": "9c4b39534d22df4e63d21fab6c9509013a7deb8f49ff0ddbd290fe21a391a784",
+            "size": 782336,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "comctl32.dll",
+            "sha256": "3bd1fadf7c93dc5f3d217b37f1995e10dd058881cd31507dd56b3651d74e7073",
+            "size": 2706808,
+            "status": "downloaded"
+          },
+          {
+            "file": "comctl32.pdb",
+            "sha256": "d20868552191eb633d6a68b28822d64004d08ce8deffe68e1fdf4bdf0e0ab3dc",
+            "size": 2191360,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "comdlg32.dll",
+            "sha256": "60ca1dacde76e3af83d4f3d02f09b8f4469cd953f5b42a44bddf9be449267744",
+            "size": 958464,
+            "status": "downloaded"
+          },
+          {
+            "file": "comdlg32.pdb",
+            "sha256": "66f6a8eb46af7efc9b74979b589222aef4187c3591f61c9a95db12be344e3f86",
+            "size": 1331200,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "comctl32.dll",
+            "status": "[Errno 17] File exists: 'artifacts\\\\goal-x-b\\\\24616837b5289299466cf64e37952d61bc95df6b\\\\run-40375067926\\\\attempt-1\\\\windows-2025-vs2026-20261021.278.1\\\\round-original\\\\symbols\\\\comctl32.dll'"
+          },
+          {
+            "file": "comctl32v582.pdb",
+            "sha256": "88a5ac24ef138df2ae8462bfa621b733eb79696376c297876c545cac66cfef74",
+            "size": 536576,
+            "status": "downloaded"
+          }
+        ],
+        [
+          {
+            "file": "explorerframe.dll",
+            "sha256": "838d8cbcb3e0c1b13f8ee9afa0ab91d1cf319b80bf0cc8cd7b5c0145821c455d",
+            "size": 2854912,
+            "status": "downloaded"
+          },
+          {
+            "file": "ExplorerFrame.pdb",
+            "sha256": "6c3fa9c70113b188893022e28ced0ea442fd7e5ecb500649a213ef3eed51e6d9",
+            "size": 4411392,
+            "status": "downloaded"
+          }
+        ]
+      ],
+      "usedThread5800ModuleKeys": [
+        {
+          "name": "user32.dll",
+          "base": 140714802216960,
+          "size": 1855488,
+          "timestamp": 1660300851,
+          "pdb": "user32.pdb",
+          "pdbKey": "3579F64F76E762424E445A0B4F3ACE411"
+        },
+        {
+          "name": "SHCore.dll",
+          "base": 140714793238528,
+          "size": 999424,
+          "timestamp": 3104915035,
+          "pdb": "shcore.pdb",
+          "pdbKey": "71563305D34AB3A25C9C8ABFBAFE61A61"
+        },
+        {
+          "name": "comctl32.dll",
+          "base": 140714289397760,
+          "size": 2699264,
+          "timestamp": 1290468177,
+          "pdb": "comctl32.pdb",
+          "pdbKey": "1FF2BC9A3160F746D9052BFBC32F055A1"
+        },
+        {
+          "name": "comdlg32.dll",
+          "base": 140714810736640,
+          "size": 978944,
+          "timestamp": 3425290385,
+          "pdb": "comdlg32.pdb",
+          "pdbKey": "34E04CB2488413FCEBC7B41164F6A6511"
+        },
+        {
+          "name": "explorerframe.dll",
+          "base": 140713656713216,
+          "size": 2867200,
+          "timestamp": 4012992242,
+          "pdb": "ExplorerFrame.pdb",
+          "pdbKey": "C5DB5C19360249A023F00AF3D16DFBB41"
+        }
+      ],
+      "intermediateOutcomes": [
+        {
+          "check": "Naive PDB information-stream age equality",
+          "outcome": "FAIL",
+          "meaning": "Retained analysis limitation, not CI; GUID matched but information age differed from image age"
+        },
+        {
+          "check": "SymSrvGetFileIndexInfoW expected GUID/age",
+          "outcome": "PASS",
+          "count": 13,
+          "meaning": "Documented API returned all original dump keys; DBI ages independently 1"
+        },
+        {
+          "check": "Second same-filename comctl32 image",
+          "outcome": "REJECTED",
+          "meaning": "Create-new download collision and PE identity mismatch rejected; not loaded for unwind"
+        }
+      ],
+      "limitations": [
+        "Post-timeout sample after display restoration",
+        "No managed/JIT unwind",
+        "No phase duration or event trace",
+        "No complete owner/window inventory",
+        "No original binary or loaded assembly byte hashes"
+      ]
+    },
+    "liveDifferential": {
+      "status": "NOT RUN",
+      "primaryKeyboardCases": 0,
+      "freshMenuControlCases": 0,
+      "locatorControlCases": 0,
+      "independentLiveNegativeCases": 0,
+      "reason": "Original dump establishes native construction, but no harness defect or corrective precondition is proven. Stop at bounded evidence closure; no retry-to-green or claim of completed live differential."
+    },
+    "sources": [
+      {
+        "path": "src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs",
+        "gitBlob": "ae3254b43fff982e222674d6748823c342f402e3",
+        "sha256GitBytes": "53bc1afd54fa320f775cb84ee0ee6a7c0f3bb8d7c96f7ed97e3ee9f4e6f340e9",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs#L13",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs#L60",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs#L63",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs#L72",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs#L182",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiRefinementChecks.cs#L185"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs",
+        "gitBlob": "adec48d74fb2855835346b954dabd9a7d58ccf2d",
+        "sha256GitBytes": "7ebd3ead22ac7d3f81814cc77dc27b3459ae754cce0b27f0c701ce8c220d42f6",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs#L91",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs#L1535",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs#L1540",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs#L1561",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs#L1788",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiChecks.cs#L1804"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native.Validation/NativeUiFailureDiagnostics.cs",
+        "gitBlob": "d54bde3b5bb4d51ab32bfcf412353c46601d4959",
+        "sha256GitBytes": "7bd7a835a4d8d782cd6dc8e2524f7c254516107c49be9ad4c3da0393e8c82b5b",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native.Validation/NativeUiFailureDiagnostics.cs#L61"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/MainWindow.xaml",
+        "gitBlob": "65049eb388021fd759cd7a640e162b1092340758",
+        "sha256GitBytes": "8f33874070476c7e307a83be55cf68b1b739b98cb419c4a1aa7a4d75dccfd299",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/MainWindow.xaml#L10",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/MainWindow.xaml#L43"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/MainWindow.xaml.cs",
+        "gitBlob": "4706c0fa1008f7cdbe3fd070573b7aad54f52077",
+        "sha256GitBytes": "850c879b5730df1075e52801056a31acc408faa57f0c4fe98438254cfea513aa",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/MainWindow.xaml.cs#L697",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/MainWindow.xaml.cs#L716"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/MainWindow.Desktop.cs",
+        "gitBlob": "402272a76c9531941e20715d3dcf9656e6e053c8",
+        "sha256GitBytes": "31a29022ed66677121fb2ced6f7fb8bb6b98a964227e0008c8ba1f8a70eb3f6f",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/MainWindow.Desktop.cs#L174"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.cs",
+        "gitBlob": "be6797dda600fd26139c40754a3a71112b4a5240",
+        "sha256GitBytes": "3dcb3a424a8a2c95aef1f029f5d6888cfb53211ecc2d934fb1cd0c886b86a393",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.cs#L139"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.Tree.cs",
+        "gitBlob": "f0c561ef75e4430807c3182fef9b30c3fc5b7a75",
+        "sha256GitBytes": "072b89483cf34249be19a52e8520bdb5d1267f95e8c6de771534028de2311866",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.Tree.cs#L8"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/Platform/DesktopDialogs.cs",
+        "gitBlob": "6704a9003194c8fdd0e162c73aec3978ca9c444f",
+        "sha256GitBytes": "7ce878327db65860def5fab209a3014311ce66780f13e06eb376e9dd58659f2a",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/Platform/DesktopDialogs.cs#L15"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/App.xaml.cs",
+        "gitBlob": "ad641bd5951167c7708ff5141d256ccbb91e2b43",
+        "sha256GitBytes": "6a71850dc725f57d2e8daecf087895bb2a4153618a5cf5e579573f54ce47c76a",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/src/native/LensDocsStudio.Native/App.xaml.cs#L42"
+        ]
+      },
+      {
+        "path": ".github/workflows/native.yml",
+        "gitBlob": "fbb281dc752d5c2ff3dc18441c999ee694033d75",
+        "sha256GitBytes": "1fd5c4396d96bf1e33533176ec257f76978ec5a870c82ceb436aaa55a62bc3b1",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L25",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L245",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L319",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L345",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L371",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L398",
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/native.yml#L448"
+        ]
+      },
+      {
+        "path": ".github/workflows/pages.yml",
+        "gitBlob": "6633dcef20ac05e4f6c0384dc4e47842db449456",
+        "sha256GitBytes": "bfd8066b694861b79d7a84dfa18c521b75d14d2d0e1034572989f33f9519eb02",
+        "identicalToDevelop": true,
+        "sourceAnchors": [
+          "https://github.com/DouglasNLima/local-docs-studio/blob/24616837b5289299466cf64e37952d61bc95df6b/.github/workflows/pages.yml#L1"
+        ]
+      }
+    ],
+    "finalValidation": {
+      "native": "NOT RUN",
+      "web": "NOT RUN",
+      "reason": "Documentation-only closure with no proven repair; original mandatory Native failure remains blocking",
+      "localChecks": {
+        "staticIntegrity": "PASS: 50 modules, 57 shell assets, 150 vendor assets, 56 dependency scans; 208 service-worker asset attempts",
+        "originalManifestPreservation": "PASS: all 13 original top-level keys and nested values unchanged",
+        "sourceIdentity": "PASS: only the three report files differ; 12 cited source files byte-identical to develop",
+        "relativeLinksAndSourceAnchors": "PASS",
+        "diffWhitespace": "PASS",
+        "nativeAndBrowserExecution": "NOT RUN: documentation-only follow-up; no personal-host GUI execution"
+      },
+      "sourceIdentity": "Final commit/tree recorded after commit creation in PR body and append-only comment",
+      "newPerformance": "NOT RUN"
+    },
+    "decision": {
+      "rootCause": "INCONCLUSIVE",
+      "localisedBoundary": "PROVEN native common-dialogue construction at captured instant",
+      "correctiveCodeChanges": 0,
+      "reportCi": "NOT ACCEPTED",
+      "originalNativeGate": "FAIL",
+      "reviewer": "NO-GO",
+      "pr50": "OPEN/DRAFT",
+      "architecture": "ARCHIVE / HOLD",
+      "pr38": "OPEN/DRAFT/PAUSED",
+      "performanceIntegration": "NO-GO",
+      "original250ms": "INCOMPLETE",
+      "experimentalV2Input": "FAIL",
+      "paragraphMilliseconds": 148.88,
+      "appearanceMilliseconds": [
+        228.87,
+        192.51
+      ],
+      "mediaSaveCancelMilliseconds": [
+        454.69,
+        6190.4
+      ],
+      "betaPublicProduction": "No new authorisation; prior acceptance limits unchanged",
+      "newGuiActions": 0,
+      "newNativeApplicationLaunches": 0,
+      "ciDispatchesOrReruns": 0,
+      "merge": false,
+      "readyTransition": false,
+      "pr38Mutation": false,
+      "releaseOrDeployment": false
+    }
   }
 }

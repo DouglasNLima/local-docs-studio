@@ -1,5 +1,7 @@
 # Continuous architecture feasibility — Goal X, 26 October 2026
 
+**Goal X-B acceptance update:** the original exact-head Native attempt FAILED. Offline inspection localises the captured thread to native common-dialogue initialisation, but does not establish the cause of its delay or a justified repair. **Root cause INCONCLUSIVE; report CI NOT ACCEPTED; owner-review integration NO-GO.** PR #50 stays Draft. The original Goal X study below is retained; its planned/pending CI wording is historical and is superseded only by the [Goal X-B receipt](#goal-x-b--native-ci-attribution-and-report-acceptance) below.
+
 ## Executive decision
 
 **ARCHIVE / HOLD; NO-GO for integrating PR #38. Keep the existing PR OPEN/DRAFT/PAUSED and preserve its branch and evidence.** Confidence is HIGH in the integration decision and MEDIUM in the investment-priority judgement. The public-WPF experiment demonstrates complete eager layout and presentation within its distinct v2 budgets on two recorded hosts, with substantial bounded functional parity. It does not pass the unchanged 100 ms Input contract: ordinary paragraph selection reaches 148.88 ms, appearance 228.87/192.51 ms, and native media Save/Cancel 454.69/6,190.40 ms. The original stock 250 ms goal remains INCOMPLETE. Neither a supported correction covering these independent stalls nor compatibility of the custom viewer with today's complete application has been established. The evidence supports preserving useful research, but does not justify funding a migration or another broad implementation round now. This assessment runs no new performance diagnostic and makes no impossibility claim. [Original receipt][receipt38]; [full observations][measurements]; [contract implementation][gate].
@@ -218,7 +220,87 @@ No merge/Ready transition, product rendering change, release/tag, production sig
 
 Separate final verdicts: **original 250 ms — INCOMPLETE; strict v2 Input — FAIL; normal product shipping with PR38 integrated — NO-GO/BLOCKED**. Accepted stock correctness and the previous tested-host portable acceptance remain separate, source-labelled facts; public production certification remains outside this Goal.
 
+## Goal X-B — Native CI attribution and report acceptance
+
+### Source and scope
+
+Live GitHub reads confirmed PR #50 OPEN/DRAFT at `24616837b5289299466cf64e37952d61bc95df6b`, tree `b8d56f4c53a52c974d6a78cfd5f79d099ff87d3f`, sole parent/current develop `0df86ad2bdae005d49be68096c2f784b49de8109`, tree `05d534030761a7b68a8579bb33e4dfb50161ce90`. PR #38 remained OPEN/DRAFT/PAUSED at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`, tree `6da0d065d4c76dab2102ef9411761890c2da2441`. The initial report diff is exactly the three documentation files. Product, validation, workflows and dependencies are byte-identical to develop; that excludes a code delta as the explanation, not environmental or latent product causes.
+
+This follow-up also changes only those three files: this report adds attribution and acceptance closure; the evidence README adds reproduction/retention boundaries; the JSON appends `goalXB` with original receipts, all job/step outcomes, hashes, symbols, unknowns and decisions. Original historical values are preserved. A fresh clean detached worktree extends the existing PR branch without disturbing its occupied earlier worktree. The final commit/tree and immutable links belong in the PR delivery receipt, avoiding a self-referential commit hash.
+
+### Original failed run and real skips
+
+[Native run 40375067926, attempt 1][XB-native] is `workflow_dispatch` at the original report SHA, checkout confirmed by job-log lines 39 and 117. Job [121755784939][XB-job] failed at step 32, **Validate native desktop workflows**. Lines 572–573 invoke:
+
+```text
+dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
+```
+
+The first terminating error is line 586, `System.InvalidOperationException: The workspace reopen dialogue did not appear.` Lines 587–590 locate `Wait` at `NativeUiChecks.cs:1805`, `OpenFolder` at `NativeUiRefinementChecks.cs:185`, `CheckRefinement:72`, and `RunCore:91`; line 591 records exit 1. The normal dialogue wait remains 20 seconds, with 100 ms observation polling. The earlier stock list/table/mixed observations above 250 ms were recorded by a successful observational step and did **not** cause this job failure. They do not pass the historical performance contract.
+
+| Original Native job | Actual result | Classification |
+|---|---|---|
+| `121755784939` native | FAILURE | Mandatory UI gate failed; prior successful steps remain successful |
+| `121755787598` Original .853 diagnostic replay | SKIPPED | Explicit opt-in false; planned exclusion, not acceptance |
+| `121759874558` Historical upgrade | SKIPPED | Branch condition excludes this assessment; also depends on native; no historical migration claim |
+| `121759874328` companion-installed-authoring | SKIPPED | Blocked by failed `needs: native`; 21-family matrix did not execute |
+| `121759874700` class-installed-authoring | SKIPPED | Blocked by failed native dependency |
+| `121759874943` er-installed-authoring | SKIPPED | Blocked by failed native dependency |
+| `121759875533` state-installed-authoring | SKIPPED | Blocked by failed native dependency |
+
+Inside the failed job, recovery, package creation, installer wizard, package negatives and installation/upgrade/uninstall steps 33–37 were SKIPPED after failure. Evidence upload succeeded. The manifest retains every setup, validation, post-action and cleanup step outcome; six skipped jobs are not six planned successes.
+
+Before failure, Release build passed with zero warnings/errors; Core **2,210/2,210** passed, zero skipped; corpus/export **176** passed; host guards **54** passed; browser export smoke **12** passed. **25 package-negative controls and 24 installed families × three synthetic lifecycle phases were NOT RUN at this report source.** Eight earlier UI check descriptions were retained, but the complete 75-check Native UI suite failed. These are original-source results, not final-follow-up acceptance.
+
+[Web 40375076102, attempt 1][XB-web], also `workflow_dispatch` at `24616837`, succeeded: Edge job `121755806290` **135 passed**, Chromium `121755806585` **135 passed**; both static checks passed (50 modules, 57 shell assets, 150 vendor assets, 56 dependency scans). Aggregate job `121759402516` succeeded; Pages `121759460505` was deliberately SKIPPED by branch/event policy. Chromium's post-job cache reservation warning did not fail tests or the job.
+
+### Original artefacts and exact-source timeline
+
+Both original archives were downloaded as data and independently hashed. [Failure artefact 12675087255][XB-artifact] is **45,893,301 bytes**, SHA-256 `1a740a57c3df3bf6389c4704ab0c8e570b12121d9c7a334ab4e2d8c2eef17a54`, 3,147 members, expiry **2026-11-09 18:15:59 UTC**. The [develop comparison artefact 12668699884][XB-baseline-artifact] is **342,455,972 bytes**, SHA-256 `7c9c93d3b43825995c94e95e5f75e95c82aadbcb9cd531f1dad76698c0fbec7d`, 3,597 members, expiry **2026-11-09 17:09:45 UTC**. These are finite hosted retention dates, not permanent availability. New local evidence paths are keyed by full SHA/run/attempt/image/round and remain ignored and append-only. No archived executable was run.
+
+| Phase | Observed evidence | Not observed / limitation |
+|---|---|---|
+| A — before closure | Runtime receipt identifies PID **1952**, expected/actual executable under the checked-out Native Release output. Dump process-start time is **18:14:39 UTC**. Synthetic source SHA-256 `0e381cde040f0c18f7315fccae5e8c474a78626ae29bf1baef0cfb570d902020`; draft is 116 characters, SHA-256 `c2617a43e4670455246e407dec9a1b14e0003e9cf73175c6ea26891c869f4a02`. Earlier guards checked editor focus and exact pasted draft. | No event-time HWND/owner/foreground/focused-control inventory, process binary digest or loaded assembly digests was recorded for this phase. No reconstructed key trace. |
+| B — after closure | `native-refinement-workspace-closed.png` shows an empty workspace, dirty `fixture.md`, retained draft and “Workspace closed” status. Source guards reached this capture only after session Workspace null, zero tree items and retained document/root/text checks. Archived session agrees: Workspace null, same draft, retained synthetic root, caret 116. | Final Undo restoration was after reopening and was **not reached**. Current Undo stack, dispatcher readiness and menu/button CanExecute at the action were not independently recorded. |
+| C — single shortcut | Source calls `FocusWindow(window)` then exactly one `Keyboard.TypeSimultaneously(CONTROL, SHIFT, KEY_O)`. `FocusWindow` proves foreground **PID**, not exact HWND/control. XAML binds `PreviewKeyDown` to `WindowKeyDown`; `HandleDesktopKey` has no Ctrl+Shift+O interception; Key.O chooses `OpenFolderCommand` when Shift is present. The view-model calls `DesktopDialogs.OpenFolder`, constructing WPF `OpenFolderDialog` with the exact title and main-window owner. | InputGestureText alone was not used as proof. Actual key delivery, modifiers, handled state, command CanExecute and callback entry/return were not logged. Source supports the route; it does not supply missing event evidence. |
+| D — failure boundary | The captured process thread **5800** is inside `comdlg32!CFileOpenSave::Show` → `user32!InternalCreateDialog` → `comdlg32!CFileOpenSave::_InitOpenSaveDialog` → Explorer navigation/address-toolbar creation → `ImageList_LoadImageW` → `user32!CopyDibHdr+0x62`. Native common-dialogue construction was therefore reached in PID 1952. | One post-timeout dump cannot assign elapsed time to a frame, distinguish CPU/scheduling/resource delay, prove which keyboard event invoked it, or recover the full owner chain. It is not a sampling profile or a supported repair. |
+| D — windows/captures | Post-failure UIA child-window inventory has one application-named window `{X=1,Y=1,Width=1022,Height=718}`. Descendants expose TitleBar/SystemMenuBar only; its separate child dump is empty. Failure PNGs show retained draft and no visible folder picker in the captured area. | Inventory is restricted to the application PID; it lacks HWND/class/enabled/modal fields and other-process windows. Absence here cannot prove absence throughout the desktop. Display restoration happens during exception unwinding before the outer failure capture; changed geometry is not pre-action evidence. |
+
+ZIP member timestamps place the closed-workspace capture at **18:15:16**, first failure desktop capture at **18:15:36**, dump header at **18:15:50**, and later UIA/error receipts at **18:15:54**; the job emits the error at **18:15:55.982 UTC**. ZIP times are coarse two-second archive metadata, not event-trace timestamps. The dump occurs after the failed wait and display restoration. It localises the sampled work, not the entire original wait.
+
+Important member hashes: closed-workspace PNG `7c9df5c881808995b8b98f48d0be6dcf8bf94ebd54316df71809064d5af534ee`; failure desktop PNG `1950749974957a9263e7a5b64b2b229f0d412383609800faee98210847cbeb0b`; original dump `cf229122b3d080c9fa988046a66e46fccc2d5eac0fe911a095653a7b97ca0745`; original `native-ui.json` `4a006f5fc6a94d13dab55cb670cd075a6a248c232bfd6756e67f14beb9c858d1`. The JSON manifest records all inspected member hashes and source anchors.
+
+### Comparison and causal hypotheses
+
+Develop [40361576134][baseline-native], attempt 1, **push**, passed the same unchanged check. Its `ui/native-refinement.json` explicitly records `WorkspaceClosePreservesDraftRootsAndUndo: true`; its post-reopen export screenshot shows the tree restored and the draft undone. The full UI receipt records 75 checks; the job log also records 25 package negatives and three subsequent installed UI passes. Overall: 25 successful jobs and the two planned exclusions, including all 24 installed authoring families. None is PR #50 acceptance.
+
+Both runs report Windows Server 2025 `10.0.26100`, image `windows-2025-vs2026/20261021.278.1`, runner `2.338.0`, provisioner `20261021.618`, four logical processors, and loaded framework-dependent Core/WPF **10.0.14** paths. Their display setup/restoration receipts agree. They are different worker IDs and regions (**northcentralus** develop; **westus3** report); passing process PID is 10508. CPU model, cache temperature, scheduling and matching loaded-module hashes are not established. “Fresh process” does not mean cold operating-system cache. Portable 10.0.13 pins remain a separate package identity.
+
+| Hypothesis | Supporting observations | Contradicting observations / missing proof | Finding |
+|---|---|---|---|
+| H1 — shortcut not delivered / wrong focus | Foreground guard checks PID only; no key or exact-focus trace | Correct preview-key route exists; original process is subsequently in native common-dialogue construction, contradicting a simple “nothing was invoked” account | **INCONCLUSIVE** for exact delivery/focus; not a proven repair target |
+| H2 — command disabled / not invoked | No action-time CanExecute or callback receipt | No custom OpenFolder CanExecute condition in source; native `CFileOpenSave::Show` is present. A blanket claim that no native dialogue invocation occurred is **DISPROVEN** | **INCONCLUSIVE** for exact command-event attribution |
+| H3 — dialogue opened but selector too narrow | Selector requires exact title and same PID; failure inventory excludes foreign processes | No ready picker in captures; observed stack remains inside construction. Correct source title/owner and develop PASS oppose a deterministic selector error | **INCONCLUSIVE**; no locator relaxation justified |
+| H4 — asynchronous focus/readiness/timing | Native creation still present after the failed wait; post-failure UIA exposes chrome only | One sample supplies no duration, event ordering or preceding condition whose wait would repair this; same source passed earlier | **INCONCLUSIVE** cause; native-initialisation location **PROVEN** |
+| H5 — other bounded cause, e.g. shell image/resource or runner scheduling | Exact native stack includes Explorer toolbar image loading and `CopyDibHdr`; workers differ | No repeated sample, resource counters or scheduler trace; stack membership is not exclusive time/cause | **INCONCLUSIVE** root cause; no product/runtime workaround justified |
+
+### Bounded diagnostic and decision closure
+
+The only new diagnostic was an ignored **offline, read-only dump reader**. It used original captured thread/memory records and `StackWalk64`, loading exact Microsoft image/PDB files as data, never executing them. PE timestamp/SizeOfImage and CodeView identities matched the dump; `SymSrvGetFileIndexInfoW` matched all thirteen PDB GUID/age keys; `SYMOPT_EXACT_SYMBOLS` was enabled. A second same-named comctl32 image with a different identity was rejected, not substituted. The walk stops at the first unregistered/JIT address; no managed unwind or complete command stack is claimed. The [evidence README](evidence/continuous-feasibility-2026-10/README.md#goal-x-b-offline-attribution-and-retention) explains reproduction and an initial rejected symbol-age check.
+
+This original evidence establishes that native construction was reached, sufficient to reject a speculative keyboard/locator repair. It does **not** isolate the underlying latency cause. A fresh shortcut-versus-menu differential, a second locator control and an independent live negative control were **NOT RUN**: they would add new execution under incompletely matched runtime/ownership conditions without proving a correction to the observed shell-initialisation boundary. No live diagnostic acceptance is claimed. New GUI actions **0**; new native application launches **0**; CI dispatches/reruns **0**. This is a bounded evidence closure with an explicitly unresolved cause, not completion of the optional live differential or attribution certification. It does not authorise broader Windows shell profiling.
+
+No precondition or locator defect is proven, so **zero corrective code changes** are made. No timeout, focus policy, keyboard action, assertion, job condition, failure propagation or population changes. No final-head Native/Web run is claimed: final-source checks are documentation/static checks only, recorded with the final SHA in the PR receipt. The previous mandatory Native failure is **not waived because this is documentation-only**. Report CI remains **NOT ACCEPTED / FAIL (original gate), root-cause attribution INCONCLUSIVE; reviewer NO-GO**. A green retry alone would not establish a fix. PR #50 remains Draft; owner review must not treat this follow-up as permission to merge.
+
+Architecture recommendation stays **ARCHIVE / HOLD**. PR #38 stays OPEN/DRAFT/PAUSED, with no integration/migration or cross-link mutation. Original stock **250 ms INCOMPLETE**; experimental v2 **Input FAIL**, including paragraph **148.88 ms**, appearance **228.87/192.51 ms**, media **454.69/6,190.40 ms**, unchanged. No new beta/public-production authorisation, release, signing, package publication, application/Pages deployment, Ready transition or merge. No personal-host GUI, installer, registry, association, clipboard or OS-setting operation occurred.
+
 <!-- immutable references -->
+
+[XB-native]: https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926
+[XB-job]: https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/job/121755784939
+[XB-web]: https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375076102
+[XB-artifact]: https://github.com/DouglasNLima/local-docs-studio/actions/runs/40375067926/artifacts/12675087255
+[XB-baseline-artifact]: https://github.com/DouglasNLima/local-docs-studio/actions/runs/40361576134/artifacts/12668699884
 
 [D-fixtures]: https://github.com/DouglasNLima/local-docs-studio/blob/0df86ad2bdae005d49be68096c2f784b49de8109/src/native/LensDocsStudio.Native.Validation/ContinuousPreviewFixtures.cs#L1
 [D-hub]: https://github.com/DouglasNLima/local-docs-studio/blob/0df86ad2bdae005d49be68096c2f784b49de8109/docs/native/mermaid-creation-hub.md#L1
