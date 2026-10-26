@@ -37,16 +37,23 @@ internal static partial class NativeUiChecks
         WriteNew(Path.Combine(output, name + "-operator-ready.json"), new { atUtc = DateTimeOffset.UtcNow, status = "WAITING_FOR_OPERATOR_BEFORE_INPUT",
             processId, startUtc = start, hwnd = hwnd.ToInt64(), executable, actionSent = false, observationBudgetSeconds = 20 });
         Console.WriteLine("HOST READY: activate the new synthetic Lens window now; no input has been sent. Existing 20-second observation budget applies.");
+        var observations = new List<object>();
         try { Wait(() =>
         {
             process.Refresh(); GetWindowThreadProcessId(hwnd, out var owner);
             if (process.HasExited || process.StartTime.ToUniversalTime() != start || process.MainModule?.FileName != executable
                 || owner != processId || window.Properties.ProcessId.Value != processId || !HostNormalConsole())
                 throw new HostFindInputBlockedException("New-session identity or normal console changed during operator handoff; no input sent.");
-            return GetForegroundWindow() == hwnd;
+            var foreground = GetForegroundWindow();
+            GetWindowThreadProcessId(foreground, out var foregroundProcess);
+            if (observations.Count < 256) observations.Add(new { atUtc = DateTimeOffset.UtcNow,
+                targetHwnd = hwnd.ToInt64(), foregroundHwnd = foreground.ToInt64(), foregroundProcess, matches = foreground == hwnd });
+            return foreground == hwnd;
         }, "Operator did not activate the exact new synthetic window within the unchanged observation budget; no input sent."); }
         catch (InvalidOperationException error) when (error is not HostFindInputBlockedException)
         { throw new HostFindInputBlockedException(error.Message); }
+        finally { WriteNew(Path.Combine(output, name + "-operator-observations.json"), new { processId, startUtc = start,
+            actionSent = false, observationBudgetSeconds = 20, observations, scope = "Read-only window/process identifiers; no foreign application title or content" }); }
         AssertHostForeground(processId, window);
         WriteNew(Path.Combine(output, name + "-operator-foreground.json"), new { atUtc = DateTimeOffset.UtcNow, status = "PASS", processId, startUtc = start,
             hwnd = hwnd.ToInt64(), foreground = GetForegroundWindow().ToInt64(), actionSent = false });

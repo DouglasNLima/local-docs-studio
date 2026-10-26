@@ -1,5 +1,30 @@
 # Current native Windows readiness
 
+## Goal VIII-F diagnostic continuation — 26 October 2026
+
+Source `276625aa8a52523834ef7b2630a12b78b59a71b9` completed all nine workflows:
+eight successful and one failed, with 114 passed jobs, two failed jobs and eight
+expected skips. Both native runs passed, including the independently verified
+2,210-case Core union and 144 hosted installed-family phases. PR Web Edge failed
+its unchanged initial style assertion after a stylesheet request returned
+`net::ERR_NO_BUFFER_SPACE`; the required aggregate failed accordingly. Its
+lower-level cause remains UNPROVED. A same-source passing push is not a substitute.
+
+Portable .917 h03 FAILED at initial TextPattern readiness before commands; h07
+BLOCKED at the initial operator foreground handoff before commands. Both windows
+were reported closed normally, their subsequent process absence was observed,
+and payload/workspace/host preservation passed. All original receipts remain
+immutable in the [source-labelled delivery](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6413413529).
+
+The diagnostic continuation records the original TextPattern exceptions and
+observation times, existing opt-in preview phase metadata and numerical foreground
+identities. It preserves the same readiness predicate, input guards and deadlines.
+Web test diagnostics collect bounded read-only runner counters only upon the proved
+loopback buffer error; requests, assertions, browser cases and production assets
+are unchanged. These observations are not a product fix or acceptance result.
+Fresh committed-source gates and portable acceptance remain required.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
 ## Goal VIII-F initial preview observation — 26 October 2026
 
 At `d8b02a6`, independently verified .915 passed local native/UIA Find Enter and

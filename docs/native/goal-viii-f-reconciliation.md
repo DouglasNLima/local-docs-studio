@@ -3,6 +3,47 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Retained 276625a failures and diagnostic continuation — 26 October 2026
+
+The [complete source-labelled receipt](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6413413529)
+pins source `276625aa8a52523834ef7b2630a12b78b59a71b9`, tree
+`cfbe49ffe87eda59302b393ca7877eb9c4008893`: 114 passed jobs, two failed jobs,
+eight expected skips across nine completed attempt-1 workflows. Both native runs,
+raw 2,210-case Core unions, 528-path .917/.918 packages and 144 installed-family
+phases passed. Actual HC measured 4.528515190218159:1 against the unchanged 4.5.
+Original failed HC and f05 remain unchanged and do not acquire later results.
+
+PR Web run 40296690418, Edge job 121484357443, retains 134 PASS / one FAIL and its
+aggregate failure. The trace records the document stylesheet request failing with
+`net::ERR_NO_BUFFER_SPACE`, followed by a successful service-worker precache GET.
+The source-identical push passed 135 Edge tests; it does not certify the failed PR
+run. Buffer/socket causation remains UNPROVED. No retry or product change occurred.
+
+Portable h03 stopped at initial provider readiness, 09:40:38.7318729Z, before
+commands. Its exact foreground handoff passed, but the original 20-second check
+expired; the subsequent failure snapshot could read the selections. h07 stopped
+at initial foreground handoff before any picker, private edit or owner mutation.
+Both normal closures are operator statements plus read-only subsequent process
+absence, not recorded closure sequences. Both preservation completions passed;
+1,056 payload files, 12 workspace files and five operator-installed files were
+independently rehashed. The 3,923-file evidence index has SHA-256
+`445d6eec35d2e14c25c2412fdc64acb85c7794fd9f63130ee0ad0bdafc64cac8`.
+
+FlaUI 5.0.0's `IsSupported` calls the same native-pattern getter as `Pattern`
+and catches `PatternNotSupportedException`. The diagnostic continuation retains
+that exact true/false rule while recording the original exception per observation,
+without short-circuiting any required check or extending the deadline. Existing
+preview phase HelpText is enabled only in the prepared child process. Initial
+operator-handoff observations record numerical HWND/PID values without foreign
+window titles or content; later guards still reject immediately.
+
+The Web helper listens during the unchanged `gotoApp` sequence and triggers only
+on loopback `ERR_NO_BUFFER_SPACE`. It captures request/time/process-memory data and,
+on Windows GitHub Actions only, one bounded read-only TCP/process-counter sample.
+It never repeats a request, changes connection settings or turns a failed assertion
+into a pass. The runner helper rejects personal-host invocation. These diagnostics
+require new source-labelled validation; they establish no remediation by themselves.
+
 ## Initial preview observation correction — 26 October 2026
 
 Source `d8b02a6db1f154d51e60fb38f297c30c026d2dde`, tree

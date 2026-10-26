@@ -20,6 +20,7 @@ internal static partial class NativeUiChecks
         WriteNew(Path.Combine(output, "before.json"), new { atUtc = DateTimeOffset.UtcNow, revision, tree, variant, source, originalHash, fullShell = "NOT RUN" });
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         var info = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = workspace };
+        info.Environment["LENS_NATIVE_PREVIEW_DIAGNOSTICS"] = "1";
         if (variant.EndsWith("Observed", StringComparison.Ordinal))
         {
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_STARTUP_HOOKS"))) throw new IOException("Inherited startup hooks are forbidden.");
@@ -43,9 +44,7 @@ internal static partial class NativeUiChecks
             stage = "preview-readiness";
             // The first preview can still be pending after the source and observer are ready.
             // Observe its actual provider before reading selection; never repeat input.
-            ObserveUntil(() => editor.Patterns.Text.IsSupported
-                && main.FindFirstDescendant(cf => cf.ByAutomationId("DocumentPreview")) is { } preview
-                && preview.Patterns.Text.IsSupported, "Initial editor/preview TextPattern providers did not become available.");
+            ObserveInitialProviders();
             Snapshot("ready");
 
             if (variant == "InvalidMermaid")
@@ -157,6 +156,63 @@ internal static partial class NativeUiChecks
 
         void Guard(AutomationElement? focus = null) => AssertHostForeground(app.ProcessId, main, focus);
         void ObserveUntil(Func<bool> condition, string failure, bool ownerOnly = false) => Wait(() => { AssertHostForeground(app.ProcessId, ownerOnly ? null : main); return condition(); }, failure);
+        void ObserveInitialProviders()
+        {
+            var samples = new List<object>(); var clock = Stopwatch.StartNew(); var ready = false;
+            var hwnd = main!.Properties.NativeWindowHandle.Value;
+            try
+            {
+                ObserveUntil(() =>
+                {
+                    var editorReady = false; var previewReady = false; var previewFound = false;
+                    string? editorError = null; string? previewError = null;
+                    try
+                    {
+                        editorReady = HasTextPattern(editor!, out editorError);
+                        if (editorReady)
+                        {
+                            var preview = main!.FindFirstDescendant(cf => cf.ByAutomationId("DocumentPreview"));
+                            previewFound = preview is not null;
+                            if (preview is not null) previewReady = HasTextPattern(preview, out previewError);
+                        }
+                        return ready = editorReady && previewReady;
+                    }
+                    finally
+                    {
+                        if (samples.Count < 256) samples.Add(new { atUtc = DateTimeOffset.UtcNow, elapsedMilliseconds = clock.Elapsed.TotalMilliseconds,
+                            editorReady, previewFound, previewReady, editorError, previewError, foreground = GetForegroundWindow().ToInt64() });
+                    }
+                }, "Initial editor/preview TextPattern providers did not become available.");
+            }
+            finally
+            {
+                object? previewState = null;
+                if (GetForegroundWindow() == hwnd && HostNormalConsole())
+                {
+                    try
+                    {
+                        var status = main.FindFirstDescendant(cf => cf.ByAutomationId("PreviewStatus"));
+                        previewState = new { status = status?.Name, diagnostic = status?.Properties.HelpText.ValueOrDefault };
+                    }
+                    catch (Exception error) { previewState = new { observationError = error.ToString() }; }
+                }
+                WriteNew(Path.Combine(output, "initial-provider-observations.json"), new { revision, tree, processId = app.ProcessId,
+                    hwnd = hwnd.ToInt64(), ready, actionSent = false, observationBudgetSeconds = 20, samples, previewState });
+            }
+        }
+        static bool HasTextPattern(AutomationElement element, out string? error)
+        {
+            error = null;
+            try { _ = element.Patterns.Text.Pattern; return true; }
+            catch (Exception exception)
+            {
+                error = exception.ToString();
+                // FlaUI IsSupported uses this same getter and catches only this exception.
+                // Preserve its readiness result while retaining the underlying failure.
+                if (exception is FlaUI.Core.Exceptions.PatternNotSupportedException) return false;
+                throw;
+            }
+        }
         void Preserve() { if (ReadEditorText(editor!) != source || Hash(path) != originalHash) throw new IOException("Original source was not preserved."); }
         JsonElement LastNative() => ReadObservedText(Path.Combine(output, "native-observations.jsonl")).Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(line => JsonSerializer.Deserialize<JsonElement>(line)).Last(row => row.TryGetProperty("selectionStart", out _));
@@ -168,6 +224,8 @@ internal static partial class NativeUiChecks
             WriteNew(Path.Combine(output, name + ".json"), new { atUtc = DateTimeOffset.UtcNow, revision, tree, variant, processId = app.ProcessId, processStartUtc = Process.GetProcessById(app.ProcessId).StartTime.ToUniversalTime(), hwnd = hwnd.ToInt64(), foreground = GetForegroundWindow().ToInt64(), dpi = HostWindowDpi(hwnd), sourceHash = Hash(path),
                 ownerText = editor is null ? null : ReadEditorText(editor), editorSelection = editor?.Patterns.Text.Pattern.GetSelection().Select(r => r.GetText(-1)).ToArray(),
                 previewSelection = preview?.Patterns.Text.Pattern.GetSelection().Select(r => r.GetText(-1)).ToArray(),
+                previewStatus = main.FindFirstDescendant(cf => cf.ByAutomationId("PreviewStatus"))?.Name,
+                previewDiagnostics = main.FindFirstDescendant(cf => cf.ByAutomationId("PreviewStatus"))?.Properties.HelpText.ValueOrDefault,
                 controls = main.FindAllDescendants().Where(e => e.Properties.HasKeyboardFocus.ValueOrDefault || e.Properties.AutomationId.ValueOrDefault is "FindText" or "FindContext" or "DiagramError0" or "DiagramPreview0").Select(e => new { id = e.Properties.AutomationId.ValueOrDefault, name = e.Name, focused = e.Properties.HasKeyboardFocus.ValueOrDefault }).ToArray() });
         }
     }
