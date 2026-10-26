@@ -17,6 +17,41 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--host-owned-window-controls")
+        {
+            try { NativeHostOwnerPolicy.RunControls(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--find-routing")
+        {
+            try { NativeFindRoutingChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--host-mermaid-fixtures")
+        {
+            try { NativeHostMermaidFixtureChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--window-discovery")
+        {
+            try
+            {
+                if (args.Length != 2) throw new ArgumentException("A fresh unit-evidence directory is required.");
+                var discoveryOutput = Path.GetFullPath(args[1]);
+                if (Directory.Exists(discoveryOutput) || File.Exists(discoveryOutput)) throw new IOException("Unit evidence already exists; preserve it.");
+                Directory.CreateDirectory(discoveryOutput); NativeWindowDiscoveryChecks.Run(discoveryOutput); return 0;
+            }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--development-host-ui")
+        {
+            try
+            {
+                if (args.Length is not (5 or 6) || args.Length == 6 && args[5] is not ("--shell-only" or "--diagnostic-FindEnter" or "--diagnostic-FindNext" or "--diagnostic-FindTyped" or "--diagnostic-FindEnterObserved" or "--diagnostic-FindNextObserved" or "--diagnostic-FindTypedObserved" or "--diagnostic-FindEditorEnterObserved" or "--diagnostic-FindPreviewObserved" or "--diagnostic-InvalidMermaid" or "--diagnostic-OwnedWindow")) throw new ArgumentException("Use the guarded Invoke-NativePortableHostSmoke.ps1 RunUi path with independent source/tree/executable pins.");
+                return NativeUiChecks.RunDevelopmentHost(args[1], args[2], args[3], args[4], args.Length == 6 && args[5] == "--shell-only", args.Length == 6 && args[5].StartsWith("--diagnostic-", StringComparison.Ordinal) ? args[5][13..] : null);
+            }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--mermaid-creation-ui")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"

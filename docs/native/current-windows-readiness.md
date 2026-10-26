@@ -1,6 +1,264 @@
 # Current native Windows readiness
 
-## Goal IX execution update — 25 October 2026
+## Goal VIII-F owner acceptance and library transition — 26 October 2026
+
+Source `0204b4089ed7bb4f2aca51a16b0db92b61c56584`, tree
+`3c0ccaad4d6649e470cbcfa1a07d9f7965ebfe41`, completed nine attempt-1 workflows:
+116 jobs passed, with eight expected skips. Both .925/.926 packages retain 528
+verified paths, bundled Core/WPF 10.0.13, the 2,210-case parent Core union and
+144 independently verified hosted installation phases. Actual hosted High
+Contrast passed at 4.528515190218159:1 against the unchanged 4.5 requirement.
+
+Fresh .925 session l02 passed actual nonmodal stale-owner rejection. Four native
+snapshots retained the visual foreground, exact owner/session/version bindings
+and private/saved source. One authorised owner mutation ran with the actual UIA
+client option observed as 1, then 0, then restored to 1. l03–l07 separately passed
+Find Enter/Next, editor Return, preview Find/focus and invalid/valid Mermaid.
+Their saved workspace bytes and payloads were independently verified. Actual
+window DPI was 96; this is not formal alternate-DPI certification. Earlier l01
+remains FAIL before mutation because three visible windows violated the exact
+two-window guard. Its extra tool window's purpose remains unproved.
+
+The original contiguous shell l08 remains BLOCKED at `isolated-library`, after
+six completed checks including private Apply, one-step Undo/Redo and Save.
+The guard recorded expected main HWND 17110276 versus foreground 28117902,
+both PID 20796 on the normal console. The extra HWND's exact role was not
+recorded. A later guarded main capture reports the synthetic snippet saved;
+read-only files contain one template and one snippet. These later observations
+do not turn the interrupted sequence into PASS. Operator closure was requested;
+the remaining shell stages were not run.
+
+[WPF 10.0.13 ButtonAutomationPeer](https://github.com/dotnet/wpf/blob/v10.0.13/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Automation/Peers/ButtonAutomationPeer.cs)
+queues Invoke asynchronously. The client previously required main foreground
+immediately after confirming the library prompt, without observing its closure.
+The scoped validation correction captures that prompt's HWND, observes its
+disappearance through the existing guarded 20-second Wait, then retains the
+exact-main foreground and saved-status assertions. It records before-confirm
+and closed receipts. There is no repeated input, activation or longer deadline.
+Fresh source gates and the original complete shell remain required.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
+## Goal VIII-F observed automatic UIA focus — 26 October 2026
+
+Source `aeed1b8907e1cc50bd5f39ace0924150e73e01ed`, tree
+`962aa3740935c83c15f710cc1f8cfcf3a798a6f6`, produced independently verified
+.923/.924 packages with 528 paths and bundled Core/WPF 10.0.13. Both raw hosted
+Core results match the 2,210-case original parent union. The retained CI receipt
+records the complete workflow outcomes separately from local acceptance.
+
+Fresh .923 session k01 (PID 59236, started 13:02:50.2229751Z) passed the initial
+operator foreground handoff, native source/preview, picker Cancel and private
+Cancel. Both native pre-mutation snapshots proved the exact nonmodal owner and
+private draft, with main HWND 19995846 and visual HWND 16127236. At
+13:03:16.374186Z the read-only trace observed the main editor's automation
+`SetFocusCore` through `ElementProxy.InContextSetFocus`; at 13:03:16.3882906Z
+the owner TextChanged stack reached AvalonEdit's `IValueProvider.SetValue`.
+The original post-call guard BLOCKED before Apply: the expected visual HWND
+had become the main HWND, still in the same process on the normal console.
+No stale-owner rejection or post-mutation native snapshot was reached.
+
+Microsoft documents that [UIA AutoSetFocus](https://learn.microsoft.com/en-us/windows/win32/api/uiautomationclient/nf-uiautomationclient-iuiautomation2-get_autosetfocus)
+normally focuses the target before SetValue. The old client's property was not
+sampled, so this attribution combines the actual call order, unchanged FlaUI
+client construction and the documented default. A fresh real client independently
+returned 1. The validation-only correction suppresses AutoSetFocus around the
+single authorised explicit owner mutation and restores its prior value in a
+finally block. Existing foreground and native owner/version guards stay intact.
+Real-client controls verify both prior settings and exception restoration without
+opening windows or modifying documents; these are not portable GUI acceptance.
+
+The operator confirmed Cancel and normal close without saving. Native close was
+observed at 13:03:42.7282776Z; separate process absence and bounded preservation
+passed, including all 528 payload and six saved workspace hashes. k01 remains
+BLOCKED. The shell's read-only owner observer is now limited to its first launch,
+where owner scenarios occur, so restart cannot replay preserved request files.
+The original contiguous shell and fresh-source portable acceptance remain unproved.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
+## Goal VIII-F focused portable passes and retained owner block — 26 October 2026
+
+Source `aab991166d9cc3a8befea809ce3752253d21903c`, tree
+`9ddd601504b35c8fcab72cbfe1dcb3896360adf7`, completed all nine attempt-1
+workflows successfully: 116 passed jobs and eight expected skips. Independent
+archive verification proves both 2,210-case Core unions, 144 hosted installed
+phases, all four 135-case browser jobs, the creation picker in three appearances,
+and 19+19 expanded appearances. Actual hosted HC remains 4.528515190218159:1
+against the unchanged 4.5 requirement. The prior Class reinstall failure remains
+failed at its original source; both new-source Class lifecycle jobs passed.
+
+Verified portable .922, bundled Core/WPF 10.0.13 at real DPI 144, passed five
+separate sessions: Find Enter, Next, ordinary editor Return with Find visible,
+preview Find/focus, and ordinary-guard invalid Mermaid with its valid companion.
+Native and independent UIA editor ranges agree on Café at UTF-16 start 2, length 4,
+caret 6. These are focused passes, not a contiguous complete-shell acceptance.
+
+Session j07 BLOCKED before commands at the initial operator handoff. Fresh j08
+passed that handoff, 24-family picker invocation/Cancel and source selection
+preservation, then the first private Cancel. Two native observations proved the
+exact enabled nonmodal owner/private identities and visual foreground before the
+single explicit synthetic owner SetValue. The immediate post-call foreground
+guard stopped before Apply. A later guarded capture found the main window
+foreground and its editor focused; the causal transition remains UNPROVED.
+No post-mutation native snapshot or stale Apply rejection was recorded. Both
+sessions were reported closed normally by the operator and independently absent;
+all 3,696 payload and 42 saved workspace hashes across seven sessions passed.
+
+The next validation-only diagnostic records the numerical failed guard boundary
+and at most 128 process-local focus/source observations with bounded call stacks.
+It attaches only after the existing exact packaged owner/session checks. It does
+not activate, focus, mutate or retry; all input guards and deadlines remain.
+This is observation for an unproved cause, not a product fix or acceptance pass.
+Fresh exact-source gates and portable evidence are required after this change.
+The [retained receipt](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6415900963)
+indexes 6,649 files with SHA-256
+`325cb3b94baad406e807439006dd45a320d45c29adc35ca31cfe74825a55cf70`.
+**PR #48 remains Draft; stale-owner acceptance and the original complete shell
+are incomplete, so HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
+## Goal VIII-F accessibility discovery and Class observation — 26 October 2026
+
+At `b1067061a03f71534a358862572cde6d089dc51e`, verified portable .919 session
+`i03` FAILED before commands at 11:00:24.6580043Z. Operator foreground passed;
+all 152 initial editor TextPattern observations returned a null native pattern.
+The preview's own diagnostic reported the current generation finished without
+error. The failure snapshot then read both selection providers successfully.
+Normal closure was confirmed by the operator, subsequent process absence was
+checked, and all 528 payload and six workspace hashes remained unchanged.
+
+The pinned AvalonEdit 6.3.1.120 parent peer delegates Text to an already existing
+TextArea peer. An unshown actual-control reproduction proves the provider is null
+before child peer creation and exposes the exact source afterwards. The harness
+now discovers both editor and preview surfaces before checking their providers;
+its previous editor-first short circuit prevented the later tree discovery.
+Both required patterns, the 20-second deadline and every foreground guard remain.
+The compiled regression adds this lifecycle proof to the six existing Find checks.
+Fresh committed-source portable acceptance is still required.
+
+The same source's PR native run `40307172659` also retains a failed Class reinstall,
+job `121533619659`: an observation of the initially empty draft called `Single()`
+and threw before its existing wait could observe the expected inserted class.
+The predicate now requires exactly one class with ID `B` without throwing on an
+empty observation. No action is repeated and the final assertion is unchanged;
+the reason the failed run observed an empty draft is not independently established.
+New hosted gates must prove the result. All earlier failures remain source-labelled.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
+## Goal VIII-F diagnostic continuation — 26 October 2026
+
+Source `276625aa8a52523834ef7b2630a12b78b59a71b9` completed all nine workflows:
+eight successful and one failed, with 114 passed jobs, two failed jobs and eight
+expected skips. Both native runs passed, including the independently verified
+2,210-case Core union and 144 hosted installed-family phases. PR Web Edge failed
+its unchanged initial style assertion after a stylesheet request returned
+`net::ERR_NO_BUFFER_SPACE`; the required aggregate failed accordingly. Its
+lower-level cause remains UNPROVED. A same-source passing push is not a substitute.
+
+Portable .917 h03 FAILED at initial TextPattern readiness before commands; h07
+BLOCKED at the initial operator foreground handoff before commands. Both windows
+were reported closed normally, their subsequent process absence was observed,
+and payload/workspace/host preservation passed. All original receipts remain
+immutable in the [source-labelled delivery](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6413413529).
+
+The diagnostic continuation records the original TextPattern exceptions and
+observation times, existing opt-in preview phase metadata and numerical foreground
+identities. It preserves the same readiness predicate, input guards and deadlines.
+Web test diagnostics collect bounded read-only runner counters only upon the proved
+loopback buffer error; requests, assertions, browser cases and production assets
+are unchanged. These observations are not a product fix or acceptance result.
+Fresh committed-source gates and portable acceptance remain required.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
+## Goal VIII-F initial preview observation — 26 October 2026
+
+At `d8b02a6`, independently verified .915 passed local native/UIA Find Enter and
+Next in fresh g01/g02 sessions. Both main native CI jobs passed and .915/.916 retain
+all 528 payload paths and bundled Core/WPF 10.0.13; the complete matrix outcomes
+are source-labelled in the delivery receipts.
+
+Local g03 editor-Return acceptance FAILED before commands: the diagnostic's first
+selection snapshot requested a preview TextPattern while `Preview pending` was
+visible. The next read-only snapshot succeeded with unchanged source. The operator
+closed the window normally; subsequent process absence and bounded host/source
+preservation were verified. The failed receipt remains unchanged.
+
+The validation-only correction adds an initial provider-readiness observation with
+the existing foreground guard and 20-second deadline. Required selection/source
+assertions are unchanged. Fresh exact-head CI/package/local acceptance is required;
+**HOST PORTABLE / INTERNAL BETA remain BLOCKED** until the focused cases and one
+complete contiguous shell pass. No product, runtime, renderer or release-policy
+change is introduced. See [the source-labelled account](goal-viii-f-reconciliation.md).
+
+## Goal VIII-F attended handoff and owner guard — 26 October 2026
+
+Existing Draft PR #48 remains unmerged. At source `2f5a0a8`, all nine mandatory
+workflows passed (116 jobs, eight explicit skips); Core retained the exact 2,210-case
+union. The operator accepted the current host baseline and confirmed availability.
+Verified portable .914 passed one native/UIA Find Enter session (UTF-16 2/4, caret6);
+two fresh Next sessions stopped before input on initial foreground mismatch.
+Their manual closure and subsequent process absence are recorded separately.
+The original blocked f05 and failed HC receipts remain immutable.
+
+The validation-only correction observes operator activation before a fresh launch's
+first action within the existing 20-second observation budget. Subsequent guards
+remain immediate. A read-only, source-pinned child observer records native owner,
+session, document/private versions and exact source hashes. The one deliberate
+synthetic stale-owner mutation requires matching native, Win32 and UIA identity,
+enabled nonmodal ownership and visual-window foreground. Wrong identities, modal,
+foreign foreground and changed versions reject before mutation. The focused owner
+case also verifies the retained 24-family picker and Cancel selection preservation.
+Product, web, runtime/renderer pins and the 20/25-second budgets are unchanged.
+
+This correction needs its own committed-source gates and actual portable evidence;
+the delivery receipt records those outcomes. **HOST PORTABLE / INTERNAL BETA remain
+BLOCKED until all required focused and contiguous shell checks pass.** Production,
+personal-host installer and paused PR #38 / 250 ms qualifications are unchanged.
+
+## Goal VIII-F reconciliation — 25 October 2026
+
+Accepted Goal IX is **MERGED** through
+[PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49) into develop
+509ce10819a07ca75c1d637e681eb8181f56fb0c, tree
+e8509717f34d3ba057200da52d09fb7c7045a0a9. Exact-source
+[native postmerge 40241304147](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40241304147)
+and [web postmerge 40241304149](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40241304149)
+passed (25/3 successful jobs; 2 historical skips/1 Pages skip).
+Its 24-family, 28-variant creation hub is accepted for controlled preview within
+the existing restrictions. This does not certify PR #48 or local acceptance.
+
+[Goal VIII-F](goal-viii-f-reconciliation.md) reconciles that develop into existing
+Draft PR #48 using a normal merge. Both the creation hub and FindText
+PreviewKeyDown correction are retained. Final exact-source gates are recorded in
+the post-commit PR receipt; they are not inferred from either parent.
+
+The operator reports closing the original synthetic window. Read-only observation
+found PID 19116 absent and no Lens processes. The interaction sequence was not
+recorded; original f05 stays **BLOCKED permanently**. A newly observed Start Menu
+shortcut differs from f05's host snapshot. The operator confirms an installation;
+read-only identity shows Goal IX preview .909. Local GUI testing is stopped pending
+acceptance of the changed host baseline; no restoration or input was attempted.
+
+**HOST PORTABLE / INTERNAL BETA: BLOCKED. HOST INSTALLER: NOT RUN.
+PUBLIC PRODUCTION: NO-GO.** Original HC failure at 2.542596:1 remains FAILED,
+with cause UNPROVED. Stale-owner acceptance and a new complete shell are NOT RUN.
+PR #38 and the unaccepted 250 ms objective remain paused.
+
+## Historical Goal VIII-E record
+
+PR #48's 25 October 2026 [Goal VIII-E handoff](goal-viii-e-owned-window-acceptance.md)
+records **HOST CLEANUP: BLOCKED pending manual operator action**. The exact f05
+process still owns an `Unsaved Mermaid draft` OK/Cancel confirmation. Read-only
+Win32 inspection proves the dialog → visual editor → main ownership chain; this
+modal state does not prove the safe pre-mutation boundary. No guard exception,
+new host test, process termination or further close request was performed.
+
+The corrected .891 portable Find/Enter and independent invalid/valid Mermaid GUI
+checks passed at their recorded source. Original f05 remains **BLOCKED** after
+seven groups, before the stale-owner mutation; the real stale-owner rejection and
+the fresh complete shell remain untested. **HOST PORTABLE and INTERNAL BETA remain
+BLOCKED; HOST INSTALLER is NOT RUN; PUBLIC PRODUCTION is NO-GO.** The dated
+integrated baseline below is historical and does not certify this continuation.
+
+## Historical Goal IX premerge execution update — 25 October 2026
 
 The rechecked accepted develop is `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`, tree
 `1fb777317ad6e5c8531eebcb565fefae4227e354`, after merged PR #47. Its
@@ -130,3 +388,104 @@ They are not silently rewritten or promoted into new-source certification.
 `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`. It is not edited, resumed, merged,
 cherry-picked or closed. Its experimental architecture and the historical 250 ms
 comparison are outside this goal.
+
+## CURRENT — Goal VIII existing development-host evidence, 24 October 2026
+
+This appended section supersedes only the present testing qualification; all
+historical sections above retain their original source and scope. The accepted
+integrated `develop` is now `9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f`, tree
+`1fb777317ad6e5c8531eebcb565fefae4227e354`, verified PR #47 merge. Exact-merge
+[native 40108034236](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034236)
+has 25 successful jobs and two historical skips; exact-merge
+[web 40108034406](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40108034406)
+has three successful jobs and Pages skipped. Both are push, attempt 1, at that SHA.
+
+The user explicitly authorised isolated portable tests on the existing development
+computer. Its SDKs do not block **DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION**.
+The unchanged clean-machine preflight still reports BLOCKED. This is Windows 11
+Home x64 `26300.9711`, normal active-console token, actual native window DPI 144
+(150%). No scale/theme/default-app/security setting was changed.
+
+| Current decision surface | Status and evidence boundary |
+|---|---|
+| Verified frozen portable `.871` | PASS: original archive/API digest, exact source/tree, unsigned self-contained Core/WPF 10.0.13, 528 independent payload hashes before execution |
+| Local 24-family entry matrix | PASS: 27 exact-source/keyboard/private-validation/Cancel/reopen cases, including three C4 views and TreeView box mode; `s06` client `6075adbf54aae4eae69b912118b202f459cc715a` |
+| Local appearance | NOT RUN as full appearance acceptance: actual 880×600/1280×800 logical bounds at 150%; inspected Venn pair. Ten incomplete large capture frames remain invalid visual evidence |
+| Local shell/owner/restart | BLOCKED until a complete accepted receipt: exact Find/Enter selection failed in `s08`; separate foreground refusals prevented later keyboard input. Passed independent substeps remain attributed; later unperformed steps are NOT RUN |
+| Local native export APIs | PASS: real DOCX/PDF/PNG/HTML/Docs Site plus canonical source/SVG, API source `1de34f87b92b101398e62922e8c7f6bc8e269130`. Independent Unicode, PDF colours/page, image bytes/dimensions and ZIP checks. Framework-dependent validation runtime is separate (actual 10.0.12 in `s15`); portable runtime remains bundled 10.0.13. GUI export dialogues NOT RUN |
+| Host preservation | PASS in completed sessions: observed associations, registration/shortcuts and four existing private-state file hashes unchanged; bounded observation, not a system-wide write trace |
+| HOST INSTALLER | NOT RUN — UNSAFE SHARED REGISTRATION. Fixed per-user AppId/uninstall/Start Menu/default-state surfaces cannot be isolated by choosing another install directory; original hosted-only installer guard retained |
+| Clean Windows / 100% / 125% / multi-monitor | NOT RUN / NOT CERTIFIED; no feature activation, VM creation, scale change, log-off or restart |
+| Physical reader / local OS High Contrast | NOT RUN. Hosted actual OS High Contrast and UIA remain separately labelled |
+| INTERNAL BETA | BLOCKED while a critical local smoke or mandatory final feature gate lacks acceptance. Green hosted CI cannot resolve a local failure |
+| PUBLIC PRODUCTION | BLOCKED pending separate release certification, historical migration, signing/trust and updater decisions |
+
+The [Goal VIII host report/operator path](goal-viii-development-host-acceptance.md)
+contains the exact baseline hashes, local scenario attribution, retained failures,
+read-only DPI observer, synthetic state routing, interruption behaviour and safe
+commands. The [later clean-Windows mini-checklist](goal-viii-clean-windows-mini-checklist.md)
+is **NOT RUN now** and complements the unchanged Goal VII detailed runbooks.
+
+[Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48) targets
+`develop` and stays Draft. Its post-commit engineering receipt names the distinct
+final feature SHA/tree, exact-source push/PR runs and attempts, every job conclusion
+and skip, preview hashes/expiry, independent 528-path inspection/full payload delta
+and any later source-labelled local completion. That feature head is not silently
+substituted for the frozen integrated source or earlier local client source.
+
+Candidate `.876`, source `6a6d13505e3babe58b7a9c2e2ebdbdec6b883c3e`, failed the
+hosted push lifecycle after 75 desktop checks at a whole-desktop UIA closure
+observation (`E_UNEXPECTED`). The original archive/log/screenshot are retained; its
+dependent installed-family checks were skipped and are not 72 successful phases.
+The bounded harness correction uses native PID/real-HWND discovery and preserves
+the action count, original deadline and exact persisted-draft/source checks. The
+post-commit engineering receipt must record the final AFTER gates independently.
+No product defect, historical RCA or successful draft retention is inferred from
+the failed observation.
+
+Production code, dependency pins, private state format, original fixtures and
+protective contracts are unchanged. PR #38 remains OPEN / DRAFT / PAUSED at
+`31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; 250 ms remains INCOMPLETE. Historical
+`.749`/`.853` PDF/Journey/intermediate ER causes remain INCONCLUSIVE, and the hosted
+two-version install/upgrade/reinstall remains SYNTHETIC. No installer was invoked
+on this host, and no merge, release, signing, update feed or production deployment
+is authorised.
+
+## Goal VIII-B — local remediation remains blocked, 25 October 2026
+
+See [the source-labelled investigation](goal-viii-b-local-remediation.md). A fresh
+verified .880 portable session reproduced Find/Enter's exact Unicode selection
+failure at the existing 150% DPI; the native cause remains UNPROVED. A separate
+Next differential stopped at the original foreground guard before input. Both
+synthetic apps closed normally and observed host preservation passed. No shipping
+product change is justified or included.
+
+The incorrect truncated-label expectation is independently disproved. A new
+incomplete-arrow fixture has a proved DiagramService pre-parser error and safe
+native-control fallback with a valid positive companion. Its portable GUI check
+and the complete shell sequence remain NOT RUN. Original failures are retained.
+HOST PORTABLE, INTERNAL BETA and PUBLIC PRODUCTION remain BLOCKED. New-head hosted
+CI is recorded separately after commit and cannot substitute for local acceptance.
+
+## Goal VIII-C — original required CI failure, 25 October 2026
+
+The completed original `75ab77e` inventory has seven successful workflows and one
+failed desktop UX workflow. See [the preserved-evidence triage](goal-viii-c-acceptance-triage.md).
+The `baseline` job passed its historical application steps, then failed the current
+validation process's pressed-colour assertion before current High Contrast capture.
+The original run remains FAILED; no contrast cause or product fix is established.
+Read-only diagnostics retain the unchanged equality and 4.5 contrast acceptance.
+New clean-source CI and local sequential Core experiments receive separate receipts.
+HOST PORTABLE and INTERNAL BETA remain BLOCKED; HOST INSTALLER remains NOT RUN;
+PUBLIC PRODUCTION remains NO-GO. No foreground guard or original shell requirement
+is waived, and no old evidence is rewritten.
+
+The subsequent `694b9fa` actual HC experiment passed at 7.893:1 with matching
+requested/effective/WPF/Win32 colours; the original cause remains UNPROVED. Local
+sequential Core passed 3/3 focused and 2,117/2,117 full. The corrected read-only
+observer at `bb3a04a` proved that real Find Return arrived but native selection was
+absent, alongside empty UIA. Its separate Next control was blocked before input by
+the foreground guard. Local GUI work stopped; invalid/valid GUI and the entire
+shell remain NOT RUN. See the Goal VIII-C report for session attribution, normal
+exits, host preservation and the operator-assisted next step. No shipping Find fix
+or local acceptance PASS is claimed.

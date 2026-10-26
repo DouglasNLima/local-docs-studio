@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createArtifactBundleFixtureZip } from './helpers/fixtures.mjs';
 import { createZipBuffer, getZipText, readZipEntries } from './helpers/zip.mjs';
+import { observeBootstrapNetwork } from './helpers/bootstrap-network-diagnostics.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
@@ -53,9 +54,14 @@ async function waitForAppReady(page) {
 }
 
 async function gotoApp(page) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await waitForAppReady(page);
-  await expect(page.locator('.topbar')).toHaveCSS('display', 'flex');
+  const finishDiagnostics = observeBootstrapNetwork(page, test.info());
+  try {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await expect(page.locator('.topbar')).toHaveCSS('display', 'flex');
+  } finally {
+    await finishDiagnostics();
+  }
 }
 
 async function openFixture(page, name) {

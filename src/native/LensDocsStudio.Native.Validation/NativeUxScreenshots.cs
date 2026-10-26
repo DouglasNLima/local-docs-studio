@@ -23,6 +23,7 @@ internal static partial class NativeUiChecks
                 var resources = new System.Windows.ResourceDictionary(); LensDocsStudio.Native.Platform.ThemeService.Apply(resources, "System");
                 var foreground = (System.Windows.Media.SolidColorBrush)resources["PressedTextBrush"];
                 var background = (System.Windows.Media.SolidColorBrush)resources["PressedBrush"];
+                WriteUxContrastDiagnostic(output, executable, revision, resources, foreground, background);
                 if (foreground.Color != System.Windows.SystemColors.HighlightTextColor || NativeSyntaxChecks.Contrast(foreground.Color, background.Color) < 4.5)
                     throw new IOException("Actual Windows high-contrast command press colours lost readable text and icon contrast.");
             }
@@ -110,4 +111,59 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error) { File.WriteAllText(Path.Combine(output, "failure.json"), JsonSerializer.Serialize(new { Error = error.ToString(), Observations = observations })); Console.Error.WriteLine(error); return 1; }
     }
+    // Read only, after the original resource evaluation: do not prime WPF's colour
+    // cache before Apply, pump the dispatcher, reapply a theme or repair a value.
+    // This describes the validation process; the capture child has not started.
+    private static void WriteUxContrastDiagnostic(string output, string executable, string revision,
+        System.Windows.ResourceDictionary resources, System.Windows.Media.SolidColorBrush foreground,
+        System.Windows.Media.SolidColorBrush background)
+    {
+        object Colour(System.Windows.Media.Color colour) => new { argb = colour.ToString(), colour.A, colour.R, colour.G, colour.B };
+        System.Windows.Media.Color OsColour(int index)
+        {
+            var value = UxGetSysColor(index);
+            return System.Windows.Media.Color.FromRgb((byte)value, (byte)(value >> 8), (byte)(value >> 16));
+        }
+        object Brush(System.Windows.Media.SolidColorBrush brush)
+        {
+            var binding = System.Windows.Data.BindingOperations.GetBinding(brush, System.Windows.Media.SolidColorBrush.ColorProperty);
+            var requested = binding?.Source?.GetType().GetProperty("Colour")?.GetValue(binding.Source);
+            return new { effective = Colour(brush.Color), requested = requested is System.Windows.Media.Color colour ? Colour(colour) : null,
+                bindingStatus = System.Windows.Data.BindingOperations.GetBindingExpression(brush, System.Windows.Media.SolidColorBrush.ColorProperty)?.Status.ToString(), brush.IsFrozen };
+        }
+        object Binary(string path) => new { path = Path.GetFullPath(path), sha256 = Hash(path),
+            version = FileVersionInfo.GetVersionInfo(path).ProductVersion };
+        var systemForeground = System.Windows.SystemColors.HighlightTextColor;
+        var systemBackground = System.Windows.SystemColors.HighlightColor;
+        var osForeground = OsColour(14); // COLOR_HIGHLIGHTTEXT
+        var osBackground = OsColour(13); // COLOR_HIGHLIGHT
+        var report = new
+        {
+            atUtc = DateTimeOffset.UtcNow, scope = "VALIDATION_PROCESS_PRE_ASSERTION; capture application not yet launched",
+            revisionArgument = revision, githubSha = Environment.GetEnvironmentVariable("GITHUB_SHA"),
+            runId = Environment.GetEnvironmentVariable("GITHUB_RUN_ID"), attempt = Environment.GetEnvironmentVariable("GITHUB_RUN_ATTEMPT"),
+            runnerImage = Environment.GetEnvironmentVariable("ImageOS"), imageVersion = Environment.GetEnvironmentVariable("ImageVersion"),
+            os = System.Runtime.InteropServices.RuntimeInformation.OSDescription, osVersion = Environment.OSVersion.VersionString,
+            runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+            processId = Environment.ProcessId, sessionId = Process.GetCurrentProcess().SessionId,
+            harness = Binary(typeof(NativeUiChecks).Assembly.Location), themeAssembly = Binary(typeof(LensDocsStudio.Native.Platform.ThemeService).Assembly.Location),
+            wpf = Binary(typeof(System.Windows.Application).Assembly.Location), targetExecutable = Binary(executable),
+            targetAssembly = Binary(Path.ChangeExtension(executable, ".dll")),
+            requestedTheme = "System", wpfHighContrast = System.Windows.SystemParameters.HighContrast, osHighContrast = NativeTestHighContrast.IsEnabledNow,
+            themeDictionaries = resources.MergedDictionaries.SelectMany(dictionary => dictionary.MergedDictionaries).Select(dictionary => dictionary.Source?.ToString()).ToArray(),
+            pressedText = Brush(foreground), pressedBackground = Brush(background),
+            wpfHighlightText = Colour(systemForeground), wpfHighlight = Colour(systemBackground),
+            win32HighlightText = Colour(osForeground), win32Highlight = Colour(osBackground),
+            pressedContrast = NativeSyntaxChecks.Contrast(foreground.Color, background.Color),
+            wpfContrast = NativeSyntaxChecks.Contrast(systemForeground, systemBackground),
+            win32Contrast = NativeSyntaxChecks.Contrast(osForeground, osBackground),
+            foregroundEqualsWpfHighlightText = foreground.Color == systemForeground, requiredContrast = 4.5,
+            screenshotInputs = new { themes = new[] { "System" }, sizes = new[] { "860x540", "1280x800", "1440x900", "1920x1080" },
+                source = "Unchanged synthetic Documentation workspace fixture in NativeUxScreenshots.cs", capturesStarted = false }
+        };
+        File.WriteAllText(Path.Combine(output, "high-contrast-pre-assertion.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "GetSysColor")]
+    private static extern uint UxGetSysColor(int index);
 }

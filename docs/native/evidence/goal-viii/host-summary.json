@@ -1,0 +1,605 @@
+{
+  "schemaVersion": 1,
+  "qualification": "DEVELOPMENT_HOST / HOST_LOCAL_VALIDATION",
+  "cleanMachineCertified": false,
+  "portableSourceRevision": "9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f",
+  "portableSourceTree": "1fb777317ad6e5c8531eebcb565fefae4227e354",
+  "portableSha256": "a56e95e450cf9ca36d50199ee8ad825c5e701c4cf5e35170a47da2d9b269babc",
+  "os": {
+    "edition": "Windows 11 Home",
+    "build": "26300.9711",
+    "architecture": "x64"
+  },
+  "elevated": false,
+  "windowDpi": 144,
+  "effectiveScalePercent": 150,
+  "hostInstaller": {
+    "status": "NOT RUN",
+    "reason": "UNSAFE SHARED REGISTRATION"
+  },
+  "matrix": {
+    "status": "PASS",
+    "scope": "Entry/source/keyboard/private validation/Cancel/reopen only",
+    "harnessSourceRevision": "6075adbf54aae4eae69b912118b202f459cc715a",
+    "harnessSourceTree": "4c98136dfcf83da568410b8ad39c579a97d9cb25",
+    "cases": [
+      {
+        "status": "PASS",
+        "family": "Architecture",
+        "prefix": "Architecture",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Connection 3 \u00b7 route --> records"
+        ],
+        "milliseconds": 14446.5119,
+        "sourceSha256": "b32de1997207ecd85c2cd855e48de13038188904b8e3c1f93000ce999cac99e6"
+      },
+      {
+        "status": "PASS",
+        "family": "Block",
+        "prefix": "Block",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Link 3 \u00b7 editor \u2192 preview \u00b7 Renders"
+        ],
+        "milliseconds": 15698.2533,
+        "sourceSha256": "fbb5199b46ae8f1b0bc35ac1306e5edead17fe3b7971416a56bf10eecdd285ef"
+      },
+      {
+        "status": "PASS",
+        "family": "C4",
+        "prefix": "C4",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Relationship 2 \u00b7 Rel_Back \u00b7 docs \u2192 archive"
+        ],
+        "milliseconds": 20162.3805,
+        "sourceSha256": "20ccd3bff1274931348ba248470cff2def7f76ea1b2523286902a8576ea34100"
+      },
+      {
+        "status": "PASS",
+        "family": "C4Component",
+        "prefix": "C4",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Relationship 1 \u00b7 Rel \u00b7 editor \u2192 preview"
+        ],
+        "milliseconds": 13905.7399,
+        "sourceSha256": "e8d49aa6368054cc49b7b3bc253e7801beafe3486c95fd171fab949c0cbdc679"
+      },
+      {
+        "status": "PASS",
+        "family": "C4Container",
+        "prefix": "C4",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Relationship 1 \u00b7 Rel \u00b7 reader \u2192 ui"
+        ],
+        "milliseconds": 12837.2168,
+        "sourceSha256": "95d8a6d58085e71eb8eb3ae07894e4308b6b83e965d572bf3ee46e3f25b284eb"
+      },
+      {
+        "status": "PASS",
+        "family": "Class",
+        "prefix": "Class",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Relationship 1 \u00b7 Author \u2192 Document \u00b7 writes"
+        ],
+        "milliseconds": 17599.9008,
+        "sourceSha256": "e261667802ac78f96723f8ce9631bc2d55e850f107c0440b3334a74b4531dbae"
+      },
+      {
+        "status": "PASS",
+        "family": "Er",
+        "prefix": "Er",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Relationship 1 \u00b7 AUTHOR \u2192 DOCUMENT \u00b7 writes"
+        ],
+        "milliseconds": 17710.5773,
+        "sourceSha256": "f5e446584063a66b45b20dfa9549d0c37698d2233318e1b17b20216e2bb9427a"
+      },
+      {
+        "status": "PASS",
+        "family": "Flowchart",
+        "prefix": "Mermaid",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "A \u2192 B"
+        ],
+        "milliseconds": 13707.1548,
+        "sourceSha256": "5ac5439e2e59c9d8d7faaea195437cced7e56fae0490403550a46e64d6ec84fc"
+      },
+      {
+        "status": "PASS",
+        "family": "Gantt",
+        "prefix": "Gantt",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "  Task \u00b7 Prepare pack \u00b7 2026-10-26 \u00b7 1 days"
+        ],
+        "milliseconds": 16301.3326,
+        "sourceSha256": "61f2375b8884c3e595c10982a9ca53155ce36a77f2b8eca4534cbcf8a48f1b7d"
+      },
+      {
+        "status": "PASS",
+        "family": "GitGraph",
+        "prefix": "GitGraph",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Command 7 \u00b7 commit \u00b7 4 \u00b7 branch main"
+        ],
+        "milliseconds": 12333.443,
+        "sourceSha256": "09da593084518aa708a67ee671a053f592182e177251890a4f2d37b404fb50e1"
+      },
+      {
+        "status": "PASS",
+        "family": "Journey",
+        "prefix": "Journey",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "    Actor 1 \u00b7 Reader \u00b7 task Read documentation"
+        ],
+        "milliseconds": 18744.3305,
+        "sourceSha256": "fe919837dc32c31f4fac29fc2ba1e62e3b821908e52d46075ca980122d4922e1"
+      },
+      {
+        "status": "PASS",
+        "family": "Kanban",
+        "prefix": "Kanban",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Card \u00b7 Publish guide \u00b7 ID: published"
+        ],
+        "milliseconds": 14034.4124,
+        "sourceSha256": "37271dacfb4ef33585f81d7d7d5024111711ec247bbed0fa0611d15fe38598ad"
+      },
+      {
+        "status": "PASS",
+        "family": "Mindmap",
+        "prefix": "Mindmap",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "    Node 7 \u00b7 Exports \u00b7 depth 2"
+        ],
+        "milliseconds": 16972.9808,
+        "sourceSha256": "bfd85965360c45a30e9c1ab33e68d4df6eb2d50554670b03d118618e68ce6b96"
+      },
+      {
+        "status": "PASS",
+        "family": "Packet",
+        "prefix": "Packet",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Field 4 \u00b7 Options \u00b7 40..47 inclusive \u00b7 range"
+        ],
+        "milliseconds": 15789.4852,
+        "sourceSha256": "da5fa175a2d3dc62118963f9ec78351f495a2d4459e9fe3a3caad32fb709a8d6"
+      },
+      {
+        "status": "PASS",
+        "family": "Pie",
+        "prefix": "Pie",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Category 3 \u00b7 Examples \u00b7 1"
+        ],
+        "milliseconds": 13651.4999,
+        "sourceSha256": "2d5632e5c359e6a3615f2371b2715011b84f62786d9c58fbeb2427d7421e8893"
+      },
+      {
+        "status": "PASS",
+        "family": "Quadrant",
+        "prefix": "Quadrant",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Source declaration \u00b7 quadrant-4 \u00b7 Defer"
+        ],
+        "milliseconds": 25464.1478,
+        "sourceSha256": "cada1d2168a2f0d26551376042c2d214dd23f6a70e02d8d272328fc130f7f076"
+      },
+      {
+        "status": "PASS",
+        "family": "Radar",
+        "prefix": "Radar",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Curve 2 \u00b7 axis 4 \u00b7 Review \u00b7 2"
+        ],
+        "milliseconds": 22661.9893,
+        "sourceSha256": "9fedd8d30e150c3e9915588d02d7327ee7870a91d96ae76e42e5b2f2e630b194"
+      },
+      {
+        "status": "PASS",
+        "family": "Requirement",
+        "prefix": "Requirement",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Relation \u00b7 studio \u2192 guide \u00b7 satisfies"
+        ],
+        "milliseconds": 14459.5146,
+        "sourceSha256": "865d590d79893ef8f2944b6132e49784259d14dd75634eae3d55aa122a9a0e08"
+      },
+      {
+        "status": "PASS",
+        "family": "Sankey",
+        "prefix": "Sankey",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Rename node across proved endpoints \u00b7 Research"
+        ],
+        "milliseconds": 13344.2495,
+        "sourceSha256": "363df431f7d765909c0af8b9038979357815e98076161a240f48c152f82dcb51"
+      },
+      {
+        "status": "PASS",
+        "family": "Sequence",
+        "prefix": "Sequence",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Message 1 \u00b7 A \u2192 B: Review guide"
+        ],
+        "milliseconds": 14663.4194,
+        "sourceSha256": "2f08d78ae26e48f4c3900569c487d14cc1f5afbd4452c85e0e57ae668f8fa9c3"
+      },
+      {
+        "status": "PASS",
+        "family": "State",
+        "prefix": "State",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Transition 3 \u00b7 Review \u2192 Final (diagram)"
+        ],
+        "milliseconds": 12531.1481,
+        "sourceSha256": "4d4bc8069380bde9b515978cf295bf92fd0c4c8eb9960d7854d0dfecce6b94a3"
+      },
+      {
+        "status": "PASS",
+        "family": "Timeline",
+        "prefix": "Timeline",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "    Event 1 \u00b7 Export documentation"
+        ],
+        "milliseconds": 17623.4803,
+        "sourceSha256": "208429d34133dbe8dc8c0a7aafc4678f0e410b3ade5cef314b131ec74471e04e"
+      },
+      {
+        "status": "PASS",
+        "family": "Treemap",
+        "prefix": "Treemap",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Zero-value Treemap occurrence remains an actual keyboard target",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Node 4 \u00b7 Planned \u00b7 explicit 0 \u00b7 no native tile"
+        ],
+        "milliseconds": 21829.2049,
+        "sourceSha256": "f7755d8555a28686c6c049c943fbf52463e5dba9b21e1329099e35c82b54fc9b"
+      },
+      {
+        "status": "PASS",
+        "family": "TreeView",
+        "prefix": "TreeView",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Node 5 \u00b7 hidden.txt \u00b7 depth 1"
+        ],
+        "milliseconds": 20409.9777,
+        "sourceSha256": "76b7da230b7fc4ee8ec8c487bf3f460620dfbea7b17f2d3e2f68e7e35826f208"
+      },
+      {
+        "status": "PASS",
+        "family": "TreeViewBox",
+        "prefix": "TreeView",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Node 2 \u00b7 Reference \u00b7 depth 0"
+        ],
+        "milliseconds": 21110.0058,
+        "sourceSha256": "1cc6ed22d4f92a83e59e4030235ee4f564270d4caac9ecbe03d21c8c4752ef53"
+      },
+      {
+        "status": "PASS",
+        "family": "Venn",
+        "prefix": "Venn",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Union 2 \u00b7 A, C \u00b7 unrendered label \u00b7 keyboard occurrence"
+        ],
+        "milliseconds": 17211.9429,
+        "sourceSha256": "80aa27732ad0be43468becef637bb1119692acc5c1b32535f77dbed2ed06c11c"
+      },
+      {
+        "status": "PASS",
+        "family": "Xy",
+        "prefix": "XYChart",
+        "checks": [
+          "Standalone source and normal Visual Edit entry correspond exactly",
+          "Actual keyboard occurrence selection and private validation retain exact source",
+          "Cancel preserves owner and saved bytes",
+          "Close/reopen returns the same private source"
+        ],
+        "selected": [
+          "Series 2 \u00b7 value 3 \u00b7 10"
+        ],
+        "milliseconds": 27034.4743,
+        "sourceSha256": "7a75a00e4a5ea1952abd13c435b3ca028d44f67c5d02de564778fd3098ce773b"
+      }
+    ]
+  },
+  "fullVisualMatrix": {
+    "status": "NOT RUN",
+    "reason": "Ten incomplete large capture frames retained; inspected Venn pair is limited local appearance evidence"
+  },
+  "shell": {
+    "status": "BLOCKED",
+    "reason": "s08 exact Find/Enter selection failure remains unresolved; s07/s11 foreground guard stopped later input",
+    "unperformed": [
+      "owner Apply/Undo/Redo",
+      "template/snippet UI saves",
+      "stale-owner/dirty private Cancel",
+      "pane/inspector persistence",
+      "zoom/Fit/pan",
+      "invalid-source UI",
+      "save/restart/close workspace"
+    ]
+  },
+  "nativeExportApi": {
+    "status": "PASS",
+    "scope": "DEVELOPMENT_HOST_NATIVE_EXPORT_API",
+    "portableUiSourceRevision": "9b1e73bbf564c53b48149e8c0dcd6fd7acbe308f",
+    "apiAssembly": "0.1.0-preview.1+1de34f87b92b101398e62922e8c7f6bc8e269130",
+    "apiNativeSha256": "aa455479da37d7c78153203d2e5f5c6936ff8023f4db546afc2135446d98ba21",
+    "apiCoreSha256": "f8cb13b7aa3167df93cb37357bd0c4369303544d0e1eea80026d5ce3e283dd0b",
+    "sourceSha256": "990c0ec966d38842f5ab666c67c3d7a9d6c40f1a216d8cf450bc8701454fdb42",
+    "exports": [
+      {
+        "file": "host.docx",
+        "bytes": 13266,
+        "sha256": "7f1be5fa188839ddc549bcd1171c309d3d6b4da5a69aedd97d1306b010e11efb"
+      },
+      {
+        "file": "host.pdf",
+        "bytes": 177177,
+        "sha256": "8109f99b0f8e53f396d42a5338fc716bbf74a87bab9995270b35c697b32e5220"
+      },
+      {
+        "file": "host.html",
+        "bytes": 14225,
+        "sha256": "4e0f65535fc2f2f667296caff10db717a0e84a99ac188a828cf239ecc418e006"
+      },
+      {
+        "file": "host-diagram.mmd",
+        "bytes": 36,
+        "sha256": "5ac5439e2e59c9d8d7faaea195437cced7e56fae0490403550a46e64d6ec84fc"
+      },
+      {
+        "file": "host-diagram.svg",
+        "bytes": 3660,
+        "sha256": "88f758d3d6581a90b2b0e256c31a36c7cd5c4d39068884b275448be3c6974597"
+      },
+      {
+        "file": "host-diagram.png",
+        "bytes": 8657,
+        "sha256": "eff2565c7f15ec38bab214a8f09d00e00b8029f535c23b4aed7729d9f5e1937c"
+      },
+      {
+        "file": "host-site.zip",
+        "bytes": 28443,
+        "sha256": "48dc26c13471e260f515853a1629a2a687b2abb63639addc05f0e7d748a39623"
+      }
+    ],
+    "docsSite": {
+      "SourcePages": 4,
+      "Diagrams": 2,
+      "Warnings": []
+    },
+    "notRun": "Portable UI file dialogues: shared Windows shell history cannot be isolated. PDF text/colour and saved PNG dimensions require the independent inspection receipt."
+  },
+  "exportInspection": {
+    "status": "PASS",
+    "scope": "DEVELOPMENT_HOST_INDEPENDENT_EXPORT_INSPECTION",
+    "apiSourceRevision": "1de34f87b92b101398e62922e8c7f6bc8e269130",
+    "pdfSha256": "8109f99b0f8e53f396d42a5338fc716bbf74a87bab9995270b35c697b32e5220",
+    "pdfPages": 1,
+    "unicodeTextExact": true,
+    "codeTextPresent": true,
+    "pdfCharacterColours": [
+      "(0.0, 0.0, 0.0)",
+      "(0.027, 0.349, 0.522)",
+      "(0.086, 0.396, 0.204)",
+      "(0.357, 0.129, 0.714)"
+    ],
+    "diagramPngSize": [
+      471,
+      149
+    ],
+    "docsSiteEntries": [
+      "index.html",
+      "assets/docs-site.css",
+      "assets/docs-site.js",
+      "assets/docs-site-data.js",
+      "assets/search-index.json",
+      "site-manifest.json",
+      "README.md",
+      ".nojekyll"
+    ],
+    "docxMediaCount": 0,
+    "note": "Actual exported files; API identity is separate from portable UI. Page appearance requires the separate visual inspection."
+  },
+  "exportInspectionAddendum": {
+    "status": "PASS",
+    "scope": "DEVELOPMENT_HOST_DOCX_IMAGES_AND_PDF_VISUAL_REVIEW",
+    "apiSourceRevision": "1de34f87b92b101398e62922e8c7f6bc8e269130",
+    "docxImageEntries": [
+      "media/image.png",
+      "media/image2.png"
+    ],
+    "canonicalDiagramBytesMatch": true,
+    "fixtureImagePixelsMatch": true,
+    "pdfVisualReview": "PASS: one actual rendered page; Unicode, coloured code, table, image and native diagram visible with no clipping. Raw details syntax is the existing protected export behaviour.",
+    "addendum": "Initial inspection counted only word/media; actual OpenXML relationships use media/ at package root. That diagnostic zero is superseded, original receipt retained."
+  },
+  "notRun": [
+    "SDK-free clean Windows",
+    "125%/100% display",
+    "multi-monitor",
+    "physical audible screen reader",
+    "local OS High Contrast",
+    "personal-host installer",
+    "historically sourced upgrade",
+    "portable GUI export dialogues"
+  ],
+  "media": [
+    {
+      "file": "host-venn-880x600.png",
+      "sha256": "b92c1e4154fe7eb9fdd69f4f0729cbbcb44e6783b5629446c3d364c989010fee",
+      "provenance": "s06/ui/Venn/viewport-880x600.png"
+    },
+    {
+      "file": "host-venn-1280x800.png",
+      "sha256": "5bc8a83ea311d1af54249c822a601d332eff035866e2640e6b7569eeefecb6b9",
+      "provenance": "s06/ui/Venn/viewport-1280x800.png"
+    },
+    {
+      "file": "native-api-pdf-page.png",
+      "sha256": "13c374e1ad6753968e6962bdca96e35c6a073a9ae4824227cf5549201aa189c5",
+      "provenance": "s11/exports/independent/page-1.png"
+    }
+  ],
+  "publicProduction": "BLOCKED",
+  "internalBeta": "BLOCKED",
+  "rawEvidence": "Ignored artifacts/native/development-host/<portable-source-SHA>/<fresh-session>; raw host snapshots never published",
+  "finalFeatureSource": "See post-commit Draft PR engineering receipt; not identical to integrated source or earlier client source"
+}

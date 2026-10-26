@@ -340,7 +340,7 @@
     <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8" FocusManager.IsFocusScope="True">
      <WrapPanel>
       <TextBlock x:Name="FindContext" Text="Find in editor" VerticalAlignment="Center" Margin="0,0,8,0"/>
-      <TextBox x:Name="FindText" Width="210" Padding="5" AutomationProperties.Name="Find text" KeyDown="FindKeyDown"/>
+      <TextBox x:Name="FindText" Width="210" Padding="5" AutomationProperties.Name="Find text" PreviewKeyDown="FindKeyDown"/>
       <TextBox x:Name="ReplaceText" Width="150" Padding="5" Margin="5,0" Visibility="Collapsed" AutomationProperties.Name="Replacement text"/>
       <Button Content="Next" Click="FindNext" AutomationProperties.AutomationId="FindNext"/><Button x:Name="ReplaceButton" Content="Replace" Visibility="Collapsed" Click="ReplaceOne" AutomationProperties.AutomationId="ReplaceOne"/>
       <Button Content="Close" Click="CloseFind" AutomationProperties.AutomationId="CloseFind"/>

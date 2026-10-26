@@ -1,0 +1,53 @@
+{
+  "internalBeta": "BLOCKED",
+  "hostInstaller": "NOT RUN",
+  "recordedAtUtc": "2026-10-25T00:11:06.9224295Z",
+  "portableRuntime": "10.0.13",
+  "newHeadCi": "See post-commit receipt",
+  "originalFailures": "Preserved FAIL",
+  "diagnosticSource": "9b10c48f3399a8c70054215f72c2dd12f6c89039",
+  "invalidSource": "Focused renderer/native-control PASS; portable GUI NOT RUN",
+  "nextControl": "BLOCKED before input",
+  "hostPortable": "BLOCKED",
+  "evidence": [
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b01/ui/completion.json",
+      "sha256": "16398b7db336a52c0d183cfa8cda447d390dbfd98c780062ace39b12582d1cde"
+    },
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b01/ui/before-action.json",
+      "sha256": "1d261eb0d1afe8a8f552ed852e8f1cdb27dc229b4b3e2bf347c0e6848ca05c6f"
+    },
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b01/ui/after-action.json",
+      "sha256": "4669369b286963cda66b135f6c865c542fa6230912a73ff6dfdd7896c6976feb"
+    },
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b01/ui/after-close-find.json",
+      "sha256": "cbb02eb168847eeddb11e4b8dcbd5ad56eca6eb7b45461997e8ddd3d21f86c90"
+    },
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b01/complete.json",
+      "sha256": "5946155f72865c0a2b00ede109ddff0dd9b79ed2edcf18dc5e7becff201d855e"
+    },
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b02/ui/completion.json",
+      "sha256": "8c8e3f063f42b35ebf9e13edc9012f59be2a9101ab77f09c00dab76948855081"
+    },
+    {
+      "path": "artifacts/native/development-host/11957e294a6f87b9729913b174b919ff23d176ed/b02/complete.json",
+      "sha256": "a281114daefb07184ec8d485bf4444e0b1a3be3049fe3cb054be67615c4166b5"
+    },
+    {
+      "path": "artifacts/native/g8b/11957e294a6f87b9729913b174b919ff23d176ed/f01/renderer-clean-9b10c48/completion.json",
+      "sha256": "7963dea2f019674dc816f527f103d40c0cdbc3048638d5187ef0adaa0518f8de"
+    }
+  ],
+  "find": "FAIL / cause UNPROVED",
+  "portableSource": "11957e294a6f87b9729913b174b919ff23d176ed",
+  "portableTree": "ced9a65224b5ae00be2100112aaf27093a745511",
+  "fixtureTestRuntime": "10.0.12 / separate framework-dependent scope",
+  "schemaVersion": 1,
+  "dpi": 144,
+  "publicProduction": "BLOCKED"
+}
