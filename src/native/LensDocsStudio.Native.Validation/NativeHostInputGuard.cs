@@ -10,6 +10,13 @@ internal static partial class NativeUiChecks
     {
         var foreground = GetForegroundWindow();
         GetWindowThreadProcessId(foreground, out var owner);
+        if (owner != processId || window is not null && foreground != window.Properties.NativeWindowHandle.Value || !HostNormalConsole()
+            || focus is not null && !focus.Properties.HasKeyboardFocus.Value)
+            throw new HostFindInputBlockedException("Expected candidate PID/HWND/focus must remain foreground on the unlocked Default console desktop; no activation or input retry is permitted.");
+    }
+
+    private static bool HostNormalConsole()
+    {
         var desktop = HostFindOpenInputDesktop(0, false, 1);
         var accessible = false;
         if (desktop != IntPtr.Zero)
@@ -18,8 +25,30 @@ internal static partial class NativeUiChecks
             try { if (HostFindGetUserObjectInformation(desktop, 2, buffer, 1024, out _)) accessible = Marshal.PtrToStringUni(buffer) == "Default"; }
             finally { Marshal.FreeHGlobal(buffer); HostFindCloseDesktop(desktop); }
         }
-        if (owner != processId || window is not null && foreground != window.Properties.NativeWindowHandle.Value || !accessible
-            || Process.GetCurrentProcess().SessionId != HostActiveConsoleSession() || focus is not null && !focus.Properties.HasKeyboardFocus.Value)
-            throw new HostFindInputBlockedException("Expected candidate PID/HWND/focus must remain foreground on the unlocked Default console desktop; no activation or input retry is permitted.");
+        return accessible && Process.GetCurrentProcess().SessionId == HostActiveConsoleSession();
+    }
+
+    // Only before the first action of a new launch. The existing 20-second Wait
+    // budget observes an explicit operator activation; later guards never wait or retry.
+    private static void AwaitHostOperatorForeground(int processId, Window window, string executable, string output, string name)
+    {
+        using var process = Process.GetProcessById(processId);
+        var start = process.StartTime.ToUniversalTime(); var hwnd = window.Properties.NativeWindowHandle.Value;
+        WriteNew(Path.Combine(output, name + "-operator-ready.json"), new { atUtc = DateTimeOffset.UtcNow, status = "WAITING_FOR_OPERATOR_BEFORE_INPUT",
+            processId, startUtc = start, hwnd = hwnd.ToInt64(), executable, actionSent = false, observationBudgetSeconds = 20 });
+        Console.WriteLine("HOST READY: activate the new synthetic Lens window now; no input has been sent. Existing 20-second observation budget applies.");
+        try { Wait(() =>
+        {
+            process.Refresh(); GetWindowThreadProcessId(hwnd, out var owner);
+            if (process.HasExited || process.StartTime.ToUniversalTime() != start || process.MainModule?.FileName != executable
+                || owner != processId || window.Properties.ProcessId.Value != processId || !HostNormalConsole())
+                throw new HostFindInputBlockedException("New-session identity or normal console changed during operator handoff; no input sent.");
+            return GetForegroundWindow() == hwnd;
+        }, "Operator did not activate the exact new synthetic window within the unchanged observation budget; no input sent."); }
+        catch (InvalidOperationException error) when (error is not HostFindInputBlockedException)
+        { throw new HostFindInputBlockedException(error.Message); }
+        AssertHostForeground(processId, window);
+        WriteNew(Path.Combine(output, name + "-operator-foreground.json"), new { atUtc = DateTimeOffset.UtcNow, status = "PASS", processId, startUtc = start,
+            hwnd = hwnd.ToInt64(), foreground = GetForegroundWindow().ToInt64(), actionSent = false });
     }
 }

@@ -3,6 +3,51 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Attended continuation and bounded remediation — 26 October 2026
+
+The source2f5a0a8 receipt records nine successful exact-head workflows, 116 passed
+jobs and eight expected skips, with the independently verified 2,210-case Core
+union. Following operator confirmation, verified portable .914 executed in three
+fresh isolated sessions: f01 Find Enter PASS with one Return, native plus UIA Café
+range 2/4 and caret6, Close Find/editor focus and normal close; f02/f03 Next BLOCKED
+at initial foreground before input. Every 528-file payload and six-file synthetic
+workspace was independently checked. Current-baseline host/default state and the
+operator's separate installation remained unchanged. Manual closure of f02/f03
+was confirmed by the operator and followed by read-only process absence checks;
+their interaction steps were not independently recorded. All earlier snapshots
+below retain their historical scope.
+
+The new harness correction adds an explicit pre-input operator handoff using the
+existing 20-second observation deadline, without activation, retries of actions,
+or waiting after a later foreground failure. Original 25-second owner readiness
+is unchanged. Fresh ready/foreground receipts pin process start, executable and
+HWND. A failed or expired handoff is BLOCKED and never resumed.
+
+For the existing nonmodal stale-owner case, the validation executable's opt-in
+read-only startup observer binds the exact package, harness, synthetic path/state,
+actual captured MermaidDocumentEditSession, owner editor and native AvalonEdit
+version chain. It records process start, both HWNDs/PIDs/ownership, visible-window
+count, enabled state, Default desktop, foreground, object/session/generation,
+owner/private versions and source/private/saved hashes. It exposes no mutation
+command and is excluded from the shipping payload. Identity is checked before
+source observation. Sequential fresh observations must match before a single
+explicit-target synthetic owner ValuePattern mutation while its eligible visual
+window remains foreground. Actual stale Apply must reject and preserve exact
+private/external/saved bytes; cancellation then restores and saves the baseline.
+
+Deterministic negative controls reject wrong PID/HWND/owner, disabled/modal or
+ambiguous windows, foreign foreground, reused identity and changed native versions
+even with identical bytes. These controls are a required native workflow step,
+not a GUI acceptance substitute. `RunUi -ScenarioGroup OwnedWindow` supplies a
+separate fresh focused case, including picker invocation/Cancel and captured
+selection. The original full shell calls the same bounded owner proof and keeps
+all its original stages. No generic foreground or ValuePattern exception exists.
+
+Final SHA/tree, exact-source build/Core/CI, independently verified package and
+fresh focused/contiguous GUI outcomes belong to the subsequent delivery receipt.
+Earlier passes do not certify this correction. PR #48 stays Draft and unmerged;
+production and PR #38 / 250 ms remain blocked/paused as before.
+
 ## Reconciliation boundary
 
 The fetched starting feature head was `2d86fe3eb9ed95c832f7b3cbfba29005343bb7bd`,

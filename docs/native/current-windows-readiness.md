@@ -1,5 +1,30 @@
 # Current native Windows readiness
 
+## Goal VIII-F attended handoff and owner guard — 26 October 2026
+
+Existing Draft PR #48 remains unmerged. At source `2f5a0a8`, all nine mandatory
+workflows passed (116 jobs, eight explicit skips); Core retained the exact 2,210-case
+union. The operator accepted the current host baseline and confirmed availability.
+Verified portable .914 passed one native/UIA Find Enter session (UTF-16 2/4, caret6);
+two fresh Next sessions stopped before input on initial foreground mismatch.
+Their manual closure and subsequent process absence are recorded separately.
+The original blocked f05 and failed HC receipts remain immutable.
+
+The validation-only correction observes operator activation before a fresh launch's
+first action within the existing 20-second observation budget. Subsequent guards
+remain immediate. A read-only, source-pinned child observer records native owner,
+session, document/private versions and exact source hashes. The one deliberate
+synthetic stale-owner mutation requires matching native, Win32 and UIA identity,
+enabled nonmodal ownership and visual-window foreground. Wrong identities, modal,
+foreign foreground and changed versions reject before mutation. The focused owner
+case also verifies the retained 24-family picker and Cancel selection preservation.
+Product, web, runtime/renderer pins and the 20/25-second budgets are unchanged.
+
+This correction needs its own committed-source gates and actual portable evidence;
+the delivery receipt records those outcomes. **HOST PORTABLE / INTERNAL BETA remain
+BLOCKED until all required focused and contiguous shell checks pass.** Production,
+personal-host installer and paused PR #38 / 250 ms qualifications are unchanged.
+
 ## Goal VIII-F reconciliation — 25 October 2026
 
 Accepted Goal IX is **MERGED** through

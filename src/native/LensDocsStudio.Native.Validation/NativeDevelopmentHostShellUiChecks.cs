@@ -10,7 +10,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    private static void RunDevelopmentHostShell(string executable, string sandbox, UIA3Automation automation, string revision, string tree)
+    private static void RunDevelopmentHostShell(string executable, string sandbox, UIA3Automation automation, string revision, string tree, bool ownerOnly = false)
     {
         var output = Path.Combine(sandbox, "ui", "shell"); Directory.CreateDirectory(output);
         var workspace = Path.Combine(sandbox, "workspace"); var sourcePath = Path.Combine(workspace, "acceptance-lf.md");
@@ -19,6 +19,7 @@ internal static partial class NativeUiChecks
         var source = File.ReadAllText(sourcePath); var checks = new List<string>(); var observations = new List<object>(); var failures = new List<object>();
         WriteNew(Path.Combine(output, "before.json"), new { sourceSha256 = Hash(sourcePath), preferencesSha256 = Hash(Path.Combine(state, "preferences.json")), revision, tree });
         Application? app = null; Window? main = null; var stage = "launch"; var closingOwnedProcess = false;
+        var launchNumber = 0;
         try
         {
             Launch();
@@ -28,6 +29,15 @@ internal static partial class NativeUiChecks
             Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramActionPNG")) is not null, "Synthetic image/diagram preview was not ready.");
             Wait(() => ObserveWindow(main!).FindFirstDescendant(cf => cf.ByName("Synthetic orange square")) is not null, "The actual relative image is missing from native preview.");
             Capture(main, "first-launch"); checks.Add("Explicit synthetic folder/file, Unicode, relative image and native diagram render in the actual process");
+            if (ownerOnly)
+            {
+                stage = "focused-stale-owner";
+                RunHostPickerCancel(app!.ProcessId, main, editor, automation, sourcePath, source, output);
+                RunHostOwnerConflict(app!.ProcessId, main, editor, automation, sandbox, output, sourcePath, source);
+                FocusWindow(main); closingOwnedProcess = true; main.Close(); Wait(() => app.HasExited, "Focused owner session did not close normally.");
+                WriteNew(Path.Combine(output, "completion.json"), new { atUtc = DateTimeOffset.UtcNow, status = "PASS", scope = "FOCUSED_STALE_OWNER_ONLY", revision, tree, fullShell = "NOT RUN" });
+                return;
+            }
             stage = "quick-open"; QuickOpen("acceptance-crlf.md");
             if (ReadEditorText(Find(main, "MarkdownEditor")) != File.ReadAllText(Path.Combine(workspace, "acceptance-crlf.md"))) throw new IOException("CRLF file did not retain its exact source.");
             QuickOpen("relative.md"); QuickOpen("acceptance-lf.md"); editor = Find(main, "MarkdownEditor");
@@ -49,11 +59,11 @@ internal static partial class NativeUiChecks
             try
             {
             stage = "editor-find"; FocusWindow(main); editor.Focus();
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            AssertHostForeground(app!.ProcessId, main, editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in editor", "Ctrl+F did not target the editor.");
             Find(main, "FindText").AsTextBox().Text = "Café";
             Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Editor Find input did not acquire keyboard focus with its exact query.");
-            Capture(main, "editor-find-before-enter", activate: false); Keyboard.Type(VirtualKeyShort.RETURN);
+            Capture(main, "editor-find-before-enter", activate: false); AssertHostForeground(app!.ProcessId, main, Find(main, "FindText")); Keyboard.Type(VirtualKeyShort.RETURN);
             Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Editor Find/Enter did not select exact Unicode text.");
             Capture(main, "editor-find"); Find(main, "CloseFind").AsButton().Invoke();
             stage = "preview-find";
@@ -61,11 +71,11 @@ internal static partial class NativeUiChecks
             var range = preview.Patterns.Text.Pattern.DocumentRange.FindText("Only synthetic", false, false) ?? throw new IOException("Native preview text is missing.");
             var bounds = range.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
             FocusWindow(main); Mouse.Click(new System.Drawing.Point((int)(bounds.Left + bounds.Width / 2), (int)(bounds.Top + bounds.Height / 2)));
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            FocusWindow(main); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(main, "FindContext").Name == "Find in preview", "Ctrl+F did not target the focused preview.");
             Find(main, "FindText").AsTextBox().Text = "Café";
             Wait(() => Find(main, "FindText").Properties.HasKeyboardFocus.Value && Find(main, "FindText").AsTextBox().Text == "Café", "Preview Find input did not acquire keyboard focus with its exact query.");
-            Keyboard.Type(VirtualKeyShort.RETURN);
+            AssertHostForeground(app!.ProcessId, main, Find(main, "FindText")); Keyboard.Type(VirtualKeyShort.RETURN);
             Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Café"), "Preview Find/Enter did not select exact Unicode text.");
             Capture(main, "preview-find"); Find(main, "CloseFind").AsButton().Invoke();
             checks.Add("Editor and preview Ctrl+F retain separate contexts, Unicode input, Enter and close/focus behaviour");
@@ -79,8 +89,9 @@ internal static partial class NativeUiChecks
                 throw;
             }
             stage = "owner-edit";
+            RunHostPickerCancel(app!.ProcessId, main, editor, automation, sourcePath, source, output);
             var action = main.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramEditVisually", StringComparison.Ordinal));
-            action.AsButton().Invoke(); var visual = Modal("MermaidVisualEditor");
+            FocusWindow(main); action.AsButton().Invoke(); var visual = Modal("MermaidVisualEditor");
             Wait(() => Find(visual, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal), "Flowchart did not reach Ready.");
             Find(visual, "MermaidElements").AsListBox().Select(0);
             Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Host Café😀🚀";
@@ -90,17 +101,17 @@ internal static partial class NativeUiChecks
             Wait(() => ReadEditorText(editor).Contains("Host Café😀🚀", StringComparison.Ordinal), "Apply did not update the exact owner.");
             var edited = ReadEditorText(editor);
             if (File.ReadAllText(sourcePath) != source) throw new IOException("Private Apply wrote saved source before Save.");
-            FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            FocusWindow(main); editor.Focus(); AssertHostForeground(app!.ProcessId, main, editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => ReadEditorText(editor) == source, "One-step owner Undo did not restore exact source.");
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            AssertHostForeground(app!.ProcessId, main, editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
             Wait(() => ReadEditorText(editor) == edited, "One-step owner Redo did not restore the applied draft.");
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            AssertHostForeground(app!.ProcessId, main, editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => ReadObservedText(sourcePath) == edited, "Ctrl+S did not persist exact Unicode source.");
             source = edited; checks.Add("Private property validation/Apply, one-step owner Undo/Redo and Ctrl+S preserve exact source ownership");
             stage = "isolated-library";
             foreach (var (command, title, name) in new[] { ("SaveDocumentTemplate", "Save document template", "Synthetic host template"), ("SaveMarkdownSnippet", "Save Markdown snippet", "Synthetic host snippet") })
             {
-                FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                FocusWindow(main); editor.Focus(); AssertHostForeground(app!.ProcessId, main, editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 Find(main, "FileMenu").AsMenuItem().Expand(); Find(main, command).AsMenuItem().Invoke();
                 Window? prompt = null; Wait(() => (prompt = HostWindows(automation, app!.ProcessId).SingleOrDefault(window => window.Name == title)) is not null, "Native library name prompt did not open.");
                 Find(prompt!, "WorkspacePathInput").AsTextBox().Text = name; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
@@ -112,19 +123,7 @@ internal static partial class NativeUiChecks
             Capture(main, "isolated-library");
             checks.Add("Actual app template/snippet saves use only the explicit synthetic content-library state and retain source");
             stage = "cancel-stale-owner";
-            OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Cancelled private edit"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
-            Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private Cancel fixture did not validate.");
-            Find(visual, "MermaidCancel").AsButton().Invoke(); WaitModalClosed("MermaidVisualEditor");
-            if (ReadEditorText(editor) != source || File.ReadAllText(sourcePath) != source) throw new IOException("Cancel changed the exact owner or saved source.");
-            OpenDraft(); Find(visual, "MermaidNodeLabel").AsTextBox().Text = "Private conflict"; Find(visual, "MermaidUpdateNode").AsButton().Invoke();
-            Wait(() => Find(visual, "MermaidApply").IsEnabled, "Private conflict fixture did not validate.");
-            var privateSource = ReadEditorText(Find(visual, "MermaidDraftSource")); var external = source + "\nExternal synthetic owner\n";
-            FocusWindow(main); editor.Patterns.Value.Pattern.SetValue(external); FocusWindow(visual); Find(visual, "MermaidApply").AsButton().Invoke();
-            Wait(() => Find(visual, "MermaidStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Stale-owner replacement was not rejected.");
-            if (ReadEditorText(Find(visual, "MermaidDraftSource")) != privateSource || ReadEditorText(editor) != external || File.ReadAllText(sourcePath) != source) throw new IOException("Stale rejection changed the private/external/saved source.");
-            Capture(visual, "stale-owner"); Find(visual, "MermaidCancel").AsButton().Invoke(); WaitModalClosed("MermaidVisualEditor");
-            editor.Patterns.Value.Pattern.SetValue(source); FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Wait(() => ReadObservedText(sourcePath) == source, "Synthetic owner did not return to its saved baseline.");
+            RunHostOwnerConflict(app!.ProcessId, main, editor, automation, sandbox, output, sourcePath, source);
             checks.Add("Dirty private Cancel and stale-owner Apply rejection retain exact private, external and saved source");
             stage = "panes";
             Drag("SidebarSplitter", 24); Drag("EditorSplitter", 24); Drag("OutlineSplitter", -20); Capture(main, "resized-panes");
@@ -134,7 +133,7 @@ internal static partial class NativeUiChecks
             Wait(() => Find(diagram, "DiagramZoomLabel").Name == "175%", "Actual diagram zoom did not change.");
             Find(diagram, "DiagramFit").AsButton().Invoke(); Capture(diagram, "diagram-fit");
             var scale = HostWindowDpi(diagram.Properties.NativeWindowHandle.Value) / 96.0;
-            diagram.Patterns.Transform.Pattern.Resize(560 * scale, 400 * scale);
+            FocusWindow(diagram); diagram.Patterns.Transform.Pattern.Resize(560 * scale, 400 * scale);
             Find(diagram, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(400);
             var viewport = Find(diagram, "DiagramViewport"); var scroll = viewport.Patterns.Scroll.Pattern;
             Wait(() => scroll.HorizontallyScrollable.Value, "Enlarged native drawing did not expose horizontal pan.");
@@ -171,12 +170,6 @@ internal static partial class NativeUiChecks
             WriteNew(Path.Combine(output, "completion.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_SHELL_UI", revision, tree, checks, observations,
                 notRun = new[] { "Personal-host shell Open/Save dialogues: shared Windows recent-folder history cannot be isolated; no dialogue invoked", "Inspector drag persistence", "Physical screen reader, alternate DPI, OS High Contrast and installer" } });
 
-            void OpenDraft()
-            {
-                main.FindAllDescendants().Single(element => (element.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("DiagramEditVisually", StringComparison.Ordinal)).AsButton().Invoke();
-                visual = Modal("MermaidVisualEditor"); Wait(() => Find(visual, "MermaidStatus").Name.StartsWith("Ready", StringComparison.Ordinal), "Reopened Flowchart is not ready.");
-                Find(visual, "MermaidElements").AsListBox().Select(0);
-            }
         }
         catch (Exception error)
         {
@@ -191,14 +184,19 @@ internal static partial class NativeUiChecks
             closingOwnedProcess = false;
             Console.WriteLine("HOST LOCAL: launching the explicit synthetic shell; normal foreground focus is required.");
             var info = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = workspace };
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_STARTUP_HOOKS"))) throw new IOException("Inherited startup hooks are forbidden.");
+            info.Environment["DOTNET_STARTUP_HOOKS"] = typeof(StartupHook).Assembly.Location;
+            info.Environment["LENS_OWNER_OBSERVATION_ROOT"] = sandbox;
             foreach (var arg in new[] { "--state-directory", state, workspace, sourcePath }) info.ArgumentList.Add(arg);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Shell owner did not open within 25 seconds.");
+            AwaitHostOperatorForeground(app.ProcessId, main, executable, output, "launch-" + ++launchNumber);
+            CaptureHostRuntime(Process.GetProcessById(app.ProcessId), executable, output, revision, tree, "runtime-" + launchNumber + ".json");
             AssertHostForeground(app.ProcessId, main);
         }
         void FocusWindow(Window window) => AssertHostForeground(app!.ProcessId, window);
         AutomationElement Find(Window window, string id)
         {
-            AssertHostForeground(app!.ProcessId); return NativeUiChecks.Find(window, id);
+            AssertHostForeground(app!.ProcessId, window); return NativeUiChecks.Find(window, id);
         }
         void Wait(Func<bool> condition, string failure) => NativeUiChecks.Wait(() =>
         {

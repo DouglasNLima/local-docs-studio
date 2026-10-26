@@ -17,6 +17,7 @@ public static class StartupHook
 {
     public static void Initialize()
     {
+        LensDocsStudio.Native.Validation.NativeHostOwnerProbe.Initialise();
         var root = Environment.GetEnvironmentVariable("LENS_FIND_OBSERVATION_ROOT");
         if (root is null) return;
         root = Path.GetFullPath(root);

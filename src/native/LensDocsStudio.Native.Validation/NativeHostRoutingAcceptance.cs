@@ -34,6 +34,7 @@ internal static partial class NativeUiChecks
         {
             main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Owner did not open within 25 seconds.");
             CaptureHostRuntime(Process.GetProcessById(app.ProcessId), executable, output, revision, tree);
+            stage = "operator-handoff"; AwaitHostOperatorForeground(app.ProcessId, main, executable, output, "initial");
             Guard(); editor = Find(main, "MarkdownEditor");
             ObserveUntil(() => ReadEditorText(editor) == source, "Exact synthetic source did not load.");
             if (variant.EndsWith("Observed", StringComparison.Ordinal))

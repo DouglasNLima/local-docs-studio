@@ -51,6 +51,8 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --find-routing artifacts/native/find-routing
       - name: Prove host Mermaid fixture parser boundary and native fallback
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --host-mermaid-fixtures artifacts/native/host-mermaid-fixtures
+      - name: Reject unsafe nonmodal owner mutations before any input
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --host-owned-window-controls artifacts/native/host-owned-window-controls
       - name: Validate pluggable signing policy
         run: pwsh -NoProfile -File scripts/native/Test-NativeSigning.ps1
       - name: Validate Windows signature trust with a disposable certificate
@@ -153,6 +155,7 @@ jobs:
           path: |
             artifacts/native/tests/
             artifacts/native/host-mermaid-fixtures/
+            artifacts/native/host-owned-window-controls/
             artifacts/native/host-controls/**/host-controls.json
             artifacts/native/editor-baseline.json
             artifacts/native/input-safety/

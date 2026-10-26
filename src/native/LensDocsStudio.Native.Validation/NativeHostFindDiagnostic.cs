@@ -37,6 +37,7 @@ internal static partial class NativeUiChecks
             Wait(() => ReadEditorText(editor) == source, "Exact synthetic editor source did not load.");
             if (variant.EndsWith("Observed", StringComparison.Ordinal))
                 Wait(() => File.Exists(Path.Combine(output, "native-observations.jsonl")) && ReadObservedText(Path.Combine(output, "native-observations.jsonl")).Contains("probe-attached", StringComparison.Ordinal), "Read-only native observer did not attach; no input sent.");
+            stage = "operator-handoff"; AwaitHostOperatorForeground(app.ProcessId, main, executable, output, "initial");
             stage = "foreground"; AssertForeground(); editor.Focus();
             Wait(() => editor.Properties.HasKeyboardFocus.Value, "Actual MarkdownEditor did not acquire focus.");
             Observe("editor-focused");

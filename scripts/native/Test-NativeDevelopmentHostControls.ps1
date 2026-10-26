@@ -117,7 +117,10 @@ $localClient=(Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStud
     (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeDevelopmentHostShellUiChecks.cs') -Raw) +
     (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostFindDiagnostic.cs') -Raw) +
     (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostRoutingAcceptance.cs') -Raw) +
-    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostInputGuard.cs') -Raw)
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostInputGuard.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostOwnerAcceptance.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostOwnerProbe.cs') -Raw) +
+    (Get-Content -LiteralPath (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/NativeHostOwnerPolicy.cs') -Raw)
 foreach ($forbidden in 'NativeTestDisplay(', 'NativeTestHighContrast(', 'Clipboard.', 'ChangeDisplaySettings(', 'SHAppBarMessage(', 'Registry.SetValue(', '.Kill(', '.GetDesktop(', '.SetForeground(') {
     if ($localClient.Contains($forbidden)) { throw "Local UI client contains forbidden host operation: $forbidden" }
 }

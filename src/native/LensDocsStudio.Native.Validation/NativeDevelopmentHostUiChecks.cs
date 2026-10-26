@@ -68,6 +68,12 @@ internal static partial class NativeUiChecks
         Directory.CreateDirectory(output);
         if (diagnostic is not null)
         {
+            if (diagnostic == "OwnedWindow")
+            {
+                using var ownerAutomation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
+                RunDevelopmentHostShell(executable, sandbox, ownerAutomation, revision, tree, ownerOnly: true);
+                return 0;
+            }
             if (diagnostic is not ("FindEnter" or "FindNext" or "FindTyped" or "FindEnterObserved" or "FindNextObserved" or "FindTypedObserved" or "FindEditorEnterObserved" or "FindPreviewObserved" or "InvalidMermaid")) throw new ArgumentException("Unknown bounded diagnostic.");
             return diagnostic is "FindEditorEnterObserved" or "FindPreviewObserved" or "InvalidMermaid"
                 ? RunHostRoutingAcceptance(executable, sandbox, revision, tree, diagnostic)
@@ -212,7 +218,7 @@ internal static partial class NativeUiChecks
                 if ((attributes & FileAttributes.Directory) != 0) pending.Push(entry);
             }
     }
-    private static void CaptureHostRuntime(Process process, string executable, string output, string revision, string tree)
+    private static void CaptureHostRuntime(Process process, string executable, string output, string revision, string tree, string filename = "runtime.json")
     {
         var payload = Path.GetDirectoryName(executable)!;
         var modules = process.Modules.Cast<ProcessModule>().ToArray();
@@ -222,7 +228,7 @@ internal static partial class NativeUiChecks
             if (found.Length != 1 || !Path.GetDirectoryName(found[0].FileName)!.Equals(payload, StringComparison.OrdinalIgnoreCase)) throw new IOException("Actual CoreCLR/WPF module is not loaded from the verified portable payload.");
             return new { name, path = "<sandbox>/payload/" + name, sha256 = Hash(found[0].FileName), version = FileVersionInfo.GetVersionInfo(found[0].FileName).ProductVersion };
         }).ToArray();
-        WriteNew(Path.Combine(output, "runtime.json"), new { status = "PASS", scope = "DEVELOPMENT_HOST_LOADED_MODULES", processId = process.Id, revision, tree, runtime, cleanMachineCertified = false });
+        WriteNew(Path.Combine(output, filename), new { status = "PASS", scope = "DEVELOPMENT_HOST_LOADED_MODULES", processId = process.Id, revision, tree, runtime, cleanMachineCertified = false });
     }
     private static void WriteNew(string path, object value) { using var stream = new FileStream(path, FileMode.CreateNew); JsonSerializer.Serialize(stream, value, new JsonSerializerOptions { WriteIndented = true }); stream.Flush(true); }
     [DllImport("kernel32.dll", EntryPoint = "WTSGetActiveConsoleSessionId")] private static extern uint HostActiveConsoleSession();
