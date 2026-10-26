@@ -1,5 +1,43 @@
 # Current native Windows readiness
 
+## Goal VIII-F owner acceptance and library transition — 26 October 2026
+
+Source `0204b4089ed7bb4f2aca51a16b0db92b61c56584`, tree
+`3c0ccaad4d6649e470cbcfa1a07d9f7965ebfe41`, completed nine attempt-1 workflows:
+116 jobs passed, with eight expected skips. Both .925/.926 packages retain 528
+verified paths, bundled Core/WPF 10.0.13, the 2,210-case parent Core union and
+144 independently verified hosted installation phases. Actual hosted High
+Contrast passed at 4.528515190218159:1 against the unchanged 4.5 requirement.
+
+Fresh .925 session l02 passed actual nonmodal stale-owner rejection. Four native
+snapshots retained the visual foreground, exact owner/session/version bindings
+and private/saved source. One authorised owner mutation ran with the actual UIA
+client option observed as 1, then 0, then restored to 1. l03–l07 separately passed
+Find Enter/Next, editor Return, preview Find/focus and invalid/valid Mermaid.
+Their saved workspace bytes and payloads were independently verified. Actual
+window DPI was 96; this is not formal alternate-DPI certification. Earlier l01
+remains FAIL before mutation because three visible windows violated the exact
+two-window guard. Its extra tool window's purpose remains unproved.
+
+The original contiguous shell l08 remains BLOCKED at `isolated-library`, after
+six completed checks including private Apply, one-step Undo/Redo and Save.
+The guard recorded expected main HWND 17110276 versus foreground 28117902,
+both PID 20796 on the normal console. The extra HWND's exact role was not
+recorded. A later guarded main capture reports the synthetic snippet saved;
+read-only files contain one template and one snippet. These later observations
+do not turn the interrupted sequence into PASS. Operator closure was requested;
+the remaining shell stages were not run.
+
+[WPF 10.0.13 ButtonAutomationPeer](https://github.com/dotnet/wpf/blob/v10.0.13/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Automation/Peers/ButtonAutomationPeer.cs)
+queues Invoke asynchronously. The client previously required main foreground
+immediately after confirming the library prompt, without observing its closure.
+The scoped validation correction captures that prompt's HWND, observes its
+disappearance through the existing guarded 20-second Wait, then retains the
+exact-main foreground and saved-status assertions. It records before-confirm
+and closed receipts. There is no repeated input, activation or longer deadline.
+Fresh source gates and the original complete shell remain required.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
 ## Goal VIII-F observed automatic UIA focus — 26 October 2026
 
 Source `aeed1b8907e1cc50bd5f39ace0924150e73e01ed`, tree

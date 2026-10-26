@@ -3,6 +3,47 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Retained 0204b40 passes and interrupted library transition — 26 October 2026
+
+Candidate `0204b4089ed7bb4f2aca51a16b0db92b61c56584`, tree
+`3c0ccaad4d6649e470cbcfa1a07d9f7965ebfe41`, passed all nine attempt-1 workflows
+(116 jobs, eight expected skips). Independent receipts retain both .925/.926
+528-path packages, bundled Core/WPF 10.0.13, both raw 2,210-case Core unions,
+144 installed phases, four 135-case browser jobs and all appearance suites.
+
+Local .925 l02 proves actual portable stale-owner rejection after one mutation:
+four native snapshots retain exact owner/session/version identities and visual
+foreground. The actual client option was 1 before, 0 during and 1 after the
+mutation. Private, external and saved bytes matched their expected sources.
+Five fresh sessions l03–l07 passed Find Enter/Next, ordinary editor Return,
+preview Find/focus and ordinary-guard invalid Mermaid with its valid companion.
+Those six passed sessions closed normally; independent payload/workspace checks
+passed. l01 remains FAIL before mutation on three visible windows; the extra
+same-process tool window's exact purpose is not established by l02 passing.
+
+Original full-shell l08 (PID 20796, started 14:23:03.3866066Z) passed six checks
+through private Apply, one-step Undo/Redo and Save. It BLOCKED at line 118 while
+checking main status after confirming a library prompt: expected HWND 17110276,
+observed foreground 28117902, same PID and normal console. The exact role of
+28117902 was not recorded. A subsequent guarded main snapshot reports
+`Saved snippet: Synthetic host snippet`; isolated state contains one template
+and one snippet. Saved Markdown differs only by the intended node label
+`Host Café😀🚀`. The remaining owner/pane/diagram/restart stages were not run.
+Manual closure was requested; no failed action was repeated.
+
+The pinned [WPF Invoke implementation](https://github.com/dotnet/wpf/blob/v10.0.13/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Automation/Peers/ButtonAutomationPeer.cs)
+queues the button click. The source defect is the acceptance client's missing
+prompt-closure observation before its exact-main check; the failed HWND's role
+is not retroactively inferred. The correction observes disappearance of the
+captured prompt HWND through the existing same-process normal-console Wait,
+then preserves exact-main foreground and saved-status assertions. New receipts
+record the prompt before confirmation and the main after closure. The 20-second
+budget, all input guards and the original shell sequence remain unchanged.
+
+This source change requires fresh CI/package and portable proof. Prior focused
+passes remain attributed to 0204b40; complete shell, HOST PORTABLE and INTERNAL
+BETA remain BLOCKED. PR #48 remains Open/Draft; PR #38 stays paused.
+
 ## Retained aeed1b8 owner-focus evidence and scoped client correction — 26 October 2026
 
 Candidate `aeed1b8907e1cc50bd5f39ace0924150e73e01ed`, tree

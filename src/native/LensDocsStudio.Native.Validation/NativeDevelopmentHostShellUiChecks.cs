@@ -114,7 +114,19 @@ internal static partial class NativeUiChecks
                 FocusWindow(main); editor.Focus(); AssertHostForeground(app!.ProcessId, main, editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 Find(main, "FileMenu").AsMenuItem().Expand(); Find(main, command).AsMenuItem().Invoke();
                 Window? prompt = null; Wait(() => (prompt = HostWindows(automation, app!.ProcessId).SingleOrDefault(window => window.Name == title)) is not null, "Native library name prompt did not open.");
-                Find(prompt!, "WorkspacePathInput").AsTextBox().Text = name; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
+                Find(prompt!, "WorkspacePathInput").AsTextBox().Text = name;
+                var promptHandle = prompt!.Properties.NativeWindowHandle.Value;
+                WriteNew(Path.Combine(output, command + "-before-confirm.json"), new { atUtc = DateTimeOffset.UtcNow,
+                    processId = app!.ProcessId, promptHwnd = promptHandle.ToInt64(), title, name, revision, tree });
+                Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
+                // WPF queues Invoke asynchronously. Observe this exact prompt's closure
+                // before requiring the main HWND; the existing process/console guard
+                // and 20-second observation budget apply, with no further input.
+                Wait(() => !HostIsWindow(promptHandle), "The confirmed synthetic library name prompt did not close.");
+                AssertHostForeground(app!.ProcessId, main);
+                WriteNew(Path.Combine(output, command + "-closed.json"), new { atUtc = DateTimeOffset.UtcNow,
+                    processId = app.ProcessId, promptHwnd = promptHandle.ToInt64(), mainHwnd = main.Properties.NativeWindowHandle.Value.ToInt64(),
+                    foreground = GetForegroundWindow().ToInt64(), status = "PASS", revision, tree });
                 Wait(() => Find(main, "Status").Name.Contains("Saved", StringComparison.Ordinal) && Find(main, "Status").Name.Contains(name, StringComparison.Ordinal), "Synthetic library item was not saved.");
             }
             var library = new LensDocsStudio.Core.State.LocalLibraryStore(Path.Combine(state, "content-library")).ReadAsync().GetAwaiter().GetResult();
