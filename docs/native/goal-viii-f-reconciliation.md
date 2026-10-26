@@ -3,6 +3,60 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Retained aab9911 passes and owner-focus diagnostic — 26 October 2026
+
+The [source-labelled receipt](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6415900963)
+pins source `aab991166d9cc3a8befea809ce3752253d21903c`, tree
+`9ddd601504b35c8fcab72cbfe1dcb3896360adf7`: nine successful attempt-1 workflows,
+116 passed jobs and eight expected skips. Both native packages (.921/.922) retain
+528 verified paths, bundled Core/WPF 10.0.13 and the exact source/tree. Independent
+raw receipts prove both 2,210-case Core unions, 144 hosted install/synthetic
+same-source upgrade/reinstall phases, 57 other suite archives, three picker
+archives and all four 135-case browser jobs. Actual HC measured
+4.528515190218159:1 against 4.5; original failed HC causation remains unproved.
+
+Five .922 focused portable sessions at DPI 144 passed: j03 editor Return at
+11:47:00.9122054Z, j01 Find Enter at 11:49:33.6871456Z, j02 Next at
+11:50:34.2187127Z, j04 preview Find at 11:52:46.7449049Z and j05 invalid/valid
+Mermaid at 11:54:44.2220119Z. Single-action native traces, independent UIA ranges,
+query/source preservation, one-step Undo and returned focus are retained. These
+do not replace one original contiguous shell.
+
+j07 remains BLOCKED before commands: PID 58812, start 11:56:42.3685392Z,
+162 initial foreground observations and no match. The operator later confirmed
+normal closure; current process absence and bounded preservation passed.
+
+j08 (PID 27732, start 12:11:40.895256Z) passed its initial foreground handoff at
+12:11:42.2977554Z and 24-family picker invocation/Cancel at 12:11:45.0560809Z,
+preserving exact Café selection. Private Cancel preserved owner/saved source.
+At 12:11:47.6823605Z and 12:11:48.1464746Z, native snapshots proved main HWND
+46270944, visual HWND 6752702, exact same PID/start/document/session, enabled
+nonmodal ownership and visual foreground on the normal console. The explicit
+owner ValuePattern.SetValue returned once; its immediate post-call foreground
+guard blocked at NativeHostOwnerAcceptance.cs:67. Apply was NOT RUN and the
+post-mutation native snapshot was NOT REACHED. The failure capture itself
+passed the main-window foreground guard and reported the main editor focused.
+The specific failed tuple and causal focus transition were not recorded, so
+neither a product defect nor operator/UIA responsibility is established.
+
+The operator confirmed private Cancel and normal closure without saving. Separate
+read-only absence and Complete passed. Independent verification rehashed 3,696
+payloads and 42 unchanged saved workspace files across seven sessions. The source
+remains `990c0ec966d38842f5ab666c67c3d7a9d6c40f1a216d8cf450bc8701454fdb42`.
+The evidence index contains 6,649 files, zero reparse points, SHA-256
+`325cb3b94baad406e807439006dd45a320d45c29adc35ca31cfe74825a55cf70`;
+all 3,408 parent b106 indexed files were independently rehashed unchanged.
+
+The narrow next diagnostic adds the exact numerical failed foreground tuple and
+a read-only process-local focus/source event log after existing packaged synthetic
+owner checks. It retains at most 128 events and 16,000 call-stack characters per
+event, never records foreign window titles/content, and sends no action. No
+foreground restoration, new mutation exception, retry, longer wait or relaxed
+assertion is introduced. This does not remediate the unproved cause; new-source
+CI/package verification and a fresh operator-attended session remain necessary.
+STALE OWNER / HOST PORTABLE / INTERNAL BETA stay BLOCKED; COMPLETE LOCAL SHELL is
+NOT RUN. PR #48 stays Draft and PR #38 / experimental 250 ms stay paused.
+
 ## Retained b106706 failures and bounded observation corrections — 26 October 2026
 
 Source `b1067061a03f71534a358862572cde6d089dc51e`, tree

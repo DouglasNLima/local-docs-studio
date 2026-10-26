@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using ICSharpCode.AvalonEdit;
@@ -43,6 +44,47 @@ internal static class NativeHostOwnerProbe
         var output = Path.Combine(root, "ui", "owner-observations"); Directory.CreateDirectory(output);
         var ids = new Dictionary<object, int>(ReferenceEqualityComparer.Instance); var next = 0; var sequence = 0;
         var versions = new List<(TextDocument Document, ITextSourceVersion Version, int Id)>();
+        var observedWindows = new HashSet<Window>();
+        StreamWriter? focusLog = null;
+        var focusEvents = 0;
+        void ObserveFocus(MainWindow main, MermaidVisualEditorWindow visual, TextEditor editor)
+        {
+            // Attach only after the existing packaged synthetic owner/session checks.
+            // These observers never select, focus, activate or change a document.
+            focusLog ??= new StreamWriter(new FileStream(Path.Combine(output, "focus-events.jsonl"), FileMode.CreateNew, FileAccess.Write, FileShare.Read), new UTF8Encoding(false)) { AutoFlush = true };
+            void Record(string observation, Window window, object? newFocus = null)
+            {
+                if (focusEvents++ >= 128) return;
+                var stack = Environment.StackTrace;
+                var foreground = GetForegroundWindow();
+                GetWindowThreadProcessId(foreground, out var foregroundPid);
+                try
+                {
+                    focusLog.WriteLine(JsonSerializer.Serialize(new { atUtc = DateTimeOffset.UtcNow, observation,
+                        processId = Environment.ProcessId, window = window == main ? "owner" : "private",
+                        hwnd = new WindowInteropHelper(window).Handle.ToInt64(), foreground = foreground.ToInt64(), foregroundPid,
+                        focusType = newFocus?.GetType().FullName, focusName = (newFocus as FrameworkElement)?.Name,
+                        ownerFocused = editor.IsKeyboardFocusWithin, ownerSourceSha256 = Digest(Encoding.UTF8.GetBytes(editor.Document.Text)),
+                        stack = stack.Length <= 16000 ? stack : stack[..16000], scope = "Bounded process-local read-only focus/source trace; no foreign title or content" }));
+                }
+                catch (IOException) { focusEvents = 128; }
+                catch (UnauthorizedAccessException) { focusEvents = 128; }
+            }
+            void Attach(Window window)
+            {
+                window.AddHandler(Keyboard.PreviewGotKeyboardFocusEvent,
+                    new KeyboardFocusChangedEventHandler((_, e) => Record("preview-focus", window, e.NewFocus)), true);
+                window.Activated += (_, _) => Record("activated", window);
+                window.Deactivated += (_, _) => Record("deactivated", window);
+            }
+            if (observedWindows.Add(main))
+            {
+                Attach(main);
+                editor.TextChanged += (_, _) => Record("owner-source-changed", main);
+                main.Closed += (_, _) => { Record("owner-closed", main); focusEvents = 128; focusLog.Dispose(); };
+            }
+            if (observedWindows.Add(visual)) Attach(visual);
+        }
         int Id(object value) { if (!ids.TryGetValue(value, out var id)) ids.Add(value, id = ++next); return id; }
         int VersionId(TextDocument document)
         {
@@ -79,6 +121,7 @@ internal static class NativeHostOwnerProbe
                     || session.Owner.EffectivePath != sourcePath || session.Owner.IsSaving || editor.IsReadOnly
                     || AutomationProperties.GetAutomationId(editor) != "MarkdownEditor")
                     throw new IOException("Explicit synthetic document/editor/session identity changed; no source observed.");
+                ObserveFocus(main, visual, editor);
                 var version = (ITextSourceVersion)Field(session, "version");
                 var draft = (LensDocsStudio.Core.Mermaid.MermaidVisualDraft)Field(visual, "draft");
                 var mainHwnd = new WindowInteropHelper(main).Handle; var visualHwnd = new WindowInteropHelper(visual).Handle;

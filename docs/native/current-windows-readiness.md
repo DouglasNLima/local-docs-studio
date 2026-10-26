@@ -1,5 +1,45 @@
 # Current native Windows readiness
 
+## Goal VIII-F focused portable passes and retained owner block — 26 October 2026
+
+Source `aab991166d9cc3a8befea809ce3752253d21903c`, tree
+`9ddd601504b35c8fcab72cbfe1dcb3896360adf7`, completed all nine attempt-1
+workflows successfully: 116 passed jobs and eight expected skips. Independent
+archive verification proves both 2,210-case Core unions, 144 hosted installed
+phases, all four 135-case browser jobs, the creation picker in three appearances,
+and 19+19 expanded appearances. Actual hosted HC remains 4.528515190218159:1
+against the unchanged 4.5 requirement. The prior Class reinstall failure remains
+failed at its original source; both new-source Class lifecycle jobs passed.
+
+Verified portable .922, bundled Core/WPF 10.0.13 at real DPI 144, passed five
+separate sessions: Find Enter, Next, ordinary editor Return with Find visible,
+preview Find/focus, and ordinary-guard invalid Mermaid with its valid companion.
+Native and independent UIA editor ranges agree on Café at UTF-16 start 2, length 4,
+caret 6. These are focused passes, not a contiguous complete-shell acceptance.
+
+Session j07 BLOCKED before commands at the initial operator handoff. Fresh j08
+passed that handoff, 24-family picker invocation/Cancel and source selection
+preservation, then the first private Cancel. Two native observations proved the
+exact enabled nonmodal owner/private identities and visual foreground before the
+single explicit synthetic owner SetValue. The immediate post-call foreground
+guard stopped before Apply. A later guarded capture found the main window
+foreground and its editor focused; the causal transition remains UNPROVED.
+No post-mutation native snapshot or stale Apply rejection was recorded. Both
+sessions were reported closed normally by the operator and independently absent;
+all 3,696 payload and 42 saved workspace hashes across seven sessions passed.
+
+The next validation-only diagnostic records the numerical failed guard boundary
+and at most 128 process-local focus/source observations with bounded call stacks.
+It attaches only after the existing exact packaged owner/session checks. It does
+not activate, focus, mutate or retry; all input guards and deadlines remain.
+This is observation for an unproved cause, not a product fix or acceptance pass.
+Fresh exact-source gates and portable evidence are required after this change.
+The [retained receipt](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6415900963)
+indexes 6,649 files with SHA-256
+`325cb3b94baad406e807439006dd45a320d45c29adc35ca31cfe74825a55cf70`.
+**PR #48 remains Draft; stale-owner acceptance and the original complete shell
+are incomplete, so HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
 ## Goal VIII-F accessibility discovery and Class observation — 26 October 2026
 
 At `b1067061a03f71534a358862572cde6d089dc51e`, verified portable .919 session

@@ -10,9 +10,13 @@ internal static partial class NativeUiChecks
     {
         var foreground = GetForegroundWindow();
         GetWindowThreadProcessId(foreground, out var owner);
-        if (owner != processId || window is not null && foreground != window.Properties.NativeWindowHandle.Value || !HostNormalConsole()
-            || focus is not null && !focus.Properties.HasKeyboardFocus.Value)
-            throw new HostFindInputBlockedException("Expected candidate PID/HWND/focus must remain foreground on the unlocked Default console desktop; no activation or input retry is permitted.");
+        var expectedWindow = window?.Properties.NativeWindowHandle.Value;
+        var normalConsole = HostNormalConsole();
+        var expectedFocus = focus?.Properties.HasKeyboardFocus.Value;
+        if (owner != processId || expectedWindow is not null && foreground != expectedWindow || !normalConsole
+            || expectedFocus is false)
+            throw new HostFindInputBlockedException("Expected candidate PID/HWND/focus must remain foreground on the unlocked Default console desktop; no activation or input retry is permitted. "
+                + $"Expected PID={processId}, observed PID={owner}, expected HWND={expectedWindow?.ToInt64()}, foreground HWND={foreground.ToInt64()}, normal console={normalConsole}, required control focused={expectedFocus}.");
     }
 
     private static bool HostNormalConsole()
