@@ -3,6 +3,49 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Retained b106706 failures and bounded observation corrections — 26 October 2026
+
+Source `b1067061a03f71534a358862572cde6d089dc51e`, tree
+`941dc6cbedb312828a7ec97627c1b2218771c32e`, produced independently verified
+.919/.920 packages: 528 paths each, Core/WPF 10.0.13, 523 unchanged paths and
+five changed paths against .893. Both hosted Core TRX files retain the exact
+2,210-case union. Both web events passed 135 Chromium and 135 Edge cases; that
+does not fix or relabel the older stylesheet buffer failure. Actual hosted HC
+again measured 4.528515190218159:1 against the unchanged 4.5 threshold.
+
+Portable .919 `i03` stopped before commands at 11:00:24.6580043Z, PID 88472,
+start 11:00:00.7509799Z, HWND 30019106, DPI 144. The operator handoff passed
+at 11:00:03.5127067Z. Every one of 152 samples recorded a null editor native
+TextPattern; the preview pattern was not queried because of the short circuit.
+The preview diagnostic independently reported generation 1 accepted, phase
+`finished`, current source and no error. The failure snapshot, which first
+searched the preview tree, subsequently read both selection providers.
+The operator confirmed normal closure; the probe retained `window-closed` and
+read-only subsequent process absence was checked. This does not establish the
+complete interaction sequence. Preservation passed with 528 payload and six
+workspace files rehashed. This session remains FAIL; the full shell was NOT RUN.
+
+[The pinned AvalonEdit source](https://github.com/icsharpcode/AvalonEdit/blob/862415d51eddc9eac93f462dbc522ffbf929cd52/ICSharpCode.AvalonEdit/TextEditorAutomationPeer.cs)
+implements Text delegation using `FromElement(TextArea)`, which does not create
+the child peer. An unshown instance of the actual compiled MarkdownEditor proved
+the null-before-child / exact-source-provider-after-child behaviour on the local
+framework-dependent 10.0.12 runtime. This is mechanism evidence, not bundled
+portable acceptance. The bounded harness correction moves preview-tree discovery
+ahead of pattern checks, retains both patterns and the same deadline, and adds
+two actual-peer lifecycle checks beside the six compiled Find routing checks.
+There is no shipping control, renderer, runtime or focus-policy change.
+
+PR native job [121533619659](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40307172659/job/121533619659)
+also FAILED during Class reinstall. Install and upgrade UI receipts passed;
+reinstall retained 40 passed checks before `Sequence contains no elements` in
+the `empty-final` observation after Add/Update. The original archive SHA-256 is
+`8d54377b94ba47a4df7539b30432a7cebc70c7839ebe742fa0a2a2393f414583`.
+The observation now returns false for an empty or non-singleton class list and
+requires exactly one class with ID `B` within the existing wait. It neither
+repeats the action nor accepts an empty result. The underlying reason for the
+empty observation remains unproved until fresh hosted evidence; the failed run
+is not rerun or relabelled. All new-source gates and local acceptance remain due.
+
 ## Retained 276625a failures and diagnostic continuation — 26 October 2026
 
 The [complete source-labelled receipt](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6413413529)

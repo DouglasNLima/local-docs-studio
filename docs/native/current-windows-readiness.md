@@ -1,5 +1,33 @@
 # Current native Windows readiness
 
+## Goal VIII-F accessibility discovery and Class observation — 26 October 2026
+
+At `b1067061a03f71534a358862572cde6d089dc51e`, verified portable .919 session
+`i03` FAILED before commands at 11:00:24.6580043Z. Operator foreground passed;
+all 152 initial editor TextPattern observations returned a null native pattern.
+The preview's own diagnostic reported the current generation finished without
+error. The failure snapshot then read both selection providers successfully.
+Normal closure was confirmed by the operator, subsequent process absence was
+checked, and all 528 payload and six workspace hashes remained unchanged.
+
+The pinned AvalonEdit 6.3.1.120 parent peer delegates Text to an already existing
+TextArea peer. An unshown actual-control reproduction proves the provider is null
+before child peer creation and exposes the exact source afterwards. The harness
+now discovers both editor and preview surfaces before checking their providers;
+its previous editor-first short circuit prevented the later tree discovery.
+Both required patterns, the 20-second deadline and every foreground guard remain.
+The compiled regression adds this lifecycle proof to the six existing Find checks.
+Fresh committed-source portable acceptance is still required.
+
+The same source's PR native run `40307172659` also retains a failed Class reinstall,
+job `121533619659`: an observation of the initially empty draft called `Single()`
+and threw before its existing wait could observe the expected inserted class.
+The predicate now requires exactly one class with ID `B` without throwing on an
+empty observation. No action is repeated and the final assertion is unchanged;
+the reason the failed run observed an empty draft is not independently established.
+New hosted gates must prove the result. All earlier failures remain source-labelled.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
 ## Goal VIII-F diagnostic continuation — 26 October 2026
 
 Source `276625aa8a52523834ef7b2630a12b78b59a71b9` completed all nine workflows:

@@ -168,13 +168,13 @@ internal static partial class NativeUiChecks
                     string? editorError = null; string? previewError = null;
                     try
                     {
+                        // AvalonEdit delegates Text to an existing TextArea automation peer.
+                        // Discover both surfaces before querying patterns so tree discovery
+                        // is not short-circuited by that child's initial absence.
+                        var preview = main!.FindFirstDescendant(cf => cf.ByAutomationId("DocumentPreview"));
+                        previewFound = preview is not null;
                         editorReady = HasTextPattern(editor!, out editorError);
-                        if (editorReady)
-                        {
-                            var preview = main!.FindFirstDescendant(cf => cf.ByAutomationId("DocumentPreview"));
-                            previewFound = preview is not null;
-                            if (preview is not null) previewReady = HasTextPattern(preview, out previewError);
-                        }
+                        if (editorReady && preview is not null) previewReady = HasTextPattern(preview, out previewError);
                         return ready = editorReady && previewReady;
                     }
                     finally

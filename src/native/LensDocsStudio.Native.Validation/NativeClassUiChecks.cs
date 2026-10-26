@@ -177,7 +177,9 @@ internal static partial class NativeUiChecks
                 {
                     SelectClass("A"); Click("ClassDelete"); Await(model => model.Classes.Count == 0); Check(Find(visual!, "ClassAddClass").IsEnabled, "Deleting the last independent class retains an editable empty native draft");
                     Click("ClassUndo"); Await(_ => Draft() == raw); Click("ClassRedo"); Await(model => model.Classes.Count == 0);
-                    Click("ClassAddClass"); Set("ClassNodeId", "B"); Click("ClassUpdate"); Await(model => model.Classes.Single().Id == "B"); Click("ClassCancel"); Discard(); WaitClosed();
+                    // The draft starts empty. Observe the exact one-class result within
+                    // Await's existing deadline instead of throwing on the first empty read.
+                    Click("ClassAddClass"); Set("ClassNodeId", "B"); Click("ClassUpdate"); Await(model => model.Classes.Count == 1 && model.Classes[0].Id == "B"); Click("ClassCancel"); Discard(); WaitClosed();
                 }
                 else
                 {
