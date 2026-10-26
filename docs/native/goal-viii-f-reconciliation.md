@@ -3,6 +3,33 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Initial preview observation correction — 26 October 2026
+
+Source `d8b02a6db1f154d51e60fb38f297c30c026d2dde`, tree
+`50b1d6ec2481f90592f484c982d9c32a71d5da14`, produced independently verified
+portable .915/.916 with 528 payload paths and bundled Core/WPF 10.0.13. Both main
+native jobs passed; the complete installed-family matrices have separate final
+receipts. Local .915 sessions g01 Find Enter and g02 Next passed with native/UIA
+exact Café selection and normal exits at 08:50:20Z and 08:51:37Z respectively.
+
+Fresh g03 remains **FAILED**, before commands, at 08:53:08Z: the initial diagnostic
+snapshot read the preview TextPattern before its first render. Its captured image
+shows `Preview pending`; the immediately following read-only failure snapshot
+successfully recorded the same provider and unchanged source. Operator handoff
+had passed for PID 58056, start 08:53:04.2732758Z, HWND 17569448, actual DPI 144.
+The operator reported normal closure; read-only process absence and bounded host,
+payload and source preservation were then verified. No interaction sequence is
+inferred from that closure statement, and g03 is not replayed or relabelled.
+
+The narrow correction observes initial editor/preview TextPattern availability
+before taking the first selection snapshot, through the existing guarded
+20-second observation helper. It does not catch or bypass a failed selection,
+retry input, extend a deadline or change a fixture. All exact editor Return,
+preview Find, invalid-source and owner assertions remain. This corrected source
+requires fresh committed-head gates, verified packages and new local sessions;
+g01/g02 remain evidence only for d8b02a6. Full local shell and internal beta remain
+BLOCKED pending the complete mandatory sequence.
+
 ## Attended continuation and bounded remediation — 26 October 2026
 
 The source2f5a0a8 receipt records nine successful exact-head workflows, 116 passed

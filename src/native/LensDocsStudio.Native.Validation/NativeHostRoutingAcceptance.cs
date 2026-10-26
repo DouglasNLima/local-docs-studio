@@ -36,9 +36,16 @@ internal static partial class NativeUiChecks
             CaptureHostRuntime(Process.GetProcessById(app.ProcessId), executable, output, revision, tree);
             stage = "operator-handoff"; AwaitHostOperatorForeground(app.ProcessId, main, executable, output, "initial");
             Guard(); editor = Find(main, "MarkdownEditor");
+            stage = "source-readiness";
             ObserveUntil(() => ReadEditorText(editor) == source, "Exact synthetic source did not load.");
             if (variant.EndsWith("Observed", StringComparison.Ordinal))
                 ObserveUntil(() => File.Exists(Path.Combine(output, "native-observations.jsonl")) && ReadObservedText(Path.Combine(output, "native-observations.jsonl")).Contains("probe-attached", StringComparison.Ordinal), "Read-only observer did not attach.");
+            stage = "preview-readiness";
+            // The first preview can still be pending after the source and observer are ready.
+            // Observe its actual provider before reading selection; never repeat input.
+            ObserveUntil(() => editor.Patterns.Text.IsSupported
+                && main.FindFirstDescendant(cf => cf.ByAutomationId("DocumentPreview")) is { } preview
+                && preview.Patterns.Text.IsSupported, "Initial editor/preview TextPattern providers did not become available.");
             Snapshot("ready");
 
             if (variant == "InvalidMermaid")

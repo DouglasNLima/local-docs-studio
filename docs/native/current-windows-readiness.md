@@ -1,5 +1,25 @@
 # Current native Windows readiness
 
+## Goal VIII-F initial preview observation — 26 October 2026
+
+At `d8b02a6`, independently verified .915 passed local native/UIA Find Enter and
+Next in fresh g01/g02 sessions. Both main native CI jobs passed and .915/.916 retain
+all 528 payload paths and bundled Core/WPF 10.0.13; the complete matrix outcomes
+are source-labelled in the delivery receipts.
+
+Local g03 editor-Return acceptance FAILED before commands: the diagnostic's first
+selection snapshot requested a preview TextPattern while `Preview pending` was
+visible. The next read-only snapshot succeeded with unchanged source. The operator
+closed the window normally; subsequent process absence and bounded host/source
+preservation were verified. The failed receipt remains unchanged.
+
+The validation-only correction adds an initial provider-readiness observation with
+the existing foreground guard and 20-second deadline. Required selection/source
+assertions are unchanged. Fresh exact-head CI/package/local acceptance is required;
+**HOST PORTABLE / INTERNAL BETA remain BLOCKED** until the focused cases and one
+complete contiguous shell pass. No product, runtime, renderer or release-policy
+change is introduced. See [the source-labelled account](goal-viii-f-reconciliation.md).
+
 ## Goal VIII-F attended handoff and owner guard — 26 October 2026
 
 Existing Draft PR #48 remains unmerged. At source `2f5a0a8`, all nine mandatory
