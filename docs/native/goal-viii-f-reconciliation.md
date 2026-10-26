@@ -89,6 +89,19 @@ tests cannot substitute for that portable GUI outcome.
 
 ## Source-labelled checks and delivery
 
+On 26 October UTC, the first merged candidate
+`1c3cddc526664763b2f535cbd2144765e1145659` failed native push run
+[40247151371](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40247151371),
+job 121331027518, before compilation. The unchanged host-controls assertion
+requires the Goal VIII paused-performance predicate immediately after `if:`;
+the merge put the accepted Goal IX predicate first. Local execution reproduced
+the exact failure. Reordering those two conjunctions preserves every predicate
+and satisfies the original assertion without changing tests, exclusions or
+behaviour. All 54 host controls then passed. The failed source/run and its raw
+artifact remain failed; later source gates are independent. Superseded runs may
+be cancelled by the existing workflow concurrency policy after the corrective
+push; cancelled or dependent-skipped jobs do not count as passes.
+
 Precommit combined-source locked restore and warnings-as-errors Release build
 passed with zero warnings/errors. Core passed 2,210 cases, zero skips. Existing
 creation-session, compiled Find routing and deterministic invalid/valid native
