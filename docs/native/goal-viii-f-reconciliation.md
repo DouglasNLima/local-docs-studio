@@ -3,6 +3,59 @@
 Recorded 25 October 2026 for existing [Draft PR #48](https://github.com/DouglasNLima/local-docs-studio/pull/48).
 Local Markdown, Mermaid, and documentation studio.
 
+## Retained aeed1b8 owner-focus evidence and scoped client correction — 26 October 2026
+
+Candidate `aeed1b8907e1cc50bd5f39ace0924150e73e01ed`, tree
+`962aa3740935c83c15f710cc1f8cfcf3a798a6f6`, retains both original downloaded
+.923/.924 package archives, complete 528-path manifests, bundled Core/WPF
+10.0.13 and both independently recomputed 2,210-case hosted Core unions.
+Its CI inventory and all raw artifacts are retained with their actual outcomes.
+
+The only new local session, k01 using .923, remains BLOCKED. PID 59236 started
+at 13:02:50.2229751Z and passed the operator foreground handoff at
+13:03:10.8915237Z. Picker invocation/Cancel preserved the exact Café selection;
+private Cancel preserved saved and owner source. Two native observations proved
+the enabled nonmodal owner/session/editor identity and visual foreground before
+the one permitted synthetic owner mutation. The exact failed guard then recorded
+expected visual HWND 16127236 versus actual main HWND 19995846, both PID 59236,
+with the normal console still true. Apply and the post-mutation snapshot were
+not reached; no input retry or foreground restoration followed.
+
+The process-local trace records automation SetFocusCore on the main editor at
+13:03:16.374186Z, before its Value provider mutation at 13:03:16.3882906Z.
+The owner hash changes once from
+`990c0ec966d38842f5ab666c67c3d7a9d6c40f1a216d8cf450bc8701454fdb42`
+to `dea07871b7b33262af33197d75b76e7368fd902d85f566b78ae964d6d01b28b9`;
+the private pre-mutation hash is
+`3ddb956c7a00465146cd823331f69103545b068b517e640710f6145bb8c4302d`.
+The operator confirmed private Cancel and normal closure without saving. The
+native close observation at 13:03:42.7282776Z retains the changed in-memory hash;
+independent absence and rehash prove all six saved workspace files and 528
+portable payload files unchanged. Later operator interactions are not automated
+acceptance, and no unrecorded Apply rejection is inferred.
+
+The [Microsoft AutoSetFocus contract](https://learn.microsoft.com/en-us/windows/win32/api/uiautomationclient/nf-uiautomationclient-iuiautomation2-get_autosetfocus)
+explains the observed ordering: the UIA client normally focuses a target before
+SetValue. Pinned FlaUI 5.0.0 delegates directly to that COM pattern and does not
+override the default during construction. A fresh actual client returns 1; the
+original k01 client's property was not sampled. The narrow validation correction
+sets this client option to 0 only around the already authorised owner mutation,
+checks it before the callback, and restores the previous option in finally.
+Both pre/post foreground guards, exact owner policy, single mutation and all
+deadlines remain. Actual-client controls prove both previous values and exception
+restoration without GUI input; portable remediation is not yet claimed.
+
+Source inspection also identified that the read-only observer's request sequence
+restarts at 1 while the first launch's request/response files remain. Owner
+scenarios finish before the shell restart. The next source therefore enables
+that observer only on the first launch, preserving every original file and all
+restart source/runtime/pane assertions. This is a source-level collision
+correction, not an observed full-shell pass or a relabelled earlier failure.
+
+New-source CI, verified packages, focused portable tests and one complete original
+shell are still required. PR #48 remains Draft; STALE OWNER / HOST PORTABLE /
+INTERNAL BETA remain BLOCKED. PR #38 and experimental Continuous stay paused.
+
 ## Retained aab9911 passes and owner-focus diagnostic — 26 October 2026
 
 The [source-labelled receipt](https://github.com/DouglasNLima/local-docs-studio/pull/48#issuecomment-6415900963)

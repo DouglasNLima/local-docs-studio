@@ -1,5 +1,42 @@
 # Current native Windows readiness
 
+## Goal VIII-F observed automatic UIA focus — 26 October 2026
+
+Source `aeed1b8907e1cc50bd5f39ace0924150e73e01ed`, tree
+`962aa3740935c83c15f710cc1f8cfcf3a798a6f6`, produced independently verified
+.923/.924 packages with 528 paths and bundled Core/WPF 10.0.13. Both raw hosted
+Core results match the 2,210-case original parent union. The retained CI receipt
+records the complete workflow outcomes separately from local acceptance.
+
+Fresh .923 session k01 (PID 59236, started 13:02:50.2229751Z) passed the initial
+operator foreground handoff, native source/preview, picker Cancel and private
+Cancel. Both native pre-mutation snapshots proved the exact nonmodal owner and
+private draft, with main HWND 19995846 and visual HWND 16127236. At
+13:03:16.374186Z the read-only trace observed the main editor's automation
+`SetFocusCore` through `ElementProxy.InContextSetFocus`; at 13:03:16.3882906Z
+the owner TextChanged stack reached AvalonEdit's `IValueProvider.SetValue`.
+The original post-call guard BLOCKED before Apply: the expected visual HWND
+had become the main HWND, still in the same process on the normal console.
+No stale-owner rejection or post-mutation native snapshot was reached.
+
+Microsoft documents that [UIA AutoSetFocus](https://learn.microsoft.com/en-us/windows/win32/api/uiautomationclient/nf-uiautomationclient-iuiautomation2-get_autosetfocus)
+normally focuses the target before SetValue. The old client's property was not
+sampled, so this attribution combines the actual call order, unchanged FlaUI
+client construction and the documented default. A fresh real client independently
+returned 1. The validation-only correction suppresses AutoSetFocus around the
+single authorised explicit owner mutation and restores its prior value in a
+finally block. Existing foreground and native owner/version guards stay intact.
+Real-client controls verify both prior settings and exception restoration without
+opening windows or modifying documents; these are not portable GUI acceptance.
+
+The operator confirmed Cancel and normal close without saving. Native close was
+observed at 13:03:42.7282776Z; separate process absence and bounded preservation
+passed, including all 528 payload and six saved workspace hashes. k01 remains
+BLOCKED. The shell's read-only owner observer is now limited to its first launch,
+where owner scenarios occur, so restart cannot replay preserved request files.
+The original contiguous shell and fresh-source portable acceptance remain unproved.
+**PR #48 stays Draft; HOST PORTABLE / INTERNAL BETA remain BLOCKED.**
+
 ## Goal VIII-F focused portable passes and retained owner block — 26 October 2026
 
 Source `aab991166d9cc3a8befea809ce3752253d21903c`, tree

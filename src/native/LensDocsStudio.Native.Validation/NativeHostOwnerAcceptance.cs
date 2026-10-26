@@ -61,10 +61,15 @@ internal static partial class NativeUiChecks
         if (ReadEditorText(editor) != source || ReadEditorText(Control("MermaidDraftSource")) != privateSource || File.ReadAllText(sourcePath) != source)
             throw new HostFindInputBlockedException("Synthetic source changed at the mutation boundary.");
         AssertHostForeground(processId, visual);
-        // This one explicit-target UIA mutation is authorised only by the complete
-        // native + Win32 + UIA policy above. It never changes OS foreground/focus.
-        editor.Patterns.Value.Pattern.SetValue(external);
-        AssertHostForeground(processId, visual);
+        // The complete native + Win32 + UIA policy authorises one explicit-target
+        // mutation. UIA's default AutoSetFocus would activate the owner first.
+        var automaticFocus = NativeHostAutomaticFocus.Run(automation, () =>
+        {
+            AssertHostForeground(processId, visual);
+            editor.Patterns.Value.Pattern.SetValue(external);
+            AssertHostForeground(processId, visual);
+        });
+        WriteNew(Path.Combine(output, "owner-mutation-client.json"), automaticFocus);
         var after = Snapshot(); NativeHostOwnerPolicy.AfterMutation(before, after, Digest(external));
         Control("MermaidApply").AsButton().Invoke();
         Observe(() => Control("MermaidStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Stale-owner Apply was not rejected.");

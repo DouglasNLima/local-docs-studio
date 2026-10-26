@@ -186,7 +186,10 @@ internal static partial class NativeUiChecks
             var info = new ProcessStartInfo(executable) { UseShellExecute = false, WorkingDirectory = workspace };
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_STARTUP_HOOKS"))) throw new IOException("Inherited startup hooks are forbidden.");
             info.Environment["DOTNET_STARTUP_HOOKS"] = typeof(StartupHook).Assembly.Location;
-            info.Environment["LENS_OWNER_OBSERVATION_ROOT"] = sandbox;
+            // Owner scenarios occur only in the first launch. A restart must not
+            // consume those preserved request/response files as new observations.
+            info.Environment.Remove("LENS_OWNER_OBSERVATION_ROOT");
+            if (launchNumber == 0) info.Environment["LENS_OWNER_OBSERVATION_ROOT"] = sandbox;
             foreach (var arg in new[] { "--state-directory", state, workspace, sourcePath }) info.ArgumentList.Add(arg);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Shell owner did not open within 25 seconds.");
             AwaitHostOperatorForeground(app.ProcessId, main, executable, output, "launch-" + ++launchNumber);

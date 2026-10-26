@@ -124,6 +124,7 @@ internal static class NativeHostOwnerPolicy
         document.Text = "Changed synthetic owner"; document.Text = "Synthetic owner";
         if (captured.CompareAge(document.Version) == 0) throw new IOException("Restored bytes concealed an intervening native version change.");
         checks.Add("Actual AvalonEdit version chain detects changes even after identical bytes are restored");
+        NativeHostAutomaticFocus.RunControls(output);
         File.WriteAllText(Path.Combine(output, "controls.json"), JsonSerializer.Serialize(new { status = "PASS", scope = "DETERMINISTIC_OWNER_POLICY_ONLY", guiAcceptance = "NOT RUN", checks }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
