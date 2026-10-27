@@ -1,5 +1,9 @@
 # Native implementation progress
 
+## Goal #52 - complex ER and preview loading - 27 October 2026
+
+Implemented bounded/cancellable pinned ER layout, diagnostic categories, transient retry/cache policy, full-canvas bounded PNG export and native lifecycle-aware loading. Core: 2,251 passed. Complete native corpus: 202 diagram/export cases, zero failures after retaining and correcting four initial PNG size failures. Shown WPF/UIA Light/Dark, Continuous/Pages and terminal-state evidence is committed with the [receipt](complex-er-preview-loading.md). Original SPC validation is unavailable; actual hosted High Contrast, package/lifecycle and final CI remain separately reported on the Draft PR. No merge/signing/publication is part of this work.
+
 ## Native desktop UX refinements - 27 October 2026
 
 Caption theming, bidirectional Find/counters, direct diagram panning, verified ER/Flowchart inspection and preview zoom are implemented from develop `0df86ad`, with local native runtime and regression evidence. See the [source-labelled implementation and validation receipt](native-desktop-ux-refinements.md). Final acceptance and hosted CI remain pending; existing release and paused-PR boundaries are unchanged.

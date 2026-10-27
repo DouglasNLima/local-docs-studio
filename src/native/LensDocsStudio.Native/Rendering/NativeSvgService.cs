@@ -118,11 +118,14 @@ public sealed partial class NativeSvgService
         }
     }
 
-    public DrawingImage Render(string generatedSvg)
+    public DrawingImage Render(string generatedSvg, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         lock (drawings) if (drawings.TryGetValue(generatedSvg, out var cached)) return cached;
         var svg = Prepare(generatedSvg);
+        cancellationToken.ThrowIfCancellationRequested();
         var image = RenderPrepared(svg);
+        cancellationToken.ThrowIfCancellationRequested();
         if (generatedSvg.Length <= 2_000_000)
         {
             lock (drawings)
@@ -196,6 +199,19 @@ public sealed partial class NativeSvgService
         if (drawing.Bounds.IsEmpty || drawing.Bounds.Width < 1 || drawing.Bounds.Height < 1) throw new InvalidDataException("The diagram has no visible geometry.");
         using var drawingPhase = MermaidDiagnostics.Measure("native.wpf.drawing-freeze");
         drawing.Freeze(); var image = new DrawingImage(drawing); image.Freeze(); return image;
+    }
+
+    /// <summary>Export the entire canvas at 2× where possible, reducing scale within the existing pixel budget.</summary>
+    public static byte[] ToExportPng(ImageSource source)
+    {
+        for (var scale = 2d; scale >= 1d / 64; scale /= 2)
+        {
+            var width = Math.Ceiling(source.Width * scale); var height = Math.Ceiling(source.Height * scale);
+            if (double.IsFinite(width) && double.IsFinite(height) && width > 0 && height > 0
+                && width <= 16000 && height <= 16000 && width * height <= 64_000_000)
+                return ToPng(source, scale);
+        }
+        throw new IOException("This diagram is too large to export as one image. Export SVG to preserve the complete diagram.");
     }
 
     public static byte[] ToPng(ImageSource source, double scale = 2)

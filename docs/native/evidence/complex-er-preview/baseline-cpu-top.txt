@@ -1,0 +1,41 @@
+Top 40 Functions (Inclusive)                                                  Inclusive           Exclusive
+1.  (Non-Activities)                                                          100%                0%
+2.  Threads                                                                   100%                0%
+3.  Thread.StartCallback()                                                    76.32%              0%
+4.  WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class W    41.11%              41.11%
+5.  PortableThreadPool+WorkerThread.WorkerThreadStart()                       35.2%               0%
+6.  LowLevelLifoSemaphore.WaitForSignal(int32)                                35.2%               0%
+7.  il!Interop+Kernel32.GetQueuedCompletionStatus(int,unsigned int32&,unsi    35.2%               35.2%
+8.  Probe!Program.<Main>$(class System.String[])                              23.61%              0%
+9.  DiagramService.Render(class System.String,bool,class System.String,val    23.56%              0.01%
+10. DiagramService.RenderUncached(class System.String,class System.String,    23.54%              0%
+11. MermaidRenderer.RenderSvg(class System.String,class Mermaider.Models.R    23.52%              0%
+12. MermaidRenderPipeline.Execute(class System.String,class Mermaider.Mode    23.52%              0.01%
+13. TimerQueue.TimerThread()                                                  23.51%              0%
+14. DiagramSvgStage.Render(class Mermaider.Rendering.NormalizedRenderReque    23.45%              0%
+15. MermaidEntityLayoutProvider.LayoutEr(class Mermaider.Models.ErDiagram)    23.39%              0%
+16. DefaultLayoutProvider.LayoutEr(class Mermaider.Models.ErDiagram)          23.38%              0%
+17. LightweightErLayoutEngine.Layout(class Mermaider.Models.ErDiagram)        23.38%              0%
+18. SugiyamaLayout.Compute(class Sugiyama.LayoutGraph,class Sugiyama.Layou    23.36%              0%
+19. SugiyamaLayout.ComputeSingle(class Sugiyama.LayoutGraph,class Sugiyama    23.36%              0.02%
+20. CrossingMinimizer.Run(class Sugiyama.Internal.GraphBuffer,int32,bool,b    23.3%               0.02%
+21. CrossingMinimizer.InsertionRefinement(class Sugiyama.Internal.GraphBuf    23.13%              0.04%
+22. Buffer.MemmoveInternal(unsigned int8&,unsigned int8&,unsigned int)        23.06%              23.06%
+23. PortableThreadPool+GateThread.GateThreadStart()                           17.6%               0%
+24. CrossingMinimizer.Optimize(class Sugiyama.Internal.GraphBuffer,int32,b    2.76%               0.01%
+25. CrossingMinimizer.MoveNode(class Sugiyama.Internal.GraphBuffer,int32[]    0.33%               0%
+26. Array.Copy(class System.Array,int32,class System.Array,int32,int32)       0.23%               0%
+27. CrossingMinimizer.CountCrossingsBetween(class Sugiyama.Internal.GraphB    0.08%               0.06%
+28. EventSource.InitializeDefaultEventSources()                               0.07%               0%
+29. .ctor()                                                                   0.07%               0%
+30. .cctor()                                                                  0.07%               0%
+31. EventSource.Initialize(value class System.Guid,class System.String,cla    0.07%               0%
+32. Int32].Sort(value class System.Span`1<!0>,class System.Comparison`1<!0    0.07%               0%
+33. Int32].IntroSort(value class System.Span`1<!0>,int32,class System.Comp    0.07%               0.05%
+34. ErParser.Parse(class System.String[])                                     0.07%               0%
+35. ErParser.ParseCore(class System.String[])                                 0.06%               0.01%
+36. StaticsHelpers.GetGCStaticBaseSlow(value class System.Runtime.Compiler    0.06%               0%
+37. InitHelpers.InitClassSlow(value class System.Runtime.CompilerServices.    0.06%               0.01%
+38. EventSource.EnsureDescriptorsInitialized()                                0.05%               0%
+39. EventSource.DoCommand(class System.Diagnostics.Tracing.EventCommandEve    0.05%               0%
+40. EventSource.CreateManifestAndDescriptors(class System.Type,class Syste    0.05%               0%

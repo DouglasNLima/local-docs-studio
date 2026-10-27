@@ -1,0 +1,938 @@
+[
+  {
+    "Name": "complete-detailed.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 2347.6222,
+    "CpuMs": 2546.875,
+    "Allocated": 1250240792,
+    "PeakWorkingSet64": 56918016,
+    "PrivateMemorySize64": 27054080,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 284,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 165.3066,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1025480
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 1809.2368,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1240697680
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 1924.6058,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1241031336
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 145.8507,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 6757320
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 2275.7489,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1249832112
+        }
+      }
+    ]
+  },
+  {
+    "Name": "complete-detailed.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.3862,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 60010496,
+    "PrivateMemorySize64": 27262976,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 284,
+    "Phases": []
+  },
+  {
+    "Name": "complete-detailed.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 1080.7918,
+    "CpuMs": 1546.875,
+    "Allocated": 1250058424,
+    "PeakWorkingSet64": 67563520,
+    "PrivateMemorySize64": 32346112,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 284,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 3.9646,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 977248
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 1010.7578,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1240644224
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 1013.1654,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1240966904
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 60.9189,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 6779504
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 1080.4365,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1249701360
+        }
+      }
+    ]
+  },
+  {
+    "Name": "complete-detailed.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.1408,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 67588096,
+    "PrivateMemorySize64": 32206848,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 284,
+    "Phases": []
+  },
+  {
+    "Name": "complete-relationships.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 1020.535,
+    "CpuMs": 1781.25,
+    "Allocated": 1258863384,
+    "PeakWorkingSet64": 71008256,
+    "PrivateMemorySize64": 34136064,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 0,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 2.1898,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 399400
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 996.8772,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1254408000
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 998.5459,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1254685720
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 18.8971,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 3354872
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 1020.3088,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1258768512
+        }
+      }
+    ]
+  },
+  {
+    "Name": "complete-relationships.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0239,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 71008256,
+    "PrivateMemorySize64": 33726464,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 0,
+    "Phases": []
+  },
+  {
+    "Name": "complete-relationships.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 849.7923,
+    "CpuMs": 1515.625,
+    "Allocated": 1258867016,
+    "PeakWorkingSet64": 73289728,
+    "PrivateMemorySize64": 36089856,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 0,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.8414,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 399400
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 840.7344,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1254405160
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 841.8255,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1254682824
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 6.6628,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 3351440
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 849.6524,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1258762184
+        }
+      }
+    ]
+  },
+  {
+    "Name": "complete-relationships.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0235,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 73293824,
+    "PrivateMemorySize64": 36057088,
+    "Entities": 39,
+    "Relationships": 115,
+    "Attributes": 0,
+    "Phases": []
+  },
+  {
+    "Name": "monitoring.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 15.6088,
+    "CpuMs": 15.625,
+    "Allocated": 14913272,
+    "PeakWorkingSet64": 73584640,
+    "PrivateMemorySize64": 36761600,
+    "Entities": 13,
+    "Relationships": 46,
+    "Attributes": 138,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.6477,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 433440
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 9.5409,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 11106704
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 9.9834,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 11229832
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 4.4404,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 2667448
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 15.4482,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 14776424
+        }
+      }
+    ]
+  },
+  {
+    "Name": "monitoring.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0262,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 73584640,
+    "PrivateMemorySize64": 36724736,
+    "Entities": 13,
+    "Relationships": 46,
+    "Attributes": 138,
+    "Phases": []
+  },
+  {
+    "Name": "monitoring.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 21.8283,
+    "CpuMs": 46.875,
+    "Allocated": 14918568,
+    "PeakWorkingSet64": 74117120,
+    "PrivateMemorySize64": 38121472,
+    "Entities": 13,
+    "Relationships": 46,
+    "Attributes": 138,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.6101,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 433440
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 12.5831,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 11100720
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 12.9952,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 11218528
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 7.1567,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 2667480
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 21.119,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 14765152
+        }
+      }
+    ]
+  },
+  {
+    "Name": "monitoring.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0282,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 74117120,
+    "PrivateMemorySize64": 38121472,
+    "Entities": 13,
+    "Relationships": 46,
+    "Attributes": 138,
+    "Phases": []
+  },
+  {
+    "Name": "operations.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 65.015,
+    "CpuMs": 46.875,
+    "Allocated": 65278320,
+    "PeakWorkingSet64": 74137600,
+    "PrivateMemorySize64": 38187008,
+    "Entities": 22,
+    "Relationships": 68,
+    "Attributes": 195,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.8264,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 627432
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 56.6986,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 59753976
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 57.2108,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 59931800
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 6.3318,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 3876584
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 64.8477,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 65075568
+        }
+      }
+    ]
+  },
+  {
+    "Name": "operations.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0308,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 74137600,
+    "PrivateMemorySize64": 38182912,
+    "Entities": 22,
+    "Relationships": 68,
+    "Attributes": 195,
+    "Phases": []
+  },
+  {
+    "Name": "operations.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 103.5305,
+    "CpuMs": 125,
+    "Allocated": 65280712,
+    "PeakWorkingSet64": 74579968,
+    "PrivateMemorySize64": 39223296,
+    "Entities": 22,
+    "Relationships": 68,
+    "Attributes": 195,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.8236,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 627432
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 94.7423,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 59752928
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 95.257,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 59930360
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 6.7856,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 3876584
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 103.3632,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 65074128
+        }
+      }
+    ]
+  },
+  {
+    "Name": "operations.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0327,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 74579968,
+    "PrivateMemorySize64": 38223872,
+    "Entities": 22,
+    "Relationships": 68,
+    "Attributes": 195,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 13.7493,
+    "CpuMs": 15.625,
+    "Allocated": 10434072,
+    "PeakWorkingSet64": 74579968,
+    "PrivateMemorySize64": 38236160,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.381,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 243104
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 10.2946,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 8334704
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 10.7036,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 8408952
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 2.3042,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1440064
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 13.6629,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10353312
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0226,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 74579968,
+    "PrivateMemorySize64": 38236160,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 31.8935,
+    "CpuMs": 31.25,
+    "Allocated": 10432968,
+    "PeakWorkingSet64": 74752000,
+    "PrivateMemorySize64": 38293504,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.4038,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 243104
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 28.7799,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 8334424
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 29.0518,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 8408280
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 2.1071,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1440064
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 31.8081,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10352640
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0195,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 74752000,
+    "PrivateMemorySize64": 38285312,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 14.2317,
+    "CpuMs": 15.625,
+    "Allocated": 12685744,
+    "PeakWorkingSet64": 74973184,
+    "PrivateMemorySize64": 38244352,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.3885,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 269952
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 10.5209,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10408064
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 10.7874,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10485424
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 2.7398,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1545368
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 14.1461,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 12594368
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0205,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 74973184,
+    "PrivateMemorySize64": 38244352,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 11.8644,
+    "CpuMs": 15.625,
+    "Allocated": 12693616,
+    "PeakWorkingSet64": 75206656,
+    "PrivateMemorySize64": 36098048,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.4221,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 269952
+        }
+      },
+      {
+        "OperationName": "renderer.ER.sugiyama-layout-routing",
+        "Ms": 7.6399,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10408064
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 7.8997,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10485424
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 3.1826,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1545392
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 11.7839,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 12594392
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0204,
+    "CpuMs": 0,
+    "Allocated": 0,
+    "PeakWorkingSet64": 75206656,
+    "PrivateMemorySize64": 37044224,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": []
+  }
+]

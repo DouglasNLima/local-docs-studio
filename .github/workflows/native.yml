@@ -22,6 +22,34 @@ env:
   LENS_NATIVE_WIZARD_ARGUMENTS: --no-file-associations
   LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
 jobs:
+  complex-er-preview:
+    if: ${{ !inputs.replay_original_853 }}
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build pinned complex ER and preview lifecycle checks
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify complete ER geometry native conversion inspection and exports
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --complex-er artifacts/native/complex-er .
+      - name: Verify shown Light and Dark preview loading with UI Automation
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --preview-loading-ui artifacts/native/preview-loading .
+      - name: Verify loading with actual Windows High Contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --preview-loading-ui artifacts/native/preview-loading-high-contrast . --high-contrast
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-complex-er-preview
+          path: |
+            artifacts/native/complex-er/
+            artifacts/native/preview-loading/
+            artifacts/native/preview-loading-high-contrast/
+          retention-days: 14
   native:
     if: ${{ !inputs.replay_original_853 }}
     runs-on: windows-latest

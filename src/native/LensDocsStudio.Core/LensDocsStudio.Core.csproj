@@ -4,6 +4,7 @@
   <ItemGroup><EmbeddedResource Include="Content\built-in-catalogue.json" LogicalName="Content.built-in-catalogue.json" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="..\..\..\docs\native\user-guide.md" Link="Content\native-help.md" LogicalName="Content.native-help.md" /></ItemGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="LensDocsStudio.Core.Tests" />
     <EmbeddedResource Include="Exports\DocsSiteTemplates\site.css" LogicalName="DocsSite.site.css" />
     <EmbeddedResource Include="Exports\DocsSiteTemplates\site.js" LogicalName="DocsSite.site.js" />
   </ItemGroup>

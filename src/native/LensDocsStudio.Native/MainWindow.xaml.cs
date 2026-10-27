@@ -61,6 +61,7 @@ public partial class MainWindow : Window
         InitialiseSynchronisation();
         InitialiseFind();
         InitialisePreviewZoom();
+        InitialisePreviewLoading();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();
@@ -127,6 +128,8 @@ public partial class MainWindow : Window
         // The shared reader may still display the outgoing document while rendering.
         // Its visible position must never be captured for the incoming tab.
         renderedDocumentId = null; renderedVersion = null; syncAnchors = null;
+        if (displayedTab is null) { rendered = null; parsed = null; Preview.Document = new FlowDocument(); Outline.ItemsSource = null; }
+        QueuePreviewLoading();
         try
         {
             Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
@@ -149,7 +152,7 @@ public partial class MainWindow : Window
         BindActiveDocument(); QueuePreview();
         QueueActiveTabVisibility();
     }
-    private void QueuePreview() { CancelPreview(); previewTimer.Stop(); if (!closing) previewTimer.Start(); }
+    private void QueuePreview() { CancelPreview(); previewTimer.Stop(); QueuePreviewLoading(); if (!closing) previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
         previewTimer.Stop();
@@ -157,7 +160,7 @@ public partial class MainWindow : Window
         CancelPreview();
         model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
-        { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
+        { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); ResetPreviewLoading(); return; }
         if (!ThemeService.IsCurrentHighContrast(SystemParameters.HighContrast))
         {
             // Windows broadcasts asynchronously to WPF. Keep the complete previous
@@ -179,14 +182,29 @@ public partial class MainWindow : Window
         var standalone = Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         var acquired = false;
         var request = ++diagnosticRequest;
+        var loadingTicket = QueuePreviewLoading(start: true);
         diagnosticError = null;
-        void Phase(string name) { PreviewConstructionEvents.Log.Stage("request/" + name, request); if (request == diagnosticRequest) PublishPreviewDiagnostic(name); }
+        void Phase(string name)
+        {
+            PreviewConstructionEvents.Log.Stage("request/" + name, request);
+            if (request != diagnosticRequest) return;
+            PublishPreviewDiagnostic(name);
+            var stage = name switch {
+                "prepare-await-start" => PreviewLoadingPhase.Parsing,
+                "media-await-start" => PreviewLoadingPhase.Media,
+                "construction-await-start" => PreviewLoadingPhase.Building,
+                "attachment-start" => PreviewLoadingPhase.Attaching,
+                _ => (PreviewLoadingPhase?)null
+            };
+            if (stage is { } current) LoadingPhase(loadingTicket, current);
+        }
         Phase("queued");
         bool Current() => !closing && !cancellation.IsCancellationRequested && model.ActiveDocument == tab
             && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0
             && appearance == model.Theme && dark == ThemeService.IsDark(model.Theme) && highContrast == SystemParameters.HighContrast
             && ThemeService.IsCurrentHighContrast(highContrast)
-            && diagramTheme == CurrentDiagramTheme && sourcePath == tab.EffectivePath && workspaceRoot == tab.EffectiveWorkspace;
+            && diagramTheme == CurrentDiagramTheme && sourcePath == tab.EffectivePath && workspaceRoot == tab.EffectiveWorkspace
+            && (forcePreview || model.Layout != "Editor" || !preparePreview);
         try
         {
             await previewGate.WaitAsync(cancellation); acquired = true;
@@ -195,13 +213,18 @@ public partial class MainWindow : Window
             var prepared = await Task.Run(() =>
             {
                 PreviewConstructionEvents.Log.Stage("worker/parse-start", request);
-                var source = markdown.Parse(text, standalone);
+                ParsedDocument source;
+                using (MermaidDiagnostics.Measure("preview.markdown-parse")) source = markdown.Parse(text, standalone);
                 PreviewConstructionEvents.Log.Stage("worker/parse-end", request);
                 var results = new Dictionary<FencedCodeBlock, DiagramResult>();
                 foreach (var code in preparePreview ? source.Syntax.Descendants<FencedCodeBlock>() : [])
                 {
                     cancellation.ThrowIfCancellationRequested();
-                    if (code.Info is "mermaid" or "mmd") results[code] = diagrams.Render(code.Lines.ToString(), dark, diagramTheme);
+                    if (code.Info is "mermaid" or "mmd")
+                    {
+                        Dispatcher.BeginInvoke(() => { if (Current()) LoadingPhase(loadingTicket, PreviewLoadingPhase.Diagrams); });
+                        results[code] = diagrams.Render(code.Lines.ToString(), dark, diagramTheme, cancellation);
+                    }
                 }
                 return (source, results, syntax: preparePreview ? CodeSyntaxService.Prepare(source, cancellation) : null);
             }, cancellation);
@@ -222,9 +245,9 @@ public partial class MainWindow : Window
                 {
                     cancellation.ThrowIfCancellationRequested();
                     if (!diagram.Success) continue;
-                    try { drawings[code] = svg.Render(diagram.Svg!); }
-                    catch (Exception ex) when (ex is not OutOfMemoryException)
-                    { prepared.results[code] = new(diagram.Source, null, "Native diagram rendering failed: " + ex.Message); }
+                    try { drawings[code] = svg.Render(diagram.Svg!, cancellation); }
+                    catch (Exception ex) when (ex is not OutOfMemoryException && ex is not OperationCanceledException)
+                    { prepared.results[code] = new(diagram.Source, null, "Native diagram rendering failed: " + ex.Message) { FailureKind = DiagramFailureKind.NativeConversion }; }
                 }
                 var images = previewImages.Prepare(prepared.source, sourcePath, workspaceRoot, cancellation);
                 var formulae = previewMaths.Prepare(prepared.source, dark, cancellation);
@@ -233,6 +256,7 @@ public partial class MainWindow : Window
             if (!Current()) { Phase("stale-rejected"); return; }
             Phase("media-await-end");
             Phase("construction-await-start");
+            using var constructionPhase = MermaidDiagnostics.Measure("preview.document-construction");
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, reference =>
                 {
                     if (model.ActiveDocument == tab && renderedDocumentId == tab.Id && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0) Navigate(reference);
@@ -243,6 +267,7 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset),
                 offset => OpenMermaidVisualEditor(tab, prepared.source, sourceVersion, offset));
+            constructionPhase?.Dispose();
             if (!Current()) { Phase("stale-rejected"); return; }
             Phase("construction-await-end");
             Phase("selection-capture-start");
@@ -253,6 +278,7 @@ public partial class MainWindow : Window
             Phase("viewport-save-end");
             parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
             Phase("attachment-start");
+            using var attachmentPhase = MermaidDiagnostics.Measure("preview.attachment-first-layout");
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             if (searchPreview) InvalidateFind();
             Phase("attachment-end");
@@ -270,10 +296,16 @@ public partial class MainWindow : Window
             var previewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
             previewBeforeEditorStatus = model.Layout == "Editor" ? previewStatus : null;
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout" : previewStatus;
+            // Loaded fitting and the first render/layout run before ContextIdle. Do not wait for
+            // the entire background paginator, which can legitimately remain active for long books.
+            if (Preview.IsLoaded && model.Layout != "Editor")
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle, cancellation);
+            attachmentPhase?.Dispose();
+            if (Current()) FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Completed, rendered.Warnings.Count != 0);
         }
-        catch (OperationCanceledException) { Phase("cancel-observed"); }
-        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) { diagnosticError = ex.GetType().Name; model.PreviewStatus = "Preview could not be updated: " + ex.Message; Phase("failed"); } }
-        finally { if (acquired) previewGate.Release(); Phase("finished"); }
+        catch (OperationCanceledException) { Phase("cancel-observed"); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Cancelled); }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) { diagnosticError = ex.GetType().Name; model.PreviewStatus = "Preview could not be updated: " + ex.Message; Phase("failed"); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Failed); } }
+        finally { if (acquired) previewGate.Release(); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Cancelled); Phase("finished"); }
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
@@ -526,7 +558,7 @@ public partial class MainWindow : Window
             await model.RunAsync(async () =>
             {
                 var expected = await LensDocsStudio.Core.Exports.ExportFileStore.ReadExistingAsync(dialog.FileName, model.OperationToken);
-                var bytes = format == "SVG" ? System.Text.Encoding.UTF8.GetBytes(svg.Prepare(value)) : NativeSvgService.ToPng(svg.Render(value));
+                var bytes = format == "SVG" ? System.Text.Encoding.UTF8.GetBytes(svg.Prepare(value)) : NativeSvgService.ToExportPng(svg.Render(value));
                 await WriteExportAsync(dialog.FileName, bytes, expected, model.OperationToken);
                 await model.CompleteExportAsync(dialog.FileName, bytes);
             });

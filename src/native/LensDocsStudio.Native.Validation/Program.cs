@@ -17,6 +17,16 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--complex-er")
+        {
+            try { NativeComplexErChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() is "--preview-loading" or "--preview-loading-ui")
+        {
+            try { NativePreviewLoadingChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), args[0] == "--preview-loading-ui", args.Contains("--high-contrast")); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--desktop-ux-interactions")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
@@ -794,7 +804,7 @@ internal static class Program
                         try
                         {
                             var drawing = LensDocsStudio.Native.Platform.StaWorker.RunAsync(() => native.Render(diagram.Svg!)).GetAwaiter().GetResult();
-                            var png = NativeSvgService.ToPng(drawing);
+                            var png = NativeSvgService.ToExportPng(drawing);
                             File.WriteAllBytes(Path.Combine(output, name + ".png"), png);
                             File.WriteAllText(Path.Combine(output, name + ".svg"), native.Prepare(diagram.Svg!));
                             bytes = png.Length;

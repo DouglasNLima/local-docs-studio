@@ -18,6 +18,7 @@ public partial class MainWindow
     {
         if (previewCancellation is { IsCancellationRequested: false }) PreviewConstructionEvents.Log.Stage("shell/cancel-requested", diagnosticRequest);
         previewCancellation?.Cancel();
+        if (closing) ResetPreviewLoading();
     }
 
     private void PublishPreviewDiagnostic(string phase)

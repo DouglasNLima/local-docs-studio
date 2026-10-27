@@ -201,7 +201,7 @@ public partial class DiagramWindow : Window
     {
         try
         {
-            using var stream = new MemoryStream(NativeSvgService.ToPng(DiagramImage.Source));
+            using var stream = new MemoryStream(NativeSvgService.ToExportPng(DiagramImage.Source));
             var bitmap = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad); bitmap.Freeze();
             Clipboard.SetImage(bitmap); DiagramStatus.Text = "Diagram image copied to the Windows clipboard.";
         }

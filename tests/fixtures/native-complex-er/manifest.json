@@ -1,0 +1,38 @@
+[
+  {
+    "name": "complete-relationships",
+    "entities": 39,
+    "relationships": 115,
+    "attributes": 0
+  },
+  {
+    "name": "complete-detailed",
+    "entities": 39,
+    "relationships": 115,
+    "attributes": 284
+  },
+  {
+    "name": "operations",
+    "entities": 22,
+    "relationships": 68,
+    "attributes": 195
+  },
+  {
+    "name": "monitoring",
+    "entities": 13,
+    "relationships": 46,
+    "attributes": 138
+  },
+  {
+    "name": "workflow-assignment",
+    "entities": 11,
+    "relationships": 21,
+    "attributes": 82
+  },
+  {
+    "name": "workflow-definitions",
+    "entities": 12,
+    "relationships": 20,
+    "attributes": 97
+  }
+]

@@ -33,7 +33,7 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
             var result = diagrams.Render(code.Lines.ToString(), dark, diagramTheme);
             if (!result.Success) throw new InvalidDataException(result.Error);
             var drawing = svg.Render(result.Svg!);
-            var bytes = NativeSvgService.ToPng(drawing);
+            var bytes = NativeSvgService.ToExportPng(drawing);
             CountImage(bytes);
             diagramImages[code.Span.Start] = new(bytes, (int)Math.Ceiling(drawing.Width * 2), (int)Math.Ceiling(drawing.Height * 2), "Mermaid diagram");
         }

@@ -1,5 +1,14 @@
 # Functional parity matrix
 
+## Complex ER and preview loading - 27 October 2026
+
+| Capability | Current implementation and evidence |
+|---|---|
+| Complex native ER | Six equivalent fixtures through 39 entities / 115 relationships / 284 attributes; complete source, semantic, SVG/PNG and inspection checks. Bounded pinned search, cancellable layout and six-second ER allowance; other families keep three seconds. Original SPC snapshot unavailable. |
+| Preview loading | Native ring, delayed lifecycle state, incoming-document masking, same-document refresh and explicit retry. Shown Light/Dark, Continuous/Pages and UIA checks pass locally; actual OS High Contrast and package gates are reported on the Draft PR. |
+
+See the [engineering receipt](complex-er-preview-loading.md) for original failures, resource policy, screenshots and remaining certification limits. The independent Continuous 250 ms gate is unchanged.
+
 ## Native desktop UX refinements — 27 October 2026
 
 Caption theming, bidirectional Find/counters, direct diagram panning, verified ER/Flowchart inspection and preview zoom are implemented from develop `0df86ad`, with local native runtime and regression evidence. See the [source-labelled implementation and validation receipt](native-desktop-ux-refinements.md). Final acceptance and hosted CI remain pending; existing release and paused-PR boundaries are unchanged.

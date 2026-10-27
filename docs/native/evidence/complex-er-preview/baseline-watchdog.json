@@ -1,0 +1,8 @@
+{
+  "Case": "complete-detailed",
+  "Baseline": "bebd1635a66e3be9cc76c7c38e27a26837fcdeb5",
+  "Outcome": "External watchdog stopped a non-interruptible ER layout",
+  "WallSeconds": 73.5789031,
+  "CpuSeconds": 71.703125,
+  "PeakWorkingSet64": 53493760
+}
