@@ -47,6 +47,9 @@ internal static partial class NativeUiChecks
         UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferences))!;
         bool Visible(string id) => window.FindFirstDescendant(cf => cf.ByAutomationId(id)) is { IsOffscreen: false };
 
+        // Quick start has just switched back from a closed draft. Establish the incoming
+        // preview's visibility before testing whether a panel action preserves it.
+        Wait(() => Visible("DocumentPreview"), "The restored document preview did not become visible before panel checks.");
         Find(window, "ToggleSidebar").AsButton().Invoke();
         Wait(() => !Visible("WorkspaceTree") && ReadPreferences().Desktop?.ShowSidebar == false, "Workspace did not collapse and persist.");
         if (!Visible("DocumentPreview")) throw new IOException("Hiding workspace also hid the preview.");

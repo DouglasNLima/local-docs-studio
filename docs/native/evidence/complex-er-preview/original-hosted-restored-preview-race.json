@@ -1,0 +1,10 @@
+{
+  "Passed": false,
+  "Checks": [
+    "Startup file opened through native controls",
+    "Empty-draft quick start exposes native workspace/document/help actions, yields to typing and preserves existing source",
+    "Actual application process exposes its loaded .NET runtime and WPF graphics modules"
+  ],
+  "Error": "System.IO.IOException: Hiding workspace also hid the preview.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.CheckDesktopControls(Window window, AutomationElement editor, UIA3Automation automation, Int32 process, String state, String output, String source) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiDesktopControls.cs:line 52\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.RunCore(String executable, String output, Boolean requireBundledRuntime, Boolean desktopUxOnly, Boolean firstLaunchOnly) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 69",
+  "FixtureRoot": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\ux-controls\\ui-16ef671c486647aeadaa56a8f821a0b5"
+}
