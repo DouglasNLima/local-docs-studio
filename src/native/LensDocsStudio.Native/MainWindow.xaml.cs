@@ -296,10 +296,10 @@ public partial class MainWindow : Window
             var previewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
             previewBeforeEditorStatus = model.Layout == "Editor" ? previewStatus : null;
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout" : previewStatus;
-            // Loaded fitting and the first render/layout run before ContextIdle. Do not wait for
-            // the entire background paginator, which can legitimately remain active for long books.
+            // Queued Loaded fitting and Render-priority layout run before this marker. Background
+            // pagination has lower priority; ContextIdle would wait for the entire book instead.
             if (Preview.IsLoaded && model.Layout != "Editor")
-                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle, cancellation);
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Loaded, cancellation);
             attachmentPhase?.Dispose();
             if (Current()) FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Completed, rendered.Warnings.Count != 0);
         }

@@ -142,6 +142,13 @@ internal static class NativePreviewLoadingChecks
                 Hold(); var closing = Render(); model.ActiveDocument = null; Call("BindActiveDocument"); Await(closing);
                 Check(!loading.Busy && host.Visibility == Visibility.Visible && preview.Document.Blocks.Count == 0, "Closing the active document removes loading and outgoing content"); Release();
             }
+            // A ready first page must not wait for unrelated background pagination.
+            model.NewDocumentCommand.Execute(null); var paged = model.ActiveDocument!;
+            paged.EditorDocument.Text = "# Paged document\n\n" + string.Join("\n\n", Enumerable.Repeat("A paragraph for first-page readiness. " + new string('x', 120), 4000));
+            Call("SetLayout", "Split"); Await(Render());
+            paged.EditorDocument.Insert(paged.EditorDocument.TextLength, "\n\nLatest paged revision.");
+            Await(ObservePagedReadiness(Render()));
+
             // The full production path handles dense Mermaid plus Markdown, without a timing stub.
             model.NewDocumentCommand.Execute(null); model.ActiveDocument!.EditorDocument.Text = "# Complex ER\n\n```mermaid\n" + File.ReadAllText(Path.Combine(root, "tests/fixtures/native-complex-er/complete-detailed.mmd")) + "```\n\nComplete document.\n\n```mermaid\n" + File.ReadAllText(Path.Combine(root, "tests/fixtures/native-complex-er/monitoring.mmd")) + "```\n";
             Call("SetLayout", "Split"); var complex = Render();
@@ -170,6 +177,18 @@ internal static class NativePreviewLoadingChecks
         object? Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window);
         object? Call(string name, params object?[] args) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, args);
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
+        async Task ObservePagedReadiness(Task render)
+        {
+            await render; // UI continuation observes readiness before background pagination resumes.
+            var paginator = (DynamicDocumentPaginator)((IDocumentPaginatorSource)preview.Document).DocumentPaginator;
+            var complete = paginator.IsPageCountValid; var pages = paginator.PageCount;
+            Check(!loading.Busy && host.Visibility == Visibility.Visible && paginator.GetPage(0) != DocumentPage.Missing,
+                "Pages refresh installs its first visible page and dismisses loading");
+            timings.Add(new { Scenario = "Pages refresh readiness", PagesAtReady = pages, PaginationCompleteAtReady = complete,
+                BackgroundPaginationEnabled = paginator.IsBackgroundPaginationEnabled });
+            Check(paginator.IsBackgroundPaginationEnabled && !complete, "Pages refresh does not wait for all background pages");
+            Capture("pages-refresh-ready");
+        }
         void MeasureBusyPresentation(string scenario)
         {
             using var process = Process.GetCurrentProcess(); var cpu = process.TotalProcessorTime;
