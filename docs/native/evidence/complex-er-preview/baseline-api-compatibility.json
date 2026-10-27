@@ -1,0 +1,19 @@
+{
+  "Status": "FAIL",
+  "AcceptanceEligible": true,
+  "MeasuredBudgetResult": "FAIL",
+  "Enforced": false,
+  "ThresholdMilliseconds": 250,
+  "Boundary": "Input callback queued before attachment, synchronous Measure/Arrange/UpdateLayout and dispatcher delivery; unchanged original first-layout boundary",
+  "ReadinessBoundary": "Before parsing through full construction, attachment, initial layout and ApplicationIdle; no required content deferred",
+  "Samples": [
+    {
+      "Name": "mixed",
+      "Repetition": 0,
+      "FirstLayoutMilliseconds": 506.6793,
+      "FirstLayoutAcceptance": "FAIL",
+      "InputAcceptance": "FAIL",
+      "Correctness": "PASS"
+    }
+  ]
+}

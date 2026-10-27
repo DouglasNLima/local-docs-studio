@@ -649,6 +649,14 @@ internal static class Program
             catch (IOException ex) when (ex.Message.StartsWith("Windows rejected the installer signature", StringComparison.Ordinal))
             { Console.WriteLine("Actual Windows Authenticode verification rejected the unsigned installer: " + ex.Message); return 0; }
         }
+        return RunCorpus(args);
+    }
+
+    // Older-product comparisons share this compiled dispatcher. Keep new corpus-only APIs
+    // outside Main's JIT boundary so unused checks do not require newer product methods.
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static int RunCorpus(string[] args)
+    {
         var output = Path.GetFullPath(args.FirstOrDefault() ?? "artifacts/native/validation");
         var repository = Path.GetFullPath(args.ElementAtOrDefault(1) ?? ".");
         Directory.CreateDirectory(output);

@@ -73,6 +73,11 @@ The ordinary app was also built/launched locally with isolated state: its access
 
 Local Core: **2,251 passed, none skipped**. The full native corpus passed 202 cases; static integrity and all 270 Chromium/Edge browser tests passed. All 12 native export-browser checks passed; final hosted outcomes are recorded on the Draft PR and in the validation tracking document as they complete. Initial build/test/three-second/corpus failure logs remain under ignored `artifacts/native/goal52/`; compact shareable baseline and final evidence is committed here. The source review and final recommendation must distinguish these observations from any pending gate.
 
+## First hosted acceptance and compatibility repair
+
+The [first hosted native run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40582261606) at `f2e9e4fbb4f98d3bdd39f08d2d2d9d48e6cea5a3` passed the complex ER job, shown Light/Dark loading and actual Windows High Contrast. [High Contrast results](evidence/complex-er-preview/hosted-high-contrast.json), [initial](evidence/complex-er-preview/High-Contrast-initial.png), [refresh](evidence/complex-er-preview/High-Contrast-refresh.png) and [Pages](evidence/complex-er-preview/High-Contrast-Pages-completed.png) captures are retained with that source identity.
+
+The first controlled Continuous comparison failed before measuring its baseline: the shared compiled Program.Main referenced the newly added PNG export API, which the pinned older product cannot supply. This was an introduced harness compatibility failure, not the inherited 250 ms result. The original stderr is retained. Corpus execution now has a separate non-inlined JIT boundary, and the existing one-argument SVG rendering API remains available alongside the cancellation overload. The identical comparison protocol, fixtures, thresholds and older product remain unchanged. A local mixed-content run of the current harness against the unmodified PR #51 product verifies that compatibility; final hosted comparison results are recorded on the Draft PR.
 ## Reproduction
 
 Generate fixtures with `node scripts/native/Generate-ComplexErFixtures.mjs`. Build the Release solution and run the Core tests normally. Run the complete prescribed native corpus and `npm test`; the new fixtures are automatically part of the corpus.

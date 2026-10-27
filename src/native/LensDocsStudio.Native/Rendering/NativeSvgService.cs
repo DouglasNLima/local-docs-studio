@@ -118,7 +118,10 @@ public sealed partial class NativeSvgService
         }
     }
 
-    public DrawingImage Render(string generatedSvg, CancellationToken cancellationToken = default)
+    // Keep the original signature for the identical-harness comparisons against older binaries.
+    public DrawingImage Render(string generatedSvg) => Render(generatedSvg, default);
+
+    public DrawingImage Render(string generatedSvg, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         lock (drawings) if (drawings.TryGetValue(generatedSvg, out var cached)) return cached;
