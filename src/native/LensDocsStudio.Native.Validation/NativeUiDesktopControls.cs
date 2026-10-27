@@ -116,6 +116,10 @@ internal static partial class NativeUiChecks
         Wait(() => Find(window, "FindContext").Name == "Find in editor", "Toolbar fixture search did not target the editor.");
         Find(window, "FindText").AsTextBox().Text = "Searchable"; Find(window, "FindNext").AsButton().Invoke();
         Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Searchable"), "Toolbar fixture did not select its exact source word.");
+        Wait(() => Find(window, "FindCounter").Name == "1 of 1", "Editor Find counter did not reflect its exact source occurrence.");
+        Find(window, "FindPrevious").AsButton().Invoke();
+        Wait(() => Find(window, "FindCounter").Name == "1 of 1" && editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Searchable"), "Previous did not wrap a single editor occurrence.");
+        if (!Find(window, "PreviewZoomLabel").Name.Contains("percent", StringComparison.Ordinal)) throw new IOException("Preview zoom lacks its accessible percentage.");
         Find(window, "CloseFind").AsButton().Invoke();
         Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Searchable"), "Closing Find discarded the toolbar fixture's source selection.");
         Find(window, "FormatBold").AsButton().Invoke();

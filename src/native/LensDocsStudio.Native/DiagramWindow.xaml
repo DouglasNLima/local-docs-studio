@@ -1,4 +1,4 @@
-<Window x:Class="LensDocsStudio.Native.DiagramWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+<Window x:Class="LensDocsStudio.Native.DiagramWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls" xmlns:rendering="clr-namespace:LensDocsStudio.Native.Rendering"
  Title="Rendered preview" Width="1000" Height="750" MinWidth="500" MinHeight="350" WindowStartupLocation="CenterOwner" AutomationProperties.AutomationId="DiagramWindow"
  Icon="Resources/Brand/application.ico" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" PreviewKeyDown="DiagramKeyDown" PreviewKeyUp="DiagramKeyUp" Loaded="InitialView">
  <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
@@ -11,17 +11,20 @@
    <Button Content="Fit width" Click="FitWidth" ToolTip="Fit the diagram width" AutomationProperties.AutomationId="DiagramFitWidth"/>
    <Button ToolBar.OverflowMode="Never" Content="100%" Click="ActualSize" ToolTip="Actual Size (Ctrl+0)" AutomationProperties.AutomationId="DiagramActualSize"/>
    <Button ToolBar.OverflowMode="Never" Content="Reset" Click="ResetView" ToolTip="Reset View (Home)" AutomationProperties.AutomationId="DiagramReset"/>
-   <Slider x:Name="Zoom" ToolBar.OverflowMode="Never" Minimum="1" Maximum="400" Value="100" Width="140" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
-   <TextBlock x:Name="ZoomLabel" ToolBar.OverflowMode="Never" Text="100%" Width="55" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DiagramZoomLabel"/>
+   <Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="100" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
+   <TextBlock x:Name="ZoomLabel" ToolBar.OverflowMode="Never" Text="100%" Width="55" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DiagramZoomLabel" AutomationProperties.Name="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite"/>
    <Button Content="Copy image" Click="CopyImage" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="DiagramCopyImage"/>
    <Button Content="SVG…" Tag="SVG" Click="Export" Padding="12,6" Margin="0,0,8,0"/>
    <Button Content="PNG…" Tag="PNG" Click="Export" Padding="12,6"/>
   </ToolBar>
-  <TextBlock x:Name="DiagramStatus" DockPanel.Dock="Bottom" Margin="16,10" Text="Space+drag or middle-button drag to pan. Ctrl+mouse wheel zooms around the pointer. F fits; Home resets." TextWrapping="Wrap" AutomationProperties.AutomationId="DiagramCopyStatus"/>
-  <ScrollViewer x:Name="DiagramScroll" Focusable="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="DiagramMouseWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost" Padding="24" Background="{DynamicResource WindowBrush}" AutomationProperties.AutomationId="DiagramViewport" AutomationProperties.Name="Diagram viewport">
-   <Image x:Name="DiagramImage" Stretch="None" HorizontalAlignment="Center" VerticalAlignment="Center" AutomationProperties.Name="Mermaid diagram drawing">
-    <Image.LayoutTransform><ScaleTransform x:Name="DiagramScale" ScaleX="1" ScaleY="1"/></Image.LayoutTransform>
-   </Image>
+  <TextBlock x:Name="DiagramStatus" DockPanel.Dock="Bottom" Margin="16,10" Text="Left-drag to pan; Space+drag and middle-drag also work. Ctrl+mouse wheel zooms around the pointer. F fits; Home resets." TextWrapping="Wrap" AutomationProperties.AutomationId="DiagramCopyStatus" AutomationProperties.LiveSetting="Polite"/>
+  <ComboBox x:Name="InspectionChoices" DockPanel.Dock="Bottom" Margin="16,0,16,6" Visibility="Collapsed" DisplayMemberPath="Description" SelectedValuePath="Identity" SelectionChanged="InspectionChoiceChanged" ToolTip="Inspect an entity or relationship; Escape clears selection" AutomationProperties.Name="Inspect diagram connections" AutomationProperties.AutomationId="DiagramInspectionChoices"/>
+  <ScrollViewer x:Name="DiagramScroll" Focusable="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="DiagramMouseWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost" MouseLeave="DiagramMouseLeave" Padding="24" Background="{DynamicResource WindowBrush}" AutomationProperties.AutomationId="DiagramViewport" AutomationProperties.Name="Diagram viewport">
+   <Grid x:Name="DiagramSurface" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid.LayoutTransform><ScaleTransform x:Name="DiagramScale" ScaleX="1" ScaleY="1"/></Grid.LayoutTransform>
+    <Image x:Name="DiagramImage" Stretch="None" AutomationProperties.Name="Mermaid diagram drawing"/>
+    <rendering:DiagramInspectionOverlay x:Name="InspectionOverlay" IsHitTestVisible="False" Highlight="{DynamicResource AccentBrush}"/>
+   </Grid>
   </ScrollViewer>
  </DockPanel>
 </Window>

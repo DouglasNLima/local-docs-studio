@@ -177,7 +177,14 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         var button = new Button { Content = format, Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
                         System.Windows.Automation.AutomationProperties.SetAutomationId(button, diagramMedia is null
                             ? "DiagramErrorCopySource" + code.Span.Start : "DiagramAction" + format.Replace(" ", "", StringComparison.Ordinal));
-                        button.Click += (_, _) => exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!);
+                        button.Click += async (_, _) =>
+                        {
+                            if (format != "Zoom" || diagramMedia?.Image.Source is not DrawingImage drawing || Window.GetWindow(button) is not { } owner)
+                            { exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!); return; }
+                            button.IsEnabled = false;
+                            try { await DiagramWindow.ShowCanonicalAsync(owner, diagram, drawing, selected => exportDiagram(selected, diagram.Svg!)); }
+                            finally { button.IsEnabled = true; }
+                        };
                         actions.Children.Add(button);
                     }
                     if (editDiagramVisually is not null && visualTargets.Any(target => code.Span.Start >= target.Container.Start && code.Span.Start < target.Container.End)

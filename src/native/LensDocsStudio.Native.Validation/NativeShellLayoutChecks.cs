@@ -49,6 +49,8 @@ internal static class NativeShellLayoutChecks
             {
                 var content = (DockPanel)window.Content; window.Content = null; content.DataContext = model;
                 var surface = new Border { Child = content };
+                // Preserve ElementName bindings when hosting the real shell outside its Window.
+                NameScope.SetNameScope(surface, NameScope.GetNameScope(window));
                 surface.Resources.MergedDictionaries.Add(window.Resources);
                 surface.Background = (Brush)application.Resources["WindowBrush"];
                 System.Windows.Documents.TextElement.SetForeground(surface, (Brush)application.Resources["TextBrush"]);
@@ -85,9 +87,11 @@ internal static class NativeShellLayoutChecks
                     bitmap.Render(surface); var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
                     using var file = File.Create(Path.Combine(output, prefix + "-" + (int)(scale * 100) + ".png")); encoder.Save(file);
                 }
-                var required = Descendants(surface).OfType<Button>().Where(button => button.Content is "Cancel operation" or "Next" or "Replace" or "Close").ToArray();
-                if (required.Length != 4) throw new IOException("The native shell is missing a required operation/search control.");
-                var bounds = required.Select(button => new { Label = (string)button.Content, Bounds = new Rect(button.TranslatePoint(new(), surface), button.RenderSize),
+                var expectedNames = new Dictionary<string, string> { ["CancelOperation"] = "Cancel operation", ["FindPrevious"] = "Previous match",
+                    ["FindNext"] = "Next match", ["ReplaceOne"] = "Replace", ["CloseFind"] = "Close", ["PreviewZoomLabel"] = "Preview zoom 100 percent; restore 100 percent" };
+                var required = Descendants(surface).OfType<Button>().Where(button => expectedNames.ContainsKey(System.Windows.Automation.AutomationProperties.GetAutomationId(button))).ToArray();
+                if (required.Length != expectedNames.Count) throw new IOException("The native shell is missing a required operation/search/zoom control.");
+                var bounds = required.Select(button => new { Label = expectedNames[System.Windows.Automation.AutomationProperties.GetAutomationId(button)], Bounds = new Rect(button.TranslatePoint(new(), surface), button.RenderSize),
                     AccessibleName = new ButtonAutomationPeer(button).GetName(), button.IsEnabled }).ToArray();
                 File.WriteAllText(Path.Combine(output, prefix + ".json"), JsonSerializer.Serialize(bounds, new JsonSerializerOptions { WriteIndented = true }));
                 foreach (var control in bounds)
@@ -138,7 +142,9 @@ internal static class NativeShellLayoutChecks
         try
         {
             var content = (DockPanel)window.Content; window.Content = null; content.DataContext = model;
-            var surface = new Border { Child = content }; surface.Resources.MergedDictionaries.Add(window.Resources);
+            var surface = new Border { Child = content };
+                // Preserve ElementName bindings when hosting the real shell outside its Window.
+                NameScope.SetNameScope(surface, NameScope.GetNameScope(window)); surface.Resources.MergedDictionaries.Add(window.Resources);
             using var host = new HwndSource(new HwndSourceParameters("Native active tab validation") { Width = 1440, Height = 900, WindowStyle = unchecked((int)0x80000000) });
             host.RootVisual = surface;
             var observations = new List<object>();

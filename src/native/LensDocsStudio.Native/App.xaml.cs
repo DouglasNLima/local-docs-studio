@@ -38,7 +38,10 @@ public partial class App : Application
         var session = new SessionStore(stateRoot);
         var dialogs = new DesktopDialogs();
         var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(stateRoot, "write-recovery")), session, new WorkspaceService(), dialogs);
-        ThemeService.Apply(Resources, "Light");
+        var initialTheme = "System";
+        try { initialTheme = (await session.ReadAsync<UserPreferences>("preferences.json", validate: WorkspaceSettings.ArePreferencesValid))?.Theme ?? "System"; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { /* The normal session recovery reports unreadable preferences. */ }
+        ThemeService.Apply(Resources, initialTheme);
         var window = new MainWindow(model, dialogs, args.ToArray());
         dialogs.Owner = window;
         MainWindow = window;

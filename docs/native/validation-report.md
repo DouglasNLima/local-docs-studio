@@ -1,5 +1,9 @@
 # Native validation report
 
+## Native desktop UX refinements - 27 October 2026
+
+Caption theming, bidirectional Find/counters, direct diagram panning, verified ER/Flowchart inspection and preview zoom are implemented from develop `0df86ad`, with local native runtime and regression evidence. See the [source-labelled implementation and validation receipt](native-desktop-ux-refinements.md). Final acceptance and hosted CI remain pending; existing release and paused-PR boundaries are unchanged.
+
 ## Goal IX - Mermaid creation hub, 25 October 2026
 
 [Draft PR #49](https://github.com/DouglasNLima/local-docs-studio/pull/49) adds the

@@ -21,6 +21,7 @@ internal static class NativeFindRoutingChecks
 {
     public static void Run(string output)
     {
+        SynchronizationContext.SetSynchronizationContext(new System.Windows.Threading.DispatcherSynchronizationContext(System.Windows.Threading.Dispatcher.CurrentDispatcher));
         if (Directory.Exists(output) || File.Exists(output)) throw new IOException("Fresh Find event evidence required.");
         Directory.CreateDirectory(output);
         var state = Path.Combine(output, "state");
@@ -51,10 +52,12 @@ internal static class NativeFindRoutingChecks
                 "Child peer discovery exposes the exact source Text provider without input or source mutation");
             using var host = new HwndSource(new HwndSourceParameters("Hidden Find event test") { Width = 1, Height = 1, WindowStyle = unchecked((int)0x80000000) });
             var enter = RaiseKey(query, Keyboard.PreviewKeyDownEvent, Key.Enter);
+            PumpUntil(() => editor.SelectionLength == 4);
             Check(enter.Handled && editor.SelectionStart == 2 && editor.SelectionLength == 4 && editor.SelectedText == "Café", "Compiled FindText preview route selects the first exact Unicode occurrence once");
             var bubble = RaiseKey(query, Keyboard.KeyDownEvent, Key.Enter, enter.Handled);
             Check(bubble.Handled && editor.SelectionStart == 2, "Handled bubbling phase cannot invoke a duplicate search");
             var next = RaiseKey(query, Keyboard.PreviewKeyDownEvent, Key.Enter);
+            PumpUntil(() => editor.SelectionStart == 8);
             Check(next.Handled && editor.SelectionStart == 8 && editor.SelectedText == "Café", "A separate next Enter advances exactly one occurrence");
             var editorEnter = RaiseKey(editor.TextArea, Keyboard.PreviewKeyDownEvent, Key.Enter);
             Check(!editorEnter.Handled && editor.SelectionStart == 8 && editor.Document.Text == source, "Visible Find bar does not intercept editor preview Enter or mutate source");
@@ -70,6 +73,17 @@ internal static class NativeFindRoutingChecks
                 target.RaiseEvent(args); return args;
             }
             void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
+            void PumpUntil(Func<bool> ready)
+            {
+                var limit = System.Diagnostics.Stopwatch.StartNew();
+                while (!ready() && limit.Elapsed < TimeSpan.FromSeconds(5))
+                {
+                    var frame = new System.Windows.Threading.DispatcherFrame();
+                    window.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, () => frame.Continue = false);
+                    System.Windows.Threading.Dispatcher.PushFrame(frame);
+                    Thread.Sleep(1);
+                }
+            }
         }
         finally { typeof(MainWindow).GetMethod("CompleteClose", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, null); }
     }

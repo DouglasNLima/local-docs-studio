@@ -59,6 +59,8 @@ public partial class MainWindow : Window
         InitialiseExportFeedback();
         DocumentTabs.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(TabStripViewportChanged));
         InitialiseSynchronisation();
+        InitialiseFind();
+        InitialisePreviewZoom();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();
@@ -71,7 +73,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; InvalidateFind(); CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -134,6 +136,7 @@ public partial class MainWindow : Window
             Editor.ScrollToVerticalOffset(displayedTab?.VerticalOffset ?? 0);
         }
         finally { bindingViewport = false; }
+        InvalidateFind();
         UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();
@@ -251,6 +254,7 @@ public partial class MainWindow : Window
             parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
             Phase("attachment-start");
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
+            if (searchPreview) InvalidateFind();
             Phase("attachment-end");
             Phase("installed");
             Phase("sync-install-start");
@@ -387,64 +391,6 @@ public partial class MainWindow : Window
             if (!wasRestoring && CurrentAnchor()) CaptureCurrentNavigation();
             RefreshNavigationControls();
         }
-    }
-    private void OpenFind(object sender, RoutedEventArgs e) => ShowFind(false);
-    private void OpenReplace(object sender, RoutedEventArgs e) => ShowFind(true);
-    private void ShowFind(bool replace)
-    {
-        searchPreview = previewFocused && !replace;
-        FindContext.Text = searchPreview ? "Find in preview" : "Find in editor";
-        ReplaceText.Visibility = ReplaceButton.Visibility = replace ? Visibility.Visible : Visibility.Collapsed;
-        FindBar.Visibility = Visibility.Visible; FindText.Focus(); FindText.SelectAll();
-    }
-    private void CloseFind(object sender, RoutedEventArgs e) => HideFind();
-    private void HideFind() { FindBar.Visibility = Visibility.Collapsed; if (searchPreview) Preview.Focus(); else Editor.Focus(); }
-    private void FindKeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Enter) { FindNext(sender, e); e.Handled = true; } else if (e.Key == Key.Escape) { HideFind(); e.Handled = true; } }
-    private void FindNext(object sender, RoutedEventArgs e)
-    {
-        var query = FindText.Text;
-        if (query.Length == 0) return;
-        if (searchPreview)
-        {
-            if (Preview.Document is null || Preview.Selection is null) { model.Status = "The preview is still updating."; return; }
-            rendered?.ExpandDetails();
-            var start = Preview.Selection.IsEmpty ? Preview.Document.ContentStart : Preview.Selection.End;
-            if (!FindPreview(start, query) && !FindPreview(Preview.Document.ContentStart, query) && rendered is not null)
-            {
-                var match = rendered.Formulae.FirstOrDefault(formula => formula.Source.Contains(query, StringComparison.CurrentCultureIgnoreCase));
-                if (match is not null)
-                {
-                    _ = PreviewNavigationService.BringIntoViewAsync(Preview, match.Element.ElementStart, match.Element.ElementEnd);
-                    model.Status = "Matching formula selected; its LaTeX source is available from the context menu.";
-                }
-            }
-            return;
-        }
-        var text = Editor.Document.Text;
-        var offset = text.IndexOf(query, Math.Min(Editor.SelectionStart + Editor.SelectionLength, text.Length), StringComparison.CurrentCultureIgnoreCase);
-        if (offset < 0) offset = text.IndexOf(query, StringComparison.CurrentCultureIgnoreCase);
-        if (offset >= 0) { Editor.Select(offset, query.Length); _ = EditorNavigationService.BringIntoViewAsync(Editor, offset); }
-        else model.Status = "No matches found.";
-    }
-    private bool FindPreview(TextPointer start, string query)
-    {
-        for (var pointer = start; pointer is not null && pointer.CompareTo(Preview.Document.ContentEnd) < 0; pointer = pointer.GetNextContextPosition(LogicalDirection.Forward))
-        {
-            if (pointer.GetPointerContext(LogicalDirection.Forward) != TextPointerContext.Text) continue;
-            var run = pointer.GetTextInRun(LogicalDirection.Forward);
-            var index = run.IndexOf(query, StringComparison.CurrentCultureIgnoreCase);
-            if (index < 0) continue;
-            var matchStart = pointer.GetPositionAtOffset(index)!;
-            _ = PreviewNavigationService.BringIntoViewAsync(Preview, matchStart, matchStart.GetPositionAtOffset(query.Length)!); return true;
-        }
-        model.Status = "No matches found."; return false;
-    }
-    private void ReplaceOne(object sender, RoutedEventArgs e)
-    {
-        if (Editor.IsReadOnly) return;
-        if (string.Equals(Editor.SelectedText, FindText.Text, StringComparison.CurrentCultureIgnoreCase) && FindText.Text.Length != 0)
-            Editor.Document.Replace(Editor.SelectionStart, Editor.SelectionLength, ReplaceText.Text);
-        FindNext(sender, e);
     }
     private void Format(object sender, RoutedEventArgs e)
     {
@@ -705,6 +651,8 @@ public partial class MainWindow : Window
         if (e.Key == Key.Escape && FindBar.Visibility == Visibility.Visible) { HideFind(); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey is Key.Left or Key.Right)
         { _ = MoveNavigationAsync(e.SystemKey == Key.Right); e.Handled = true; return; }
+        if (e.Key == Key.F3 && (Keyboard.Modifiers & ~ModifierKeys.Shift) == 0)
+        { if (FindBar.Visibility != Visibility.Visible) ShowFind(false); _ = NavigateFindAsync((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? -1 : 1); e.Handled = true; return; }
         if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
         var shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
         switch (e.Key)

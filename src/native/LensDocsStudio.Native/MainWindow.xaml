@@ -340,9 +340,11 @@
     <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8" FocusManager.IsFocusScope="True">
      <WrapPanel>
       <TextBlock x:Name="FindContext" Text="Find in editor" VerticalAlignment="Center" Margin="0,0,8,0"/>
-      <TextBox x:Name="FindText" Width="210" Padding="5" AutomationProperties.Name="Find text" PreviewKeyDown="FindKeyDown"/>
+      <TextBox x:Name="FindText" Width="210" Padding="5" AutomationProperties.Name="Find text" AutomationProperties.AutomationId="FindText" PreviewKeyDown="FindKeyDown" TextChanged="FindQueryChanged"/>
       <TextBox x:Name="ReplaceText" Width="150" Padding="5" Margin="5,0" Visibility="Collapsed" AutomationProperties.Name="Replacement text"/>
-      <Button Content="Next" Click="FindNext" AutomationProperties.AutomationId="FindNext"/><Button x:Name="ReplaceButton" Content="Replace" Visibility="Collapsed" Click="ReplaceOne" AutomationProperties.AutomationId="ReplaceOne"/>
+      <TextBlock x:Name="FindCounter" Text="0 of 0" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="FindCounter" AutomationProperties.Name="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite"/>
+      <Button Content="↑" Click="FindPrevious" ToolTip="Previous match (Shift+Enter or Shift+F3)" AutomationProperties.Name="Previous match" AutomationProperties.AutomationId="FindPrevious"/>
+      <Button Content="↓" Click="FindNext" ToolTip="Next match (Enter or F3)" AutomationProperties.Name="Next match" AutomationProperties.AutomationId="FindNext"/><Button x:Name="ReplaceButton" Content="Replace" Visibility="Collapsed" Click="ReplaceOne" AutomationProperties.AutomationId="ReplaceOne"/>
       <Button Content="Close" Click="CloseFind" AutomationProperties.AutomationId="CloseFind"/>
      </WrapPanel>
     </Border>
@@ -424,8 +426,9 @@
      <DockPanel x:Name="PreviewPane" Grid.Column="2">
       <ToolBar x:Name="PreviewToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Preview commands">
        <ComboBox x:Name="ReadingModeControl" Width="120" SelectionChanged="ReadingModeChanged" ToolTip="Preview reading mode" AutomationProperties.Name="Preview reading mode" AutomationProperties.AutomationId="PreviewReadingMode"/>
-       <Button Tag="out" Click="PreviewZoomChanged" ToolTip="Zoom out" AutomationProperties.Name="Zoom out"><ui:CommandIcon Kind="ZoomOut"/></Button>
-       <Button Tag="in" Click="PreviewZoomChanged" ToolTip="Zoom in" AutomationProperties.Name="Zoom in"><ui:CommandIcon Kind="ZoomIn"/></Button>
+       <Button ToolBar.OverflowMode="Never" Tag="out" Click="PreviewZoomChanged" ToolTip="Zoom out" AutomationProperties.Name="Zoom out"><ui:CommandIcon Kind="ZoomOut"/></Button>
+       <Button x:Name="PreviewZoomLabel" ToolBar.OverflowMode="Never" MinWidth="58" Content="{Binding Zoom, ElementName=Preview}" ContentStringFormat="{}{0:0}%" Click="ResetPreviewZoom" ToolTip="Restore preview zoom to 100%" AutomationProperties.AutomationId="PreviewZoomLabel" AutomationProperties.Name="{Binding Zoom, ElementName=Preview, StringFormat='Preview zoom {0:0} percent; restore 100 percent'}"/>
+       <Button ToolBar.OverflowMode="Never" Tag="in" Click="PreviewZoomChanged" ToolTip="Zoom in" AutomationProperties.Name="Zoom in"><ui:CommandIcon Kind="ZoomIn"/></Button>
        <CheckBox x:Name="FollowCaretControl" Style="{StaticResource Desktop.ToolbarCheckBox}" Tag="caret" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Follow the editor caret in the preview" AutomationProperties.Name="Follow caret" AutomationProperties.AutomationId="FollowCaretControl"><ui:CommandIcon Kind="Focus"/></CheckBox>
        <CheckBox x:Name="SyncScrollControl" Style="{StaticResource Desktop.ToolbarCheckBox}" Tag="scroll" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Synchronise source regions when either pane scrolls" AutomationProperties.Name="Synchronise scroll" AutomationProperties.AutomationId="SyncScrollControl"><ui:CommandIcon Kind="Sync"/></CheckBox>
        <CheckBox x:Name="SyncSelectionControl" Style="{StaticResource Desktop.ToolbarCheckBox}" Tag="selection" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Synchronise literal text selection in both directions" AutomationProperties.Name="Synchronise selection" AutomationProperties.AutomationId="SyncSelectionControl"><ui:CommandIcon Kind="Selection"/></CheckBox>
