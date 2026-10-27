@@ -80,7 +80,7 @@ internal static partial class NativeUiChecks
                 process.Refresh(); measurements.Add(new { Entities = entities, Relationships = relationships, EditorOpenIncludingUiaMilliseconds = openMs, TwentyEntitySelectionsMilliseconds = entityMs,
                     TwentyAttributeSelectionsMilliseconds = attributeMs, TwentyRelationshipSelectionsMilliseconds = relationshipMs, WorkingSetBeforeEditor = beforeMemory, WorkingSetAfterInteractions = process.WorkingSet64,
                     TargetObservations = targetObservations, ActualEndpointDrag = drag, DragLimitation = drag is null ? "No complete endpoint target in the fitted viewport; no pointer timing claim for this size." : null, SourceExact = true, ProcessResponding = true });
-                _ = DwmFlush(); visual.CaptureToFile(Path.Combine(output, "er-" + entities + ".png")); app.Kill(); app.Dispose(); app = null; visual = null;
+                _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, "er-" + entities + ".png")); app.Kill(); app.Dispose(); app = null; visual = null;
             }
             File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Measurements = measurements, Scope = "Real disposable native process; timings include UIA transport and cold conversion. Resource failures and pointer limitations remain explicit. The harness does not override production rendering limits." }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
