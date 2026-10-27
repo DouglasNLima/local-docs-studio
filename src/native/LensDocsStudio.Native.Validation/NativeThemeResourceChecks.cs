@@ -20,6 +20,8 @@ internal static class NativeThemeResourceChecks
         ThemeService.Apply(application.Resources, "Light");
         var text = new TextBlock();
         var window = new Window { Content = text };
+        CaptionThemeService.Attach(window);
+        var handle = new System.Windows.Interop.WindowInteropHelper(window).EnsureHandle();
         text.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         SolidColorBrush? owned = null;
         var samples = new List<object>();
@@ -37,7 +39,11 @@ internal static class NativeThemeResourceChecks
                 if (ReferenceEquals(otherText, brush) || otherText.Color != otherColour)
                     throw new IOException("Theme resources crossed their owner dictionaries.");
                 owned = brush;
-                samples.Add(new { Theme = theme, Colour = brush.Color.ToString(), ConsumerCurrent = true, OwnerIsolated = true, BrushRetained = true });
+                var supported = DwmGetWindowAttribute(handle, 35, out var caption, sizeof(uint)) >= 0;
+                var expectedCaption = SystemParameters.HighContrast ? uint.MaxValue : theme == "Dark" ? 0x00242120u : 0x00FAFAFAu;
+                if (supported && caption != expectedCaption) throw new IOException("The native caption retained an obsolete theme colour.");
+                samples.Add(new { Theme = theme, Colour = brush.Color.ToString(), ConsumerCurrent = true, OwnerIsolated = true, BrushRetained = true,
+                    DwmCaptionSupported = supported, CaptionColour = caption.ToString("X8"), CaptionMatches = supported && caption == expectedCaption });
             }
         }
         finally { window.Close(); }
@@ -46,4 +52,6 @@ internal static class NativeThemeResourceChecks
             Scope = "Unshown WPF resource-consumer/ownership regression only; actual shown appearance and OS transitions are separate checks."
         }));
     }
+    [System.Runtime.InteropServices.DllImport("dwmapi.dll", ExactSpelling = true)]
+    private static extern int DwmGetWindowAttribute(IntPtr window, uint attribute, out uint value, uint size);
 }

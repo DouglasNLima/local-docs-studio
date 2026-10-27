@@ -1423,7 +1423,9 @@ internal static partial class NativeUiChecks
                 preview = Find(window, "DocumentPreview"); preview.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
                 Wait(() => Find(window, "FindContext").Name == "Find in preview", "Formula search used the wrong context.");
                 Find(window, "FindText").AsTextBox().Text = @"\frac{x^2}{y_1}"; Keyboard.Type(VirtualKeyShort.RETURN);
-                Wait(() => Find(window, "Status").Name.StartsWith("Matching formula selected", StringComparison.Ordinal), "Preview Find did not locate native LaTeX source.");
+                Wait(() => Find(window, "Status").Name.StartsWith("Matching formula source;", StringComparison.Ordinal)
+                    && Find(window, "FindCounter").Name == "1 of 1" && !formulaImage.IsOffscreen,
+                    "Preview Find did not count and reveal the exact native LaTeX source.");
                 Keyboard.Type(VirtualKeyShort.ESCAPE); window.CaptureToFile(Path.Combine(output, "native-maths-preview.png"));
                 if (editor.Patterns.Value.Pattern.Value.Value != beforeMaths + mathsFixture || ReadObservedText(source) != templateSavedSource)
                     throw new IOException("Native formula preview, copy or search changed source.");

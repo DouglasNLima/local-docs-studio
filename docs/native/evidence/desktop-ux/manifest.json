@@ -1,0 +1,33 @@
+{
+  "scope": "Local Windows development-build observations; not installed-package, screen-reader or High Contrast certification",
+  "baseRevision": "0df86ad2bdae005d49be68096c2f784b49de8109",
+  "baseTree": "05d534030761a7b68a8579bb33e4dfb50161ce90",
+  "nativeRuntimeAssemblySha256": "b8888e82f328ec001e64dcd3f736cff3bb897a0a635b7402053cc322cd3ee287",
+  "baselineRuntimeAssemblySha256": "eba7b954f68fd339ac93fb9bd77968212cf66ef9c0c18a22d664ce62375031da",
+  "exportComparisons": {
+    "png": {
+      "selected": "1bc0e22aa1ae276cadf0d5bd43cbd0b1faa820a451dec5392e2bb40e14be4443",
+      "cleared": "1bc0e22aa1ae276cadf0d5bd43cbd0b1faa820a451dec5392e2bb40e14be4443",
+      "identical": true
+    },
+    "svg": {
+      "selected": "226fea8ba20b8ba52f46446049e0b1f63e8e6853bb384e524ccdd18cffa0b40e",
+      "cleared": "226fea8ba20b8ba52f46446049e0b1f63e8e6853bb384e524ccdd18cffa0b40e",
+      "identical": true
+    }
+  },
+  "files": {
+    "baseline-dark-caption.png": "d59ab58185a2f4aed96be67d0b71332424af66f85b5e9d4a7cbf7f2e70741eb8",
+    "compiled-checks.json": "ce779256e2c9d0fb5816f22b344ab9c992c15a5c014515750b261afc8396f95b",
+    "dark-caption.png": "0aea1027df6a5daa4a4f69dfafb6e793374ec814a9d3b7a6fca3c2d5ebc6a6ec",
+    "er-22-68-after-pan.png": "adf92f8b9578f2cb74c7fb78eeab0b7aeab15ca6f61950c69429b14d7f7cc767",
+    "er-22-68-contact-selected.png": "0487552f5a6ca9ee95a2317c3b53b0e50542477127f4cef4277db6f34abd3bfb",
+    "er-relationship-hover.png": "7d057e175e9b431a618cd3893e9e01663deaecf8907cfbe75654d97f4f9fa396",
+    "find-editor-next.png": "cfd6621f261c76cbc9ca9c8ca92cb856181331a1fbbe0b76ec9e331f9755095b",
+    "find-preview-visible-selection.png": "a057015aeb6cc9addba0fa0cac2f21dcb6bd2b2a83a4dcc6e8008f660b5a9d80",
+    "find-replacement-24.png": "f4f667fe1d27920c077a6251d2f4c05c9f9455655ad2d041c4e9482ba8f4b88c",
+    "light-caption.png": "d61c6d012a3666b398c29ec44a72d4c9ec66993b6a17394bca508191416793fe",
+    "main-preview-zoom-110.png": "56dbb3da4552781bad01313cf4d56fba6bb04a442cc9dfda9037d6357a0b0b42",
+    "system-theme.png": "80c55c6cc72b77441b790c8c7c9d2b05753166b3aaf02c0f0c1fb212f605ccca"
+  }
+}

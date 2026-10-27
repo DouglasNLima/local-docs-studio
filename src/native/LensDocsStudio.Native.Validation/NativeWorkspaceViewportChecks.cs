@@ -46,9 +46,9 @@ internal static partial class NativeUiChecks
                 var editor = Find(window, "MarkdownEditor"); var preview = Find(window, "DocumentPreview");
                 Wait(() => ReadEditorText(editor) == texts["A"] && HasPreview("A"), "First document did not finish its preview.");
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
-                Find(window, "FollowCaretControl").AsCheckBox().IsChecked = synchronised;
-                Find(window, "SyncScrollControl").AsCheckBox().IsChecked = synchronised;
-                Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
+                SetPreviewSynchronisation(window, "FollowCaretControl", synchronised);
+                SetPreviewSynchronisation(window, "SyncScrollControl", synchronised);
+                SetPreviewSynchronisation(window, "SyncSelectionControl", false);
                 Wait(() =>
                 {
                     var preferencePath = Path.Combine(root, mode + synchronised, "preferences.json");

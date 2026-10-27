@@ -55,6 +55,9 @@ public static class PreviewNavigationService
                         if (selectionEnd is not null)
                         {
                             if (viewer.Selection is not { } selection) return;
+                            // The reader creates its own inner viewer; its inactive
+                            // selection setting is not inherited from the outer control.
+                            scrolling.IsInactiveSelectionHighlightEnabled = viewer.IsInactiveSelectionHighlightEnabled;
                             selection.Select(position, selectionEnd);
                         }
                         BringIntoScrollView(scrolling, position, diagnostic);
@@ -79,6 +82,7 @@ public static class PreviewNavigationService
                     if (selectionEnd is not null)
                     {
                         if (viewer.Selection is not { } selection) return;
+                        paged.IsInactiveSelectionHighlightEnabled = viewer.IsInactiveSelectionHighlightEnabled;
                         selection.Select(position, selectionEnd);
                     }
                     // The exact text position already chose the page. Bringing its parent

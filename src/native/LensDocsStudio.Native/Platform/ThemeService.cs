@@ -63,6 +63,7 @@ public static class ThemeService
 
     public static void Apply(ResourceDictionary resources, string theme)
     {
+        if (ReferenceEquals(resources, Application.Current?.Resources)) CaptionThemeService.Apply(theme);
         using var processing = System.Windows.Threading.Dispatcher.CurrentDispatcher.DisableProcessing();
         PreviewConstructionEvents.Log.Stage("theme-update-start");
         try

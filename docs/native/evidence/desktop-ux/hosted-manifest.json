@@ -1,0 +1,39 @@
+{
+  "sourceRevision": "69e4814f095e8b1d5159077fa81b3382944d039c",
+  "sourceTree": "a540333a997e8fa58752d309bbd1964b39017852",
+  "workflow": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40552248970",
+  "artifact": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40552248970/artifacts/12755139817",
+  "artifactSha256": "35e26a6b96ddbd06046142c0cce8c8e84343ccdda412273fa5661a5a51bdb982",
+  "scope": "The new normal and actual High Contrast UX suites passed; the full desktop suite subsequently stopped at an obsolete formula status assertion. This is not whole-workflow acceptance.",
+  "normal": {
+    "Passed": true,
+    "ActualHighContrast": false,
+    "Checks": [
+      "Requested operating-system High Contrast is active",
+      "Shown native caption and content captured for Light, Dark and System without recreating the window",
+      "Initial query result preserves keyboard focus",
+      "Separate editor/preview counts, initial focus, forward/backward wrap, F3, empty/missing and cross-inline selection",
+      "Replacement invalidation, exact Undo and live/reset document zoom",
+      "Actual Copy image pixels exclude temporary relationship/entity highlighting",
+      "Pan beyond viewport and outside mouse release preserve entity selection",
+      "Inspection, pan, zoom and copy preserve source and saved bytes"
+    ],
+    "CanonicalClipboardPixelSha256": "BD26AC727695ECA5F2874D5FAF2B0522ACCC98E334C110CDD11D728AE0D339E7"
+  },
+  "highContrast": {
+    "Passed": true,
+    "ActualHighContrast": true,
+    "Checks": [
+      "Requested operating-system High Contrast is active",
+      "Shown native caption and content captured for Light, Dark and System without recreating the window",
+      "Initial query result preserves keyboard focus",
+      "Separate editor/preview counts, initial focus, forward/backward wrap, F3, empty/missing and cross-inline selection",
+      "Replacement invalidation, exact Undo and live/reset document zoom",
+      "Actual Copy image pixels exclude temporary relationship/entity highlighting",
+      "Pan beyond viewport and outside mouse release preserve entity selection",
+      "Inspection, pan, zoom and copy preserve source and saved bytes"
+    ],
+    "CanonicalClipboardPixelSha256": "BD26AC727695ECA5F2874D5FAF2B0522ACCC98E334C110CDD11D728AE0D339E7"
+  },
+  "screenshotSha256": "ae994e748f5ef74aa3070b6f8663b82e99107f440b067449cae99aa8c42f8a0f"
+}

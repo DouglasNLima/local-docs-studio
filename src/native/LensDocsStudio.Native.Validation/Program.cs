@@ -17,6 +17,18 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--desktop-ux-interactions")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Automated desktop UX input and High Contrast acceptance require a disposable GitHub-hosted Windows runner."); return 1; }
+            return NativeUiChecks.RunDesktopUxInteractions(args[1], args[2], args[3], args.Contains("--high-contrast"));
+        }
+        if (args.FirstOrDefault() == "--desktop-ux")
+        {
+            try { NativeDesktopUxChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--host-owned-window-controls")
         {
             try { NativeHostOwnerPolicy.RunControls(Path.GetFullPath(args[1])); return 0; }

@@ -1,0 +1,100 @@
+erDiagram
+    direction LR
+    Application {
+        string id PK
+        string name
+    }
+    Contact {
+        string id PK
+        string name
+    }
+    Operation {
+        string id PK
+        string name
+    }
+    Account {
+        string id PK
+        string name
+    }
+    Team {
+        string id PK
+        string name
+    }
+    Project {
+        string id PK
+        string name
+    }
+    Task {
+        string id PK
+        string name
+    }
+    Resource {
+        string id PK
+        string name
+    }
+    Assignment {
+        string id PK
+        string name
+    }
+    Document {
+        string id PK
+        string name
+    }
+    Version {
+        string id PK
+        string name
+    }
+    Review {
+        string id PK
+        string name
+    }
+    Approval {
+        string id PK
+        string name
+    }
+    Application ||--o{ Contact : relationship_01
+    Contact ||--o{ Operation : relationship_02
+    Operation ||--o{ Account : relationship_03
+    Account ||--o{ Team : relationship_04
+    Team ||--o{ Project : relationship_05
+    Project ||--o{ Task : relationship_06
+    Task ||--o{ Resource : relationship_07
+    Resource ||--o{ Assignment : relationship_08
+    Assignment ||--o{ Document : relationship_09
+    Document ||--o{ Version : relationship_10
+    Version ||--o{ Review : relationship_11
+    Review ||--o{ Approval : relationship_12
+    Application ||--o{ Contact : relationship_13
+    Operation ||--o{ Operation : relationship_14
+    Application ||--o{ Operation : relationship_15
+    Contact ||--o{ Account : relationship_16
+    Operation ||--o{ Team : relationship_17
+    Account ||--o{ Project : relationship_18
+    Team ||--o{ Task : relationship_19
+    Project ||--o{ Resource : relationship_20
+    Task ||--o{ Assignment : relationship_21
+    Resource ||--o{ Document : relationship_22
+    Assignment ||--o{ Version : relationship_23
+    Document ||--o{ Review : relationship_24
+    Version ||--o{ Approval : relationship_25
+    Application ||--o{ Account : relationship_26
+    Contact ||--o{ Team : relationship_27
+    Operation ||--o{ Project : relationship_28
+    Account ||--o{ Task : relationship_29
+    Team ||--o{ Resource : relationship_30
+    Project ||--o{ Assignment : relationship_31
+    Task ||--o{ Document : relationship_32
+    Resource ||--o{ Version : relationship_33
+    Assignment ||--o{ Review : relationship_34
+    Document ||--o{ Approval : relationship_35
+    Application ||--o{ Team : relationship_36
+    Contact ||--o{ Project : relationship_37
+    Operation ||--o{ Task : relationship_38
+    Account ||--o{ Resource : relationship_39
+    Team ||--o{ Assignment : relationship_40
+    Project ||--o{ Document : relationship_41
+    Task ||--o{ Version : relationship_42
+    Resource ||--o{ Review : relationship_43
+    Assignment ||--o{ Approval : relationship_44
+    Application ||--o{ Project : relationship_45
+    Contact ||--o{ Task : relationship_46

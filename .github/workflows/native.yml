@@ -47,6 +47,12 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --theme-resources artifacts/native/theme-resources
       - name: Test document safety and parsing
         run: dotnet test src/native/LensDocsStudio.Core.Tests -c Release --no-build --logger "trx;LogFileName=native-core.trx" --results-directory artifacts/native/tests
+      - name: Verify desktop UX search geometry zoom and canonical export fidelity
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --desktop-ux artifacts/native/desktop-ux .
+      - name: Verify actual desktop UX keyboard pointer export and caption interactions
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --desktop-ux-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/desktop-ux/ui .
+      - name: Verify desktop UX under actual Windows High Contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --desktop-ux-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/desktop-ux/high-contrast . --high-contrast
       - name: Verify compiled Find keyboard routing without OS input
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --find-routing artifacts/native/find-routing
       - name: Prove host Mermaid fixture parser boundary and native fallback
@@ -164,6 +170,7 @@ jobs:
             artifacts/native/signing-adapters/**/signing-adapters.json
             artifacts/native/validation/
             artifacts/native/theme-resources/
+            artifacts/native/desktop-ux/
             artifacts/native/quadrant-compatibility/
             artifacts/native/source-editor-fidelity/
             artifacts/native/chart-compatibility/

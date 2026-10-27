@@ -9,6 +9,7 @@ public static class WindowStateService
 {
     public static void FitInitialWindow(Window window)
     {
+        CaptionThemeService.Attach(window);
         var area = SystemParameters.WorkArea;
         window.MinWidth = Math.Min(window.MinWidth, area.Width);
         window.MinHeight = Math.Min(window.MinHeight, area.Height);

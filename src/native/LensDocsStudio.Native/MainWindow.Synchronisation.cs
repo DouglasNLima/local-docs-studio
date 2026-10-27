@@ -303,12 +303,11 @@ public partial class MainWindow
     }
     private int? VisiblePreviewSource() => Preview.ViewingMode == FlowDocumentReaderViewingMode.Scroll
         ? rendered?.TextMap.VisibleSource(Preview.ActualHeight) ?? syncAnchors?.VisibleSource(Preview) : syncAnchors?.VisibleSource(Preview);
-    private async void PreviewZoomChanged(object sender, RoutedEventArgs e)
+    private void PreviewZoomChanged(object sender, RoutedEventArgs e)
     {
         var difference = (sender as FrameworkElement)?.Tag as string == "in" ? 10 : -10;
         Preview.Zoom = Math.Clamp(Preview.Zoom + difference, 50, 200);
-        var zoom = (int)Preview.Zoom;
-        await PersistDesktop(current => current with { Preview = (current.Preview ?? new()) with { Zoom = zoom } });
+
     }
     private void FindPreviewFromToolbar(object sender, RoutedEventArgs e) { previewFocused = true; ShowFind(false); }
 }

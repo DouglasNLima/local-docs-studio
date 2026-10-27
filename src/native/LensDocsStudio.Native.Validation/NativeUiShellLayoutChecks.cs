@@ -65,7 +65,7 @@ internal static partial class NativeUiChecks
             var bounds = window.BoundingRectangle;
             if (window.FindFirstDescendant(cf => cf.ByAutomationId("CancelOperation"))?.IsOffscreen == false)
                 throw new IOException("The idle status bar retained an inactive Cancel operation button.");
-            var controls = new[] { "FindNext", "ReplaceOne", "CloseFind" }
+            var controls = new[] { "FindPrevious", "FindNext", "ReplaceOne", "CloseFind", "PreviewZoomLabel" }
                 .Select(id => new { Id = id, Element = Find(window, id) })
                 .Select(item => new { item.Id, item.Element.Name, Bounds = item.Element.BoundingRectangle, item.Element.IsOffscreen }).ToArray();
             foreach (var control in controls)

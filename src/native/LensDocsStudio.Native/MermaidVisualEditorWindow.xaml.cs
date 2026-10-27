@@ -458,7 +458,7 @@ public partial class MermaidVisualEditorWindow : Window
         catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Select the source and try again."; }
     }
     private void EditOwningSource(object sender, RoutedEventArgs e) { editSource?.Invoke(); Status.Text = "The owning document's source is available. This private draft remains open."; }
-    private void ShowRenderedPreview(object sender, RoutedEventArgs e)
+    private async void ShowRenderedPreview(object sender, RoutedEventArgs e)
     {
         if (busy || renderingCanvas || SourcePending || PropertiesPending || inlineEditor is not null) return;
         if (canonicalRender is not { Success: true } result || canonicalDrawing is not { } drawing || result.Source != draft.Source
@@ -467,7 +467,7 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             // The immutable drawing is shared with the canvas; session drag transforms belong to a private clone.
-            new DiagramWindow(drawing, format => exportDiagram?.Invoke(format, result.Svg!)) { Owner = this }.Show();
+            await DiagramWindow.ShowCanonicalAsync(this, result, drawing, format => exportDiagram?.Invoke(format, result.Svg!));
         }
         catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "Preview could not be opened: " + ex.Message; }
     }
