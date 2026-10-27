@@ -9,6 +9,35 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
+    private static void SetPreviewSynchronisation(Window window, string id, bool enabled) =>
+        WithPreviewToolbarControl(window, id, control => control.AsCheckBox().IsChecked = enabled);
+
+    private static void WithPreviewToolbarControl(Window window, string id, Action<AutomationElement> action)
+    {
+        var owner = ObserveWindow(window);
+        var control = owner.FindFirstDescendant(cf => cf.ByAutomationId(id));
+        if (control is { IsOffscreen: false }) { action(control); return; }
+        // Secondary commands remain available through WPF overflow when the
+        // always-visible zoom percentage occupies the narrower preview toolbar.
+        var toolbar = owner.FindFirstDescendant(cf => cf.ByName("Preview commands"))
+            ?? throw new IOException("The preview toolbar is unavailable.");
+        var more = toolbar.FindFirstDescendant(cf => cf.ByName("More commands"))
+            ?? throw new IOException("The preview overflow command is unavailable.");
+        if (more.IsOffscreen) throw new IOException("The preview overflow command is clipped.");
+        more.Click();
+        try
+        {
+            Wait(() => (control = window.Automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(window.Properties.ProcessId.Value).And(cf.ByAutomationId(id)))
+                .FirstOrDefault(item => !item.IsOffscreen)) is not null, "Preview overflow did not expose " + id);
+            action(control!);
+        }
+        finally
+        {
+            if (more.Patterns.Toggle.Pattern.ToggleState.Value == FlaUI.Core.Definitions.ToggleState.On)
+                more.Patterns.Toggle.Pattern.Toggle();
+        }
+    }
+
     private static void CheckDesktopControls(Window window, AutomationElement editor, UIA3Automation automation, int process, string state, string output, string source)
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);

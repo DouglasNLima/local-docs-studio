@@ -46,9 +46,9 @@ internal static partial class NativeUiChecks
                 var editor = Find(window, "MarkdownEditor"); var preview = Find(window, "DocumentPreview");
                 Wait(() => ReadEditorText(editor) == texts["A"] && HasPreview("A"), "First document did not finish its preview.");
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
-                SetSynchronisation("FollowCaretControl", synchronised);
-                SetSynchronisation("SyncScrollControl", synchronised);
-                SetSynchronisation("SyncSelectionControl", false);
+                SetPreviewSynchronisation(window, "FollowCaretControl", synchronised);
+                SetPreviewSynchronisation(window, "SyncScrollControl", synchronised);
+                SetPreviewSynchronisation(window, "SyncSelectionControl", false);
                 Wait(() =>
                 {
                     var preferencePath = Path.Combine(root, mode + synchronised, "preferences.json");
@@ -94,35 +94,6 @@ internal static partial class NativeUiChecks
                 foreach (var pair in texts) if (File.ReadAllText(Path.Combine(root, pair.Key + ".md")) != pair.Value) throw new IOException("Viewport navigation mutated disk source.");
                 observations.Add(new { ReadingMode = mode, Synchronised = synchronised, FirstOpenTop = true, ReturnOwnPosition = true, SidebarExistingTab = true, RapidLatestWins = true, AnchorBackForward = true, AEditorPercent = aOffset, BEditorPercent = bOffset });
 
-                void SetSynchronisation(string id, bool enabled)
-                {
-                    var control = window.FindFirstDescendant(cf => cf.ByAutomationId(id));
-                    if (control is { IsOffscreen: false })
-                    {
-                        control.AsCheckBox().IsChecked = enabled;
-                        return;
-                    }
-                    // The always-visible zoom percentage leaves secondary commands in
-                    // WPF's native overflow at this width. Exercise the actual control;
-                    // retain the persisted-preference and viewport assertions below.
-                    var toolbar = window.FindFirstDescendant(cf => cf.ByName("Preview commands"))
-                        ?? throw new IOException("The preview toolbar is unavailable.");
-                    var more = toolbar.FindFirstDescendant(cf => cf.ByName("More commands"))
-                        ?? throw new IOException("The preview overflow command is unavailable.");
-                    if (more.IsOffscreen) throw new IOException("The preview overflow command is clipped.");
-                    more.Click();
-                    try
-                    {
-                        Wait(() => (control = automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId(id)))
-                            .FirstOrDefault(item => !item.IsOffscreen)) is not null, "Preview overflow did not expose " + id);
-                        control!.AsCheckBox().IsChecked = enabled;
-                    }
-                    finally
-                    {
-                        if (more.Patterns.Toggle.Pattern.ToggleState.Value == FlaUI.Core.Definitions.ToggleState.On)
-                            more.Patterns.Toggle.Pattern.Toggle();
-                    }
-                }
                 void Open(string name, bool wait = true)
                 {
                     var tree = Find(window, "WorkspaceTree");

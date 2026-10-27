@@ -19,7 +19,7 @@ internal static partial class NativeUiChecks
         UserPreferences? preferences = null;
         SessionState? session = null;
         foreach (var id in new[] { "FollowCaretControl", "SyncScrollControl", "SyncSelectionControl" })
-            Find(window, id).AsCheckBox().IsChecked = true;
+            SetPreviewSynchronisation(window, id, true);
         Wait(() => (preferences = ReadDesktopState<UserPreferences>(state, "preferences.json")) is not null,
             "The actual desktop preferences could not be observed.");
         if (preferences!.Desktop?.ShowSidebar != false) Find(window, "ToggleSidebar").AsButton().Invoke();
@@ -74,8 +74,11 @@ internal static partial class NativeUiChecks
         if (window.FindFirstDescendant(cf => cf.ByAutomationId("WorkspaceTree"))?.IsOffscreen == false)
             throw new IOException("Restart did not apply the persisted hidden workspace panel.");
         foreach (var id in new[] { "FollowCaretControl", "SyncScrollControl", "SyncSelectionControl" })
-            if (Find(window, id).AsCheckBox().IsChecked != true)
-                throw new IOException("Restart did not apply its independent synchronisation choice: " + id);
+            WithPreviewToolbarControl(window, id, control =>
+            {
+                if (control.AsCheckBox().IsChecked != true)
+                    throw new IOException("Restart did not apply its independent synchronisation choice: " + id);
+            });
         var active = Find(window, "DocumentTabs").FindAllDescendants(cf => cf.ByControlType(ControlType.TabItem))
             .Single(tab => tab.Patterns.SelectionItem.Pattern.IsSelected.Value);
         active.RightClick();

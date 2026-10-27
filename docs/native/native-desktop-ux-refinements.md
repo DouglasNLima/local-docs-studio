@@ -44,6 +44,8 @@ The first hosted run passed the new normal/actual High Contrast interactions and
 
 Actual hosted High Contrast preserves the system caption and readable ER inspection overlay: [selected ER entity](evidence/desktop-ux/hosted-high-contrast-er.png). The [hosted evidence manifest](evidence/desktop-ux/hosted-manifest.json) identifies the exact implementation revision and immutable workflow artefact. This evidence does not imply that every independent CI gate passed.
 
+The next run passed the corrected workspace viewport and formula checks, then exposed the same closed-overflow assumption in session restoration. The tested overflow interaction is now shared by synchronisation and session checks, including reading the restored checkbox state. No product code, source-fidelity assertion, timing bound or host guard changed in these test corrections.
+
 ## Responsiveness and remaining certification limits
 
 Final measured canonical ER rendering: **1,140 ms** (22/68) and **1,253 ms** (13/46). Opening the inspection metadata adds **1,078 ms / 866 ms** on its worker, once per viewer. Pointer geometry is flattened/cached once; 1,000 hit queries at 25% zoom took **14.6 ms / 8.6 ms**, with **32,064 allocated bytes** each. These are local observations, not hardware-independent performance guarantees. The original probe accidentally included whole-drawing bounds recomputation inside every sample; the final probe caches the drawing dimensions and measures hit testing separately.

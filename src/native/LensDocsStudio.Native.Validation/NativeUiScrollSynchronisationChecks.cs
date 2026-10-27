@@ -26,9 +26,9 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => ReadEditorText(editor) == fixture && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Region 090", StringComparison.Ordinal),
                 "The scroll fixture did not reach its actual native preview.");
-            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
-            Find(window, "FollowCaretControl").AsCheckBox().IsChecked = false;
-            Find(window, "SyncScrollControl").AsCheckBox().IsChecked = true;
+            SetPreviewSynchronisation(window, "SyncSelectionControl", false);
+            SetPreviewSynchronisation(window, "FollowCaretControl", false);
+            SetPreviewSynchronisation(window, "SyncScrollControl", true);
             foreach (var mode in new[] { "Continuous", "Pages" })
             {
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
@@ -65,8 +65,8 @@ internal static partial class NativeUiChecks
                 observations.Add(new { ReadingMode = mode, EditorToPreview = true, PreviewToEditor = true, RapidLatestRegion = anchor,
                     CaretPreserved = true, FocusPreserved = true, NoPreviewRebuild = true });
             }
-            Find(window, "SyncScrollControl").AsCheckBox().IsChecked = false;
-            Find(window, "FollowCaretControl").AsCheckBox().IsChecked = true;
+            SetPreviewSynchronisation(window, "SyncScrollControl", false);
+            SetPreviewSynchronisation(window, "FollowCaretControl", true);
             Wait(() => ReadPreferences().Desktop is { FollowCaret: true, SyncScroll: false, SyncSelection: false }, "Independent caret following did not become active.");
             // AvalonEdit's UIA Select changes the selection without moving its caret.
             // Use the actual source Find command and a caret key to exercise following.
@@ -79,8 +79,8 @@ internal static partial class NativeUiChecks
             Wait(() => Visible(preview, "Region 055"), "Independent follow-caret did not reveal the current source block.");
             if (!ReadPreferences().Desktop!.FollowCaret || ReadPreferences().Desktop!.SyncScroll || ReadPreferences().Desktop!.SyncSelection)
                 throw new IOException("The independent follow-caret setting changed another synchronisation preference.");
-            Find(window, "FollowCaretControl").AsCheckBox().IsChecked = false;
-            Find(window, "SyncScrollControl").AsCheckBox().IsChecked = true;
+            SetPreviewSynchronisation(window, "FollowCaretControl", false);
+            SetPreviewSynchronisation(window, "SyncScrollControl", true);
             editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 40);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
             Wait(() => ReadEditorText(editor).Length == 0, "The cancellation fixture did not switch to its new document.");
@@ -112,7 +112,7 @@ internal static partial class NativeUiChecks
         {
             try
             {
-                Find(window, "FollowCaretControl").AsCheckBox().IsChecked = false; Find(window, "SyncScrollControl").AsCheckBox().IsChecked = false;
+                SetPreviewSynchronisation(window, "FollowCaretControl", false); SetPreviewSynchronisation(window, "SyncScrollControl", false);
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(prior.Preview?.ReadingMode ?? "Automatic"); reading.Collapse();
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == original, "The scroll fixture did not retain its exact insertion Undo.");

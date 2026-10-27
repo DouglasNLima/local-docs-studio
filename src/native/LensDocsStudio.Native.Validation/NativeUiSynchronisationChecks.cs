@@ -26,7 +26,7 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => ReadEditorText(editor) == fixture && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native sync fixture", StringComparison.Ordinal),
                 "The synchronisation fixture did not reach the actual editor and native preview.");
-            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = true;
+            SetPreviewSynchronisation(window, "SyncSelectionControl", true);
             Wait(() => ReadPreferences().Desktop?.SyncSelection == true, "Selection synchronisation did not persist.");
             foreach (var mode in new[] { "Continuous", "Pages" })
             {
@@ -88,13 +88,13 @@ internal static partial class NativeUiChecks
                 observations.Add(new { ReadingMode = mode, RepeatedEditorToPreview = true, RepeatedPreviewToEditor = true, UnicodeExact = true,
                     FocusPreserved = true, Geometry = selectedGeometry });
             }
-            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
+            SetPreviewSynchronisation(window, "SyncSelectionControl", false);
             Wait(() => ReadPreferences().Desktop?.SyncSelection == false, "Disabling selection synchronisation did not persist.");
             var retained = preview.Patterns.Text.Pattern.GetSelection().Single().Clone();
             FocusEditor(); Nth(editor, "action", 2).Select(); Thread.Sleep(180);
             if (!RetainedSelection())
                 throw new IOException("Disabled synchronisation still changed the preview selection.");
-            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = true;
+            SetPreviewSynchronisation(window, "SyncSelectionControl", true);
             Layout("Editor"); Wait(() => preview.IsOffscreen, "Editor layout did not hide its native preview.");
             FocusEditor(); Nth(editor, "action", 3).Select(); Thread.Sleep(180);
             Layout("Split"); Wait(() => !preview.IsOffscreen, "Split layout did not restore the native preview.");
@@ -118,7 +118,7 @@ internal static partial class NativeUiChecks
             Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Résumé 😀"), "Selection used stale offsets after a valid Unicode source edit.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => ReadEditorText(editor) == fixture, "The mapped Unicode edit did not retain its exact Undo.");
-            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
+            SetPreviewSynchronisation(window, "SyncSelectionControl", false);
             if (ReadEditorText(editor) != fixture || !File.ReadAllBytes(source).SequenceEqual(saved)) throw new IOException("Selection synchronisation changed source bytes.");
             window.CaptureToFile(Path.Combine(output, "native-selection-synchronisation.png"));
             File.WriteAllText(Path.Combine(output, "native-selection-synchronisation.json"), JsonSerializer.Serialize(new {
