@@ -54,7 +54,7 @@ Verify code-owner resolution through GitHub's CODEOWNERS errors API and the PR U
 
 ## Releases, identities and confidential reports
 
-OWNER ACTION REQUIRED: protect future `native-v*` and existing release tag patterns
+OWNER ACTION REQUIRED: protect future `native-v*` and existing `v0.1.0-dev*` tags
 against update/deletion; restrict creation to the named release actor after approval.
 Inventory existing tags first. No tag rules or tags are changed here. Prepare a
 `native-production` publication environment with named required reviewers, prevent

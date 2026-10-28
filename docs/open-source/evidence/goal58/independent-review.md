@@ -12,10 +12,21 @@ metadata, outer artefact and both installer hashes, notice/rights checks, workfl
 placement and permissions, and the licence/governance/SignPath boundaries.
 
 That review covered the original 55-reference web notice pack and 2,417-path
-rights ledger. The subsequent Mammoth supplier-notice addition is separately
-reviewed on its frozen follow-up commit; its exact result and the final source
-SHA/tree are recorded in the final PR receipt to avoid a self-referential commit.
-The follow-up preserves programme bytes and the documented attribution gaps.
+rights ledger. The Mammoth follow-up was independently reviewed at commit
+`5f35772be88fafe78364fddb51baa03746f6f13d`, tree
+`36f54f50a6658d1d2264920f985f60115561c6ae`. Fresh supplier/archive downloads
+reproduced all 12 unique original notice files and both evidence records, including
+isarray's README grant. In-memory assembly reproduced the complete 68-reference,
+65-component web pack; the checker covered all 2,434 paths. Programme bytes remain
+unchanged and the stated attribution gaps remain visible.
+
+One concrete evidence finding was identified: `mammoth-notice-gap.json` incorrectly
+put the upstream commit SHA in `sourceTree`. The actual tree was independently
+verified through the [Git commit endpoint](https://api.github.com/repos/mwilliamson/dingbat-to-unicode/git/commits/b27f259b49907f99b1b9097abba5a9668106b779)
+as `a6835fcdb31ca22965128795cf2d7184426f6e26`, with exactly the recorded 14 paths,
+and the field was corrected before publication. No other actionable material
+finding was identified. The final correction SHA/tree and its review confirmation
+are recorded in the PR receipt to avoid a self-referential commit.
 
 This is independent agent engineering review, not human GitHub approval, legal
 ownership clearance or evidence that repository controls have been enabled.
