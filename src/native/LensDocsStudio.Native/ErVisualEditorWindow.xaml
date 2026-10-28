@@ -11,7 +11,7 @@
    <StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Mermaid" Foreground="{DynamicResource AccentBrush}"/><TextBlock Text="Mermaid Visual Editor" FontSize="14" FontWeight="SemiBold" Margin="8,0"/><TextBlock Text="/ ER" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/></StackPanel>
   </Border>
   <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="ER commands">
-   <Button Content="Arrange…" Click="OpenArrangement" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ErArrange" ToolTip="Open Navigate and Arrange modes with separate layout history and workspace persistence"/>
+   <Button x:Name="ArrangeButton" Content="Arrange…" IsEnabled="False" Click="OpenArrangement" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ErArrange" ToolTip="Open Navigate and Arrange modes with separate layout history and workspace persistence"/>
    <Button x:Name="UndoButton" Click="Undo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="ErUndo"><ui:CommandIcon Kind="Undo"/></Button>
    <Button x:Name="RedoButton" Click="Redo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="ErRedo"><ui:CommandIcon Kind="Redo"/></Button>
    <Separator/>

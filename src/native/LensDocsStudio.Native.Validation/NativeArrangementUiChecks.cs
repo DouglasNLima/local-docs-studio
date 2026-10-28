@@ -97,7 +97,8 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(arrangement!, "ArrangementStatus").Name.StartsWith("Saved workspace arrangement restored", StringComparison.Ordinal), "Native re-open did not load the workspace sidecar.");
                 Check(ReadState().Positions["A"] == keyboard.Positions["A"], "Real window re-open recovers the pinned arrangement");
                 arrangement!.Close(); arrangement = null; editor!.Close();
-                void Ready() => Wait(() => Find(arrangement!, "ArrangementSave").IsEnabled && !Find(arrangement!, "ArrangementState").Name.Contains("Working", StringComparison.Ordinal), "Arrangement work did not finish.");
+                void Ready() => Wait(() => Find(arrangement!, "ArrangementSave").IsEnabled && Find(arrangement!, "ArrangementState").Name.Length > 0
+                    && !Find(arrangement!, "ArrangementState").Name.Contains("Working", StringComparison.Ordinal), "Arrangement work did not finish.");
                 void Save() { Find(arrangement!, "ArrangementSave").AsButton().Invoke(); Wait(() => Find(arrangement!, "ArrangementStatus").Name.StartsWith("Layout saved", StringComparison.Ordinal), "Save layout did not complete."); Ready(); }
                 ArrangementState ReadState()
                 {

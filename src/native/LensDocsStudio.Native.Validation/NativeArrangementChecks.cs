@@ -26,6 +26,7 @@ internal static class NativeArrangementChecks
         var checks = new List<string>(); var measurements = new List<object>(); var passed = false;
         try
         {
+            VerifyEntryReadiness(Check);
             foreach (var file in Directory.GetFiles(Path.Combine(root, "tests/fixtures/native-complex-er"), "*.mmd"))
             {
                 var source = File.ReadAllText(file); var engine = new ArrangementEngine(new DiagramService().Render(source));
@@ -147,6 +148,27 @@ internal static class NativeArrangementChecks
         }
         finally { File.WriteAllText(Path.Combine(output, "arrangement.json"), JsonSerializer.Serialize(new { Status = passed ? "PASS" : "FAIL", Provenance = "Public synthetic fixtures and shown owned WPF windows; no desktop input or private sources", HighContrast = highContrast, Checks = checks, Measurements = measurements }, new JsonSerializerOptions { WriteIndented = true })); }
         void Check(bool condition, string description) { if (!condition) throw new IOException(description); checks.Add(description); }
+    }
+    private static void VerifyEntryReadiness(Action<bool, string> check)
+    {
+        ThemeService.Apply(Application.Current.Resources, "Light");
+        foreach (var family in new[] { "ER", "Flowchart" })
+        {
+            var source = family == "ER" ? "erDiagram\n A ||--o{ B : owns\n" : "flowchart TD\n A --> B\n";
+            Window editor = family == "ER" ? new ErVisualEditorWindow(source, new(), (_, _) => Task.FromResult<string?>(null))
+                : new MermaidVisualEditorWindow(source, new(), (_, _) => Task.FromResult<string?>(null));
+            var called = false; Action<Window, string> arrange = (_, actualSource) => called = actualSource == source;
+            if (editor is ErVisualEditorWindow er) er.ArrangeDiagram = arrange;
+            if (editor is MermaidVisualEditorWindow flow) flow.ArrangeDiagram = arrange;
+            var button = (Button)editor.FindName("ArrangeButton");
+            check(!button.IsEnabled, "Arrange entry is disabled before canonical mapping: " + family);
+            editor.Show(); Until(() => button.IsEnabled);
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            check(called, "Ready Arrange entry routes the exact owning source: " + family);
+            var input = (ICSharpCode.AvalonEdit.TextEditor)editor.FindName("SourceEditor"); input.Text = source + "\n";
+            check(!button.IsEnabled, "Pending source disables Arrange entry: " + family);
+            input.Text = source; editor.Close();
+        }
     }
     private static object? Field(object target, string name) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(target);
     private static object? Call(object target, string name, params object[] arguments) => target.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(target, arguments);

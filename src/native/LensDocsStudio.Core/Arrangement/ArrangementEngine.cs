@@ -154,8 +154,19 @@ public sealed class ArrangementEngine
                 if (!new ArrangementBox(group.X + 8, group.Y + 32, group.Width - 16, group.Height - 40).Contains(box))
                     throw new InvalidDataException("Keep this node inside its existing subgraph. Moving compound groups is not supported.");
             }
-            if (membership.Length == 0 && graph.Groups.Any(group => box.Intersects(new(group.X, group.Y, group.Width, group.Height))))
-                throw new InvalidDataException("An ungrouped node cannot overlap an existing subgraph.");
+            foreach (var group in groups.Values)
+            {
+                var boundary = new ArrangementBox(group.X, group.Y, group.Width, group.Height);
+                // Containing ancestors are allowed, but a parent-owned node must not
+                // visually enter a nested group to which its source does not belong.
+                var belongsInside = membership.Any(member =>
+                {
+                    var own = groups[member.Id];
+                    return boundary.Contains(new(own.X, own.Y, own.Width, own.Height));
+                });
+                if (!belongsInside && box.Intersects(boundary))
+                    throw new InvalidDataException("A node cannot enter a subgraph to which its source does not belong.");
+            }
         }
     }
 

@@ -193,6 +193,7 @@ public partial class ErVisualEditorWindow : Window
     private void UpdateActions()
     {
         if (draft is null || UpdateButton is null) return; var can = CanEdit; var clean = !PropertiesPending;
+        ArrangeButton.IsEnabled = can && clean && ArrangeDiagram is not null;
         void Action(Button button, ErEditOperation? operation, bool requireClean = true)
         {
             var capability = operation is null ? new ErOperationCapability(false, "Select an applicable element.") : ErCapabilityAnalysis.For(draft.Model, operation);

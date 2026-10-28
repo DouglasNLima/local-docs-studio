@@ -3,6 +3,12 @@
   "Provenance": "Public synthetic fixtures and shown owned WPF windows; no desktop input or private sources",
   "HighContrast": false,
   "Checks": [
+    "Arrange entry is disabled before canonical mapping: ER",
+    "Ready Arrange entry routes the exact owning source: ER",
+    "Pending source disables Arrange entry: ER",
+    "Arrange entry is disabled before canonical mapping: Flowchart",
+    "Ready Arrange entry routes the exact owning source: Flowchart",
+    "Pending source disables Arrange entry: Flowchart",
     "Public ER fixture has a real safe candidate: complete-detailed.mmd",
     "Every arranged ER occurrence is inspectable",
     "Arranged source and hard geometry constraints hold",
@@ -139,9 +145,9 @@
         "ConnectionLength": 399196.22436293715,
         "Bends": 1108
       },
-      "CandidateMilliseconds": 7327.5673,
-      "AllocatedBytes": 9581439576,
-      "WorkingSetBytes": 376832000
+      "CandidateMilliseconds": 3332.7794,
+      "AllocatedBytes": 9578910088,
+      "WorkingSetBytes": 508293120
     },
     {
       "Fixture": "complete-detailed.mmd",
@@ -165,9 +171,9 @@
         "ConnectionLength": 469847.9862133331,
         "Bends": 516
       },
-      "CandidateMilliseconds": 7327.5673,
-      "AllocatedBytes": 11474802104,
-      "WorkingSetBytes": 472313856
+      "CandidateMilliseconds": 3332.7794,
+      "AllocatedBytes": 11474513784,
+      "WorkingSetBytes": 611201024
     },
     {
       "Fixture": "complete-relationships.mmd",
@@ -191,9 +197,9 @@
         "ConnectionLength": 266636.29329918977,
         "Bends": 1180
       },
-      "CandidateMilliseconds": 5726.0474,
-      "AllocatedBytes": 11543586496,
-      "WorkingSetBytes": 510861312
+      "CandidateMilliseconds": 2904.1567,
+      "AllocatedBytes": 11538149408,
+      "WorkingSetBytes": 647929856
     },
     {
       "Fixture": "complete-relationships.mmd",
@@ -217,9 +223,9 @@
         "ConnectionLength": 583123.2595733333,
         "Bends": 535
       },
-      "CandidateMilliseconds": 5726.0474,
-      "AllocatedBytes": 13032239960,
-      "WorkingSetBytes": 477208576
+      "CandidateMilliseconds": 2904.1567,
+      "AllocatedBytes": 13025859128,
+      "WorkingSetBytes": 619315200
     },
     {
       "Fixture": "monitoring.mmd",
@@ -243,9 +249,9 @@
         "ConnectionLength": 61010.36287619041,
         "Bends": 188
       },
-      "CandidateMilliseconds": 175.9588,
-      "AllocatedBytes": 659779920,
-      "WorkingSetBytes": 428376064
+      "CandidateMilliseconds": 73.4813,
+      "AllocatedBytes": 658752224,
+      "WorkingSetBytes": 568008704
     },
     {
       "Fixture": "monitoring.mmd",
@@ -269,9 +275,9 @@
         "ConnectionLength": 162656.38834666667,
         "Bends": 204
       },
-      "CandidateMilliseconds": 175.9588,
-      "AllocatedBytes": 968159640,
-      "WorkingSetBytes": 406904832
+      "CandidateMilliseconds": 73.4813,
+      "AllocatedBytes": 966962600,
+      "WorkingSetBytes": 553877504
     },
     {
       "Fixture": "operations.mmd",
@@ -295,9 +301,9 @@
         "ConnectionLength": 163406.59877714337,
         "Bends": 430
       },
-      "CandidateMilliseconds": 359.7027,
-      "AllocatedBytes": 1197783736,
-      "WorkingSetBytes": 411430912
+      "CandidateMilliseconds": 166.0658,
+      "AllocatedBytes": 1196439384,
+      "WorkingSetBytes": 555835392
     },
     {
       "Fixture": "operations.mmd",
@@ -321,9 +327,9 @@
         "ConnectionLength": 166248.14056,
         "Bends": 226
       },
-      "CandidateMilliseconds": 359.7027,
-      "AllocatedBytes": 1677933592,
-      "WorkingSetBytes": 460734464
+      "CandidateMilliseconds": 166.0658,
+      "AllocatedBytes": 1676447192,
+      "WorkingSetBytes": 615022592
     },
     {
       "Fixture": "workflow-assignment.mmd",
@@ -347,9 +353,9 @@
         "ConnectionLength": 14600.789260000007,
         "Bends": 56
       },
-      "CandidateMilliseconds": 42.6586,
-      "AllocatedBytes": 330655760,
-      "WorkingSetBytes": 368226304
+      "CandidateMilliseconds": 18.3486,
+      "AllocatedBytes": 330455864,
+      "WorkingSetBytes": 512827392
     },
     {
       "Fixture": "workflow-assignment.mmd",
@@ -373,9 +379,9 @@
         "ConnectionLength": 39204.03378666667,
         "Bends": 81
       },
-      "CandidateMilliseconds": 42.6586,
-      "AllocatedBytes": 500794352,
-      "WorkingSetBytes": 349593600
+      "CandidateMilliseconds": 18.3486,
+      "AllocatedBytes": 500535120,
+      "WorkingSetBytes": 495312896
     },
     {
       "Fixture": "workflow-definitions.mmd",
@@ -399,9 +405,9 @@
         "ConnectionLength": 24750.524693333347,
         "Bends": 70
       },
-      "CandidateMilliseconds": 50.357,
-      "AllocatedBytes": 381852168,
-      "WorkingSetBytes": 342761472
+      "CandidateMilliseconds": 20.5836,
+      "AllocatedBytes": 381582688,
+      "WorkingSetBytes": 486453248
     }
   ]
 }

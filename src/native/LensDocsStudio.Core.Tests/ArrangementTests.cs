@@ -162,6 +162,18 @@ public sealed class ArrangementTests : IDisposable
         Assert.Empty(engine.Candidates(engine.Canonical.State));
         Assert.Equal(source, engine.Canonical.Render.Source);
     }
+
+    [Fact]
+    public void A_parent_owned_node_cannot_visually_enter_a_nested_group()
+    {
+        const string source = "flowchart TD\n subgraph outer[Outer]\n A[Parent node]\n subgraph inner[Inner]\n B[Child B] --> C[Child C]\n end\n end\n A --> B\n";
+        var engine = Engine(source); var b = engine.Boxes["B"]; var a = engine.Boxes["A"];
+        var inner = engine.Canonical.Render.FlowchartLayout!.Groups.Single().Children.Single();
+        var state = engine.Canonical.State.Move("A", b.X + b.Width / 2 - a.Width / 2, inner.Y + 8);
+        var error = Assert.Throws<InvalidDataException>(() => engine.Arrange(state));
+        Assert.Contains("source does not belong", error.Message);
+        Assert.Equal(source, engine.Canonical.Render.Source);
+    }
     [Fact]
     public async Task Oversized_metadata_fails_closed()
     {

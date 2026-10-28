@@ -136,6 +136,7 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (SourceEditor is null) return;
         var canEdit = CanTransform;
+        ArrangeButton.IsEnabled = canEdit && !PropertiesPending && ArrangeDiagram is not null;
         NodeProperties.IsEnabled = EdgeProperties.IsEnabled = GroupProperties.IsEnabled = canEdit;
         Palette.IsEnabled = Direction.IsEnabled = canEdit && !PropertiesPending;
         ApplyButton.IsEnabled = canEdit && !PropertiesPending && draft.CanApply; UndoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanUndo;

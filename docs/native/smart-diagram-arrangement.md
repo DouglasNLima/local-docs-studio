@@ -130,7 +130,7 @@ Local checkpoints on 28 October 2026:
 - Web: static checks and all 270 Chromium/Edge tests passed.
 - Native corpus: all 202 cases/export checks passed; desktop UX and dynamic
   theme-resource regressions passed. All 12 native Docs Site browser tests passed.
-- Shown owned WPF windows: 112 assertions, Light/Dark ER/Flowchart, real loaded
+- Shown owned WPF windows: 118 assertions, Light/Dark ER/Flowchart, real loaded
   controls and saved sidecars, reopen, stable inspection and exact SVG/PNG outputs.
 - All six public complex ER fixtures accept a far-corner manual move with zero
   unrelated-body intersections and zero label/body overlaps (11–1,884 ms in a
@@ -143,6 +143,10 @@ Local checkpoints on 28 October 2026:
   A subsequent native candidate-rehydration timeout is retained in
   `arrangement-routing`; the complete subsequent `arrangement-review` run passed.
   These observations remain relevant to slower or heavily loaded machines.
+- The final nested-group regression increases arrangement coverage to 29 focused
+  cases, all passing. A later full local run passed 2,283 and failed one unchanged
+  canonical complex-ER case at its six-second deadline. That original outcome is
+  retained; final hosted full-suite results must be read alongside local results.
 - Sidecar tests include actual Windows junction rejection and read-only writes,
   external conflicts, retained corrupt bytes, backup recovery and portable copying.
 - Candidate search in the passing local WPF run took 30–5,750 ms; maximum sampled
@@ -173,7 +177,8 @@ contains full metrics. These are synthetic, non-sensitive shown-WPF captures:
 
 The [extended native candidate receipt](evidence/smart-arrangement/local-candidate-ui.json)
 adds shown-window search cancellation, candidate preview without mutation,
-explicit acceptance, saving and exact automatic-route restoration (112 checks).
+explicit acceptance, saving and exact automatic-route restoration, plus editor
+entry readiness before/after canonical mapping and pending source (118 checks).
 Viewport captures retain their zoom and scrolling; SVG/PNG exports contain the
 complete drawing.
 
@@ -185,6 +190,17 @@ in run [40667182236](https://github.com/DouglasNLima/local-docs-studio/actions/r
 The harness now follows the existing shell-dialogue pattern: focus the labelled
 filename input, type the destination, verify its value and click Save. This is a
 test correction pending hosted revalidation, not a suppressed export assertion.
+
+The second hosted input attempt in run
+[40668395351](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40668395351)
+exposed an editor-readiness race before opening Arrange. The entry now stays
+disabled until canonical mapping finishes and while source/properties are
+pending. Both editors have shown-window regressions for this state. Manual
+placement also rejects entering a nested group absent from the node's authored
+membership. The original failed artefacts remain available. The independent
+Continuous run [40668395045](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40668395045)
+failed its controlled gate while both visible interaction jobs passed; its
+threshold and workflow are unchanged.
 
 The actual compiled native executable was launched on this Windows host with a
 fresh synthetic workspace and isolated state before committing. Computer Use
