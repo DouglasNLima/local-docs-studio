@@ -17,6 +17,13 @@ namespace LensDocsStudio.Native;
 
 public partial class ErVisualEditorWindow : Window
 {
+    public Action<Window, string>? ArrangeDiagram { get; set; }
+    private void OpenArrangement(object sender, RoutedEventArgs e)
+    {
+        if (!CanEdit || PropertiesPending) { Status.Text = "Finish the pending source or property edit before arranging."; return; }
+        if (ArrangeDiagram is null) { Status.Text = "Open the diagram from its owning document to arrange it."; return; }
+        ArrangeDiagram(this, draft.Source);
+    }
     private ErVisualDraft draft = null!;
     private readonly DiagramService diagrams;
     private readonly NativeSvgService svg = new();

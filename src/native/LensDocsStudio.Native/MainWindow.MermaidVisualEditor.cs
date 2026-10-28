@@ -147,6 +147,30 @@ public partial class MainWindow
         catch (Exception error) when (error is ArgumentException or System.Text.RegularExpressions.RegexMatchTimeoutException)
         { model.Status = "Visual authoring could not safely inspect this source. The document is unchanged; use Edit source. " + error.Message; return; }
         window.Owner = this;
+        var arrangementPath = tab.EffectivePath; var arrangementRoot = tab.WorkspaceRoot;
+        Action<Window, string> arrange = (parent, diagramSource) =>
+        {
+            try
+            {
+                ArrangementDocumentContext? Context()
+                {
+                    if (!model.Documents.Contains(tab) || tab.IsSaving || diagramSource != session.Target.Source || tab.EffectivePath != arrangementPath || tab.WorkspaceRoot != arrangementRoot)
+                        throw new IOException("The owning diagram changed or has a pending source draft. Apply source changes, then reopen its visual editor before arranging.");
+                    var offset = session.SourceOffset();
+                    if (tab.FilePath is not { } file || tab.WorkspaceRoot is not { } root) return null;
+                    new Core.Workspace.WorkspacePath(root).Resolve(Path.GetRelativePath(root, file));
+                    return new(root, Path.GetRelativePath(root, file).Replace('\\', '/'), tab.EditorDocument.Text, IsStandaloneMermaid(tab), offset);
+                }
+                _ = Context();
+                var existing = parent.OwnedWindows.OfType<DiagramArrangementWindow>().FirstOrDefault();
+                if (existing is not null) { existing.Activate(); return; }
+                new DiagramArrangementWindow(diagramSource, diagrams, Context, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme) { Owner = parent }.Show();
+            }
+            catch (Exception error) when (error is IOException or ArgumentException)
+            { model.Status = error.Message; if (parent.FindName("Status") is System.Windows.Controls.TextBlock status) status.Text = error.Message; }
+        };
+        if (window is ErVisualEditorWindow erEditor) erEditor.ArrangeDiagram = arrange;
+        if (window is MermaidVisualEditorWindow flowEditor) flowEditor.ArrangeDiagram = arrange;
         if (onClosed is not null) window.Closed += (_, _) => onClosed();
         window.Show();
     }

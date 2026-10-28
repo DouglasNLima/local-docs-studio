@@ -1,5 +1,9 @@
 # Native implementation progress
 
+## Goal 54 — smart diagram arrangement (28 October 2026)
+
+The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.
+
 ## Original SPC acceptance - 28 October 2026
 
 The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.

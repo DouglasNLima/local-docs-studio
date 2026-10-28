@@ -182,7 +182,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             if (format != "Zoom" || diagramMedia?.Image.Source is not DrawingImage drawing || Window.GetWindow(button) is not { } owner)
                             { exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!); return; }
                             button.IsEnabled = false;
-                            try { await DiagramWindow.ShowCanonicalAsync(owner, diagram, drawing, selected => exportDiagram(selected, diagram.Svg!)); }
+                            try { await DiagramWindow.ShowCanonicalAsync(owner, diagram, drawing, selected => exportDiagram(selected, diagram.Svg!),
+                                editDiagramVisually is not null && visualTargets.Any(target => code.Span.Start >= target.Container.Start && code.Span.Start < target.Container.End)
+                                    ? () => editDiagramVisually(code.Span.Start) : null); }
                             finally { button.IsEnabled = true; }
                         };
                         actions.Children.Add(button);

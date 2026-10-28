@@ -20,7 +20,8 @@ internal static class BoundedErLayout
     private const double NodeSpacing = 20;
     private const double LayerSpacing = 72;
 
-    internal static PositionedErDiagram Layout(ErDiagram diagram, IGraphLayoutProvider inner, CancellationToken cancellationToken, int restarts)
+    internal static PositionedErDiagram Layout(ErDiagram diagram, IGraphLayoutProvider inner, CancellationToken cancellationToken, int restarts,
+        double nodeSpacing = NodeSpacing, double layerSpacing = LayerSpacing)
     {
         if (diagram.Entities.Count == 0)
             return new PositionedErDiagram { Width = 0, Height = 0, Entities = [], Relationships = [] };
@@ -72,7 +73,7 @@ internal static class BoundedErLayout
         // Labels sit on their own column in the gap (never stacked), so the gap only has to fit one label plus the stubs and
         // crow's-foot markers: the Sugiyama layout sizes each gap from its labels (label extent + 56) and uses LayerSpacing
         // for gaps that carry none.
-        const double effectiveLayerSpacing = LayerSpacing;
+        var effectiveLayerSpacing = layerSpacing;
 
         var layoutGraph = new LayoutGraph(layoutDir, layoutNodes, layoutEdges, []);
         var componentCount = CountConnectedComponents(layoutNodes, layoutEdges);
@@ -83,7 +84,7 @@ internal static class BoundedErLayout
         var result = SugiyamaLayout.Compute(layoutGraph, new LayoutOptions
         {
             Padding = Padding,
-            NodeSpacing = NodeSpacing,
+            NodeSpacing = nodeSpacing,
             LayerSpacing = effectiveLayerSpacing,
             CrossingIterations = 8,
             StrictTopDownFanout = true,

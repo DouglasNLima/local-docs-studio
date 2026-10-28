@@ -1,5 +1,9 @@
 # Native integration readiness
 
+## Goal 54 — smart diagram arrangement (28 October 2026)
+
+The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.
+
 ## Current status - 24 October 2026
 
 The authoritative [Current Windows readiness](current-windows-readiness.md) records

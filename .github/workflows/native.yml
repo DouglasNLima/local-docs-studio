@@ -22,6 +22,33 @@ env:
   LENS_NATIVE_WIZARD_ARGUMENTS: --no-file-associations
   LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
 jobs:
+  diagram-arrangement:
+    if: ${{ !inputs.replay_original_853 }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build native arrangement and validation
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify complex arranged geometry persistence and vector raster exports
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement artifacts/native/arrangement .
+      - name: Verify actual pointer keyboard pins persistence and exports
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-input src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/arrangement-input
+      - name: Verify arrangement with actual Windows High Contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement artifacts/native/arrangement-high-contrast . --high-contrast
+      - name: Verify arrangement input with actual Windows High Contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-input src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/arrangement-input-high-contrast --high-contrast
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-diagram-arrangement
+          path: artifacts/native/arrangement*/
+          retention-days: 14
   complex-er-preview:
     if: ${{ !inputs.replay_original_853 }}
     runs-on: windows-latest

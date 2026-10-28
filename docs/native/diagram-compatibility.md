@@ -1,5 +1,9 @@
 # Native diagram compatibility
 
+## Goal 54 — smart diagram arrangement (28 October 2026)
+
+The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.
+
 Current integrated status (24 October 2026): [Current Windows readiness](current-windows-readiness.md).
 There are 24 bounded native editor families. Dated expansion milestones below
 retain their original sources and counts; the [Goal VII audit](goal-vii-ux-audit.md)

@@ -14,6 +14,13 @@ namespace LensDocsStudio.Native;
 
 public partial class MermaidVisualEditorWindow : Window
 {
+    public Action<Window, string>? ArrangeDiagram { get; set; }
+    private void OpenArrangement(object sender, RoutedEventArgs e)
+    {
+        if (!CanTransform || PropertiesPending) { Status.Text = "Finish the pending source or property edit before arranging."; return; }
+        if (ArrangeDiagram is null) { Status.Text = "Open the diagram from its owning document to arrange it."; return; }
+        ArrangeDiagram(this, draft.Source);
+    }
     private readonly MermaidVisualDraft draft;
     private readonly DiagramService diagrams;
     private readonly Func<string, CancellationToken, Task<string?>> applyToDocument;
@@ -467,7 +474,7 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             // The immutable drawing is shared with the canvas; session drag transforms belong to a private clone.
-            await DiagramWindow.ShowCanonicalAsync(this, result, drawing, format => exportDiagram?.Invoke(format, result.Svg!));
+            await DiagramWindow.ShowCanonicalAsync(this, result, drawing, format => exportDiagram?.Invoke(format, result.Svg!), () => OpenArrangement(this, new()));
         }
         catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "Preview could not be opened: " + ex.Message; }
     }

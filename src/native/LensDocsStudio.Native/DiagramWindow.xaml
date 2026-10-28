@@ -7,6 +7,7 @@
  </ResourceDictionary></Window.Resources>
  <DockPanel>
   <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="Diagram commands">
+   <Button x:Name="ArrangeButton" Content="Arrange…" Visibility="Collapsed" Click="Arrange" ToolTip="Open the owning visual editor to arrange this diagram" AutomationProperties.AutomationId="DiagramArrange"/>
    <Button ToolBar.OverflowMode="Never" Content="Fit diagram" Click="FitDiagram" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="DiagramFit"/>
    <Button Content="Fit width" Click="FitWidth" ToolTip="Fit the diagram width" AutomationProperties.AutomationId="DiagramFitWidth"/>
    <Button ToolBar.OverflowMode="Never" Content="100%" Click="ActualSize" ToolTip="Actual Size (Ctrl+0)" AutomationProperties.AutomationId="DiagramActualSize"/>

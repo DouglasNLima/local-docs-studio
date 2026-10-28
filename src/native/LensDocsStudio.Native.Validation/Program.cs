@@ -17,6 +17,18 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--arrangement")
+        {
+            try { NativeArrangementChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), args.Contains("--high-contrast")); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--arrangement-input")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Automated arrangement desktop input requires a disposable GitHub-hosted Windows runner."); return 1; }
+            return NativeUiChecks.RunArrangementInput(args[1], args[2], args.Contains("--high-contrast"));
+        }
         if (args.FirstOrDefault() == "--complex-er")
         {
             try { NativeComplexErChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
