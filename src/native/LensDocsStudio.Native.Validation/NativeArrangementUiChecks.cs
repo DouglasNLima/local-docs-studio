@@ -76,8 +76,13 @@ internal static partial class NativeUiChecks
                     Wait(() => (dialogue = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Export arranged " + format)))?.AsWindow()) is not null, "The explicit arranged export dialogue did not open.");
                     TextBox? filename = null;
                     Wait(() => (filename = dialogue!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))?.AsTextBox())?.IsEnabled == true, "The export filename field was not ready.");
-                    filename!.Text = Path.Combine(folder, "arranged." + format.ToLowerInvariant());
-                    dialogue!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))).Single(button => button.AutomationId != "DropDown").AsButton().Invoke();
+                    FocusWindow(dialogue!); filename!.Focus();
+                    Wait(() => filename.Properties.HasKeyboardFocus.Value, "The export filename field did not acquire focus.");
+                    var destination = Path.Combine(folder, "arranged." + format.ToLowerInvariant());
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(destination);
+                    Wait(() => filename.Text == destination, "The export dialogue did not accept the typed destination.");
+                    File.WriteAllText(Path.Combine(folder, "dialogue-" + format + ".json"), JsonSerializer.Serialize(new { Format = format, Expected = destination, Observed = filename.Text }));
+                    dialogue!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))).Single(button => button.AutomationId != "DropDown").AsButton().Click();
                     Wait(() => File.Exists(Path.Combine(folder, "arranged." + format.ToLowerInvariant())), "The arranged export was not written."); Ready();
                 }
                 var expected = engine.Arrange(keyboard);

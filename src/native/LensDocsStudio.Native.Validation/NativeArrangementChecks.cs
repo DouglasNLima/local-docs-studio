@@ -50,6 +50,35 @@ internal static class NativeArrangementChecks
                         CandidateMilliseconds = elapsed, AllocatedBytes = GC.GetTotalAllocatedBytes() - allocated, WorkingSetBytes = Environment.WorkingSet });
                 }
             }
+            // Real candidate selection/acceptance in a shown window, separately from
+            // pure engine tests and the hosted pointer/keyboard acceptance process.
+            ThemeService.Apply(Application.Current!.Resources, "Light");
+            var dense = new System.Text.StringBuilder("flowchart TD\n"); var random = new Random(2);
+            for (var i = 0; i < 14; i++) dense.Append($" N{i}[Node {i}]\n");
+            for (var i = 0; i < 36; i++) dense.Append($" N{random.Next(14)} --> N{random.Next(14)}\n");
+            var denseSource = dense.ToString(); var denseWorkspace = Path.Combine(output, "Dense-Flowchart"); Directory.CreateDirectory(denseWorkspace);
+            File.WriteAllText(Path.Combine(denseWorkspace, "diagram.mmd"), denseSource);
+            ArrangementDocumentContext DenseContext() => new(denseWorkspace, "diagram.mmd", denseSource, true, 0);
+            var denseWindow = new DiagramArrangementWindow(denseSource, new(), DenseContext, ThemeService.IsDark("Light")); denseWindow.Show();
+            Until(() => Field(denseWindow, "session") is ArrangementSession && !(bool)Field(denseWindow, "busy")!);
+            var denseSession = (ArrangementSession)Field(denseWindow, "session")!;
+            Capture(denseWindow, Path.Combine(denseWorkspace, "canonical-window.png"));
+            Call(denseWindow, "GenerateCandidates", denseWindow, new RoutedEventArgs()); Call(denseWindow, "Revert", denseWindow, new RoutedEventArgs());
+            Until(() => !(bool)Field(denseWindow, "busy")!);
+            Check(!denseSession.IsDirty && Field(denseWindow, "candidateSearch") is null, "Cancelling candidate search retains the accepted source-owned layout");
+            Call(denseWindow, "GenerateCandidates", denseWindow, new RoutedEventArgs()); Until(() => !(bool)Field(denseWindow, "busy")!);
+            var denseChoices = (ComboBox)denseWindow.FindName("CandidateChoices"); Check(denseChoices.Items.Count == 2, "Dense Flowchart exposes two real measured strategies in the native window");
+            denseChoices.SelectedIndex = 0; Until(() => !(bool)Field(denseWindow, "busy")!);
+            Check(!denseSession.IsDirty && Field(denseWindow, "proposed") is ArrangementSnapshot, "Previewing an automatic layout cannot replace the accepted layout");
+            Capture(denseWindow, Path.Combine(denseWorkspace, "candidate-window.png"));
+            Call(denseWindow, "AcceptCandidate", denseWindow, new RoutedEventArgs()); Until(() => !(bool)Field(denseWindow, "busy")!);
+            Check(denseSession.IsDirty && denseSession.Current.State.Strategy != ArrangementStrategy.Canonical, "Explicit acceptance installs a distinct verified native candidate");
+            Call(denseWindow, "SaveLayout", denseWindow, new RoutedEventArgs()); Until(() => !(bool)Field(denseWindow, "busy")!);
+            var denseSvg = denseSession.Current.Render.Svg; Check(!denseSession.IsDirty, "Accepted candidate saves independently of source"); denseWindow.Close();
+            var denseReopen = new DiagramArrangementWindow(denseSource, new(), DenseContext, ThemeService.IsDark("Light")); denseReopen.Show();
+            Until(() => Field(denseReopen, "session") is ArrangementSession && !(bool)Field(denseReopen, "busy")!);
+            Check(((ArrangementSession)Field(denseReopen, "session")!).Current.Render.Svg == denseSvg, "Native reopen restores the accepted automatic routes exactly"); denseReopen.Close();
+
             foreach (var theme in highContrast ? new[] { "System" } : new[] { "Light", "Dark" })
             foreach (var family in new[] { "ER", "Flowchart" })
             {

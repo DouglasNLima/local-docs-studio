@@ -23,6 +23,7 @@ public partial class DiagramArrangementWindow : Window
     private readonly string theme;
     private readonly Func<ArrangementDocumentContext?> ownerContext;
     private readonly CancellationTokenSource lifetime = new();
+    private CancellationTokenSource? candidateSearch;
     private readonly NativeSvgService svg = new();
     private ArrangementEngine engine = null!;
     private ArrangementSession session = null!;
@@ -141,11 +142,19 @@ public partial class DiagramArrangementWindow : Window
     private async void ResetLayout(object sender, RoutedEventArgs e) => await Run(async () => { proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; session.Reset(); await Present(session.Current); });
     private async void ViewCanonical(object sender, RoutedEventArgs e) => await Run(async () => { proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; await Present(engine.Canonical); });
     private async void ViewArranged(object sender, RoutedEventArgs e) => await Run(async () => { proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; await Present(session.Current); });
-    private async void Revert(object sender, RoutedEventArgs e) => await Run(async () => { proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; session.Accept(checkpoint!, session.Generation); await PresentCurrent(); Status.Text = "Reverted to the arrangement from the last load or save."; });
+    private async void Revert(object sender, RoutedEventArgs e)
+    {
+        if (candidateSearch is not null) { candidateSearch.Cancel(); return; }
+        await Run(async () => { proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; session.Accept(checkpoint!, session.Generation); await PresentCurrent(); Status.Text = "Reverted to the arrangement from the last load or save."; });
+    }
     private async void GenerateCandidates(object sender, RoutedEventArgs e) => await Run(async () =>
     {
         Status.Text = "Comparing bounded deterministic candidates…";
-        var candidates = await Task.Run(() => engine.Candidates(session.Current.State, lifetime.Token), lifetime.Token); CheckOwner();
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
+        candidateSearch = cancellation;
+        IReadOnlyList<ArrangementSnapshot> candidates;
+        try { candidates = await Task.Run(() => engine.Candidates(session.Current.State, cancellation.Token), cancellation.Token); CheckOwner(); }
+        finally { candidateSearch = null; }
         CandidateChoices.ItemsSource = candidates.Select(c => new Candidate(c, $"{(c.State.Strategy == ArrangementStrategy.FewerCrossings ? "Fewer crossings" : "Compact")} · crossings {c.Quality.Crossings} · area {c.Quality.Area:0} · bends {c.Quality.Bends}")).ToArray();
         CandidatePanel.Visibility = candidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         Status.Text = candidates.Count > 0 ? $"Current: {session.Current.Quality.Crossings} crossings; area {session.Current.Quality.Area:0}. Select a candidate to preview; Accept candidate changes the layout."
@@ -201,7 +210,7 @@ public partial class DiagramArrangementWindow : Window
     private async void KeyPressed(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
-        { if (pointer is not null) CancelPointer(); else if (proposed is not null) CancelCandidate(this, new()); else Select(null); e.Handled = true; return; }
+        { if (candidateSearch is not null) candidateSearch.Cancel(); else if (pointer is not null) CancelPointer(); else if (proposed is not null) CancelCandidate(this, new()); else Select(null); e.Handled = true; return; }
         if (Viewport.IsKeyboardFocused && !busy && ArrangeMode.IsChecked == true && proposed is null && ReferenceEquals(displayed, session.Current) && NodeId(selected) is { } id && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
         {
             var step = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? 1 : 10; var position = session.Current.State.Positions[id];

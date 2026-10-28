@@ -67,6 +67,7 @@ scores, bends, length and aspect ratio are measured. Node overlap, unrelated
 body intersections and label/body overlaps are hard rejection conditions.
 Compact can increase crossings considerably. The candidate list reports this
 trade-off before explicit acceptance; no candidate is applied automatically.
+Escape or Cancel / revert can cancel an active candidate search.
 
 Manual routing uses bounded orthogonal obstacle search, node-specific ports,
 separate self/parallel occurrences and label placement against node bodies and
@@ -129,7 +130,7 @@ Local checkpoints on 28 October 2026:
 - Web: static checks and all 270 Chromium/Edge tests passed.
 - Native corpus: all 202 cases/export checks passed; desktop UX and dynamic
   theme-resource regressions passed. All 12 native Docs Site browser tests passed.
-- Shown owned WPF windows: 106 assertions, Light/Dark ER/Flowchart, real loaded
+- Shown owned WPF windows: 112 assertions, Light/Dark ER/Flowchart, real loaded
   controls and saved sidecars, reopen, stable inspection and exact SVG/PNG outputs.
 - All six public complex ER fixtures accept a far-corner manual move with zero
   unrelated-body intersections and zero label/body overlaps (11–1,884 ms in a
@@ -168,6 +169,22 @@ contains full metrics. These are synthetic, non-sensitive shown-WPF captures:
 | --- | --- |
 | ![Canonical ER](evidence/smart-arrangement/Light-ER-canonical.png) | ![Arranged ER](evidence/smart-arrangement/Light-ER-arranged.png) |
 | ![Canonical Flowchart](evidence/smart-arrangement/Dark-Flowchart-canonical.png) | ![Arranged Flowchart](evidence/smart-arrangement/Dark-Flowchart-arranged.png) |
+| ![Dense canonical viewport](evidence/smart-arrangement/Dense-Flowchart-canonical.png) | ![Dense candidate viewport](evidence/smart-arrangement/Dense-Flowchart-candidate.png) |
+
+The [extended native candidate receipt](evidence/smart-arrangement/local-candidate-ui.json)
+adds shown-window search cancellation, candidate preview without mutation,
+explicit acceptance, saving and exact automatic-route restoration (112 checks).
+Viewport captures retain their zoom and scrolling; SVG/PNG exports contain the
+complete drawing.
+
+The first hosted arrangement-input run on commit `5a32f9e` passed actual ER
+pointer movement, pinning, Escape, deactivation/capture loss, keyboard and
+Undo/Redo. It failed to find the exported SVG at the requested test path although
+the window reported export completion. The failing log and screenshots remain
+in run [40667182236](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40667182236).
+The harness now follows the existing shell-dialogue pattern: focus the labelled
+filename input, type the destination, verify its value and click Save. This is a
+test correction pending hosted revalidation, not a suppressed export assertion.
 
 The actual compiled native executable was launched on this Windows host with a
 fresh synthetic workspace and isolated state before committing. Computer Use

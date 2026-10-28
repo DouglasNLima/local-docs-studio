@@ -48,6 +48,7 @@ jobs:
         with:
           name: native-diagram-arrangement
           path: artifacts/native/arrangement*/
+          include-hidden-files: true
           retention-days: 14
   complex-er-preview:
     if: ${{ !inputs.replay_original_853 }}
