@@ -1,0 +1,12 @@
+{
+  "name": "lens-highlight-provenance-tools",
+  "private": true,
+  "type": "module",
+  "description": "Maintenance-only reconstruction of the pinned vendored Highlight.js asset; not an application build",
+  "dependencies": {
+    "@rollup/plugin-commonjs": "22.0.2",
+    "highlight.js": "11.11.1",
+    "rollup": "2.80.0",
+    "terser": "5.39.0"
+  }
+}

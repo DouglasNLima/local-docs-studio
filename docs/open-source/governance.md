@@ -1,5 +1,9 @@
 # Community governance proposal
 
+Goal #58 supplies [exact proposed settings and verification steps](governance-settings.md).
+CODEOWNERS and a provenance check are prepared in source; no administration control
+is claimed effective merely because its policy is written.
+
 Status: review only, 28 October 2026. The owner has selected a free, community
 maintained, open-source direction. There will be no subscription, paid licence
 or feature tier. MIT is proposed, not adopted. Community participation does not

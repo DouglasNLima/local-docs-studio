@@ -1,0 +1,1190 @@
+{
+  "schemaVersion": 1,
+  "upstreamVersion": "11.11.1",
+  "originalBundleSha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0",
+  "archive": {
+    "url": "https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz",
+    "sha256": "fbc9443263e976583bd5640e550b77f84d8d7e19fc8408dfe53776a5bae7ed39",
+    "integrity": "sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==",
+    "verified": true
+  },
+  "historicalMap": {
+    "url": "https://cdn.jsdelivr.net/sm/28ec7303afe7b37888f587daa79c82654af73c2e239f8f61fee3a3b1e6b716e1.map",
+    "sha256": "b850e00e00a5006f0c484e0751063281a9d3a8789ef18acd59769612288ac06d",
+    "sourceCount": 195
+  },
+  "installedFilesVerified": 1559,
+  "sources": [
+    {
+      "source": "jsdelivr-header.js",
+      "sha256": "502fc93ae8002641a03bb14a75707da495a501b4680bfff7fe75cff065c18283",
+      "bytes": 255,
+      "result": "CDN-generated header; not an upstream source"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/core.js",
+      "sha256": "e647525f110a3e00e31fc77f7e69104be85ce02534bb8263c1b2be2afe09ad1e",
+      "bytes": 75941,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/1c.js",
+      "sha256": "d18dca162d26ced03fe0add6b603907423af56e6c83783c51440948449f79516",
+      "bytes": 64912,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/abnf.js",
+      "sha256": "fa6fcd5680b3686a73313c2535ea09df4252542dc1c09fdce49c8ff17df4d7d0",
+      "bytes": 1475,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/accesslog.js",
+      "sha256": "7bb5e92ea6a24adeda96a471548365f6020b07f957a1742a92c5cb59cf4b1e36",
+      "bytes": 1976,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/actionscript.js",
+      "sha256": "7fea1bdf5965ffa5fb027ead5058de98c811c190193ba0018f4579e8d1e6e1be",
+      "bytes": 2870,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ada.js",
+      "sha256": "a5e263322627cf5dbee5d235e3d467a7dd95bd82c27972364773da85f36f3e2b",
+      "bytes": 6705,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/angelscript.js",
+      "sha256": "a7a26715c5b899645226dafe30ddbb3a9846d90af48063b7b6237aa1d06fcf44",
+      "bytes": 3532,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/apache.js",
+      "sha256": "985ad9355ef15548ced5d76b50f8adde2943540973f2855e2e5884fe7c2f225f",
+      "bytes": 2552,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/applescript.js",
+      "sha256": "45b06bf272151d7ff94145bb0f48aed10252dad5219c472e05b6b652a56bcf33",
+      "bytes": 4059,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/arcade.js",
+      "sha256": "c665b0933a0795d56c449d5b4589cb07e655b608a8427de7db0c1b7ec8f6f9b7",
+      "bytes": 8618,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/arduino.js",
+      "sha256": "c26fe9e10b39e3ccb9d9e928cf1fdb988267cbb92abf189daa85c0da23adcfae",
+      "bytes": 20392,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/armasm.js",
+      "sha256": "1e03fa485c3b6091cdadd6fdbd49c12fdba965c6142d7bba8a5df103cc1e4173",
+      "bytes": 5202,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/xml.js",
+      "sha256": "dcb9cd430937eb3b1416b385d9fcda72fa9233dcfe93bf0146235f6c3a2b6487",
+      "bytes": 7002,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/asciidoc.js",
+      "sha256": "02485ba24ff6ba15764d56d4c72bf6c2ae5d87a5467831e4701b1c2eab649684",
+      "bytes": 6403,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/aspectj.js",
+      "sha256": "e55f519df580376ec1cdf27b59dda6478396619d81f2ffdfad76de682e541779",
+      "bytes": 5250,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/autohotkey.js",
+      "sha256": "e2a8391e95f564b0140a902122a142a939c32caddaa0d431ada180af09fa7bc5",
+      "bytes": 2195,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/autoit.js",
+      "sha256": "f0c6211296c25372aa7c21ffa2e8e3703eabceb979e8b98a32de53140d3fc92c",
+      "bytes": 9639,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/avrasm.js",
+      "sha256": "0ad782f9ac1558c7ae2720d9aada6268f1bb6258137ef77d9ba05013dc7bf5d8",
+      "bytes": 2957,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/awk.js",
+      "sha256": "20fd802c2893d7a018f68c19d4c34a24aca2fe9662075733e33fad97cb331cb9",
+      "bytes": 1362,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/axapta.js",
+      "sha256": "58618c0c23ccac1c620c96f83a84b8297d27afa291981deb8aea58f1259f25d4",
+      "bytes": 3081,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/bash.js",
+      "sha256": "134f86c16781d91ee183e4c5f479449e1c0d6b256f2f1db080fdd40252ac2b1c",
+      "bytes": 6518,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/basic.js",
+      "sha256": "8c0c07c722362d7a8a2c48af66a7d568ee3869d5f6f31010b47e3dc775f88e83",
+      "bytes": 3646,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/bnf.js",
+      "sha256": "db38ccbe444a20a448765472660f4878fa136a6660fc224e6a5898c16926b955",
+      "bytes": 730,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/brainfuck.js",
+      "sha256": "943c594563ddaec5f0ecca80d99caadf594b802e7e57af78acd189096aad4629",
+      "bytes": 1127,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/c.js",
+      "sha256": "1b20c2ea0cdd3c94f26807d098df8b72485e1892657dae3d4ea8e5fcbcc389cc",
+      "bytes": 8287,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/cal.js",
+      "sha256": "82802a8eed07ed019c6f710dc41963b0c93a37dafd9ff7872992223dad0bdd50",
+      "bytes": 2691,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/capnproto.js",
+      "sha256": "4a8cab3812f672ae3ad6651f15d0dda1331dc47d84b82573b378167f133ddd1d",
+      "bytes": 1618,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ceylon.js",
+      "sha256": "384236472e17bacd5012966df6898613d4611ff8df4811cd7f29d00775a71e37",
+      "bytes": 2446,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/clean.js",
+      "sha256": "7d2b55a96060a1546088e9068a37ee012c06445bb1783858899802cc09bc1811",
+      "bytes": 1103,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/clojure.js",
+      "sha256": "d57805170607e3c457bdb194e2249fbd7f5f9cda7b5b0b6abb1c3ee566bb63bf",
+      "bytes": 6319,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/clojure-repl.js",
+      "sha256": "4984f960343219026cd37757431276de29fb9eb2f09b477ad46479f7b48e9d25",
+      "bytes": 500,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/cmake.js",
+      "sha256": "74c7346d4061f41712f4b850199df4caa233892f65cfc4a827afd207c06e7929",
+      "bytes": 3316,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/coffeescript.js",
+      "sha256": "d89c9ccb2fcce1eab24b6c762ab65c305aef642a2987740271db55c11b72b923",
+      "bytes": 6900,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/coq.js",
+      "sha256": "1e1ee52a976770335e2200cee3db4e39af10c6184d231ebd4960b3d95f03cba7",
+      "bytes": 6712,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/cos.js",
+      "sha256": "4fd9b8f8d23724d2c6fe13ddc984daf1a2d1293e7cf0409d4bccd0b48eb47c70",
+      "bytes": 5310,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/cpp.js",
+      "sha256": "1627fbc57ca24db044065473f784dad8924763f01ee517dceffd73710d6f4937",
+      "bytes": 12684,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/crmsh.js",
+      "sha256": "354e071791e69fd038fb9a9fbb623dff1d280352b8331acfeeb57df8f8fdc542",
+      "bytes": 2512,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/crystal.js",
+      "sha256": "7b3f8f45fe9d1975d7aa2b37c6a23a02af6a978f865f7528cca5d5347cde0ba2",
+      "bytes": 7187,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/csharp.js",
+      "sha256": "9c16bff5a4227203b5307025453594b011b8f75e0f98f8bd934ac3f55c65f649",
+      "bytes": 8557,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/csp.js",
+      "sha256": "9bd77ea88028724a82374fc1207ba38e049c2ed37a8e85a61fac83bdebe6d056",
+      "bytes": 1046,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/css.js",
+      "sha256": "2787cf1b1f53248434ea67921acc2ffdeb0192c0b95b84003f57b8c711c87040",
+      "bytes": 18879,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/d.js",
+      "sha256": "5c6b9d03bc867edd79a36fc96bef2adb1b09affdcf7a06cde60819fb265d1964",
+      "bytes": 6831,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/markdown.js",
+      "sha256": "76dfa64c3f05c1bc9c3036727fa69b9c6b6e6af003060ed9cc5bebf7ecec4fd9",
+      "bytes": 5248,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dart.js",
+      "sha256": "ea74baa813991a158984e40a26bbb10b24b1351c7c62bb7fe4224b019fa2586c",
+      "bytes": 4706,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/delphi.js",
+      "sha256": "84cc1470f7f23dd464e69350f8131d9003407dca727f7c4f67e1b8f86ca68bb1",
+      "bytes": 4381,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/diff.js",
+      "sha256": "bf381b1d5c9e9206b00873aabb3e5a235e70020859487dd77e50d5aa42d8b3a7",
+      "bytes": 1209,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/django.js",
+      "sha256": "e8daa7fd5a1161edc94c29f62fcbaca7fe96f69e4d396e93b2121aa7220a388b",
+      "bytes": 2808,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dns.js",
+      "sha256": "bd311536eb8165f98d8d829434991ca53d57685efb211d8d788c3331c5153c93",
+      "bytes": 2401,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dockerfile.js",
+      "sha256": "e596a2a957d03d7a767fda01c6cc97d0f78ac7657fb00c802f109c72b3f202a8",
+      "bytes": 904,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dos.js",
+      "sha256": "d2de5c1db8e28852b3c4ec365226f834d05725405909ef30e1593dac1a87609e",
+      "bytes": 2566,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dsconfig.js",
+      "sha256": "5230221ff19870a65d63f16ad9fa43891ddf2c0082fb6db534b33aab7e18979d",
+      "bytes": 1329,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dts.js",
+      "sha256": "01c3e222f1cb1a65115efda64ee2b0dd5dc7911a3592b07ffcce54208ca9bee7",
+      "bytes": 3065,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/dust.js",
+      "sha256": "e4ccce6a4dcc000a59a34ed895ef777574362f64aa2a2f577d8431bd9dc0027d",
+      "bytes": 1019,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ebnf.js",
+      "sha256": "9b4c6e83c36bd97c4963548f9d2fb62903a380fbd6e18545f5baf4ceb8efd0fd",
+      "bytes": 1006,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/elixir.js",
+      "sha256": "be5e2d4f385c3578b4bde2450bd0d82a053e4d571258e2e4bed340dc49ce9c72",
+      "bytes": 5786,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/elm.js",
+      "sha256": "21f9cae91392372f3d83b2f319916c49d8dd31df6b818c747e5ccef1fee81265",
+      "bytes": 2519,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ruby.js",
+      "sha256": "674a01b27ef166027666640e41f897f239845ff1f4822964521534ac1f76b10a",
+      "bytes": 9939,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/erb.js",
+      "sha256": "e073947b54c808e8bea1caf6c1004882ee3590c49835d22df1dfe408379535be",
+      "bytes": 661,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/erlang-repl.js",
+      "sha256": "4e64029788911e803e8329ad7218f82386ae4a0d4761b1a10f1fa14616841bf0",
+      "bytes": 1352,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/erlang.js",
+      "sha256": "6dcf7c517ebd753c7cdc06fed64761558418f766331f120f5e165201475cb297",
+      "bytes": 5212,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/excel.js",
+      "sha256": "40b7f97a1f63a2474f9355a966e8161e413b1c7ed865b9a0001f26f42fcea53f",
+      "bytes": 9453,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/fix.js",
+      "sha256": "b046ed9fd9f6e876230b975368657e7885e574ab06a59b07a794e5f19c19d97a",
+      "bytes": 787,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/flix.js",
+      "sha256": "f151ecf1f25e528f416c91de80363d49b554486e6c6afa46e8d0e82ad70cafe6",
+      "bytes": 1309,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/fortran.js",
+      "sha256": "576cf78337ff96081e18b9f5badfd2d2560e69b0ce23e84b1084d7c7e390ebf4",
+      "bytes": 9330,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/fsharp.js",
+      "sha256": "004303be259a63e3fc2d6786e2299262283341a4c2ed1de6ae023409cfa90803",
+      "bytes": 14959,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/gams.js",
+      "sha256": "aa3cfe6b178e9af23c93652479a0c3867bb48d530511023fd0a788d18cd2a039",
+      "bytes": 5227,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/gauss.js",
+      "sha256": "ab9c1496846b85a38ab195c43d36a1b070d850a771b1a3931b7d55e267e4954b",
+      "bytes": 17226,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/gcode.js",
+      "sha256": "1f080b2eda5899003018a23b562d014668476ba220896437b10332e4e7c5f018",
+      "bytes": 4350,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/gherkin.js",
+      "sha256": "1cb672223574a24a26e40dc6b6abb97a555472adfd398f4bdc289b6456bf9094",
+      "bytes": 1187,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/glsl.js",
+      "sha256": "35117d450081fdc5575c4442b8e598d9d7cd40d74a104f62da2d24830b9f7ce5",
+      "bytes": 9921,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/gml.js",
+      "sha256": "54cf9392a64633e8b834878e016615416ce985a00ac1862ebadb7d3dcc43acbd",
+      "bytes": 77802,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/go.js",
+      "sha256": "98069181c26f9335fb1d05dd5fc880b0863dc4503ae17634c68d5c8e86189647",
+      "bytes": 3190,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/golo.js",
+      "sha256": "af89e997eb9c60a48923fa50992ec426e991387ec3b91b5d5794381ec4a3f380",
+      "bytes": 1220,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/gradle.js",
+      "sha256": "58318d1f3fbf3bfe7f6d5f19f7051d914ae1a41554c00b5dd5bbd63d63670098",
+      "bytes": 3006,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/graphql.js",
+      "sha256": "0d76e2e8e0a7d8447d4e4512c16dfee9dd7f6910a7979fc0b1e591426ff51180",
+      "bytes": 1481,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/groovy.js",
+      "sha256": "b0001d539e803538aef120955de80289b96747da6e205a7e383c8d8a7b2ff1de",
+      "bytes": 3559,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/haml.js",
+      "sha256": "4235ab665ca73eab039c5cda04f664830b3460befb2685e3e80ac01e17c621ff",
+      "bytes": 2696,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/handlebars.js",
+      "sha256": "25d0d8b12ab1700feed9c50b80090ff6266d5d80128451043d7b07088c085b20",
+      "bytes": 6458,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/haskell.js",
+      "sha256": "26019f7fbf0df8dea1b94dd7f45f38ae5e361da0ec14b1e9b3b7a038256c0836",
+      "bytes": 5663,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/haxe.js",
+      "sha256": "f413bee7c75aad45fbc6fcf8ffea306f2c6117e2e159e799412109cbb93fe67d",
+      "bytes": 4410,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/hsp.js",
+      "sha256": "9fd7eede7eff5c7ba04dc5799657ba2f9a2f802d9107a7a1d6c8f07b1a360b62",
+      "bytes": 3952,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/http.js",
+      "sha256": "9e7b9d1688be0c98798d74623a51b266fab84fe133f6e0c06b26f95dd5fe9599",
+      "bytes": 2082,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/hy.js",
+      "sha256": "df06ae1caaf83a96bb4c13e10bc45da5f71430feb004dce6b6815e33f3444517",
+      "bytes": 4433,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/inform7.js",
+      "sha256": "c11823a6ca351aa53ed89a2a6b290e9237b495ffc65bcc350963092acf3b919e",
+      "bytes": 1653,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ini.js",
+      "sha256": "21eee54329761c77fcf8ef38b42497f602992ef468ea7b578c89fd212cbcdb46",
+      "bytes": 2347,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/irpf90.js",
+      "sha256": "dbe76803b6de9c90a75a4c6b25e0934cff61882f7b9e10f6c4e8ceeeb1de4719",
+      "bytes": 6127,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/isbl.js",
+      "sha256": "5ec962d6ab5ccc0b608feb08e2ecd09d8914bc0e55be6ee666c8b88980361c50",
+      "bytes": 108233,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/java.js",
+      "sha256": "b0199bbacc0fcc8ad282f14b270275180d115004364bc393afee843e51e6318b",
+      "bytes": 6228,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/javascript.js",
+      "sha256": "26621006809440240317c074a5e6681838b5be5c20fdcdee560e2d25448d85a9",
+      "bytes": 17751,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/jboss-cli.js",
+      "sha256": "d444e81e175d102c89437ab39ca63533e690cf1ddffe1b8f400d9015ef9f73bf",
+      "bytes": 1536,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/json.js",
+      "sha256": "6923a3613029162eedb83f67fad8451183ce5df423a9aa37878b0efb8c54d6d1",
+      "bytes": 1338,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/julia.js",
+      "sha256": "1192ca8b6736617102704a047dc5986fad33118fc9334c08a9a147ac8d1ec43a",
+      "bytes": 9133,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/julia-repl.js",
+      "sha256": "4a490971d2b32bae73cae9bf1a9c774c25b4627360ab31cfe1b85667f3c7af79",
+      "bytes": 1791,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/kotlin.js",
+      "sha256": "9d52051b1e7751f435233e3f9ca394672fef354f48c7ca93f224a20348eed3db",
+      "bytes": 7459,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/lasso.js",
+      "sha256": "da4d8964b64f75228cb653b53140d4ced02013e15f23640d43596d027c56fa51",
+      "bytes": 5164,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/latex.js",
+      "sha256": "e6ba2d87ea51a58bc4718e3e975aa71aa51735929996546e687c7608d7a2804d",
+      "bytes": 7813,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ldif.js",
+      "sha256": "2d04fc1e71c7dafc4389fea18148d4efa3614bc88a9d02d4d26f1adbbbf16f64",
+      "bytes": 567,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/leaf.js",
+      "sha256": "e304853afa5854a8cd6cee89297bc2fba28c740d50508d5598fdda9f084624ab",
+      "bytes": 1805,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/less.js",
+      "sha256": "51b7de8232de1db0bcde6c98688b32d7c1c2206b7fd7a5d60d7f321c5fd5694d",
+      "bytes": 21570,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/lisp.js",
+      "sha256": "67c03c88b50131d5651830f6deca04a6478988fa8afe05a7fb87d748963c9037",
+      "bytes": 2606,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/livecodeserver.js",
+      "sha256": "9335ff378099f18696dfceb2a47a48dbadaebb66d0509c2a8dcea644a1ff152f",
+      "bytes": 10295,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/livescript.js",
+      "sha256": "96c3bdf7116e3f2b5dd530b994dbf943e46cc9e2f3ac02066d63e0ee68e95ed4",
+      "bytes": 7242,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/llvm.js",
+      "sha256": "0dd312ddac55156d2390213f6894523961c872497d65d5e536f43ba8eaeca9c9",
+      "bytes": 4569,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/lsl.js",
+      "sha256": "e298aced60219a5df4f05df806f583f63cf3f0f142a325233563e5cbce91390d",
+      "bytes": 12732,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/lua.js",
+      "sha256": "c7a76dd97df55b02171622d8c12f10eb7e5bd6652525780cb9c23723cd7e5f9d",
+      "bytes": 3098,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/makefile.js",
+      "sha256": "ea14abb43ba2b4c95c71ff043bc5c993ca2e0376829fa18ab46d8bf0a3e81ac5",
+      "bytes": 2198,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/mathematica.js",
+      "sha256": "e2459e929421722dff53a63cdafc64b84dd7886a6279b8098035f04b46703410",
+      "bytes": 147961,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/matlab.js",
+      "sha256": "acf783cdc473a6626ea4883417f09cf10ce77270d9e69f7f74ed878751a288d9",
+      "bytes": 3650,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/maxima.js",
+      "sha256": "897501a5fceb6c1d586dcfc15cbc0c2a142d75f5aa84184ac9773b270a5c3dac",
+      "bytes": 32833,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/mel.js",
+      "sha256": "e931b205145a4b41e2cb021cc11e34b758eedfb94ccf48c7327e8a467409c93d",
+      "bytes": 19110,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/mercury.js",
+      "sha256": "fa6aefffe8372f2b38004ee6df4e4c2e2cd0afa1e64b93de4b15f0d842e15d75",
+      "bytes": 3362,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/mipsasm.js",
+      "sha256": "ab17e53b714741dab95ac7f99938f5e70b5a0463720d86cf7980f512e61f4410",
+      "bytes": 4335,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/mizar.js",
+      "sha256": "d80174838c2b906636b168aa0cba070f9b3b7319dccffc4a8bc0327fcd03fcd3",
+      "bytes": 1075,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/perl.js",
+      "sha256": "d8de97b3c31591ba10fa232e7d0a7833011f1795dd8461435f12e3a34ef171e0",
+      "bytes": 9784,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/mojolicious.js",
+      "sha256": "e7a5bc74cb48cab248aaf0f1c30b4c64c36f263ec9b872ef4e83a28c6fe729f0",
+      "bytes": 733,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/monkey.js",
+      "sha256": "07f6478402dc8ad86c1cd91de9b825d3a45132cf21bb613586268ec229cbac63",
+      "bytes": 3002,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/moonscript.js",
+      "sha256": "e41a4705a9a706ca188fe407725e60cccfbac5a360a3058f723138da17b20fdd",
+      "bytes": 3605,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/n1ql.js",
+      "sha256": "311340fb9ab405873bafb45e565dae19dfde871cb1459f3520dd16a4590afabb",
+      "bytes": 6186,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/nestedtext.js",
+      "sha256": "e8776c0bb6530c6f34428f246717aabd1c9b6ab9cf6a88e28125ef55fa623875",
+      "bytes": 1462,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/nginx.js",
+      "sha256": "e88962b499acd9fad8796f818ef9e408ba10e0463aa34e48302c668d0a6a945b",
+      "bytes": 3138,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/nim.js",
+      "sha256": "54db327a672d3fb6dfbbfeaf1257815b3cbf0148426e1c3dac12a45afc092d29",
+      "bytes": 2971,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/nix.js",
+      "sha256": "be0346b1e30e66f2c6bb29a8e5610f393003b68756d92d3bc6c5964b6ccb2802",
+      "bytes": 6939,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/node-repl.js",
+      "sha256": "57356f98a9f6dce0478458e5353eb2416891dcd7b3282bf828faf3f197ec7079",
+      "bytes": 674,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/nsis.js",
+      "sha256": "b3c40f4ad82b7e97db1c44258175c3cba3619dbe9e639b9b2faf4f6c4d65fc8b",
+      "bytes": 10015,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/objectivec.js",
+      "sha256": "3a410538d1040627da9f664fc109cd5efa8fef655dffc99612d83e2b5af3548b",
+      "bytes": 4924,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ocaml.js",
+      "sha256": "0d24e3f6ca7c762c3cba193d8a9f6d55f70000bb5629ceee9f3f664a1ebe8855",
+      "bytes": 2522,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/openscad.js",
+      "sha256": "1eda3792a238c7f5e3ad6fbf08dabf036850a749110820893f396bfb726d7aa8",
+      "bytes": 2083,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/oxygene.js",
+      "sha256": "ed9fde9f34e04e98225881999c73cc6650f798c2f8e7bf95263588da9c70e28f",
+      "bytes": 2921,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/parser3.js",
+      "sha256": "3f6268d6dcacf27b9bd0265b071b4ce1f83e119cb761ea16f2bb981ec552ccdc",
+      "bytes": 1064,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/pf.js",
+      "sha256": "7c845ae2b327c7d3915a71672752a087923d9cae2bbad110f2351c29d083f6db",
+      "bytes": 2039,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/pgsql.js",
+      "sha256": "e4e58d47c247d274a029577d42dd1de504cfc6ba1df16360a26fb2b86756315f",
+      "bytes": 28751,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/php.js",
+      "sha256": "82b007366f7627b28aef384a5cea7eed3d880178eb57cad7e564fcd695588cd5",
+      "bytes": 14420,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/php-template.js",
+      "sha256": "25d6be3facd42cdfec6b4b9785d61edcce5ec17bbce706cba3c131b10b3d4027",
+      "bytes": 1175,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/plaintext.js",
+      "sha256": "74a42662f49d0093dee501a4e46db9f36c1f8752bff4f86bdcb26c88362854bd",
+      "bytes": 313,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/pony.js",
+      "sha256": "174302d4caa6c4f9ffbcd187fb7daa58fa13d077eb1462acfeccc08fdb999e29",
+      "bytes": 2123,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/powershell.js",
+      "sha256": "77290ddd0732b0722ed390ff8cc2ba08aa48fcaee7d4d8bac4f3f139add628fe",
+      "bytes": 8112,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/processing.js",
+      "sha256": "ad6f8c9f661c94bcf5a2b711297791aa7982270606ce3ad17caac52a569567d4",
+      "bytes": 7094,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/profile.js",
+      "sha256": "2aa92603f874e5d2454b10261ac4b05661b3e79bd212071ccd3cdfe801338766",
+      "bytes": 889,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/prolog.js",
+      "sha256": "66a28113e186ad9ebc72a741a74f75a6f5510fe08b7d8b632f4efd1b1a9f9404",
+      "bytes": 1621,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/properties.js",
+      "sha256": "ab7e9031fc54e65ea1e025274fd256174e6c3b79e8b1d3489b3e56ad66a9714e",
+      "bytes": 1616,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/protobuf.js",
+      "sha256": "2a129d91e1b8cc955768eae64322a835f3f75a73651598fbf1bdccca2757080d",
+      "bytes": 1444,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/puppet.js",
+      "sha256": "1dde9f041d42c55baf74f4771d267121b7d3accb0d13af54be85015bf3d23219",
+      "bytes": 5806,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/purebasic.js",
+      "sha256": "d4a5d4877b43f4e1ea5b289850786af28844dbcf3cd0933a870ea707c70b5e13",
+      "bytes": 4426,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/python.js",
+      "sha256": "6fa85c05f6852e7f761b5c0cfdb3f75992704012bbde67197db2c22286fcd072",
+      "bytes": 9185,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/python-repl.js",
+      "sha256": "86fd43acce89a8e90d657efa4733263b301e10c80620e717e6137679a95b7b10",
+      "bytes": 650,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/q.js",
+      "sha256": "d86b58fdbd775d878ede8d044c1d7174d138ae96e82068594fe77710941c6d23",
+      "bytes": 1606,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/qml.js",
+      "sha256": "8289d2e1fc83ca83c3895a306b6aab8ac8c4470ff0d4514780691af5146813d3",
+      "bytes": 5529,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/r.js",
+      "sha256": "5ab85530aa424f887d6f80abeefda8ebd460b65d5c1793f22f4c8f3aa99049c7",
+      "bytes": 7947,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/reasonml.js",
+      "sha256": "d6034cc36ae7faa71044010b08e2364511200340ed6b8095eacf45179348aec4",
+      "bytes": 3089,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/rib.js",
+      "sha256": "c580be9309c20c61e845a96947e88676e32526bd93deb117e7211e6701ebf659",
+      "bytes": 1744,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/roboconf.js",
+      "sha256": "10c594bc159edb44e7d182693a010d2ce6df60e52d58c1ac8ca22715de8340f1",
+      "bytes": 1572,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/routeros.js",
+      "sha256": "f8d8124af1701a55d6b80b112b334111a3db633364ea668dc7d154a71d03b363",
+      "bytes": 5503,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/rsl.js",
+      "sha256": "f26b0093125bfd81a6afcd18641e3d2e40ea507434eaf2047bb87b13203e9398",
+      "bytes": 2355,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/ruleslanguage.js",
+      "sha256": "3ed6800f4ba12bbd98f06af79ade72eca1582656633b8694ee5cd5222c92f5c4",
+      "bytes": 4999,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/rust.js",
+      "sha256": "a2a910ee925554795148043b6a895690d254e30e9d6a9351fe4b99b09f47853d",
+      "bytes": 6125,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/sas.js",
+      "sha256": "4aba0421284957058c6ba9a9c4bf8d2ae9a6754ae4276083c5f5fc82798a9296",
+      "bytes": 8365,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/scala.js",
+      "sha256": "08b47600c03eb2f0efc9eb139ad0b1fa9cef2e9200cf14bf9ef5f7b8856299ee",
+      "bytes": 4529,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/scheme.js",
+      "sha256": "ee95ba39479bbbe4b1d80c5200c16f8c942a70849088aae2ee1c4a9b4253e4cc",
+      "bytes": 5500,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/scilab.js",
+      "sha256": "6180eaa16551b6d484391850a9a250c416eec9e274528d5847dca480ef2e6e04",
+      "bytes": 2133,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/scss.js",
+      "sha256": "e5f50219481926f9dc09c1c6efb0f8132a6fa568f07f7f62c94310a8d17ddb2e",
+      "bytes": 19463,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/shell.js",
+      "sha256": "e53d881fbe6c40616e2b4f1631212e32563dcdc15c15bd46626213c3bc152c30",
+      "bytes": 786,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/smali.js",
+      "sha256": "7485d0591ef2de85c1b2ced1809ca991955679e88131fa0031e852308bfef0ad",
+      "bytes": 2230,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/smalltalk.js",
+      "sha256": "6343dde6e7e7b35571ff6f19aaa440247653122bc507b9b833ad63715ece5ceb",
+      "bytes": 1601,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/sml.js",
+      "sha256": "bbfec1b87c98e4e68828337b7b236e51271bfb3d419f18dbd022ca93012efbd5",
+      "bytes": 2232,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/sqf.js",
+      "sha256": "f0b8ccbe262337b3d6708fbf977b7067b843d048fd756fadfefea09e256fb612",
+      "bytes": 58823,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/sql.js",
+      "sha256": "a0cbca94463751a929701957153fd23552944f47c00da87605f2e0b1f27ff6fb",
+      "bytes": 11985,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/stan.js",
+      "sha256": "03f0b23523cf31720c9da3a45ecff08589914977ceab80b924c6d61d671243bc",
+      "bytes": 10544,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/stata.js",
+      "sha256": "338c1c1dab519acc0322287450e0dac0fcf4c94af6f52907305648f439dac21c",
+      "bytes": 17496,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/step21.js",
+      "sha256": "f13c4d715d7ca688e0c5ee24b5da5a00748277791cc34da6bc76b0303eb040c9",
+      "bytes": 1488,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/stylus.js",
+      "sha256": "7a0681e1cad334c3e513e81c5d81983f71320192808bc8193791542c825e9919",
+      "bytes": 19227,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/subunit.js",
+      "sha256": "724c8ea375085c841ee77f0920d941c607a416047ac3dd79e3d93a7c1a3b9387",
+      "bytes": 946,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/swift.js",
+      "sha256": "b1e8b0d93cf939f19c51fa4fce780996af4755065afd0ee43764bf47eaf991f4",
+      "bytes": 22512,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/taggerscript.js",
+      "sha256": "3ad3d8ece2e99d8dc86071e049edcd33a664428398e16489d5fc96e3af83d83c",
+      "bytes": 1093,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/yaml.js",
+      "sha256": "008894ba282fa3436798b08314862ef3d4c39f8fe92a182acc4167d10d17e4c0",
+      "bytes": 5017,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/tap.js",
+      "sha256": "6e3ac22e5ae8f9ad149258b4932fdf84f4d36f7465d260168d272c129b04b8dd",
+      "bytes": 1066,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/tcl.js",
+      "sha256": "5cdd9814e4d5b2a3935abddb5db534973cba43bdd1f678ddcb49c2c0328ff4b4",
+      "bytes": 3342,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/thrift.js",
+      "sha256": "b658de7cd2bfec8e9ca53097657b95a03f0c6db987ac588996682c9a7b48d982",
+      "bytes": 1429,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/tp.js",
+      "sha256": "d70d6629a08fc3a5687b60c686e44fe1e6db62954560a9a5e1923a158f13072f",
+      "bytes": 3080,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/twig.js",
+      "sha256": "1d15152a927055c6fc386a5f64bd4e55ef0b2354ed8f66d88c10ffb312840542",
+      "bytes": 4354,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/typescript.js",
+      "sha256": "ba351fb35bd479c4228d539ee4f4772286623f2be4134bc80f9e10285451790b",
+      "bytes": 21354,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/vala.js",
+      "sha256": "4f312e4d62f5804298ad7a1f8b9dbe1bba2e5e0771243a42eecb360899856465",
+      "bytes": 1831,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/vbnet.js",
+      "sha256": "b1026b16f10af73dfb34f174726fad857fd8d9b15ff9f9b70d410174cb805382",
+      "bytes": 5281,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/vbscript.js",
+      "sha256": "0c269dd5fb3957a2e02a338fc61ef1f264c2d437bc3e541b5b72aab418488da9",
+      "bytes": 3599,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/vbscript-html.js",
+      "sha256": "37efb4641038a9e97d67e528682948f51c8718cac95e5dd6fe1f45d471b83c23",
+      "bytes": 513,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/verilog.js",
+      "sha256": "35e3b17a3e6476730f3f57ea70c62cf8cf73de05142e0fe20639b623294da230",
+      "bytes": 10340,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/vhdl.js",
+      "sha256": "a7e9e97fbe62a1c2479757f06c0a27321a72e882449a2d1c34368ca9e9447734",
+      "bytes": 3921,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/vim.js",
+      "sha256": "561c4d4932b25687b920fa68dcab013935a6cf9c9719179352e12760c00ca884",
+      "bytes": 10494,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/wasm.js",
+      "sha256": "08e0dacdff2f21c5928e934c2e70e9ca34c6d6345856951d344e4a6b772ee9bb",
+      "bytes": 3026,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/wren.js",
+      "sha256": "daa744c7d625595d49847714720fd9d96efe06a4b2cce73abd2534f32ac36bff",
+      "bytes": 5158,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/x86asm.js",
+      "sha256": "d41df2c6bff5df8649db1bd92f81eac22e51903c828a71df9e89c654da9bc92c",
+      "bytes": 21260,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/xl.js",
+      "sha256": "4e711d3c8a11831c86b9f4e0cb816d200a997359ec39c7d5b6085939f8912c34",
+      "bytes": 3423,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/xquery.js",
+      "sha256": "b053731dacd63c74c439c921af7bb120e42af83f66d60b51ee2660d72cb10334",
+      "bytes": 8675,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/languages/zephir.js",
+      "sha256": "3c97b003f30e076c52e88c323950397490016731fc046b82a47e47db1a4d90cf",
+      "bytes": 3516,
+      "result": "EXACT_ARCHIVE_BYTES"
+    },
+    {
+      "source": "/npm/highlight.js@11.11.1/lib/index.js",
+      "sha256": "a00bb045c0ca0cec739886cc05a06a0fa0335d0b8d0bf156dbb7d23d130d081d",
+      "bytes": 12296,
+      "result": "EXACT_ARCHIVE_BYTES"
+    }
+  ],
+  "limitation": "The map authenticates its source contents against npm. It does not independently authenticate the old minifier output or prove its build recipe."
+}

@@ -1,0 +1,15 @@
+# Review routing only; branch protection and independent reviewers need owner action.
+# The existing repository owner is not evidence of copyright or signing authority.
+* @DouglasNLima
+/.github/ @DouglasNLima
+/scripts/compliance/ @DouglasNLima
+/scripts/native/ @DouglasNLima
+/installer/ @DouglasNLima
+/src/native/ @DouglasNLima
+/src/windows/ @DouglasNLima
+/assets/scripts/ @DouglasNLima
+/assets/vendor/ @DouglasNLima
+/service-worker.js @DouglasNLima
+/docs/open-source/ @DouglasNLima
+/SECURITY.md @DouglasNLima
+/CODE_OF_CONDUCT.md @DouglasNLima

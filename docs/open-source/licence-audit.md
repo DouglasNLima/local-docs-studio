@@ -1,5 +1,9 @@
 # Licensing and provenance audit — Goal #56
 
+This historical audit is supplemented by the [Goal #58 closeout](third-party-closeout.md):
+Highlight.js is now exactly reconstructed, and known web notices plus a file-level
+native candidate SBOM are supplied. Historical findings below retain their date.
+
 Recorded 28 October 2026. **Technical audit delivered with blocking findings;
 not legal clearance, licence adoption or production certification.**
 

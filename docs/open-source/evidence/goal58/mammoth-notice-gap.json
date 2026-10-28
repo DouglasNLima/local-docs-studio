@@ -1,0 +1,28 @@
+{
+  "component": "dingbat-to-unicode@1.0.1",
+  "declaration": "BSD-2-Clause in npm package metadata; original copyright/grant text not established",
+  "npmArchiveInspected": true,
+  "versionTag": "js-1.0.1",
+  "tagObject": "bf8184cc2522b6f30a4c35e5062418382ff03667",
+  "sourceCommit": "b27f259b49907f99b1b9097abba5a9668106b779",
+  "sourceTree": "a6835fcdb31ca22965128795cf2d7184426f6e26",
+  "sourcePaths": [
+    "dingbats.csv",
+    "generate.py",
+    "js",
+    "js/.gitignore",
+    "js/README.md",
+    "js/package-lock.json",
+    "js/package.json",
+    "js/src",
+    "js/src/dingbats.ts",
+    "js/src/index.ts",
+    "js/test",
+    "js/test/tests.ts",
+    "js/test/tsconfig.json",
+    "js/tsconfig.json"
+  ],
+  "sourceUrl": "https://github.com/mwilliamson/dingbat-to-unicode/tree/b27f259b49907f99b1b9097abba5a9668106b779",
+  "status": "BLOCKED",
+  "nextAction": "Obtain a version-applicable upstream copyright/grant or separately review a reproducible attributable replacement; do not invent a BSD copyright holder or infer incompatibility."
+}

@@ -4,6 +4,12 @@ This repository has no approved first-party licence yet. Third-party components
 retain their own licences; this file neither relicenses them nor certifies a
 complete distribution. See the [audit findings](docs/open-source/licence-audit.md).
 
+Goal #58 adds an [exact Highlight.js reconstruction and payload review](docs/open-source/third-party-closeout.md),
+a [cached known web notice pack](assets/vendor/THIRD-PARTY-NOTICES.txt), and a
+[file-level native candidate SBOM](docs/open-source/evidence/goal58/native-preview-957-sbom.json).
+The notice pack retains original upstream texts; complete embedded dependency
+closure and first-party rights remain separately classified.
+
 The [source-labelled inventory](docs/open-source/evidence/inventory.json) identifies
 versions, lockfile references, authors/copyright fields, licence declarations,
 upstream repositories and hashes. The [notice index](docs/open-source/evidence/upstream-notices/index.json)

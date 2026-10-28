@@ -1,0 +1,114 @@
+[
+  {
+    "component": "@xmldom/xmldom@0.8.6",
+    "source": "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.8.6.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71",
+    "file": "4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "base64-js@1.5.1",
+    "source": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1",
+    "file": "5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "bluebird@3.4.7",
+    "source": "https://registry.npmjs.org/bluebird/-/bluebird-3.4.7.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "bd92858f2261ae179cd4c4f56aaa6fa628dee927cc33808044bd7f676198c0fc",
+    "file": "bd92858f2261ae179cd4c4f56aaa6fa628dee927cc33808044bd7f676198c0fc.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "buffer@4.9.1",
+    "source": "https://registry.npmjs.org/buffer/-/buffer-4.9.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "06bafa45fdad2579ba0e43b0c9b2c6290287c99c4203c300254a462b38a307f6",
+    "file": "06bafa45fdad2579ba0e43b0c9b2c6290287c99c4203c300254a462b38a307f6.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "ieee754@1.1.8",
+    "source": "https://registry.npmjs.org/ieee754/-/ieee754-1.1.8.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "6d5ef6dcbcc2d08589c716a674536afe8a23ac2499a814afb5b14b39cc415126",
+    "file": "6d5ef6dcbcc2d08589c716a674536afe8a23ac2499a814afb5b14b39cc415126.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "isarray@1.0.0",
+    "source": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz",
+    "upstreamPath": "package/README.md#License (original section bytes)",
+    "sha256": "66aa9feab8bb39aceebd69f2a357015d57ceab486d3c7a19ff8d3d4110a6d101",
+    "file": "66aa9feab8bb39aceebd69f2a357015d57ceab486d3c7a19ff8d3d4110a6d101.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "jszip@3.7.1",
+    "source": "https://registry.npmjs.org/jszip/-/jszip-3.7.1.tgz",
+    "upstreamPath": "package/lib/license_header.js",
+    "sha256": "6fb1237a7b1f4ecd3704dcf50f57d55d99cbaf4a5ef8a2cb7eb5fb8cbff66f45",
+    "file": "6fb1237a7b1f4ecd3704dcf50f57d55d99cbaf4a5ef8a2cb7eb5fb8cbff66f45.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "jszip@3.7.1",
+    "source": "https://registry.npmjs.org/jszip/-/jszip-3.7.1.tgz",
+    "upstreamPath": "package/LICENSE.markdown",
+    "sha256": "14450c78405ad2a2173e25740b56406556779149df9c4c83523a8c63d0686210",
+    "file": "14450c78405ad2a2173e25740b56406556779149df9c4c83523a8c63d0686210.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "lop@0.4.2",
+    "source": "https://registry.npmjs.org/lop/-/lop-0.4.2.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+    "file": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "mammoth@1.12.0",
+    "source": "https://registry.npmjs.org/mammoth/-/mammoth-1.12.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+    "file": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "option@0.2.4",
+    "source": "https://registry.npmjs.org/option/-/option-0.2.4.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1",
+    "file": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "process@0.11.9",
+    "source": "https://registry.npmjs.org/process/-/process-0.11.9.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "59a400d04c5078579acc27ddd6452c1bdf763f9506e01364700935fbb1a7c91b",
+    "file": "59a400d04c5078579acc27ddd6452c1bdf763f9506e01364700935fbb1a7c91b.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "underscore@1.13.1",
+    "source": "https://registry.npmjs.org/underscore/-/underscore-1.13.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "708bd87d08b48ffd427ee2717fe76efeb63c09c5bdf64e3dae4674e20986bc6c",
+    "file": "708bd87d08b48ffd427ee2717fe76efeb63c09c5bdf64e3dae4674e20986bc6c.txt",
+    "evidenceSet": "mammoth"
+  },
+  {
+    "component": "xmlbuilder@10.0.0",
+    "source": "https://registry.npmjs.org/xmlbuilder/-/xmlbuilder-10.0.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "sha256": "8ad16994acb18814fcd2ff6d0b559906b842047b995baf33fd0c55e4d24cbac8",
+    "file": "8ad16994acb18814fcd2ff6d0b559906b842047b995baf33fd0c55e4d24cbac8.txt",
+    "evidenceSet": "mammoth"
+  }
+]

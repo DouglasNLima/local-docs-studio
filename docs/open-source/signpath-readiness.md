@@ -1,5 +1,9 @@
 # SignPath eligibility review
 
+See the [Goal #58 application decision packet](signpath-application-packet.md) for
+the current evidence, owner classifications, exact binary selectors and unanswered
+provider decisions. The observations below are retained as the Goal #56 baseline.
+
 Checked 28 October 2026 against the official [conditions](https://signpath.org/terms.html),
 [Foundation description](https://signpath.org/) and [application page](https://signpath.org/apply).
 The conditions page itself is labelled Draft; acceptance and interpretation belong
