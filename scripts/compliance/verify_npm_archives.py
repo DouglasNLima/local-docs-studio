@@ -23,6 +23,7 @@ def main():
     vendor = {row['path']: row['sha256'] for row in files if row['path'].startswith('assets/vendor/')}
     matches = {path: [] for path in vendor}
     module_path_matches = {path: [] for path in vendor}
+    extension_matches = {path: [] for path in vendor}
     results = []
     for package in inventory['npm']:
         record = dict(name=package['name'], version=package['version'], status='UNAVAILABLE')
@@ -66,6 +67,11 @@ def main():
                         for path, expected in vendor.items():
                             if remapped_digest == expected and digest != expected:
                                 module_path_matches[path].append(member.name)
+                    if package['name'] in ('mermaid', 'dompurify') and member.name.endswith('.mjs'):
+                        extension_digest = hashlib.sha256(content.replace(b'.mjs', b'.js')).hexdigest()
+                        for path, expected in vendor.items():
+                            if extension_digest == expected and digest != expected and not module_path_matches[path]:
+                                extension_matches[path].append(member.name)
                     if re.search(r'^(licen[cs]e|notice|copying|third.party.notices)(\.|$)', pathlib.PurePosixPath(member.name).name, re.I):
                         # Use the content hash as the local name, never an archive-controlled path.
                         target = args.output / (digest + '.txt')
@@ -77,12 +83,15 @@ def main():
     report = dict(sourceRevision=inventory['sourceRevision'], sourceTree=inventory['sourceTree'],
                   packages=results, exactVendorMatches=matches,
                   mermaidModulePathOnlyMatches=module_path_matches,
+                  moduleExtensionOnlyMatches=extension_matches,
                   transformation='Quoted .mjs module paths changed to .js; all other bytes identical to the Git blob.',
+                  extensionTransformation='All .mjs extensions changed to .js, including licence-comment paths or sourceMappingURL; all other bytes identical.',
                   limits='Archive integrity authenticates bytes against registry metadata; does not certify ownership or a complete transitive inventory.')
     (args.output / 'archive-evidence.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(dict(packages=len(results), failed=sum(x['status'] != 'INSPECTED' for x in results),
                           vendorFiles=len(vendor), exactMatches=sum(bool(v) for v in matches.values()),
-                          modulePathOnlyMatches=sum(bool(v) for v in module_path_matches.values()))))
+                          modulePathOnlyMatches=sum(bool(v) for v in module_path_matches.values()),
+                          extensionOnlyMatches=sum(bool(v) for v in extension_matches.values()))))
 
 
 if __name__ == '__main__':

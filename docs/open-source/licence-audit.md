@@ -70,11 +70,18 @@ permission or incompatibility.
 The [archive evidence](evidence/npm-archive-evidence.json) proves 148 of 232 vendor
 files byte-for-byte against upstream npm archives. Another 78 match after changing
 only quoted `.mjs` module paths to `.js`; record these as local modifications.
-The project-generated manifest is separate. Five JavaScript files remain outside
-that reconstruction: three Mermaid chunks (`3SSMPTDK`, `67TQ5CYL`, `7FYTHRHK`),
-DOMPurify 3.4.5 and Highlight.js 11.11.1. Retrieve/review their exact transformation
-recipes, embedded dependencies and original notices before certifying the web
-bundle. Source maps alone do not prove a complete Mammoth/PDF.js/other bundle
+Four more files match after the same extension replacement also covers paths in
+licence comments/sourceMappingURL: three Mermaid chunks (`3SSMPTDK`, `67TQ5CYL`,
+`7FYTHRHK`) and DOMPurify 3.4.5. These are identified local modifications, not
+unexplained code changes. The project-generated manifest is separate.
+
+Highlight.js 11.11.1 remains outside the reconstruction. Its header identifies
+`highlight.js` (not the separate `@highlightjs/cdn-assets` package), jsDelivr,
+Rollup 2.79.2 and Terser 5.39.0. The [observed versioned `+esm` response](evidence/highlight-cdn-comparison.json)
+differs from the vendored bytes, so a live CDN fetch is not immutable build provenance. The
+collector uses the actual `highlight.js` package for licence evidence. Recover the
+exact bundling recipe and embedded notices before certifying this file.
+Source maps alone do not prove a complete Mammoth/PDF.js/other bundle
 transitive closure. No vendor bytes were replaced during this audit.
 
 ## Redistribution findings

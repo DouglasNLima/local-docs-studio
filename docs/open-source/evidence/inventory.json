@@ -1591,34 +1591,6 @@
       "metadataSha256": "3e58f6f1158bd1f98da6d926ff649813091aa6886195c15e3d0a610e7551425d"
     },
     {
-      "name": "@highlightjs/cdn-assets",
-      "version": "11.11.1",
-      "evidence": [
-        "assets/vendor/manifest.json (top-level distribution)"
-      ],
-      "source": "https://registry.npmjs.org/%40highlightjs%2Fcdn-assets/11.11.1",
-      "status": "METADATA_REVIEWED",
-      "licence": "BSD-3-Clause",
-      "repository": {
-        "url": "git://github.com/highlightjs/highlight.js.git",
-        "type": "git"
-      },
-      "dist": {
-        "shasum": "136984ae467865e22080b3a4b65398a086e1ae7b",
-        "tarball": "https://registry.npmjs.org/@highlightjs/cdn-assets/-/cdn-assets-11.11.1.tgz",
-        "fileCount": 908,
-        "integrity": "sha512-VEPdHzwelZ12hEX18BHduqxMZGolcUsrbeokHYxOUIm8X2+M7nx5QPtPeQgRxR9XjhdLv4/7DD5BWOlSrJ3k7Q==",
-        "signatures": [
-          {
-            "sig": "MEUCIESozOwX3UGjYt8tUX0gvD/xVj7qz5wgqap35pCprsRrAiEAz54hHQ5wFu2bALkCv/wHLcm5NYtaCV8P7tcOaOhiMVY=",
-            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
-          }
-        ],
-        "unpackedSize": 4328928
-      },
-      "metadataSha256": "cd79ac236b783fac6243f78043107eab19cc02643f9959d980d913066199c555"
-    },
-    {
       "name": "@iconify/utils",
       "version": "3.0.2",
       "evidence": [
@@ -2698,6 +2670,34 @@
         "unpackedSize": 773398
       },
       "metadataSha256": "7af113aabad77516775b6810b56fa3b92a1e23d8d99c3aff89f4d29b4563d12d"
+    },
+    {
+      "name": "highlight.js",
+      "version": "11.11.1",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/highlight.js/11.11.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git://github.com/highlightjs/highlight.js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "fca06fa0e5aeecf6c4d437239135fabc15213585",
+        "tarball": "https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz",
+        "fileCount": 1559,
+        "integrity": "sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==",
+        "signatures": [
+          {
+            "sig": "MEUCIHlIe8qR36z0+FijmZQcuymrxIlAM9lNXkL135OJol0HAiEAkvLmKixJgAs+LjRnr5ydwPQev2Vslq/YdjqYUSFCUY8=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 5433042
+      },
+      "metadataSha256": "c9e6f849f21285caf86dca18c57d504d0d0abc30252ece0ac80a6577e87c2be0"
     },
     {
       "name": "internmap",

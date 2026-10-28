@@ -158,7 +158,7 @@ def main():
                     name, version = pinned.rsplit('@', 1)
                     npm[(name.replace('+', '/'), version)].add(path)
     # Top-level browser distribution versions are explicit in the tracked filenames.
-    web = [('dompurify', '3.4.5'), ('fflate', '0.8.2'), ('@highlightjs/cdn-assets', '11.11.1'),
+    web = [('dompurify', '3.4.5'), ('fflate', '0.8.2'), ('highlight.js', '11.11.1'),
            ('katex', '0.16.25'), ('mammoth', '1.12.0'), ('marked', '16.4.2'),
            ('mermaid', '11.15.0'), ('pdfjs-dist', '5.7.284')]
     for name, version in web:

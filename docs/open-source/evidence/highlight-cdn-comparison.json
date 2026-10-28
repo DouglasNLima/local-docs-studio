@@ -1,0 +1,13 @@
+[
+  {
+    "source": "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/+esm",
+    "sha256": "aa69b326953d482964d7d541de714c636446ac1e83bc4e31c079d8125f038835",
+    "baselineByteMatch": false,
+    "observedDate": "2026-10-28",
+    "baselineRevision": "5c61d17966befee665856a7993cb174252df5214",
+    "baselinePath": "assets/vendor/highlight-11.11.1.esm.js",
+    "baselineSha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0",
+    "baselineBytes": 955998,
+    "limits": "A mutable versioned CDN response is a comparison, not the original bundle build recipe or immutable provenance."
+  }
+]

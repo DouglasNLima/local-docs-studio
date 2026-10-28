@@ -23,8 +23,9 @@ update that list when dependency pins change. It is not an automatic complete SB
 
 `verify_npm_archives.py` validates exact registry archives, reads tar members without
 extracting or executing them, preserves notice bytes under digest filenames and
-compares vendored Git blob hashes. The only recorded Mermaid transformation changes
-quoted `.mjs` paths to `.js`. Unmatched files remain unresolved. Inspect the error
+compares vendored Git blob hashes. Recorded transformations change quoted Mermaid
+`.mjs` paths to `.js`, or all `.mjs` extensions including licence-comment/source-map
+paths in Mermaid/DOMPurify. Unmatched files remain unresolved. Inspect the error
 and coverage fields before interpreting the process exit code; a completed
 inventory may contain missing metadata or failed inspections.
 
