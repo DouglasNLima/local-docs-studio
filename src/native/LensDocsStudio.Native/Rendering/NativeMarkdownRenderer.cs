@@ -157,7 +157,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             panel.Children.Add(image);
                             diagramMedia = new(image, image.MaxHeight, actions); media.Add(diagramMedia);
                         }
-                        catch (Exception ex) when (ex is not OutOfMemoryException)
+                        catch (Exception ex) when (ex is not OutOfMemoryException && ex is not OperationCanceledException)
                         {
                             diagramFailure = "Native diagram rendering failed: " + ex.Message;
                         }

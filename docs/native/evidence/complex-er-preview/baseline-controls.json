@@ -1,0 +1,278 @@
+[
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 412.9579,
+    "CpuMs": 187.5,
+    "Allocated": 10684128,
+    "PeakWorkingSet64": 49750016,
+    "PrivateMemorySize64": 19939328,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 51.9621,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 298712
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 292.5952,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 8401096
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 44.3392,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1513920
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 398.39,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10508728
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.428,
+    "CpuMs": 0,
+    "Allocated": 82000,
+    "PeakWorkingSet64": 52723712,
+    "PrivateMemorySize64": 20127744,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 28.154,
+    "CpuMs": 31.25,
+    "Allocated": 10413696,
+    "PeakWorkingSet64": 55783424,
+    "PrivateMemorySize64": 23240704,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.6357,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 244448
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 22.139,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 8384464
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 4.9498,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1441024
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 28.0261,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10330976
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-assignment.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0683,
+    "CpuMs": 0,
+    "Allocated": 82000,
+    "PeakWorkingSet64": 55783424,
+    "PrivateMemorySize64": 23240704,
+    "Entities": 11,
+    "Relationships": 21,
+    "Attributes": 82,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 0,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 24.2761,
+    "CpuMs": 15.625,
+    "Allocated": 12656280,
+    "PeakWorkingSet64": 56033280,
+    "PrivateMemorySize64": 23601152,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.6216,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 271232
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 18.1362,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10459776
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 5.1125,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1546416
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 24.1183,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 12570896
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 1,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0796,
+    "CpuMs": 0,
+    "Allocated": 90200,
+    "PeakWorkingSet64": 56033280,
+    "PrivateMemorySize64": 23601152,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": []
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 2,
+    "Cache": false,
+    "Success": true,
+    "Error": null,
+    "Ms": 34.1612,
+    "CpuMs": 31.25,
+    "Allocated": 12662056,
+    "PeakWorkingSet64": 57159680,
+    "PrivateMemorySize64": 24797184,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": [
+      {
+        "OperationName": "renderer.parse-before-layout",
+        "Ms": 0.6048,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 271232
+        }
+      },
+      {
+        "OperationName": "renderer.layout.ER",
+        "Ms": 18.711,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 10459776
+        }
+      },
+      {
+        "OperationName": "renderer.svg-after-layout",
+        "Ms": 14.4992,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 1546416
+        }
+      },
+      {
+        "OperationName": "renderer.pipeline",
+        "Ms": 34.067,
+        "Tags": {
+          "thread.start": 2,
+          "thread.end": 2,
+          "allocated.current-thread.bytes": 12570896
+        }
+      }
+    ]
+  },
+  {
+    "Name": "workflow-definitions.mmd",
+    "Run": 3,
+    "Cache": true,
+    "Success": true,
+    "Error": null,
+    "Ms": 0.0843,
+    "CpuMs": 0,
+    "Allocated": 90200,
+    "PeakWorkingSet64": 57159680,
+    "PrivateMemorySize64": 24797184,
+    "Entities": 12,
+    "Relationships": 20,
+    "Attributes": 97,
+    "Phases": []
+  }
+]

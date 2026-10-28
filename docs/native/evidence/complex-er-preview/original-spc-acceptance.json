@@ -1,0 +1,1012 @@
+{
+  "Provenance": "Original private acceptance archive supplied by the user; only allowlisted aggregate measurements are public. No original source, names, hashes, geometry coordinates, screenshots or paths are included.",
+  "BaselineCommit": "44c8b994e10e2e6c591a27f8e870372833ecc87c",
+  "BaselineTree": "7e3fd129b5f2f08c4a6c27bb89146ff9857fcf41",
+  "ProductSourceBlob": "b3db33e0e54bc34c7afd0ebd6adce84d1c2f791b",
+  "TestedSource": "Routing correction committed alongside this report; final commit/tree and hosted outcomes are recorded in the PR addendum.",
+  "Method": "Three fresh processes per case, each with one process-cold render, two warm uncached renders and one cache hit. Native conversion/export follows the first render. Phase timings are inclusive, not additive. UI timings include real WPF layout and private screenshot capture.",
+  "Cases": [
+    {
+      "Case": "complete-relationships",
+      "Source": {
+        "Entities": 39,
+        "Relationships": 115,
+        "Attributes": 0,
+        "MaximumDegree": 22,
+        "SelfRelationships": 3,
+        "ParallelEndpointGroups": 6,
+        "ArchiveManifestHashMatch": true,
+        "MatchesOriginalMarkdown": true
+      },
+      "ColdMilliseconds": [
+        605.8178,
+        610.3524,
+        632.5327
+      ],
+      "WarmUncachedMilliseconds": [
+        211.4257,
+        183.3974,
+        228.6049,
+        193.9858,
+        224.4066,
+        197.544
+      ],
+      "CacheMilliseconds": [
+        0.4111,
+        0.4736,
+        0.4259
+      ],
+      "ColdCpuMilliseconds": [
+        609.375,
+        593.75,
+        609.375
+      ],
+      "ColdAllocatedBytes": [
+        86763944,
+        86749744,
+        86762080
+      ],
+      "ColdRendererPeakWorkingSetBytes": [
+        61140992,
+        61358080,
+        61190144
+      ],
+      "PeakNativeExportProcessBytes": 352235520.0,
+      "RenderFailures": 0,
+      "BeforeRouteBodyIntersections": 0,
+      "AfterRouteBodyIntersections": 0.0,
+      "LabelEntityIntersections": 0,
+      "CompleteSourceSemanticsExportsInspection": true,
+      "CanonicalSvgRepeatedEqual": true,
+      "FirstColdPhaseMilliseconds": [
+        {
+          "Phase": "renderer.parse-before-layout",
+          "Milliseconds": 37.8203
+        },
+        {
+          "Phase": "renderer.ER.sugiyama-layout-routing",
+          "Milliseconds": 462.1863
+        },
+        {
+          "Phase": "renderer.layout.ER",
+          "Milliseconds": 509.3549
+        },
+        {
+          "Phase": "renderer.svg-after-layout",
+          "Milliseconds": 42.1762
+        },
+        {
+          "Phase": "renderer.pipeline",
+          "Milliseconds": 597.0083
+        },
+        {
+          "Phase": "svg.sanitisation",
+          "Milliseconds": 21.9642
+        },
+        {
+          "Phase": "native.sharpvectors.read",
+          "Milliseconds": 323.9606
+        },
+        {
+          "Phase": "native.wpf.drawing-freeze",
+          "Milliseconds": 6.1084
+        },
+        {
+          "Phase": "geometry.correspondence.Er",
+          "Milliseconds": 6.2196
+        }
+      ],
+      "ShownUi": {
+        "Status": "PASS",
+        "Checks": 484,
+        "Measurements": [
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Original initial",
+            "Milliseconds": 1312.4179,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 48,
+            "MaximumInputGapMilliseconds": 93.23829999999998,
+            "CpuMilliseconds": 1468.75,
+            "AllocatedBytes": 182641072,
+            "PeakWorkingSet64": 356794368
+          },
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 122.0554,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Original initial",
+            "Milliseconds": 431.6044,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 16,
+            "MaximumInputGapMilliseconds": 46.9083,
+            "CpuMilliseconds": 593.75,
+            "AllocatedBytes": 174857968,
+            "PeakWorkingSet64": 416071680
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 148.8767,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          }
+        ]
+      },
+      "Lifecycle": {
+        "Status": "PASS",
+        "ActiveCancellation": true,
+        "RetryAfterCancellation": true,
+        "DeadlineClassification": "Deadline",
+        "RetryAfterDeadline": true,
+        "ControlledDeadlineHoldMilliseconds": 6250,
+        "ObservedDeadlineMilliseconds": 6274.327,
+        "Note": "Controlled diagnostic hold tests the unchanged six-second budget; this is not a naturally occurring timeout or a performance measurement."
+      }
+    },
+    {
+      "Case": "complete-detailed",
+      "Source": {
+        "Entities": 39,
+        "Relationships": 115,
+        "Attributes": 284,
+        "MaximumDegree": 22,
+        "SelfRelationships": 3,
+        "ParallelEndpointGroups": 6,
+        "ArchiveManifestHashMatch": true,
+        "MatchesOriginalMarkdown": false
+      },
+      "ColdMilliseconds": [
+        550.7434,
+        652.9709,
+        579.4449
+      ],
+      "WarmUncachedMilliseconds": [
+        205.5717,
+        191.5303,
+        234.6672,
+        200.9605,
+        236.3346,
+        207.4123
+      ],
+      "CacheMilliseconds": [
+        0.2134,
+        0.2015,
+        0.1783
+      ],
+      "ColdCpuMilliseconds": [
+        562.5,
+        671.875,
+        578.125
+      ],
+      "ColdAllocatedBytes": [
+        90197392,
+        90185056,
+        90184992
+      ],
+      "ColdRendererPeakWorkingSetBytes": [
+        62537728,
+        62861312,
+        62836736
+      ],
+      "PeakNativeExportProcessBytes": 573722624.0,
+      "RenderFailures": 0,
+      "BeforeRouteBodyIntersections": 2,
+      "AfterRouteBodyIntersections": 0.0,
+      "LabelEntityIntersections": 0,
+      "CompleteSourceSemanticsExportsInspection": true,
+      "CanonicalSvgRepeatedEqual": true,
+      "FirstColdPhaseMilliseconds": [
+        {
+          "Phase": "renderer.parse-before-layout",
+          "Milliseconds": 40.0259
+        },
+        {
+          "Phase": "renderer.ER.sugiyama-layout-routing",
+          "Milliseconds": 378.918
+        },
+        {
+          "Phase": "renderer.layout.ER",
+          "Milliseconds": 430.1927
+        },
+        {
+          "Phase": "renderer.svg-after-layout",
+          "Milliseconds": 64.7385
+        },
+        {
+          "Phase": "renderer.pipeline",
+          "Milliseconds": 541.6845
+        },
+        {
+          "Phase": "svg.sanitisation",
+          "Milliseconds": 56.9333
+        },
+        {
+          "Phase": "native.sharpvectors.read",
+          "Milliseconds": 1339.4805
+        },
+        {
+          "Phase": "native.wpf.drawing-freeze",
+          "Milliseconds": 52.3845
+        },
+        {
+          "Phase": "geometry.correspondence.Er",
+          "Milliseconds": 10.2563
+        }
+      ],
+      "ShownUi": {
+        "Status": "PASS",
+        "Checks": 484,
+        "Measurements": [
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Original initial",
+            "Milliseconds": 2791.7985,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 99,
+            "MaximumInputGapMilliseconds": 265.0344,
+            "CpuMilliseconds": 3390.625,
+            "AllocatedBytes": 600487480,
+            "PeakWorkingSet64": 449302528
+          },
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 276.5572,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Original initial",
+            "Milliseconds": 1411.8696,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 55,
+            "MaximumInputGapMilliseconds": 46.8065,
+            "CpuMilliseconds": 1984.375,
+            "AllocatedBytes": 522738216,
+            "PeakWorkingSet64": 552796160
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 225.7455,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          }
+        ]
+      },
+      "Lifecycle": {
+        "Status": "PASS",
+        "ActiveCancellation": true,
+        "RetryAfterCancellation": true,
+        "DeadlineClassification": "Deadline",
+        "RetryAfterDeadline": true,
+        "ControlledDeadlineHoldMilliseconds": 6250,
+        "ObservedDeadlineMilliseconds": 6277.9345,
+        "Note": "Controlled diagnostic hold tests the unchanged six-second budget; this is not a naturally occurring timeout or a performance measurement."
+      }
+    },
+    {
+      "Case": "operations",
+      "Source": {
+        "Entities": 22,
+        "Relationships": 68,
+        "Attributes": 195,
+        "MaximumDegree": 16,
+        "SelfRelationships": 2,
+        "ParallelEndpointGroups": 2,
+        "ArchiveManifestHashMatch": true,
+        "MatchesOriginalMarkdown": true
+      },
+      "ColdMilliseconds": [
+        385.046,
+        383.0328,
+        395.7308
+      ],
+      "WarmUncachedMilliseconds": [
+        222.5985,
+        184.9803,
+        216.3106,
+        202.2912,
+        230.2766,
+        199.3842
+      ],
+      "CacheMilliseconds": [
+        0.1809,
+        0.1968,
+        0.1679
+      ],
+      "ColdCpuMilliseconds": [
+        375,
+        390.625,
+        390.625
+      ],
+      "ColdAllocatedBytes": [
+        49336128,
+        49323792,
+        49323792
+      ],
+      "ColdRendererPeakWorkingSetBytes": [
+        59916288,
+        60035072,
+        60211200
+      ],
+      "PeakNativeExportProcessBytes": 449449984.0,
+      "RenderFailures": 0,
+      "BeforeRouteBodyIntersections": 6,
+      "AfterRouteBodyIntersections": 0.0,
+      "LabelEntityIntersections": 0,
+      "CompleteSourceSemanticsExportsInspection": true,
+      "CanonicalSvgRepeatedEqual": true,
+      "FirstColdPhaseMilliseconds": [
+        {
+          "Phase": "renderer.parse-before-layout",
+          "Milliseconds": 39.3717
+        },
+        {
+          "Phase": "renderer.ER.sugiyama-layout-routing",
+          "Milliseconds": 210.3905
+        },
+        {
+          "Phase": "renderer.layout.ER",
+          "Milliseconds": 276.6622
+        },
+        {
+          "Phase": "renderer.svg-after-layout",
+          "Milliseconds": 52.6747
+        },
+        {
+          "Phase": "renderer.pipeline",
+          "Milliseconds": 376.1929
+        },
+        {
+          "Phase": "svg.sanitisation",
+          "Milliseconds": 32.6625
+        },
+        {
+          "Phase": "native.sharpvectors.read",
+          "Milliseconds": 964.4108
+        },
+        {
+          "Phase": "native.wpf.drawing-freeze",
+          "Milliseconds": 48.4879
+        },
+        {
+          "Phase": "geometry.correspondence.Er",
+          "Milliseconds": 7.3194
+        }
+      ],
+      "ShownUi": {
+        "Status": "PASS",
+        "Checks": 296,
+        "Measurements": [
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Original initial",
+            "Milliseconds": 1782.798,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 61,
+            "MaximumInputGapMilliseconds": 199.9094,
+            "CpuMilliseconds": 2078.125,
+            "AllocatedBytes": 381362200,
+            "PeakWorkingSet64": 405745664
+          },
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 212.8876,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Original initial",
+            "Milliseconds": 1193.4161,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 47,
+            "MaximumInputGapMilliseconds": 47.13810000000001,
+            "CpuMilliseconds": 1578.125,
+            "AllocatedBytes": 329927704,
+            "PeakWorkingSet64": 488681472
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 124.1597,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          }
+        ]
+      },
+      "Lifecycle": {
+        "Status": "PASS",
+        "ActiveCancellation": true,
+        "RetryAfterCancellation": true,
+        "DeadlineClassification": "Deadline",
+        "RetryAfterDeadline": true,
+        "ControlledDeadlineHoldMilliseconds": 6250,
+        "ObservedDeadlineMilliseconds": 6274.4064,
+        "Note": "Controlled diagnostic hold tests the unchanged six-second budget; this is not a naturally occurring timeout or a performance measurement."
+      }
+    },
+    {
+      "Case": "monitoring",
+      "Source": {
+        "Entities": 13,
+        "Relationships": 46,
+        "Attributes": 138,
+        "MaximumDegree": 10,
+        "SelfRelationships": 3,
+        "ParallelEndpointGroups": 1,
+        "ArchiveManifestHashMatch": true,
+        "MatchesOriginalMarkdown": true
+      },
+      "ColdMilliseconds": [
+        224.2096,
+        228.9799,
+        231.5918
+      ],
+      "WarmUncachedMilliseconds": [
+        63.317,
+        47.8547,
+        69.5558,
+        50.3522,
+        77.1464,
+        55.3895
+      ],
+      "CacheMilliseconds": [
+        0.1784,
+        0.1676,
+        0.1779
+      ],
+      "ColdCpuMilliseconds": [
+        218.75,
+        234.375,
+        234.375
+      ],
+      "ColdAllocatedBytes": [
+        14518088,
+        14524776,
+        14526560
+      ],
+      "ColdRendererPeakWorkingSetBytes": [
+        57458688,
+        57565184,
+        57495552
+      ],
+      "PeakNativeExportProcessBytes": 564830208.0,
+      "RenderFailures": 0,
+      "BeforeRouteBodyIntersections": 0,
+      "AfterRouteBodyIntersections": 0.0,
+      "LabelEntityIntersections": 0,
+      "CompleteSourceSemanticsExportsInspection": true,
+      "CanonicalSvgRepeatedEqual": true,
+      "FirstColdPhaseMilliseconds": [
+        {
+          "Phase": "renderer.parse-before-layout",
+          "Milliseconds": 41.6544
+        },
+        {
+          "Phase": "renderer.ER.sugiyama-layout-routing",
+          "Milliseconds": 63.9825
+        },
+        {
+          "Phase": "renderer.layout.ER",
+          "Milliseconds": 113.8691
+        },
+        {
+          "Phase": "renderer.svg-after-layout",
+          "Milliseconds": 52.1359
+        },
+        {
+          "Phase": "renderer.pipeline",
+          "Milliseconds": 215.9813
+        },
+        {
+          "Phase": "svg.sanitisation",
+          "Milliseconds": 26.252
+        },
+        {
+          "Phase": "native.sharpvectors.read",
+          "Milliseconds": 718.0239
+        },
+        {
+          "Phase": "native.wpf.drawing-freeze",
+          "Milliseconds": 41.8195
+        },
+        {
+          "Phase": "geometry.correspondence.Er",
+          "Milliseconds": 4.7521
+        }
+      ],
+      "ShownUi": {
+        "Status": "PASS",
+        "Checks": 208,
+        "Measurements": [
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Original initial",
+            "Milliseconds": 1365.2083,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 47,
+            "MaximumInputGapMilliseconds": 176.49529999999982,
+            "CpuMilliseconds": 1593.75,
+            "AllocatedBytes": 243963992,
+            "PeakWorkingSet64": 386514944
+          },
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 186.5008,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Original initial",
+            "Milliseconds": 829.8609,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 34,
+            "MaximumInputGapMilliseconds": 39.1515,
+            "CpuMilliseconds": 1015.625,
+            "AllocatedBytes": 207982288,
+            "PeakWorkingSet64": 453083136
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 125.1003,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          }
+        ]
+      },
+      "Lifecycle": {
+        "Status": "PASS",
+        "ActiveCancellation": true,
+        "RetryAfterCancellation": true,
+        "DeadlineClassification": "Deadline",
+        "RetryAfterDeadline": true,
+        "ControlledDeadlineHoldMilliseconds": 6250,
+        "ObservedDeadlineMilliseconds": 6274.4822,
+        "Note": "Controlled diagnostic hold tests the unchanged six-second budget; this is not a naturally occurring timeout or a performance measurement."
+      }
+    },
+    {
+      "Case": "workflow-assignment",
+      "Source": {
+        "Entities": 11,
+        "Relationships": 21,
+        "Attributes": 82,
+        "MaximumDegree": 9,
+        "SelfRelationships": 0,
+        "ParallelEndpointGroups": 0,
+        "ArchiveManifestHashMatch": true,
+        "MatchesOriginalMarkdown": true
+      },
+      "ColdMilliseconds": [
+        492.948,
+        515.2853,
+        500.7176
+      ],
+      "WarmUncachedMilliseconds": [
+        156.8202,
+        136.4063,
+        161.5301,
+        133.4227,
+        200.5679,
+        171.7415
+      ],
+      "CacheMilliseconds": [
+        0.5035,
+        0.5137,
+        0.6325
+      ],
+      "ColdCpuMilliseconds": [
+        515.625,
+        531.25,
+        500
+      ],
+      "ColdAllocatedBytes": [
+        87383584,
+        87383584,
+        87383584
+      ],
+      "ColdRendererPeakWorkingSetBytes": [
+        58724352,
+        58912768,
+        58810368
+      ],
+      "PeakNativeExportProcessBytes": 344870912.0,
+      "RenderFailures": 0,
+      "BeforeRouteBodyIntersections": 5,
+      "AfterRouteBodyIntersections": 0.0,
+      "LabelEntityIntersections": 0,
+      "CompleteSourceSemanticsExportsInspection": true,
+      "CanonicalSvgRepeatedEqual": true,
+      "FirstColdPhaseMilliseconds": [
+        {
+          "Phase": "renderer.parse-before-layout",
+          "Milliseconds": 39.0086
+        },
+        {
+          "Phase": "renderer.ER.sugiyama-layout-routing",
+          "Milliseconds": 337.3733
+        },
+        {
+          "Phase": "renderer.layout.ER",
+          "Milliseconds": 398.7576
+        },
+        {
+          "Phase": "renderer.svg-after-layout",
+          "Milliseconds": 39.544
+        },
+        {
+          "Phase": "renderer.pipeline",
+          "Milliseconds": 485.119
+        },
+        {
+          "Phase": "svg.sanitisation",
+          "Milliseconds": 17.6925
+        },
+        {
+          "Phase": "native.sharpvectors.read",
+          "Milliseconds": 444.0032
+        },
+        {
+          "Phase": "native.wpf.drawing-freeze",
+          "Milliseconds": 11.2776
+        },
+        {
+          "Phase": "geometry.correspondence.Er",
+          "Milliseconds": 2.8458
+        }
+      ],
+      "ShownUi": {
+        "Status": "PASS",
+        "Checks": 108,
+        "Measurements": [
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Original initial",
+            "Milliseconds": 1249.7262,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 42,
+            "MaximumInputGapMilliseconds": 192.3538000000001,
+            "CpuMilliseconds": 1328.125,
+            "AllocatedBytes": 222326704,
+            "PeakWorkingSet64": 366575616
+          },
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 80.0976,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Original initial",
+            "Milliseconds": 547.6719,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 20,
+            "MaximumInputGapMilliseconds": 46.788400000000024,
+            "CpuMilliseconds": 687.5,
+            "AllocatedBytes": 200194144,
+            "PeakWorkingSet64": 419672064
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 151.3079,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          }
+        ]
+      },
+      "Lifecycle": {
+        "Status": "PASS",
+        "ActiveCancellation": true,
+        "RetryAfterCancellation": true,
+        "DeadlineClassification": "Deadline",
+        "RetryAfterDeadline": true,
+        "ControlledDeadlineHoldMilliseconds": 6250,
+        "ObservedDeadlineMilliseconds": 6269.2312,
+        "Note": "Controlled diagnostic hold tests the unchanged six-second budget; this is not a naturally occurring timeout or a performance measurement."
+      }
+    },
+    {
+      "Case": "workflow-definitions",
+      "Source": {
+        "Entities": 12,
+        "Relationships": 20,
+        "Attributes": 97,
+        "MaximumDegree": 8,
+        "SelfRelationships": 0,
+        "ParallelEndpointGroups": 4,
+        "ArchiveManifestHashMatch": true,
+        "MatchesOriginalMarkdown": true
+      },
+      "ColdMilliseconds": [
+        242.0146,
+        236.5606,
+        271.8965
+      ],
+      "WarmUncachedMilliseconds": [
+        78.2694,
+        68.3658,
+        77.5695,
+        71.1369,
+        98.7919,
+        102.1067
+      ],
+      "CacheMilliseconds": [
+        0.1836,
+        0.2048,
+        0.3164
+      ],
+      "ColdCpuMilliseconds": [
+        234.375,
+        234.375,
+        265.625
+      ],
+      "ColdAllocatedBytes": [
+        21043424,
+        21043424,
+        21031088
+      ],
+      "ColdRendererPeakWorkingSetBytes": [
+        54800384,
+        55001088,
+        54759424
+      ],
+      "PeakNativeExportProcessBytes": 335134720.0,
+      "RenderFailures": 0,
+      "BeforeRouteBodyIntersections": 2,
+      "AfterRouteBodyIntersections": 0.0,
+      "LabelEntityIntersections": 0,
+      "CompleteSourceSemanticsExportsInspection": true,
+      "CanonicalSvgRepeatedEqual": true,
+      "FirstColdPhaseMilliseconds": [
+        {
+          "Phase": "renderer.parse-before-layout",
+          "Milliseconds": 38.4485
+        },
+        {
+          "Phase": "renderer.ER.sugiyama-layout-routing",
+          "Milliseconds": 95.277
+        },
+        {
+          "Phase": "renderer.layout.ER",
+          "Milliseconds": 145.4416
+        },
+        {
+          "Phase": "renderer.svg-after-layout",
+          "Milliseconds": 39.4128
+        },
+        {
+          "Phase": "renderer.pipeline",
+          "Milliseconds": 232.157
+        },
+        {
+          "Phase": "svg.sanitisation",
+          "Milliseconds": 20.3175
+        },
+        {
+          "Phase": "native.sharpvectors.read",
+          "Milliseconds": 464.5907
+        },
+        {
+          "Phase": "native.wpf.drawing-freeze",
+          "Milliseconds": 10.9655
+        },
+        {
+          "Phase": "geometry.correspondence.Er",
+          "Milliseconds": 3.4256
+        }
+      ],
+      "ShownUi": {
+        "Status": "PASS",
+        "Checks": 104,
+        "Measurements": [
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Original initial",
+            "Milliseconds": 1112.4877,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 36,
+            "MaximumInputGapMilliseconds": 146.92549999999994,
+            "CpuMilliseconds": 1359.375,
+            "AllocatedBytes": 171202032,
+            "PeakWorkingSet64": 369795072
+          },
+          {
+            "theme": "Light",
+            "mode": "Continuous",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 120.0745,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Original initial",
+            "Milliseconds": 621.5511,
+            "VisibleRing": true,
+            "Warnings": 0,
+            "UiPulses": 24,
+            "MaximumInputGapMilliseconds": 47.41919999999996,
+            "CpuMilliseconds": 796.875,
+            "AllocatedBytes": 146277088,
+            "PeakWorkingSet64": 425578496
+          },
+          {
+            "theme": "Dark",
+            "mode": "Pages",
+            "Scenario": "Same-source warm refresh",
+            "Milliseconds": 145.6472,
+            "VisibleRing": null,
+            "Warnings": null,
+            "UiPulses": null,
+            "MaximumInputGapMilliseconds": null,
+            "CpuMilliseconds": null,
+            "AllocatedBytes": null,
+            "PeakWorkingSet64": null
+          }
+        ]
+      },
+      "Lifecycle": {
+        "Status": "PASS",
+        "ActiveCancellation": true,
+        "RetryAfterCancellation": true,
+        "DeadlineClassification": "Deadline",
+        "RetryAfterDeadline": true,
+        "ControlledDeadlineHoldMilliseconds": 6250,
+        "ObservedDeadlineMilliseconds": 6276.5293,
+        "Note": "Controlled diagnostic hold tests the unchanged six-second budget; this is not a naturally occurring timeout or a performance measurement."
+      }
+    }
+  ],
+  "OriginalMarkdownUi": {
+    "Status": "PASS",
+    "rows": [
+      {
+        "theme": "Light",
+        "mode": "Continuous",
+        "Scenario": "Original initial",
+        "Milliseconds": 4525.7811,
+        "VisibleRing": true,
+        "Warnings": 0,
+        "UiPulses": 162,
+        "MaximumInputGapMilliseconds": 461.3959,
+        "CpuMilliseconds": 6031.25,
+        "AllocatedBytes": 1165188848,
+        "PeakWorkingSet64": 513642496
+      },
+      {
+        "theme": "Light",
+        "mode": "Continuous",
+        "Scenario": "Same-source warm refresh",
+        "Milliseconds": 601.0483
+      },
+      {
+        "theme": "Dark",
+        "mode": "Pages",
+        "Scenario": "Original initial",
+        "Milliseconds": 3891.5487,
+        "VisibleRing": true,
+        "Warnings": 0,
+        "UiPulses": 151,
+        "MaximumInputGapMilliseconds": 60.54979999999978,
+        "CpuMilliseconds": 5203.125,
+        "AllocatedBytes": 1056038304,
+        "PeakWorkingSet64": 569180160
+      },
+      {
+        "theme": "Dark",
+        "mode": "Pages",
+        "Scenario": "Same-source warm refresh",
+        "Milliseconds": 516.1277
+      }
+    ]
+  },
+  "ControlledDeadlineUi": {
+    "Status": "PASS",
+    "ControlledHoldMilliseconds": 6250,
+    "DeadlineMilliseconds": 6514.2763
+  }
+}

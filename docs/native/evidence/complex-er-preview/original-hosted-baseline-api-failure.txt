@@ -1,0 +1,2 @@
+Unhandled exception. System.MissingMethodException: Method not found: 'Byte[] LensDocsStudio.Native.Rendering.NativeSvgService.ToExportPng(System.Windows.Media.ImageSource)'.
+   at LensDocsStudio.Native.Validation.Program.Main(String[] args)

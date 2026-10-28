@@ -435,12 +435,16 @@
        <Button Click="ToggleOutline" ToolTip="Toggle outline (Ctrl+Alt+O)" AutomationProperties.Name="Toggle outline"><ui:CommandIcon Kind="Outline"/></Button>
        <Button Click="FindPreviewFromToolbar" ToolTip="Find in preview" AutomationProperties.Name="Find in preview"><ui:CommandIcon Kind="Search"/></Button>
        <Button Click="CopyRenderedContent" ToolTip="Copy rendered content" AutomationProperties.Name="Copy rendered content"><ui:CommandIcon Kind="Document"/></Button>
+       <Button Click="RetryPreview" ToolTip="Retry the current preview" AutomationProperties.Name="Retry preview" AutomationProperties.AutomationId="RetryPreview">Retry preview</Button>
       </ToolBar>
-      <AdornerDecorator>
+      <Grid Background="{DynamicResource WindowBrush}">
+      <AdornerDecorator x:Name="PreviewContentHost">
      <rendering:DocumentPreview x:Name="Preview" Style="{StaticResource DocumentPreviewStyle}"
        Background="{DynamicResource WindowBrush}" GotKeyboardFocus="PreviewFocused" PreviewMouseDown="OnPreviewMouseDown"
        AutomationProperties.Name="Document preview" AutomationProperties.AutomationId="DocumentPreview"/>
       </AdornerDecorator>
+      <rendering:PreviewLoadingView x:Name="PreviewLoading"/>
+      </Grid>
      </DockPanel>
      <GridSplitter x:Name="OutlineSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize outline"/>
      <DockPanel x:Name="OutlinePanel" Grid.Column="4" Background="{DynamicResource PanelBrush}">

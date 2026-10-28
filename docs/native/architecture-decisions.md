@@ -1,5 +1,15 @@
 # Native architecture decisions
 
+## Original SPC acceptance - 28 October 2026
+
+The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
+
+## Complex ER and preview loading - 27 October 2026
+
+Keep Mermaider/Sugiyama 0.15.1 and the existing parser/SVG pipeline. Adapt the pinned ER adapter to expose cancellation, its expanded-node bound and deterministic dense-graph search without 160 repeated restarts. Exact small-graph geometry remains covered. Measured shown-WPF cost justifies six seconds for ER; other deadlines remain three seconds. Source attribution ships with packages. Success and deterministic authoring errors are cacheable; deadlines/layout/SVG/conversion failures are retryable and never cached as failures.
+
+Preview loading uses a separate generation/context state model driven by pipeline transitions. One presentation-only timer handles 200 ms visibility alongside the existing debounce; native transform animation adds no render requests. [Measurements and trade-offs](complex-er-preview-loading.md). No browser runtime or new rendering engine is introduced.
+
 ## Native desktop UX refinements - 27 October 2026
 
 Caption theming, bidirectional Find/counters, direct diagram panning, verified ER/Flowchart inspection and preview zoom are implemented from develop `0df86ad`, with local native runtime and regression evidence. See the [source-labelled implementation and validation receipt](native-desktop-ux-refinements.md). Final acceptance and hosted CI remain pending; existing release and paused-PR boundaries are unchanged.

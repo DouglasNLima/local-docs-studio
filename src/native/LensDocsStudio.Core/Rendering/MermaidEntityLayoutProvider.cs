@@ -6,7 +6,7 @@ namespace LensDocsStudio.Core.Rendering;
 
 /// <summary>Decode portable Mermaid numeric escapes after parsing, before the existing layout and SVG renderer.
 /// This avoids turning escaped delimiters into syntax, and keeps preview/export text and measurements consistent.</summary>
-internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider inner) : IGraphLayoutProvider
+internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider inner, CancellationToken cancellationToken = default) : IGraphLayoutProvider
 {
     internal Action? BeforeLayout { get; set; }
     internal Action? AfterLayout { get; set; }
@@ -79,7 +79,10 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
         // Capture this render's inputs and output; never run a second layout to infer identities.
         static IReadOnlyList<ErAttributeInfo> Attributes(IReadOnlyList<ErAttributeInfo> values) => Array.AsReadOnly(values.Select(value => value with { Keys = Array.AsReadOnly(value.Keys.ToArray()) }).ToArray());
         ErSemantics = diagram with { Entities = Array.AsReadOnly(diagram.Entities.Select(entity => entity with { Attributes = Attributes(entity.Attributes) }).ToArray()), Relationships = Array.AsReadOnly(diagram.Relationships.ToArray()) };
-        var positioned = inner.LayoutEr(diagram);
+        // 160 random restarts repeatedly run quadratic insertion refinement. The measured
+        // dense cases use one deterministic search; small diagrams retain pinned geometry.
+        var positioned = BoundedErLayout.Layout(diagram, inner, cancellationToken,
+            diagram.Entities.Count <= 12 && diagram.Relationships.Count <= 24 ? 160 : 0);
         ErLayout = positioned with { Entities = Array.AsReadOnly(positioned.Entities.Select(entity => entity with { Attributes = Attributes(entity.Attributes) }).ToArray()),
             Relationships = Array.AsReadOnly(positioned.Relationships.Select(relationship => relationship with { Points = Array.AsReadOnly(relationship.Points.ToArray()) }).ToArray()) };
         layoutPhase?.Dispose(); AfterLayout?.Invoke();

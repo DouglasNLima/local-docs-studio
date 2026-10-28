@@ -53,10 +53,19 @@ internal static partial class NativeUiChecks
                 var openMs = timer.Elapsed.TotalMilliseconds;
                 Find(visual!, "ErSourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); timer.Restart();
                 for (var i = 0; i < 20; i++) Find(visual!, "ErCanvas_entity:E" + (i % entities)).Patterns.SelectionItem.Pattern.Select(); var entityMs = timer.Elapsed.TotalMilliseconds;
-                var targets = visual!.FindAllDescendants().Where(item => (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("ErCanvas_", StringComparison.Ordinal)).ToArray();
-                var rows = targets.Where(item => item.Name.Contains(" · attribute ", StringComparison.Ordinal)).ToArray();
-                var edges = targets.Where(item => item.Name.StartsWith("Relationship ", StringComparison.Ordinal)).ToArray();
-                if (rows.Length != entities * 2 || edges.Length != relationships) throw new IOException("ER native performance targets do not match exact source occurrences.");
+                AutomationElement[] rows = [], edges = []; var targetObservations = 0;
+                // Selection updates the inspector's UIA subtree. Observe only the canvas and
+                // retry transient provider observations within the existing wait; never replay input.
+                Wait(() => {
+                    targetObservations++;
+                    var targets = Find(visual!, "ErViewport").FindAllDescendants()
+                        .Where(item => (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("ErCanvas_", StringComparison.Ordinal))
+                        .Select(item => (Element: item, Name: item.Name)).ToArray();
+                    var observedRows = targets.Where(item => item.Name.Contains(" · attribute ", StringComparison.Ordinal)).Select(item => item.Element).ToArray();
+                    var observedEdges = targets.Where(item => item.Name.StartsWith("Relationship ", StringComparison.Ordinal)).Select(item => item.Element).ToArray();
+                    if (observedRows.Length != entities * 2 || observedEdges.Length != relationships) return false;
+                    rows = observedRows; edges = observedEdges; return true;
+                }, "ER native performance targets do not match exact source occurrences.");
                 timer.Restart(); for (var i = 0; i < 20; i++) rows[i % rows.Length].Patterns.SelectionItem.Pattern.Select(); var attributeMs = timer.Elapsed.TotalMilliseconds;
                 timer.Restart(); for (var i = 0; i < 20; i++) edges[i % edges.Length].Patterns.SelectionItem.Pattern.Select(); var relationshipMs = timer.Elapsed.TotalMilliseconds;
                 Find(visual!, "ErFit").AsButton().Invoke(); var endpoint = Find(visual!, "ErSecondEndpoint"); var bounds = endpoint.BoundingRectangle; var viewport = Find(visual!, "ErViewport").BoundingRectangle; string? drag = null;
@@ -70,15 +79,17 @@ internal static partial class NativeUiChecks
                 if (ReadEditorText(Find(visual!, "ErSource")) != source || File.ReadAllText(path) != source || app.HasExited || !process.Responding) throw new IOException("ER performance interaction changed source or stopped responding.");
                 process.Refresh(); measurements.Add(new { Entities = entities, Relationships = relationships, EditorOpenIncludingUiaMilliseconds = openMs, TwentyEntitySelectionsMilliseconds = entityMs,
                     TwentyAttributeSelectionsMilliseconds = attributeMs, TwentyRelationshipSelectionsMilliseconds = relationshipMs, WorkingSetBeforeEditor = beforeMemory, WorkingSetAfterInteractions = process.WorkingSet64,
-                    ActualEndpointDrag = drag, DragLimitation = drag is null ? "No complete endpoint target in the fitted viewport; no pointer timing claim for this size." : null, SourceExact = true, ProcessResponding = true });
-                _ = DwmFlush(); visual.CaptureToFile(Path.Combine(output, "er-" + entities + ".png")); app.Kill(); app.Dispose(); app = null; visual = null;
+                    TargetObservations = targetObservations, ActualEndpointDrag = drag, DragLimitation = drag is null ? "No complete endpoint target in the fitted viewport; no pointer timing claim for this size." : null, SourceExact = true, ProcessResponding = true });
+                _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, "er-" + entities + ".png")); app.Kill(); app.Dispose(); app = null; visual = null;
             }
-            File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Measurements = measurements, Scope = "Real disposable native process; timings include UIA transport and cold conversion. Resource failures and pointer limitations remain explicit. No rendering limits changed." }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
+            File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Measurements = measurements, Scope = "Real disposable native process; timings include UIA transport and cold conversion. Resource failures and pointer limitations remain explicit. The harness does not override production rendering limits." }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
         catch (Exception error) { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Measurements = measurements, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); File.WriteAllText(Path.Combine(output, "er-performance-failure.txt"), error.ToString()); Console.Error.WriteLine(error); return 1; }
         finally { Mouse.Up(MouseButton.Left); if (app is not null) { try { app.Kill(); } catch { } app.Dispose(); } }
     }).GetAwaiter().GetResult();
     private static bool IsRenderDeadline(string? diagnostic) => diagnostic is
         "Diagram could not be rendered: The operation was canceled." or
-        "Rendering resource deadline reached (3 seconds). Reduce the diagram size and validate again.";
+        "Rendering resource deadline reached (3 seconds). Reduce the diagram size and validate again." or
+        "Rendering resource deadline reached (3 seconds). Retry the preview or reduce the diagram size." or
+        "Rendering resource deadline reached (6 seconds). Retry the preview or reduce the diagram size.";
 }

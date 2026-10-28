@@ -1,0 +1,9 @@
+{
+  "DiagramCases": 202,
+  "Failures": [
+    "055-complete-detailed-light: This diagram is too large to export as one image, or its image scale is invalid.",
+    "056-complete-detailed-dark: This diagram is too large to export as one image, or its image scale is invalid.",
+    "061-operations-light: This diagram is too large to export as one image, or its image scale is invalid.",
+    "062-operations-dark: This diagram is too large to export as one image, or its image scale is invalid."
+  ]
+}

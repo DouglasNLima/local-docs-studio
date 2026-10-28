@@ -1,0 +1,13 @@
+Test run for C:\Users\dougl\.codex\worktrees\native-complex-mermaid-rendering\MarkdownReader\src\native\LensDocsStudio.Core.Tests\bin\Release\net10.0\LensDocsStudio.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+  Failed LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(name: "complete-detailed", entities: 39, relationships: 115, attributes: 284) [10 s]
+  Error Message:
+   Rendering resource deadline reached (6 seconds). Retry the preview or reduce the diagram size.
+  Stack Trace:
+     at LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(String name, Int32 entities, Int32 relationships, Int32 attributes) in C:\Users\dougl\.codex\worktrees\native-complex-mermaid-rendering\MarkdownReader\src\native\LensDocsStudio.Core.Tests\ComplexErRenderingTests.cs:line 28
+   at InvokeStub_ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:01:01.67]     LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(name: "complete-detailed", entities: 39, relationships: 115, attributes: 284) [FAIL]
+Results File: C:\Users\dougl\.codex\worktrees\native-complex-mermaid-rendering\MarkdownReader\artifacts\native\goal52\candidate-final-core\core.trx
+
+Failed!  - Failed:     1, Passed:  2250, Skipped:     0, Total:  2251, Duration: 1 m 5 s - LensDocsStudio.Core.Tests.dll (net10.0)

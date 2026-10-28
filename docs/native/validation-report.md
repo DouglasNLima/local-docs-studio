@@ -1,5 +1,15 @@
 # Native validation report
 
+## Original SPC acceptance - 28 October 2026
+
+The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
+
+## Goal #52 - complex ER and preview loading - 27 October 2026
+
+Release build: zero warnings/errors. Core: **2,251 passed, zero skipped**. Full native corpus: **202 diagram/export cases, zero failures**. Six equivalent ER fixtures preserve counts/source and native inspection/export correspondence. Shown WPF/UIA checks cover ordinary Markdown, dense/multiple Mermaid, Light/Dark, Continuous/Pages, initial/refresh, stale cancellation, masking, errors, Editor-only mode, document/application closure and reduced motion. Desktop UX, compiled Find and dynamic resource checks pass. Static web integrity and all 270 Chromium/Edge browser tests pass. All 12 native export-browser checks pass. The final shown lifecycle run passes 86 checks, including first-page readiness with background pagination still enabled and incomplete; the original 1,334-page completion-wait failure is retained. Hosted outcomes are recorded on the Draft PR.
+
+The initial four corpus failures were oversized 2x PNGs from new tall fixtures; bounded whole-canvas export fixes them without changing image limits. Original three-second failures remain in evidence. Local --mermaid-fidelity correctly refused its disposable-host guard; that GUI gate remains hosted. Computer-use captures show a white client area on both independent baseline and candidate builds; shown-WPF bitmap/UIA evidence is identified separately. Actual OS High Contrast retains the hosted-desktop guard. The Continuous 250 ms failure remains unsuppressed. [Full receipt](complex-er-preview-loading.md).
+
 ## Native desktop UX refinements - 27 October 2026
 
 Caption theming, bidirectional Find/counters, direct diagram panning, verified ER/Flowchart inspection and preview zoom are implemented from develop `0df86ad`, with local native runtime and regression evidence. See the [source-labelled implementation and validation receipt](native-desktop-ux-refinements.md). Final acceptance and hosted CI remain pending; existing release and paused-PR boundaries are unchanged.

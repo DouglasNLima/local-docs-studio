@@ -1,5 +1,13 @@
 # Native experience improvements
 
+## Original SPC acceptance - 28 October 2026
+
+The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
+
+## Complex ER and preview loading - 27 October 2026
+
+Incoming documents mask outgoing preview content immediately and show a delayed centred native ring while work remains pending. Updates retain the same document's accepted preview with compact feedback. Request-owned lifecycle state rejects stale completion/cancellation; existing viewport restoration retains scroll, zoom and selection ownership. Windows animation preferences permit a static busy ring. Retry preview uses current source and appearance, without caching transient failures. Large PNG exports preserve the entire canvas at a bounded scale. [Evidence and limitations](complex-er-preview-loading.md).
+
 ## Native desktop UX refinements - 27 October 2026
 
 Caption theming, bidirectional Find/counters, direct diagram panning, verified ER/Flowchart inspection and preview zoom are implemented from develop `0df86ad`, with local native runtime and regression evidence. See the [source-labelled implementation and validation receipt](native-desktop-ux-refinements.md). Final acceptance and hosted CI remain pending; existing release and paused-PR boundaries are unchanged.
