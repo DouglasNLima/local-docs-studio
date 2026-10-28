@@ -1,0 +1,29 @@
+[
+  {
+    "name": "microsoft.windowsappsdk",
+    "version": "2.1.3",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.windowsappsdk/2.1.3/microsoft.windowsappsdk.nuspec",
+    "licence": "license.txt",
+    "licenceType": "file",
+    "licenceUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://github.com/microsoft/windowsappsdk"
+  },
+  {
+    "name": "microsoft.web.webview2",
+    "version": "1.0.3967.48",
+    "source": "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.3967.48/microsoft.web.webview2.nuspec",
+    "licence": "LICENSE.txt",
+    "licenceType": "file",
+    "licenceUrl": "https://aka.ms/deprecateLicenseUrl",
+    "projectUrl": "https://aka.ms/webview"
+  },
+  {
+    "name": "mono.cecil",
+    "version": "0.11.6",
+    "source": "https://api.nuget.org/v3-flatcontainer/mono.cecil/0.11.6/mono.cecil.nuspec",
+    "licence": "MIT",
+    "licenceType": "expression",
+    "licenceUrl": "https://licenses.nuget.org/MIT",
+    "projectUrl": "http://github.com/jbevain/cecil/"
+  }
+]

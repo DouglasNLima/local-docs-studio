@@ -1,0 +1,618 @@
+[
+  {
+    "component": "@braintree/sanitize-url@7.1.1",
+    "source": "https://registry.npmjs.org/@braintree/sanitize-url/-/sanitize-url-7.1.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "0984740e0c3d725c8044dec7edcefe1dbce180ef5a7bc710c251e19607000158.txt",
+    "sha256": "0984740e0c3d725c8044dec7edcefe1dbce180ef5a7bc710c251e19607000158"
+  },
+  {
+    "component": "highlight.js@11.11.1",
+    "source": "https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490.txt",
+    "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+  },
+  {
+    "component": "@iconify/utils@3.0.2",
+    "source": "https://registry.npmjs.org/@iconify/utils/-/utils-3.0.2.tgz",
+    "upstreamPath": "package/license.txt",
+    "file": "a86793ac023162ce98b91899601c15f6712f44943163c4f92a0a4bf89152b3bf.txt",
+    "sha256": "a86793ac023162ce98b91899601c15f6712f44943163c4f92a0a4bf89152b3bf"
+  },
+  {
+    "component": "@playwright/test@1.64.0",
+    "source": "https://registry.npmjs.org/@playwright/test/-/test-1.64.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb.txt",
+    "sha256": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb"
+  },
+  {
+    "component": "@playwright/test@1.64.0",
+    "source": "https://registry.npmjs.org/@playwright/test/-/test-1.64.0.tgz",
+    "upstreamPath": "package/NOTICE",
+    "file": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d.txt",
+    "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d"
+  },
+  {
+    "component": "@upsetjs/venn.js@2.0.0",
+    "source": "https://registry.npmjs.org/@upsetjs/venn.js/-/venn.js-2.0.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "6a3508febf2cfccfee96597394543a6154a4bb0b1f91f28404be42c09e9fcb54.txt",
+    "sha256": "6a3508febf2cfccfee96597394543a6154a4bb0b1f91f28404be42c09e9fcb54"
+  },
+  {
+    "component": "cose-base@1.0.3",
+    "source": "https://registry.npmjs.org/cose-base/-/cose-base-1.0.3.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "5fb3cf4a14c3c5af6e473a192df8bca10c77754e3a0c6492c79fb92a76a5478a.txt",
+    "sha256": "5fb3cf4a14c3c5af6e473a192df8bca10c77754e3a0c6492c79fb92a76a5478a"
+  },
+  {
+    "component": "cose-base@2.2.0",
+    "source": "https://registry.npmjs.org/cose-base/-/cose-base-2.2.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "5fb3cf4a14c3c5af6e473a192df8bca10c77754e3a0c6492c79fb92a76a5478a.txt",
+    "sha256": "5fb3cf4a14c3c5af6e473a192df8bca10c77754e3a0c6492c79fb92a76a5478a"
+  },
+  {
+    "component": "cytoscape@3.33.1",
+    "source": "https://registry.npmjs.org/cytoscape/-/cytoscape-3.33.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e4b62495bacaefaf330f38f226e20d1d60d658d444998ba7406a191f96a2e701.txt",
+    "sha256": "e4b62495bacaefaf330f38f226e20d1d60d658d444998ba7406a191f96a2e701"
+  },
+  {
+    "component": "cytoscape-cose-bilkent@4.1.0",
+    "source": "https://registry.npmjs.org/cytoscape-cose-bilkent/-/cytoscape-cose-bilkent-4.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "440fc58a56a12814e417d2b341da89b050da052dc75bdb235607d37ec5fe74ef.txt",
+    "sha256": "440fc58a56a12814e417d2b341da89b050da052dc75bdb235607d37ec5fe74ef"
+  },
+  {
+    "component": "cytoscape-fcose@2.2.0",
+    "source": "https://registry.npmjs.org/cytoscape-fcose/-/cytoscape-fcose-2.2.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "2837634f403949215760fcdd2fa1ed0c64875d02099ecc8318c704b852f1421d.txt",
+    "sha256": "2837634f403949215760fcdd2fa1ed0c64875d02099ecc8318c704b852f1421d"
+  },
+  {
+    "component": "d3-array@2.12.1",
+    "source": "https://registry.npmjs.org/d3-array/-/d3-array-2.12.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "0747bebeb06b10954913149be9b9a8bdf6fad3e6fdcbd9f9524e7a94c13d2cea.txt",
+    "sha256": "0747bebeb06b10954913149be9b9a8bdf6fad3e6fdcbd9f9524e7a94c13d2cea"
+  },
+  {
+    "component": "d3-array@3.2.4",
+    "source": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "3e6849627f74ff73c257a3ae1efb574015d94fc1035c05ec3c15805165efcbc4.txt",
+    "sha256": "3e6849627f74ff73c257a3ae1efb574015d94fc1035c05ec3c15805165efcbc4"
+  },
+  {
+    "component": "d3-axis@3.0.0",
+    "source": "https://registry.npmjs.org/d3-axis/-/d3-axis-3.0.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-brush@3.0.0",
+    "source": "https://registry.npmjs.org/d3-brush/-/d3-brush-3.0.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-color@3.1.0",
+    "source": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884.txt",
+    "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+  },
+  {
+    "component": "d3-dispatch@3.0.1",
+    "source": "https://registry.npmjs.org/d3-dispatch/-/d3-dispatch-3.0.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-ease@3.0.1",
+    "source": "https://registry.npmjs.org/d3-ease/-/d3-ease-3.0.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "b989d9085148d21ff64a75e14462aefa06b2589a55553b07b1460c70081c7d08.txt",
+    "sha256": "b989d9085148d21ff64a75e14462aefa06b2589a55553b07b1460c70081c7d08"
+  },
+  {
+    "component": "d3-format@3.1.0",
+    "source": "https://registry.npmjs.org/d3-format/-/d3-format-3.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-hierarchy@3.1.2",
+    "source": "https://registry.npmjs.org/d3-hierarchy/-/d3-hierarchy-3.1.2.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-interpolate@3.0.1",
+    "source": "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-path@1.0.9",
+    "source": "https://registry.npmjs.org/d3-path/-/d3-path-1.0.9.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "b8265327ab678f554800e71188b1cc6b1ff57522e292d2b1c0be66f27cf328b6.txt",
+    "sha256": "b8265327ab678f554800e71188b1cc6b1ff57522e292d2b1c0be66f27cf328b6"
+  },
+  {
+    "component": "d3-path@3.1.0",
+    "source": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "a09b0d6d76e768fca2085fad05743ee81ddd11946bcda160a3cf5e1081a479aa.txt",
+    "sha256": "a09b0d6d76e768fca2085fad05743ee81ddd11946bcda160a3cf5e1081a479aa"
+  },
+  {
+    "component": "d3-sankey@0.12.3",
+    "source": "https://registry.npmjs.org/d3-sankey/-/d3-sankey-0.12.3.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "2bf785e778d67a4f5266cffcd4f2cc5bb98cde73791666e7efeb8002ba32dfa5.txt",
+    "sha256": "2bf785e778d67a4f5266cffcd4f2cc5bb98cde73791666e7efeb8002ba32dfa5"
+  },
+  {
+    "component": "d3-scale@4.0.2",
+    "source": "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-scale-chromatic@3.1.0",
+    "source": "https://registry.npmjs.org/d3-scale-chromatic/-/d3-scale-chromatic-3.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "0986d93944902cca9af86824b6a641b4b7c2d10602fc510c433a8bcd443919fe.txt",
+    "sha256": "0986d93944902cca9af86824b6a641b4b7c2d10602fc510c433a8bcd443919fe"
+  },
+  {
+    "component": "d3-selection@3.0.0",
+    "source": "https://registry.npmjs.org/d3-selection/-/d3-selection-3.0.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-shape@1.3.7",
+    "source": "https://registry.npmjs.org/d3-shape/-/d3-shape-1.3.7.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "7eea8533ea92bd8c32a901e89ecb0305890905bb12711449565ddff96891146d.txt",
+    "sha256": "7eea8533ea92bd8c32a901e89ecb0305890905bb12711449565ddff96891146d"
+  },
+  {
+    "component": "d3-shape@3.2.0",
+    "source": "https://registry.npmjs.org/d3-shape/-/d3-shape-3.2.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884.txt",
+    "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+  },
+  {
+    "component": "d3-time@3.1.0",
+    "source": "https://registry.npmjs.org/d3-time/-/d3-time-3.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884.txt",
+    "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+  },
+  {
+    "component": "d3-time-format@4.1.0",
+    "source": "https://registry.npmjs.org/d3-time-format/-/d3-time-format-4.1.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-timer@3.0.1",
+    "source": "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-transition@3.0.1",
+    "source": "https://registry.npmjs.org/d3-transition/-/d3-transition-3.0.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "d3-zoom@3.0.0",
+    "source": "https://registry.npmjs.org/d3-zoom/-/d3-zoom-3.0.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee.txt",
+    "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+  },
+  {
+    "component": "dagre-d3-es@7.0.14",
+    "source": "https://registry.npmjs.org/dagre-d3-es/-/dagre-d3-es-7.0.14.tgz",
+    "upstreamPath": "package/LICENSE.md",
+    "file": "d01eb84ccce437dbf5fd40853bceea0f287930920acea066597a4a25ead63858.txt",
+    "sha256": "d01eb84ccce437dbf5fd40853bceea0f287930920acea066597a4a25ead63858"
+  },
+  {
+    "component": "dayjs@1.11.19",
+    "source": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.19.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "5faab7526d055651be3aab769d58897be6bd91f3d39d137f25f12dba1b31d5dc.txt",
+    "sha256": "5faab7526d055651be3aab769d58897be6bd91f3d39d137f25f12dba1b31d5dc"
+  },
+  {
+    "component": "dompurify@3.4.0",
+    "source": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "1b02e03c3fb4f87d476c128f0eb9def1f5a1709d28b180465228bd41574623b7.txt",
+    "sha256": "1b02e03c3fb4f87d476c128f0eb9def1f5a1709d28b180465228bd41574623b7"
+  },
+  {
+    "component": "dompurify@3.4.5",
+    "source": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.5.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "component": "es-toolkit@1.45.1",
+    "source": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.45.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "ed68888a2a28f32a05e88f24d4d4ee75075a1bda2b6372a1f2e00fa0576a5524.txt",
+    "sha256": "ed68888a2a28f32a05e88f24d4d4ee75075a1bda2b6372a1f2e00fa0576a5524"
+  },
+  {
+    "component": "fflate@0.8.2",
+    "source": "https://registry.npmjs.org/fflate/-/fflate-0.8.2.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "805f6cb28bb8b6d3a0badd83c93bccd9671fa01a3b4b92b7042b0743325ac243.txt",
+    "sha256": "805f6cb28bb8b6d3a0badd83c93bccd9671fa01a3b4b92b7042b0743325ac243"
+  },
+  {
+    "component": "internmap@2.0.3",
+    "source": "https://registry.npmjs.org/internmap/-/internmap-2.0.3.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "9ea8903938dab5f12c4572d60725069bec2d1b0dc3bcc210b09bae946a5ebb1f.txt",
+    "sha256": "9ea8903938dab5f12c4572d60725069bec2d1b0dc3bcc210b09bae946a5ebb1f"
+  },
+  {
+    "component": "js-yaml@4.1.1",
+    "source": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550.txt",
+    "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550"
+  },
+  {
+    "component": "katex@0.16.25",
+    "source": "https://registry.npmjs.org/katex/-/katex-0.16.25.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3.txt",
+    "sha256": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3"
+  },
+  {
+    "component": "khroma@2.1.0",
+    "source": "https://registry.npmjs.org/khroma/-/khroma-2.1.0.tgz",
+    "upstreamPath": "package/license",
+    "file": "66b333b0f66759a0b710459e03f7029abe17f4358114a128d2c972e642961b49.txt",
+    "sha256": "66b333b0f66759a0b710459e03f7029abe17f4358114a128d2c972e642961b49"
+  },
+  {
+    "component": "layout-base@1.0.2",
+    "source": "https://registry.npmjs.org/layout-base/-/layout-base-1.0.2.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "eabb762d8a95109a39c9be3247325529a5239a7aca327d909c3ccdc41f3a06bf.txt",
+    "sha256": "eabb762d8a95109a39c9be3247325529a5239a7aca327d909c3ccdc41f3a06bf"
+  },
+  {
+    "component": "layout-base@2.0.1",
+    "source": "https://registry.npmjs.org/layout-base/-/layout-base-2.0.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "eabb762d8a95109a39c9be3247325529a5239a7aca327d909c3ccdc41f3a06bf.txt",
+    "sha256": "eabb762d8a95109a39c9be3247325529a5239a7aca327d909c3ccdc41f3a06bf"
+  },
+  {
+    "component": "lodash-es@4.18.1",
+    "source": "https://registry.npmjs.org/lodash-es/-/lodash-es-4.18.1.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc.txt",
+    "sha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc"
+  },
+  {
+    "component": "mammoth@1.12.0",
+    "source": "https://registry.npmjs.org/mammoth/-/mammoth-1.12.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1.txt",
+    "sha256": "6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1"
+  },
+  {
+    "component": "marked@16.3.0",
+    "source": "https://registry.npmjs.org/marked/-/marked-16.3.0.tgz",
+    "upstreamPath": "package/LICENSE.md",
+    "file": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c.txt",
+    "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+  },
+  {
+    "component": "marked@16.4.2",
+    "source": "https://registry.npmjs.org/marked/-/marked-16.4.2.tgz",
+    "upstreamPath": "package/LICENSE.md",
+    "file": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c.txt",
+    "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+  },
+  {
+    "component": "mermaid@11.15.0",
+    "source": "https://registry.npmjs.org/mermaid/-/mermaid-11.15.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80.txt",
+    "sha256": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80"
+  },
+  {
+    "component": "pdfjs-dist@5.7.284",
+    "source": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.7.284.tgz",
+    "upstreamPath": "package/cmaps/LICENSE",
+    "file": "aa92ab5a472974865a96fd4a4e9c13bb41bf6fe1b309cb6b8da48bc9e19839a2.txt",
+    "sha256": "aa92ab5a472974865a96fd4a4e9c13bb41bf6fe1b309cb6b8da48bc9e19839a2"
+  },
+  {
+    "component": "pdfjs-dist@5.7.284",
+    "source": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.7.284.tgz",
+    "upstreamPath": "package/iccs/LICENSE",
+    "file": "286e4fd7b447330b2c88e23890e3cd0a9d38cb398d4a59cb247f578ccbda3213.txt",
+    "sha256": "286e4fd7b447330b2c88e23890e3cd0a9d38cb398d4a59cb247f578ccbda3213"
+  },
+  {
+    "component": "pdfjs-dist@5.7.284",
+    "source": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.7.284.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+    "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+  },
+  {
+    "component": "playwright@1.64.0",
+    "source": "https://registry.npmjs.org/playwright/-/playwright-1.64.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb.txt",
+    "sha256": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb"
+  },
+  {
+    "component": "playwright@1.64.0",
+    "source": "https://registry.npmjs.org/playwright/-/playwright-1.64.0.tgz",
+    "upstreamPath": "package/NOTICE",
+    "file": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d.txt",
+    "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d"
+  },
+  {
+    "component": "playwright-core@1.64.0",
+    "source": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.64.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb.txt",
+    "sha256": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb"
+  },
+  {
+    "component": "playwright-core@1.64.0",
+    "source": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.64.0.tgz",
+    "upstreamPath": "package/NOTICE",
+    "file": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d.txt",
+    "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d"
+  },
+  {
+    "component": "roughjs@4.6.6",
+    "source": "https://registry.npmjs.org/roughjs/-/roughjs-4.6.6.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "dca9a392272606ac748ac0976a2a1133f14eef841c27beaa51a844d53c56a09d.txt",
+    "sha256": "dca9a392272606ac748ac0976a2a1133f14eef841c27beaa51a844d53c56a09d"
+  },
+  {
+    "component": "ts-dedent@2.2.0",
+    "source": "https://registry.npmjs.org/ts-dedent/-/ts-dedent-2.2.0.tgz",
+    "upstreamPath": "package/LICENSE",
+    "file": "eff13095d9d762c3bd9dda74370c81e2130c28f2691bc455603abf973bac25b9.txt",
+    "sha256": "eff13095d9d762c3bd9dda74370c81e2130c28f2691bc455603abf973bac25b9"
+  },
+  {
+    "component": "uuid@14.0.0",
+    "source": "https://registry.npmjs.org/uuid/-/uuid-14.0.0.tgz",
+    "upstreamPath": "package/LICENSE.md",
+    "file": "beaa6b04fb82e41dd2ad679e19e27953afb5999b1abbb455b6564e78ebfeb332.txt",
+    "sha256": "beaa6b04fb82e41dd2ad679e19e27953afb5999b1abbb455b6564e78ebfeb332"
+  },
+  {
+    "component": "CommunityToolkit.Mvvm@8.4.2",
+    "source": "https://www.nuget.org/packages/CommunityToolkit.Mvvm/8.4.2",
+    "upstreamPath": "License.md",
+    "file": "651997ef19dbb9ecb8dd660dbc86444a65af21f18cfe08daa69bf201cd5cfdfc.txt",
+    "sha256": "651997ef19dbb9ecb8dd660dbc86444a65af21f18cfe08daa69bf201cd5cfdfc"
+  },
+  {
+    "component": "CommunityToolkit.Mvvm@8.4.2",
+    "source": "https://www.nuget.org/packages/CommunityToolkit.Mvvm/8.4.2",
+    "upstreamPath": "ThirdPartyNotices.txt",
+    "file": "7774f8b0ab66bfb47ec154ce24a2d6d574febc44a74d940b8a037d1c56756163.txt",
+    "sha256": "7774f8b0ab66bfb47ec154ce24a2d6d574febc44a74d940b8a037d1c56756163"
+  },
+  {
+    "component": "FlaUI.Core@5.0.0",
+    "source": "https://www.nuget.org/packages/FlaUI.Core/5.0.0",
+    "upstreamPath": "LICENSE.txt",
+    "file": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529.txt",
+    "sha256": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529"
+  },
+  {
+    "component": "FlaUI.UIA3@5.0.0",
+    "source": "https://www.nuget.org/packages/FlaUI.UIA3/5.0.0",
+    "upstreamPath": "LICENSE.txt",
+    "file": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529.txt",
+    "sha256": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529"
+  },
+  {
+    "component": "Interop.UIAutomationClient@10.19041.0",
+    "source": "https://www.nuget.org/packages/Interop.UIAutomationClient/10.19041.0",
+    "upstreamPath": "LICENSE.txt",
+    "file": "ae507f8cb7ce8b34d9ba817d165492af4225482305a8b92c7620f5fa7b7c57a1.txt",
+    "sha256": "ae507f8cb7ce8b34d9ba817d165492af4225482305a8b92c7620f5fa7b7c57a1"
+  },
+  {
+    "component": "Microsoft.CodeCoverage@17.14.1",
+    "source": "https://www.nuget.org/packages/Microsoft.CodeCoverage/17.14.1",
+    "upstreamPath": "build/netstandard2.0/ThirdPartyNotices.txt",
+    "file": "4fc4244935bbe3516164402c573f053a5d246571ed4d357e6cccd8ebec296bbc.txt",
+    "sha256": "4fc4244935bbe3516164402c573f053a5d246571ed4d357e6cccd8ebec296bbc"
+  },
+  {
+    "component": "Microsoft.CodeCoverage@17.14.1",
+    "source": "https://www.nuget.org/packages/Microsoft.CodeCoverage/17.14.1",
+    "upstreamPath": "ThirdPartyNotices.txt",
+    "file": "4fc4244935bbe3516164402c573f053a5d246571ed4d357e6cccd8ebec296bbc.txt",
+    "sha256": "4fc4244935bbe3516164402c573f053a5d246571ed4d357e6cccd8ebec296bbc"
+  },
+  {
+    "component": "Microsoft.Extensions.DependencyInjection.Abstractions@8.0.2",
+    "source": "https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2",
+    "upstreamPath": "LICENSE.TXT",
+    "file": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b.txt",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "component": "Microsoft.Extensions.DependencyInjection.Abstractions@8.0.2",
+    "source": "https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "b60b2912da28eaa6518593c9e2efb5334ee062d3c42e80d8fdfa806b3dc52977.txt",
+    "sha256": "b60b2912da28eaa6518593c9e2efb5334ee062d3c42e80d8fdfa806b3dc52977"
+  },
+  {
+    "component": "Microsoft.Extensions.Logging.Abstractions@8.0.3",
+    "source": "https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions/8.0.3",
+    "upstreamPath": "LICENSE.TXT",
+    "file": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b.txt",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "component": "Microsoft.Extensions.Logging.Abstractions@8.0.3",
+    "source": "https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions/8.0.3",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "b60b2912da28eaa6518593c9e2efb5334ee062d3c42e80d8fdfa806b3dc52977.txt",
+    "sha256": "b60b2912da28eaa6518593c9e2efb5334ee062d3c42e80d8fdfa806b3dc52977"
+  },
+  {
+    "component": "Microsoft.Extensions.ObjectPool@10.0.3",
+    "source": "https://www.nuget.org/packages/Microsoft.Extensions.ObjectPool/10.0.3",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "307d014f65d8482314f1400ddeae7a0cbabb96c2207bcc77f6233cc10588e5d9.txt",
+    "sha256": "307d014f65d8482314f1400ddeae7a0cbabb96c2207bcc77f6233cc10588e5d9"
+  },
+  {
+    "component": "Microsoft.NETCore.App.Runtime.win-x64@10.0.13",
+    "source": "https://www.nuget.org/packages/Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+    "upstreamPath": "LICENSE.TXT",
+    "file": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b.txt",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "component": "Microsoft.NETCore.App.Runtime.win-x64@10.0.13",
+    "source": "https://www.nuget.org/packages/Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21.txt",
+    "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+  },
+  {
+    "component": "Microsoft.TestPlatform.TestHost@17.14.1",
+    "source": "https://www.nuget.org/packages/Microsoft.TestPlatform.TestHost/17.14.1",
+    "upstreamPath": "ThirdPartyNotices.txt",
+    "file": "e2ce7628e0f67d0d724eea9d9286a6938bf1eedd253fc84b23d72ae54778a5f7.txt",
+    "sha256": "e2ce7628e0f67d0d724eea9d9286a6938bf1eedd253fc84b23d72ae54778a5f7"
+  },
+  {
+    "component": "Microsoft.WindowsDesktop.App.Runtime.win-x64@10.0.13",
+    "source": "https://www.nuget.org/packages/Microsoft.WindowsDesktop.App.Runtime.win-x64/10.0.13",
+    "upstreamPath": "LICENSE",
+    "file": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab.txt",
+    "sha256": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab"
+  },
+  {
+    "component": "Newtonsoft.Json@13.0.3",
+    "source": "https://www.nuget.org/packages/Newtonsoft.Json/13.0.3",
+    "upstreamPath": "LICENSE.md",
+    "file": "b98a397897ff55f76cddc380041507a95a896b2946e0188703bf0496793d6516.txt",
+    "sha256": "b98a397897ff55f76cddc380041507a95a896b2946e0188703bf0496793d6516"
+  },
+  {
+    "component": "SharpVectors.Wpf@1.8.6",
+    "source": "https://www.nuget.org/packages/SharpVectors.Wpf/1.8.6",
+    "upstreamPath": "lib/License.txt",
+    "file": "b340c0c95ff913bc1a1c6d8672172b38769fc9a9177b692fc9945130c61b231f.txt",
+    "sha256": "b340c0c95ff913bc1a1c6d8672172b38769fc9a9177b692fc9945130c61b231f"
+  },
+  {
+    "component": "Sugiyama@0.15.1",
+    "source": "https://www.nuget.org/packages/Sugiyama/0.15.1",
+    "upstreamPath": "THIRD-PARTY-NOTICES.md",
+    "file": "8e97d608d09fe2d147bba332d15feb008b8967f7e09cf6c93f0e245d37b40c2b.txt",
+    "sha256": "8e97d608d09fe2d147bba332d15feb008b8967f7e09cf6c93f0e245d37b40c2b"
+  },
+  {
+    "component": "System.IO.Hashing@10.0.12",
+    "source": "https://www.nuget.org/packages/System.IO.Hashing/10.0.12",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21.txt",
+    "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+  },
+  {
+    "component": "System.IO.Packaging@10.0.2",
+    "source": "https://www.nuget.org/packages/System.IO.Packaging/10.0.2",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21.txt",
+    "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+  },
+  {
+    "component": "System.Management@8.0.0",
+    "source": "https://www.nuget.org/packages/System.Management/8.0.0",
+    "upstreamPath": "LICENSE.TXT",
+    "file": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b.txt",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "component": "System.Management@8.0.0",
+    "source": "https://www.nuget.org/packages/System.Management/8.0.0",
+    "upstreamPath": "THIRD-PARTY-NOTICES.TXT",
+    "file": "19c19dcac9f3ee6302cfbc6745bb8e79f08efc4c933eb8dc5509bf14b88347ec.txt",
+    "sha256": "19c19dcac9f3ee6302cfbc6745bb8e79f08efc4c933eb8dc5509bf14b88347ec"
+  },
+  {
+    "component": "WpfMath@2.1.0",
+    "source": "https://www.nuget.org/packages/WpfMath/2.1.0",
+    "upstreamPath": "FONT-LICENSES.md",
+    "file": "32356de73439e0823f3db6d425360367aa31997ed4a5e3699e1360c87c97dcae.txt",
+    "sha256": "32356de73439e0823f3db6d425360367aa31997ed4a5e3699e1360c87c97dcae"
+  },
+  {
+    "component": "microsoft.web.webview2-LICENSE.txt",
+    "source": "See legacy-package-evidence.json",
+    "upstreamPath": "microsoft.web.webview2-LICENSE.txt",
+    "file": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55.txt",
+    "sha256": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55"
+  },
+  {
+    "component": "microsoft.windowsappsdk-license.txt",
+    "source": "See legacy-package-evidence.json",
+    "upstreamPath": "microsoft.windowsappsdk-license.txt",
+    "file": "5b11e6347756e40fe0274bc08c97f89201b94f0d50181a09a00f1f4740840501.txt",
+    "sha256": "5b11e6347756e40fe0274bc08c97f89201b94f0d50181a09a00f1f4740840501"
+  },
+  {
+    "component": "Microsoft.WindowsAppSDK@2.1.3",
+    "source": "See legacy-package-evidence.json",
+    "upstreamPath": "license.txt",
+    "file": "5b11e6347756e40fe0274bc08c97f89201b94f0d50181a09a00f1f4740840501.txt",
+    "sha256": "5b11e6347756e40fe0274bc08c97f89201b94f0d50181a09a00f1f4740840501"
+  }
+]

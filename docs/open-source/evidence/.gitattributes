@@ -1,0 +1,2 @@
+# Preserve original upstream notice bytes and digest-named evidence on Windows.
+upstream-notices/*.txt -text -diff
