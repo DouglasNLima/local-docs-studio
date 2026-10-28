@@ -221,6 +221,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version "0.1.1-preview.${{ github.run_number }}"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Record file-level binary SBOMs for the exact preview candidates
+        run: |
+          foreach ($base in '0.1.0','0.1.1') {
+            $version = "$base-preview.${{ github.run_number }}"
+            python scripts/compliance/binary_sbom.py --archive "artifacts/native/packages/$version/LensDocsStudio.Native-$version-win-x64.zip" --output "artifacts/native/packages/$version/binary-sbom.json" --expected-source (git rev-parse HEAD) --fetch-registry
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
       - name: Validate visible installer wizard
         timeout-minutes: 4
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard ${{ env.LENS_NATIVE_WIZARD_ARGUMENTS }}

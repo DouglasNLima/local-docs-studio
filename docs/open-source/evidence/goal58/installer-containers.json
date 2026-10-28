@@ -1,0 +1,25 @@
+{
+  "artifactId": 12850041407,
+  "runId": 40759577875,
+  "sourceRevision": "22d434a923a03e86ebee237e71c55ef89dd996ed",
+  "sourceTree": "133cc2e59515aec1e44691c0e2333aa4f47d3ef4",
+  "outerArtifactSha256": "e5fa09bd1554d30a6f0ec77de8997bbbed4b3c781024cc7eaaaaaa283c0d1563",
+  "installers": [
+    {
+      "path": "packages/0.1.0-preview.957/LensDocsStudio.Native-0.1.0-preview.957-win-x64-Setup.exe",
+      "bytes": 59241466,
+      "sha256": "f75ec0ba9a2dc1ebc45c23ec152047eef0bc841bf0c8f5f4ec63e71c603e8c9d",
+      "kind": "Inno Setup 6.7.1 container; not a wholly first-party binary",
+      "payloadEvidence": "Corresponding same-run portable ZIP and hosted installed payload-parity checks; no independent decompression claim"
+    },
+    {
+      "path": "packages/0.1.1-preview.957/LensDocsStudio.Native-0.1.1-preview.957-win-x64-Setup.exe",
+      "bytes": 59239405,
+      "sha256": "e0bf7ae72353e86c59347dd98ee18146ad7f266aef5a90a2284f4c0eed391ee5",
+      "kind": "Inno Setup 6.7.1 container; not a wholly first-party binary",
+      "payloadEvidence": "Corresponding same-run portable ZIP and hosted installed payload-parity checks; no independent decompression claim"
+    }
+  ],
+  "historicalReleaseAssetsChanged": false,
+  "distribution": "Unsigned internal previews; not public native releases"
+}

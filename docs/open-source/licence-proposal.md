@@ -1,5 +1,8 @@
 # First-party licence proposal — not an operative licence
 
+The [Goal #58 owner decision packet](rights-decision.md) supplies the proposed
+copyright line, path-level decision ledger and exact exclusions for this draft.
+
 **No licence is adopted by this file.** Do not rename it to `LICENSE`, set package
 metadata to MIT, or add blanket SPDX headers until the owner explicitly approves
 the audit findings, copyright holder and scope. The repository currently has no

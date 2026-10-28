@@ -1,0 +1,32 @@
+name: Validate OSS provenance
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  provenance:
+    name: OSS provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.22.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.12'
+      - name: Install pinned maintenance tools without lifecycle scripts
+        run: npm ci --prefix scripts/compliance/highlight --ignore-scripts --no-audit --no-fund
+      - name: Verify upstream archive, installed sources and historical map
+        run: python scripts/compliance/highlight/verify_upstream.py
+      - name: Reconstruct the exact historical Highlight.js bytes
+        run: node scripts/compliance/highlight/build.mjs
+      - name: Verify notice bytes, rights boundaries and recorded SBOM
+        run: python scripts/compliance/check_foundation.py

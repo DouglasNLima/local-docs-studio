@@ -1,5 +1,9 @@
 # Open-source and free Windows distribution readiness
 
+The [Goal #58 closeout and owner decision packet](goal58-closeout.md) continues
+this audit from the authorised PR #57 merge. The receipt below retains its original
+Goal #56 source and validation context.
+
 Goal #56 audit/signing-preparation milestone, 28 October 2026.
 
 The owner has chosen free, community maintained distribution with no subscriptions,

@@ -1,0 +1,26 @@
+{
+  "tools": {
+    "rollup": "2.80.0",
+    "terser": "5.39.0",
+    "commonjs": "22.0.2"
+  },
+  "options": {
+    "strictRequires": false,
+    "format": "es",
+    "module": true,
+    "compressPasses": 1,
+    "mangle": true
+  },
+  "entry": "highlight.js/es/index.js",
+  "version": "11.11.1",
+  "unminifiedSha256": "ce191575eb1c9d8b4959806a7f2fb238577291957d00f34015c6f0d6baa02a00",
+  "minifiedBodySha256": "a727240be16c77e3928f0d5af1c62b353235e46f227281d364d840c77e213ce3",
+  "originalBodySha256": "a727240be16c77e3928f0d5af1c62b353235e46f227281d364d840c77e213ce3",
+  "exactHistoricalBody": true,
+  "candidateSha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0",
+  "candidateBytes": 955998,
+  "sourceMapSha256": "57ea7b365ae6090a631487dd66759c4ba124b6bbf17a39420082db2026050af2",
+  "sourceMapSources": 194,
+  "originalSha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0",
+  "exactHistoricalReconstruction": true
+}

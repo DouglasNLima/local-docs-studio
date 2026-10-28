@@ -1,0 +1,43 @@
+{
+  "observedAt": "2026-10-28",
+  "repository": "DouglasNLima/local-docs-studio",
+  "visibility": "public",
+  "ownerType": "User",
+  "defaultBranch": "main",
+  "branches": {
+    "develop": {
+      "name": "develop",
+      "commit": "22d434a923a03e86ebee237e71c55ef89dd996ed",
+      "protected": false
+    },
+    "main": {
+      "name": "main",
+      "commit": "0d100cc29dde2ba80755fb1e8af60ffd9d006b16",
+      "protected": false
+    }
+  },
+  "rulesets": [],
+  "privateVulnerabilityReporting": {
+    "enabled": false
+  },
+  "environments": [
+    {
+      "name": "github-pages",
+      "protectionRules": [
+        {
+          "id": 55527123,
+          "node_id": "GA_kwDOSmyM784DT0bT",
+          "type": "branch_policy"
+        }
+      ],
+      "deploymentBranchPolicy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      }
+    }
+  ],
+  "adminChangesApplied": false,
+  "MFA": "Not independently verified",
+  "namedIndependentReviewer": "Not appointed",
+  "signingApprover": "Not appointed"
+}

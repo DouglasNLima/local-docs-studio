@@ -1,0 +1,3 @@
+# Preserve the assembled upstream notices byte-for-byte, including original endings.
+/assets/vendor/THIRD-PARTY-NOTICES.txt -text
+/docs/open-source/evidence/upstream-notices/*.txt -text
