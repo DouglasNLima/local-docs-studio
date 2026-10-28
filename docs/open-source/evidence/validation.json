@@ -1,0 +1,125 @@
+{
+  "scope": "Working-tree local checks before the delivery commit; not a production certificate or final hosted receipt.",
+  "trx": [
+    {
+      "file": "goal56-core.trx",
+      "sha256": "2854bca564e4dd5caeda70868aa6847d630e7101a90c34d94729219bf64e3df2",
+      "counters": {
+        "total": "2298",
+        "executed": "2298",
+        "passed": "2297",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "failures": [
+        {
+          "name": "LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(name: \"complete-detailed\", entities: 39, relationships: 115, attributes: 284)",
+          "message": "Rendering resource deadline reached (6 seconds). Retry the preview or reduce the diagram size."
+        }
+      ]
+    },
+    {
+      "file": "goal56-er-isolated.trx",
+      "sha256": "3c3410f4e63944e76ea77d7ff5e54781e84c3970c5f24290489ed5df5be198b5",
+      "counters": {
+        "total": "6",
+        "executed": "6",
+        "passed": "6",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "failures": []
+    },
+    {
+      "file": "goal56-trust-lifecycle.trx",
+      "sha256": "253bb4f28f9723c71cc6831a31d38b3511f7daa2d44056b94e32afe49b715f5e",
+      "counters": {
+        "total": "58",
+        "executed": "58",
+        "passed": "58",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "failures": []
+    },
+    {
+      "file": "goal56-updates.trx",
+      "sha256": "34870484e6ae8e481d1a25db0e276239b8b76438e2f4faec2eb53a5c12f6e1c5",
+      "counters": {
+        "total": "51",
+        "executed": "51",
+        "passed": "51",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "failures": []
+    }
+  ],
+  "syntheticNoticeChecks": 5,
+  "actualNoticeChecks": {
+    "verifiedNoticeFiles": 14,
+    "files": [
+      "licences\\CommunityToolkit.Mvvm\\License.md",
+      "licences\\CommunityToolkit.Mvvm\\ThirdPartyNotices.txt",
+      "licences\\Microsoft.Extensions.DependencyInjection.Abstractions\\LICENSE.TXT",
+      "licences\\Microsoft.Extensions.DependencyInjection.Abstractions\\THIRD-PARTY-NOTICES.TXT",
+      "licences\\Microsoft.Extensions.Logging.Abstractions\\LICENSE.TXT",
+      "licences\\Microsoft.Extensions.Logging.Abstractions\\THIRD-PARTY-NOTICES.TXT",
+      "licences\\Microsoft.Extensions.ObjectPool\\THIRD-PARTY-NOTICES.TXT",
+      "licences\\Microsoft.NETCore.App.Runtime.win-x64\\LICENSE.TXT",
+      "licences\\Microsoft.NETCore.App.Runtime.win-x64\\THIRD-PARTY-NOTICES.TXT",
+      "licences\\Microsoft.WindowsDesktop.App.Runtime.win-x64\\LICENSE",
+      "licences\\SharpVectors.Wpf\\lib\\License.txt",
+      "licences\\Sugiyama\\THIRD-PARTY-NOTICES.md",
+      "licences\\System.IO.Hashing\\THIRD-PARTY-NOTICES.TXT",
+      "licences\\WpfMath\\FONT-LICENSES.md"
+    ]
+  },
+  "signingAdapterMockChecks": 14,
+  "staticChecks": "PASS; 50 modules, 57 shell assets, 150 cached vendor files, 56 external-dependency scans",
+  "invalidCommand": "npm run test:unit is absent on develop; no tests executed by that command"
+}

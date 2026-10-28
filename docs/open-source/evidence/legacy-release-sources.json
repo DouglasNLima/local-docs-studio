@@ -1,0 +1,42 @@
+[
+  {
+    "tag": "v0.1.0-dev.4",
+    "asset": "LensDocsStudio.Windows-0.1.0-dev.zip",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/releases/download/v0.1.0-dev.4/LensDocsStudio.Windows-0.1.0-dev.zip",
+    "apiDigest": "sha256:06bfa3896e1cca48f1dc87d2f49d2387a8bcb93078e9f070764f22b048dd860c",
+    "file": "v0.1.0-dev.4-LensDocsStudio.Windows-0.1.0-dev.zip",
+    "size": 34115305
+  },
+  {
+    "tag": "v0.1.0-dev.3",
+    "asset": "LensDocsStudio.Windows-0.1.0-dev.zip",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/releases/download/v0.1.0-dev.3/LensDocsStudio.Windows-0.1.0-dev.zip",
+    "apiDigest": "sha256:8edd6af39590e28fb24412177145c36c85e6174b8afedc0ef5dbe2a9a61437e9",
+    "file": "v0.1.0-dev.3-LensDocsStudio.Windows-0.1.0-dev.zip",
+    "size": 34054203
+  },
+  {
+    "tag": "v0.1.0-dev.2",
+    "asset": "LensDocsStudio.Windows-0.1.0-dev.zip",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/releases/download/v0.1.0-dev.2/LensDocsStudio.Windows-0.1.0-dev.zip",
+    "apiDigest": "sha256:c7c9e52322eda140d9ab60f9d8d2bf257eed9ea898f50fc8efa2d90a04a9bf0b",
+    "file": "v0.1.0-dev.2-LensDocsStudio.Windows-0.1.0-dev.zip",
+    "size": 34031627
+  },
+  {
+    "tag": "v0.1.0-dev.1",
+    "asset": "LensDocsStudio.Windows-0.1.0-dev.zip",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/releases/download/v0.1.0-dev.1/LensDocsStudio.Windows-0.1.0-dev.zip",
+    "apiDigest": "sha256:3c9c343b8abb06655b6a2dd55caceeff2542ed64bcf4ff943afc7a5957c79a7a",
+    "file": "v0.1.0-dev.1-LensDocsStudio.Windows-0.1.0-dev.zip",
+    "size": 33972441
+  },
+  {
+    "tag": "v0.1.0-dev",
+    "asset": "LensDocsStudio.Windows-0.1.0-dev.zip",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/releases/download/v0.1.0-dev/LensDocsStudio.Windows-0.1.0-dev.zip",
+    "apiDigest": "sha256:8cd380c42c33aab8fe02c82184ff0a6ffde6fc0c6b077be40e0cf6a51c7e6188",
+    "file": "v0.1.0-dev-LensDocsStudio.Windows-0.1.0-dev.zip",
+    "size": 33911043
+  }
+]

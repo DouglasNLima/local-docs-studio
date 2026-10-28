@@ -2,6 +2,14 @@
 
 Local Markdown, Mermaid, and documentation studio.
 
+Lens Docs Studio is intended to remain free and community maintained, with no
+subscriptions, paid licences or features restricted by a plan. Open-source
+licensing is being prepared: MIT is proposed and has **not** been adopted.
+See the [licence audit and readiness receipt](docs/open-source/README.md),
+[contribution guide](CONTRIBUTING.md), [support](SUPPORT.md),
+[security policy](SECURITY.md), [third-party notices](THIRD_PARTY_NOTICES.md) and
+[Code signing policy](docs/open-source/code-signing-policy.md).
+
 <a id="native-windows-reconstruction"></a>
 
 ## Native Windows edition

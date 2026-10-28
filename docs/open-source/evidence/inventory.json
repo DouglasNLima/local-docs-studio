@@ -1,0 +1,3371 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "5c61d17966befee665856a7993cb174252df5214",
+  "sourceTree": "d995527c96141dca398a0adcff6c9d007edacde3",
+  "trackedFiles": 2300,
+  "categories": {
+    "build-test-distribution": 73,
+    "web-or-project-source": 72,
+    "upstream-web": 232,
+    "documentation": 151,
+    "recorded-evidence": 898,
+    "artwork-or-fixture": 6,
+    "native-source": 716,
+    "adapted-upstream": 3,
+    "legacy-shell-source": 18,
+    "fixture": 131
+  },
+  "nuget": [
+    {
+      "name": "AngleSharp",
+      "version": "1.8.4",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "lbwt3oqjyxI6x01NT0kRqnudE+gxLqRAs/X49/iVWyguj6OtRfYCanV1mL+jYZgeeAqnGqWzqi7+s5gdtBF1Ag=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "lbwt3oqjyxI6x01NT0kRqnudE+gxLqRAs/X49/iVWyguj6OtRfYCanV1mL+jYZgeeAqnGqWzqi7+s5gdtBF1Ag=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "lbwt3oqjyxI6x01NT0kRqnudE+gxLqRAs/X49/iVWyguj6OtRfYCanV1mL+jYZgeeAqnGqWzqi7+s5gdtBF1Ag=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "lbwt3oqjyxI6x01NT0kRqnudE+gxLqRAs/X49/iVWyguj6OtRfYCanV1mL+jYZgeeAqnGqWzqi7+s5gdtBF1Ag=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/AngleSharp/1.8.4",
+      "status": "METADATA_REVIEWED",
+      "authors": "AngleSharp",
+      "copyright": "Copyright 2013-2026, AngleSharp.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://anglesharp.github.io/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/AngleSharp/AngleSharp",
+        "branch": "refs/heads/main",
+        "commit": "32981ded5b0c78c4a5afcfbb677ffb329078fdf8"
+      },
+      "metadataSha256": "34265c58900fc45073f929e4632e85aeb490ec32d756c755b8d512df2d4fa3d9",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "9c2e71b31d95eff4ff7d95ee61ce09f3a8e6e64e517616a8ddaa216819afff61",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "AvalonEdit",
+      "version": "6.3.1.120",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "6ASBKPzAg64BLDlFOJo4Ypr1sA/6hB5+TfHLJaZYUSTE0jgxvKlVqKeo/ISTG9qEMxu604qUu6BGugmJkfdrNw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Direct",
+          "contentHash": "6ASBKPzAg64BLDlFOJo4Ypr1sA/6hB5+TfHLJaZYUSTE0jgxvKlVqKeo/ISTG9qEMxu604qUu6BGugmJkfdrNw=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/AvalonEdit/6.3.1.120",
+      "status": "METADATA_REVIEWED",
+      "authors": "AvalonEdit Contributors",
+      "copyright": "2000-2025 AlphaSierraPapa for the SharpDevelop Team",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "http://www.avalonedit.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/icsharpcode/AvalonEdit.git",
+        "commit": "862415d51eddc9eac93f462dbc522ffbf929cd52"
+      },
+      "metadataSha256": "77f4c9a63df96561fe9950c2ee0a592315f2012e1dedc06d4b0a68cf6e6ac929",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "8ac3e5aa2bb6178d92cbe72c7900a683fab0aee66a8eafa481611c444dbee3e3",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "CommunityToolkit.Mvvm",
+      "version": "8.4.2",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "WadCzGEc2U+3e20avRLng4qNtt4zoOGWrdUISqJWrHe3/FSnrYjuM5Sb4yQb09LhkBXrrI4Zt3dLKgRMbItsrg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Direct",
+          "contentHash": "WadCzGEc2U+3e20avRLng4qNtt4zoOGWrdUISqJWrHe3/FSnrYjuM5Sb4yQb09LhkBXrrI4Zt3dLKgRMbItsrg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/CommunityToolkit.Mvvm/8.4.2",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "(c) .NET Foundation and Contributors. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/CommunityToolkit/dotnet",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/CommunityToolkit/dotnet",
+        "branch": "refs/heads/rel/8.4.2",
+        "commit": "35dfe7b12da0e64384bfaec7ebc0883196a89f9f"
+      },
+      "metadataSha256": "f527c8b88468974b36805a629db57129dcc8d6397e57eadff3fdba0fb4b6d740",
+      "notices": [
+        {
+          "path": "License.md",
+          "sha256": "651997ef19dbb9ecb8dd660dbc86444a65af21f18cfe08daa69bf201cd5cfdfc"
+        },
+        {
+          "path": "ThirdPartyNotices.txt",
+          "sha256": "7774f8b0ab66bfb47ec154ce24a2d6d574febc44a74d940b8a037d1c56756163"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "8cb4b5be8e95f9f1ec26cf341d84fbee8244e88102ebc7c88242e960e0e35805",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "DocumentFormat.OpenXml",
+      "version": "3.5.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "zxdOf5VVCe/uNklbRhj8dVBzQGj3DoqkUuqOp9cAZVuN8mNYDjof1lvSQA2OQNr8Ptc9d7pbA7Azq/ReaI3FpA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "zxdOf5VVCe/uNklbRhj8dVBzQGj3DoqkUuqOp9cAZVuN8mNYDjof1lvSQA2OQNr8Ptc9d7pbA7Azq/ReaI3FpA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "zxdOf5VVCe/uNklbRhj8dVBzQGj3DoqkUuqOp9cAZVuN8mNYDjof1lvSQA2OQNr8Ptc9d7pbA7Azq/ReaI3FpA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "zxdOf5VVCe/uNklbRhj8dVBzQGj3DoqkUuqOp9cAZVuN8mNYDjof1lvSQA2OQNr8Ptc9d7pbA7Azq/ReaI3FpA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/DocumentFormat.OpenXml/3.5.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/dotnet/Open-XML-SDK",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/Open-XML-SDK",
+        "branch": "refs/heads/main",
+        "commit": "3139fdfd27414548a41555f7848d5728f6e71a42"
+      },
+      "metadataSha256": "24269c24eda971be12f86756b8f2ccfceef2e5a008eef12dbd8959cf9ce355c3",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "71375a11a53eeb554005477ce6ca127909aebed474900e92298360b49a68307f",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "DocumentFormat.OpenXml.Framework",
+      "version": "3.5.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "U5txtc3ORno73xQx9Lf2gWzfaSZnZwKHfLkTAslhlew9lxe5XbUiCt0dY1fHeAf8yRqszUAe5i/+xLC9R/Xfsw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "U5txtc3ORno73xQx9Lf2gWzfaSZnZwKHfLkTAslhlew9lxe5XbUiCt0dY1fHeAf8yRqszUAe5i/+xLC9R/Xfsw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "U5txtc3ORno73xQx9Lf2gWzfaSZnZwKHfLkTAslhlew9lxe5XbUiCt0dY1fHeAf8yRqszUAe5i/+xLC9R/Xfsw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "U5txtc3ORno73xQx9Lf2gWzfaSZnZwKHfLkTAslhlew9lxe5XbUiCt0dY1fHeAf8yRqszUAe5i/+xLC9R/Xfsw=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/DocumentFormat.OpenXml.Framework/3.5.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/dotnet/Open-XML-SDK",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/Open-XML-SDK",
+        "branch": "refs/heads/main",
+        "commit": "3139fdfd27414548a41555f7848d5728f6e71a42"
+      },
+      "metadataSha256": "15bde8a3f5eb8089980298eac6a265e9b98b0f331dd77bf5b9a83e6a9780fa1d",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d317d974986a90d8f6de1832a48fb1052d771ea475a37a2f4e3be85c497fa9c5",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "FlaUI.Core",
+      "version": "5.0.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "VWWYqwjsYkii2BrUsz5+bpXEp27NherKhLt19hTxHwJP4KrfyZoeo1FdBov4ZTh655wZAKDGIjR7NJLDesuzeg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/FlaUI.Core/5.0.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "Roemer",
+      "copyright": "Copyright (c) 2016-2024",
+      "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+      "projectUrl": "https://github.com/FlaUI/FlaUI",
+      "licence": "LICENSE.txt",
+      "licenceType": "file",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/FlaUI/FlaUI",
+        "commit": "c5e7eb7af081e68534cb6b6890a38aa791ce4168"
+      },
+      "metadataSha256": "5e1b3e378272da66a3da9400512ac86c7377e17638a15d2b796f9a9aca1c71b9",
+      "notices": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "191cc65ea82036b77f1872e6d4ebf743d3d120895bba2fa5248d126cd6f568a7",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "FlaUI.UIA3",
+      "version": "5.0.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Direct",
+          "contentHash": "s1Yy1RsRJ0OXvmtxQlNJd0cu4sfvN3PFFu6skBGK8VlwPl/b38E0V5kCbo2gvkuhRIu4Itfxjdo7DUMF7qJw4Q=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/FlaUI.UIA3/5.0.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "Roemer",
+      "copyright": "Copyright (c) 2016-2024",
+      "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+      "projectUrl": "https://github.com/FlaUI/FlaUI",
+      "licence": "LICENSE.txt",
+      "licenceType": "file",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/FlaUI/FlaUI",
+        "commit": "c5e7eb7af081e68534cb6b6890a38aa791ce4168"
+      },
+      "metadataSha256": "7b7cef52f9a2e3b7bed37a0b30361cea3cf10a0df4e25616b06ad5cd394b16cb",
+      "notices": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d5d2e083539a04bf6c9053781dfd47332854a76faeb8e9c3c68cc82109f711f2",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Interop.UIAutomationClient",
+      "version": "10.19041.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "Me5vKNZ1JSg6txTsPQXaWx7fVNh+fmcUPPwtDKJtqvbMM0N8aoa/l/QPolkJIRnasCabCNt4v2zG4p1Q9HU98A=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Interop.UIAutomationClient/10.19041.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "Roemer",
+      "copyright": "Copyright (c) 2020",
+      "licenseUrl": "https://aka.ms/deprecateLicenseUrl",
+      "projectUrl": "https://github.com/Roemer/UIAutomation-Interop",
+      "licence": "LICENSE.txt",
+      "licenceType": "file",
+      "repository": null,
+      "metadataSha256": "98d8c4eff181dabb9b789cce4dfec02af7c6a683e9c5225ab03ce6e7c81631ae",
+      "notices": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "ae507f8cb7ce8b34d9ba817d165492af4225482305a8b92c7620f5fa7b7c57a1"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "0d2ed17db2cb13a262f0580ab992db87577651c25a9899053df4114b4d9ff3b1",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Markdig",
+      "version": "1.4.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "lLhaiI/mNDTNzgLqnmknhf4LjgTqOAyjx5+GNz0X3AxYMxUhmFppF2WVMdER+SDqwhE5wUF1pzs/cuLwFxs7xA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "lLhaiI/mNDTNzgLqnmknhf4LjgTqOAyjx5+GNz0X3AxYMxUhmFppF2WVMdER+SDqwhE5wUF1pzs/cuLwFxs7xA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "lLhaiI/mNDTNzgLqnmknhf4LjgTqOAyjx5+GNz0X3AxYMxUhmFppF2WVMdER+SDqwhE5wUF1pzs/cuLwFxs7xA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "lLhaiI/mNDTNzgLqnmknhf4LjgTqOAyjx5+GNz0X3AxYMxUhmFppF2WVMdER+SDqwhE5wUF1pzs/cuLwFxs7xA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Markdig/1.4.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "Alexandre Mutel",
+      "copyright": "Alexandre Mutel",
+      "licenseUrl": "https://licenses.nuget.org/BSD-2-Clause",
+      "projectUrl": "https://xoofx.github.io/markdig",
+      "licence": "BSD-2-Clause",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xoofx/markdig",
+        "commit": "56e9c238584a44a169f174c881855c049768634c"
+      },
+      "metadataSha256": "f9931cf3466719029b37f55aee1eea76dd41a0348e747464238a22a496560248",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "bdd84353a3f499f989f3111b33aceebd9434f8a069ca8b3da2a065f2230e7baf",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Mermaider",
+      "version": "0.15.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "MN2IzFVOdAudzsmWweeHs+j8TDbyHaacbfvniSWtFEa19eIB7to2nlY1srfUVyxvu2Ge7wBDbr7jrhryP4MGig=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "MN2IzFVOdAudzsmWweeHs+j8TDbyHaacbfvniSWtFEa19eIB7to2nlY1srfUVyxvu2Ge7wBDbr7jrhryP4MGig=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "MN2IzFVOdAudzsmWweeHs+j8TDbyHaacbfvniSWtFEa19eIB7to2nlY1srfUVyxvu2Ge7wBDbr7jrhryP4MGig=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "MN2IzFVOdAudzsmWweeHs+j8TDbyHaacbfvniSWtFEa19eIB7to2nlY1srfUVyxvu2Ge7wBDbr7jrhryP4MGig=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Mermaider/0.15.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Nullean and contributors",
+      "copyright": "Nullean",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/nullean/mermaider",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/nullean/mermaider",
+        "commit": "71b64845570d633a94d29e85579c0a02786fece8"
+      },
+      "metadataSha256": "1511ff73db7856dfeda6618064a095c1bed894b36ba8e2b751ae7d60e0d64af9",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "0dfb57fa49924facd9a7e5a2d18083972ef1c5b73e9a3c8d6fdf66817252e182",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.CodeCoverage",
+      "version": "17.14.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "pmTrhfFIoplzFVbhVwUquT+77CbGH+h4/3mBpdmIlYtBi9nAB+kKI6dN3A/nV4DFi3wLLx/BlHIPK+MkbQ6Tpg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.CodeCoverage/17.14.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/microsoft/vstest",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/microsoft/vstest",
+        "commit": "490850ae3fdc1b470e3804ceab4f6a41cf89ae51"
+      },
+      "metadataSha256": "e8a419e9a7d1045db037afaea25cee698e035acf29e21805ef501bef317d5b5b",
+      "notices": [
+        {
+          "path": "build/netstandard2.0/ThirdPartyNotices.txt",
+          "sha256": "4fc4244935bbe3516164402c573f053a5d246571ed4d357e6cccd8ebec296bbc"
+        },
+        {
+          "path": "ThirdPartyNotices.txt",
+          "sha256": "4fc4244935bbe3516164402c573f053a5d246571ed4d357e6cccd8ebec296bbc"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "7fc432b46f06bd1a0fe3baced8a1269c32f1229c9eb1aab6e931630dd5b8d06b",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.Extensions.DependencyInjection.Abstractions",
+      "version": "8.0.2",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "3iE7UF7MQkCv1cxzCahz+Y/guQbTqieyxyaWKhrRO91itI9cOKO76OHeQDahqG4MmW5umr3CcCvGmK92lWNlbg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "3iE7UF7MQkCv1cxzCahz+Y/guQbTqieyxyaWKhrRO91itI9cOKO76OHeQDahqG4MmW5umr3CcCvGmK92lWNlbg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/runtime",
+        "commit": "81cabf2857a01351e5ab578947c7403a5b128ad1"
+      },
+      "metadataSha256": "0d37e4c53a93e295975d3f62214ff54088f34ac72dc1d601e1c504190bb59dc8",
+      "notices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        },
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "b60b2912da28eaa6518593c9e2efb5334ee062d3c42e80d8fdfa806b3dc52977"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "51f2df1100245f10da54f0bb7e813f277155117777d4fbbab902214e27372606",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.Extensions.Logging.Abstractions",
+      "version": "8.0.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "dL0QGToTxggRLMYY4ZYX5AMwBb+byQBd/5dMiZE07Nv73o6I5Are3C7eQTh7K2+A4ct0PVISSr7TZANbiNb2yQ=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "dL0QGToTxggRLMYY4ZYX5AMwBb+byQBd/5dMiZE07Nv73o6I5Are3C7eQTh7K2+A4ct0PVISSr7TZANbiNb2yQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions/8.0.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/runtime",
+        "commit": "eba546b0f0d448e0176a2222548fd7a2fbf464c0"
+      },
+      "metadataSha256": "2e248071b6c3b471db228aa5f8f71be4b3fe0076ad1914e82579a13b54b37526",
+      "notices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        },
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "b60b2912da28eaa6518593c9e2efb5334ee062d3c42e80d8fdfa806b3dc52977"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "e4c498d5a13051b4577a148f1d8c3470167215c507e2392069b75dc61322bb74",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.Extensions.ObjectPool",
+      "version": "10.0.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "dQKlVXzqflsv5X8iDlAN5YmTL1GcLCrOLKo1s9PNdfjqxeu0S/jmWTfiLGno+8+o1qFL3+VFAH5/ftmypN+sPw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "dQKlVXzqflsv5X8iDlAN5YmTL1GcLCrOLKo1s9PNdfjqxeu0S/jmWTfiLGno+8+o1qFL3+VFAH5/ftmypN+sPw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "dQKlVXzqflsv5X8iDlAN5YmTL1GcLCrOLKo1s9PNdfjqxeu0S/jmWTfiLGno+8+o1qFL3+VFAH5/ftmypN+sPw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "dQKlVXzqflsv5X8iDlAN5YmTL1GcLCrOLKo1s9PNdfjqxeu0S/jmWTfiLGno+8+o1qFL3+VFAH5/ftmypN+sPw=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.Extensions.ObjectPool/10.0.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://asp.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/dotnet",
+        "commit": "c2435c3e0f46de784341ac3ed62863ce77e117b4"
+      },
+      "metadataSha256": "874070f494e9353215030f2601683097a05845370a592e625a47359ad05fe60a",
+      "notices": [
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "307d014f65d8482314f1400ddeae7a0cbabb96c2207bcc77f6233cc10588e5d9"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "21e03c68b7a86d3a192d37a690cc0f745e791097d006d9650b89cb67a22205a6",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.NET.Test.Sdk",
+      "version": "17.14.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "HJKqKOE+vshXra2aEHpi2TlxYX7Z9VFYkr+E5rwEvHC8eIXiyO+K9kNm8vmNom3e2rA56WqxU+/N9NJlLGXsJQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.NET.Test.Sdk/17.14.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/microsoft/vstest",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/microsoft/vstest",
+        "commit": "490850ae3fdc1b470e3804ceab4f6a41cf89ae51"
+      },
+      "metadataSha256": "4be5fe2a9a8685231d30a32509fc10c97057d377b9ea22c33a7a3ac017cfce69",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "9995330c5bc5a7bc759caadc9d17748616cdbb983c11062df122a74607614ff0",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.NETCore.App.Runtime.win-x64",
+      "version": "10.0.13",
+      "references": [
+        {
+          "path": "native runtime",
+          "type": "outside-lock",
+          "contentHash": null
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/dotnet",
+        "commit": "4099f83977f4d29604a9aeb971fb0a7bc1d5f699"
+      },
+      "metadataSha256": "84e8cb90bd380fe379ba5eec956ff386803901d78c6a1a3d79cea372091508a3",
+      "notices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        },
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+        }
+      ],
+      "lockMatchesCacheMetadata": false,
+      "archiveSha256": "c66885d464697be75676b4d1fbca38b8806f3af01d65d27205b3f06add094444",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.TestPlatform.ObjectModel",
+      "version": "17.14.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "xTP1W6Mi6SWmuxd3a+jj9G9UoC850WGwZUps1Wah9r1ZxgXhdJfj1QqDLJkFjHDCvN42qDL2Ps5KjQYWUU0zcQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/17.14.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/microsoft/vstest",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/microsoft/vstest",
+        "commit": "490850ae3fdc1b470e3804ceab4f6a41cf89ae51"
+      },
+      "metadataSha256": "46d770701d691e3617a59d7a0ffbd7b07bfe727a945648db3a629401d6a07ea1",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "40c7fa3bec34213fb5e8caf3a3bc27f8ddb47f72f5fe60e1b3faa3984a35ad8b",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.TestPlatform.TestHost",
+      "version": "17.14.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "d78LPzGKkJwsJXAQwsbJJ7LE7D1wB+rAyhHHAaODF+RDSQ0NgMjDFkSA1Djw18VrxO76GlKAjRUhl+H8NL8Z+Q=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.TestPlatform.TestHost/17.14.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/microsoft/vstest",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/microsoft/vstest",
+        "commit": "490850ae3fdc1b470e3804ceab4f6a41cf89ae51"
+      },
+      "metadataSha256": "2988ea729e27c2ddbe49e8f1be039124580cc18be40c2be4cb120d4078068bb3",
+      "notices": [
+        {
+          "path": "ThirdPartyNotices.txt",
+          "sha256": "e2ce7628e0f67d0d724eea9d9286a6938bf1eedd253fc84b23d72ae54778a5f7"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d5cc4759cbc7443ee8ad0dc41043cfc55184913a71a26d7fce82020bd4889c9b",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Microsoft.Web.WebView2",
+      "version": "1.0.3967.48",
+      "references": [
+        {
+          "path": "legacy shell, direct only",
+          "type": "outside-lock",
+          "contentHash": null
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.Web.WebView2/1.0.3967.48",
+      "status": "MISSING_RESTORED_METADATA"
+    },
+    {
+      "name": "Microsoft.WindowsAppSDK",
+      "version": "2.1.3",
+      "references": [
+        {
+          "path": "legacy shell, direct only",
+          "type": "outside-lock",
+          "contentHash": null
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.WindowsAppSDK/2.1.3",
+      "status": "MISSING_RESTORED_METADATA"
+    },
+    {
+      "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
+      "version": "10.0.13",
+      "references": [
+        {
+          "path": "native runtime",
+          "type": "outside-lock",
+          "contentHash": null
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Microsoft.WindowsDesktop.App.Runtime.win-x64/10.0.13",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/dotnet",
+        "commit": "4099f83977f4d29604a9aeb971fb0a7bc1d5f699"
+      },
+      "metadataSha256": "a0ffed4f68e380b58660955bf8812e67c470f6cb42e4d610d11cc08402b5e413",
+      "notices": [
+        {
+          "path": "LICENSE",
+          "sha256": "a89886665765362eb77e0f8e26602c924520041d1711b2eedc136434fe4d01ab"
+        }
+      ],
+      "lockMatchesCacheMetadata": false,
+      "archiveSha256": "af044758d6bc23eca96b60c9ce13b38f211c3e736eef9458de3cadbbd3e20ff2",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Mono.Cecil",
+      "version": "0.11.6",
+      "references": [
+        {
+          "path": "scripts/native/experiments/MarkerReuse/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "f33RkDtZO8VlGXCtmQIviOtxgnUdym9xx/b1p9h91CRGOsJFxCFOFK1FDbVt1OCf1aWwYejUFa2MOQyFWTFjbA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Mono.Cecil/0.11.6",
+      "status": "MISSING_RESTORED_METADATA"
+    },
+    {
+      "name": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Newtonsoft.Json/13.0.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "James Newton-King",
+      "copyright": "Copyright \u00a9 James Newton-King 2008",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://www.newtonsoft.com/json",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/JamesNK/Newtonsoft.Json",
+        "commit": "0a2e291c0d9c0c7675d445703e51750363a549ef"
+      },
+      "metadataSha256": "64aeffca22289eeb3bd32cbe72722ac878d2eadcee9f8885f17daa2e8357c518",
+      "notices": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "b98a397897ff55f76cddc380041507a95a896b2946e0188703bf0496793d6516"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "872fc189e638ab1056555b03aaa38f68bcb54286e221aa646eb1129babf63c77",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "PDFsharp-MigraDoc-WPF",
+      "version": "6.2.4",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "0r3+I3H4BIv2Mt5+3ajQnilY5kqs6fByoVdNly1A2jGOJwjW5qaWE+ohgi9hbMY3hK/JwcxvuChhHz4fi5DO3Q=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Direct",
+          "contentHash": "0r3+I3H4BIv2Mt5+3ajQnilY5kqs6fByoVdNly1A2jGOJwjW5qaWE+ohgi9hbMY3hK/JwcxvuChhHz4fi5DO3Q=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/PDFsharp-MigraDoc-WPF/6.2.4",
+      "status": "METADATA_REVIEWED",
+      "authors": "PDFsharp Team",
+      "copyright": "\u00a9 2026 empira",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://docs.pdfsharp.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/empira/PDFsharp",
+        "branch": "master"
+      },
+      "metadataSha256": "d4086eb9465212750986e7f6c5be2f57bf34eae3a575064766312596048bff80",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "a0550d30fd8686d8caa43a8f62557e7fe323c43462bfa21c89d4166734df3c48",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "PDFsharp-WPF",
+      "version": "6.2.4",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "wD2byoUNGc/IDmSSSPLGGCNMXf4TybnjKlcYa40nuWIYLVA4DSvnCvWr7HbsBEwFvAYRP6DceQ4MN35COD/pdw=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "wD2byoUNGc/IDmSSSPLGGCNMXf4TybnjKlcYa40nuWIYLVA4DSvnCvWr7HbsBEwFvAYRP6DceQ4MN35COD/pdw=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/PDFsharp-WPF/6.2.4",
+      "status": "METADATA_REVIEWED",
+      "authors": "PDFsharp Team",
+      "copyright": "\u00a9 2026 empira",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://docs.pdfsharp.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/empira/PDFsharp",
+        "branch": "master"
+      },
+      "metadataSha256": "56fa6d8f26e95ea060f0516295891c28de802b34f0aa41a6d23412b183e94f8e",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "138109ddeeea62eeb7844b0c8ebf5eb05ec5acd51f464f4dcd8d653b6bd4f807",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "PdfPig",
+      "version": "0.1.16",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "qQcbsNMYVY+K5ELptax2S8thNMk0+rSQq3H/KdYj3LLcko8yTCz8y5KIvsKxIyAuTN0ZYNnfsZkM+0EvxTwHVA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "qQcbsNMYVY+K5ELptax2S8thNMk0+rSQq3H/KdYj3LLcko8yTCz8y5KIvsKxIyAuTN0ZYNnfsZkM+0EvxTwHVA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "qQcbsNMYVY+K5ELptax2S8thNMk0+rSQq3H/KdYj3LLcko8yTCz8y5KIvsKxIyAuTN0ZYNnfsZkM+0EvxTwHVA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "qQcbsNMYVY+K5ELptax2S8thNMk0+rSQq3H/KdYj3LLcko8yTCz8y5KIvsKxIyAuTN0ZYNnfsZkM+0EvxTwHVA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/PdfPig/0.1.16",
+      "status": "METADATA_REVIEWED",
+      "authors": "UglyToad",
+      "copyright": null,
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": "https://github.com/UglyToad/PdfPig",
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/UglyToad/PdfPig",
+        "commit": "a7bb35662bbbf405efddad50aedc9bcdcf515afc"
+      },
+      "metadataSha256": "a8a3d5fa1563443c9cfaa70cdd3815bdca048f6da78afbe726967d42d7f1fe23",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d67171846ea8c28f50359137065fec4514266d7a32b23eae6c5f2ebed8ffcfc4",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "SharpVectors.Wpf",
+      "version": "1.8.6",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "FjD8w5D+nBHBLlVOxr4tZpmqN6XOHhMllKKI9PZDeqjet4wS4PUDdpV/7p71SPQoeowvMivYFoKXsszFUmPpfg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Direct",
+          "contentHash": "FjD8w5D+nBHBLlVOxr4tZpmqN6XOHhMllKKI9PZDeqjet4wS4PUDdpV/7p71SPQoeowvMivYFoKXsszFUmPpfg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/SharpVectors.Wpf/1.8.6",
+      "status": "METADATA_REVIEWED",
+      "authors": "Elinam LLC (Japan)",
+      "copyright": "Copyright (c) 2010 - 2026 Elinam LLC",
+      "licenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+      "projectUrl": "https://github.com/ElinamLLC/SharpVectors",
+      "licence": "BSD-3-Clause",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/ElinamLLC/SharpVectors",
+        "branch": "master"
+      },
+      "metadataSha256": "5fc08db75667582069ac7a41373d4498932f013a31dbb8d1f0a1d5b6e6dfd324",
+      "notices": [
+        {
+          "path": "lib/License.txt",
+          "sha256": "b340c0c95ff913bc1a1c6d8672172b38769fc9a9177b692fc9945130c61b231f"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "8da7c26ce92ec9bbe42345b6f926705b98bf8ceaa5cfa967b8eefac0c1d6aeb0",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "Sugiyama",
+      "version": "0.15.1",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "qli1R/Nl8SaNX4MzvHvxNw7d7t1WSFEktbvnZJGdKGi/lNXtMfOMt6/41ryoPMs4C6dTc/rtfpCKpery0UpzmA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "qli1R/Nl8SaNX4MzvHvxNw7d7t1WSFEktbvnZJGdKGi/lNXtMfOMt6/41ryoPMs4C6dTc/rtfpCKpery0UpzmA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "qli1R/Nl8SaNX4MzvHvxNw7d7t1WSFEktbvnZJGdKGi/lNXtMfOMt6/41ryoPMs4C6dTc/rtfpCKpery0UpzmA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "qli1R/Nl8SaNX4MzvHvxNw7d7t1WSFEktbvnZJGdKGi/lNXtMfOMt6/41ryoPMs4C6dTc/rtfpCKpery0UpzmA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/Sugiyama/0.15.1",
+      "status": "METADATA_REVIEWED",
+      "authors": "Nullean and contributors",
+      "copyright": "Nullean",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/nullean/mermaider",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/nullean/mermaider",
+        "commit": "71b64845570d633a94d29e85579c0a02786fece8"
+      },
+      "metadataSha256": "2b3b694cf6c5eb3be721f14d1078bbad18b5f7ee1022f2a20d5a28a556f6223c",
+      "notices": [
+        {
+          "path": "THIRD-PARTY-NOTICES.md",
+          "sha256": "8e97d608d09fe2d147bba332d15feb008b8967f7e09cf6c93f0e245d37b40c2b"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "3d6fe14e8de9ea4d7ee49349eca395bbecc49d987b390d1d7c1c56a311b70243",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "System.IO.Hashing",
+      "version": "10.0.12",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "jDix4bBMYnpZdSPcnY+KDV6ik3SRMzpMKby/bZl/XUwIiflwRNAFZ0oOl61R/pSaveIJ8t1gs2BUlrGsPs/bcg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "jDix4bBMYnpZdSPcnY+KDV6ik3SRMzpMKby/bZl/XUwIiflwRNAFZ0oOl61R/pSaveIJ8t1gs2BUlrGsPs/bcg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "jDix4bBMYnpZdSPcnY+KDV6ik3SRMzpMKby/bZl/XUwIiflwRNAFZ0oOl61R/pSaveIJ8t1gs2BUlrGsPs/bcg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "jDix4bBMYnpZdSPcnY+KDV6ik3SRMzpMKby/bZl/XUwIiflwRNAFZ0oOl61R/pSaveIJ8t1gs2BUlrGsPs/bcg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/System.IO.Hashing/10.0.12",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/dotnet",
+        "commit": "95017c711e6afc1085133d440e42b4bd78155701"
+      },
+      "metadataSha256": "23762c4a6fbc6165ffbc22731127998978526b1cf775a0bb86ecba5080a5ffec",
+      "notices": [
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d918de044168a48e148a73e84c6db6f8fea570963848dc4c03631aad97958dd1",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "System.IO.Packaging",
+      "version": "10.0.2",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "JTpM4z0wpoIHHDvlCU27HsXo+zVnpWib94HXQpzzr+jc/P9NYf4w353AK4MXyGq/grm1mbLi7eXsOsDU8sGmNg=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Core/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "JTpM4z0wpoIHHDvlCU27HsXo+zVnpWib94HXQpzzr+jc/P9NYf4w353AK4MXyGq/grm1mbLi7eXsOsDU8sGmNg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/System.IO.Packaging/10.0.2",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/dotnet",
+        "commit": "44525024595742ebe09023abe709df51de65009b"
+      },
+      "metadataSha256": "b41f9f8c7f534f01af94fb7b64169a2fea044087821324ce5cab928cdf87d409",
+      "notices": [
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d75d169bff3840871dfd41f1141bfdd6c6a319a2a53620bdef69106be084f5e9",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "System.Management",
+      "version": "8.0.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0/win-x64",
+          "type": "Transitive",
+          "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/System.Management/8.0.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "Microsoft",
+      "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://dot.net/",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dotnet/runtime",
+        "commit": "5535e31a712343a63f5d7d796cd874e563e5ac14"
+      },
+      "metadataSha256": "2614b5a13af7b58279e2ead12fe2f7ba6ae8307dc778486a0df3e6f8531edb22",
+      "notices": [
+        {
+          "path": "LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        },
+        {
+          "path": "THIRD-PARTY-NOTICES.TXT",
+          "sha256": "19c19dcac9f3ee6302cfbc6745bb8e79f08efc4c933eb8dc5509bf14b88347ec"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "1f0a5f0dbfbeabbfefc51eaae7b986160979534bf1cbea1127aa2b14a3917cfd",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "WpfMath",
+      "version": "2.1.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "216GtCBYFMPw5SaArNcuTgemgAWw985LihSEf7mtOjJYTN04X4BVFGPrkJ2Fiv1ffL8gX2xiRw/o+q1SC5oSAA=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Direct",
+          "contentHash": "216GtCBYFMPw5SaArNcuTgemgAWw985LihSEf7mtOjJYTN04X4BVFGPrkJ2Fiv1ffL8gX2xiRw/o+q1SC5oSAA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/WpfMath/2.1.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "ForNeVeR",
+      "copyright": "Copyright \u00a9 Alex Regueiro 2010; Copyright \u00a9 WPF-Math Contributors 2023; Copyright \u00a9 XAML-Math Contributors 2023",
+      "licenseUrl": "https://licenses.nuget.org/MIT%20AND%20OFL-1.1",
+      "projectUrl": "https://github.com/ForNeVeR/xaml-math",
+      "licence": "MIT AND OFL-1.1",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/ForNeVeR/xaml-math.git",
+        "commit": "d6f576345998777dcf7ad112da1add9bd7ad9674"
+      },
+      "metadataSha256": "2248101035764aad0f1ce6c4b98eb07ca814f0998be3239edb73fb73a1b7bf37",
+      "notices": [
+        {
+          "path": "FONT-LICENSES.md",
+          "sha256": "32356de73439e0823f3db6d425360367aa31997ed4a5e3699e1360c87c97dcae"
+        }
+      ],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "37622fa45d0dd18a312744eed4da8bf55a7b297606be87169c2bedb443eb7bad",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "XamlMath.Shared",
+      "version": "2.1.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Native.Validation/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "p7W78KZc2EWuVqAd704m4yGWg0HtxahjNYRVxDWhw7npf8oMD8C7EUc1pjkjZIcmk5PxXJ+t5FE2Fs3gBYjv1A=="
+        },
+        {
+          "path": "src/native/LensDocsStudio.Native/packages.lock.json",
+          "framework": "net10.0-windows7.0",
+          "type": "Transitive",
+          "contentHash": "p7W78KZc2EWuVqAd704m4yGWg0HtxahjNYRVxDWhw7npf8oMD8C7EUc1pjkjZIcmk5PxXJ+t5FE2Fs3gBYjv1A=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/XamlMath.Shared/2.1.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "ForNeVeR",
+      "copyright": "Copyright \u00a9 Alex Regueiro 2010; Copyright \u00a9 WPF-Math Contributors 2023; Copyright \u00a9 XAML-Math Contributors 2023",
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/ForNeVeR/xaml-math",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "url": "https://github.com/ForNeVeR/xaml-math.git"
+      },
+      "metadataSha256": "17b0f72ac52cd600d6ecac62be60069d6ae6ce1c626d43abcd86671283961628",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "e64a64e7a1827b8186c79a78cac50cf118a02009341e109a89c02808f5d5bc8f",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "coverlet.collector",
+      "version": "6.0.4",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "lkhqpF8Pu2Y7IiN7OntbsTtdbpR1syMsm2F3IgX6ootA4ffRqWL5jF7XipHuZQTdVuWG/gVAAcf8mjk8Tz0xPg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/coverlet.collector/6.0.4",
+      "status": "METADATA_REVIEWED",
+      "authors": "tonerdo",
+      "copyright": null,
+      "licenseUrl": "https://licenses.nuget.org/MIT",
+      "projectUrl": "https://github.com/coverlet-coverage/coverlet",
+      "licence": "MIT",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/coverlet-coverage/coverlet.git",
+        "commit": "90b21079d43cffae3a18f264e00962b9c8a1d57a"
+      },
+      "metadataSha256": "e9104ceb9439eac522d5e522fb100f17659efe14e0a676a935695822dc038cab",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "89e89497b1b9a55290e15eabc6111ed1e85ea74feed51043dc4008eb70104c8d",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit",
+      "version": "2.9.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "TlXQBinK35LpOPKHAqbLY4xlEen9TBafjs0V5KnA4wZsoQLQJiirCR4CbIXvOH8NzkW4YeJKP5P/Bnrodm0h9Q=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit/2.9.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/xunit",
+        "commit": "9712244020d385955d33136b3fe3e87de43539cd"
+      },
+      "metadataSha256": "8f3373c5260b2acec2874a280640e0fbb9ac538d754880d7abaa4473c3497d25",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "04fae949b8e5201ecfa07fa8702baca8c0eb3198114194b3793789cc72bf23d7",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.abstractions",
+      "version": "2.0.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "pot1I4YOxlWjIb5jmwvvQNbTrZ3lJQ+jUGkGjWE3hEFM0l5gOnBWS+H3qsex68s5cO52g+44vpGzhAt+42vwKg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.abstractions/2.0.3",
+      "status": "LICENCE_LINK_REVIEW_REQUIRED",
+      "authors": "James Newkirk,Brad Wilson",
+      "copyright": null,
+      "licenseUrl": "https://raw.githubusercontent.com/xunit/xunit/master/license.txt",
+      "projectUrl": "https://github.com/xunit/xunit",
+      "licence": null,
+      "licenceType": null,
+      "repository": null,
+      "metadataSha256": "e59191df9e3047dd953b695c886597786ac2771f66897baa40877f643da9f7b1",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "d03d72fc2df8880448f7a81bddb00e1bcb5c18f323c7e7cc69b4cfa727469403",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.analyzers",
+      "version": "1.18.0",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "OtFMHN8yqIcYP9wcVIgJrq01AfTxijjAqVDy/WeQVSyrDC1RzBWeQPztL49DN2syXRah8TYnfvk035s7L95EZQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.analyzers/1.18.0",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson,marcind",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/xunit.analyzers",
+        "commit": "2620a4ddabcba16ceb64ea9ad19c566252015fe8"
+      },
+      "metadataSha256": "270ffb0dce41126154f16bad2ee025da605185fb5308247877745e5eef97689e",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "0ce81a98b9df8bd51ae480e6dc9566f4c68e15b4926e6ab997c8f634f3b7a9dd",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.assert",
+      "version": "2.9.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "/Kq28fCE7MjOV42YLVRAJzRF0WmEqsmflm0cfpMjGtzQ2lR5mYVj1/i0Y8uDAOLczkL3/jArrwehfMD0YogMAA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.assert/2.9.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/xunit",
+        "commit": "9712244020d385955d33136b3fe3e87de43539cd"
+      },
+      "metadataSha256": "e3f99045088c262b14a62dd93cf025912e9e653f5ce1d77e7f858238e0bcb508",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "bc760e75ef1b775d293a6afb89301836d3e5a87cec265e31dedd430ee61d0c20",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.core",
+      "version": "2.9.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "BiAEvqGvyme19wE0wTKdADH+NloYqikiU0mcnmiNyXaF9HyHmE6sr/3DC5vnBkgsWaE6yPyWszKSPSApWdRVeQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.core/2.9.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/xunit",
+        "commit": "9712244020d385955d33136b3fe3e87de43539cd"
+      },
+      "metadataSha256": "08c844d40924a386d7600e2523c57f1a2a1d6a77c03b8c0001501831944a0691",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "aa4550f09c3f2d95a6c62ae43cec22af2edbbd99f722e691ceefeca761fc6a7c",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.extensibility.core",
+      "version": "2.9.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "kf3si0YTn2a8J8eZNb+zFpwfoyvIrQ7ivNk5ZYA5yuYk1bEtMe4DxJ2CF/qsRgmEnDr7MnW1mxylBaHTZ4qErA=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.extensibility.core/2.9.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/xunit",
+        "commit": "9712244020d385955d33136b3fe3e87de43539cd"
+      },
+      "metadataSha256": "0c5886e9320c6dd828e50048c27cf355314fe20e2d8d4026b4a3a9fe42d4a359",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "99ca555fe9b447b1747aff426819db6a2f60b6ee0655caa28c4b91a9ef3d0f48",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.extensibility.execution",
+      "version": "2.9.3",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Transitive",
+          "contentHash": "yMb6vMESlSrE3Wfj7V6cjQ3S4TXdXpRqYeNEI3zsX31uTsGMJjEw6oD5F5u1cHnMptjhEECnmZSsPxB6ChZHDQ=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.extensibility.execution/2.9.3",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/xunit",
+        "commit": "9712244020d385955d33136b3fe3e87de43539cd"
+      },
+      "metadataSha256": "9c5498549b5200b65ba0c7e0d4597c269c6bbb2e374ea8f1c28d76dc3f3a0bdd",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "dabc4cb360ede1c01c98e14cc0fe587774693f40679a22fc71794acac5d8d23c",
+      "archiveMatchesCacheSidecar": true
+    },
+    {
+      "name": "xunit.runner.visualstudio",
+      "version": "3.1.4",
+      "references": [
+        {
+          "path": "src/native/LensDocsStudio.Core.Tests/packages.lock.json",
+          "framework": "net10.0",
+          "type": "Direct",
+          "contentHash": "5mj99LvCqrq3CNi06xYdyIAXOEh+5b33F2nErCzI5zWiDdLHXiPXEWFSUAF8zlIv0ZWqjZNCwHTQeAPYbF3pCg=="
+        }
+      ],
+      "source": "https://www.nuget.org/packages/xunit.runner.visualstudio/3.1.4",
+      "status": "METADATA_REVIEWED",
+      "authors": "jnewkirk,bradwilson",
+      "copyright": "Copyright (C) .NET Foundation",
+      "licenseUrl": "https://licenses.nuget.org/Apache-2.0",
+      "projectUrl": null,
+      "licence": "Apache-2.0",
+      "licenceType": "expression",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/xunit/visualstudio.xunit",
+        "commit": "50e68bbb8b9ddd4b1bbb95d062b62010caf99909"
+      },
+      "metadataSha256": "5cb4620571521ee8627f8d81c3341aee015bccee0e2054caa08bbe43f7351436",
+      "notices": [],
+      "lockMatchesCacheMetadata": true,
+      "archiveSha256": "5b54674b105a5f2cbd5e6e0e67956a1b67e082d94eaa7fddbc803110e6eff2d4",
+      "archiveMatchesCacheSidecar": true
+    }
+  ],
+  "npm": [
+    {
+      "name": "@braintree/sanitize-url",
+      "version": "7.1.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-KNLZD3CH.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/%40braintree%2Fsanitize-url/7.1.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/braintree/sanitize-url.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "15e19737d946559289b915e5dad3b4c28407735e",
+        "tarball": "https://registry.npmjs.org/@braintree/sanitize-url/-/sanitize-url-7.1.1.tgz",
+        "fileCount": 19,
+        "integrity": "sha512-i1L7noDNxtFyL5DmZafWy1wRVhGehQmzZaz1HiN5e7iylJMSZR7ekOV7NsIqa5qBldlLrsKv4HbgFUVlQrz8Mw==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDGPaDQK4uRtDagXy8FbO8ftAjl14yGfV3mTPyeJdFgOAIhAL8H27crUDdhAqdJC3VggNRJA8gKrtBacM569JZx2W1c",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 23826
+      },
+      "metadataSha256": "3e58f6f1158bd1f98da6d926ff649813091aa6886195c15e3d0a610e7551425d"
+    },
+    {
+      "name": "@highlightjs/cdn-assets",
+      "version": "11.11.1",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/%40highlightjs%2Fcdn-assets/11.11.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git://github.com/highlightjs/highlight.js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "136984ae467865e22080b3a4b65398a086e1ae7b",
+        "tarball": "https://registry.npmjs.org/@highlightjs/cdn-assets/-/cdn-assets-11.11.1.tgz",
+        "fileCount": 908,
+        "integrity": "sha512-VEPdHzwelZ12hEX18BHduqxMZGolcUsrbeokHYxOUIm8X2+M7nx5QPtPeQgRxR9XjhdLv4/7DD5BWOlSrJ3k7Q==",
+        "signatures": [
+          {
+            "sig": "MEUCIESozOwX3UGjYt8tUX0gvD/xVj7qz5wgqap35pCprsRrAiEAz54hHQ5wFu2bALkCv/wHLcm5NYtaCV8P7tcOaOhiMVY=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 4328928
+      },
+      "metadataSha256": "cd79ac236b783fac6243f78043107eab19cc02643f9959d980d913066199c555"
+    },
+    {
+      "name": "@iconify/utils",
+      "version": "3.0.2",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-INKRHTLW.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/%40iconify%2Futils/3.0.2",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iconify/iconify.git",
+        "type": "git",
+        "directory": "packages/utils"
+      },
+      "dist": {
+        "shasum": "9599607f20690cd3e7a5d2d459af0eb81a89dc2b",
+        "tarball": "https://registry.npmjs.org/@iconify/utils/-/utils-3.0.2.tgz",
+        "fileCount": 151,
+        "integrity": "sha512-EfJS0rLfVuRuJRn4psJHtK2A9TqVnkxPpHY6lYHiB9+8eSuudsxbwMiavocG45ujOo6FJ+CIRlRnlOGinzkaGQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIHcrhf36XhKuqirIKOKCDT5PzoDoCv7qGSyYpxKrgwsrAiEAjskjp8zes2NEjvc22wi8YLVicKk8xELbkqB1CzS/YTA=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 194786
+      },
+      "metadataSha256": "8e28d004658d257c0f043db940d50cefa0a164d9cbb52b8b16e452b6307337a3"
+    },
+    {
+      "name": "@playwright/test",
+      "version": "1.64.0",
+      "evidence": [
+        "package-lock.json (test tooling)"
+      ],
+      "source": "https://registry.npmjs.org/%40playwright%2Ftest/1.64.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "Apache-2.0",
+      "repository": {
+        "url": "git+https://github.com/microsoft/playwright.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "af51c4f1dd5f689b2ff16e6eacf27ac00843f239",
+        "tarball": "https://registry.npmjs.org/@playwright/test/-/test-1.64.0.tgz",
+        "fileCount": 11,
+        "integrity": "sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==",
+        "signatures": [
+          {
+            "sig": "MEUCIGwd51zzl/s8Ynfqb0g5X4T+qVJV9EBVQ/iTzmv37UcCAiEAh2l1BiEXafRIyIvzZNem1KBq9ghLXR3nlaCvwN0/ico=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEQCIBopA8fVjn2UeqqCfyPot2liG+Devo2O0ihw6z9lbhgNAiB+H4G3cKuPWJRlL4qND+igTMpXrIR0QBLfyapqtbt5jQ==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@playwright%2ftest@1.64.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 28542
+      },
+      "metadataSha256": "3b0b58492384cbc40363d7fee3c0918a412db5f6868dac06221c90f5058a57e2"
+    },
+    {
+      "name": "@upsetjs/venn.js",
+      "version": "2.0.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/vennDiagram-MWXL3ELB.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/%40upsetjs%2Fvenn.js/2.0.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "https://github.com/upsetjs/venn.js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "3be192038cdda927aa4f8b22ab51af82abf47f34",
+        "tarball": "https://registry.npmjs.org/@upsetjs/venn.js/-/venn.js-2.0.0.tgz",
+        "fileCount": 14,
+        "integrity": "sha512-WbBhLrooyePuQ1VZxrJjtLvTc4NVfpOyKx0sKqioq9bX1C1m7Jgykkn8gLrtwumBioXIqam8DLxp88Adbue6Hw==",
+        "signatures": [
+          {
+            "sig": "MEUCIHLsz1ieSVelNUU+3UGLUAobPzKvDFz5zQ3zI2HJUx+8AiEAhxy4EDLmCTvDe77BtJGCOh0FNOT+LKVrT6GwRbqSWtQ=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 245876
+      },
+      "metadataSha256": "f2cbe7871fd3e8e5afc078875c98b84c86024f407e2cde7e87b038abd5ca1e5b"
+    },
+    {
+      "name": "cose-base",
+      "version": "1.0.3",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/cose-bilkent-UX7MHV2Q.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/cose-base/1.0.3",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iVis-at-Bilkent/cose-base.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "650334b41b869578a543358b80cda7e0abe0a60a",
+        "tarball": "https://registry.npmjs.org/cose-base/-/cose-base-1.0.3.tgz",
+        "fileCount": 14,
+        "integrity": "sha512-s9whTXInMSgAp/NVXVNuVxVKzGH2qck3aQlVHxDCdAEPgtMKwc4Wq6/QKhgdEdgbLSi9rBTAcPoRa6JpiG4ksg==",
+        "signatures": [
+          {
+            "sig": "MEUCIQDG+2M5XdSBjhRw8pwqxavsuCvfWnhdbb30eaLpCh2K4QIgKbdwVgrf2azUK6uoPVRsbp4B7gna6rNhY1cQPqg+jmo=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 93352,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJew/BtCRA9TVsSAnZWagAA0b0P/iMu4NHYlxfa2ndeecVy\nBi+D9oN67qM1bx93PVwfjxwAfT0E9/VPqXHQ0iImCy2x0pN3MTp2ZV3y5Hym\n7DWq0RKkl/QPN66EGPol8lveHgUhsco7GZaoJLIeWKArf4ns4GwChKX4STJB\n9QP6ThpsHcii2gbHZTj2wlhZCYAR8K2GjyzEaNQ2K9j+dMAmv5OOmUbnVN6e\n++6jymFlmSUSSWpHTou0CxOPyUv4KYKtMpcADxozzMVU/C3B1EhHQ/INsk/K\ne3JOlc+imcl0Zk1MT8BybVcMOc/lgrNX5HRu8XexL41XKdwONlUzg7rxQLKM\nykWYFffkon120gOB524Q8lBqMGxdP+jN5/FlzJyEaSS05spnHw4ufxfkxv9g\nPueh5fF/ZEaTZsCKc0LWsSPHxnJxdNJjp/yZJpj9SgLP5WZO55DeRknR5s/e\nXhE87gnZfK5ZPB4MfPqHLv8O6MjOYTfk06+Wak8JDP38bFG5ZTKpNC8Ejix8\nqBXJXG+HVahy3LsorJBcVnPb5O4Em7VedGy/Ps3wFLwuKqpT6MbjE9dwsBWu\n24GS9EoF762wsOJKSCmrKdlYEWi/3edyFnNeSgfRJOlq+BpI1LVx5z63quYb\nlJBMdPjn1srIodmzqhNyuL/qz52LpOBLhMTKXWDRKVEl5DSM3n/4T0NFch59\nwhuD\r\n=Y5fb\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "06d9e8f83eecf28273e601add7c89820f25e9050ffc82c2912a8e706056c8ea6"
+    },
+    {
+      "name": "cose-base",
+      "version": "2.2.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/architectureDiagram-UL44E2DR.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/cose-base/2.2.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iVis-at-Bilkent/cose-base.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "1c395c35b6e10bb83f9769ca8b817d614add5c01",
+        "tarball": "https://registry.npmjs.org/cose-base/-/cose-base-2.2.0.tgz",
+        "fileCount": 15,
+        "integrity": "sha512-AzlgcsCbUMymkADOJtQm3wO9S3ltPfYOFD5033keQn9NJzIbtnZj+UdBJe7DYml/8TdbtHJW3j58SOnKhWY/5g==",
+        "signatures": [
+          {
+            "sig": "MEUCIQC2CXu/8LBcm2ddZx2ajirjY54p2UnHUnhKqmWHIdlFTwIgN5KAGYvaaACL72M3cnhVccoCOz+A12VYzvbiYbM/hkA=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 234348,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjxpy6ACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2Vmq0BA//VjCbU1bRqXW2+YFokIU9Ppi4iWL7pAKT4uIhAdgC5lDAHPV8\r\nSAuoPtqWyI/0dtJJdq/810LgYaO9n/aBh9vkBMRj2Cen4nD1klJdoJwKYubk\r\nuSPP9n1EQdmZlR1l7AOrFYAHxXfq2anLWsj083FFH8NwIVLLVWKQfiQ/45EY\r\nCHd9SdBtrYcEZdJYL8UT6oTorSc+7LyaNwrL2LbqqVWdeikjaBGEv827lmBB\r\nTMU2JnQJqxa3j1V5qu9SHFdGci91BBpig2JTRsVATDQ1hBnewBxz295ut4Yi\r\n5729VlWEQYBh3sL7F1LvaMQ2LEEE54YiJcGoYD2xfouPckBnostQfLR+jg6n\r\nSCQZNYzzCLA19yQK2mE0NhWO+a+52tBM+SBY6Sb06hbGiRNr9QhFXAEo2WnV\r\n91AW5w++Wy/rGtUciWoPdMgk+Gp6Ar0oGwe3mLfrEYQQhRCe19LQKl902Wuk\r\nZhr3dLDxdC1BlVReJNVnN2NeVgWsgfRZDGBS/HyiM/pELCvLquNIUPHQBcHD\r\nGc0uzkUghIZrPxCBST6MvSpQ2NUXgwpMTW5LgVZa82zW7a1cfPb2ddYsA3bt\r\nYNylgEP9WR4x7s4WCpXNcFGkzyysjCm0D2CBjOBlqvU2nUXr1DHt7Sa6knd2\r\nL96fN53oLHTlv/5y85ucM7GOSrbS8tkFm6I=\r\n=Q2py\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "c5cb4cc492faf3e29c9af23f7f30345084d3c707ea544e7561b225356f7324a5"
+    },
+    {
+      "name": "cytoscape",
+      "version": "3.33.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-3SSMPTDK.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/cytoscape/3.33.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/cytoscape/cytoscape.js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "449e05d104b760af2912ab76482d24c01cdd4c97",
+        "tarball": "https://registry.npmjs.org/cytoscape/-/cytoscape-3.33.1.tgz",
+        "fileCount": 202,
+        "integrity": "sha512-iJc4TwyANnOGR1OmWhsS9ayRS3s+XQ185FmuHObThD+5AeJCakAAbWv8KimMTt08xCCLNgneQwFp+JRJOr9qGQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCKUWe3jO3FvRYqCYMnPVukuIGtn4oo5KkZzGy9RFzc2AIgEd0V7ciXNQcRBYjsGptLKarcf7srDFnTQndJve4k8Lo=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 5671578
+      },
+      "metadataSha256": "ad383e92c5d7aa56656c59978a271264d5f99dd7f8d5aed8ddbb9103cc78e0ea"
+    },
+    {
+      "name": "cytoscape-cose-bilkent",
+      "version": "4.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/cose-bilkent-UX7MHV2Q.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/cytoscape-cose-bilkent/4.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/cytoscape/cytoscape.js-cose-bilkent.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "762fa121df9930ffeb51a495d87917c570ac209b",
+        "tarball": "https://registry.npmjs.org/cytoscape-cose-bilkent/-/cytoscape-cose-bilkent-4.1.0.tgz",
+        "fileCount": 16,
+        "integrity": "sha512-wgQlVIUJF13Quxiv5e1gstZ08rnZj2XaLHGoFMYXz7SkNfCDOOteKBE6SYRfA9WxxI/iBc3ajfDoc6hb/MRAHQ==",
+        "signatures": [
+          {
+            "sig": "MEYCIQC5+SNfJ+533Qfhfb1SEbEbxG9ek/yb4asqYTTPZ6Gv4QIhANgjqZtgcK714eXoo86yjb69G/i98JX2jAJUoNxJhp3W",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 82395,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJddiw1CRA9TVsSAnZWagAAM40QAIBuyqW/W7+qnpOMtog6\nR84g9bx7g++wvjc7YC4rwKg3Ln0K+AFwb0CfgDlEqQJuvLkcReDhN9bFf7Nw\n5ssVsl+TVKfjxg1j5AYvnw9KxcixCpzsjpNxWb0rsFplIfKEJI32wfrHXAOg\nlrkaioSA7n/s4onxZ4lrNw7mhzTD6yIvMUwzECa40s1l9Kxx9ggyns1xa+Fl\nR5wv7e8k7rNwj5eVqsESvQAHsSlYi9dUmIkXkq7bLvBUKebZDB88qt5COzX+\nacZJE1rkQNng4jHzQg6AW2oP6/Fin7Za+9/Lq7m4vS7e9HEmmUzc/j4FIVbp\nyG/P4o0Q5svOht/YpYqUjlGriZbufjp2Kg1hjVpYUJzMDEDzxGMnt8EbxCfA\nd0gvIjr1yrzRLxx8KDljorXoDC7K3mgz/hNGAh2iiM7lOZ6sVb0iRpGUnRQ3\n4tbwbuGKFK0pPMhMepugcCVqkbITmaGaxUQag+PC3/XGE2HYkw6/8iQ0Mmyh\n4E1obAGEw7GJcQuT9diFAuOPCvMUO4oTqiPU83/fR3uEDfYf0t5oTH1+1ccH\nASHJ8QJ8c8q9PamZUJFzqb/aCA4b/w4yxbO3C7XSUys+Ghx3d5RvySHpRfXw\ntMUe0H9qOYEefMcRBoCI6R02512wc5WZi4qujP4+e9cUTa/2hvl9cVCBEzmP\nQkK2\r\n=RLZ8\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "0b2de04e1aa6bca47d4f4783eed5ce7e65fede00f25b39e518ecbb96d60594af"
+    },
+    {
+      "name": "cytoscape-fcose",
+      "version": "2.2.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/architectureDiagram-UL44E2DR.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/cytoscape-fcose/2.2.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iVis-at-Bilkent/cytoscape.js-fcose.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "e4d6f6490df4fab58ae9cea9e5c3ab8d7472f471",
+        "tarball": "https://registry.npmjs.org/cytoscape-fcose/-/cytoscape-fcose-2.2.0.tgz",
+        "fileCount": 33,
+        "integrity": "sha512-ki1/VuRIHFCzxWNrsshHYPs6L7TvLu3DL+TyIGEsRcvVERmxokbf5Gdk7mFxZnTdiGtnA4cfSmjZJMviqSuZrQ==",
+        "signatures": [
+          {
+            "sig": "MEYCIQD0bNYXsSEiM6qkgwTZlA2qmFNQnGgWszBv8MI8mZrXkwIhAMpIvMcDjGSV+4htYarlZzXTNrm6AIcdubpbxAgPOoWP",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 8681809,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjxqhKACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpDUw//crL4jS37qD5I20NID7wwvqgi/raiFK+xt4vnt6zGNStaFLYl\r\ngoe7qzGQq4ifSiy/BlyAI7ZvZh54HOFFYy9m/9IEXAafnvLbfjGoC6NqtcAP\r\nBLKccjZHFWjrGWMXqdeSDNlhOvhJO+xEwlQmqhqD4Qmg+yYs6dGENk2S9uLC\r\nh2fcPNiitcvj/y8svdWkck04pzh0H0RKkaamz9AF/eltU1BEsrf/VxKRNJvb\r\nZS8/494bfJ4YgxExU2A2a27saXYLIhWU6M436GV8OoPP4X4ZmphiIN3wzzWJ\r\ndMOHdGK1VJq/KQuILjChKh+Mmx1br7JSf0Y3MdNFq4aPxhwY6IJYVxz2neR/\r\nUIwgnvkydXqtMF3kP6HA6wY4hgvBVvnZWONi8makU9nNB6k3QuPV0P3Y32JO\r\nvIZ4DhMd7G5K6FCY6ErpMcClRhwnSFIqMGYPvAOOrbX/yvbhHT/BUo9nM9nO\r\nms0sByimEFTlyYDxGyeoJk/q5u3y3hghf93brTm+s9l1QK1qKwnjrVFyj3A5\r\nN6CIDlGohj4yGqSQi5/YLUw+aqJUYrMqTSSuxRt4OqLT+CeeNEhk6PHC3AiN\r\nyq2cxUfOkbYTueXCUpryq93dScrXGja9jGF1di6vyZEBY/tw7TmX+6ENZAOR\r\nSf5owqAUEMOZ7oJXqn+NylRrxAfX1pWl4qY=\r\n=dj3b\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "693a02d4da94b4e5164b2cbdd26533cacdc0ba6fcd84efa51c1729f98b67cc51"
+    },
+    {
+      "name": "d3-array",
+      "version": "2.12.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/sankeyDiagram-URQDO5SZ.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-array/2.12.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-array.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "e20b41aafcdffdf5d50928004ececf815a465e81",
+        "tarball": "https://registry.npmjs.org/d3-array/-/d3-array-2.12.1.tgz",
+        "fileCount": 64,
+        "integrity": "sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDn5ytYo+hy9SKI8ZaqbtHgVf/bGGj60FOzM7AOE2fvgwIhAKWtWbVACuzPwnYSpgR7WyYd191LfGiRyjd6D5TARz8R",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 135892,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgW20eCRA9TVsSAnZWagAA1QwP/jUfORYUxzQyX3WCYQPc\nfata24pTWQr0MGkd/WiO7Fqz9dg9f7bNqVl5NT3wUAm7VVl23ESTNhF3hd33\nzIbqEweiPfod+Yjg5TZwliuD8VHw0+KoQBo08zy6c+sKtNjOudFBf/pVBrd1\n3w2B1MjXDoCbbm/iJXTel+OYSF8GU4xo+5dSYfzRr9gUbNI4MGzvhI0L5oV8\n5QXyAP4qLGpMopjlP8mXJ5C8IzryesrIiOyIbkhewvDiKpw2PFmVtQv3yL3J\nFWdoB7Ec1HNIBSJkB4qD6CoA+HzCjz+ph2ClV8aMN8YCS9Ot2pO1Q+7aFrzj\nSuqtA8nsTsFbheaDAh0Yl0GgVeYvv/keuIZnFxcZl6IK4cRCIQmn7lCdUkI9\ncRVtof5rN5mEwUFkKLdJT60SZKkwNY5PzXK5qq+S0m0YxcJqutKz/RchIdYl\nVem8MxftJSlCEpQNC9D6A8hHS0uei7ncnB2DVk7zI/KuBSQEFEVG/Pab4+A/\nS5PD8GhnLOEaOr2RcBK6Qk1V5x5wQfceCFWs8Se607gdpCJes86NL9ZBZuL/\nnWBLgM1bzHLHpZrTgbIEN1penrGA/DQUI6C+lbklmKaVye3ZwVqeW3jPVYoX\n/3c4Gsnnbr/V+fSPWj4F9+F/CWmF9LDwb4qddcMw50GGDzvsXHmpdYQO4rpn\nLun5\r\n=dfIR\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "aeba34f3b861b7c1ead6a250d109f2d6b767ab5edffa5cc374da925f6da45072"
+    },
+    {
+      "name": "d3-array",
+      "version": "3.2.4",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-array/3.2.4",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-array.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "15fec33b237f97ac5d7c986dc77da273a8ed0bb5",
+        "tarball": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz",
+        "fileCount": 66,
+        "integrity": "sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==",
+        "signatures": [
+          {
+            "sig": "MEUCIB7J7S5RpXxWrAU6v5ArgA3IWiAR5RPd494w/lmZfrOGAiEAldBrCDSBSbtKq2iWhLwg0tcrsG9J8WnCNhqNbAhR8+s=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 163730
+      },
+      "metadataSha256": "efc336f352239ffe4ad51a7e77a0e918bf1019915ee066b801136d802e35a9c1"
+    },
+    {
+      "name": "d3-axis",
+      "version": "3.0.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-axis/3.0.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-axis.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "c42a4a13e8131d637b745fc2973824cfeaf93322",
+        "tarball": "https://registry.npmjs.org/d3-axis/-/d3-axis-3.0.0.tgz",
+        "fileCount": 8,
+        "integrity": "sha512-IH5tgjV4jE/GhHkRV0HiVYPDtvfjHQlQfJHs0usq7M30XcSBvOotpmH1IgkcXsO/5gEQZD43B//fc7SRT5S+xw==",
+        "signatures": [
+          {
+            "sig": "MEUCIQD1xo3eyFgDv5kj/WT9H8Jc6rRH7ZrK1Twv2ebC66w9vAIgN7jiSnjEc8zvvdl8R1Z+Lwd0yFrP+R3/jPsrZpAZTEA=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 31410,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgwDcJCRA9TVsSAnZWagAAO7YP/1XScAYWyVpz+mG1IoE7\nB0NGxp+7/HHPifNsSFbLE29bjbkdv/ePoAZo5u0nMRtT8VFUpnru7rBduMZS\nUGphG/nESzMx6N+KvJgfduf/Glf8fdDWUMvdowPJSsdv3gidctmWhPMztjUm\nKw0HQSyFGMvraChL4UnXXD7iK1ITINi3EfLRLkjM79uaIEvQQHzTFtXwCfFZ\nXDj9XYjwkExJKln3kJMmXT8exMgEGO+yrHeXz8dwXvQ2wDzL9+6C2ZfcheM2\n6WL83EIMgVT1VKqL8crISUwuqFpstSstFcy9ALZ8aDG3uF4BZPzYqrGPIvjp\nAAqsGK4FU6BmHLo8isWyIboIrw232Jr+mC1ueastYC95iInzCe24i9LDlpK3\ngTFbZZEDs8emjh0nkQATBMq1AplnTrMACfHnMWYhVdgXlI4oJjw+Snyn6o9S\nXZnX/Vt2GTwXF68mnZAfbCN+bwBF/sI0vPAi82Ce4bnzZQoG7aP+zIh3P3W2\nzGc+58vzXJL/NeXM7oyO1BsWxasV51EaYw7hRXZmsbuvRP8MuIyxFQwKnSAZ\nXSo71mNtEpWG/pjEJjk4SuEndkrLUGeeYa/93fk/Gn1ODkvYP4IKxxGL2OJw\n0FmcJrCiUr3JjxpkZX/LXxRxrC4PlItOgz1j+Jq87oPPLrvzNlyZshvnr4HK\nGH/v\r\n=1mum\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "65ac9e37ca77819738a02fdfb2f2701343a2fd51bbb2a1537b56b94c0aa4f01a"
+    },
+    {
+      "name": "d3-brush",
+      "version": "3.0.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-brush/3.0.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-brush.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "6f767c4ed8dcb79de7ede3e1c0f89e63ef64d31c",
+        "tarball": "https://registry.npmjs.org/d3-brush/-/d3-brush-3.0.0.tgz",
+        "fileCount": 10,
+        "integrity": "sha512-ALnjWlVYkXsVIGlOsuWH1+3udkYFI48Ljihfnh8FZPF2QS9o+PzGLBslO0PjzVoHLZ2KCVgAM8NVkXPJB2aNnQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCsTth2XOJ7xkALtFlpu9RDpRxhfWccMY0sylVYwYSYQAIgf47O7jXDrK9og/KSGaJJzFzWsV6aV3LpCKIjTw2HHXo=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 66555,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgwVb6CRA9TVsSAnZWagAA8QcP/3O75na5WYIINlH6e2DS\nvwTk2UYTbEnuK9aps123IUwsxVGJ5T9334Y27sadihQfx4n3n3qARXz6MfkR\n28vdOjzA1Wx9KWa+NgBF7q4muI/A+j/90lyq3KGV1L+40aN9l5PscQQ0Ljw6\neuF+Mqj/7Y1QXv4Fhf6secpiOlhvjh6cJZECSY6+sP6PoPDDvtH5XkORQxPG\nns/puEhdi4/UVW5C/Wr9gQDjyuM4d/r9meGPrCJk55ZuKIoIOhAj5V14dxMa\nlqdQCpOK6ib8jZobNUYFSsfNlf5KYznxqzZHVuMl09dVbZSMoS2yA5qSCjjq\nmLA/vQkoslTJxVRB9Mfx3WH3wLC8PgzFWmKVbYnnmgSf9LDVpLDxRaNsoxfq\nEZO90bSppCFVDJ99DBmSznOqNBuMOVi5p3wQ4Zhv/vqhyIH1tTUYVBjWf2gx\n4EYeatwxXZm0EZx2pXeiaZmk2WyV8ZRptZjpw+JWfzhqxHkA0QO1En7P5cK+\nysH4xHn9m8D0xOSPJe1L5AtPQOVzE+KTU0l8ssWJthyUbAjIjzqJ0fQY1cbP\njC5y4ZwT4q+DszNWnWNzk9VMqTR5ZcbdUuv4lcC78vs/CXiLHkUARehUtRLA\nBW9eF/IQxQzLWkpfRXL0OtpK2a1PVR9re1hWWPdEiLm0INcUazkvx7mK3iJQ\nPp1N\r\n=VfnL\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "a1f59424450218081f01dafd09e11caccb858da37222b321f07ea3e207424e24"
+    },
+    {
+      "name": "d3-color",
+      "version": "3.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-color/3.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-color.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "395b2833dfac71507f12ac2f7af23bf819de24e2",
+        "tarball": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.0.tgz",
+        "fileCount": 11,
+        "integrity": "sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA==",
+        "signatures": [
+          {
+            "sig": "MEUCIFz00mTz0dUdKpLV8ciP7YiIVtXigzNtnYvPaGlvYsPCAiEAqNxJQJssNWi8D8HmPlNqPN4esBSsjkYSLs1ziyOvxOc=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 61152,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJiQjrEACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2Vmrugw/9HHJ4jHaxRXkhEPPfFvpOGLWf2gXX8uV9D4Jt0p801IUw6DBp\r\nPBNlWKGXwn0FQQSkcXt2LtmQf/D+sGXDp+GcUqgQ8ToyNUjHa6a/D7s45qid\r\nFHH0h4ep6mqiiekKE/nQaFk6l5B6+XsX8A3F1j3Oph3eFnwCXS0Ew9YN/kyo\r\nk8n8XIPj8/3LugEnCXmymzrSOkB+ez0DrcyUtzfbKFkqz8JzSJy1I6iNBvyU\r\n2/yh/kxv3EbOxwYoZRF1MVWqUTQaOTlXbNS2B/3VbrlIoNnYtMOFYsSmLBvD\r\nmMiGrc9oSqZJR5CMAWZg0+TByON9MlwtCaVFe0ue25+QDBg/yDpttAk1+DUR\r\nXfmS2oIMV5QigMSH1YtEB+OutNWvnIpNC/pAz56JHWaI+PxUz0laZnOh3NyN\r\nOjChm19K83RIuSvDVqX5XMkc3D/En/bdQC0aG8n8kHWmm4Apx8FBfa16vjFo\r\nCwt01BLmJ7MyGYeAl1zbhW/Wtbq1wky6Xt26CS/6ccxYldah/0iHyXReKu1f\r\n90Bj/Xc3sIrYow/eJGnMEO7mZnoJe4lKF9pcAIA9HYgv1zc+U6hYGJpYn279\r\nSImBL37HuUSVvzDAJidbo1jn9U9xInk6igi9eBtLexQGgXCM8w3NnO3RTbx7\r\nQv9oc0/1RIW+E4BQ/t+LlW4VYW/Pd4czD64=\r\n=oW6C\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "85bb4cf747b3f64fee8ad46ff6dbc416d889d2090296cf27016cb39de44eae73"
+    },
+    {
+      "name": "d3-dispatch",
+      "version": "3.0.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-dispatch/3.0.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-dispatch.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "5fc75284e9c2375c36c839411a0cf550cbfc4d5e",
+        "tarball": "https://registry.npmjs.org/d3-dispatch/-/d3-dispatch-3.0.1.tgz",
+        "fileCount": 7,
+        "integrity": "sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCw+1GEEAqkCcBI+R8izt3uB25dSQuUUgLlilu+13KlRwIhAPFDcnbrbsBqPsRl+Zkti1ut5UDneb1ohQpD8EkE4T1h",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 15604,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgu8LZCRA9TVsSAnZWagAAzaIP/RyFfbhTnA0iW+c6NC4h\nwtUV5XyCcHZp20WrfZWFWvWcP4N++e+tE+h52V6X/PKJyEWrOIAyCdLSPCHo\nO+dGX6DJznFdf9eNDJhLLc2bu+WsqcNuHE7yJFbLysXQMCfFJ8jkfmzaQNZ1\npZz5TEkmZ8lOzCrRDY8pSjvUbjRveBvR2IesAPbgQqxaqoPLtdCXZ5Y+y9uc\nn7iLU8Tix+dcMSphew9mjaJc9oSNzk06m38Cqe0yh/cGk48f1q27NwhJSJ3i\njDHdYstBvCAp9cFTVWhlcaRsX0u3tqc9uN4iyc5zf9AgTZum5YKrUTfygl/6\nItS9YhtWc5kGGFj+TvOrxlPrtc1zieFZXr8OVbTw7ioKUOCFrCAMtxEll0GB\nalNRDPV0JGFIco78UBKf1JhLYOoiUGYwGqUvI5D4T4lFJ8FS7Sj7dJ07q7SR\nir++wk9adGconAjTSeLtIpfDL4dCxskeVZkAqq7IL7zO+4/dQDr9qgDJoqr5\neJSuh6TWAYprNR/N3NphEdHPTT2tQAbizvCmwnED9l0/UjcxCVzLK2l7M+EO\nhjuyDuaXmI3Of0mFGNGsj0TSsDKlxgOT1ATM/b4+l9TdMxJdhVYsN5G6v2V1\nzjCvXNY6w0i9Of5zBaZdAI+sEQzskoWkVqCkTvydqJI5VgLBgY8uPHTDHB2A\nBtww\r\n=Z11w\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "b2eb396e040ae2af159f8c7e45499ed2f35b4af7491838024c12b7fdac827fae"
+    },
+    {
+      "name": "d3-ease",
+      "version": "3.0.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-ease/3.0.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-ease.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "9658ac38a2140d59d346160f1f6c30fda0bd12f4",
+        "tarball": "https://registry.npmjs.org/d3-ease/-/d3-ease-3.0.1.tgz",
+        "fileCount": 17,
+        "integrity": "sha512-wR/XK3D3XcLIZwpbvQwQ5fK+8Ykds1ip7A2Txe0yxncXSdq1L9skcG7blcedkOX+ZcgxGAmLX1FrRGbADwzi0w==",
+        "signatures": [
+          {
+            "sig": "MEQCIHFhlqXOr7vnirM86vH05AVRIzEf9nSrvnzsL6PXSnP4AiBMTOlJB3Hxv8U3v4e5AaRZcSuP3nux7dy/7yo45YmomQ==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 34629,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgu8NrCRA9TVsSAnZWagAAvksQAI+qffYM/UlyLXRrwEUK\nUdX5QfqL0/bZj/8UYC4oG9jyL0JjXtxxdUO57NQdZrQSH8C1jQGPQEYsVT1i\nuz66l85bMdroSGIWCrjqOEdLV8fTt+PmY0SSlpnhE3mQxZ9HuyD3J3TEx/Gb\ndKrNz4lBAeV3U/FGST4Zf7Y35px4jd9ulu8805OHIaVo4SK4sv7xJaKcz+2R\nlcNnto3OftDEdCs6SIGmeXABgHXCRzwNxBqDUkcFyRt49eTfv2jY2bQk0RQO\nkyyA1MGk644tSUgnuUAH7Y2Vjl6+agK8j7DxeUVtwfG0x9Kf3gNLHvICCur1\nGpv6pZpUSmnjMTwmbbEvRe/ywGaTQzoWS6q41I+LwqGgJhld2DiID8xo1Qsb\neOoltVMnFiMLo7mZRxU29C+sC7huZdKeMeKCjb5Md8d5yZlwnLFgcJofMu/s\nJdXbK/6XVCCHLoxX40E8f3f6yoGuJy1j/PTWO2twqT/GFaTXa3RyvKvnOSrw\nk1SOGfWOhmSrAL/gna6zDGgWJrV6iR38Yjff8Dsvz65gnrFSs1WF8qgH6dBA\nUVyfxO++l1gwoduq0LmFEWCJcwm6i4U0Rmx8VRNPFZSzHKTRBPyGgYlo4eRD\nIOAU/O6LD9HDS9B9FszFdJ70tbFRsJv1l8+G2WC8//d2QdzKZm6UWFtPNpdy\nZyZk\r\n=Ne9v\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "420fca6d2ef552b861007907df81d2b2281ba7b26558360f1614a6c595a29564"
+    },
+    {
+      "name": "d3-format",
+      "version": "3.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-format/3.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-format.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "9260e23a28ea5cb109e93b21a06e24e2ebd55641",
+        "tarball": "https://registry.npmjs.org/d3-format/-/d3-format-3.1.0.tgz",
+        "fileCount": 80,
+        "integrity": "sha512-YyUI6AEuY/Wpt8KWLgZHsIU86atmikuoOmCfommt0LYHiQSPjvX2AcFc38PX0CBpr2RCyZhjex+NS/LPOv6YqA==",
+        "signatures": [
+          {
+            "sig": "MEUCIB9Kv4f5ErotjQr3WczSLYi+sqZhpRVu9vX+2kbK5R2KAiEAjtdyyejsO1VmCE8KxodZmlKaSdqAuFghsaw/4fVYfOc=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 57833,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJhq540CRA9TVsSAnZWagAA2xYP/1e5MORY/OMTm8gPOHXv\nLJIRZbqD7oqc/1d2PAYXBVPckXQ3dGNQWGmLcCbGhgitMyqk5lF1tkPwMab2\nC2YCh2UzEz+EQThMR3Cd+jOMufxc/Knnc00yQYp4Taba41PeaKsPmeeiVJJ+\nFMp0+1qPBGLt2JCJ6yoHG88rYUaUsfFWXryZJT3YSto4GdQQFGqsWmsw1kBj\n/4zAITO1redzbYe0Dq2QLxcstHnW9xbgNBpqXESjmnrcsHMcmunQ6OJjlMH0\n3ibGpeVnDYQ1Atr893d/uM2BnGXVzksF5htcq28Atczee/tUBpWbNjVLC8no\nY0QV/MOJJ3rIbF6nId9ajbaTUDTHn2ikPXqTv1a3d6cHOW+4KaCwhb68YVDP\nd2oY0m+2FUflZTTKoUViGVsOfLH2TllZF8nJN+MObLNsWixGhS1FHZO6tbK7\nvXPjPQHb8Txy/2mmUIcX07ay1uq26c5ZL8sPV+ZDaU6iX4sjB5JKvG4GWRJY\noCvF9ob9FYyD/AyD7KgqxEXcmohUEKBmXezppGWTX0sqLgELwHUKTlVPimfm\nvaguW5WY7nvPB/8kBHKWjMZUTMCDnfI3m0rawaRHKXpwTw1i3Gha39oQP7OA\noog8ajJ1SHtyh+zvNyYAMBQkOMuFj3mA5F3QrfBQ7ZOBz/mOu4rvkTAg+R6u\nLXR2\r\n=EoNA\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "107ec875df2f2858e95d6c3c4803caf284554059fe13cb52d04a44e110b07791"
+    },
+    {
+      "name": "d3-hierarchy",
+      "version": "3.1.2",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-hierarchy/3.1.2",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-hierarchy.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b01cd42c1eed3d46db77a5966cf726f8c09160c6",
+        "tarball": "https://registry.npmjs.org/d3-hierarchy/-/d3-hierarchy-3.1.2.tgz",
+        "fileCount": 39,
+        "integrity": "sha512-FX/9frcub54beBdugHjDCdikxThEqjnR93Qt7PvQTOHxyiNCAlvMrHhclk3cD5VeAaq9fxmfRp+CnWw9rEMBuA==",
+        "signatures": [
+          {
+            "sig": "MEQCIEPPHUHSBzrt0QnY8rmWdf5aLSRE2iTuqWsQ5fUgg8XeAiB9JYOWYa/okaFWd1F1iJIIa3Pjh/SD8AA1etepTPIuOw==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 136230,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJiSMwpACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpvjA//Z9SNHilwopNtVX5XAEKd3rtWtpeiunXkSkQUaCpiFsjKmpwe\r\nNEEgUCxoU6KPH59CBzAUA8pLXhyfddOFV0/xypuUjq2804H+ZDXL/GF+hPOK\r\nhorShXReGnwLqvTTLmDQtFA+YyhX5y2UeCoLukK1tIDl+6WTOg9Bz7HrQMTw\r\n27d4yK4VAPzPgTNSzCteko2bAImFh7GPfBYDKYn2YCpXWGYLLzhJ78IlZ/Dh\r\nhK3wvHcjcl8w7CT0P3LkKCNgxlGIVBrkjrdnbxIQHQSD3MQq6dZykKEtfknu\r\nhXU4eEGKnQlPHecvkFSTbvVyawe5ILoive5ITT90+Z3h9xJOI/MeteIXndbQ\r\nB776T6y/DoPPIdYSKdG4pLNkVlNMshMZ80XPa09YXQu58mRdJQgEiCEXk/NZ\r\nUcerytS1Q3ezbOTx4HdNJd1lK2Edla5wRKcj86BGKEQspBfHaljin7WY6NEe\r\nJT0lww0uFQEyTUhufp4EeSelqEHsQIi48UthrH1wL8UE2YjJegm21/1RTWML\r\n0uGuoxbkIaGOFLG7sYPEZYxeWLHErHeG+4KGg9skkpMOm0/aGeS+OEFS/Vgu\r\nJBis/2hX0i5w+1Po6Nr12eShXQCuAKhSPeLOlcKigqynZo10Kksa8yJ/e9AR\r\nm6hHTjBNrvPjcaZT08KRh84PremvOaNCppg=\r\n=O+yy\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "2f3af515824350e6acd86b9ec0c357e6f922ef7288bb0c8887524dd775760424"
+    },
+    {
+      "name": "d3-interpolate",
+      "version": "3.0.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-interpolate/3.0.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-interpolate.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "3c47aa5b32c5b3dfb56ef3fd4342078a632b400d",
+        "tarball": "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz",
+        "fileCount": 31,
+        "integrity": "sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==",
+        "signatures": [
+          {
+            "sig": "MEUCIDRlgx9Tj981Yxo3b+y658H5kA+7SUQgtXjCB54wDSnyAiEA7qxstU+I/DzBPwdZpXgDhFdbVfbCBXBXlOkVXhS5mfk=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 69687,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgu8SqCRA9TVsSAnZWagAA18AP/37UiDCkIvvs4pmGY/e7\niL9vRO1D5f9Tkk/zYdm77KF3g50bNozY54LE5C6egB/jy5ibRHdU1S6vDE6j\n8Sg5XD9UTcoWqfH+9vczAiHcC8j9FaF6vlPJ0evFC8GBf7TWd8tY7sAD0ORN\npdLi2VCzVIc2cwo+mFoUdavVWR4md+cvW8nZ/aPwT6Rl46QkcCYvsF3c+yR3\nD1zHWem81MeFTHSFHEuwn+frRLj4Ibrb7/3qcbegK2jHBsBTAlLAFi/FK3qI\nTK6E+q/BJYjo0EuA5HN0j3K+o0Jl4gAVYBg5H73pj3PoV4t4WjYIotfTdHIo\n+oj5bmUWTRXeBjZJfxblb2X4pII0nr/VTT22uLZIRDSMZmlRGlt5I03DJQ5r\nZ0G4a0wceSm0cbjBB2vPmf6OAHGHIkumAmKlTckq/sC8jhhuS5jEHtaQe4Of\njHCTQDgk79Z6Hs4NwQ7HuMQRsX/TsBjr81Xy9pG0B5hYVFMWLb5erYaXdkQk\nd27u14mJtpaKtBGGw16Yt7TJ5avmlgv6FDv9WObd5UX99sfCzTOkMqKifQPG\n534NovUfDH6X6tKi55TMKBnWEl693HRRGmfBnGSLwHXBi0D/RCFbdRtNS7vo\nz/P2P8v8fZrmvEstlLiCjv7ESCDvTGHkcfmGOfhyQABw0BOcGfwhQhUZTYoZ\nVx3a\r\n=srq0\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "7d5b2c6d687b626131c96fc00948bbef399ae46c5ffdfeb88a12030f2d0bbe90"
+    },
+    {
+      "name": "d3-path",
+      "version": "1.0.9",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/sankeyDiagram-URQDO5SZ.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-path/1.0.9",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-path.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "48c050bb1fe8c262493a8caf5524e3e9591701cf",
+        "tarball": "https://registry.npmjs.org/d3-path/-/d3-path-1.0.9.tgz",
+        "fileCount": 7,
+        "integrity": "sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==",
+        "signatures": [
+          {
+            "sig": "MEQCICZr/ufjpVVjNIoYCTCzjz00rCqM2ivypJ/Bkfv3YTijAiBH3/AAWmGZpLSu6k6GP6cFA4uYvO48vn+42l02b1CQwQ==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 20235,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJd0EXfCRA9TVsSAnZWagAAxqAP/i4OLxhrLb9Uat51O7+/\nQXCqbneWmwXjk+gGm997KK42HIZMZlgmOa/zKiC8fnKz+YUB59ozphrkzdCF\nJ0f/2BHHleEwWTMs2hhTl1GP73/OGh/nlL/Sss+LMH4mEw9eoXzB8MdvN1y1\n84xZY/j+QunbsNeFBqHkz+u4DN0z15LSstPzsVnjovu90S3S6rpkS9rQ9mVC\nu/v4+Ju4sbEHsfbeyNsfPYNuVgcHiMDsvS42EVNEpCuj7SH/RkfEvvFMUcpv\nef0O+u5eLUq6BkDhxoPUPF5XXCP+cf5j+IRwmnczXmBVKDltZ2OIpDFJyDHD\nVkdR+cKrcwyoc4wdgbW7Ii819hKjsj64cMnLp18LopkQ/S/Pd3CDQR9U3e7G\n1qPR5b04nFhmFQ76/wAtQJIBW6ZCPoC/jxlf1WMUwknpgQXtcwT3xhSoMtLI\ni2T8FygqkL0XQj85BcBWezj72IZD/Oxufh0Bog9931ZsjWI74M9Z9BvD35g1\na02YauWvA5V5HN2n/c103MlZG84fyq9OzDvGEL6RxgmckgA/FOa82uYBVzoj\npIuR7fuOkh7uEvqUkOHIJLZAkpZkPvEnokUbvm6qI5q8dXznReUxaAvJ0iX7\nxZyFgLUNdDcRC+nQedaaXN7hGe1LePGV9Dw8fjN7RLB0j9LsQn9zLSZbImoq\njF4f\r\n=P1vz\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "eba4bd05cd250f03d1ca6893ffec629b97eae4923688ee716636cb8ff7d0ff36"
+    },
+    {
+      "name": "d3-path",
+      "version": "3.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-path/3.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-path.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "22df939032fb5a71ae8b1800d61ddb7851c42526",
+        "tarball": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.0.tgz",
+        "fileCount": 7,
+        "integrity": "sha512-p3KP5HCf/bvjBSSKuXid6Zqijx7wIfNW+J/maPs+iwR35at5JCbLUT0LzF1cnjbCHWhqzQTIN2Jpe8pRebIEFQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIB0sFa5Jb76PeadU+R6EHHayMdiUVh8p41Av1Dwvb3GOAiEA4zg76bK+ddCr49c4Ej6FYE2wKHBD+MQJuKxvEJFU2ZA=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 20858,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjoNydACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2Vmr+Sg//RvFHSzv7sNV8xfNRFOpdpRbQZN9YoSVJAegO0wdVZUP79afo\r\nOPlJsGKbKvHL5sfxgb7SbSacHlEOFyXwovFfXn3xJuyWUF25vATdvpY4JiZI\r\nfzV8vbgU48YhqPP9pRKxWWwXSgMx8GrmlA2hAeFCPafy+cYC7gFVobEiZ7P3\r\n/93FIGOPXiTPJEM7iTxqiVKpMDQO2BMOs8NpUB3L1q+lz0G9yDAhV6NsVjsW\r\nUaPNgczP2NTOYWbSDJkCCeNYHb78cMJbJ6pSBlG/TZz7beqfKeWUnP3WjrMg\r\ntSkRSEV/Ni8QVo1fcBDiGTFOB+tqHWNt0QuJarufSHkmDrQQzzCPZ8MDrJcx\r\n+dfmwMxdv2vYKnGBXoKlFzE0YhVU6Lo6eCVWuCSVLv6MS/nrqee5S9DfsPgR\r\nj0w5mYCenUydWPpQA7XdW/zKTjAkgJ/Y7CxXAj7S/PP0k/m5I0aHvQpr41RP\r\nelaHXOvoAOZrRsFAQKdlomDcKr4h/SJHR2QAFDRiFDAsL/6En0syilsSOFiU\r\nPvtl5/QvFJ2BXzTnPMFl96GbQAMUtkqEFOktXnlqzsPx8nFsLc1B8USZw5dh\r\nody8KZVrBz2qqu12MWMaEzNEpAVEJ7gp8JKeHCxlQtYeE6cF9n/AM19A8Lsd\r\nFTj6kLYpmIjVxGgxXjGYLuYXOsB9KfptYRM=\r\n=KWRq\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "b41bac95560fe34589b26faa7d763e9506d8b36e0bd63cbe0a92a5117c1f59ba"
+    },
+    {
+      "name": "d3-sankey",
+      "version": "0.12.3",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/sankeyDiagram-URQDO5SZ.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-sankey/0.12.3",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-sankey.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b3c268627bd72e5d80336e8de6acbfec9d15d01d",
+        "tarball": "https://registry.npmjs.org/d3-sankey/-/d3-sankey-0.12.3.tgz",
+        "fileCount": 10,
+        "integrity": "sha512-nQhsBRmM19Ax5xEIPLMY9ZmJ/cDvd1BG3UVvt5h3WRxKg5zGRbvnteTyWAbzeSvlh3tW7ZEmq4VwR5mB3tutmQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIExT0stpz3JnZ3U7nEqzvFTm/hg1zTMdbI/gmMsZdL44AiEA/6IqlzUopvEhuN1VCsZ197zr3YCAN8QfpBHscju5+3c=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 46205,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJdbGNyCRA9TVsSAnZWagAA1UkP/jECv8oGFrwr7jKZE7OM\n7oneANooJFmYUvvEs6iL2rfvPcW55uu9LdcO3ghRWlNKx5l55Uzjy9gwsTJx\nRBX1xB1T41ud3HodAq7rIJXZjGYqK4ks2/w6hyoZLUyfjTGQQzfF2VJBSy8k\n1Up6i5VPkxMUUdzXtKdWfO+jYzFz0VpHBLRyOFOUN3/msErVwZLNv8IbSZAa\nH66t/s8XTGzh5QTm0lRV1nQnVfCJzJOYglI2EQWNulILaDveVoUa2x3hbJ3a\nMsNyW4N0zqKprM+In6gIZbvTZUciloj0xeJOTA8GAxKkkm9hg9TtAWflTWPb\nCbevcmrhZ1C//aWVJaLlFfio/QKJHftUg37YKPqaZHpCaU1DoZkprwv4K/HR\n51XppXqi+O43iKp5gtZg+wbeRg4ApIM+gmbB/rBdAFf5j7EbOTaxfmvkVlFr\nZ498rr7cm5wtH+LErLvTcm3rZtuhXCTvI1dxSwQGq9jF+ZDdhWRPqj8NgYeZ\n09zBHDrZMKnwD5dhgD27WralldHscs7NZB1//RF1abvt+7Rh1dsFj/95ysRv\nvh5MCEZYI51K7wLpafbIfetvBKn181lKIsUvsxBugB5SzxNmP3IGA8SvZSxS\nAUhIXAxkDegCJoztNpkrZisGZYhkD3Y7X0x9Y0mmpMCodqfmGQBJVstt3YA5\n8HI3\r\n=L0Fh\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "2564cd8954660a9b8a33112944d09a619b840e048da683d20a38d9e2cf1a27c9"
+    },
+    {
+      "name": "d3-scale",
+      "version": "4.0.2",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-scale/4.0.2",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-scale.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "82b38e8e8ff7080764f8dcec77bd4be393689396",
+        "tarball": "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz",
+        "fileCount": 29,
+        "integrity": "sha512-GZW464g1SH7ag3Y7hXjf8RoUuAFIqklOAq3MRl4OaWabTFJY9PN/E1YklhXLh+OQ3fM9yS2nOkCoS+WLZ6kvxQ==",
+        "signatures": [
+          {
+            "sig": "MEQCICTpwtNeJSnXFdWQzBU/6j2bX1dTLmWXNc0ZVUTZQ6WJAiB5lmT4/7u/25EaOMi7T34oTvYqRjV1x5YmOxZTo87GGQ==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 174363,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJh2nlUCRA9TVsSAnZWagAABH8P/2nGPNtPaPZhoF97W5wg\nOvD7e4yY7lbKuduz4QqbYe450qldst/jbEBajI4G2dEKPnRQVvW1iC9niick\nAga5Y8S1uU8KsYTIxiHNx9q5tBZiZNTiACY/r/GgQOCnB3RbF+1XueCZm/vR\nLMyNBpcrYG2fJqx+mhkZk2ahCcxO2QOUY9+OszCdHnRB6PenA5Bb5d7K08Qo\nwdqceMQ3uiAMskjKzaGZHKtgm/mDTmcw858UiUwm9E35awOKTWiTcQuSGc/J\nE4GWS/Luqp0qM/S9mrztP85PVEssE+v5WZeiPQq0AUI6eEBRJRYkpKshXXNC\nIz0cF3Q5jzf3rX2JwOIScqCC4MjN+T3vZqZCxX8HnTEA7shtLGpjOEvXiTe3\nK7WyDcaOeooEgrzwB6ohJVboZcoiIDJa1KDE+Ry3DxGSGJrZe/2sdTl2r/tc\nIpqvR84AZNAcjxCKhLl4QF4/pWk0gl3oHlg+isBLIXQutr8N/NHVSqNUXoI+\n46+NY20v7tc+dSzpa629CrGjkxOwwt8QejzGx334215R3lLf2/lVCpM6TA5M\nX5BnO6WlhXmMJwhO81po4mrTFPswwE+GTDmalCBqioALYk656Jox4399JElQ\nCXTQW5iqnjatw6CNcw9OJA7aQWVpBJmFuVPSJ1wrnWMcO365gVHfFdptuNF/\n/b9f\r\n=jRws\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "d54b5c17c1c85071ed35b71c46160d4d2a9a4f4cbebdfc7cb32cc3a75d637951"
+    },
+    {
+      "name": "d3-scale-chromatic",
+      "version": "3.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-scale-chromatic/3.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-scale-chromatic.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "34c39da298b23c20e02f1a4b239bd0f22e7f1314",
+        "tarball": "https://registry.npmjs.org/d3-scale-chromatic/-/d3-scale-chromatic-3.1.0.tgz",
+        "fileCount": 53,
+        "integrity": "sha512-A3s5PWiZ9YCXFye1o246KoscMWqf8BsD9eRiJ3He7C9OBaxKhAd5TFCdEx/7VbKtxxTsu//1mMJFrEt572cEyQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIQDWcsfeNMHZidXBCLIuoIe/8SXsifDV8WEuRLdAK4uy8gIga+bh6PXInez1dUiDte5V7L1vok/rElZkhCidLxAg2tA=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 75697
+      },
+      "metadataSha256": "b38590190a0e2faf7c34c33a541ef49a53b53eb9708374ef07bdae873108fd65"
+    },
+    {
+      "name": "d3-selection",
+      "version": "3.0.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-selection/3.0.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-selection.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "c25338207efa72cc5b9bd1458a1a41901f1e1b31",
+        "tarball": "https://registry.npmjs.org/d3-selection/-/d3-selection-3.0.0.tgz",
+        "fileCount": 59,
+        "integrity": "sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCBBXm03rNYNSj4xem0DT0BbUiPfVBdTExIHXr2lCtWAQIgb/Xld4TyR/Hs0bwz4FDmyb2+ViviaZ37Y9J1VPu++hI=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 134715,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgvlogCRA9TVsSAnZWagAAdX4P/0BErAPF6YOgGxP25KFF\n/LfsGaxh4rQtIWhC41tcq7RrX9nXQadHJOiGI7vFRQeNqIvJJBCBwZVrycfX\nQD3X7D5NiNewIS1b6r/jv/MNySSRf0pz0nFaolzAmxeImzeXS71PkdFviLYp\n1AML8bbqPCE6H3w7YqJBe3gyqSSoU3ky6Hmra0ZQ1UNO4U80oR1fbdAMxihs\n24ex6KcwxMSLCJaLCGNPFzPu5302zXDKufnU2jn5aVNgOgRbbEX9TmMyUixJ\nyaORkAyHQpUpvtuiCTvCWwQJLqjCjNyayujm6/qqyNjV79WA6zErpg/gryjW\nYYkGKm/VvtVieUfBKnCgdO90sKRxTvgOSOXd2RGkgJkm5USSujRkpKlmdHOl\nTvfsf/mYbhVenkZPKnr9uvNsdRgXw7XxHrzzdw3WM/oGyBpAoIsMQeEKTD7I\nBMZbm5klG1pHrjx1dAICHyRAoOxgZHiX6TFMTso/7QUdMVUYaGHIeIKokykZ\nTqJJ2MIlVE06iWF6O/eWX9A1tQsmIk4GrVoBCUoDOuD3KslUYzM6Sz0fZEvX\nh8Np847FiOf9jbT3cxeLyJAEw3URExNfXpIHvQhCOLMRnP6jIr5RFNcz6D9r\ndkO9mOa0VwT2ctCH1VJhwV+V3ILzJV6SRUspjOMYCxI3Dgth7mrI1uLfR2pq\nBfpo\r\n=LjXN\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "ad3a82c93377f90bb52dc5c88d4137d17358b79aa0996736c937975247d3e4ca"
+    },
+    {
+      "name": "d3-shape",
+      "version": "1.3.7",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/sankeyDiagram-URQDO5SZ.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-shape/1.3.7",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-3-Clause",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-shape.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "df63801be07bc986bc54f63789b4fe502992b5d7",
+        "tarball": "https://registry.npmjs.org/d3-shape/-/d3-shape-1.3.7.tgz",
+        "fileCount": 57,
+        "integrity": "sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw==",
+        "signatures": [
+          {
+            "sig": "MEUCIH+/tmQ+RtCjkyfW3/AOLjjtbw02BoA7YmbJj6w85zbXAiEAyqt9ajx7ayJp6dvH51aoIWeSLsp+mdAWvNIvJVWGbY4=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 231330,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJd0G+vCRA9TVsSAnZWagAAFNQP/i7GJJS2BV9LMo4Oj2Ck\nvzYalnz6/oXGIUFOrH+q4ldSbSRKLGYd2jDWkdHasdqiGVPjXYYAoGZ6rgU6\nzXOsfXkQjbXt5p3E3QDP2s1upTkmqqP+x/y9Qo3+H2btEPcQHBa1osqmYpEt\nw+EA62NCc9OedGU4Hy0E6PG8PMgmPQnWtCd7ZUCKz1qvEpbHMcUTZEJt10wO\nAdNigCerWPv5syUnjGApkQ12k7krpotrBykSyT/SBQoyMhKBWZ7scGwtiCvT\ncR+InO3bGe65sQVMWgdlYGk6SqCkTSzfhruSueWk6MYzl4cekAxZ2+AioQKA\naXkM4xwmiHdZUjrsRfUMQD2hxNq2hBcJfySLk5rmCvgvTQWXGVx1UYMJQfKC\nHe3C/RNrdUnzTm/LPc0S3QiIEgrN73yG3GC4xx0pyweefTcx6zY1t5+ML/zV\nWVvrjhgcYIvqO7I4az0VQz41BcQnhFR1V0sr1dxouGQalepMIK3uJr04oh+F\nSbV88RKP0NtKtpgwsfw+oIw8QOv2PGg5nv/x71AI2WTFleTryjiKmypCbaWn\nL3U/271EkRl1hk3OmI+t7iwSD9ozpp9GMuAdTRPbwZbeymVIDXceyhlFBNbv\nrif5dvFIIVEpSDGz3L3h/bjgKFENdI2eo3Fqu/Pwo4yiDqTrvJRJ6tXF3eTC\nQtaN\r\n=Upra\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "238e90fa1c6304ef26cb415e1a583e8a3c131e752866c43806d7d500ef6603a0"
+    },
+    {
+      "name": "d3-shape",
+      "version": "3.2.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-shape/3.2.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-shape.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "a1a839cbd9ba45f28674c69d7f855bcf91dfc6a5",
+        "tarball": "https://registry.npmjs.org/d3-shape/-/d3-shape-3.2.0.tgz",
+        "fileCount": 65,
+        "integrity": "sha512-SaLBuwGm3MOViRq2ABk3eLoxwZELpH6zhl3FbAoJ7Vm1gofKx6El1Ib5z23NUEhF9AsGl7y+dzLe5Cw2AArGTA==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDTtyw+AtmH6gd2uChXUEmwt8Hpqd75ntYw4hui9d7GpgIhALz/5Dp746uWIQbsJuFjrAJzwiTZLBXwqqxcipxYdD+w",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 247267,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjokelACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpoThAAmXLoPCNq5k/30WTprlMofmAjUkC6ml/dUvMCHS0JAUr0h5Ew\r\nbH85QlG64m+tClO9Qdp1iFQcaFwulK2/6sZ0P/MqZ0Fg48hHz7eNcW3OHV2U\r\nCHM1jjKfNlh+hKsvR9DE7oPgCKpcjIcUZfk6HLl2z54HbpELm090by0QG93s\r\nktqHbQKns0B+JiV4hg+YT3WD5xKfmuIQ/zq7MpoyJ8uP90xvrbwi6bFivi4n\r\nu/E6mi6knMYEm53yi7pAIgXxkhLnC1gKqXuh5Nv4EzL/XChAZ9d4Z7cn4SUZ\r\nhHzgURs0o+193zyqvqoT7Grwx7VovMCSX5ddRs+rt/qM+Ow4Of7j9fjgLpTE\r\nuhxb9xGGTdfv8Z0iewCwIb1JHdG8Vc2rLnbbIspCBjoiFi7Cv9fXWJxf+clh\r\n5HfRpK+i3lI/FgRB4pmXTK4EN7eEg4XFTEfMDFOEP+1PtNc4trmpZp+79Gso\r\nkyIThaCMEq/no4+lG3pq/9ZLyS7pG3oUgDUVRohV1Jibez3OVHmzFSL2xhzO\r\nkuY+jK0xj+6y8bC+Nu62YoMg9UVar1Un84Xt9r1NgMk/y9lQ3nVwWajmhl/E\r\nwQXaB8CmkfH3ef+jXV3EC8XfYUl8MdfdIzzwcLrz4so1zBx+Gph8zuEZ9kYt\r\nFwAFhAW5NF/Lo8C1B9a1IAPZZqW3QMper3s=\r\n=A8yy\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "5109e9194deac647e0ed48fdef983386fc786238739c148ac6ac09fe956ad6eb"
+    },
+    {
+      "name": "d3-time",
+      "version": "3.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-time/3.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-time.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "9310db56e992e3c0175e1ef385e545e48a9bb5c7",
+        "tarball": "https://registry.npmjs.org/d3-time/-/d3-time-3.1.0.tgz",
+        "fileCount": 17,
+        "integrity": "sha512-VqKjzBLejbSMT4IgbmVgDjpkYrNWUYJnbCGo874u7MMKIWsILRX+OpX/gTk8MqjpT1A/c6HY2dCA77ZN0lkQ2Q==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCp2H7HdL9HPfkSsdemeLA2cCjiRYE3u5ejtpRIB3jZiwIgFQu39bQjS2Jk2Fohge9VKCABKHgE7HA3A9376CPQJxo=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 64483,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjipEQACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmrGxg//bfSGGD7G+hxuu/q445bTZI5Pl60bk6GBfiPqNx+Wyic3tgBl\r\nb+DWtJj/W6S6HFptXBLstdtMtMP1lYA9D9KFYHTkUgtYDxAC/MuAVGijY0DR\r\nYJu/rzQU5Wypar3jO51O5KqgWRV8pcsxlak+I3biwgcQ8GbISXTsRzpFsQrN\r\nNEvstvatZ9tOJlaF/u4sWpWeR5RMIMFgTFtYgGPDfl16Adp+e6Wd+xDimavJ\r\nj3ImpLP3n2io09o2+3LdUJMgO+Hnd1Tl5XOoO2YJvS1zcXrF/gZ1MXg7QlNz\r\nA2E0IvJhbuUDJtv4HWtn5MSRfez7nS85FBZVj7ddaxW9r9/vquIcvd0FQFl+\r\npwV4wejwhqDSl3qDBz8N1qnJPUG3WvteTGQYGxj9A5MyArlqHTgjzDKdIyHJ\r\n84Xkvrikiu2BxtmJmmqERTExXgdFiiauBAawy98oGnH9VYuaaCZYI2XlK3mR\r\ncwTOZzDp2xLmla6Efjq8wOfwdn+1fY5eeQz9fxIKIH/SNvQ2JsiAvRb/Q2Jd\r\nlxjLwRMzXCu13avx/toRfvQfRjs95lhO7LvT4NhBxpjs1lpESw44ra24O10J\r\n5REm6ADIEl6zDhf+bqrF3yjsbiUonAXVIAD0u/csUSE5BDw55M4RxbzRsO/s\r\nFTXnpcPgY3GaePA2UQJLvvmitTjhkQqpMQc=\r\n=fhg6\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "6bc04ee13779fe228160e61f0820d55ad08a9368ad6e90387df613da61182db6"
+    },
+    {
+      "name": "d3-time-format",
+      "version": "4.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-time-format/4.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-time-format.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "7ab5257a5041d11ecb4fe70a5c7d16a195bb408a",
+        "tarball": "https://registry.npmjs.org/d3-time-format/-/d3-time-format-4.1.0.tgz",
+        "fileCount": 44,
+        "integrity": "sha512-dJxPBlzC7NugB2PDLwo9Q8JiTR3M3e4/XANkreKSUxF8vvXKqm1Yfq4Q5dl8budlunRVlUUaDUgFt7eA8D6NLg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDgeR9vxyzFyY3MjFJFQaS5GZ5oDjPad91LGj8kXGhY0gIhAM92phjBE+68qa4ppBhywXQs/KhKLyjOnbOD1HsLHvGJ",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 85603,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJhq587CRA9TVsSAnZWagAA2sgP/i08YUi/fC0UzUuod6eh\nqCELSQzYXjdWESFcy1foIhLl3VQ47Ua0YRXyEpnSF8Pf7XzONFV2qs6uqGND\nHrfgmowrahJVmEfxH2kn5MkuqoXwcc0/7hFdQqjMPGF5SCrpk9o73q6rr5Vk\nCVz2gvIJEo1nIqInB0ZlKOkMe7+OGNJV/uF1TlPKTUYA4bLULiPtvlPZssOw\nctChr36SsJKiHtFnPbhLUjrAhVFfCDP9P7lhZAxf/0YMPcs9MQAdOvrzNhce\necd5444FnWDinzy8UkSTlQ980HOBs4MSAU0uX7+AXCNZrFNJeoMrURhxCLVQ\nt8B7g4ex+Ps4qDPBC317R4t05B+fc+o01ml4ytOFo829yBkdgepsPrfEr28r\nak6moyugO6sGLfuaIsS2UJEEqH8NtVYOWzuOViXt9LQNwT74AeNSsEFdBCwk\nlT+WpULxYz3Sh4jnkIhA+J/O2OtzPg096M/GDm2DGW1n4GEyrX0/SEoyWVfU\n+DxZc3ArBnKq9+Ro47OWSwbOPwmJ/RpAOEUofg5fXpk1lKWSGNtLokhABBFm\nUPd8gysgboOJSgjXofhDjip2knpKEuvHUi74qpQFzRwhwSNJHSZyEd8npqQW\np0ofmaJvEAe3ROKrt5jDo8ShUHYYBhJBvMnbn8YnRf9hglYG9pCfSsaBiFre\nuvF5\r\n=yBPL\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "d35c1f7e9fb5d8058c9659bae40e4b11f8ab1aa27f98421373ea781f569e12dc"
+    },
+    {
+      "name": "d3-timer",
+      "version": "3.0.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-timer/3.0.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-timer.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "6284d2a2708285b1abb7e201eda4380af35e63b0",
+        "tarball": "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz",
+        "fileCount": 9,
+        "integrity": "sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCxGeQ3ICOkDcA9TZViSBJLvmasQf5yiflLZ+R2JCzqLgIhAJ25BSfOJAL8+ervm9Xk4qfxNMBfTX4CVOR8m8O5ugLl",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 18405,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgu8W6CRA9TVsSAnZWagAAo1IP/AqZGrYlCc4O4zrtZOOZ\nVaFxJPQMR2IHs49pdVFKjzDnWm71pAS6EeLE73Hiyj8nnCbnoj1+d6XA7VBB\ntI2b21wJ+G5p2CiwVyrQLiAfOmHUclWNU/B4G8/KTSFCtGj1qk0xPAgboC+j\nq9iihZQ+GStKTQMZxdPWC97YxxoEODBH9iSfGOuC9JmfjiZ1grIPHoW+VTQI\nybaSV1it4rxEJw7h3MAgEE31kA6voBKXBrVZPyzb9dA9XXfxGXwT7f/Vd3JD\nDwC4+gJxxd+1UGjQDnPPS2tn7wdlOaYTqO8tB4/Av7Xv94AkepsWwu8Gip49\nED8RSIBDFLluKjIKkrbBiJI3M9VXFeDe+RCowLNt5/ecvybRkg/aDTrE8Sks\nmIH20CE5IY7U31Ky+Vg+H8Zgl+rqOSpbSSaJHQ1ypUR0Zev4xjD9/vqk5x9q\nn5Os1/ubH4uIV+sakFvdylA6+mT6sw98L9W7pADFDhiFRno6HJDy5/+hzfKH\n1xSfh/VdWhcBSCHaOkHF/qPccFZP1lD+2QzkuLCmdciewkd3GcEbJ/gqmQrG\nRifg8/uIv800huTxXPBPIEEQwQL7D8MZ6zLPRCIzOhBTHjoX82OLazhfRGtz\n01eMKZglhgQ1bbGArLLIUldLqscJoSAXXH/n7i0lc0cCJST8KOlQyrJjI5dn\ncZPo\r\n=VC+4\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "dcce69a0bb17b1c0116b5a8d32c71b3bd8802a19c1277a9c2da76d2b2bb39213"
+    },
+    {
+      "name": "d3-transition",
+      "version": "3.0.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-transition/3.0.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-transition.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "6869fdde1448868077fdd5989200cb61b2a1645f",
+        "tarball": "https://registry.npmjs.org/d3-transition/-/d3-transition-3.0.1.tgz",
+        "fileCount": 34,
+        "integrity": "sha512-ApKvfjsSR6tg06xrL434C0WydLr7JewBB3V+/39RMHsaXTOG0zmt/OAXeng5M5LBm0ojmxJrpomQVZ1aPvBL4w==",
+        "signatures": [
+          {
+            "sig": "MEUCIEeXHmpKANgVZ1JfEvHvNMpxbgI3IGpNPSnTk+i0+uvnAiEA+U4/b2kVfaQ4N5hbOZ1VTVdoVyI9LpvK0kGHF3goWvg=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 110525,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgwVPRCRA9TVsSAnZWagAAQcQP+QHm5IcHnWEkye3SRzwo\nCmlMLmBiSK8e06ySBTDITrkATBP3++mN/uJdgyMUwycDV16pg+SA/iBWNNcO\n2KJ9oAWxIK50KsGV8V6SlkUkvw9+dSaOT+krGe9DElLe/UCANKzaG/2QB4xP\nMza7mxfVTJa0K8cCDJFRBsIJRUMZOffUF4uESHHk9ybe8md8398FSMje793i\n7xQedelVeCpC2ozjienBOb97S/7e4110bm5gYP8rnedGy6cXDnP9vYmV/BkG\n4RsAm5lT0+o8C2MaeCaj8NpPjxSa4Qh7kt8i6t7c/NE3tsO9bmkyiBIyZoMO\npGvjhKU9MFdMvrp6wbAjWAR+qw9RWvuQmssdzUo+gv/mTEK/tdnT8O8Wlbe+\nICHzVeRBLGQakDTLwnuBIZooLKoc9mWCsKDVuR7v58RhlfJzJzmtAKGhf6Mq\nrAoCek092OM6o+oV1uVyg2fwgWBm9GyMExGmZSzXzK1pPcpOiGuOAVMKABRI\ngFCA5tzyDsmNwCsKnFOGkA92t4toKaYrLMdB7Zdi88nTe5X8oeETzty7cA7T\nD6cefSFvvWJF3kzB/aPcq57Pb1gtejIF4EeADvB0l/Z4TjWcuv41QdHsfOmX\nyfSJpjzRxQdfHU143MiSMmRA82RahiparisNAtet9IQCvR1DgHW5Obgl31bn\neDcF\r\n=U4Fx\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "83ffcb5a7430b7647acef661b8f36de027c722b6954ce464d6245762ca9bde5f"
+    },
+    {
+      "name": "d3-zoom",
+      "version": "3.0.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/d3-zoom/3.0.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/d3/d3-zoom.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "d13f4165c73217ffeaa54295cd6969b3e7aee8f3",
+        "tarball": "https://registry.npmjs.org/d3-zoom/-/d3-zoom-3.0.0.tgz",
+        "fileCount": 11,
+        "integrity": "sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw==",
+        "signatures": [
+          {
+            "sig": "MEQCIEXEeRVdyez31T/X9tqSQnwnA76NtUPlG7J7YxKO7FXZAiAkWxlnr/t19NRW//pY9Vw550qyDaEmtMGtbudipn1WJA==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 86878,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgwWGOCRA9TVsSAnZWagAAufgP/A3Os4eLQYIPYQ/82TBs\nwx0T2Lxxyi0uu9mr/3q0eY++y48tzJUr8Bok7w29f8G4mZ3UwGUMiXlWZqDh\n5dfyh+UD/CtPAhjXAYr7t6XqDMPtOXOzYNzuTpkF/1zSWhjsvCjOY1RIL7cF\nlYbuEjVVPveQqrB0GcAqJWkgcN3UhN7sJJL7X1U2VZ72LC5gnK4vofg2+gr/\ntttiQcW/9HJMIPcIx79JTPK3P7mrkyHXWtu/zhJSrn66PPoCR5XjwFdqrOXw\nhui1IXM0jRNZY+g0DqEumQle40fg64yYBue4fUAgE1bFfJ4ThbVe2NdTuV7m\no40uspXr+vtFGD+Ld/fijn/qgZqyxqcSmArWX6RnR0TpaZdojZ1b8n2e90bP\nmidR5kjl4kzD9QoQaKIfebz0tz1RAjMEI5dQuvg5W/J8Z952JWv21URDsK/C\ncIe5T84INvqIJKNWBT6qnJK/jKwoy9+GjrgJAkMTBUEM+31fwKZN35ug5Y/0\nGO7zWN4oYfj3yVpGH2KeaurBk0hmg/kgej612/mpml8RlthcusbCsOHhPcyZ\nNmEsOv2jrymlinFSsfcoePzwdkMkoL9P7kfU153wiq9Egi6XoFc8BHwpA8+3\nWCM4QyZJRUwFqndULJmsIZyzNg3UWa9AnmRLOhvx3c1X+Lb4fxj/eTn2VslJ\n3QAu\r\n=3RY9\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "9d2d220a366a69969b9ab12ae4c08d05763561df7071e7e4d0c7ac4d96e0436d"
+    },
+    {
+      "name": "dagre-d3-es",
+      "version": "7.0.14",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-KRXBNO2N.mjs.map",
+        "assets/vendor/chunks/mermaid.esm.min/chunk-W44A43WB.mjs.map",
+        "assets/vendor/chunks/mermaid.esm.min/dagre-ND4H6XIP.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/dagre-d3-es/7.0.14",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/tbo47/dagre-es.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "1272276e26457cf3b97dac569f8f0531ec33c377",
+        "tarball": "https://registry.npmjs.org/dagre-d3-es/-/dagre-d3-es-7.0.14.tgz",
+        "fileCount": 137,
+        "integrity": "sha512-P4rFMVq9ESWqmOgK+dlXvOtLwYg0i7u0HBGJER0LZDJT2VHIPAMZ/riPxqJceWMStH5+E61QxFra9kIS3AqdMg==",
+        "signatures": [
+          {
+            "sig": "MEUCIQDFFlBus1UEu6eWg0SnMDPNd0kId8sT0xc19ZtsweaR6QIgJrSrJ6Va2M/fgxkUj2NCruLISC0kHRQIuIZd8W6EpkU=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 243154
+      },
+      "metadataSha256": "7ca7a5dffe34cfdcd49ad74250c097c7fea6de5d226caefd4896b8a9af63d1de"
+    },
+    {
+      "name": "dayjs",
+      "version": "1.11.19",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map",
+        "assets/vendor/chunks/mermaid.esm.min/ganttDiagram-JCBTUEKG.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/dayjs/1.11.19",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iamkun/dayjs.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "15dc98e854bb43917f12021806af897c58ae2938",
+        "tarball": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.19.tgz",
+        "fileCount": 451,
+        "integrity": "sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDLgKS5d/HR6vbmmsSWt1mBd2cjUkOeQKKlhaEuVcxkRQIhALwKTv3Sy0gwCVfOlfjCw/5Cjc41uxk3x+24afFS2h6Z",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 678966
+      },
+      "metadataSha256": "82b2937112d7e00dd8ef10333d8f4d55b21927caee7c478e4da08d5c420e119b"
+    },
+    {
+      "name": "dompurify",
+      "version": "3.4.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-67TQ5CYL.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/dompurify/3.4.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "(MPL-2.0 OR Apache-2.0)",
+      "repository": {
+        "url": "git://github.com/cure53/DOMPurify.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b1fc33ebdadb373241621e0a30e4ad81573dfd0b",
+        "tarball": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.0.tgz",
+        "fileCount": 13,
+        "integrity": "sha512-nolgK9JcaUXMSmW+j1yaSvaEaoXYHwWyGJlkoCTghc97KgGDDSnpoU/PlEnw63Ah+TGKFOyY+X5LnxaWbCSfXg==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCiqc+Qpp7Qs7qv3D5LGsBYbFVCVPS5j6eZK8fB/cMeMQIgccYvvkERG9kzwVva+4m9eiKF1HL9TjK/OvY6cJ5p2Ls=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 836226
+      },
+      "metadataSha256": "1638c915a1908eaa1361e9bbba0e2399c384d829a23d2cb1a8ff5238ddc0229b"
+    },
+    {
+      "name": "dompurify",
+      "version": "3.4.5",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/dompurify/3.4.5",
+      "status": "METADATA_REVIEWED",
+      "licence": "(MPL-2.0 OR Apache-2.0)",
+      "repository": {
+        "url": "git://github.com/cure53/DOMPurify.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "bedc7d30a6007ae9a8937b952be6adb76a28e871",
+        "tarball": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.5.tgz",
+        "fileCount": 20,
+        "integrity": "sha512-OrwIBKsdNSVEeubdJ1HBv/wNENRM9ytAVCv7YXt//A3vPdVMNuACRqK9mXCGCBW2ln7BT/A4X0jXHo2Gu89miA==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCUjx4dD/o3ZxlAN1etCu0YqK8ZoHrnp9q7tB4B4lccrgIhAPNkRHp51GyKLqeIPyyk2ofjNWLEdkclAEWXqrZ9sFbO",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 641795
+      },
+      "metadataSha256": "830db45a2794c9c58482a7881cc74e1d9f955dfef4575a2a6a9ef142d376dd61"
+    },
+    {
+      "name": "es-toolkit",
+      "version": "1.45.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-QA3QBVWF.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/es-toolkit/1.45.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/toss/es-toolkit.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "21b28b2bd43178fd4c9c937c445d5bcaccce907b",
+        "tarball": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.45.1.tgz",
+        "fileCount": 2743,
+        "integrity": "sha512-/jhoOj/Fx+A+IIyDNOvO3TItGmlMKhtX8ISAHKE90c4b/k1tqaqEZ+uUqfpU8DMnW5cgNJv606zS55jGvza0Xw==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCjBrUmmWzyxp9Jej7usKHT1Cq0bhTvrqfbuwWGUP/g7AIhANibSWlzJvTi1WuECAqnj9SA9GqRCY7HwNOa57i4kjyh",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/es-toolkit@1.45.1",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 2615332
+      },
+      "metadataSha256": "044746e01957d5c2e2733de17ab158e3632e698f2a3b8013f2988fe350a439bd"
+    },
+    {
+      "name": "fflate",
+      "version": "0.8.2",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/fflate/0.8.2",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/101arrowz/fflate.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "fc8631f5347812ad6028bbe4a2308b2792aa1dea",
+        "tarball": "https://registry.npmjs.org/fflate/-/fflate-0.8.2.tgz",
+        "fileCount": 17,
+        "integrity": "sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDLAODdcX19AoVTVIHQ3xOpYBga8kP9W+M8IMQ1482QmgIhAIEK2d7j7xrXLo5MMRt/rCCzuTnvmX3TbIM2MzGC9AbQ",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 773398
+      },
+      "metadataSha256": "7af113aabad77516775b6810b56fa3b92a1e23d8d99c3aff89f4d29b4563d12d"
+    },
+    {
+      "name": "internmap",
+      "version": "2.0.3",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/internmap/2.0.3",
+      "status": "METADATA_REVIEWED",
+      "licence": "ISC",
+      "repository": {
+        "url": "git+https://github.com/mbostock/internmap.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "6685f23755e43c524e251d29cbc97248e3061009",
+        "tarball": "https://registry.npmjs.org/internmap/-/internmap-2.0.3.tgz",
+        "fileCount": 6,
+        "integrity": "sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==",
+        "signatures": [
+          {
+            "sig": "MEQCIHBmnd3DzBtSez8Kl20W7WvRu+LemFDZKGhYGlSGKBa1AiAtnwWs3fEoalUgmnEDaLcfWfnPJTabV1g8Diu9IUIMgQ==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 10470,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJh2v5WCRA9TVsSAnZWagAAWbEP/ilrFg/K98onVeSM6Xtt\nItphGsXHdqBq64GB3Akf5cw+RykofcbjVZyyvRNt56IlZHSOjP2hFc3iZSng\nEFS+0gqk0nBao45G0LWGtM+MrFtrToPYjSId5r5dHwDFMTfaLkAB8rg8D/Wh\nWiUqC1REF6PCLGhLzd6kl8+dYpUfPB39NwJMjWYSEFgvWMgBfwmsD2fXrjgy\n1F7qAZdzSWhb4TaLFVlDTB15K6lHixSu9+x9r/q1Y3R9mKz8DsacxXfIOeRg\nw39hAUHxY2zPXIoY3Jnc74VtqNGV8Bf/3Xzp1VvwrZhordwzcOiwrjAaF0tb\njBDkmDKDsxathcbgtbtiVeuQFNFS2+lfq6IxcQVtQCelReF/kH31fpVEyrki\naAYYTCFnG31tmAsIUxQd1+D1KL/wsTeOHrB+6AagumV0GG6lpy9zpOFgIZPf\naxoSn+RNGxcllyO4U+9rZGa6axLcRfK1gyTVbnTHH07tPOBTEjeQxkE3RjqX\ntGh8yKQeClu8rFFMpQnx1x4ITRDWTJiFRFbdv0sfUUJ+TpcBH/YIalQ5+K5J\ntD32/QMpPd73KCU/hR0Y7GKtrdsv+kdyCXBdo2wu3wkbi/5/j9fOYtFqzNww\nG05AaUsDu0m6+0RvwzPmraaIjS/iarMgfKcbP4B4asQ+rHF9778ZgJemVehT\nCO7P\r\n=stVG\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "efff9214ae9163a79f6c925b1fd68cb5a4d92a053f376ab4df25e1ae9ae01a0a"
+    },
+    {
+      "name": "js-yaml",
+      "version": "4.1.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-7FYTHRHK.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/js-yaml/4.1.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/nodeca/js-yaml.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "854c292467705b699476e1a2decc0c8a3458806b",
+        "tarball": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.1.tgz",
+        "fileCount": 32,
+        "integrity": "sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==",
+        "signatures": [
+          {
+            "sig": "MEUCIQCCes6PRL5wFcFmbO7FJ3GoaKp2TlKz73vqiGxbWGGX7gIgRR3ETViKIxwoCo+2ka4OUOc23wRZPR8p1NN/pU+Mf5g=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 386271
+      },
+      "metadataSha256": "02e87ee5e9c75b02bcb6ebea801f03dd315e0c723c25069d8d673293954d2350"
+    },
+    {
+      "name": "katex",
+      "version": "0.16.25",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/katex-K3KEBU37.mjs.map",
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/katex/0.16.25",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/KaTeX/KaTeX.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "61699984277e3bdb3e89e0e446b83cd0a57d87db",
+        "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.25.tgz",
+        "fileCount": 209,
+        "integrity": "sha512-woHRUZ/iF23GBP1dkDQMh1QBad9dmr8/PAwNA54VrSOVYgI12MAcE14TqnDdQOdzyEonGzMepYnqBMYdsoAr8Q==",
+        "signatures": [
+          {
+            "sig": "MEYCIQD7nN9wsr/CAKBj/NEq9Ihwwq53uul0egQmLMWmABUH1QIhAPiWpXQ4bG5BrjbJXzUDahkQMzG+0F8YH4uSRUnTdMmg",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 4039588
+      },
+      "metadataSha256": "e29488f9dc06462a8f994d95d04bc276ec559a713fceadbe386f0fec2fabb27f"
+    },
+    {
+      "name": "khroma",
+      "version": "2.1.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-67TQ5CYL.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/khroma/2.1.0",
+      "status": "METADATA_REVIEWED",
+      "licence": null,
+      "repository": {
+        "url": "git+https://github.com/fabiospampinato/khroma.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "45f2ce94ce231a437cf5b63c2e886e6eb42bbbb1",
+        "tarball": "https://registry.npmjs.org/khroma/-/khroma-2.1.0.tgz",
+        "fileCount": 191,
+        "integrity": "sha512-Ls993zuzfayK269Svk9hzpeGUKob/sIgZzyHYdjQoAdQetRKpOLj+k/QQQ/6Qi0Yz65mlROrfd+Ev+1+7dz9Kw==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDqSuNt6WtxbVKr+VmzXHgcQW61YpCE5DXnlyWBfzDltQIhAOnNF9+pS6a3hYOcyxPZZSQw7ew9bTH0Zd7uKy+QwsRS",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 143253
+      },
+      "metadataSha256": "523d6298a1a0dffc7196c57571bfb27e77809ab19391af7092c46f59c559e044"
+    },
+    {
+      "name": "layout-base",
+      "version": "1.0.2",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/cose-bilkent-UX7MHV2Q.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/layout-base/1.0.2",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iVis-at-Bilkent/layout-base.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "1291e296883c322a9dd4c5dd82063721b53e26e2",
+        "tarball": "https://registry.npmjs.org/layout-base/-/layout-base-1.0.2.tgz",
+        "fileCount": 40,
+        "integrity": "sha512-8h2oVEZNktL4BH2JCOI90iD1yXwL6iNW7KcCKT2QZgQJR2vbqDsldCTPRU9NifTCqHZci57XvQQ15YTu+sTYPg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCOy/EosiJnUSyjmF+na6w+WFTsw9SK4yLQwVtzmK7v3wIhAK/6+R8YyVt0njlkcNIOrrBTf/2LSkq3FV77iOfU625f",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 301942,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.4\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJdrrSsCRA9TVsSAnZWagAA5TcQAJ3J0ppILKXjrIRq2gom\nwEBN19cnMJIuUX20FDC0Exr6a75pXZfG2f4R22AuxrB9Pq8isJKyRFlTzUK0\nMhPVRm0tPd0g1qGh4WyPHGBuxiOQokBUiI/uHxL407L1MVPbmY44G8WDqQ1V\nywwCll4BsbX1ndXBVP+37zVAeIT1w/6PI7orSFIB5BHQtFhtW4u7HHwkPPCs\nieElT8C9zhEniuBhnM3cHQPuXeM0JfDX5au+VQeSgV9I4EFy2XWNgncP2C1S\nsH/SlXyIGTZZYijZe+gnW3AycqxKTUVEYHwupLBAhyFEVlld4KCtoctwbXTg\njjDMaW4czx/wvYHalchmyzB44zlPQSxddeBEmrSwN1VaR1tO4IGtyF4LyPy0\nzO2dYwTBxP2W4DnGedxUq5qqZx7ko8YPUk3XDD1xfNjW9bjl7fM8fWZfEPoN\nMA+a7zRN4Ne9IcftizL+56gTXIQeZVXPGlk1LP7vzfeExLSq0tIy21NixQQj\n6npFJTLXq8+nVrpX+UW/FcoPY9XVMwerFe1zA2q24ZXmkBsFF3+Cj1ctTlbV\nlA2EOV14yfOprv6GhYeoqPbqV4q7mPBa1fEI5HqLJk+IqildN51bP66hitEq\n761dc4jpMLLYuZGu1FCQVUvkDmEQcMsDm6dCPfyz5b/8dgjKX+IxlyW+Al/h\nWcAG\r\n=cYfp\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "2dadc00c8afbc27c6be3108590473b27daca8b38f8bd477e5b5356ebc0f28174"
+    },
+    {
+      "name": "layout-base",
+      "version": "2.0.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/architectureDiagram-UL44E2DR.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/layout-base/2.0.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/iVis-at-Bilkent/layout-base.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "d0337913586c90f9c2c075292069f5c2da5dd285",
+        "tarball": "https://registry.npmjs.org/layout-base/-/layout-base-2.0.1.tgz",
+        "fileCount": 42,
+        "integrity": "sha512-dp3s92+uNI1hWIpPGH3jK2kxE2lMjdXdr+DH8ynZHpd6PUlH6x6cbuXnoMmiNumznqaNO31xu9e79F0uuZ0JFg==",
+        "signatures": [
+          {
+            "sig": "MEQCICslHbNWrhe1QAfd4ZwN923/jdNQyEl2EJP3dInSOO8+AiAX/WXqmEk/kxHZio4ELW8xDN9CFMKKytirip0Tv/T2eA==",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 400005,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJg1bKqCRA9TVsSAnZWagAAJGAQAIYqqIhk5Ng73rL1G1Q9\nIcJeclqp+d54OGWEXbnxxDt5c5zv5Y08Oq6FBP7W0F+XyLKkiVmSsKdbEUKD\nU48dKckJCpHP8ZTTXwgMioFm6XB3Qzo8WM2ab10+NS1FkglUNAYlXobNBeGQ\nmP7WQf9+8mug+E0yHtVC+VStem3NnXLtNe56yq7fUne5Ie7m4kjH2z+jYrNC\nrbROpPOYyOLxfkbWCtiQammqhqXtiG45wqLvOmvvRv9te2qhaO1aBQtCF2dC\nA3AM1atmjp0YzARDXPmxZyNABY0ICngo0Xo/ZW6Kx9bufSClXQJNea+AW0DF\n6Z1fpvdG30Zo1kJcQ4ah2VfdwCV+wLqGvnVmwQl6XvnUFe/rtU7v99+xzltW\n1AGRymlMmGwyrOQaIXXFo+fF1JDIooX1LpvfPkrjiQEOdsE4Nnp18kG3O3p0\nYOyjyneTMVudj0ykhfrcWKrVSqrPDmnROMM/8oTHoqQwoNizZDoSfwf+uXNU\nXABGOLQBF1+J/y6V3gUWheEkvFdIAY+2a52tEXepDwAOY0v5XQ+eg4NkHcZf\nY/zEkR4H7GD70N1qBE+8YQkhmiDVUYD8Ra9zLNQO1g0galgi76GV3tLsIO4F\nYJno+QUqo9P/jb/yErkb+IwyIct+6HXvluSjxUd6voD2YfoDr7CnBl6/nCOG\nsZBh\r\n=6yxt\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "75def23dd3bbd9028ba4504978d3972b355f88fabc85270d807979809b860940"
+    },
+    {
+      "name": "lodash-es",
+      "version": "4.18.1",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-W44A43WB.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/lodash-es/4.18.1",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/lodash/lodash.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b962eeb80d9d983a900bf342961fb7418ca10b1d",
+        "tarball": "https://registry.npmjs.org/lodash-es/-/lodash-es-4.18.1.tgz",
+        "fileCount": 647,
+        "integrity": "sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==",
+        "signatures": [
+          {
+            "sig": "MEUCIQD1ZbYD7P03sQv7gtZG1On1OGaSah6FYWvNHh5D2ptbDAIgRRnzF67eLGwcl/27/ZMP8zp1qFhCZgpUZyVoyHQ4rn4=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 634630
+      },
+      "metadataSha256": "175e33b8efa9221ac159d49fdea2d70ec967d02bbd4e2f4613da9993bf920dea"
+    },
+    {
+      "name": "mammoth",
+      "version": "1.12.0",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/mammoth/1.12.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "BSD-2-Clause",
+      "repository": {
+        "url": "git+https://github.com/mwilliamson/mammoth.js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "102ed719a933ac08ed65b37e9856622f1051effb",
+        "tarball": "https://registry.npmjs.org/mammoth/-/mammoth-1.12.0.tgz",
+        "fileCount": 117,
+        "integrity": "sha512-cwnK1RIcRdDMi2HRx2EXGYlxqIEh0Oo3bLhorgnsVJi2UkbX1+jKxuBNR9PC5+JaX7EkmJxFPmo6mjLpqShI2w==",
+        "signatures": [
+          {
+            "sig": "MEQCIATgZTDYsFycE++enAK1MYYQSGVWSf9A4cDOsXFkhCDqAiAjF7QsG57G6GIFRKsobnLziHdDb+oBlaapth4dNw7Mbg==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 2166337
+      },
+      "metadataSha256": "43838bd563545fc04522f1944a1760689d61bb40eef228c0f0889fd0bc61f5b2"
+    },
+    {
+      "name": "marked",
+      "version": "16.3.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-INKRHTLW.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/marked/16.3.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git://github.com/markedjs/marked.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "2f513891f867d6edc4772b4a026db9cc331eb94f",
+        "tarball": "https://registry.npmjs.org/marked/-/marked-16.3.0.tgz",
+        "fileCount": 12,
+        "integrity": "sha512-K3UxuKu6l6bmA5FUwYho8CfJBlsUWAooKtdGgMcERSpF7gcBUrCGsLH7wDaaNOzwq18JzSUDyoEb/YsrqMac3w==",
+        "signatures": [
+          {
+            "sig": "MEYCIQD2bmsPc4SooFrUhfDmn4wSP9ETNLMyAKclJqBCOlAYOwIhAKWQNwXXf71FQp2Wvv//i+L7IbtHFXDBXHwKxo2SSnbf",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/marked@16.3.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 424225
+      },
+      "metadataSha256": "5c7117f46954b48b9068005f7c7a717797d29c1c6a6e5e63ea326c1ce7560692"
+    },
+    {
+      "name": "marked",
+      "version": "16.4.2",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/marked/16.4.2",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git://github.com/markedjs/marked.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "4959a64be6c486f0db7467ead7ce288de54290a3",
+        "tarball": "https://registry.npmjs.org/marked/-/marked-16.4.2.tgz",
+        "fileCount": 12,
+        "integrity": "sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA==",
+        "signatures": [
+          {
+            "sig": "MEUCIQDnAj5pOxSgJFJBvm0J8D5mhE+deSXobripY0wpmFACbAIgPBsZJP4tCwBJba0Ypl8WdEiQhpWV5yPxL9nwWqmUiOg=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/marked@16.4.2",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 430268
+      },
+      "metadataSha256": "cf7f3374ad92fb5081d5d1b0639e4015e2957cb8d98b01b781794e49504e7e35"
+    },
+    {
+      "name": "mermaid",
+      "version": "11.15.0",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/mermaid/11.15.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/mermaid-js/mermaid.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "b485c13ea5e1e74f3328c4bb00427bda87fa1c1e",
+        "tarball": "https://registry.npmjs.org/mermaid/-/mermaid-11.15.0.tgz",
+        "fileCount": 888,
+        "integrity": "sha512-pTMbcf3rWdtLiYGpmoTjHEpeY8seiy6sR+9nD7LOs8KfUbHE4lOUAprTRqRAcWSQ6MQpdX+YEsxShtGsINtPtw==",
+        "signatures": [
+          {
+            "sig": "MEUCIQDbHphMjOBFdeyALtI6GPId2+xrJJ199O8mfEQtAKeQQgIgXSispmmP4wFElRf8LziXkujYbUgIgfkWqHM71DIiBZw=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/mermaid@11.15.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 76342428
+      },
+      "metadataSha256": "a7c7262150d32a45ecd3c952b9fae8fdb4a02fe781119fcdabad193d494afc30"
+    },
+    {
+      "name": "pdfjs-dist",
+      "version": "5.7.284",
+      "evidence": [
+        "assets/vendor/manifest.json (top-level distribution)"
+      ],
+      "source": "https://registry.npmjs.org/pdfjs-dist/5.7.284",
+      "status": "METADATA_REVIEWED",
+      "licence": "Apache-2.0",
+      "repository": {
+        "url": "git+https://github.com/mozilla/pdf.js.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "01d9ff1d7ccd15245bdec8524a6770feb77fbb23",
+        "tarball": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.7.284.tgz",
+        "fileCount": 493,
+        "integrity": "sha512-h4EdYQczmGhbOlqc3PPZwxevn7ApdWPbovAuWXOB/DjIyigSnwfy2oze7c6mRcSr9XgLp3eN3EeL4DyySTPMFw==",
+        "signatures": [
+          {
+            "sig": "MEUCIHIhf+Y0283tO6BRMHvIc87DjJS4SY7IxCnhFpNaYXz8AiEA2X6S9xqgCYig1r2TxGGrXDyLJypVLoydpL8ZegYD27E=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/pdfjs-dist@5.7.284",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 35291687
+      },
+      "metadataSha256": "41b30f1f0e45ff047699cee4266240451a7bfec68fac4beb79e4a5899e7a8a72"
+    },
+    {
+      "name": "playwright",
+      "version": "1.64.0",
+      "evidence": [
+        "package-lock.json (test tooling)"
+      ],
+      "source": "https://registry.npmjs.org/playwright/1.64.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "Apache-2.0",
+      "repository": {
+        "url": "git+https://github.com/microsoft/playwright.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "c105a3ffe174d487a5927a6836a79778b1180742",
+        "tarball": "https://registry.npmjs.org/playwright/-/playwright-1.64.0.tgz",
+        "fileCount": 60,
+        "integrity": "sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCowvbKXoYvi9I40waFaVTbYQzzSRWeAcv6c7SSju8nmgIhAOw70mSMijFS56ADEZLQFO66rZE8jOqls/sm4bl1tFaV",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEUCIQDAuQdZ4eA787JWOT0aO4jOC3iH1S5hYUQU1AR/VS1l7wIgU0fgvtc2dzKrgbwsvuXHtbnMlT7+Wu1elRjpN3tPRrg=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/playwright@1.64.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 5033957
+      },
+      "metadataSha256": "faac4e18f0a8521c4e35b3bb4dba54e7f6dd1466e659fa483761d4cf43d57223"
+    },
+    {
+      "name": "playwright-core",
+      "version": "1.64.0",
+      "evidence": [
+        "package-lock.json (test tooling)"
+      ],
+      "source": "https://registry.npmjs.org/playwright-core/1.64.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "Apache-2.0",
+      "repository": {
+        "url": "git+https://github.com/microsoft/playwright.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "a765f91dabd2b2cadd67e87439842c1d6c72c652",
+        "tarball": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.64.0.tgz",
+        "fileCount": 115,
+        "integrity": "sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCWRapsz9H6Xnq9x3d0rUXkzMBucgsFddyJYTYBKS8qLAIhAORnF1gi9AvGCn0MADwkI9OR/L4FOSlfX/v+Wwvw0CSI",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEUCIHIM6MfpDS876ZfUSP6wNXVv0HDddANsiIq7f6BRMHadAiEA8UzdJX0u1skHZqrrAZGrWTvICT394/buLgftCJU/9eU=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/playwright-core@1.64.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 13655528
+      },
+      "metadataSha256": "6f244f0b86b171c2ef877f8e027ba964809d8e5df692664c8736e5d0484f6dc7"
+    },
+    {
+      "name": "roughjs",
+      "version": "4.6.6",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-5IMINLNL.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/roughjs/4.6.6",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/pshihn/rough.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "1059f49a5e0c80dee541a005b20cc322b222158b",
+        "tarball": "https://registry.npmjs.org/roughjs/-/roughjs-4.6.6.tgz",
+        "fileCount": 61,
+        "integrity": "sha512-ZUz/69+SYpFN/g/lUlo2FXcIjRkSu3nDarreVdGGndHEBJ6cXPdKguS8JGxwj5HA5xIbVKSmLgr5b3AWxtRfvQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIEWOu7PtJgEWEYwiD7rnOK2bubDsAgsCfio5UhieJNeVAiEAviwQ2KsTzB+87HqD7fvs7qKtD4IiYHjE31kmhGMZjMw=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 169684
+      },
+      "metadataSha256": "5bbfdba7a1dc7a8e2b7fe4fad275018bb726346d52a561352562f814a16b721c"
+    },
+    {
+      "name": "ts-dedent",
+      "version": "2.2.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/chunk-INKRHTLW.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/ts-dedent/2.2.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/tamino-martinius/node-ts-dedent.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "39e4bd297cd036292ae2394eb3412be63f563bb5",
+        "tarball": "https://registry.npmjs.org/ts-dedent/-/ts-dedent-2.2.0.tgz",
+        "fileCount": 13,
+        "integrity": "sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ==",
+        "signatures": [
+          {
+            "sig": "MEUCIFCjUcW+iq69fzM2mMOGL8zVpnNTJDfr20gHmxgHx6UcAiEA8ItvAS10RtPFT8yxIl/4p2C9B8b0MhxbhuSTfFq7NHc=",
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+          }
+        ],
+        "unpackedSize": 26646,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJhBrw3CRA9TVsSAnZWagAAJ5YP/R6huOV6qLfSziebWzV1\nCIKmZcstC92oDMNJgtjRnZjJ+yDu7kFOMeKVcrh+dYD55j7PTPsjNw+HzD5Z\n06bDXsWS7wCG5Ui0QtPQXA3Tdk6rPS+jsPJ0Z/BVbcpDJfRGe9rlv+GDDSJK\nz7CVEpzv/LOZO1K2q0UVcZc6CltqERubKyATA+A5+zK1exoBi/eIRA/PvJGC\n5z8CVJo5bymR5+XJNh0OwvJ1SFnBSH39fZjwm7L24v0MXB95QFV9zEVjT1/P\ns1L83Sh69CVaBnpJYdgPJ8v7KdF1mYKugaVm3QO3dHnEYBdejEcgDKizbcDL\njaZG++lR44oo1lWliKYKyKO2WI+6O5qCEi2ZmEap09bjXVAgc5+lGC4T6Ub0\nUP1RCyzATOZjW8TltbTw1j7v+nzdabGJQDs6UGmAR+V+olMAubFDNSrHoHgT\nGWqp5dEjws3BrIRzDj3MFgE+k6MEJq5JUFo7+7I+mhocSSVY2nHBH8cLWl5C\nHZcdjQeYd62y/avESSvV9dlrL90nnDtqvLxduH8txAXusMBWvHI1eTu0f+8c\nxwKnQnTug4tyFVB5fkr7ydkLp+1fjNzupRs4twGApI/gwAXcZPVUq8mjA/o3\nnxn0sJC3RZNIXK1w6OqP/BrpheqjI5mWQrYHwl2hbF/muZOmV84cAYLSzUBA\nVSRU\r\n=3auL\r\n-----END PGP SIGNATURE-----\r\n"
+      },
+      "metadataSha256": "eb745d6a3d13d5dc0cb13fe2a8aa16c233a5d00d72dcd91b8bb43f0fd1974965"
+    },
+    {
+      "name": "uuid",
+      "version": "14.0.0",
+      "evidence": [
+        "assets/vendor/chunks/mermaid.esm.min/mindmap-definition-2TDM6QVE.mjs.map"
+      ],
+      "source": "https://registry.npmjs.org/uuid/14.0.0",
+      "status": "METADATA_REVIEWED",
+      "licence": "MIT",
+      "repository": {
+        "url": "git+https://github.com/uuidjs/uuid.git",
+        "type": "git"
+      },
+      "dist": {
+        "shasum": "0af883220163d264ffe0c084f6b8a89b9666966d",
+        "tarball": "https://registry.npmjs.org/uuid/-/uuid-14.0.0.tgz",
+        "fileCount": 70,
+        "integrity": "sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQCuti3nQEyEiAG1XANeAl/30S840aRpDZjHEPEdI+o+2QIhAMkkrMdkr+Rnfa1KRcvTuIi3YaW/IHMxI43rgLp5tgBG",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/uuid@14.0.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "unpackedSize": 70265
+      },
+      "metadataSha256": "afed241ba8e324aebc43bce60ec011146f5c142a84e0795795b3c91ee18f2ff8"
+    }
+  ],
+  "limits": [
+    "Package metadata is evidence, not a grant for first-party code.",
+    "Source-map package versions do not prove complete bundle provenance.",
+    "Legacy shell transitive closure is not locked or certified here.",
+    "Image content, archive contents and ownership require human review."
+  ],
+  "historyScan": {
+    "refs": [
+      "2f6286ee4cf34da98eba30b9202a8f6f0aec96e7 refs/codex/goal-x-b/local-publication-attempt",
+      "08171f0d90315dca9db75a812c1d3b1849524b84 refs/codex/snapshots/32adea1f76fbaaf96ab06c73575b46e9e8efebb3",
+      "da37b790bb7eae3295c6f0e560e8c090eda9f433 refs/codex/snapshots/4841093c6848bba2b855fb4aa58230a07deae10b",
+      "c566144529c3c0e4393c1604544201b936e4a6a2 refs/codex/snapshots/54e63466f19c4ee51d640cd42187dc09f7cdda5a",
+      "83eeb9e489bd3c9513f9ffb17fe0b833c1a088ff refs/codex/snapshots/7fb5abe7f6d8f036bf6e5ba4767d2126a1345487",
+      "9c7454eeb892614af93881b762a1b6aecc3259d2 refs/codex/snapshots/92c7a230de414c903b8f5db3ffb4089c95f49166",
+      "eb81939835a1bb2a92cf76570de77d8d69e571ff refs/codex/snapshots/b8d8fbac32673d6f11dca5c1c2402b816fd2a495",
+      "d37da4a5bca5ae40107993de61daa3cff058362b refs/codex/snapshots/be8837ecb20e45161fc456f29f49b686c6719d88",
+      "5a373a412e86b93ea8af1b9e5b867250e3d23ee1 refs/codex/snapshots/dfe8f7394aecf401a3a64f3ba17cddca3986b0ea",
+      "42c3fc614feb6db6f69a242312604e46ff76c238 refs/codex/snapshots/e2238beb555e4417a61f216efb31063a4cbcdb0c",
+      "833e9db1f8643f7023143dd94349a2709f9ae9ce refs/codex/snapshots/ea241f78e5cf2bc77425a45c1775defdd98a8c0e",
+      "47e78d6bff490a9b0c0b5cb2022dab262fe14e5e refs/codex/snapshots/f487ba0c14e36efe680b2e3d1b79554282943781",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/captures/1793205781041/c4d72ab1-3647-4002-b885-3df868d898a1/base",
+      "3d00c5f93d845be1daa459027c6bd5c523cf6223 refs/codex/turn-diffs/checkpoints/0d8111ff1d6706b8b1bba3e0156ec465/73523e69bcf2419ae2d2e57ce1d88545/1793165025642/a0de27cc-cda0-44bc-aa85-4f845fdbbbd3",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/0f0832588bcba52f2450643e8d4c383b/8aab406746cadcb0efad064224dc5c49/1792792685318/762477c3-f90e-46d4-9600-9b55d54118a0",
+      "e8509717f34d3ba057200da52d09fb7c7045a0a9 refs/codex/turn-diffs/checkpoints/29b7da77d01f77def4b398ca62e4bee9/83dfd1b53d8f97389fbbd9b417b5c224/1792968362475/db355391-b46b-4374-9b7e-de2b4ee573d2",
+      "d995527c96141dca398a0adcff6c9d007edacde3 refs/codex/turn-diffs/checkpoints/3fb230dbc78758f501cda0fc5a7a5c09/76dc119a5cc09b36ce280e73a49eafb4/1793203140956/96d848db-2fbb-4c17-aead-82a4f30149ad",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/5502007d59421376d09bc685b64c2472/9661dab6ca478582d32e53856e5c9b4c/1793038545774/412add9e-9f0c-489f-adb2-4228ccc90ae3",
+      "ce29b89d534bfcb23ddbbfc1df165ce51715f0d0 refs/codex/turn-diffs/checkpoints/5bfd0b7e1887510aa39730c30a84b911/d32eedf5ef06e1e1600a41f880a73949/1793049000571/8c514ab0-cde8-4bda-b016-c2dadb7208f5",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/6a2d1cd03a14d95fd4470eec10208ae6/069bf0f934c2a5794fc71e22e34a4ee2/1792933428864/8569185c-afc3-49d5-897f-6fa499c2a197",
+      "1fb777317ad6e5c8531eebcb565fefae4227e354 refs/codex/turn-diffs/checkpoints/78582ac03ec6e61dda0307be283d9353/b9b0811c03fa7502418ffd334f3e1966/1792855701755/b12ebcde-89e3-43eb-be43-71f4123539ff",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/841ae6a48d57288d93e19c94f7c79c96/fb5f81a75c94d7f959f66e3fd817032f/1792877441726/72bbe2cd-9f58-449f-87b4-a59504589578",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/8910c0daada1872736f23fdafa904afd/4c402d4ae0ace9d44b284052aaa6649b/1792754361801/4310533c-8489-4953-b1f5-0cf14b5cd44d",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/8f64146fe741fe904ef405d675f8a40e/8715c4eff54c90e672b087366055ecb9/1792928544448/b79fe592-2b71-4ac2-955d-6133498675b1",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/93daa2d7ca6b3b578c11d5caac756216/f5b82a9b003e129dee158a6146335a4b/1792698986595/6ef73f09-07a4-4172-8fde-655bc0286415",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/c5356298e7f9ac779647b7575be78f1d/bf5d7f0914ad5f4e1cf0c0e85b15d0d9/1792951469284/2bd482e8-7798-492a-8fc2-f4fdb84b6214",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/c8b099de7d9482bed8113dd1e1a0f2d9/a8627f63831aa0c4a694571966a3b22f/1793030057377/487c1c94-b03e-40ba-96df-892a06c95231",
+      "c17483a8582a735bae4956da1eac46b40c059805 refs/codex/turn-diffs/checkpoints/dcbd31efde9571151c0dc4739028fac5/8f5579ccdf4b28d0ad57ee7890122c4d/1792760413132/09e5f5cb-63a2-4e8e-a702-00bd0d2e7e87",
+      "24616837b5289299466cf64e37952d61bc95df6b refs/heads/assessment/pr38-continuous-feasibility-2026-10",
+      "78f72331a7b53522a2067722dd6c05a3eef164c5 refs/heads/codex/document-navigation-history",
+      "74c4e254d6acdab95b09d8ab4f867f9ddbe8efad refs/heads/codex/local-docs-studio-feature-batch",
+      "2cc3b5680958c9c553dad23856e6010c158fccd7 refs/heads/develop",
+      "31fa3ad12f3e0c87f5e45cea6f97801af53b67cb refs/heads/experiment/native-continuous-layout-architecture",
+      "a937399a3f822c4e911e1ebe5ec0e426b64c56ac refs/heads/feature/native-continuous-preview-performance",
+      "5a373a412e86b93ea8af1b9e5b867250e3d23ee1 refs/heads/feature/native-desktop-ux-modernisation",
+      "22d34c9777b6f9d111335d3f2c9576dcda0e86da refs/heads/feature/native-desktop-ux-refinements",
+      "90fda036b799472d023d6e40a74355fbf4950ce5 refs/heads/feature/native-mermaid-advanced-partial-editing",
+      "2cd7e41938e98a05dcf3f73e7934c224a06591f8 refs/heads/feature/native-mermaid-architecture-c4-block-editors",
+      "9efb3564d7f7e21efc4c9662bc2b7c5d7424b1ad refs/heads/feature/native-mermaid-class-visual-editor",
+      "16c9e4e67bbc287f991115358beba5274a978109 refs/heads/feature/native-mermaid-creation-hub",
+      "47e78d6bff490a9b0c0b5cb2022dab262fe14e5e refs/heads/feature/native-mermaid-editor-visual-polish",
+      "af61f3ac3ecaf9e30c6d042bf621ce7d8508907d refs/heads/feature/native-mermaid-er-visual-editor",
+      "9eb5f65052310b8c367b34432dfb0f6fcb0c859c refs/heads/feature/native-mermaid-gantt-mindmap-pie-editors",
+      "9d0f6f7c026a13bc11f080ca392b84b1674f0d40 refs/heads/feature/native-mermaid-kanban-requirement-gitgraph-editors",
+      "d37da4a5bca5ae40107993de61daa3cff058362b refs/heads/feature/native-mermaid-packet-treeview-treemap-venn-editors",
+      "599a44eaa2e11ffbdb020b76a3059b4b37743154 refs/heads/feature/native-mermaid-preview-fidelity",
+      "eb551f29fd657040e05aaffd8d27d11f7a47c3c6 refs/heads/feature/native-mermaid-sequence-visual-editor",
+      "96d24a3a74c7d2ed37d4863556ed49a78000862a refs/heads/feature/native-mermaid-state-visual-editor",
+      "9a64dfa5adf79dc447db1f671ea39c94ec42de40 refs/heads/feature/native-mermaid-suite-ux-performance",
+      "5d669485122df0aa3b548bbdcecbd2d9c7198947 refs/heads/feature/native-mermaid-timeline-journey-quadrant-editors",
+      "eb81939835a1bb2a92cf76570de77d8d69e571ff refs/heads/feature/native-mermaid-visual-editor",
+      "e8cb7b6615f82c6ea635467c9ce6b92c335d9c1d refs/heads/feature/native-mermaid-xy-radar-sankey-editors",
+      "8f6f00d583ea9f1c77acb3d8c86710f80806174b refs/heads/feature/native-smart-diagram-arrangement",
+      "42c3fc614feb6db6f69a242312604e46ff76c238 refs/heads/feature/native-ux-refinement",
+      "6cc17f0b31465b93485a082fd81384d5573476d7 refs/heads/feature/native-windows-development-host-acceptance",
+      "84665322addd9d45faecde7d1347233a22d0d38d refs/heads/feature/native-windows-ux-release-readiness",
+      "833e9db1f8643f7023143dd94349a2709f9ae9ce refs/heads/feature/native-workspace-mermaid-interaction-stability",
+      "3dfda9fe6152b93bd9f6def2f68bd5e2d6d2635b refs/heads/feature/native-wpf-rebuild",
+      "5c61d17966befee665856a7993cb174252df5214 refs/heads/feature/open-source-readiness",
+      "08171f0d90315dca9db75a812c1d3b1849524b84 refs/heads/fix/native-853-postmerge-pdf-lifecycle",
+      "fb635049449364a255a788ed652283801d62631b refs/heads/fix/native-complex-mermaid-rendering",
+      "8332ddc48e64d93e766b90ef03693146bcf6f9a6 refs/heads/integration/native-consolidation-notes",
+      "1f0c6a416f421dcbacb084ffd0931ed22bc56ea8 refs/heads/integration/native-consolidation-workflow",
+      "cf2d3c4455579fad0e9c4d13e3b555329406583e refs/heads/integration/native-wpf-candidate",
+      "0d100cc29dde2ba80755fb1e8af60ffd9d006b16 refs/heads/main",
+      "c566144529c3c0e4393c1604544201b936e4a6a2 refs/heads/release/native-preview-readiness",
+      "83eeb9e489bd3c9513f9ffb17fe0b833c1a088ff refs/heads/spike/native-continuous-viewer",
+      "0d100cc29dde2ba80755fb1e8af60ffd9d006b16 refs/remotes/origin/HEAD",
+      "2fdfc4e4f2664a426428a388056f66940ad5f03a refs/remotes/origin/assessment/pr38-continuous-feasibility-2026-10",
+      "78f72331a7b53522a2067722dd6c05a3eef164c5 refs/remotes/origin/codex/document-navigation-history",
+      "74c4e254d6acdab95b09d8ab4f867f9ddbe8efad refs/remotes/origin/codex/local-docs-studio-feature-batch",
+      "5c61d17966befee665856a7993cb174252df5214 refs/remotes/origin/develop",
+      "31fa3ad12f3e0c87f5e45cea6f97801af53b67cb refs/remotes/origin/experiment/native-continuous-layout-architecture",
+      "a075975e4fa4d24b0f7fc4f3bbe6503fe1aec32e refs/remotes/origin/feature/native-continuous-preview-performance",
+      "5a373a412e86b93ea8af1b9e5b867250e3d23ee1 refs/remotes/origin/feature/native-desktop-ux-modernisation",
+      "22d34c9777b6f9d111335d3f2c9576dcda0e86da refs/remotes/origin/feature/native-desktop-ux-refinements",
+      "90fda036b799472d023d6e40a74355fbf4950ce5 refs/remotes/origin/feature/native-mermaid-advanced-partial-editing",
+      "2cd7e41938e98a05dcf3f73e7934c224a06591f8 refs/remotes/origin/feature/native-mermaid-architecture-c4-block-editors",
+      "9efb3564d7f7e21efc4c9662bc2b7c5d7424b1ad refs/remotes/origin/feature/native-mermaid-class-visual-editor",
+      "16c9e4e67bbc287f991115358beba5274a978109 refs/remotes/origin/feature/native-mermaid-creation-hub",
+      "47e78d6bff490a9b0c0b5cb2022dab262fe14e5e refs/remotes/origin/feature/native-mermaid-editor-visual-polish",
+      "af61f3ac3ecaf9e30c6d042bf621ce7d8508907d refs/remotes/origin/feature/native-mermaid-er-visual-editor",
+      "9eb5f65052310b8c367b34432dfb0f6fcb0c859c refs/remotes/origin/feature/native-mermaid-gantt-mindmap-pie-editors",
+      "9d0f6f7c026a13bc11f080ca392b84b1674f0d40 refs/remotes/origin/feature/native-mermaid-kanban-requirement-gitgraph-editors",
+      "d37da4a5bca5ae40107993de61daa3cff058362b refs/remotes/origin/feature/native-mermaid-packet-treeview-treemap-venn-editors",
+      "599a44eaa2e11ffbdb020b76a3059b4b37743154 refs/remotes/origin/feature/native-mermaid-preview-fidelity",
+      "7fcad8875871eb2eabf03e5d219e06b94b63953f refs/remotes/origin/feature/native-mermaid-sequence-visual-editor",
+      "96d24a3a74c7d2ed37d4863556ed49a78000862a refs/remotes/origin/feature/native-mermaid-state-visual-editor",
+      "9a64dfa5adf79dc447db1f671ea39c94ec42de40 refs/remotes/origin/feature/native-mermaid-suite-ux-performance",
+      "5d669485122df0aa3b548bbdcecbd2d9c7198947 refs/remotes/origin/feature/native-mermaid-timeline-journey-quadrant-editors",
+      "eb81939835a1bb2a92cf76570de77d8d69e571ff refs/remotes/origin/feature/native-mermaid-visual-editor",
+      "e8cb7b6615f82c6ea635467c9ce6b92c335d9c1d refs/remotes/origin/feature/native-mermaid-xy-radar-sankey-editors",
+      "8f6f00d583ea9f1c77acb3d8c86710f80806174b refs/remotes/origin/feature/native-smart-diagram-arrangement",
+      "42c3fc614feb6db6f69a242312604e46ff76c238 refs/remotes/origin/feature/native-ux-refinement",
+      "6cc17f0b31465b93485a082fd81384d5573476d7 refs/remotes/origin/feature/native-windows-development-host-acceptance",
+      "84665322addd9d45faecde7d1347233a22d0d38d refs/remotes/origin/feature/native-windows-ux-release-readiness",
+      "833e9db1f8643f7023143dd94349a2709f9ae9ce refs/remotes/origin/feature/native-workspace-mermaid-interaction-stability",
+      "9c7454eeb892614af93881b762a1b6aecc3259d2 refs/remotes/origin/feature/native-wpf-rebuild",
+      "da37b790bb7eae3295c6f0e560e8c090eda9f433 refs/remotes/origin/fix/native-853-postmerge-pdf-lifecycle",
+      "fb635049449364a255a788ed652283801d62631b refs/remotes/origin/fix/native-complex-mermaid-rendering",
+      "aeb4a956c9c5bd18212f69f47eeb3dc06daab35c refs/remotes/origin/integration/native-consolidation-workflow",
+      "cf2d3c4455579fad0e9c4d13e3b555329406583e refs/remotes/origin/integration/native-wpf-candidate",
+      "0d100cc29dde2ba80755fb1e8af60ffd9d006b16 refs/remotes/origin/main",
+      "c566144529c3c0e4393c1604544201b936e4a6a2 refs/remotes/origin/release/native-preview-readiness",
+      "83eeb9e489bd3c9513f9ffb17fe0b833c1a088ff refs/remotes/origin/spike/native-continuous-viewer",
+      "8b215d039188af94d32857239e6829916f4b74fc refs/tags/v0.1.0-dev",
+      "efc9b8bf26e8ada69ee58c90c8595e32eba72963 refs/tags/v0.1.0-dev.1",
+      "24b700ed1e873d048cf381be8b7840a0275dbeff refs/tags/v0.1.0-dev.2",
+      "1e8f15bf177046333cdc86076487cee74f647170 refs/tags/v0.1.0-dev.3",
+      "2555a7554e9e625af7e5d9da93725f77f4997ded refs/tags/v0.1.0-dev.4"
+    ],
+    "counts": {
+      "blobs": 7819,
+      "bytes": 470786988
+    },
+    "findings": [
+      {
+        "blob": "49a6441d450f1c63d4c2ee1a833f59251f5eaf11",
+        "rule": "credential-url",
+        "count": 1
+      },
+      {
+        "blob": "870e8668864c006606ba2a2bd7b98a1b09f9450f",
+        "rule": "credential-url",
+        "count": 2
+      }
+    ],
+    "limits": "Pattern screening only; not proof of absence. Unfetched refs, LFS, release downloads, visual/OCR and unknown secret formats are outside this scan."
+  }
+}
