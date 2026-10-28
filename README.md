@@ -6,6 +6,11 @@ Local Markdown, Mermaid, and documentation studio.
 
 ## Native Windows edition
 
+The [Smart diagram arrangement candidate](docs/native/smart-diagram-arrangement.md)
+adds explicit ER/Flowchart placement, measured layout alternatives, pins and an
+optional portable workspace sidecar. Its arranged SVG/PNG commands are separate
+from canonical exports; the report records support limits and validation status.
+
 Start with [Current native Windows readiness](docs/native/current-windows-readiness.md)
 for the accepted 24 bounded editor families, exact integrated source, controlled
 internal-preview restrictions and production certification blockers. The earlier

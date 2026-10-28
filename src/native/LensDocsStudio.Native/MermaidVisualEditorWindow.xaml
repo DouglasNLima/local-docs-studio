@@ -15,6 +15,7 @@
    </DockPanel>
   </Border>
   <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="Visual editor commands" AutomationProperties.AutomationId="MermaidToolbar">
+<Button x:Name="ArrangeButton" Content="Arrange…" IsEnabled="False" Click="OpenArrangement" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="MermaidArrange" ToolTip="Open Navigate and Arrange modes with separate layout history and workspace persistence"/>
 <Button x:Name="UndoButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="Undo" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="MermaidUndo"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Undo"/></StackPanel></Button>
 <Button x:Name="RedoButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="Redo" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="MermaidRedo"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Redo"/></StackPanel></Button>
 <Separator/>

@@ -1,5 +1,9 @@
 # Native implementation progress
 
+## Goal 54 — smart diagram arrangement (28 October 2026)
+
+The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.
+
 ## Original SPC acceptance - 28 October 2026
 
 The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
@@ -254,3 +258,5 @@ The supported implementation is ready for unsigned internal preview. Production 
 The original brief's completion clause allows explicit evidence-backed residual blockers. Production prerequisites and engineering limits are enumerated in the [report](engineering-completion-report.md#remaining-production-prerequisites-and-engineering-limits); they are not silently treated as passed. The final report/regression commit's mandatory CI must finish successfully before goal closure. Follow the PR for that exact revision's results.
 
 [Historical progress through the application baseline](history/implementation-progress-through-7008751.md) preserves all prior milestones and failures. The [continuation handoff](continuation-handoff.md) describes how to resume only outstanding acceptance work when its required resources become available. Do not recreate the native project or repeat completed implementation.
+
+The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.

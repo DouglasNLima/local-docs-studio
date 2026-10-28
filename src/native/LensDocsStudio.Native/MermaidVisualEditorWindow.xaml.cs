@@ -14,6 +14,14 @@ namespace LensDocsStudio.Native;
 
 public partial class MermaidVisualEditorWindow : Window
 {
+    public Action<Window, string>? ArrangeDiagram { get; set; }
+    public bool OwnsArrangementSource(string source) => !closed && draft is not null && draft.Source == source && !SourcePending && !PropertiesPending && inlineEditor is null;
+    private void OpenArrangement(object sender, RoutedEventArgs e)
+    {
+        if (!CanTransform || PropertiesPending) { Status.Text = "Finish the pending source or property edit before arranging."; return; }
+        if (ArrangeDiagram is null) { Status.Text = "Open the diagram from its owning document to arrange it."; return; }
+        ArrangeDiagram(this, draft.Source);
+    }
     private readonly MermaidVisualDraft draft;
     private readonly DiagramService diagrams;
     private readonly Func<string, CancellationToken, Task<string?>> applyToDocument;
@@ -129,6 +137,7 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (SourceEditor is null) return;
         var canEdit = CanTransform;
+        ArrangeButton.IsEnabled = canEdit && !PropertiesPending && ArrangeDiagram is not null;
         NodeProperties.IsEnabled = EdgeProperties.IsEnabled = GroupProperties.IsEnabled = canEdit;
         Palette.IsEnabled = Direction.IsEnabled = canEdit && !PropertiesPending;
         ApplyButton.IsEnabled = canEdit && !PropertiesPending && draft.CanApply; UndoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanUndo;
@@ -413,7 +422,7 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void Apply(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform || !draft.CanApply || PropertiesPending) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
+        if (!CanTransform || !draft.CanApply || PropertiesPending || !DiagramArrangementWindow.CloseOwned(this)) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
         try
         {
             var validated = await draft.ValidateForApplyAsync(lifetime.Token);
@@ -429,17 +438,18 @@ public partial class MermaidVisualEditorWindow : Window
         catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "The diagram could not be applied: " + ex.Message[..Math.Min(ex.Message.Length, 300)]; }
         finally { busy = false; if (!closed) UpdateActions(); }
     }
-    private void Cancel(object sender, RoutedEventArgs e) { discard = true; Close(); }
+    private void Cancel(object sender, RoutedEventArgs e) { var previous = discard; discard = true; Close(); if (!closed) discard = previous; }
     private void ConfirmClose(object? sender, CancelEventArgs e)
     {
         if (!discard && (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null) && MessageBox.Show(this, "Discard this visual editor's unsaved draft? The document will keep its current source.",
-            "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) e.Cancel = true;
+            "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) { e.Cancel = true; return; }
+        if (!DiagramArrangementWindow.CloseOwned(this)) e.Cancel = true;
     }
     public bool CloseForOwner()
     {
         if ((draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null) && MessageBox.Show(this, "Discard this visual editor's unsaved draft before closing the application?",
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return false;
-        discard = true; Close(); return true;
+        var previous = discard; discard = true; Close(); if (!closed) discard = previous; return closed;
     }
     private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
     private void ShowOriginal(object sender, RoutedEventArgs e)
@@ -467,7 +477,7 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             // The immutable drawing is shared with the canvas; session drag transforms belong to a private clone.
-            await DiagramWindow.ShowCanonicalAsync(this, result, drawing, format => exportDiagram?.Invoke(format, result.Svg!));
+            await DiagramWindow.ShowCanonicalAsync(this, result, drawing, format => exportDiagram?.Invoke(format, result.Svg!), () => OpenArrangement(this, new()));
         }
         catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "Preview could not be opened: " + ex.Message; }
     }

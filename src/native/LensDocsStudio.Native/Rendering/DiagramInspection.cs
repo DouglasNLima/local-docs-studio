@@ -88,6 +88,15 @@ public sealed class DiagramInspection
         return null;
     }
 
+    public static DiagramInspection? CreateArranged(Core.Arrangement.ArrangementSnapshot snapshot, NativeSvgService svg, CancellationToken token = default)
+    {
+        var verified = Create(snapshot.Render, svg, token);
+        // Occurrence order is verified by the canonical semantic adapter. Unlike draft
+        // GUIDs, these identities survive redraw/reopen while this exact source is owned.
+        return verified is null ? null : new(verified.Drawing, verified.Entities,
+            verified.Connections.Select((connection, ordinal) => connection with { Identity = "arranged-edge:" + ordinal }));
+    }
+
     public string? Hit(Point point, double scale)
     {
         // Overlapping labels/paths are ambiguous. Fail closed rather than assigning

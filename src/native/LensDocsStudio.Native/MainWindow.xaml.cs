@@ -631,6 +631,7 @@ public partial class MainWindow : Window
         foreach (var editor in OwnedWindows.OfType<ClassVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<SourceVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var picker in OwnedWindows.OfType<MermaidDiagramPickerWindow>()) picker.ApplyTheme(model.Theme);
+        foreach (var arrangement in OwnedWindows.Cast<Window>().SelectMany(owner => owner.OwnedWindows.OfType<DiagramArrangementWindow>())) arrangement.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];

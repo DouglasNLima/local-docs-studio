@@ -26,7 +26,7 @@ public sealed class WorkspaceService
                         cancellationToken.ThrowIfCancellationRequested();
                         if (++count > 20000) { warnings.Add("Workspace enumeration reached 20,000 entries."); break; }
                         var name = Path.GetFileName(entry);
-                        if (name is ".git" or "node_modules" or "bin" or "obj" || (File.GetAttributes(entry) & FileAttributes.ReparsePoint) != 0) continue;
+                        if (name is ".git" or ".lens-docs" or "node_modules" or "bin" or "obj" || (File.GetAttributes(entry) & FileAttributes.ReparsePoint) != 0) continue;
                         var folder = Directory.Exists(entry);
                         if (folder && !entry.Equals(excluded, StringComparison.OrdinalIgnoreCase)) entries.Add(new(name, entry, true, Walk(entry, depth + 1)));
                         else if (!folder && (IsDocument(entry) || includeImages && IsRasterImage(entry))) entries.Add(new(name, entry, false, []));

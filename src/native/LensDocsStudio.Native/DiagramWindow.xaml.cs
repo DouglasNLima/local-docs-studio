@@ -12,6 +12,8 @@ namespace LensDocsStudio.Native;
 public partial class DiagramWindow : Window
 {
     private readonly Action<string> export;
+    private Action? arrange;
+    private void Arrange(object sender, RoutedEventArgs e) => arrange?.Invoke();
     private Point? panOrigin;
     private double panHorizontal, panVertical;
     private bool panning;
@@ -177,7 +179,7 @@ public partial class DiagramWindow : Window
         }
     }
 
-    public static async Task ShowCanonicalAsync(Window owner, DiagramResult result, DrawingImage drawing, Action<string> export)
+    public static async Task ShowCanonicalAsync(Window owner, DiagramResult result, DrawingImage drawing, Action<string> export, Action? arrange = null)
     {
         using var cancellation = new CancellationTokenSource();
         void OwnerClosed(object? sender, EventArgs e) => cancellation.Cancel();
@@ -190,6 +192,7 @@ public partial class DiagramWindow : Window
             { /* Unverified metadata grants no interaction. The canonical drawing remains available. */ }
             if (cancellation.IsCancellationRequested) return;
             var window = new DiagramWindow(metadata?.Drawing ?? drawing, export, metadata) { Owner = owner };
+            if (metadata is not null && arrange is not null) { window.arrange = arrange; window.ArrangeButton.Visibility = Visibility.Visible; }
             if (metadata is null) window.DiagramStatus.Text = "Connection inspection is unavailable for this drawing. Left-drag pans; Ctrl+wheel zooms.";
             window.Show();
         }

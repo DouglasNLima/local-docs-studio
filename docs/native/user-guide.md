@@ -1,5 +1,15 @@
 # Lens Docs Studio native guide
 
+ER and Flowchart visual editors now offer **Arrange…** for separate visual
+positions without editing Mermaid. Navigate pans and inspects by default; select
+Arrange to drag nodes or use arrow keys on a selected node (Shift: one unit).
+Smart layouts previews measured Compact or Fewer crossings candidates; acceptance
+is explicit. Pin / Unpin, layout Undo/Redo and Reset are independent of source
+history. **Save layout to workspace** creates the optional portable
+`.lens-docs/diagram-layouts.json`; copy the whole workspace folder to retain it.
+Use **Export arranged SVG/PNG** from an accepted arranged view. Ordinary exports
+remain canonical. See [supported cases and acceptance evidence](smart-diagram-arrangement.md).
+
 Slow previews show a native loading ring after a short delay. A new document hides outgoing content while it loads; edits keep the accepted preview visible with an updating status. Retry preview is available on the Preview toolbar (including its overflow menu) and retries current source without changing it. Individual Mermaid errors preserve the rest of the document. ER diagrams have a six-second bounded rendering allowance; other families retain three seconds. Large PNG exports reduce image scale to preserve the complete canvas within the image budget; use SVG for full vector detail.
 
 Current integrated status (24 October 2026): [Current Windows readiness](current-windows-readiness.md).

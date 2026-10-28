@@ -1,5 +1,9 @@
 # Native validation report
 
+## Goal 54 — smart diagram arrangement (28 October 2026)
+
+The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.
+
 ## Original SPC acceptance - 28 October 2026
 
 The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
@@ -555,3 +559,5 @@ Required external evidence remains: production issuer/timestamp/revocation and s
 Broader Word/template rendering, PDF complex-script shaping/BiDi/joined or colour emoji, explicit unsupported Mermaid/HTML/LaTeX forms and large-document continuous/page layout remain limited. Prior Office 16.0.20430.20092 Word/Excel destination checks establish only their recorded fixtures. Current windowless glyph/package checks cannot replace external destination validation. Intermittent initial WPF construction delays remain unresolved despite passing subsequent samples.
 
 No downloaded installer, foreground native application, clipboard, Office instance or certificate-store test ran locally in this batch. No merge, release or tag changed. Earlier baseline, failures, corrections, run IDs and artefact paths remain in [history through 0c20f64](history/validation-report-through-0c20f64.md) and [earlier validation history](history/validation-report-through-9fddfd9.md).
+
+The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.

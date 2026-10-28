@@ -1,0 +1,51 @@
+<Window x:Class="LensDocsStudio.Native.DiagramArrangementWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:rendering="clr-namespace:LensDocsStudio.Native.Rendering"
+ Title="Diagram arrangement" Width="1100" Height="780" MinWidth="650" MinHeight="450" WindowStartupLocation="CenterOwner" AutomationProperties.AutomationId="DiagramArrangementWindow"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" PreviewKeyDown="KeyPressed">
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary Source="Resources/CommandIcons.xaml"/><ResourceDictionary Source="Resources/DesktopStyles.xaml"/>
+ </ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ <DockPanel>
+  <WrapPanel DockPanel.Dock="Top" Margin="10" x:Name="Commands">
+   <RadioButton x:Name="NavigateMode" Content="Navigate" IsChecked="True" GroupName="Mode" Margin="6" VerticalAlignment="Center" AutomationProperties.AutomationId="ArrangementNavigate"/>
+   <RadioButton x:Name="ArrangeMode" Content="Arrange" GroupName="Mode" Margin="6" VerticalAlignment="Center" AutomationProperties.AutomationId="ArrangementArrange"/>
+   <Button Content="Smart layouts" Click="GenerateCandidates" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementCandidates"/>
+   <Button x:Name="PinButton" Content="Pin / Unpin" Click="TogglePin" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementPin"/>
+   <Button x:Name="UndoButton" Content="Undo layout" Click="UndoLayout" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementUndo"/>
+   <Button x:Name="RedoButton" Content="Redo layout" Click="RedoLayout" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementRedo"/>
+   <Button Content="Reset to canonical" Click="ResetLayout" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementReset"/>
+   <Button Content="Save layout to workspace" Click="SaveLayout" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementSave"/>
+  </WrapPanel>
+  <WrapPanel DockPanel.Dock="Top" Margin="10,0,10,6">
+   <Button Content="Fit" Click="Fit" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementFit"/>
+   <Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="110" ValueChanged="ZoomChanged" Margin="6" AutomationProperties.Name="Arrangement zoom percentage" AutomationProperties.AutomationId="ArrangementZoom"/>
+   <Button Content="Canonical view" Click="ViewCanonical" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementCanonicalView"/>
+   <Button Content="Arranged view" Click="ViewArranged" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementArrangedView"/>
+   <Button x:Name="ExportSvgButton" Content="Export arranged SVG…" Tag="SVG" Click="ExportArranged" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementExportSvg"/>
+   <Button x:Name="ExportPngButton" Content="Export arranged PNG…" Tag="PNG" Click="ExportArranged" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementExportPng"/>
+   <Button Content="Cancel / revert" Click="Revert" Margin="4" Padding="8,5" AutomationProperties.AutomationId="ArrangementRevert"/>
+  </WrapPanel>
+  <WrapPanel DockPanel.Dock="Top" Margin="14,0,14,6" x:Name="CandidatePanel" Visibility="Collapsed">
+   <ComboBox x:Name="CandidateChoices" Width="470" DisplayMemberPath="Description" SelectionChanged="PreviewCandidate" AutomationProperties.Name="Proposed layouts and measured quality" AutomationProperties.AutomationId="ArrangementCandidateChoices"/>
+   <Button Content="Accept candidate" Click="AcceptCandidate" Margin="8,0" AutomationProperties.AutomationId="ArrangementAccept"/>
+   <Button Content="Cancel preview" Click="CancelCandidate" AutomationProperties.AutomationId="ArrangementCancelCandidate"/>
+  </WrapPanel>
+  <WrapPanel DockPanel.Dock="Top" Margin="14,0,14,6">
+   <ComboBox x:Name="SavedChoices" Width="400" DisplayMemberPath="Description" AutomationProperties.Name="Saved workspace layouts" AutomationProperties.AutomationId="ArrangementSavedChoices"/>
+   <Button Content="Apply selected saved layout" Click="ApplySaved" Margin="8,0" AutomationProperties.AutomationId="ArrangementReassociate"/>
+   <Button Content="Reload layouts" Click="ReloadSaved" Margin="0,0,8,0" AutomationProperties.AutomationId="ArrangementReload"/>
+   <Button Content="Load backup" Click="LoadBackup" AutomationProperties.AutomationId="ArrangementBackup"/>
+  </WrapPanel>
+  <TextBlock x:Name="Status" DockPanel.Dock="Bottom" Margin="14,10" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="ArrangementStatus"/>
+  <TextBlock x:Name="StateLabel" DockPanel.Dock="Bottom" Margin="14,4" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="ArrangementState"/>
+  <ComboBox x:Name="Elements" DockPanel.Dock="Bottom" Margin="14,6" DisplayMemberPath="Description" SelectedValuePath="Identity" SelectionChanged="SelectionChanged" AutomationProperties.Name="Inspect arrangement nodes and connections" AutomationProperties.AutomationId="ArrangementElements"/>
+  <ScrollViewer x:Name="Viewport" Focusable="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Padding="24"
+   PreviewMouseDown="PointerDown" PreviewMouseMove="PointerMove" PreviewMouseUp="PointerUp" PreviewMouseWheel="Wheel" LostMouseCapture="CaptureLost" MouseLeave="PointerLeave" AutomationProperties.Name="Diagram arrangement viewport" AutomationProperties.AutomationId="ArrangementViewport">
+   <Grid x:Name="Surface" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Grid.LayoutTransform><ScaleTransform x:Name="Scale"/></Grid.LayoutTransform>
+    <Image x:Name="Drawing" Stretch="None" IsHitTestVisible="False" AutomationProperties.Name="Verified diagram arrangement" AutomationProperties.AutomationId="ArrangementDrawing"/>
+    <rendering:DiagramInspectionOverlay x:Name="Overlay" IsHitTestVisible="False" Highlight="{DynamicResource AccentBrush}"/>
+    <Canvas IsHitTestVisible="False"><Rectangle x:Name="DragGhost" Visibility="Collapsed" Stroke="{DynamicResource TextBrush}" StrokeThickness="2" StrokeDashArray="4,3" Fill="Transparent"/></Canvas>
+   </Grid>
+  </ScrollViewer>
+ </DockPanel>
+</Window>
