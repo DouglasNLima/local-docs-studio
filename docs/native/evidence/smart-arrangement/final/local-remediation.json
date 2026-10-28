@@ -1,0 +1,25 @@
+{
+  "Status": "PASS",
+  "Scope": "Shown owned WPF windows; controlled discard responses, no OS pointer injection",
+  "Checks": [
+    "Mapped editor owns its source: ER",
+    "A pending source draft invalidates an already open arrangement owner: ER",
+    "Owner close can retain the dirty arrangement: ER",
+    "Application close arbitration reports a declined arrangement close: ER",
+    "Explicit discard closes the owned arrangement and editor: ER",
+    "Mapped editor owns its source: Flowchart",
+    "A pending source draft invalidates an already open arrangement owner: Flowchart",
+    "Owner close can retain the dirty arrangement: Flowchart",
+    "Application close arbitration reports a declined arrangement close: Flowchart",
+    "Explicit discard closes the owned arrangement and editor: Flowchart",
+    "Dense public input has a safe candidate for the stale-state regression",
+    "Two independent candidates exercise rapid selection arbitration",
+    "The candidate selector is disabled while its preview is prepared",
+    "A programmatic selection race cannot accept a different candidate from the selected item",
+    "Pinning invalidates candidates from the prior generation",
+    "A stale candidate cannot remove a newer pin or replace the accepted layout",
+    "Prepared arranged SVG preserves the visible contrasting authored node label",
+    "Prepared arranged SVG has a full vector background and no raster substitution",
+    "Prepared arranged SVG and accepted native PNG have identical pixels"
+  ]
+}

@@ -86,7 +86,7 @@ internal static partial class NativeUiChecks
                     Wait(() => File.Exists(Path.Combine(folder, "arranged." + format.ToLowerInvariant())), "The arranged export was not written."); Ready();
                 }
                 var expected = engine.Arrange(keyboard);
-                Check(File.ReadAllText(Path.Combine(folder, "arranged.svg")) == expected.Render.Svg, "Actual arranged SVG export matches the saved visible snapshot");
+                Check(File.ReadAllText(Path.Combine(folder, "arranged.svg")) == new NativeSvgService().Prepare(expected.Render.Svg!), "Actual arranged SVG export matches the prepared visible snapshot");
                 var expectedPng = StaWorker.RunAsync(() => NativeSvgService.ToExportPng(DiagramInspection.CreateArranged(expected, new())!.Drawing), default).GetAwaiter().GetResult();
                 Check(File.ReadAllBytes(Path.Combine(folder, "arranged.png")).SequenceEqual(expectedPng), "Actual arranged PNG export matches the same verified snapshot");
                 arrangement!.CaptureToFile(Path.Combine(folder, "arranged-input.png"));

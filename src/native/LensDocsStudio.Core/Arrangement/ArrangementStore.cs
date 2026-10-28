@@ -23,7 +23,9 @@ public sealed class ArrangementStore(WorkspacePath workspace)
     };
     public async Task<ArrangementStoreRead> ReadAsync(CancellationToken token = default)
     {
+        RequireCompletedSave();
         var bytes = await ReadBytesAsync(RelativePath, token).ConfigureAwait(false);
+        RequireCompletedSave();
         return bytes is null ? new(new(1, []), null) : new(Parse(bytes), Hash(bytes));
     }
     public async Task<ArrangementStoreRead> ReadBackupAsync(CancellationToken token = default)
@@ -44,29 +46,82 @@ public sealed class ArrangementStore(WorkspacePath workspace)
         // Cooperating windows/processes serialise their compare-and-replace operation.
         var lockPath = workspace.Resolve(RelativePath + ".lock");
         await using var lease = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-        var current = await ReadBytesAsync(RelativePath, token).ConfigureAwait(false);
-        if ((current is null ? null : Hash(current)) != expected.Fingerprint)
-            throw new IOException("The arrangement file changed outside this window. Reload its layouts before saving; the external file has been retained.");
+        var pending = PendingJournals();
+        if (pending.Length > 0 && !expected.FromBackup) throw InterruptedSave();
         var temporaryRelative = RelativePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         var temporary = workspace.Resolve(temporaryRelative);
         try
         {
-            await DocumentStore.WriteDurableAsync(temporary, bytes, token).ConfigureAwait(false);
-            token.ThrowIfCancellationRequested();
-            workspace.Resolve(RelativePath); workspace.Resolve(RelativePath + ".bak");
-            // Recheck after the potentially slow serialisation/flush, before the atomic publication.
-            var latest = await ReadBytesAsync(RelativePath, token).ConfigureAwait(false);
-            if ((latest is null ? null : Hash(latest)) != expected.Fingerprint) throw new IOException("The arrangement file changed during saving. Reload it before trying again.");
-            if (expected.FromBackup && current is not null)
+            if (expected.Fingerprint is null)
+            {
+                await DocumentStore.WriteDurableAsync(temporary, bytes, token).ConfigureAwait(false);
+                token.ThrowIfCancellationRequested(); workspace.Resolve(RelativePath);
+                File.Move(temporary, destination, false); // Never replace a newly appeared external file.
+                ArchiveReviewedJournals(pending);
+                return new(value, Hash(bytes));
+            }
+            // Hold the destination from compare through commit. A separate lock file
+            // cannot protect against an external editor. Deny reads too, so readers
+            // retry rather than observing an in-progress JSON write.
+            await using var target = new FileStream(workspace.Resolve(RelativePath), FileMode.Open, FileAccess.ReadWrite, FileShare.None, 8192, FileOptions.Asynchronous);
+            if (target.Length > MaximumBytes) throw new InvalidDataException("The arrangement file exceeds the 2 MB limit.");
+            var current = new byte[checked((int)target.Length)];
+            await target.ReadExactlyAsync(current, token).ConfigureAwait(false);
+            if (Hash(current) != expected.Fingerprint)
+                throw new IOException("The arrangement file changed outside this window. Reload its layouts before saving; the external file has been retained.");
+            var journalRelative = RelativePath + ".pending-" + Guid.NewGuid().ToString("N") + ".json";
+            var journal = workspace.Resolve(journalRelative);
+            if (expected.FromBackup)
             {
                 var retained = workspace.Resolve(RelativePath + ".unreadable-" + Guid.NewGuid().ToString("N"));
                 await DocumentStore.WriteDurableAsync(retained, current, token).ConfigureAwait(false);
             }
-            if (current is null) File.Move(temporary, destination, false);
-            else File.Replace(temporary, destination, workspace.Resolve(RelativePath + ".bak"), true);
+            else
+            {
+                await DocumentStore.WriteDurableAsync(temporary, current, token).ConfigureAwait(false);
+                File.Move(temporary, workspace.Resolve(RelativePath + ".bak"), true);
+            }
+            // Establish recoverable prior bytes before a journal can block normal
+            // loading, including cancellation during the first update's journal.
+            await DocumentStore.WriteDurableAsync(journal, JsonSerializer.SerializeToUtf8Bytes(new { SchemaVersion = 1, Original = current, Intended = bytes }), token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
+            try
+            {
+                // Like document/export commits, cancellation ends before mutation.
+                // A crash retains both versions in the journal and the prior backup.
+                target.Position = 0; await target.WriteAsync(bytes, CancellationToken.None).ConfigureAwait(false);
+                target.SetLength(bytes.Length); target.Flush(true);
+            }
+            catch
+            {
+                try { target.Position = 0; await target.WriteAsync(current, CancellationToken.None).ConfigureAwait(false); target.SetLength(current.Length); target.Flush(true); }
+                catch { /* Retain the durable original/intended versions for recovery. */ }
+                throw;
+            }
+            ArchiveReviewedJournals(pending);
+            File.Delete(workspace.Resolve(journalRelative));
             return new(value, Hash(bytes));
         }
         finally { if (File.Exists(temporary)) { workspace.Resolve(temporaryRelative); File.Delete(temporary); } }
+    }
+    private static IOException InterruptedSave() => new("An interrupted arrangement save needs review. Load backup explicitly before saving a recovered layout; pending recovery evidence has been retained.");
+    private void RequireCompletedSave() { if (PendingJournals().Length > 0) throw InterruptedSave(); }
+    private string[] PendingJournals()
+    {
+        var folder = Path.GetDirectoryName(workspace.Resolve(RelativePath))!;
+        if (!Directory.Exists(folder)) return [];
+        var pending = Directory.EnumerateFiles(folder, "diagram-layouts.json.pending-*.json").Take(201)
+            .Select(path => ".lens-docs/" + Path.GetFileName(path)).ToArray();
+        if (pending.Length > 200) throw new IOException("Too many pending arrangement recovery files. Review the workspace metadata before saving.");
+        foreach (var relative in pending) workspace.Resolve(relative);
+        return pending;
+    }
+    private void ArchiveReviewedJournals(IEnumerable<string> pending)
+    {
+        // Explicit backup recovery acknowledges these pre-existing journals. Keep
+        // their bytes as evidence; never parse them as save instructions.
+        foreach (var relative in pending)
+            File.Move(workspace.Resolve(relative), workspace.Resolve(relative.Replace(".pending-", ".reviewed-", StringComparison.Ordinal)), false);
     }
     private async Task<byte[]?> ReadBytesAsync(string relative, CancellationToken token)
     {

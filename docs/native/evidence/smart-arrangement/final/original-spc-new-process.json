@@ -1,0 +1,317 @@
+{
+  "Status": "PASS",
+  "Measurements": [
+    {
+      "Label": "Complete detailed",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 1867,
+        "Area": 23570457.072960008,
+        "AspectRatio": 0.9346503644111669,
+        "ConnectionLength": 450253.518,
+        "Bends": 387
+      },
+      "Entities": 39,
+      "Relationships": 115,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 39,
+      "UnambiguousRelationshipLabelHits": 115
+    },
+    {
+      "Label": "Complete detailed",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 1867,
+        "Area": 23570457.072960008,
+        "AspectRatio": 0.9346503644111669,
+        "ConnectionLength": 450253.518,
+        "Bends": 387
+      },
+      "Entities": 39,
+      "Relationships": 115,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 39,
+      "UnambiguousRelationshipLabelHits": 115
+    },
+    {
+      "Label": "Complete detailed",
+      "Phase": "new-process-restoration",
+      "Status": "PASS",
+      "Quality": null,
+      "Entities": null,
+      "Relationships": null,
+      "NativeLabelBodyIntersections": null,
+      "ClippedRoutePoints": null,
+      "EntityHits": null,
+      "UnambiguousRelationshipLabelHits": null
+    },
+    {
+      "Label": "Complete relationships",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 772,
+        "Area": 11541859.851154286,
+        "AspectRatio": 1.925985306658612,
+        "ConnectionLength": 197647.4514172789,
+        "Bends": 308
+      },
+      "Entities": 39,
+      "Relationships": 115,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 39,
+      "UnambiguousRelationshipLabelHits": 115
+    },
+    {
+      "Label": "Complete relationships",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 772,
+        "Area": 11541859.851154286,
+        "AspectRatio": 1.925985306658612,
+        "ConnectionLength": 197647.4514172789,
+        "Bends": 308
+      },
+      "Entities": 39,
+      "Relationships": 115,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 39,
+      "UnambiguousRelationshipLabelHits": 115
+    },
+    {
+      "Label": "Complete relationships",
+      "Phase": "new-process-restoration",
+      "Status": "PASS",
+      "Quality": null,
+      "Entities": null,
+      "Relationships": null,
+      "NativeLabelBodyIntersections": null,
+      "ClippedRoutePoints": null,
+      "EntityHits": null,
+      "UnambiguousRelationshipLabelHits": null
+    },
+    {
+      "Label": "Workflow Assignment",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 90,
+        "Area": 12566529.363733333,
+        "AspectRatio": 0.9340211195928753,
+        "ConnectionLength": 60720.12072000001,
+        "Bends": 47
+      },
+      "Entities": 11,
+      "Relationships": 21,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 11,
+      "UnambiguousRelationshipLabelHits": 21
+    },
+    {
+      "Label": "Workflow Assignment",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 90,
+        "Area": 12566529.363733333,
+        "AspectRatio": 0.9340211195928753,
+        "ConnectionLength": 60720.12072000001,
+        "Bends": 47
+      },
+      "Entities": 11,
+      "Relationships": 21,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 11,
+      "UnambiguousRelationshipLabelHits": 21
+    },
+    {
+      "Label": "Workflow Assignment",
+      "Phase": "new-process-restoration",
+      "Status": "PASS",
+      "Quality": null,
+      "Entities": null,
+      "Relationships": null,
+      "NativeLabelBodyIntersections": null,
+      "ClippedRoutePoints": null,
+      "EntityHits": null,
+      "UnambiguousRelationshipLabelHits": null
+    },
+    {
+      "Label": "Workflow Definitions",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 114,
+        "Area": 8962199.977984,
+        "AspectRatio": 1.6542377728131983,
+        "ConnectionLength": 80728.36767999997,
+        "Bends": 62
+      },
+      "Entities": 12,
+      "Relationships": 20,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 12,
+      "UnambiguousRelationshipLabelHits": 20
+    },
+    {
+      "Label": "Workflow Definitions",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 114,
+        "Area": 8962199.977984,
+        "AspectRatio": 1.6542377728131983,
+        "ConnectionLength": 80728.36767999997,
+        "Bends": 62
+      },
+      "Entities": 12,
+      "Relationships": 20,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 12,
+      "UnambiguousRelationshipLabelHits": 20
+    },
+    {
+      "Label": "Workflow Definitions",
+      "Phase": "new-process-restoration",
+      "Status": "PASS",
+      "Quality": null,
+      "Entities": null,
+      "Relationships": null,
+      "NativeLabelBodyIntersections": null,
+      "ClippedRoutePoints": null,
+      "EntityHits": null,
+      "UnambiguousRelationshipLabelHits": null
+    },
+    {
+      "Label": "Operations",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 590,
+        "Area": 46789519.31440458,
+        "AspectRatio": 1.2399832891468758,
+        "ConnectionLength": 314201.0405904328,
+        "Bends": 160
+      },
+      "Entities": 22,
+      "Relationships": 68,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 22,
+      "UnambiguousRelationshipLabelHits": 68
+    },
+    {
+      "Label": "Operations",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 590,
+        "Area": 46789519.31440458,
+        "AspectRatio": 1.2399832891468758,
+        "ConnectionLength": 314201.0405904328,
+        "Bends": 160
+      },
+      "Entities": 22,
+      "Relationships": 68,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 22,
+      "UnambiguousRelationshipLabelHits": 68
+    },
+    {
+      "Label": "Operations",
+      "Phase": "new-process-restoration",
+      "Status": "PASS",
+      "Quality": null,
+      "Entities": null,
+      "Relationships": null,
+      "NativeLabelBodyIntersections": null,
+      "ClippedRoutePoints": null,
+      "EntityHits": null,
+      "UnambiguousRelationshipLabelHits": null
+    },
+    {
+      "Label": "Monitoring",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 131,
+        "Area": 17875853.49410133,
+        "AspectRatio": 0.7136632486146633,
+        "ConnectionLength": 116027.04820666666,
+        "Bends": 110
+      },
+      "Entities": 13,
+      "Relationships": 46,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 13,
+      "UnambiguousRelationshipLabelHits": 46
+    },
+    {
+      "Label": "Monitoring",
+      "Phase": "new-process",
+      "Status": null,
+      "Quality": {
+        "BodyIntersections": 0,
+        "LabelBodyOverlaps": 0,
+        "Crossings": 131,
+        "Area": 17875853.49410133,
+        "AspectRatio": 0.7136632486146633,
+        "ConnectionLength": 116027.04820666666,
+        "Bends": 110
+      },
+      "Entities": 13,
+      "Relationships": 46,
+      "NativeLabelBodyIntersections": 0,
+      "ClippedRoutePoints": 0,
+      "EntityHits": 13,
+      "UnambiguousRelationshipLabelHits": 46
+    },
+    {
+      "Label": "Monitoring",
+      "Phase": "new-process-restoration",
+      "Status": "PASS",
+      "Quality": null,
+      "Entities": null,
+      "Relationships": null,
+      "NativeLabelBodyIntersections": null,
+      "ClippedRoutePoints": null,
+      "EntityHits": null,
+      "UnambiguousRelationshipLabelHits": null
+    }
+  ]
+}

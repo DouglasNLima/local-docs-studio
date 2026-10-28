@@ -37,6 +37,12 @@ jobs:
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify complex arranged geometry persistence and vector raster exports
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement artifacts/native/arrangement .
+      - name: Verify independent review regressions in owned native windows
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-remediation artifacts/native/arrangement-remediation
+      - name: Verify coordinate transforms with separately labelled physical DPI and WPF simulations
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-coordinates artifacts/native/arrangement-coordinates
+      - name: Measure actual pointer feedback and separate drop and candidate phases
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-latency artifacts/native/arrangement-latency .
       - name: Verify actual pointer keyboard pins persistence and exports
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-input src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/arrangement-input
       - name: Verify arrangement with actual Windows High Contrast

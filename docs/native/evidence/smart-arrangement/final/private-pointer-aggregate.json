@@ -1,0 +1,144 @@
+{
+  "Status": "OBSERVED",
+  "Boundary": "Real desktop mouse gestures through Computer Use; sparse event stream, not continuous-drag or tail-latency certification. Frame timestamps are WPF presentation opportunities from input-event arrival; no injection or physical scanout timestamp. Background web/Core validation was active. Sources, paths, identities, raw hashes and screenshots remain private.",
+  "Cases": [
+    {
+      "Case": "complete",
+      "ActualOsDpi": {
+        "Win32Dpi": 144,
+        "WpfDpiX": 144,
+        "WpfDpiY": 144,
+        "Awareness": 2,
+        "MonitorCount": 1,
+        "PhysicalTransitionsExercised": false
+      },
+      "ActualDrags": 3,
+      "SourcePreserved": true,
+      "WpfDragFrameOpportunities": {
+        "P99": 5.009999990463257,
+        "P95": 5.009999990463257,
+        "Maximum": 5.009999990463257,
+        "Median": 1.8848998546600342,
+        "Sparse": true,
+        "Count": 4
+      },
+      "PointerHandlerMilliseconds": {
+        "P99": 1.0779,
+        "P95": 1.0779,
+        "Maximum": 1.0779,
+        "Median": 0.1751,
+        "Sparse": true,
+        "Count": 6
+      },
+      "PointerHandlerAllocations": {
+        "P99": 3416,
+        "P95": 3416,
+        "Maximum": 3416,
+        "Median": 672,
+        "Sparse": true,
+        "Count": 6
+      },
+      "RoutingMilliseconds": {
+        "P99": 578.819,
+        "P95": 578.819,
+        "Maximum": 578.819,
+        "Median": 441.8282,
+        "Sparse": true,
+        "Count": 3
+      },
+      "GeometryValidationMilliseconds": {
+        "P99": 10.2346,
+        "P95": 10.2346,
+        "Maximum": 10.2346,
+        "Median": 7.704,
+        "Sparse": true,
+        "Count": 3
+      },
+      "PreparationMilliseconds": {
+        "P99": 7174.5763,
+        "P95": 7174.5763,
+        "Maximum": 7174.5763,
+        "Median": 4621.5207,
+        "Sparse": true,
+        "Count": 4
+      },
+      "ApplyMilliseconds": {
+        "P99": 6257.5729,
+        "P95": 6257.5729,
+        "Maximum": 6257.5729,
+        "Median": 5279.0593,
+        "Sparse": true,
+        "Count": 3
+      }
+    },
+    {
+      "Case": "operations",
+      "ActualOsDpi": {
+        "Win32Dpi": 144,
+        "WpfDpiX": 144,
+        "WpfDpiY": 144,
+        "Awareness": 2,
+        "MonitorCount": 1,
+        "PhysicalTransitionsExercised": false
+      },
+      "ActualDrags": 3,
+      "SourcePreserved": true,
+      "WpfDragFrameOpportunities": {
+        "P99": 4.489099979400635,
+        "P95": 4.489099979400635,
+        "Maximum": 4.489099979400635,
+        "Median": 1.2671000957489014,
+        "Sparse": true,
+        "Count": 3
+      },
+      "PointerHandlerMilliseconds": {
+        "P99": 2.059,
+        "P95": 2.059,
+        "Maximum": 2.059,
+        "Median": 0.2187,
+        "Sparse": true,
+        "Count": 7
+      },
+      "PointerHandlerAllocations": {
+        "P99": 2256,
+        "P95": 2256,
+        "Maximum": 2256,
+        "Median": 672,
+        "Sparse": true,
+        "Count": 7
+      },
+      "RoutingMilliseconds": {
+        "P99": 287.4088,
+        "P95": 287.4088,
+        "Maximum": 287.4088,
+        "Median": 190.8689,
+        "Sparse": true,
+        "Count": 3
+      },
+      "GeometryValidationMilliseconds": {
+        "P99": 6.6556,
+        "P95": 6.6556,
+        "Maximum": 6.6556,
+        "Median": 5.9285,
+        "Sparse": true,
+        "Count": 3
+      },
+      "PreparationMilliseconds": {
+        "P99": 7191.9337,
+        "P95": 7191.9337,
+        "Maximum": 7191.9337,
+        "Median": 3426.2821,
+        "Sparse": true,
+        "Count": 4
+      },
+      "ApplyMilliseconds": {
+        "P99": 4863.41,
+        "P95": 4863.41,
+        "Maximum": 4863.41,
+        "Median": 3695.0997,
+        "Sparse": true,
+        "Count": 3
+      }
+    }
+  ]
+}

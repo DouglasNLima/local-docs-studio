@@ -107,10 +107,19 @@ to the recorded path or saving a new arrangement; no guessed rename mapping.
 Reads reject duplicate JSON properties, unknown fields, unsupported versions,
 invalid paths, reparse points, non-finite/overflow coordinates, excessive counts
 and oversized files (2 MB, 200 records, depth 12). Writes use existing containment
-checks, a cooperating-process lock, content fingerprints before and after the
-durable temporary write, atomic replacement and `.bak`. External conflicts keep
-external bytes and require reload/review. Explicit backup recovery retains the
-unreadable primary bytes separately before publication. No background repair.
+checks, a cooperating-process lock and content fingerprints. New files use an
+atomic no-overwrite move. Existing files use an exclusive destination handle
+from comparison through a durable journalled commit, with a prior-byte `.bak`
+and rollback on write failure. This is not atomic pathname replacement: a crash
+can interrupt the primary write. A retained pending journal blocks normal loading
+even if partial bytes happen to parse. Explicit Load backup and Save layout
+recover the previous layout and archive pending journals for review. Reads never
+repair files. Cancellation before mutation can conservatively require that
+backup review. Backup publication precedes journal creation, including the first
+update. External writers cannot modify the held destination; conflicts keep
+external bytes and require reload/review. Explicit backup recovery also retains
+the unreadable primary separately. Journal evidence contains original/intended
+metadata bytes and is never interpreted as authorisation.
 Path checks and content comparison do not constitute an OS transaction against
 a malicious concurrent directory replacement. This is the existing local
 workspace trust boundary, not a new filesystem sandbox.
@@ -245,3 +254,97 @@ Current review recommendation: **NO-GO for acceptance until hosted interaction,
 High Contrast, installed lifecycle and regression results reach terminal states**.
 This source document records local evidence; the Draft PR receipt records exact
 final commit/tree, terminal CI links and any remaining conditional acceptance.
+
+## Final Arrangement Acceptance Addendum
+
+This focused pass continues Draft PR #55 on the existing branch. The verified
+base is `81bcb02f8a0ee618e70260a49a4aab8c0896c12d` (tree
+`3d00c5f93d845be1daa459027c6bd5c523cf6223`); the starting head is
+`74213763c9deff8554e0dc7f4ba1723995c91520` (tree
+`ab70f53aee5b57f416bfa9c5226112cf005e0fdf`). The PR engineering receipt records
+the final commit/tree and terminal workflow outcomes without a self-referential
+source commit. Earlier failed attempts above remain historical evidence.
+
+The original private archive was located outside the repository. ZIP CRC and all
+six manifest digests were verified privately; rendered counts match all six
+requested entity/relationship/attribute totals. No original source, identifier,
+path, raw source hash, diagram or screenshot is included in public evidence.
+The [sanitised original-source receipt](evidence/smart-arrangement/final/original-spc-aggregate.json)
+records complete supported workflows in shown production WPF windows. These
+command-driven checks do not substitute for actual pointer measurements.
+
+| Original case | Entities / relationships / attributes | Canonical crossings | Fewer Crossings | Canonical / Compact area | Search ms | Two manual apply-and-presentation times, ms |
+| --- | --- | ---: | ---: | --- | ---: | --- |
+| Complete, relationships only | 39 / 115 / 0 | 598 | 516 | 6,225,236 / 2,485,059 | 1,033 | 434 / 312 |
+| Complete, detailed | 39 / 115 / 284 | 585 | No feasible improvement | 37,641,754 / 15,664,851 | 2,920 | 1,765 / 1,618 |
+| Operations | 22 / 68 / 195 | 388 | 253 | 29,761,165 / 9,838,896 | 432 | 1,346 / 1,291 |
+| Monitoring | 13 / 46 / 138 | 108 | 104 | 11,688,575 / 6,070,653 | 149 | 948 / 880 |
+| Workflow Assignment | 11 / 21 / 82 | 9 | 7 | 5,875,986 / 3,498,667 | 67 | 566 / 575 |
+| Workflow Definitions | 12 / 20 / 97 | 4 | No feasible improvement | 5,516,194 / 3,313,882 | 66 | 666 / 623 |
+
+Compact improves area, and can increase crossings; the UI reports both metrics.
+No unavailable alternative is presented as a successful improvement. All
+generated alternatives have different geometry and improve their named score.
+All six cases passed two highly connected entity moves, pin/search preservation,
+Undo/Redo, explicit save, exact window reopen and copied-workspace restoration.
+All final entity/relationship identities and relationship-label hits were
+present; route/body and label/body intersections and clipped route points were
+zero. Prepared vector SVG and native PNG pixels matched; original bytes and
+ordinary canonical SVG/PNG remained unchanged. Search cumulative allocations
+ranged from 21.9 to 574.6 MiB; process peak working set reached 1,086 MiB across
+the complete sequential workflow, including conversion and exports. This is
+not per-frame allocation or a maximum-size memory certification.
+
+Actual local pointer input was exercised on Complete detailed and Operations
+at OS 144 DPI (150%), three accepted drags each. The
+[private pointer aggregate](evidence/smart-arrangement/final/private-pointer-aggregate.json)
+retains source-free phase statistics. The available Computer Use gestures
+delivered only four and three observed ghost frames respectively, too few to
+certify continuous movement or percentile tails. WPF input-arrival-to-frame
+opportunities had observed maxima 5.01 and 4.49 ms. Separate apply/preparation
+work took seconds while background regression work was active; it is not
+reported as pointer-frame latency. High-sample private continuous-drag latency
+remains an explicit certification gap.
+
+The hosted `--arrangement-latency` gate uses actual OS input in a real WPF window
+for small ER, small Flowchart, dense public ER and dense public Flowchart. It
+records 120 frame-paced movements plus a separate 200-event stream per case,
+coalescing, screen pixel observations after compositor flush, input handler
+allocations, idle/search dispatcher delay, release-to-visible phases and
+cancellation. No new performance threshold is imposed. WPF callbacks and
+compositor flushes are not physical photon timestamps. Final measured results
+and any failed attempts belong to the exact final-head PR receipt.
+
+The [coordinate receipt](evidence/smart-arrangement/final/local-coordinates.json)
+passes 524 checks over 72 scenarios: explicit WPF factors 100/125/150/200%,
+Fit/100/200% zoom and origin/node/end horizontal and vertical scroll. Exact
+unquantised transforms apply DPI and zoom once; Win32 screen round-trips stay
+within the derived half-physical-pixel quantisation bound. Two earlier harness
+failures incorrectly required exact integer-screen round-trips and are retained
+locally. Actual local DPI is 150%, one monitor. Windows Settings did not expose
+a targetable window; no display setting was changed. Physical 125/200% and
+monitor transitions remain unverified; hosted physical DPI is recorded separately.
+
+Two fresh reviewer contexts inspected implementation and ran their own probes.
+The [engine/storage report](evidence/smart-arrangement/final/independent-engine-storage-review.md)
+records resolved external-write race, collapsed parallel Flowchart occurrences,
+interrupted valid-primary restoration and first-update cancellation recovery.
+Final independent probes blocked 12/12 external writes and recovered 8/8
+cancelled first updates. Its scoped recommendation is GO. The
+[UI/export report](evidence/smart-arrangement/final/independent-ui-export-review.md)
+records resolved owner-close data loss, stale pins, rapid candidate-selection
+mismatch, raw SVG appearance disagreement and unguarded export writes. Its
+final 23/23 independent checks support CONDITIONAL GO pending full integration
+evidence. Original reproductions and limitations remain in both reports.
+The [focused window regressions](evidence/smart-arrangement/final/local-remediation.json)
+also pass, including rejected close, current-source ownership and exact SVG/PNG
+appearance. The persistence atomicity tradeoff is documented above.
+
+Final Core/native/UIA/installed lifecycle/web results, independent Continuous
+baseline/candidate comparisons and terminal hosted URLs are appended to the PR
+receipt after CI. The prior Native Windows run `40674408943` retains both its
+loading-observation timeout and unchanged successful second attempt. Continuous
+250 ms remains a separate unresolved gate; its threshold, tests and failure
+history are unchanged. CONDITIONAL GO is not production certification. PR #55
+remains Draft for a human decision; Issue #54, paused PRs #38/#50, releases,
+installer signing and tags are not changed.

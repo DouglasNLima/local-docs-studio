@@ -154,7 +154,8 @@ public partial class MainWindow
             {
                 ArrangementDocumentContext? Context()
                 {
-                    if (!model.Documents.Contains(tab) || tab.IsSaving || diagramSource != session.Target.Source || tab.EffectivePath != arrangementPath || tab.WorkspaceRoot != arrangementRoot)
+                    var editorOwnsSource = parent switch { ErVisualEditorWindow er => er.OwnsArrangementSource(diagramSource), MermaidVisualEditorWindow flow => flow.OwnsArrangementSource(diagramSource), _ => false };
+                    if (!editorOwnsSource || !model.Documents.Contains(tab) || tab.IsSaving || diagramSource != session.Target.Source || tab.EffectivePath != arrangementPath || tab.WorkspaceRoot != arrangementRoot)
                         throw new IOException("The owning diagram changed or has a pending source draft. Apply source changes, then reopen its visual editor before arranging.");
                     var offset = session.SourceOffset();
                     if (tab.FilePath is not { } file || tab.WorkspaceRoot is not { } root) return null;
@@ -164,7 +165,8 @@ public partial class MainWindow
                 _ = Context();
                 var existing = parent.OwnedWindows.OfType<DiagramArrangementWindow>().FirstOrDefault();
                 if (existing is not null) { existing.Activate(); return; }
-                new DiagramArrangementWindow(diagramSource, diagrams, Context, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme) { Owner = parent }.Show();
+                new DiagramArrangementWindow(diagramSource, diagrams, Context, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme,
+                    Path.Combine(model.StateDirectory, "export-recovery")) { Owner = parent }.Show();
             }
             catch (Exception error) when (error is IOException or ArgumentException)
             { model.Status = error.Message; if (parent.FindName("Status") is System.Windows.Controls.TextBlock status) status.Text = error.Message; }

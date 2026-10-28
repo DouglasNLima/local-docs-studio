@@ -47,6 +47,12 @@ internal static class ArrangementRouter
             || boxes.Any(pair => pair.Key != from && Crosses(start, departure, pair.Value, 2))
             || boxes.Any(pair => pair.Key != to && Crosses(arrival, end, pair.Value, 2)))
             throw new InvalidDataException("There is insufficient clearance for a connection port. Move the node further from its neighbours or the canvas edge.");
+        // Distinct occurrences need a visible lane, not just different stub lengths
+        // which disappear when aligned segments are simplified. Reciprocal edges
+        // share the same occurrence counter supplied by the engine.
+        if (labelRail is null && parallelIndex > 0)
+            labelRail = new ArrangementBox(boxes.Values.Max(b => b.Right) + 48 + parallelIndex * 18,
+                boxes.Values.Max(b => b.Bottom) + 48 + parallelIndex * 18, 24, 4);
         var points = new List<Point> { start };
         if (labelRail is { } rail)
         {

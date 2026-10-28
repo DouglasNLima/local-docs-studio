@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using LensDocsStudio.Core.Arrangement;
+using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
@@ -22,6 +23,8 @@ public partial class DiagramArrangementWindow : Window
     private bool dark;
     private readonly string theme;
     private readonly Func<ArrangementDocumentContext?> ownerContext;
+    private readonly Func<Window, bool> confirmDiscard;
+    private readonly string exportRecovery;
     private readonly CancellationTokenSource lifetime = new();
     private CancellationTokenSource? candidateSearch;
     private readonly NativeSvgService svg = new();
@@ -42,12 +45,15 @@ public partial class DiagramArrangementWindow : Window
     private string? movingId;
     private ArrangementPosition movingFrom;
     private sealed record Choice(string Identity, string Description);
-    private sealed record Candidate(ArrangementSnapshot Snapshot, string Description);
+    private sealed record Candidate(ArrangementSnapshot Snapshot, long Generation, string Description);
     private sealed record SavedChoice(SavedArrangement Layout, string Description);
 
-    public DiagramArrangementWindow(string source, DiagramService diagrams, Func<ArrangementDocumentContext?> ownerContext, bool dark = false, string theme = "Auto")
+    public DiagramArrangementWindow(string source, DiagramService diagrams, Func<ArrangementDocumentContext?> ownerContext, bool dark = false, string theme = "Auto",
+        string? exportRecovery = null, Func<Window, bool>? confirmDiscard = null)
     {
         this.source = source; this.diagrams = diagrams; this.ownerContext = ownerContext; this.dark = dark; this.theme = theme;
+        this.exportRecovery = exportRecovery ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LensDocsStudio.Native", "export-recovery");
+        this.confirmDiscard = confirmDiscard ?? (owner => MessageBox.Show(owner, "Discard the unsaved arrangement? Mermaid source is unchanged.", "Unsaved arrangement", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
         InitializeComponent(); WindowStateService.FitInitialWindow(this);
         Loaded += async (_, _) => await Run(async () =>
         {
@@ -59,18 +65,26 @@ public partial class DiagramArrangementWindow : Window
         Deactivated += (_, _) => CancelPointer();
         Closing += (_, e) =>
         {
-            if (session?.IsDirty == true && MessageBox.Show(this, "Discard the unsaved arrangement? Mermaid source is unchanged.", "Unsaved arrangement", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) e.Cancel = true;
+            if (session?.IsDirty == true && !this.confirmDiscard(this)) e.Cancel = true;
         };
         Closed += (_, _) => { closed = true; CancelPointer(); lifetime.Cancel(); };
+    }
+    public static bool CloseOwned(Window owner)
+    {
+        // WPF skips Closing on an owned window when its owner closes. Ask each
+        // arrangement directly, and let a declined close keep the owner alive.
+        foreach (var arrangement in owner.OwnedWindows.OfType<DiagramArrangementWindow>().ToArray())
+        { arrangement.Close(); if (!arrangement.closed) return false; }
+        return true;
     }
     private async Task Run(Func<Task> action)
     {
         if (busy || closed) return;
-        busy = true; Commands.IsEnabled = false; CancelPointer(); UpdateActions();
+        busy = true; Commands.IsEnabled = CandidateChoices.IsEnabled = false; CancelPointer(); UpdateActions();
         try { await action(); }
         catch (OperationCanceledException) { if (!closed) Status.Text = "Arrangement work was cancelled or reached its bounded deadline. The accepted layout is retained."; }
         catch (Exception error) when (error is not OutOfMemoryException) { if (!closed) Status.Text = error.Message; }
-        finally { busy = false; if (!closed) { Commands.IsEnabled = true; UpdateActions(); if (pendingAppearance is not null) RefreshAppearance(); } }
+        finally { busy = false; if (!closed) { Commands.IsEnabled = CandidateChoices.IsEnabled = true; UpdateActions(); if (pendingAppearance is not null) RefreshAppearance(); } }
     }
     public void ApplyTheme(string appearance) { pendingAppearance = appearance; if (!busy && session is not null) RefreshAppearance(); }
     private async void RefreshAppearance()
@@ -94,9 +108,11 @@ public partial class DiagramArrangementWindow : Window
     private void CheckOwner() { _ = ownerContext(); lifetime.Token.ThrowIfCancellationRequested(); }
     private async Task Present(ArrangementSnapshot snapshot)
     {
-        var view = await StaWorker.RunAsync(() => DiagramInspection.CreateArranged(snapshot, svg, lifetime.Token), lifetime.Token)
+        var view = await StaWorker.RunAsync(() =>
+        { using var preparation = MermaidDiagnostics.Measure("arrangement.native-preparation"); return DiagramInspection.CreateArranged(snapshot, svg, lifetime.Token); }, lifetime.Token)
             ?? throw new InvalidDataException("The arranged drawing and inspection geometry could not be verified. No arranged export is available.");
         CheckOwner();
+        using var install = MermaidDiagnostics.Measure("arrangement.presentation-install");
         inspection = view; displayed = snapshot; Drawing.Source = view.Drawing; Overlay.Inspection = view;
         // Selection/zoom can stay identical while geometry changes at the same
         // canvas size. Invalidate the retained WPF drawing for every new snapshot.
@@ -132,6 +148,7 @@ public partial class DiagramArrangementWindow : Window
     { selected = identity; updating = true; try { Elements.SelectedValue = identity; } finally { updating = false; } Overlay.Update(identity, null, Zoom.Value / 100); UpdateActions(); }
     private async Task ApplyState(ArrangementState state)
     {
+        using var phase = MermaidDiagnostics.Measure("arrangement.apply");
         if (state.SameAs(session.Current.State))
         {
             // A clamped move or a saved canonical layout is a no-op, not a new
@@ -143,7 +160,7 @@ public partial class DiagramArrangementWindow : Window
         var candidate = await Task.Run(() => engine.Arrange(state, lifetime.Token), lifetime.Token);
         CheckOwner(); await Present(candidate);
         if (!session.Accept(candidate, generation)) { await Present(session.Current); throw new InvalidDataException("A newer arrangement superseded this result."); }
-        proposed = null; Status.Text = "Arrangement accepted. Mermaid source is unchanged. Save layout to make it portable.";
+        InvalidateCandidates(); Status.Text = "Arrangement accepted. Mermaid source is unchanged. Save layout to make it portable.";
         UpdateActions();
     }
     private async void TogglePin(object sender, RoutedEventArgs e) { if (NodeId(selected) is { } id) await Run(() => ApplyState(session.Current.State.TogglePin(id))); }
@@ -165,15 +182,22 @@ public partial class DiagramArrangementWindow : Window
         IReadOnlyList<ArrangementSnapshot> candidates;
         try { candidates = await Task.Run(() => engine.Candidates(session.Current.State, cancellation.Token), cancellation.Token); CheckOwner(); }
         finally { candidateSearch = null; }
-        CandidateChoices.ItemsSource = candidates.Select(c => new Candidate(c, $"{(c.State.Strategy == ArrangementStrategy.FewerCrossings ? "Fewer crossings" : "Compact")} · crossings {c.Quality.Crossings} · area {c.Quality.Area:0} · bends {c.Quality.Bends}")).ToArray();
+        CandidateChoices.ItemsSource = candidates.Select(c => new Candidate(c, session.Generation, $"{(c.State.Strategy == ArrangementStrategy.FewerCrossings ? "Fewer crossings" : "Compact")} · crossings {c.Quality.Crossings} · area {c.Quality.Area:0} · bends {c.Quality.Bends}")).ToArray();
         CandidatePanel.Visibility = candidates.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         Status.Text = candidates.Count > 0 ? $"Current: {session.Current.Quality.Crossings} crossings; area {session.Current.Quality.Area:0}. Select a candidate to preview; Accept candidate changes the layout."
             : "No safe improvement was found within the bounded search. Pins are retained. Automatic movement of compound subgraphs is currently unavailable.";
     });
     private async void PreviewCandidate(object sender, SelectionChangedEventArgs e)
-    { if (CandidateChoices.SelectedItem is Candidate candidate) await Run(async () => { proposed = candidate.Snapshot; await Present(proposed); }); }
+    { if (CandidateChoices.SelectedItem is Candidate candidate) await Run(async () => { ValidateCandidate(candidate); proposed = candidate.Snapshot; await Present(proposed); }); }
     private async void AcceptCandidate(object sender, RoutedEventArgs e)
-    { if (proposed is { } candidate) await Run(async () => { CheckOwner(); session.Accept(candidate, session.Generation); proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; await Present(session.Current); }); }
+    { if (proposed is { } snapshot && CandidateChoices.SelectedItem is Candidate candidate) await Run(async () => { ValidateCandidate(candidate); CheckOwner(); if (!ReferenceEquals(snapshot, candidate.Snapshot)) throw new IOException("Select the candidate again and wait for its preview before accepting it."); if (!session.Accept(snapshot, candidate.Generation)) throw new IOException("Generate new candidates for the current arrangement."); InvalidateCandidates(); await Present(session.Current); }); }
+    private void ValidateCandidate(Candidate candidate)
+    {
+        if (candidate.Generation == session.Generation) return;
+        InvalidateCandidates(); throw new IOException("The arrangement changed after this search. Generate new candidates to preserve current positions and pins.");
+    }
+    private void InvalidateCandidates()
+    { proposed = null; CandidateChoices.ItemsSource = null; CandidatePanel.Visibility = Visibility.Collapsed; }
     private async void CancelCandidate(object sender, RoutedEventArgs e) => await Run(async () => { proposed = null; CandidatePanel.Visibility = Visibility.Collapsed; await Present(session.Current); });
 
     private void PointerDown(object sender, MouseButtonEventArgs e)
@@ -192,6 +216,7 @@ public partial class DiagramArrangementWindow : Window
     }
     private void PointerMove(object sender, MouseEventArgs e)
     {
+        using var phase = MermaidDiagnostics.Measure("arrangement.pointer.move");
         if (pointer is not { } start) { if (!busy) Overlay.Update(selected, inspection?.Hit(e.GetPosition(Drawing), Zoom.Value / 100), Zoom.Value / 100); return; }
         if (pointerButton == MouseButton.Left && e.LeftButton != MouseButtonState.Pressed || pointerButton == MouseButton.Middle && e.MiddleButton != MouseButtonState.Pressed) { CancelPointer(); return; }
         var current = e.GetPosition(Viewport); var delta = current - start;
@@ -297,8 +322,11 @@ public partial class DiagramArrangementWindow : Window
         CheckOwner(); var format = (string)((Button)sender).Tag; var snapshot = displayed; var drawing = inspection.Drawing;
         var dialog = new Microsoft.Win32.SaveFileDialog { Title = "Export arranged " + format, FileName = "arranged-diagram." + format.ToLowerInvariant(), Filter = format + " image|*." + format.ToLowerInvariant(), AddExtension = true, OverwritePrompt = true };
         if (dialog.ShowDialog(this) != true) return;
-        CheckOwner(); WorkspacePath.RejectReparsePoints(dialog.FileName);
-        var bytes = format == "SVG" ? System.Text.Encoding.UTF8.GetBytes(snapshot.Render.Svg!) : await StaWorker.RunAsync(() => NativeSvgService.ToExportPng(drawing), lifetime.Token);
-        await File.WriteAllBytesAsync(dialog.FileName, bytes, lifetime.Token); Status.Text = "Verified arranged " + format + " exported.";
+        if (!Path.GetExtension(dialog.FileName).Equals("." + format.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
+            throw new IOException("Use the ." + format.ToLowerInvariant() + " extension for this arranged export.");
+        CheckOwner(); var expected = await ExportFileStore.ReadExistingAsync(dialog.FileName, lifetime.Token);
+        var bytes = format == "SVG" ? System.Text.Encoding.UTF8.GetBytes(svg.Prepare(snapshot.Render.Svg!)) : await StaWorker.RunAsync(() => NativeSvgService.ToExportPng(drawing), lifetime.Token);
+        CheckOwner(); await new ExportFileStore(exportRecovery).WriteAsync(dialog.FileName, bytes, expected, lifetime.Token);
+        Status.Text = "Verified arranged " + format + " exported.";
     });
 }

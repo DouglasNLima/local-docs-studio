@@ -17,6 +17,22 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() is "--arrangement-latency" or "--arrangement-coordinates" or "--arrangement-observe")
+        {
+            try
+            {
+                if (args[0] == "--arrangement-latency") NativeArrangementLatencyChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]));
+                else if (args[0] == "--arrangement-coordinates") NativeArrangementCoordinateChecks.Run(Path.GetFullPath(args[1]));
+                else NativeArrangementLatencyChecks.Observe(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]));
+                return 0;
+            }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--arrangement-remediation")
+        {
+            try { NativeArrangementRemediationChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() is "--arrangement" or "--arrangement-windows")
         {
             try { NativeArrangementChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), args.Contains("--high-contrast"), args[0] == "--arrangement-windows"); return 0; }

@@ -18,6 +18,7 @@ namespace LensDocsStudio.Native;
 public partial class ErVisualEditorWindow : Window
 {
     public Action<Window, string>? ArrangeDiagram { get; set; }
+    public bool OwnsArrangementSource(string source) => !closed && draft is not null && draft.Source == source && !SourcePending && !PropertiesPending;
     private void OpenArrangement(object sender, RoutedEventArgs e)
     {
         if (!CanEdit || PropertiesPending) { Status.Text = "Finish the pending source or property edit before arranging."; return; }
@@ -280,7 +281,7 @@ public partial class ErVisualEditorWindow : Window
     }
     private async void Apply(object sender, RoutedEventArgs e)
     {
-        if (!CanEdit || PropertiesPending) return; CancelPointer(); busy = true; UpdateActions();
+        if (!CanEdit || PropertiesPending || !DiagramArrangementWindow.CloseOwned(this)) return; CancelPointer(); busy = true; UpdateActions();
         try { var result = await draft.ValidateAsync(lifetime.Token); if (!result.Success) { Status.Text = result.Error; return; } var error = await applyToDocument(draft.Source, lifetime.Token); if (closed) return; if (error is not null) { Status.Text = error; return; } discard = true; Close(); }
         catch (OperationCanceledException) { } finally { busy = false; if (!closed) UpdateActions(); }
     }
@@ -289,8 +290,12 @@ public partial class ErVisualEditorWindow : Window
     public bool CloseForOwner() { Close(); return closed; }
     private void ConfirmClose(object? sender, CancelEventArgs e)
     {
-        if (discard || draft is null) return; if (busy) { e.Cancel = true; Status.Text = "Wait for validation or Apply to finish before closing."; return; }
-        if ((draft.Source != draft.OriginalSource || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard the private ER draft and pending properties? Current changes in the owning document will be kept.", "Discard ER draft", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) e.Cancel = true;
+        if (!discard && draft is not null)
+        {
+            if (busy) { e.Cancel = true; Status.Text = "Wait for validation or Apply to finish before closing."; return; }
+            if ((draft.Source != draft.OriginalSource || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard the private ER draft and pending properties? Current changes in the owning document will be kept.", "Discard ER draft", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) { e.Cancel = true; return; }
+        }
+        if (!DiagramArrangementWindow.CloseOwned(this)) e.Cancel = true;
     }
     private void LocateSource(object sender, RoutedEventArgs e)
     {

@@ -77,9 +77,12 @@ public sealed class ArrangementEngine
         ValidateGroups(boxes);
         var routes = new List<IReadOnlyList<Point>>(); var labels = new List<Point?>(); var labelBoxes = new List<ArrangementBox>();
         var parallel = new Dictionary<(string, string), int>();
+        using (MermaidDiagnostics.Measure("arrangement.routing"))
+        {
         for (var i = 0; i < edges.Length; i++)
         {
-            token.ThrowIfCancellationRequested(); var edge = edges[i]; var pair = (edge.From, edge.To);
+            token.ThrowIfCancellationRequested(); var edge = edges[i];
+            var pair = StringComparer.Ordinal.Compare(edge.From, edge.To) <= 0 ? (edge.From, edge.To) : (edge.To, edge.From);
             var index = parallel.GetValueOrDefault(pair); parallel[pair] = index + 1;
             var route = ArrangementRouter.Route(edge.From, edge.To, boxes, i, index, er, token); routes.Add(route);
             for (var segment = 1; segment < route.Count; segment++)
@@ -99,6 +102,7 @@ public sealed class ArrangementEngine
                 placed = (new Point(rail.CentreX, rail.CentreY), rail);
             }
             labels.Add(placed.Position); labelBoxes.Add(placed.Bounds);
+        }
         }
         var widthExtent = boxes.Values.Max(b => b.Right); var heightExtent = boxes.Values.Max(b => b.Bottom);
         if (canonical.FlowchartLayout is { } compound)
@@ -120,6 +124,7 @@ public sealed class ArrangementEngine
 
     private string RenderUsing(IGraphLayoutProvider provider, CancellationToken token)
     {
+        using var phase = MermaidDiagnostics.Measure("arrangement.svg-generation");
         // One deferred final render per accepted candidate/drop, never per pointer frame.
         var colours = DiagramThemes.Colours(canonical.Theme ?? "Light");
         var options = new RenderOptions { Bg = colours.Background, Fg = colours.Foreground, Accent = colours.Accent, Surface = colours.Surface,
@@ -134,6 +139,7 @@ public sealed class ArrangementEngine
     private ArrangementSnapshot Finish(DiagramResult result, ArrangementState state, CancellationToken token)
     {
         result = result with { Svg = RenderUsing(new FixedLayout(result), token) };
+        using var phase = MermaidDiagnostics.Measure("arrangement.geometry-validation");
         var quality = Measure(result, token);
         if (quality.BodyIntersections != 0 || quality.LabelBodyOverlaps != 0) throw new InvalidDataException("Final arrangement geometry failed validation; the previous view is retained.");
         return new(result, state, quality);
@@ -172,6 +178,7 @@ public sealed class ArrangementEngine
 
     public IReadOnlyList<ArrangementSnapshot> Candidates(ArrangementState current, CancellationToken token = default)
     {
+        using var phase = MermaidDiagnostics.Measure("arrangement.candidates");
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(token); budget.CancelAfter(TimeSpan.FromSeconds(12));
         var candidates = new List<ArrangementSnapshot>();
         var grouped = canonical.FlowchartGroups.SelectMany(g => g.NodeIds).ToHashSet(StringComparer.Ordinal);

@@ -37,6 +37,34 @@ public sealed class ArrangementTests : IDisposable
         session.MarkSaved(); Assert.False(session.IsDirty); session.Undo(); Assert.True(session.IsDirty); session.Redo(); Assert.False(session.IsDirty);
         Assert.True(session.Current.State.Positions["A"].Pinned); Assert.Equal(engine.Canonical.Render.Source, session.Current.Render.Source);
     }
+    [Theory]
+    [InlineData("flowchart TD\n A --> B\n A -.-> B\n")]
+    [InlineData("flowchart TD\n A --> B\n B -.-> A\n")]
+    [InlineData("flowchart TD\n A --> A\n A -.-> A\n A --> B\n")]
+    public void Parallel_and_reciprocal_flowchart_occurrences_keep_distinct_visible_routes(string source)
+    {
+        var engine = Engine(source);
+        var state = engine.Canonical.State.Move("A", 100, 100).Move("B", 100, 600);
+        var snapshot = engine.Arrange(state);
+        var routes = snapshot.Render.FlowchartLayout!.Edges.Take(2).Select(e => string.Join(";", e.Points.Select(p => $"{p.X:R},{p.Y:R}"))).ToArray();
+        Assert.NotEqual(routes[0], routes[1]);
+        Assert.NotEqual(routes[0], string.Join(";", snapshot.Render.FlowchartLayout.Edges[1].Points.Reverse().Select(p => $"{p.X:R},{p.Y:R}")));
+        Assert.Equal(0, snapshot.Quality.BodyIntersections); Assert.Equal(source, snapshot.Render.Source);
+        Assert.Equal(snapshot.Render.Svg, engine.Arrange(snapshot.State).Render.Svg);
+    }
+    [Fact]
+    public async Task Existing_sidecar_cannot_commit_while_an_external_writer_owns_it()
+    {
+        var store = new ArrangementStore(new(root)); var expected = await store.SaveAsync(new(1, [Record()]), await store.ReadAsync());
+        var path = Path.Combine(root, ArrangementStore.RelativePath); var bytes = await File.ReadAllBytesAsync(path);
+        await using (var external = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+            await Assert.ThrowsAsync<IOException>(() => store.SaveAsync(expected.File, expected));
+        Assert.Equal(bytes, await File.ReadAllBytesAsync(path));
+        var saved = await store.SaveAsync(expected.File, expected);
+        Assert.Equal(saved.Fingerprint, (await store.ReadAsync()).Fingerprint);
+        Assert.Empty(Directory.GetFiles(Path.GetDirectoryName(path)!, "*.pending-*.json"));
+        Assert.Equal(bytes, await File.ReadAllBytesAsync(path + ".bak"));
+    }
     [Fact]
     public void Overlap_and_unknown_nodes_reject_without_changing_the_accepted_snapshot()
     {
@@ -106,6 +134,40 @@ public sealed class ArrangementTests : IDisposable
     {
         var path = Path.Combine(root, ArrangementStore.RelativePath); Directory.CreateDirectory(Path.GetDirectoryName(path)!); await File.WriteAllTextAsync(path, json);
         await Assert.ThrowsAsync<InvalidDataException>(() => new ArrangementStore(new(root)).ReadAsync()); Assert.Equal(json, await File.ReadAllTextAsync(path));
+    }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Interrupted_save_requires_explicit_backup_recovery_even_for_a_valid_or_missing_primary(bool missingPrimary)
+    {
+        var store = new ArrangementStore(new(root));
+        var saved = await store.SaveAsync(new(1, [Record()]), await store.ReadAsync());
+        saved = await store.SaveAsync(saved.File, saved);
+        var path = Path.Combine(root, ArrangementStore.RelativePath);
+        var journal = path + ".pending-test.json";
+        const string evidence = "{\"interrupted\":true}";
+        await File.WriteAllTextAsync(journal, evidence);
+        if (missingPrimary) File.Delete(path);
+        await Assert.ThrowsAsync<IOException>(() => store.ReadAsync());
+        await Assert.ThrowsAsync<IOException>(() => store.SaveAsync(saved.File, saved));
+        Assert.Equal(evidence, await File.ReadAllTextAsync(journal));
+        var backup = await store.ReadBackupAsync();
+        await store.SaveAsync(backup.File, backup);
+        Assert.Single((await store.ReadAsync()).File.Layouts);
+        Assert.False(File.Exists(journal));
+        Assert.Equal(evidence, await File.ReadAllTextAsync(path + ".reviewed-test.json"));
+    }
+    [Fact]
+    public async Task Backup_publication_failure_does_not_leave_an_unrecoverable_pending_journal()
+    {
+        var store = new ArrangementStore(new(root));
+        var saved = await store.SaveAsync(new(1, [Record()]), await store.ReadAsync());
+        var path = Path.Combine(root, ArrangementStore.RelativePath);
+        Directory.CreateDirectory(path + ".bak");
+        var error = await Xunit.Record.ExceptionAsync(() => store.SaveAsync(new(1, []), saved));
+        Assert.True(error is IOException or UnauthorizedAccessException);
+        Assert.Empty(Directory.GetFiles(Path.GetDirectoryName(path)!, "*.pending-*.json"));
+        Assert.Equal(saved.Fingerprint, (await store.ReadAsync()).Fingerprint);
     }
     [Theory]
     [InlineData(double.NaN)] [InlineData(double.PositiveInfinity)] [InlineData(1e100)]
