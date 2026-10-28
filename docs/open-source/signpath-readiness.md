@@ -1,6 +1,6 @@
 # SignPath eligibility review
 
-See the [Goal #58 application decision packet](signpath-application-packet.md) for
+See the [application decision packet updated for Goal #60](signpath-application-packet.md) for
 the current evidence, owner classifications, exact binary selectors and unanswered
 provider decisions. The observations below are retained as the Goal #56 baseline.
 

@@ -1,0 +1,164 @@
+{
+  "name": "Solo maintainer develop",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/develop"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_approving_review_count": 0,
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": [
+          "merge"
+        ]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "required_status_checks": [
+          {
+            "context": "Test static app",
+            "integration_id": 15368
+          },
+          {
+            "context": "OSS provenance",
+            "integration_id": 15368
+          },
+          {
+            "context": "native",
+            "integration_id": 15368
+          },
+          {
+            "context": "diagram-arrangement",
+            "integration_id": 15368
+          },
+          {
+            "context": "arrangement-responsiveness",
+            "integration_id": 15368
+          },
+          {
+            "context": "complex-er-preview",
+            "integration_id": 15368
+          },
+          {
+            "context": "state-installed-authoring",
+            "integration_id": 15368
+          },
+          {
+            "context": "er-installed-authoring",
+            "integration_id": 15368
+          },
+          {
+            "context": "class-installed-authoring",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Pie)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Mindmap)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Flowchart)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Gantt)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Sankey)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Sequence)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Quadrant)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Timeline)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Journey)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Xy)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Requirement)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Radar)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Block)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (C4)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Kanban)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Architecture)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (GitGraph)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (TreeView)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Packet)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Treemap)",
+            "integration_id": 15368
+          },
+          {
+            "context": "companion-installed-authoring (Venn)",
+            "integration_id": 15368
+          }
+        ],
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false
+      }
+    }
+  ]
+}

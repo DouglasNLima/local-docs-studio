@@ -1,44 +1,75 @@
-# Community governance proposal
+# Solo-maintainer governance
 
-Goal #58 supplies [exact proposed settings and verification steps](governance-settings.md).
-CODEOWNERS and a provenance check are prepared in source; no administration control
-is claimed effective merely because its policy is written.
+Policy prepared for [Goal #60](https://github.com/DouglasNLima/local-docs-studio/issues/60),
+28 October 2026. One human, **@DouglasNLima**, holds all current responsibilities.
+There is no second maintainer or independent human reviewer. Automated checks and
+separate-agent reviews are technical evidence, never independent human approval.
 
-Status: review only, 28 October 2026. The owner has selected a free, community
-maintained, open-source direction. There will be no subscription, paid licence
-or feature tier. MIT is proposed, not adopted. Community participation does not
-imply that a maintainer team or independent reviewers already exist.
+The owner has confirmed an entirely personal project: no code was created for
+employers/customers and no employer/customer contractual restrictions apply.
+The project will remain free, without subscriptions or paid feature tiers.
+MIT still needs the exact copyright notice and cleared [scope](rights-decision.md).
 
-The GitHub namespace belongs to `DouglasNLima`; the inspected Git history records
-one author name. This establishes repository history, not copyright clearance or
-SignPath role membership. Author, Reviewer, Approver, security responder and conduct
-appeal roles must be explicitly assigned and published by the owner. SignPath
-approval, if obtained, does not transfer project governance to its certificate
-publisher.
+| Role | Responsible |
+|---|---|
+| Project Owner | @DouglasNLima |
+| Lead Developer / Committer | @DouglasNLima |
+| Reviewer of external contributions | @DouglasNLima |
+| Release Authoriser | @DouglasNLima |
+| Security Maintainer | @DouglasNLima |
+| Community and Support Maintainer | @DouglasNLima |
 
-Authors prepare source and tests. Reviewers inspect changes, dependency provenance
-and CI definitions. Approvers inspect the exact source/run/candidate digests and
-each signing request. Publication has a separate owner authorisation. Prefer an
-independent reviewer and last-push approval; if staffing cannot provide this,
-record the gap and agree governance with SignPath before activating signing.
-Do not claim separation of duties while one person holds all roles.
+These are multiple responsibilities held by one person, without separation of
+duties. CODEOWNERS routes every path to this account; it does not prove copyright
+or create a signing identity. No independent appeal contact exists.
 
-Require MFA for all collaborators on GitHub and SignPath, remove obsolete access,
-and keep a recoverable access procedure without shared accounts or tokens. MFA
-enforcement and role assignments are currently UNKNOWN. A repository policy is
-not evidence that MFA is enabled.
+## Owner self-review and external contributions
 
-Read-only GitHub inspection found `develop` unprotected, no repository rulesets,
-private vulnerability reporting disabled, and only a `github-pages` environment
-with a branch rule. These are ACTION REQUIRED. Proposed controls are reviewed PRs,
-required source-specific native/web checks, resolved reviews, no force-push or
-deletion of release branches/tags, reviewed CODEOWNERS for CI/update trust, and a
-protected release environment with named required reviewers and prevention of
-self-approval. Confirm account support and actual enforced settings. No settings
-were changed by this proposal.
+1. Use a focused feature branch and PR to `develop`; promotion to `main` also
+   requires a PR. State the outcome, changed boundaries and exclusions.
+2. Record source commit/tree and a change/risk assessment covering user data,
+   dependencies, licence scope, workflows, trust and publication effects.
+3. Inspect the actual diff and relevant tests. Record hosted run URLs, attempts,
+   failures and skips against that source. Refresh affected checks and the
+   decision whenever source changes.
+4. Record an explicit human owner decision in the PR before merge: SHA/tree,
+   reviewed risk, validation, limitations and merge/defer decision. An agent must
+   not write this as if it came from the owner. Self-review is not a GitHub
+   approving review.
+5. Use a merge commit after that decision and applicable checks. No auto-merge.
+   A separate owner decision is required before public release. For a main merge
+   that triggers Pages publication, record that separate publication decision
+   before merging.
 
-Before community launch: confirm rights and licence boundaries; enable and test
-private vulnerability reporting; appoint confidential conduct/appeal contacts;
-approve the support/security expectations; publish real role membership; and
-verify controls using an unauthorised test path. Do not promise a paid SLA or
-create a subscription to satisfy these controls.
+Suggested owner record, not an approval: `Reviewed <SHA>/<tree>; risk <assessment>;
+checks <URLs/outcomes>; unresolved <limitations>; decision <merge/defer>.`
+A release decision additionally names version/channel, candidate hashes,
+signer/trust verification and distribution scope.
+
+External contributions require the human maintainer's review of source,
+permissions, dependency provenance and tests before integration. An AI review
+cannot substitute. Contributor rights and original notices must be checked;
+there is no automatic inbound licence while MIT adoption is pending.
+
+## Controls and limitations
+
+The [proposed configuration](governance-settings.md) requires PRs and CI with
+**zero** mandatory approving reviews, no mandatory CODEOWNER/last-push approval
+and no bypass actors. GitHub cannot verify the meaning of a decision comment:
+recorded self-review is an auditable human procedure, not a technical approval gate.
+
+Continuous 250 ms **FAIL** remains a production/release acceptance blocker at the
+unchanged threshold. The proposed integration checks deliberately exclude that
+performance gate so ordinary technical work can continue, with its failed runs
+disclosed in any integration decision. No failure is waived or reclassified.
+
+MFA is required for the sole GitHub maintainer and future SignPath access. Current
+verification is unknown; a null API field does not mean disabled. Verify account
+settings and retain only account/date/enabled status, never passwords, recovery
+codes or private credentials. Keep recovery information privately, use no shared
+accounts, review future appointments and remove obsolete access.
+
+Follow [SECURITY.md](../../SECURITY.md) for the disabled/unverified private reporting
+route and emergency signing/publication suspension.
+[Conduct policy](../../CODE_OF_CONDUCT.md) states the lack of independent appeal.
+Provider acceptance and [release gates](release-gates.md) remain separate.

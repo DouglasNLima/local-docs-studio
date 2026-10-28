@@ -39,3 +39,15 @@ Review all output before adding a source-labelled snapshot under
 `docs/open-source/evidence/`. Keep downloads, expanded payloads, raw logs, private
 data and keys under ignored local storage. No matching secret values belong in
 reports, issues, PRs or tool output.
+
+## Solo-maintainer decision packet
+
+Run `python scripts/compliance/rights_ledger.py` after adding/removing source
+paths, then `python scripts/compliance/check_foundation.py`,
+`python scripts/compliance/check_governance.py` and
+`python scripts/compliance/test_governance.py`. The current ledger is under
+`evidence/goal60/`; the Goal #58 ledger is retained unchanged as historical
+evidence. Classification proposes scope, never legal title or an operative grant.
+Governance checks validate proposed JSON, observed context provenance and
+non-operative licence/trust boundaries. They do not apply GitHub settings or
+establish behavioural enforcement.

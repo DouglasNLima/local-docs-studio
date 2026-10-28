@@ -1,0 +1,46 @@
+{
+  "sourceRevision": "4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0",
+  "runs": [
+    {
+      "id": 40783062858,
+      "name": "Publish Lens Docs Studio",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "head_sha": "4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0",
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40783062858"
+    },
+    {
+      "id": 40783062705,
+      "name": "Validate OSS provenance",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "head_sha": "4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0",
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40783062705"
+    },
+    {
+      "id": 40783062732,
+      "name": "Validate native Windows edition",
+      "event": "push",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_attempt": 1,
+      "head_sha": "4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0",
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40783062732"
+    }
+  ],
+  "knownFailure": {
+    "jobId": 123149324128,
+    "job": "complex-er-preview",
+    "step": "Verify preview loading placeholder and lifecycle through UI Automation",
+    "exception": "System.TimeoutException: Preview lifecycle check exceeded its bounded wait.",
+    "location": "NativePreviewLoadingChecks.cs:76 (Until at line 262)",
+    "cause": "UNPROVED",
+    "rerunByThisGoal": false,
+    "artifactId": 12858102129,
+    "artifactZipSha256": "540f4e3ff5a12b0f36e54c03c69ecd37f158cd790e56322e8c3f18e45cab607a"
+  }
+}

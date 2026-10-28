@@ -13,9 +13,13 @@ with the provider. Keep dependency notices, hashes and source evidence available
 
 Each signing request requires a named human approver. Publication requires a
 separate explicit decision after signature, manifest, payload and upgrade checks.
-Authors, Reviewers and Approvers are **not yet appointed**; publish verified
-membership before activation. MFA, PR review and protected branch/environment
-controls must be enforced, not just documented.
+The proposed trusted Author, reviewer of external contributions, human approver
+of each signing request and final Release Authoriser is **@DouglasNLima**, the
+sole maintainer. These are multiple roles, not independent human approval.
+Provider acceptance of this allocation remains unconfirmed; no signing identity
+is invented. MFA and actual branch/environment controls need verification.
+A future owner-reviewed environment must leave Prevent self-review disabled,
+or the only maintainer could not approve their own initiated deployment.
 
 The Foundation route uses its publisher identity; do not substitute the project
 owner's name or assume a stable certificate fingerprint. Add provider credit and

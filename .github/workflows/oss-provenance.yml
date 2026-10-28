@@ -30,3 +30,7 @@ jobs:
         run: node scripts/compliance/highlight/build.mjs
       - name: Verify notice bytes, rights boundaries and recorded SBOM
         run: python scripts/compliance/check_foundation.py
+      - name: Verify solo-maintainer proposals and approval boundaries
+        run: |
+          python scripts/compliance/check_governance.py
+          python scripts/compliance/test_governance.py

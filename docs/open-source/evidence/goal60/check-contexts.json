@@ -1,0 +1,438 @@
+{
+  "sourceRevision": "555a17c2667e0daff936eda10134e4586ca9708c",
+  "sourcePullRequest": 59,
+  "contexts": [
+    {
+      "name": "Historical upgrade (${{ matrix.preview }})",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "skipped",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133498635"
+    },
+    {
+      "name": "companion-installed-authoring (TreeView)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497779"
+    },
+    {
+      "name": "companion-installed-authoring (Treemap)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497685"
+    },
+    {
+      "name": "companion-installed-authoring (GitGraph)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497678"
+    },
+    {
+      "name": "companion-installed-authoring (Architecture)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497660"
+    },
+    {
+      "name": "companion-installed-authoring (Venn)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497593"
+    },
+    {
+      "name": "companion-installed-authoring (C4)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497583"
+    },
+    {
+      "name": "companion-installed-authoring (Journey)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497516"
+    },
+    {
+      "name": "companion-installed-authoring (Sankey)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497455"
+    },
+    {
+      "name": "companion-installed-authoring (Radar)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497453"
+    },
+    {
+      "name": "companion-installed-authoring (Xy)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497428"
+    },
+    {
+      "name": "companion-installed-authoring (Packet)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497411"
+    },
+    {
+      "name": "companion-installed-authoring (Block)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497408"
+    },
+    {
+      "name": "companion-installed-authoring (Flowchart)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497406"
+    },
+    {
+      "name": "companion-installed-authoring (Requirement)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497401"
+    },
+    {
+      "name": "companion-installed-authoring (Kanban)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497393"
+    },
+    {
+      "name": "companion-installed-authoring (Pie)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497388"
+    },
+    {
+      "name": "companion-installed-authoring (Gantt)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497387"
+    },
+    {
+      "name": "companion-installed-authoring (Sequence)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497348"
+    },
+    {
+      "name": "companion-installed-authoring (Quadrant)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497330"
+    },
+    {
+      "name": "companion-installed-authoring (Timeline)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497329"
+    },
+    {
+      "name": "companion-installed-authoring (Mindmap)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497301"
+    },
+    {
+      "name": "er-installed-authoring",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497227"
+    },
+    {
+      "name": "state-installed-authoring",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133497067"
+    },
+    {
+      "name": "class-installed-authoring",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123133496877"
+    },
+    {
+      "name": "Deploy to GitHub Pages",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "skipped",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773089122/job/123118379352"
+    },
+    {
+      "name": "Test static app",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773089122/job/123118338483"
+    },
+    {
+      "name": "Original .853 diagnostic replay (${{ matrix.associations }})",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "skipped",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123115581366"
+    },
+    {
+      "name": "native",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123115578809"
+    },
+    {
+      "name": "diagram-arrangement",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123115578679"
+    },
+    {
+      "name": "arrangement-responsiveness",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123115578653"
+    },
+    {
+      "name": "complex-er-preview",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204757/job/123115578321"
+    },
+    {
+      "name": "consolidated-suite-before",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "skipped",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115576241"
+    },
+    {
+      "name": "picker (light)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204930/job/123115574889"
+    },
+    {
+      "name": "Visible Continuous interactions (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204905/job/123115574857"
+    },
+    {
+      "name": "picker (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204930/job/123115574799"
+    },
+    {
+      "name": "Test static app (chromium)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773089122/job/123115170528"
+    },
+    {
+      "name": "Controlled 250 ms acceptance (replication 1)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "failure",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204905/job/123115574511"
+    },
+    {
+      "name": "Visible Continuous interactions (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204905/job/123115574433"
+    },
+    {
+      "name": "picker (dark)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204930/job/123115574327"
+    },
+    {
+      "name": "interactions (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204848/job/123115574222"
+    },
+    {
+      "name": "suite-workspace (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115574215"
+    },
+    {
+      "name": "workspace-viewports",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204848/job/123115574208"
+    },
+    {
+      "name": "Test static app (edge)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773089122/job/123115169873"
+    },
+    {
+      "name": "state-visual-editor (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115574070"
+    },
+    {
+      "name": "suite-workspace (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115574060"
+    },
+    {
+      "name": "er-visual-editor (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115574058"
+    },
+    {
+      "name": "baseline",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115574016"
+    },
+    {
+      "name": "mermaid-visual-editor",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573955"
+    },
+    {
+      "name": "Controlled 250 ms acceptance (replication 2)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "failure",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204905/job/123115573937"
+    },
+    {
+      "name": "sequence-visual-editor (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573909"
+    },
+    {
+      "name": "sequence-visual-editor (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573895"
+    },
+    {
+      "name": "state-visual-editor (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573840"
+    },
+    {
+      "name": "class-visual-editor (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573801"
+    },
+    {
+      "name": "partial-source-baseline",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573766"
+    },
+    {
+      "name": "suite-performance",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573765"
+    },
+    {
+      "name": "er-visual-editor (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573749"
+    },
+    {
+      "name": "interactions (normal)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204848/job/123115573742"
+    },
+    {
+      "name": "class-visual-editor (high-contrast)",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204824/job/123115573412"
+    },
+    {
+      "name": "OSS provenance",
+      "integrationId": 15368,
+      "app": "github-actions",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/40773204911/job/123115573062"
+    }
+  ],
+  "workflowCoverage": {
+    "develop": [
+      "pages.yml",
+      "oss-provenance.yml",
+      "native.yml"
+    ],
+    "main": [
+      "pages.yml",
+      "oss-provenance.yml"
+    ]
+  },
+  "note": "Observed check names and app sources; no claim all runs pass. Current workflow triggers inspected locally."
+}

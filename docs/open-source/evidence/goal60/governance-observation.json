@@ -1,0 +1,58 @@
+{
+  "observedAt": "2026-10-28T23:18:04.481142+00:00",
+  "method": "Read-only gh api GET; connector lacks branch-protection/ruleset/private-reporting endpoints",
+  "repository": {
+    "full_name": "DouglasNLima/local-docs-studio",
+    "visibility": "public",
+    "default_branch": "main",
+    "allow_auto_merge": false,
+    "allow_merge_commit": true,
+    "allow_squash_merge": true,
+    "allow_rebase_merge": true,
+    "delete_branch_on_merge": false
+  },
+  "ownerPermission": {
+    "login": "DouglasNLima",
+    "permission": "admin"
+  },
+  "branchProtection": {
+    "develop": {
+      "message": "Branch not protected",
+      "documentation_url": "https://docs.github.com/rest/branches/branch-protection#get-branch-protection",
+      "status": "404"
+    },
+    "main": {
+      "message": "Branch not protected",
+      "documentation_url": "https://docs.github.com/rest/branches/branch-protection#get-branch-protection",
+      "status": "404"
+    }
+  },
+  "rulesets": [],
+  "privateVulnerabilityReporting": {
+    "enabled": false
+  },
+  "codeownersDevelop": {
+    "errors": []
+  },
+  "environments": [
+    {
+      "name": "github-pages",
+      "protection_rules": [
+        {
+          "id": 55527123,
+          "node_id": "GA_kwDOSmyM784DT0bT",
+          "type": "branch_policy"
+        }
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      }
+    }
+  ],
+  "mfa": {
+    "status": "UNKNOWN",
+    "reason": "Authenticated user API did not expose a value; verify privately through account settings."
+  },
+  "administrativeMutationsPerformed": false
+}

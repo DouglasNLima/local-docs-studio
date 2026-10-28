@@ -1,4 +1,6 @@
-# Review routing only; branch protection and independent reviewers need owner action.
+# Sole human maintainer: review routing, not independent human approval.
+# Owner-authored PRs use recorded self-review; external contributions need owner review.
+# Mandatory CODEOWNER approval stays disabled for this single-maintainer model.
 # The existing repository owner is not evidence of copyright or signing authority.
 * @DouglasNLima
 /.github/ @DouglasNLima

@@ -1,5 +1,11 @@
 # Licensing and provenance audit — Goal #56
 
+Historical ownership questions below predate the owner's confirmed personal
+development/no employer or customer restrictions. See the current
+[R1–R7 decision packet](rights-decision.md), which also explicitly excludes the
+Mermaider-adapted BoundedErLayout.cs outside the PinnedMermaider folder.
+The exact public copyright notice/scope remains unapproved; this audit is preserved.
+
 This historical audit is supplemented by the [Goal #58 closeout](third-party-closeout.md):
 Highlight.js is now exactly reconstructed, and known web notices plus a file-level
 native candidate SBOM are supplied. Historical findings below retain their date.

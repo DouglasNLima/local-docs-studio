@@ -1,0 +1,9 @@
+{
+  "sourceRevision": "4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0",
+  "sourceTree": "6a8d27461d76b3cd21aba98e4ed67dcf5ba6daf9",
+  "sha256": {
+    "src/native/LensDocsStudio.Core/Updates/update-trust.json": "9fa1848ae2bb73d38c17e81aef8910fbc43622efbb85c1d911947228bbd6cc5f",
+    "package.json": "e153f47641a4ea23acd4e433d9639b6d6cf2d2f724b7eb8e0742f9af51d4efa8",
+    "package-lock.json": "65bef3c41fdd18ac8cce7f1b88a172a0d3045072c361ee5fa4726f50cc1fc42b"
+  }
+}

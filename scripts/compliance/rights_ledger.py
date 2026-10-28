@@ -5,24 +5,30 @@ import subprocess
 
 from audit_open_source import category
 
-OUTPUT = 'docs/open-source/evidence/goal58/rights-ledger.csv'
+OUTPUT = 'docs/open-source/evidence/goal60/rights-ledger.csv'
 
 
 def boundary(path):
     if path == 'assets/vendor/manifest.json':
-        return 'R1', 'OWNER ACTION REQUIRED', 'Project asset catalogue; authorship and title unconfirmed'
-    if path.startswith('assets/vendor/') or '/PinnedMermaider/' in path or path.startswith('docs/native/licences/'):
+        return 'R1', 'OWNER APPROVAL REQUIRED', 'First-party catalogue candidate; exact public notice and scope pending'
+    if (path.startswith('assets/vendor/') or '/PinnedMermaider/' in path
+            or path.startswith('docs/native/licences/')
+            or path == 'src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs'):
         return 'R6', 'NOT APPLICABLE', 'Upstream or adapted material; preserve separate grants and modification notices'
     if path.startswith('docs/open-source/evidence/'):
-        return 'R5', 'OWNER ACTION REQUIRED', 'Audit data or preserved third-party text; no blanket MIT over quoted upstream grants'
+        return 'R5', 'NOT APPLICABLE', 'Historical/audit evidence retains provenance and original rights; excluded from default MIT'
     kind = category(path)
-    if kind in ('recorded-evidence', 'artwork-or-fixture'):
-        return 'R4', 'OWNER ACTION REQUIRED', 'Confirm artwork, visible content, publication permission and trademark boundary'
-    if kind == 'fixture' or path.startswith('assets/scripts/registries/'):
-        return 'R3', 'OWNER ACTION REQUIRED', 'Confirm synthetic/original or licensed provenance; exclude customer content'
+    if kind == 'recorded-evidence':
+        return 'R5', 'NOT APPLICABLE', 'Historical machine evidence; visible artwork also requires R4 clearance; excluded from default MIT'
+    if kind == 'artwork-or-fixture':
+        return 'R4', 'OWNER APPROVAL REQUIRED', 'Excluded until separate visual copyright and branding review'
+    if (kind == 'fixture' or path.startswith('assets/scripts/registries/')
+            or path.endswith('.mmd') or '/templates/' in path
+            or path == 'src/native/LensDocsStudio.Native.Validation/ContinuousPreviewFixtures.cs'):
+        return 'R3', 'OWNER APPROVAL REQUIRED', 'Excluded until individual original or upstream-licensed provenance is verified'
     if kind == 'documentation' or path.endswith('.md'):
-        return 'R2', 'OWNER ACTION REQUIRED', 'Confirm documentation title and permission for examples/quoted material'
-    return 'R1', 'OWNER ACTION REQUIRED', 'Candidate first-party implementation; repository authorship is not proof of title'
+        return 'R2', 'OWNER APPROVAL REQUIRED', 'Original documentation candidate; exclude upstream text and uncleared embedded examples/assets'
+    return 'R1', 'OWNER APPROVAL REQUIRED', 'Personal-project implementation candidate; exact notice/scope pending; embedded examples excluded'
 
 
 def main():
