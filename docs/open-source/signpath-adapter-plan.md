@@ -1,6 +1,7 @@
 # Non-publishing SignPath CI adapter plan
 
-Design only. No active workflow, credentials, provider account or release exists.
+Design only. No active signing workflow, credentials, provider account or signed
+native release exists.
 This prepares implementation after licence/provider/governance decisions without
 installing a dormant secret-consuming workflow into PR execution.
 
@@ -46,7 +47,8 @@ Do not disguise SignPath submission inside that adapter or weaken its checks.
    envelope with the separate approved RSA-PSS key, verify it using the public
    client policy and bind tag/version/channel/architecture/origin. Include notices,
    SBOM, release notes, provenance and certification receipt. Archive results as
-   a private-to-workflow candidate only; no tag or GitHub Release mutation.
+   workflow candidate artefacts only; no tag or GitHub Release mutation. Treat
+   those artefacts as publicly accessible and include no credentials or private data.
 7. A separately authorised publication action reviews these exact immutable
    artefacts and current release absence. It alone gets `contents: write` and a
    protected publication environment. Never replace existing release assets, move
