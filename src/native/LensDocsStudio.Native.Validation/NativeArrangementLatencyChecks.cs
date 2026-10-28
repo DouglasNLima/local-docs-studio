@@ -394,11 +394,34 @@ internal static class NativeArrangementLatencyChecks
         Move(point); Button(true); Move(new(point.X + 35, point.Y + 25));
         WaitWorker(() => Ui(() => observation.Ghost.Visibility == Visibility.Visible), "The closure drag ghost did not appear.");
         var started = Now();
-        Send(new() { Type = 1, Union = new() { Keyboard = new() { Key = 0x12 } } }); Key(0x73);
-        Send(new() { Type = 1, Union = new() { Keyboard = new() { Key = 0x12, Flags = 2 } } }); Button(false);
-        WaitWorker(() => Ui(() => (bool)Field(window, "closed")!), "Actual Alt+F4 did not close the clean arrangement during drag.");
-        if (Ui(() => observation.Viewport.IsMouseCaptured || observation.Ghost.Visibility == Visibility.Visible)) throw new IOException("Closure retained the drag ghost or mouse capture.");
-        return new { ActualKeyboardClose = true, ZoomPercentage = 200, Milliseconds = Now() - started, CaptureReleased = true, PendingDragDiscarded = true, PreviouslyAcceptedLayoutSaved = true };
+        var accepted = Ui(() => observation.Session.Current.State);
+        System.ComponentModel.CancelEventHandler closing = (_, e) => observation.Steps.Enqueue(new { Stage = "closure-event", TimestampMilliseconds = Now(),
+            IsDirty = observation.Session.IsDirty, Captured = observation.Viewport.IsMouseCaptured, GhostVisible = observation.Ghost.Visibility == Visibility.Visible, Cancelled = e.Cancel });
+        Ui(() =>
+        {
+            window.Closing += closing;
+            observation.Steps.Enqueue(new { Stage = "closure-start", ClosureStartedMilliseconds = started, IsDirty = observation.Session.IsDirty,
+                Captured = observation.Viewport.IsMouseCaptured, GhostVisible = observation.Ghost.Visibility == Visibility.Visible }); return true;
+        });
+        try
+        {
+            Send(new() { Type = 1, Union = new() { Keyboard = new() { Key = 0x12 } } }); Key(0x73);
+            Send(new() { Type = 1, Union = new() { Keyboard = new() { Key = 0x12, Flags = 2 } } });
+            // Releasing before WM_CLOSE is processed commits a drop and changes the
+            // clean-window scenario into an unsaved-layout confirmation scenario.
+            WaitWorker(() => Ui(() => (bool)Field(window, "closed")!), "Actual Alt+F4 did not close the clean arrangement during drag.");
+            if (Ui(() => observation.Viewport.IsMouseCaptured || observation.Ghost.Visibility == Visibility.Visible)) throw new IOException("Closure retained the drag ghost or mouse capture.");
+            if (!Ui(() => observation.Session.Current.State.SameAs(accepted) && !observation.Session.IsDirty)) throw new IOException("Closing during drag changed the previously saved arrangement.");
+            return new { ActualKeyboardClose = true, ZoomPercentage = 200, ClosureStartedMilliseconds = started, Milliseconds = Now() - started,
+                CaptureReleased = true, PendingDragDiscarded = true, PreviouslyAcceptedLayoutSaved = true };
+        }
+        finally
+        {
+            observation.Steps.Enqueue(new { Stage = "closure-observation-end", TimestampMilliseconds = Now(),
+                ApplyPhasesAfterClosureStarted = observation.Phases.Where(p => p.Name == "arrangement.apply" && p.StartedMilliseconds >= started).ToArray() });
+            try { Send(new() { Type = 1, Union = new() { Keyboard = new() { Key = 0x12, Flags = 2 } } }); }
+            finally { Button(false); Ui(() => { window.Closing -= closing; return true; }); }
+        }
         T Ui<T>(Func<T> action) => window.Dispatcher.Invoke(action);
     }
 

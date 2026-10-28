@@ -380,6 +380,33 @@ also records canonical/candidate/final quality and both moves' separate routing,
 SVG, validation and native presentation stages for all six originals. Enclosing
 apply times and their child stages must not be added together.
 
+Run `40702508184` on `44615917` passed the full arrangement job, but retained
+two further validation failures. The pointer test completed 120 paced samples,
+120 positive pixel observations and 200 distinct continuous inputs for small ER,
+then failed its close-during-drag scenario. Its immediate mouse-up after queuing
+Alt+F4 committed a new drop before closure was observed. The corrected test keeps
+the button held until `Closed`, checks that the saved layout remains unchanged
+and clean, and releases keyboard/mouse state in `finally`. These valid partial
+measurements remain observations from a failed run; the other workloads had not
+yet executed. Fresh complete input acceptance is required.
+
+The same run's High Contrast preview check mistook completion of a captured
+render task for acceptance of the current request. The product can finish an
+old task after cancellation or appearance coalescing while a newer loading
+generation correctly remains busy. The exact initiating OS event was not
+captured, so it is not asserted as proven. The
+[independent source diagnosis](evidence/smart-arrangement/final/independent-preview-loading-review.md)
+supports a validation-only correction: captured-task and current-terminal waits
+share the original 25-second deadline, with strict current document, source,
+version, completed phase, media and visibility checks. A deterministic queued
+refresh exercises the superseded-task case. The
+[final local shown-window receipt](evidence/smart-arrangement/final/local-preview-current-request.json)
+passes 106 checks and four Light/Dark supersession scenarios. An initial local
+attempt exposed a stale test TextMap after replacement; that evidence is retained
+and the test now obtains pointers from the current preview. Product loading,
+rendering and appearance behaviour are unchanged. Hosted High Contrast remains
+a separate required result.
+
 Two fresh reviewer contexts inspected implementation and ran their own probes.
 The [engine/storage report](evidence/smart-arrangement/final/independent-engine-storage-review.md)
 records resolved external-write race, collapsed parallel Flowchart occurrences,

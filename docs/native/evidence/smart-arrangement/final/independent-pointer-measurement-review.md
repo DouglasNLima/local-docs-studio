@@ -58,3 +58,38 @@ Reviewed stable source SHA-256: `5124F368525E121459D7BA607D0E302E556A94B71870A37
 | Timing boundary / hidden threshold | **PASS.** No new product latency threshold was introduced. Four-minute workload / 25-second feedback waits are labelled harness completion bounds; final-tail timeout fails and retains censoring evidence. WPF opportunities, screen observation upper bounds and actual scanout remain distinct. |
 
 No remaining concrete source-level measurement defect was found in this batch. The new hosted receipt still needs inspection for actual distinct sample counts, null-pixel coverage, delivered coordinates, phase/drop records, search outcome classification and terminal status. Earlier failed measurements and this report's original findings remain preserved; they must not be relabelled as passes.
+
+## Hosted close-test failure — revision `4461591`, 28 October 2026
+
+Preserved evidence: `artifacts/native/final-hosted-input-4461591/responsiveness/pointer-acceptance.json` and `small-er/pointer.json`. The case remains **FAIL**. No receipt was changed or reclassified, and no product build/input was performed by this reviewer.
+
+Independent inspection finds a harness ordering defect in `CloseDuringDrag` (lines 397–399 at the failing revision): it queues Alt+F4, releases Alt and immediately releases the mouse before observing `Closed`. The real mouse-up can therefore reach product `PointerUp` and commit the provisional movement before the queued close completes.
+
+The retained timeline supports that diagnosis directly:
+
+- Closure-test down arrival: `265013.3258 ms`.
+- Closure ghost move arrival: `265015.5043 ms`; WPF opportunity: `265015.5971 ms`.
+- A **new** `arrangement.apply` starts at `265021.521 ms`, after the close fixture was saved. Its routing, SVG generation, geometry validation, native preparation and presentation installation are all present; apply completes at `265032.8028 ms`.
+- The harness subsequently times out waiting for the supposedly clean arrangement to close.
+
+This demonstrates an unintended drop during the closure test. The product's unsaved-layout confirmation is consistent with the timeout, but the exact modal/WM_CLOSE ordering was not captured and is not claimed as directly observed. The evidence does not establish a new product close regression.
+
+Minimal harness correction: retain the held mouse button until `Closed` is observed, release mouse and Alt in `finally`, record pre-close saved/dirty/ghost/capture state, and compare the accepted state after closure with the saved baseline. Checking only ghost disappearance/capture release would not detect an unintended committed drop.
+
+The completed paced/producer/drop/search measurements remain useful **failed-run observations**, not a complete acceptance pass. The producer receipt records 200 distinct arrivals and 200 distinct presentations, final input acknowledged, no tail censoring and zero observed expensive drag phases. A fresh hosted run is required after the close-sequence correction; the first measurements must remain preserved.
+
+### Independent review of the close-test correction
+
+At source SHA-256 `ACDCC5C19625F6C61614CC66325027E5034AFC8EC4D1621F37CD396F408B4945`, `CloseDuringDrag` now retains the mouse button until the actual `Closed` state is observed. It verifies capture/ghost cleanup **and** unchanged, clean accepted state against the baseline captured before the close request. Closure-start, Closing-event and observation-end entries retain state and any post-start apply phases. This addresses the demonstrated test-ordering defect without changing product behaviour or relaxing a timing threshold.
+
+One minor cleanup adjustment was requested: also send Alt-up from `finally`, so a `SendInput` failure after Alt-down cannot leave that injected key held. The success path already releases Alt before waiting. The core regression correction passes independent source review; actual closure acceptance still requires a new hosted run.
+
+The failed `4461591` small-ER receipt contains 120 paced WPF samples, 120 positive pixel observations, zero null pixel observations and 200 distinct producer arrivals/presentations. These remain explicitly failed-run observations. They were read, not modified.
+
+### Final close-test source readiness
+
+Reviewed source SHA-256: `71F01E17879F7603BDCBD1B7E11B2694911D7E623D3469BCDF55AF858A16CE72`.
+
+**Ready for publication and a fresh hosted closure run.** The final source keeps the mouse held until closure is observed, verifies unchanged/clean accepted layout and released capture/ghost, and preserves closure diagnostics. Alt-up now executes in `finally`; a nested `finally` still attempts mouse-up if Alt-up injection throws. No product behaviour or acceptance deadline was changed by this correction.
+
+No remaining concrete defect was found in this close-sequence correction. This review is source-only: the author/coordinator owns the combined build result, and hosted `4461591` remains a preserved failure. The next hosted terminal result must establish actual closure acceptance. The separate test-only preview-request correction is outside this particular follow-up review.

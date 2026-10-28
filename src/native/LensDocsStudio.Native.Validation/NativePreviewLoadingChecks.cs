@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using FlaUI.UIA3;
+using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Workspace;
@@ -50,6 +51,7 @@ internal static class NativePreviewLoadingChecks
         var loaded = typeof(MainWindow).GetMethod("WindowLoaded", BindingFlags.Instance | BindingFlags.NonPublic)!;
         window.Loaded -= (RoutedEventHandler)loaded.CreateDelegate(typeof(RoutedEventHandler), window);
         var gate = (SemaphoreSlim)Field("previewGate")!;
+        var queuedPreview = (DispatcherTimer)Field("previewTimer")!;
         var loading = (PreviewLoadingState)Field("previewLoading")!;
         var preview = (DocumentPreview)window.FindName("Preview");
         var host = (FrameworkElement)window.FindName("PreviewContentHost");
@@ -100,12 +102,41 @@ internal static class NativePreviewLoadingChecks
                     }
                     Capture(theme + "-" + mode + "-initial");
                 }
-                Release(); var watch = Stopwatch.StartNew(); Await(first); timings.Add(new { theme, mode, OrdinaryPreviewMilliseconds = watch.Elapsed.TotalMilliseconds });
+                var capturedBeforeRelease = RequestObservation(first);
+                timings.Add(new { theme, mode, Scenario = "Captured render before gate release", Observation = capturedBeforeRelease });
+                Release(); var watch = Stopwatch.StartNew(); Await(first, watch);
+                var capturedTaskMilliseconds = watch.Elapsed.TotalMilliseconds;
+                var capturedAfterAwait = RequestObservation(first);
+                timings.Add(new { theme, mode, Scenario = "Captured render task finished", CapturedTaskCompletionMilliseconds = capturedTaskMilliseconds,
+                    Observation = capturedAfterAwait });
+                // Appearance broadcasts can supersede a held request. Its task completes
+                // without accepting content; the current request still owns loading.
+                Until(() => !loading.Busy && !queuedPreview.IsEnabled, watch);
+                timings.Add(new { theme, mode, OrdinaryPreviewMilliseconds = watch.Elapsed.TotalMilliseconds,
+                    CapturedTaskCompletionMilliseconds = capturedTaskMilliseconds,
+                    BeforeRelease = capturedBeforeRelease, AfterCapturedTask = capturedAfterAwait, CurrentTerminal = RequestObservation(first) });
                 Check(!loading.Busy && view.Visibility == Visibility.Collapsed && host.Visibility == Visibility.Visible, "Successful first layout dismisses loading");
+                Check(CurrentAcceptedSource(), "Current document and exact source revision completed after any superseded request");
                 Check(new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Incoming document"), "Accepted content belongs to the active document");
                 var firstResult = (PreviewResult)Field("rendered")!;
                 Check(firstResult.Media.Count == 1 && firstResult.Warnings.Count == 0, "Local image media is prepared with the ordinary table and long text: " + string.Join("; ", firstResult.Warnings));
                 Capture(theme + "-" + mode + "-completed");
+                // Deterministically reproduce a queued appearance refresh superseding
+                // an awaited task, without depending on Windows broadcast timing.
+                Hold(); var superseded = Render(); var heldGeneration = loading.Generation;
+                Check(!superseded.IsCompleted, "Deterministic supersession starts with a pending held render task");
+                Call("QueuePreview"); Await(superseded);
+                Check(loading.Busy && loading.Generation > heldGeneration && loading.Context?.Document == a.Id,
+                    "A completed superseded task cannot certify the current queued preview");
+                Release(); var replacementWatch = Stopwatch.StartNew();
+                Until(() => !loading.Busy && !queuedPreview.IsEnabled, replacementWatch);
+                Check(CurrentAcceptedSource() && view.Visibility == Visibility.Collapsed && host.Visibility == Visibility.Visible,
+                    "Queued replacement accepts the current source and dismisses loading within the original deadline");
+                timings.Add(new { theme, mode, Scenario = "Deterministic queued refresh supersession",
+                    ReplacementMilliseconds = replacementWatch.Elapsed.TotalMilliseconds, CurrentTerminal = RequestObservation(superseded) });
+                firstResult = (PreviewResult)Field("rendered")!;
+                Check(firstResult.Media.Count == 1 && firstResult.Warnings.Count == 0,
+                    "Queued replacement retains prepared local media without warnings");
                 preview.Zoom = 120; var accepted = preview.Document;
                 Check(firstResult.TextMap.TryPreviewRange(a.EditorDocument.Text.IndexOf("Ordinary", StringComparison.Ordinal), 8, out var selectionStart, out var selectionEnd), "Selected source has a verified preview range");
                 preview.Selection.Select(selectionStart!, selectionEnd!); var focus = Keyboard.FocusedElement;
@@ -174,6 +205,15 @@ internal static class NativePreviewLoadingChecks
         void Hold() { gate.Wait(); gateHeld = true; }
         void Release() { gate.Release(); gateHeld = false; }
         Task Render() => (Task)Call("UpdatePreviewAsync", false)!;
+        object RequestObservation(Task captured) => new { captured.IsCompleted, TaskStatus = captured.Status.ToString(),
+            loading.Generation, Phase = loading.Phase.ToString(), loading.Busy, PreviewQueued = queuedPreview.IsEnabled,
+            Request = Field("diagnosticRequest"), CurrentAcceptedSource = CurrentAcceptedSource() };
+        bool CurrentAcceptedSource() => loading.Phase == PreviewLoadingPhase.Completed
+            && model.ActiveDocument is { } active && loading.Context?.Document == active.Id
+            && Field("renderedDocumentId") is Guid renderedId && renderedId == active.Id
+            && Field("parsed") is ParsedDocument acceptedParsed && acceptedParsed.Source == active.EditorDocument.Text
+            && Field("parsedVersion") is ICSharpCode.AvalonEdit.Document.ITextSourceVersion acceptedVersion
+            && active.EditorDocument.Version.CompareAge(acceptedVersion) == 0;
         object? Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window);
         object? Call(string name, params object?[] args) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, args);
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
@@ -208,11 +248,11 @@ internal static class NativePreviewLoadingChecks
             var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); using var stream = File.Create(Path.Combine(output, name + ".png")); encoder.Save(stream);
         }
     }
-    private static void Await(Task task) { Until(() => task.IsCompleted); task.GetAwaiter().GetResult(); }
-    private static void Until(Func<bool> ready)
+    private static void Await(Task task, Stopwatch? sharedDeadline = null) { Until(() => task.IsCompleted, sharedDeadline); task.GetAwaiter().GetResult(); }
+    private static void Until(Func<bool> ready, Stopwatch? sharedDeadline = null)
     {
         if (ready()) return;
-        var watch = Stopwatch.StartNew();
+        var watch = sharedDeadline ?? Stopwatch.StartNew();
         var frame = new DispatcherFrame();
         var timer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(10) };
         timer.Tick += (_, _) => { if (ready() || watch.Elapsed > TimeSpan.FromSeconds(25)) frame.Continue = false; };
