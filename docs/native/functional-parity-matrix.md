@@ -1,5 +1,9 @@
 # Functional parity matrix
 
+## Original SPC acceptance - 28 October 2026
+
+The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum---28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
+
 ## Complex ER and preview loading - 27 October 2026
 
 | Capability | Current implementation and evidence |

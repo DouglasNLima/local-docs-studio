@@ -202,7 +202,11 @@ internal static class BoundedErLayout
             });
         }
 
-        // PortAwareLayout routes (port → column → port) are final; no post-processing.
+        // The pinned router can turn below a short source while a taller neighbour in
+        // the same layer still occupies that row. Keep its ports/columns and move only
+        // an obstructed outgoing bend into the existing inter-layer gap.
+        for (var i = 0; i < positionedRels.Count; i++)
+            positionedRels[i] = ClearOutgoingBend(positionedRels[i], positionedEntities);
 
         // Self-loops carry no layout info (filtered from Sugiyama). Draw each as a rectangular loop out of the side with more free room,
         // like any other edge: straight stubs for the markers, with the label sitting on the outer vertical so it stays connected.
@@ -262,6 +266,51 @@ internal static class BoundedErLayout
             Entities = positionedEntities,
             Relationships = positionedRels,
         });
+    }
+
+    internal static PositionedErRelationship ClearOutgoingBend(PositionedErRelationship edge, IReadOnlyList<PositionedErEntity> entities)
+    {
+        var points = edge.Points;
+        if (points.Count < 4) return edge;
+        const double epsilon = .01;
+        var vertical = Math.Abs(points[0].X - points[1].X) < epsilon;
+        if (!vertical && Math.Abs(points[0].Y - points[1].Y) >= epsilon) return edge;
+        var sign = Math.Sign(vertical ? points[1].Y - points[0].Y : points[1].X - points[0].X);
+        if (sign == 0) return edge;
+        double Along(Point p) => sign * (vertical ? p.Y : p.X);
+        double Across(Point p) => vertical ? p.X : p.Y;
+        Point At(Point p, double along) => vertical ? new(p.X, sign * along) : new(sign * along, p.Y);
+        var original = Along(points[1]); var end = Along(points[3]);
+        if (Math.Abs(Along(points[2]) - original) >= epsilon || Math.Abs(Across(points[2]) - Across(points[3])) >= epsilon || end <= original) return edge;
+        var obstacles = entities.Where(n => n.Id != edge.Entity1 && n.Id != edge.Entity2).ToArray();
+        var candidate = points.ToArray(); var exit = original;
+        for (var attempt = 0; attempt <= obstacles.Length; attempt++)
+        {
+            var blocked = obstacles.Where(n => Crosses(candidate[1], candidate[2], n) || Crosses(candidate[2], candidate[3], n)).ToArray();
+            if (blocked.Length == 0)
+            {
+                if (exit == original || entities.Any(n => Crosses(candidate[0], candidate[1], n)
+                    || Crosses(candidate[1], candidate[2], n) || Crosses(candidate[2], candidate[3], n))) return edge;
+                var label = edge.LabelPosition;
+                if (label is { } position)
+                {
+                    var along = Along(position);
+                    if (Math.Abs(along - original) < epsilon) label = At(position, exit);
+                    else if (Math.Abs(Across(position) - Across(points[2])) < epsilon && along > original && along < end)
+                        label = At(position, exit + (along - original) * (end - exit) / (end - original));
+                }
+                return edge with { Points = candidate, LabelPosition = label };
+            }
+            var next = blocked.Max(n => Math.Max(Along(new(n.X, n.Y)), Along(new(n.X + n.Width, n.Y + n.Height)))) + 28;
+            // Preserve the final approach and its cardinality marker; never reverse a segment.
+            if (next <= exit || next >= end - 18) return edge;
+            exit = next; candidate[1] = At(points[1], exit); candidate[2] = At(points[2], exit);
+        }
+        return edge;
+
+        static bool Crosses(Point a, Point b, PositionedErEntity n) => Math.Abs(a.X - b.X) < epsilon
+            ? a.X > n.X + epsilon && a.X < n.X + n.Width - epsilon && Math.Max(a.Y, b.Y) > n.Y + epsilon && Math.Min(a.Y, b.Y) < n.Y + n.Height - epsilon
+            : Math.Abs(a.Y - b.Y) < epsilon && a.Y > n.Y + epsilon && a.Y < n.Y + n.Height - epsilon && Math.Max(a.X, b.X) > n.X + epsilon && Math.Min(a.X, b.X) < n.X + n.Width - epsilon;
     }
 
     /// <summary>Labels and self-loop paths can extend past entities; keep the complete horizontal canvas.</summary>

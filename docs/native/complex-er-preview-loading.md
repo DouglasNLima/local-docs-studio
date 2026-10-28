@@ -90,3 +90,44 @@ A later general-controls run checked panel preservation immediately after quick 
 Generate fixtures with `node scripts/native/Generate-ComplexErFixtures.mjs`. Build the Release solution and run the Core tests normally. Run the complete prescribed native corpus and `npm test`; the new fixtures are automatically part of the corpus.
 
 Use `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --complex-er <fresh-output> .` for phase measurements, counts, full exports and inspection correspondence. Use `--preview-loading-ui <fresh-output> .` for shown isolated WPF/UIA lifecycle acceptance (no injected OS input), or `--preview-loading` for compiled lifecycle checks. The `--high-contrast` variant retains the disposable hosted-desktop guard. The native workflow runs all three along with the existing independent regression and package jobs.
+
+## Original SPC Acceptance Addendum — 28 October 2026
+
+The private archive became available after the initial receipt. PR #53 was verified as open/draft against `develop`, at commit `44c8b994e10e2e6c591a27f8e870372833ecc87c`, tree `7e3fd129b5f2f08c4a6c27bb89146ff9857fcf41`. All six supplied Mermaid files match the archive's private SHA-256 manifest and the requested entity/relationship/attribute counts. Five also match fenced diagrams in the supplied Markdown; Complete detailed is supplied separately. This addendum records **original-source acceptance**, alongside the earlier synthetic evidence, which remains unchanged.
+
+Extraction, benchmark harness, original sources, SVG/PNG exports, runtime screenshots and detailed failure evidence remain in a local temporary directory outside the repository. The committed [aggregate report](evidence/complex-er-preview/original-spc-acceptance.json) contains only allowlisted counts, outcomes and measurements. No private identifiers, source hashes, source text, geometry coordinates, screenshots or paths are included. The final tested commit/tree and terminal hosted results are recorded in the PR addendum, avoiding a self-referential commit hash in this file.
+
+### Original topology and correction
+
+The original Complete graph has maximum incident degree **22**, versus **7** in the synthetic equivalent; it contains three self-relationships and six parallel endpoint groups. Matching counts alone did not cover this topology. All original diagrams rendered within the existing six-second ER allowance at the initial commit, but geometric checks found **15 route-segment/entity-body intersections across seven relationships**: Complete detailed 2, Operations 6, Workflow Assignment 5 and Workflow Definitions 2.
+
+The pinned port-aware router can turn below a short source while a taller neighbouring entity still occupies that row. The correction moves only an obstructed outgoing bend into the existing inter-layer gap, keeps original ports/columns and occurrence ordering, moves an attached label with its segment, and rejects a move that would reverse the approach or cross any other entity. Clear routes and self-loop routing are unchanged. Four direction variants of a generic three-box regression cover endpoint/cardinality preservation, label movement, insufficient clearance, unsafe detours and idempotence. The fixture does not reproduce private names or topology.
+
+After correction, all six originals have **zero unrelated entity-body route intersections and zero relationship-label/entity-box overlaps**. Source semantics, every attribute, cardinality, identifying/non-identifying relationship and label reconcile with the canonical renderer. Parallel and self-referential occurrences retain distinct inspection identities. Repeated uncached renders produce identical canonical SVG. Complete SVG/PNG exports preserve the full canvas, and inspection produces identical export pixels.
+
+### Measured original-source results
+
+Each row uses three fresh processes. Every process performs one process-cold render, two warm uncached renders and one cache hit: **54 uncached renders and 18 cache hits, zero natural failures**. Native conversion and full-canvas export occur after the first measured renderer call. Times are milliseconds.
+
+| Original diagram | Entities / relationships / attributes | Process-cold trials | Warm uncached range | Initial shown WPF, Light Continuous / Dark Pages |
+|---|---|---|---|---|
+| Complete — relationships only | 39 / 115 / 0 | 606 / 610 / 633 | 183–229 | 1,312 / 432 |
+| Complete — detailed | 39 / 115 / 284 | 551 / 653 / 579 | 192–236 | 2,792 / 1,412 |
+| Operations | 22 / 68 / 195 | 385 / 383 / 396 | 185–230 | 1,783 / 1,193 |
+| Monitoring | 13 / 46 / 138 | 224 / 229 / 232 | 48–77 | 1,365 / 830 |
+| Workflow Assignment | 11 / 21 / 82 | 493 / 515 / 501 | 133–201 | 1,250 / 548 |
+| Workflow Definitions | 12 / 20 / 97 | 242 / 237 / 272 | 68–102 | 1,112 / 622 |
+
+Original Complete detailed cold allocation churn is about **90.2 MB**, compared with about 1.25 GB for the synthetic dense graph. Its first cold phases measure parsing 40 ms, ER layout 430 ms (including 379 ms inside Sugiyama/layout routing), and SVG generation 65 ms. Initial SVG sanitisation takes 57 ms, SharpVectors reading 1,339 ms, drawing freeze 52 ms and correspondence checks 10 ms. These are inclusive scopes and must not be added twice; the pinned engine exposes layout/routing as one combined phase. The aggregate report retains equivalent measurements and CPU/working-set values for every case. The native benchmark/export process peaks at about **574 MB**; this includes large full-canvas rasterisation and is not a renderer memory ceiling.
+
+The real WPF MainWindow runs with the original diagram plus ordinary table/text content, a live dispatcher and rendering/loading animation. It verifies visible loading, terminal dismissal, accepted-content retention on refresh and stale-document rejection. The real DiagramWindow's accessible list and overlay are exercised for **every relationship**, including parallel and self-referential occurrences; selection/zoom do not invoke Mermaid again. This yields **1,684 shown-WPF assertions** across six originals and two appearance/reading-mode contexts. Private captures remain local.
+
+The supplied original Markdown document also completes with zero warnings: **4,526 ms Light/Continuous and 3,892 ms Dark/Pages**, with warm refreshes of 601/516 ms. Those are full-document readiness times, not per-diagram rendering deadlines. Its maximum observed dispatcher gap is 461 ms in Continuous, including private capture/layout activity; the separate 250 ms limitation remains unresolved and its gate is unchanged.
+
+### Cancellation, deadline, retry and remaining scope
+
+Every original passes cancellation during graph work and unchanged-source retry. A separately labelled diagnostic hold of 6,250 ms deliberately expires the unchanged six-second budget for each original; all return `Deadline`, permit retry and then succeed with identical source. These are **controlled classification tests, not natural timeout failures**. The actual MainWindow repeats the controlled deadline for Complete detailed: its visible spinner ends with the deadline error, then unchanged-source retry succeeds. Success, errors and supersession all reach terminal loading states.
+
+Release build and the complete Core suite pass (**2,255 tests**); the complete native corpus/export suite passes **202 cases**. Earlier failures and all initial private routing evidence are retained. Hosted normal/actual High Contrast, desktop UX, installed package, web and unchanged Continuous gates are rerun on the correction; final outcomes are appended to PR #53. Private sources never enter hosted CI.
+
+Recommendation is **CONDITIONAL GO for review**, subject to the final hosted result recorded on the PR. Original-source rendering/fidelity/loading acceptance now passes on this Windows host. Private originals were exercised locally in Light/Dark and Continuous/Pages; actual OS High Contrast regression uses the public hosted suite, not private uploads. Physical screen-reader, multi-monitor/DPI, arbitrary slower-host budgets and clean-machine release certification remain separate. No deadline was increased, no performance threshold was weakened, and no merge, issue closure, signing, tag or release was performed.

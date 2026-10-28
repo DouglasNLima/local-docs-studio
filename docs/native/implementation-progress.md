@@ -1,5 +1,9 @@
 # Native implementation progress
 
+## Original SPC acceptance - 28 October 2026
+
+The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum---28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
+
 ## Goal #52 - complex ER and preview loading - 27 October 2026
 
 Implemented bounded/cancellable pinned ER layout, diagnostic categories, transient retry/cache policy, full-canvas bounded PNG export and native lifecycle-aware loading. Core: 2,251 passed. Complete native corpus: 202 diagram/export cases, zero failures after retaining and correcting four initial PNG size failures. Shown WPF/UIA Light/Dark, Continuous/Pages and terminal-state evidence is committed with the [receipt](complex-er-preview-loading.md). Original SPC validation is unavailable; actual hosted High Contrast, package/lifecycle and final CI remain separately reported on the Draft PR. No merge/signing/publication is part of this work.

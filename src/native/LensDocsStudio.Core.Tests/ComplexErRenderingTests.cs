@@ -97,6 +97,38 @@ public sealed class ComplexErRenderingTests
         });
     }
 
+    [Theory]
+    [InlineData("TD")]
+    [InlineData("BT")]
+    [InlineData("LR")]
+    [InlineData("RL")]
+    public void Outgoing_bend_clears_taller_neighbours_without_changing_ports_or_occurrences(string direction)
+    {
+        Point Transform(Point p) => direction switch { "BT" => new(p.X, 400 - p.Y), "LR" => new(p.Y, p.X), "RL" => new(400 - p.Y, p.X), _ => p };
+        PositionedErEntity Box(string id, double x, double y, double width, double height)
+        {
+            var a = Transform(new(x, y)); var b = Transform(new(x + width, y + height));
+            return new() { Id = id, Label = id, Attributes = [], HeaderHeight = 36, RowHeight = 28, X = Math.Min(a.X, b.X), Y = Math.Min(a.Y, b.Y), Width = Math.Abs(a.X - b.X), Height = Math.Abs(a.Y - b.Y) };
+        }
+        var edge = new PositionedErRelationship { Entity1 = "Short", Entity2 = "Target", Label = "retains label", Identifying = true,
+            Cardinality1 = ErCardinality.One, Cardinality2 = ErCardinality.ZeroMany,
+            Points = new[] { new Point(120, 60), new Point(120, 88), new Point(50, 88), new Point(50, 250) }.Select(Transform).ToArray(), LabelPosition = Transform(new(50, 169)) };
+        var nodes = new[] { Box("Short", 100, 20, 80, 40), Box("Tall", 10, 20, 70, 100), Box("Target", 10, 250, 80, 40) };
+        var clear = BoundedErLayout.ClearOutgoingBend(edge, nodes);
+        Assert.Equal(Transform(new(120, 148)), clear.Points[1]); Assert.Equal(Transform(new(50, 148)), clear.Points[2]);
+        Assert.Equal(Transform(new(50, 199)), clear.LabelPosition);
+        Assert.Equal(edge.Points[0], clear.Points[0]); Assert.Equal(edge.Points[^1], clear.Points[^1]);
+        Assert.Equal(edge, clear with { Points = edge.Points, LabelPosition = edge.LabelPosition });
+        Assert.Same(clear, BoundedErLayout.ClearOutgoingBend(clear, nodes));
+        var horizontalLabel = edge with { LabelPosition = Transform(new(85, 88)) };
+        Assert.Equal(Transform(new(85, 148)), BoundedErLayout.ClearOutgoingBend(horizontalLabel, nodes).LabelPosition);
+        var noGap = edge with { Points = edge.Points.Take(3).Append(Transform(new(50, 140))).ToArray() };
+        Assert.Same(noGap, BoundedErLayout.ClearOutgoingBend(noGap, nodes));
+        // A route that cannot move safely is retained, never bent through a different box.
+        Assert.Same(edge, BoundedErLayout.ClearOutgoingBend(edge, nodes.Append(Box("Ahead", 110, 120, 20, 50)).ToArray()));
+        Assert.Same(edge, BoundedErLayout.ClearOutgoingBend(edge, [nodes[0], nodes[2]]));
+    }
+
     [Fact]
     public async Task Cancelling_dense_layout_stops_supported_search_and_does_not_cache_partial_output()
     {
