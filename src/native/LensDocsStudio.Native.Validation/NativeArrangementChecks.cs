@@ -16,7 +16,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeArrangementChecks
 {
-    public static void Run(string output, string root, bool highContrast = false)
+    public static void Run(string output, string root, bool highContrast = false, bool windowsOnly = false)
     {
         if (Directory.Exists(output)) throw new IOException("Use a fresh arrangement evidence directory; previous results must be retained.");
         Directory.CreateDirectory(output);
@@ -27,7 +27,7 @@ internal static class NativeArrangementChecks
         try
         {
             VerifyEntryReadiness(Check);
-            foreach (var file in Directory.GetFiles(Path.Combine(root, "tests/fixtures/native-complex-er"), "*.mmd"))
+            foreach (var file in windowsOnly ? [] : Directory.GetFiles(Path.Combine(root, "tests/fixtures/native-complex-er"), "*.mmd"))
             {
                 var source = File.ReadAllText(file); var engine = new ArrangementEngine(new DiagramService().Render(source));
                 var watch = Stopwatch.StartNew(); var allocated = GC.GetTotalAllocatedBytes();
@@ -111,6 +111,19 @@ internal static class NativeArrangementChecks
                 Await((Task)Call(window, "ApplyState", state)!);
                 Check(session.Current.State.Positions["A"].Pinned && session.IsDirty, "Manual move and pin belong to layout history");
                 Check(((TextBlock)window.FindName("StateLabel")).Text.Contains("Unsaved arrangement"), "Unsaved state is accessible");
+                Call(window, "Select", family == "ER" ? "entity:A" : "node:A");
+                Until(() => OverlayMatchesSelectedNode(window, "A"));
+                var canvasBefore = ((DiagramInspection)Field(window, "inspection")!).Drawing;
+                Await((Task)Call(window, "ApplyState", state.Move("A", 100, 110))!);
+                Until(() => OverlayMatchesSelectedNode(window, "A"));
+                var canvasAfter = ((DiagramInspection)Field(window, "inspection")!).Drawing;
+                Check(canvasBefore.Width == canvasAfter.Width && canvasBefore.Height == canvasAfter.Height,
+                    "Retained selection outline follows a move without a canvas-size or selection change");
+                Call(window, "UndoLayout", window, new RoutedEventArgs()); Until(() => !(bool)Field(window, "busy")!);
+                Until(() => OverlayMatchesSelectedNode(window, "A"));
+                Check(true, "Layout Undo redraws the selection outline at the restored position");
+                Await((Task)Call(window, "ApplyState", session.Current.State)!);
+                Check(ReferenceEquals(Field(window, "displayed"), session.Current), "A no-op movement retains the accepted interactive and exportable snapshot");
                 var inspection = (DiagramInspection)Field(window, "inspection")!;
                 Check(inspection.Connections.Count == 3 && inspection.Connections.Select(c => c.Identity).Distinct().Count() == 3, "Parallel and self connections have distinct current hit identities");
                 Call(window, "Fit", window, new RoutedEventArgs());
@@ -146,7 +159,7 @@ internal static class NativeArrangementChecks
             }
             passed = true;
         }
-        finally { File.WriteAllText(Path.Combine(output, "arrangement.json"), JsonSerializer.Serialize(new { Status = passed ? "PASS" : "FAIL", Provenance = "Public synthetic fixtures and shown owned WPF windows; no desktop input or private sources", HighContrast = highContrast, Checks = checks, Measurements = measurements }, new JsonSerializerOptions { WriteIndented = true })); }
+        finally { File.WriteAllText(Path.Combine(output, "arrangement.json"), JsonSerializer.Serialize(new { Status = passed ? "PASS" : "FAIL", Provenance = "Public synthetic fixtures and shown owned WPF windows; no desktop input or private sources", WindowsOnly = windowsOnly, HighContrast = highContrast, Checks = checks, Measurements = measurements }, new JsonSerializerOptions { WriteIndented = true })); }
         void Check(bool condition, string description) { if (!condition) throw new IOException(description); checks.Add(description); }
     }
     private static void VerifyEntryReadiness(Action<bool, string> check)
@@ -171,6 +184,18 @@ internal static class NativeArrangementChecks
         }
     }
     private static object? Field(object target, string name) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(target);
+    private static bool OverlayMatchesSelectedNode(DiagramArrangementWindow window, string node)
+    {
+        var inspection = (DiagramInspection)Field(window, "inspection")!;
+        var bounds = inspection.Entities.Single(e => e.Identity.EndsWith(":" + node, StringComparison.Ordinal)).Shape.Bounds;
+        static IEnumerable<GeometryDrawing> Flatten(Drawing drawing)
+        {
+            if (drawing is GeometryDrawing geometry) yield return geometry;
+            if (drawing is DrawingGroup group) foreach (var child in group.Children) foreach (var item in Flatten(child)) yield return item;
+        }
+        var visual = VisualTreeHelper.GetDrawing((DiagramInspectionOverlay)window.FindName("Overlay"));
+        return visual is not null && Flatten(visual).Any(drawing => drawing.Geometry.Bounds == bounds && drawing.Pen is not null);
+    }
     private static object? Call(object target, string name, params object[] arguments) => target.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(target, arguments);
     private static void Await(Task task) { Until(() => task.IsCompleted); task.GetAwaiter().GetResult(); }
     private static void Until(Func<bool> complete)

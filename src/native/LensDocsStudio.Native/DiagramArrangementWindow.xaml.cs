@@ -98,6 +98,9 @@ public partial class DiagramArrangementWindow : Window
             ?? throw new InvalidDataException("The arranged drawing and inspection geometry could not be verified. No arranged export is available.");
         CheckOwner();
         inspection = view; displayed = snapshot; Drawing.Source = view.Drawing; Overlay.Inspection = view;
+        // Selection/zoom can stay identical while geometry changes at the same
+        // canvas size. Invalidate the retained WPF drawing for every new snapshot.
+        Overlay.InvalidateVisual();
         updating = true;
         try
         {
@@ -129,6 +132,13 @@ public partial class DiagramArrangementWindow : Window
     { selected = identity; updating = true; try { Elements.SelectedValue = identity; } finally { updating = false; } Overlay.Update(identity, null, Zoom.Value / 100); UpdateActions(); }
     private async Task ApplyState(ArrangementState state)
     {
+        if (state.SameAs(session.Current.State))
+        {
+            // A clamped move or a saved canonical layout is a no-op, not a new
+            // accepted snapshot. Keep viewing the snapshot that owns interaction.
+            proposed = null; CandidatePanel.Visibility = Visibility.Collapsed;
+            await Present(session.Current); return;
+        }
         var generation = session.Generation;
         var candidate = await Task.Run(() => engine.Arrange(state, lifetime.Token), lifetime.Token);
         CheckOwner(); await Present(candidate);

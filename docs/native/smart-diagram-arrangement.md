@@ -126,7 +126,7 @@ same native drawing, without inspection overlays or zoom/scroll cropping.
 Local checkpoints on 28 October 2026:
 
 - Release solution build: zero warnings/errors.
-- Core: 2,283 passed, zero failed/skipped, including 28 arrangement cases.
+- Final Core run: 2,284 passed, zero failed/skipped, including 29 arrangement cases.
 - Web: static checks and all 270 Chromium/Edge tests passed.
 - Native corpus: all 202 cases/export checks passed; desktop UX and dynamic
   theme-resource regressions passed. All 12 native Docs Site browser tests passed.
@@ -146,7 +146,8 @@ Local checkpoints on 28 October 2026:
 - The final nested-group regression increases arrangement coverage to 29 focused
   cases, all passing. A later full local run passed 2,283 and failed one unchanged
   canonical complex-ER case at its six-second deadline. That original outcome is
-  retained; final hosted full-suite results must be read alongside local results.
+  retained. The subsequent isolated full run passed all 2,284 cases in 19 seconds;
+  final hosted full-suite results must be read alongside local results.
 - Sidecar tests include actual Windows junction rejection and read-only writes,
   external conflicts, retained corrupt bytes, backup recovery and portable copying.
 - Candidate search in the passing local WPF run took 30–5,750 ms; maximum sampled
@@ -201,6 +202,28 @@ membership. The original failed artefacts remain available. The independent
 Continuous run [40668395045](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40668395045)
 failed its controlled gate while both visible interaction jobs passed; its
 threshold and workflow are unchanged.
+
+On commit `777a5ee`, hosted arrangement acceptance passed 118 ordinary-window
+checks, 86 actual High Contrast window checks and 22 actual pointer/keyboard,
+save/reopen and export checks in each of normal and High Contrast modes. The
+separate desktop UX workflow initially caught WPF/Win32 highlight-colour
+disagreement before launching the capture app (2.54:1 versus 7.89:1); its unchanged
+second attempt passed. The original diagnostic is retained in
+[run 40670392916](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40670392916).
+
+Visual review of that successful input capture found a stale selection outline
+after a same-size geometry update. Every new arrangement snapshot now invalidates
+the retained overlay drawing, even when selection and zoom are unchanged. A
+no-op movement also retains the actual accepted snapshot, preserving interaction
+and export eligibility. The [final local window-only receipt](evidence/smart-arrangement/local-window-final.json)
+passes 80 focused checks, including the actual retained WPF outline geometry
+after movement and Undo. This is explicitly a UI-only run, not a substitute for
+the full complex corpus. `--arrangement-windows` supports that narrow local check;
+hosted CI continues to run the complete `--arrangement` suite. An intervening
+full local attempt retained a canonical deadline failure before reaching the
+UI cases; no rendering deadline was changed.
+
+![Selection follows the accepted Flowchart geometry](evidence/smart-arrangement/Light-Flowchart-selection.png)
 
 The actual compiled native executable was launched on this Windows host with a
 fresh synthetic workspace and isolated state before committing. Computer Use

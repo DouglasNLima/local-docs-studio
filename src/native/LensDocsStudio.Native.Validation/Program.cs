@@ -17,9 +17,9 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        if (args.FirstOrDefault() == "--arrangement")
+        if (args.FirstOrDefault() is "--arrangement" or "--arrangement-windows")
         {
-            try { NativeArrangementChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), args.Contains("--high-contrast")); return 0; }
+            try { NativeArrangementChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2]), args.Contains("--high-contrast"), args[0] == "--arrangement-windows"); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--arrangement-input")
