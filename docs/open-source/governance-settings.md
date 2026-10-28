@@ -67,6 +67,9 @@ The owner must appoint real Author, independent Reviewer, signing Approver,
 publisher, security responder and conduct/appeal contacts. One account may own the
 repository but cannot satisfy a claim of independent non-self-approval alone.
 Until a second eligible reviewer is appointed, that proposed governance is BLOCKED.
+Add the owner-approved independent reviewer, with verified write access, to the
+applicable CODEOWNERS paths before requiring code-owner approval for owner-authored
+changes. Merely adding a collaborator does not make them a code owner.
 Record collaborator access and MFA verification privately, not recovery codes or
 personal identifiers in this repository. Require MFA on GitHub and SignPath, no
 shared accounts, access removal on departure, and owner-approved recovery contacts.

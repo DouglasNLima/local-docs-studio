@@ -1304,8 +1304,24 @@ docs/open-source/evidence/distribution-evidence.json,R5,OWNER ACTION REQUIRED,Au
 docs/open-source/evidence/goal58/governance-observation.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/highlight-reconstruction.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/highlight-upstream.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/independent-review.md,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/installer-containers.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/maintenance-tool-audit.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notice-gap.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/06bafa45fdad2579ba0e43b0c9b2c6290287c99c4203c300254a462b38a307f6.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/14450c78405ad2a2173e25740b56406556779149df9c4c83523a8c63d0686210.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/4da724fc305d81606b245b324d4d2586916b9d248b23d82183df753ace0fdf71.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/59a400d04c5078579acc27ddd6452c1bdf763f9506e01364700935fbb1a7c91b.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/5b37224c080cdcc97c871ada971c224e9926370fe74f11b539aa1cf9f3b1aca1.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/6663bbd049205d38a496ccacb412a151980b444627d38de218b3b809aef330f1.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/66aa9feab8bb39aceebd69f2a357015d57ceab486d3c7a19ff8d3d4110a6d101.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/6d5ef6dcbcc2d08589c716a674536afe8a23ac2499a814afb5b14b39cc415126.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/6fb1237a7b1f4ecd3704dcf50f57d55d99cbaf4a5ef8a2cb7eb5fb8cbff66f45.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/708bd87d08b48ffd427ee2717fe76efeb63c09c5bdf64e3dae4674e20986bc6c.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/8ad16994acb18814fcd2ff6d0b559906b842047b995baf33fd0c55e4d24cbac8.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/bd92858f2261ae179cd4c4f56aaa6fa628dee927cc33808044bd7f676198c0fc.txt,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-notices/index.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
+docs/open-source/evidence/goal58/mammoth-supplier-evidence.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/native-preview-957-sbom.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/rights-ledger.csv,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
 docs/open-source/evidence/goal58/web-notice-pack.json,R5,OWNER ACTION REQUIRED,Audit data or preserved third-party text; no blanket MIT over quoted upstream grants
@@ -1466,6 +1482,7 @@ scripts/compliance/README.md,R2,OWNER ACTION REQUIRED,Confirm documentation titl
 scripts/compliance/audit_open_source.py,R1,OWNER ACTION REQUIRED,Candidate first-party implementation; repository authorship is not proof of title
 scripts/compliance/binary_sbom.py,R1,OWNER ACTION REQUIRED,Candidate first-party implementation; repository authorship is not proof of title
 scripts/compliance/check_foundation.py,R1,OWNER ACTION REQUIRED,Candidate first-party implementation; repository authorship is not proof of title
+scripts/compliance/collect_mammoth_notices.py,R1,OWNER ACTION REQUIRED,Candidate first-party implementation; repository authorship is not proof of title
 scripts/compliance/highlight/README.md,R2,OWNER ACTION REQUIRED,Confirm documentation title and permission for examples/quoted material
 scripts/compliance/highlight/build.mjs,R1,OWNER ACTION REQUIRED,Candidate first-party implementation; repository authorship is not proof of title
 scripts/compliance/highlight/package-lock.json,R1,OWNER ACTION REQUIRED,Candidate first-party implementation; repository authorship is not proof of title

@@ -38,10 +38,15 @@ def main():
     pack_bytes = (ROOT / pack['noticePack']).read_bytes()
     require(hashlib.sha256(pack_bytes).hexdigest() == pack['sha256'], 'Web notice pack hash mismatch')
     for record in pack['notices']:
-        original = (ROOT / 'docs/open-source/evidence/upstream-notices' / record['file']).read_bytes()
+        directory = ROOT / 'docs/open-source/evidence' / ('goal58/mammoth-notices' if record.get('evidenceSet') == 'mammoth' else 'upstream-notices')
+        original = (directory / record['file']).read_bytes()
         require(hashlib.sha256(original).hexdigest() == record['sha256'], 'Original notice hash mismatch: ' + record['file'])
         require(original in pack_bytes, 'Original notice bytes omitted from the web pack')
-    require(not pack['componentsWithoutIndexedNotice'] and not pack['completeEmbeddedClosure'], 'Incorrect notice completeness claim')
+    require(pack['componentsWithoutIndexedNotice'] == ['dingbat-to-unicode@1.0.1'] and not pack['completeEmbeddedClosure'], 'Incorrect notice completeness claim')
+    supplier = read_json(EVIDENCE / 'mammoth-supplier-evidence.json')
+    require(len(supplier['components']) == 14 and all(p['integrityVerified'] for p in supplier['components']), 'Missing Mammoth supplier archive evidence')
+    mammoth = subprocess.check_output(['git', 'show', 'HEAD:assets/vendor/mammoth-1.12.0.browser.min.js'], cwd=ROOT)
+    require(hashlib.sha256(mammoth).hexdigest() == supplier['minifiedSha256'], 'Mammoth supplier evidence differs from the shipped bytes')
     manifest = read_json(ROOT / 'assets/vendor/manifest.json')
     require('./' + pack['noticePack'] in manifest, 'Web notices are not cached')
 

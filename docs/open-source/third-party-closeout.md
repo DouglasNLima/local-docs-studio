@@ -30,7 +30,7 @@ original grant is now also in the cached web notice pack.
 | Mermaid 11.15.0 and embedded packages | Prior archive evidence identifies exact bytes and `.mjs`→`.js` transformations. Preserve MIT/ISC/BSD/Apache component notices and modification descriptions; the new known-notice pack retains all indexed web grants |
 | DOMPurify 3.4.5 | The extension-only change is identified. Preserve the upstream MPL-2.0 OR Apache-2.0 terms; no blanket first-party MIT or unsupported dual-licence choice is applied |
 | Highlight.js 11.11.1 | Exact reconstruction above; BSD-3-Clause grant retained. No runtime bytes changed |
-| Mammoth 1.12.0 | Vendored bundle matches the official archive, whose licence is retained. The archive has no lockfile, source map or embedded-dependency notice pack. Its dependency ranges include xmldom, Bluebird, JSZip, lop and others; these ranges do not prove the versions actually bundled. Complete transitive attribution remains BLOCKED for public redistribution; obtain the upstream build lock/notice closure or reconstruct and verify those modules before clearance |
+| Mammoth 1.12.0 | Vendored minified bytes match the official archive. Its unminified companion declares 14 exact modules/versions, and 14 original notice references were recovered for 13 of them (including isarray's README licence section). The minified file itself has no comments. Supplier declarations are useful attribution, not an independent complete rebuild. `dingbat-to-unicode@1.0.1` declares BSD-2-Clause but the inspected archive and version-tagged source contain no original notice text. Nested JSZip/polyfill closure also remains BLOCKED; do not invent a copyright holder or claim licence incompatibility from missing evidence |
 | PDF.js 5.7.284 | Main and worker bytes match the archive. Preserve its Apache grant and indexed upstream subcomponent notices. The repository does not ship the package's optional `cmaps`, `iccs`, `standard_fonts` or `wasm` directories, so those must not be claimed as shipped binaries. The conservative notice pack retains their upstream texts without claiming inclusion. Full embedded-worker closure and any future optional resources require a payload-specific review |
 | WpfMath 2.1.0 / XamlMath | Exact shipped DLL bytes map to NuGet. Retain `FONT-LICENSES.md`: `cmex10`, `cmmi10`, `cmr10`, `cmsy10` use Knuth copying/renaming conditions; `jlm_msam10.ttf` has OFL-1.1 and reserved-name conditions from the pinned JLaTeXMath source. No font modification or renaming occurred. Provider interpretation remains BLOCKED; do not call all fonts MIT |
 | Mermaider / Sugiyama / dagre | Preserve the pinned adapter's upstream MIT notice and adaptation description, plus Sugiyama's dagre attribution. A package's MIT expression does not replace that embedded notice |
@@ -39,9 +39,13 @@ original grant is now also in the cached web notice pack.
 | Legacy Windows shell | Windows App SDK binary terms and separate WebView2 runtime terms remain distinct. Excluded from the native SignPath scope; no whole-binary OSI assertion |
 
 The new [web notice pack](../../assets/vendor/THIRD-PARTY-NOTICES.txt) preserves
-55 original texts/references for 53 known runtime components, with hashes in
+68 original texts/references for 65 known runtime components, with hashes in
 [its manifest](evidence/goal58/web-notice-pack.json). It explicitly does **not**
-claim complete Mammoth/embedded-bundle closure. The vendor cache manifest includes
+claim complete Mammoth/embedded-bundle closure. The [supplier evidence](evidence/goal58/mammoth-supplier-evidence.json)
+pins the npm archive, both browser bundle hashes, declared modules and their verified
+package archives. The [remaining notice gap](evidence/goal58/mammoth-notice-gap.json)
+records the exact `dingbat-to-unicode` tag/commit and inspected paths. Its upstream
+source lock is not substituted for payload proof. The vendor cache manifest includes
 it and the service-worker cache version changes to v71, so offline app copies
 receive the notices. This does not change rendering code. Exported user Markdown
 and documents retain their own rights; the web Docs Site export emits pre-rendered
