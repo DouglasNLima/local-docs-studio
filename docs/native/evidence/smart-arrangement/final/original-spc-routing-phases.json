@@ -1,0 +1,903 @@
+{
+  "Scope": "Source-free aggregate of original SPC measurements. Manual routing, SVG, validation and native preparation are separate from input latency. Stage timings overlap enclosing apply/wall intervals; do not sum enclosing and child stages. Allocation scope follows the diagnostic phase/thread and is not per-pointer-frame allocation.",
+  "ProductSourceCommit": "bf06755146e64c64378d183b1a338d5104094eb2",
+  "ValidationCommit": "91d65d319213de0a8e2a919bf93fd964bdd9fc6b",
+  "Cases": [
+    {
+      "Case": "Complete relationships",
+      "Run": "full repetition",
+      "CandidateSearch": {
+        "Milliseconds": 1767.3623,
+        "CpuMilliseconds": 2312.5,
+        "AllocatedBytes": 452133264,
+        "WorkingSetBytes": 549289984,
+        "PeakWorkingSetBytes": 1053532160
+      },
+      "CandidateOutcome": {
+        "Count": 2,
+        "Compact": "generated",
+        "FewerCrossings": "generated"
+      },
+      "Quality": [
+        {
+          "Phase": "canonical-quality",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 598,
+            "Area": 6225236.007446943,
+            "AspectRatio": 1.633789851793176,
+            "ConnectionLength": 166692.7947620064,
+            "Bends": 724
+          },
+          "NativeLabelBodyIntersections": null,
+          "ClippedRoutePoints": null
+        },
+        {
+          "Phase": "candidate-Compact",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 1077,
+            "Area": 2485058.88,
+            "AspectRatio": 5.845766871165644,
+            "ConnectionLength": 151338.4866666667,
+            "Bends": 387
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "candidate-FewerCrossings",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 516,
+            "Area": 7314074.1523002805,
+            "AspectRatio": 1.9195513408642155,
+            "ConnectionLength": 168450.7834721549,
+            "Bends": 686
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "final",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 772,
+            "Area": 11541859.851154286,
+            "AspectRatio": 1.925985306658612,
+            "ConnectionLength": 197647.4514172789,
+            "Bends": 308
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        }
+      ],
+      "ManualMoves": [
+        {
+          "Move": 1,
+          "WallMilliseconds": 730.7016,
+          "CpuMilliseconds": 906.25,
+          "CumulativeAllocatedBytes": 119342584,
+          "WorkingSetBytes": 629149696,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 48.8103,
+              "AllocatedBytes": 18367160
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 6.4746,
+              "AllocatedBytes": 681912
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 47.5687,
+              "AllocatedBytes": 82328
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 549.9853,
+              "AllocatedBytes": 92067312
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 1.1893,
+              "AllocatedBytes": 318360
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 682.6798,
+              "AllocatedBytes": 375072
+            }
+          ]
+        },
+        {
+          "Move": 2,
+          "WallMilliseconds": 634.6328,
+          "CpuMilliseconds": 703.125,
+          "CumulativeAllocatedBytes": 119943760,
+          "WorkingSetBytes": 645980160,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 55.9682,
+              "AllocatedBytes": 19088968
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 39.9346,
+              "AllocatedBytes": 682904
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 2.6731,
+              "AllocatedBytes": 81368
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 468.2211,
+              "AllocatedBytes": 92060424
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 1.9481,
+              "AllocatedBytes": 318360
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 575.701,
+              "AllocatedBytes": 371336
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Case": "Complete detailed",
+      "Run": "focused unchanged repeat after budget exhaustion",
+      "CandidateSearch": {
+        "Milliseconds": 2084.8166,
+        "CpuMilliseconds": 2828.125,
+        "AllocatedBytes": 602411760,
+        "WorkingSetBytes": 439144448,
+        "PeakWorkingSetBytes": 512937984
+      },
+      "CandidateOutcome": {
+        "Count": 1,
+        "Compact": "generated",
+        "FewerCrossings": "no feasible improvement"
+      },
+      "Quality": [
+        {
+          "Phase": "canonical-quality",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 585,
+            "Area": 37641753.64872001,
+            "AspectRatio": 1.4889472434367548,
+            "ConnectionLength": 334095.43675237725,
+            "Bends": 706
+          },
+          "NativeLabelBodyIntersections": null,
+          "ClippedRoutePoints": null
+        },
+        {
+          "Phase": "candidate-Compact",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 1880,
+            "Area": 15664851.11808,
+            "AspectRatio": 0.8525912653975365,
+            "ConnectionLength": 336198.4585333334,
+            "Bends": 430
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "final",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 1867,
+            "Area": 23570457.072960008,
+            "AspectRatio": 0.9346503644111669,
+            "ConnectionLength": 450253.518,
+            "Bends": 387
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        }
+      ],
+      "ManualMoves": [
+        {
+          "Move": 1,
+          "WallMilliseconds": 1497.41,
+          "CpuMilliseconds": 2000,
+          "CumulativeAllocatedBytes": 638772352,
+          "WorkingSetBytes": 583909376,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 220.8427,
+              "AllocatedBytes": 27420280
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 16.585,
+              "AllocatedBytes": 1591296
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 3.9831,
+              "AllocatedBytes": 93008
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1130.883,
+              "AllocatedBytes": 542511056
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 1.3739,
+              "AllocatedBytes": 374864
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1382.3976,
+              "AllocatedBytes": 514104
+            }
+          ]
+        },
+        {
+          "Move": 2,
+          "WallMilliseconds": 1410.6996,
+          "CpuMilliseconds": 2093.75,
+          "CumulativeAllocatedBytes": 638926824,
+          "WorkingSetBytes": 632336384,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 215.7997,
+              "AllocatedBytes": 28302504
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 15.4975,
+              "AllocatedBytes": 1590848
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 4.1789,
+              "AllocatedBytes": 90848
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1034.7557,
+              "AllocatedBytes": 541814744
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 1.568,
+              "AllocatedBytes": 344144
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1284.0561,
+              "AllocatedBytes": 451064
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Case": "Operations",
+      "Run": "full repetition",
+      "CandidateSearch": {
+        "Milliseconds": 883.5017,
+        "CpuMilliseconds": 1109.375,
+        "AllocatedBytes": 305617360,
+        "WorkingSetBytes": 572760064,
+        "PeakWorkingSetBytes": 1053532160
+      },
+      "CandidateOutcome": {
+        "Count": 2,
+        "Compact": "generated",
+        "FewerCrossings": "generated"
+      },
+      "Quality": [
+        {
+          "Phase": "canonical-quality",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 388,
+            "Area": 29761165.490630243,
+            "AspectRatio": 1.3152858595141268,
+            "ConnectionLength": 229907.71400013054,
+            "Bends": 452
+          },
+          "NativeLabelBodyIntersections": null,
+          "ClippedRoutePoints": null
+        },
+        {
+          "Phase": "candidate-Compact",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 724,
+            "Area": 9838896.275999999,
+            "AspectRatio": 0.6321969074778201,
+            "ConnectionLength": 178787.00205333336,
+            "Bends": 246
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "candidate-FewerCrossings",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 253,
+            "Area": 33100023.308420576,
+            "AspectRatio": 1.462845687977512,
+            "ConnectionLength": 249003.20023545477,
+            "Bends": 372
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "final",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 590,
+            "Area": 46789519.31440458,
+            "AspectRatio": 1.2399832891468758,
+            "ConnectionLength": 314201.0405904328,
+            "Bends": 160
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        }
+      ],
+      "ManualMoves": [
+        {
+          "Move": 1,
+          "WallMilliseconds": 1965.0085,
+          "CpuMilliseconds": 2031.25,
+          "CumulativeAllocatedBytes": 405958296,
+          "WorkingSetBytes": 663896064,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 31.5836,
+              "AllocatedBytes": 8628648
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 17.1177,
+              "AllocatedBytes": 1057040
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.9322,
+              "AllocatedBytes": 45992
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1742.5985,
+              "AllocatedBytes": 351895944
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.5143,
+              "AllocatedBytes": 205256
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1812.8856,
+              "AllocatedBytes": 343000
+            }
+          ]
+        },
+        {
+          "Move": 2,
+          "WallMilliseconds": 1589.1439,
+          "CpuMilliseconds": 1765.625,
+          "CumulativeAllocatedBytes": 406455864,
+          "WorkingSetBytes": 700473344,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 16.791,
+              "AllocatedBytes": 9279128
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 10.1043,
+              "AllocatedBytes": 1056264
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 1.1638,
+              "AllocatedBytes": 45632
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1379.501,
+              "AllocatedBytes": 351888984
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.6178,
+              "AllocatedBytes": 194888
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1419.3546,
+              "AllocatedBytes": 313656
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Case": "Monitoring",
+      "Run": "full repetition",
+      "CandidateSearch": {
+        "Milliseconds": 185.4398,
+        "CpuMilliseconds": 312.5,
+        "AllocatedBytes": 92313184,
+        "WorkingSetBytes": 679862272,
+        "PeakWorkingSetBytes": 1080201216
+      },
+      "CandidateOutcome": {
+        "Count": 2,
+        "Compact": "generated",
+        "FewerCrossings": "generated"
+      },
+      "Quality": [
+        {
+          "Phase": "canonical-quality",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 108,
+            "Area": 11688574.658581335,
+            "AspectRatio": 0.6661657578940671,
+            "ConnectionLength": 85251.63314000005,
+            "Bends": 274
+          },
+          "NativeLabelBodyIntersections": null,
+          "ClippedRoutePoints": null
+        },
+        {
+          "Phase": "candidate-Compact",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 461,
+            "Area": 6070652.859039999,
+            "AspectRatio": 1.0384716684589295,
+            "ConnectionLength": 101210.02109333331,
+            "Bends": 170
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "candidate-FewerCrossings",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 104,
+            "Area": 12292783.339349331,
+            "AspectRatio": 0.7006013623631272,
+            "ConnectionLength": 88105.73266000007,
+            "Bends": 276
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "final",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 131,
+            "Area": 17875853.49410133,
+            "AspectRatio": 0.7136632486146633,
+            "ConnectionLength": 116027.04820666666,
+            "Bends": 110
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        }
+      ],
+      "ManualMoves": [
+        {
+          "Move": 1,
+          "WallMilliseconds": 983.7797,
+          "CpuMilliseconds": 1078.125,
+          "CumulativeAllocatedBytes": 275303048,
+          "WorkingSetBytes": 780500992,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 2.9217,
+              "AllocatedBytes": 2711192
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 5.9804,
+              "AllocatedBytes": 733904
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.6797,
+              "AllocatedBytes": 32016
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 862.9968,
+              "AllocatedBytes": 241450152
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.5428,
+              "AllocatedBytes": 133296
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 890.2055,
+              "AllocatedBytes": 210352
+            }
+          ]
+        },
+        {
+          "Move": 2,
+          "WallMilliseconds": 938.9517,
+          "CpuMilliseconds": 890.625,
+          "CumulativeAllocatedBytes": 275652616,
+          "WorkingSetBytes": 802488320,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 3.3021,
+              "AllocatedBytes": 2968608
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 4.025,
+              "AllocatedBytes": 736024
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.8379,
+              "AllocatedBytes": 31176
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 804.4971,
+              "AllocatedBytes": 241447264
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 1.4549,
+              "AllocatedBytes": 133296
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 840.1852,
+              "AllocatedBytes": 209272
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Case": "Workflow Assignment",
+      "Run": "full repetition",
+      "CandidateSearch": {
+        "Milliseconds": 133.9691,
+        "CpuMilliseconds": 312.5,
+        "AllocatedBytes": 23247888,
+        "WorkingSetBytes": 649986048,
+        "PeakWorkingSetBytes": 1053532160
+      },
+      "CandidateOutcome": {
+        "Count": 2,
+        "Compact": "generated",
+        "FewerCrossings": "generated"
+      },
+      "Quality": [
+        {
+          "Phase": "canonical-quality",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 9,
+            "Area": 5875986.43296,
+            "AspectRatio": 1.0252564076858812,
+            "ConnectionLength": 25907.67627333333,
+            "Bends": 100
+          },
+          "NativeLabelBodyIntersections": null,
+          "ClippedRoutePoints": null
+        },
+        {
+          "Phase": "candidate-Compact",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 127,
+            "Area": 3498667.1072639995,
+            "AspectRatio": 1.1627970944309929,
+            "ConnectionLength": 40680.86842666667,
+            "Bends": 84
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "candidate-FewerCrossings",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 7,
+            "Area": 5935380.679199998,
+            "AspectRatio": 1.0356196602617653,
+            "ConnectionLength": 26270.31470666665,
+            "Bends": 88
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "final",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 90,
+            "Area": 12566529.363733333,
+            "AspectRatio": 0.9340211195928753,
+            "ConnectionLength": 60720.12072000001,
+            "Bends": 47
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        }
+      ],
+      "ManualMoves": [
+        {
+          "Move": 1,
+          "WallMilliseconds": 1209.2375,
+          "CpuMilliseconds": 1296.875,
+          "CumulativeAllocatedBytes": 158798672,
+          "WorkingSetBytes": 654389248,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 2.3672,
+              "AllocatedBytes": 980344
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 4.7945,
+              "AllocatedBytes": 417312
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.3946,
+              "AllocatedBytes": 14816
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1069.0838,
+              "AllocatedBytes": 139567712
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.5264,
+              "AllocatedBytes": 79280
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1093.0551,
+              "AllocatedBytes": 175960
+            }
+          ]
+        },
+        {
+          "Move": 2,
+          "WallMilliseconds": 1263.7703,
+          "CpuMilliseconds": 1187.5,
+          "CumulativeAllocatedBytes": 158678808,
+          "WorkingSetBytes": 654020608,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 3.1185,
+              "AllocatedBytes": 960192
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 4.6763,
+              "AllocatedBytes": 418008
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.3168,
+              "AllocatedBytes": 14336
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1078.3367,
+              "AllocatedBytes": 139581560
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.8594,
+              "AllocatedBytes": 79280
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1105.8752,
+              "AllocatedBytes": 173712
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Case": "Workflow Definitions",
+      "Run": "full repetition",
+      "CandidateSearch": {
+        "Milliseconds": 82.7187,
+        "CpuMilliseconds": 203.125,
+        "AllocatedBytes": 33438544,
+        "WorkingSetBytes": 503390208,
+        "PeakWorkingSetBytes": 1053532160
+      },
+      "CandidateOutcome": {
+        "Count": 1,
+        "Compact": "generated",
+        "FewerCrossings": "no feasible improvement"
+      },
+      "Quality": [
+        {
+          "Phase": "canonical-quality",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 4,
+            "Area": 5516193.80092,
+            "AspectRatio": 0.9130104719283971,
+            "ConnectionLength": 12954.187700000006,
+            "Bends": 72
+          },
+          "NativeLabelBodyIntersections": null,
+          "ClippedRoutePoints": null
+        },
+        {
+          "Phase": "candidate-Compact",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 79,
+            "Area": 3313881.9338239995,
+            "AspectRatio": 2.490155894590846,
+            "ConnectionLength": 40930.47434666665,
+            "Bends": 80
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        },
+        {
+          "Phase": "final",
+          "Quality": {
+            "BodyIntersections": 0,
+            "LabelBodyOverlaps": 0,
+            "Crossings": 114,
+            "Area": 8962199.977984,
+            "AspectRatio": 1.6542377728131983,
+            "ConnectionLength": 80728.36767999997,
+            "Bends": 62
+          },
+          "NativeLabelBodyIntersections": 0,
+          "ClippedRoutePoints": 0
+        }
+      ],
+      "ManualMoves": [
+        {
+          "Move": 1,
+          "WallMilliseconds": 1531.1308,
+          "CpuMilliseconds": 1609.375,
+          "CumulativeAllocatedBytes": 178168352,
+          "WorkingSetBytes": 605380608,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 3.6928,
+              "AllocatedBytes": 1216760
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 7.7805,
+              "AllocatedBytes": 449632
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.3195,
+              "AllocatedBytes": 17008
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1370.0338,
+              "AllocatedBytes": 156354976
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.7284,
+              "AllocatedBytes": 79664
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1395.8152,
+              "AllocatedBytes": 191328
+            }
+          ]
+        },
+        {
+          "Move": 2,
+          "WallMilliseconds": 1218.4642,
+          "CpuMilliseconds": 1171.875,
+          "CumulativeAllocatedBytes": 178557008,
+          "WorkingSetBytes": 561479680,
+          "Stages": [
+            {
+              "Phase": "arrangement.routing",
+              "Milliseconds": 4.307,
+              "AllocatedBytes": 1660656
+            },
+            {
+              "Phase": "arrangement.svg-generation",
+              "Milliseconds": 5.2347,
+              "AllocatedBytes": 449472
+            },
+            {
+              "Phase": "arrangement.geometry-validation",
+              "Milliseconds": 0.4629,
+              "AllocatedBytes": 15808
+            },
+            {
+              "Phase": "arrangement.native-preparation",
+              "Milliseconds": 1078.8498,
+              "AllocatedBytes": 156339520
+            },
+            {
+              "Phase": "arrangement.presentation-install",
+              "Milliseconds": 0.6998,
+              "AllocatedBytes": 79664
+            },
+            {
+              "Phase": "arrangement.apply",
+              "Milliseconds": 1118.1185,
+              "AllocatedBytes": 172856
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -337,6 +337,49 @@ logs/receipts are retained. Product code is unchanged by this correction.
 Pointer latency now runs in its own hosted job so coordinate-test failure cannot
 prevent independent input measurements; neither failure nor threshold is hidden.
 
+The next hosted run, `40697291260`, passed the complete arrangement job,
+including all 596 coordinate checks at actual OS 96 DPI (100%) and actual High
+Contrast input. Its first responsiveness attempt failed in the measurement
+harness: a 45-second whole-workload wait expired after 62 of 120 paced moves,
+and coordinate-only acknowledgement could mistake a preceding frame for the
+new input. Those initial latency values are **invalid for certification**.
+The corrected probe correlates a newer actual input event, injection timestamp,
+physical target and ghost frame. One bounded screen capture replaces repeated
+screen reads, with capture/compositor overhead reported separately. The
+four-minute workload completion budget includes all paced and continuous input,
+drop and cancellation checks; individual feedback waits remain unchanged.
+Independent review additionally required counting arranged SVG/validation work,
+checking delivered rather than merely requested drop coordinates, and waiting
+for the last continuous input/frame instead of silently cutting off its tail
+after 80 ms. Final hosted measurements must use the corrected harness.
+The [independent measurement review](evidence/smart-arrangement/final/independent-pointer-measurement-review.md)
+records the original findings and their source-verified resolutions, including
+disjoint input-matching neighbourhoods and explicit failure outcomes. Source
+review readiness does not itself certify any measured latency.
+
+Desktop UX run `40697291285` failed its normal ER owner-launch observation before
+opening the ER editor or Arrange: the unchanged 25-second launch budget expired
+while the process remained responsive. Its launch receipt, screenshots and log
+are retained. This is an observed failure, not an inferred product pass or an
+excuse to relax the deadline; subsequent exact-head outcomes are recorded in
+the PR receipt.
+
+A second complete private workflow run on the unchanged product source passed
+all six manual/save/export/restoration workflows, including a fresh-process
+restore at both workspace roots. Complete detailed exhausted the existing
+12-second candidate-search budget during that repetition: 12,024 ms inside the
+engine and no published alternative. The accepted layout remained intact. This
+is a resource-budget outcome, not evidence that no feasible improvement exists.
+The earlier successful original-source run remains valid. A focused unchanged
+repetition generated Compact in 2,085 ms, then passed both moves, pin/history,
+save/reopen, copied-root and source/export checks. The
+[sanitised repetition receipt](evidence/smart-arrangement/final/original-spc-repetition.json)
+preserves both outcomes and separates routing from presentation time.
+The [per-case routing and allocation receipt](evidence/smart-arrangement/final/original-spc-routing-phases.json)
+also records canonical/candidate/final quality and both moves' separate routing,
+SVG, validation and native presentation stages for all six originals. Enclosing
+apply times and their child stages must not be added together.
+
 Two fresh reviewer contexts inspected implementation and ran their own probes.
 The [engine/storage report](evidence/smart-arrangement/final/independent-engine-storage-review.md)
 records resolved external-write race, collapsed parallel Flowchart occurrences,

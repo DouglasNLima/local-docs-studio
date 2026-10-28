@@ -41,7 +41,7 @@ internal static class NativeArrangementLatencyChecks
                 try
                 {
                     observation.Window.Show(); Until(() => observation.Ready); observation.Dpi();
-                    var task = Task.Run(() => Exercise(observation)); Await(task);
+                    var task = Task.Run(() => Exercise(observation)); Await(task, TimeSpan.FromMinutes(4));
                     if (!File.ReadAllBytes(sourcePath).SequenceEqual(sourceBytes)) throw new IOException("Actual pointer acceptance changed source bytes.");
                     cases.Add(new { Case = name, Status = "PASS", Measurements = task.Result, Phases = observation.Phases.ToArray(), Dpi = observation.DpiReceipt });
                 }
@@ -60,7 +60,8 @@ internal static class NativeArrangementLatencyChecks
             File.WriteAllText(System.IO.Path.Combine(output, "pointer-acceptance.json"), JsonSerializer.Serialize(new
             {
                 Status = passed ? "PASS" : "FAIL", SamplesRequestedPerWorkload = SamplesPerDrag,
-                Method = "Actual SendInput events target a shown production WPF arrangement window. Input-to-WPF timestamps end at a CompositionTarget.Rendering opportunity; separately labelled pixel observations follow DwmFlush and screen pixel verification, so they are conservative observed upper bounds, not photon/scanout timestamps. Each held-button drag has 120 frame-observation-paced samples and a separate 200-event producer-paced stream. No synthetic handler calls substitute for pointer input. Per-move allocations include opt-in diagnostic instrumentation.",
+                Method = "Actual SendInput events target a shown production WPF arrangement window. Input-to-WPF timestamps require a matching new actual pointer-arrival event before a CompositionTarget.Rendering opportunity. Separately labelled pixel observations follow DwmFlush and one bounded screen BitBlt capture per probe; they are conservative observed upper bounds including capture overhead, not photon/scanout timestamps. Each held-button drag has 120 frame-observation-paced samples and a separate 200-event producer-paced stream. No synthetic handler calls substitute for pointer input. Per-move allocations include opt-in diagnostic instrumentation.",
+                ObservationBudget = "Each complete workload has a four-minute harness budget including screen capture, 120 acknowledged probes, 200 continuous inputs and drop/candidate/cancellation checks. Individual feedback waits remain 25 seconds. These are harness completion bounds, not product latency acceptance thresholds.",
                 PhysicalDpiBoundary = "Only GetDpiForWindow/VisualTreeHelper DPI reported by the current desktop is physical coverage. No registry/display setting is changed. 125/150/200 percent and monitor transitions are not inferred from WPF scaling.",
                 NumericalAcceptance = "No new latency threshold is imposed. Raw samples, counts and percentiles are observations; bounded harness waits detect missing feedback rather than redefine the product performance gate.",
                 Cases = cases
@@ -112,6 +113,15 @@ internal static class NativeArrangementLatencyChecks
                 Corner: observation.GhostCorner(bounds), Dpi: VisualTreeHelper.GetDpi(window));
         });
         var centre = Round(layout.Centre); var original = Ui(() => observation.Session.Current.State);
+        var trajectory = Ui(() =>
+        {
+            var bounds = new Rect(observation.Viewport.PointToScreen(new(0, 0)), observation.Viewport.PointToScreen(new(observation.Viewport.ActualWidth, observation.Viewport.ActualHeight)));
+            bounds.Intersect(new Rect(GetSystemMetrics(76), GetSystemMetrics(77), GetSystemMetrics(78), GetSystemMetrics(79)));
+            var x = centre.X + 192 < bounds.Right - 3 ? 1 : centre.X - 192 > bounds.Left + 3 ? -1 : 0;
+            var y = centre.Y + 60 < bounds.Bottom - 3 ? 1 : centre.Y - 60 > bounds.Top + 3 ? -1 : 0;
+            if (x == 0 || y == 0 || !bounds.Contains(new Point(centre.X, centre.Y))) throw new IOException("The owned viewport cannot contain the bounded pointer sampling trajectory.");
+            return (X: x, Y: y);
+        });
         var id = layout.Identity[(layout.Identity.IndexOf(':') + 1)..];
         var planningEngine = Ui(() => (ArrangementEngine)Field(window, "engine")!);
         // Find a feasible target before any button is held. This is not timed as input or drop work.
@@ -121,8 +131,9 @@ internal static class NativeArrangementLatencyChecks
         try
         {
             WaitWorker(() => Ui(() => Field(window, "pointer") is Point), "Real mouse down was not accepted.");
+            var deliveredDown = Ui(() => observation.LastButtonDown) ?? throw new IOException("No actual mouse-down coordinates were observed.");
             var firstResponse = observation.NextFrame(() => Ui(() => Field(window, "selected") as string) == layout.Identity, down);
-            observation.Steps.Enqueue(new { Stage = "mouse-down", InputToWpfFrameMilliseconds = firstResponse });
+            observation.Steps.Enqueue(new { Stage = "mouse-down", InputToWpfFrameMilliseconds = firstResponse, RequestedPhysicalPoint = centre, Delivered = deliveredDown });
             // Explicitly exercise sub-threshold movement, then the actual threshold transition.
             Move(new(centre.X + 1, centre.Y)); Thread.Sleep(30);
             if (Ui(() => observation.Ghost.Visibility == Visibility.Visible)) throw new IOException("A one-physical-pixel move unexpectedly activated the drag ghost.");
@@ -130,44 +141,77 @@ internal static class NativeArrangementLatencyChecks
             var cpu = Process.GetCurrentProcess().TotalProcessorTime; var allocated = GC.GetTotalAllocatedBytes(true);
             for (var i = 0; i < SamplesPerDrag; i++)
             {
-                var target = new PixelPoint(centre.X + 35 + (i % 24) * 2, centre.Y + 15 + ((i / 24) % 2) * 25);
+                // Spacing exceeds twice the admitted one-pixel input rounding radius.
+                var target = new PixelPoint(centre.X + trajectory.X * (35 + (i % 24) * 4), centre.Y + trajectory.Y * (15 + ((i / 24) % 2) * 25));
                 var expected = new Point(layout.Corner.X + target.X - centre.X, layout.Corner.Y + target.Y - centre.Y);
                 var probes = Ui(() => observation.Probes(expected));
-                var before = ReadPixels(probes.Points); var started = Now();
-                var request = observation.Request(expected, started); Move(target);
+                var beforeStarted = Now(); var before = ReadPixels(probes.Points); var beforeCapture = Now() - beforeStarted; var started = Now();
+                var request = observation.Request(expected, target, started); Move(target);
                 var frame = request.GetAwaiter().GetResult();
                 var visible = ObservePixels(probes, before, started);
-                frameSamples.Add(new(i, frame.InputToFrameMilliseconds, visible, frame.GhostMatchesExpected));
+                frameSamples.Add(new(i, frame.InputToFrameMilliseconds, visible.InputToObservedPixelsMilliseconds, frame.GhostMatchesExpected,
+                    beforeCapture, visible.ScreenCaptureMilliseconds, visible.CompositorFlushMilliseconds, visible.CaptureCount,
+                    frame.InjectedMilliseconds, frame.InputArrivalMilliseconds, frame.FrameTimestampMilliseconds, frame.InputSequence,
+                    frame.Target, frame.ObservedPointer));
                 observation.Steps.Enqueue(frameSamples[^1]);
                 frameTimes.Add(frame.FrameTimestampMilliseconds);
             }
             // A second stream is paced by the producer, not by presentation acknowledgement.
             // WPF may coalesce samples; report the number actually observed and presented.
-            var burstStart = Now();
+            var burstStart = Now(); var finalInjected = 0d;
             for (var i = 0; i < 200; i++)
             {
-                var target = new PixelPoint(centre.X + 32 + (i % 40) * 2, centre.Y + 12 + (i / 40) * 5);
-                var injected = Now(); observation.InjectedMoves[target] = injected; Move(target); Thread.Sleep(16);
+                var target = new PixelPoint(centre.X + trajectory.X * (32 + (i % 40) * 4), centre.Y + trajectory.Y * (12 + (i / 40) * 5));
+                var injected = Now(); observation.InjectedMoves[target] = injected; finalInjected = injected; Move(target); Thread.Sleep(16);
             }
-            Thread.Sleep(80);
-            var burst = observation.StreamFrames.Where(f => f.InjectedMilliseconds >= burstStart).ToArray();
-            var arrivals = observation.StreamArrivals.Where(f => f.InjectedMilliseconds >= burstStart).ToArray();
-            observation.InjectedMoves.Clear();
-            if (burst.Length == 0) throw new IOException("No producer-paced actual pointer sample reached a WPF presentation opportunity.");
+            StreamFrame[] burst = []; StreamArrival[] arrivals = []; var finalAcknowledged = false; var observationEnd = 0d;
+            try
+            {
+                WaitWorker(() => observation.StreamArrivals.Any(f => f.InjectedMilliseconds == finalInjected)
+                    && observation.StreamFrames.Any(f => f.InjectedMilliseconds == finalInjected), "The final producer-paced input did not reach both actual arrival and WPF presentation within the bounded observation wait.");
+                finalAcknowledged = true;
+            }
+            finally
+            {
+                observationEnd = Now();
+                burst = observation.StreamFrames.Where(f => f.InjectedMilliseconds >= burstStart).ToArray();
+                arrivals = observation.StreamArrivals.Where(f => f.InjectedMilliseconds >= burstStart).ToArray();
+                observation.InjectedMoves.Clear();
+                observation.Steps.Enqueue(new { Stage = "producer-paced-stream", InjectedSamples = 200, ObservedInputEvents = arrivals.Length,
+                    DistinctArrivedInjections = arrivals.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    DistinctPresentedInjections = burst.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    UnobservedInjectedSamples = 200 - arrivals.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    UnpresentedInjectedSamples = 200 - burst.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    FinalInjectionMilliseconds = finalInjected, ObservationEndMilliseconds = observationEnd,
+                    FinalInjectionAcknowledged = finalAcknowledged, TailRightCensored = !finalAcknowledged,
+                    PresentedSamples = burst.Length, InputToWpfFrame = Statistics(burst.Select(f => f.FrameMilliseconds - f.InjectedMilliseconds)), Samples = burst });
+            }
             var dragCpu = (Process.GetCurrentProcess().TotalProcessorTime - cpu).TotalMilliseconds;
             var dragAllocated = GC.GetTotalAllocatedBytes(true) - allocated;
             var phasesWhileDragging = observation.Phases.Where(p => p.StartedMilliseconds >= down).ToArray();
-            if (phasesWhileDragging.Any(p => p.Name.StartsWith("renderer.", StringComparison.Ordinal) || p.Name.StartsWith("svg.", StringComparison.Ordinal)
-                || p.Name is "arrangement.routing" or "arrangement.native-preparation")) throw new IOException("Continuous ghost dragging invoked expensive rendering or conversion.");
-            Move(new(centre.X + planned.X, centre.Y + planned.Y)); Thread.Sleep(40);
+            var expensivePhases = phasesWhileDragging.Where(p => p.Name.StartsWith("renderer.", StringComparison.Ordinal) || p.Name.StartsWith("svg.", StringComparison.Ordinal)
+                || p.Name is "arrangement.routing" or "arrangement.native-preparation" or "arrangement.svg-generation" or "arrangement.geometry-validation").ToArray();
+            var expensivePhaseCounts = expensivePhases.GroupBy(p => p.Name).ToDictionary(group => group.Key, group => group.Count());
+            observation.Steps.Enqueue(new { Stage = "drag-expensive-work", ExpensivePhaseCount = expensivePhases.Length, CountsByPhase = expensivePhaseCounts });
+            if (expensivePhases.Length != 0) throw new IOException("Continuous ghost dragging invoked expensive rendering, geometry validation or conversion.");
+            var requestedDrop = new PixelPoint(centre.X + planned.X, centre.Y + planned.Y);
+            Move(requestedDrop); Thread.Sleep(40);
             var dropStarted = Now(); Button(false);
             WaitWorker(() => Ui(() => observation.Ready && !observation.Session.Current.State.SameAs(original)), "The real drop did not produce an accepted arrangement.");
+            var deliveredUp = Ui(() => observation.LastButtonUp) ?? throw new IOException("No actual mouse-up coordinates were observed.");
+            if (deliveredUp.TimestampMilliseconds < dropStarted) throw new IOException("The drop receipt refers to an earlier mouse-up event.");
+            var deliveredDelta = new PixelPoint(deliveredUp.Point.X - deliveredDown.Point.X, deliveredUp.Point.Y - deliveredDown.Point.Y);
+            var expectedPosition = new Point(Math.Max(32, original.Positions[id].X + deliveredDelta.X / layout.Dpi.DpiScaleX),
+                Math.Max(32, original.Positions[id].Y + deliveredDelta.Y / layout.Dpi.DpiScaleY));
             var dropFrame = observation.NextFrame(() => Ui(() => observation.Ready), dropStarted);
             var dropVisible = FlushMilliseconds(dropStarted);
+            observation.Steps.Enqueue(new { Stage = "drop", ReleaseStartedMilliseconds = dropStarted,
+                RequestedDown = centre, RequestedUp = requestedDrop, RequestedDelta = planned,
+                DeliveredDown = deliveredDown, DeliveredUp = deliveredUp, DeliveredDelta = deliveredDelta, ExpectedLayoutPosition = expectedPosition,
+                ReleaseToWpfFrameMilliseconds = dropFrame, ReleaseToCompositorFlushMilliseconds = dropVisible });
             var after = Ui(() => observation.Session.Current.State);
-            var changed = after.Positions[id]; var initial = original.Positions[id];
-            if (Math.Abs(changed.X - Math.Max(32, initial.X + planned.X / layout.Dpi.DpiScaleX)) > .01
-                || Math.Abs(changed.Y - Math.Max(32, initial.Y + planned.Y / layout.Dpi.DpiScaleY)) > .01)
+            var changed = after.Positions[id];
+            if (Math.Abs(changed.X - expectedPosition.X) > .01 || Math.Abs(changed.Y - expectedPosition.Y) > .01)
                 throw new IOException("Actual physical pointer movement was not converted to the expected layout units.");
             var cancellation = CancellationChecks(observation, id);
             var automatic = AutomaticChecks(observation);
@@ -182,16 +226,33 @@ internal static class NativeArrangementLatencyChecks
                 InputToWpfFrame = Statistics(frameSamples.Select(s => s.InputToWpfFrameMilliseconds)),
                 InputToObservedPixels = Statistics(frameSamples.Where(s => s.InputToObservedPixelsMilliseconds.HasValue).Select(s => s.InputToObservedPixelsMilliseconds!.Value)),
                 PixelObservedSamples = frameSamples.Count(s => s.InputToObservedPixelsMilliseconds.HasValue),
-                FrameIntervals = Statistics(frameTimes.Zip(frameTimes.Skip(1), (a, b) => b - a)),
+                AcknowledgementPacedPresentationIntervals = Statistics(frameTimes.Zip(frameTimes.Skip(1), (a, b) => b - a)),
+                IntervalBoundary = "Acknowledgement-paced intervals include input production and pixel observation; they are not individual WPF frame execution duration.",
+                WpfFrameExecutionDuration = "NOT MEASURED: CompositionTarget.Rendering exposes a presentation opportunity, not complete render-thread execution or scanout.",
+                BeforeInputScreenCaptureMilliseconds = Statistics(frameSamples.Select(s => s.BeforeInputScreenCaptureMilliseconds)),
+                AfterInputScreenCaptureMilliseconds = Statistics(frameSamples.Select(s => s.AfterInputScreenCaptureMilliseconds)),
+                PixelProbeCompositorFlushMilliseconds = Statistics(frameSamples.Select(s => s.PixelProbeCompositorFlushMilliseconds)),
                 PointerHandler = Statistics(pointerPhases.Select(p => p.Milliseconds)),
                 PointerHandlerAllocatedBytes = Statistics(pointerPhases.Where(p => p.AllocatedBytes.HasValue).Select(p => (double)p.AllocatedBytes!.Value)),
                 ProducerPacedStream = new { InjectedSamples = 200, RequestedIntervalMilliseconds = 16, ObservedInputEvents = arrivals.Length, PresentedSamples = burst.Length,
-                    CoalescingBoundary = "Input and WPF presentation may coalesce moves; omitted samples are not recorded as zero latency.",
+                    DistinctArrivedInjections = arrivals.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    DistinctPresentedInjections = burst.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    UnobservedInjectedSamples = 200 - arrivals.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    UnpresentedInjectedSamples = 200 - burst.Select(f => f.InjectedMilliseconds).Distinct().Count(),
+                    FinalInjectionMilliseconds = finalInjected, ObservationEndMilliseconds = observationEnd,
+                    FinalInjectionAcknowledged = finalAcknowledged, TailRightCensored = !finalAcknowledged,
+                    CoalescingBoundary = "Input and WPF presentation may coalesce moves. Observation waits for the final injected sample's arrival and frame with the existing bounded wait; missing intermediate samples are not classified as zero latency or proven coalescing.",
                     InputToArrival = Statistics(arrivals.Select(f => f.ArrivalMilliseconds - f.InjectedMilliseconds)),
                     InputToWpfFrame = Statistics(burst.Select(f => f.FrameMilliseconds - f.InjectedMilliseconds)), Samples = burst },
                 DragCpuMilliseconds = dragCpu, DragCumulativeAllocatedBytes = dragAllocated, ProcessWorkingSetBytes = Environment.WorkingSet,
-                PerMoveExpensiveRenderingCalls = 0, Samples = frameSamples,
-                Drop = new { ReleaseToWpfFrameMilliseconds = dropFrame, ReleaseToCompositorFlushMilliseconds = dropVisible,
+                PerMoveExpensiveRenderingCalls = expensivePhases.Length, ExpensivePhaseCounts = expensivePhaseCounts, Samples = frameSamples,
+                Drop = new { ReleaseStartedMilliseconds = dropStarted,
+                    RequestedDown = centre, RequestedUp = requestedDrop, RequestedDelta = planned,
+                    DeliveredDown = deliveredDown, DeliveredUp = deliveredUp, DeliveredDelta = deliveredDelta,
+                    ExpectedLayoutPosition = expectedPosition, AcceptedLayoutPosition = changed,
+                    ReleaseToRoutingStartMilliseconds = observation.Phases.Where(p => p.Name == "arrangement.routing" && p.StartedMilliseconds >= dropStarted).Select(p => (double?)(p.StartedMilliseconds - dropStarted)).FirstOrDefault(),
+                    ReleaseToWpfFrameMilliseconds = dropFrame, ReleaseToCompositorFlushMilliseconds = dropVisible,
+                    VisibilityBoundary = "Accepted state reached a WPF presentation opportunity and compositor flush; final diagram pixels were not independently verified by this timing probe.",
                     Phases = observation.Phases.Where(p => p.StartedMilliseconds >= dropStarted && p.StartedMilliseconds <= dropStarted + dropVisible).ToArray(), SourcePreserved = true },
                 Cancellation = cancellation, Automatic = automatic, Closure = closure
             };
@@ -258,13 +319,26 @@ internal static class NativeArrangementLatencyChecks
         var cancelStart = Now(); if (cancellationRequested) Key(0x1B);
         WaitWorker(() => Ui(() => observation.Ready), "Candidate cancellation did not finish.");
         var cancellation = Now() - cancelStart;
+        var cancellationStatus = Ui(() => ((TextBlock)window.FindName("Status")).Text);
+        var cancellationChoices = Ui(() => ((ComboBox)window.FindName("CandidateChoices")).Items.Count);
+        var cancellationOutcome = Classify(cancellationStatus, cancellationChoices);
+        observation.Steps.Enqueue(new { Stage = "automatic-cancellation", Outcome = cancellationOutcome, RawUiStatus = cancellationStatus,
+            CancellationRequested = cancellationRequested, CandidateChoicesCount = cancellationChoices, Milliseconds = cancellation });
+        if (cancellationOutcome == "Failure or unclassified UI outcome") throw new IOException("The automatic cancellation attempt reported a failure or unclassified UI outcome: " + cancellationStatus);
         if (!Ui(() => observation.Session.Current.State.SameAs(before))) throw new IOException("Cancelled automatic search changed the accepted layout.");
         var searchStart = Now(); Click("ArrangementCandidates");
         WaitWorker(() => Completed(searchStart) && Ui(() => observation.Ready), "Candidate generation did not finish.");
         var searchMs = Now() - searchStart;
         var count = Ui(() => ((ComboBox)window.FindName("CandidateChoices")).Items.Count);
+        var searchStatus = Ui(() => ((TextBlock)window.FindName("Status")).Text);
+        var outcome = Classify(searchStatus, count);
+        var freshCandidates = outcome == "Feasible alternatives";
+        if (!Ui(() => observation.Session.Current.State.SameAs(before))) throw new IOException("Automatic search changed the accepted layout before explicit acceptance.");
+        observation.Steps.Enqueue(new { Stage = "automatic-search", Outcome = outcome, RawUiStatus = searchStatus,
+            CandidateChoicesCount = count, FreshCandidateCount = freshCandidates ? count : 0, SearchWallMilliseconds = searchMs, AcceptedLayoutPreserved = true });
+        if (outcome == "Failure or unclassified UI outcome") throw new IOException("Automatic candidate search reported a failure or unclassified UI outcome: " + searchStatus);
         double? acceptMs = null;
-        if (count > 0)
+        if (freshCandidates)
         {
             Click("ArrangementCandidateChoices"); Key(0x28); Key(0x0D);
             WaitWorker(() => Ui(() => observation.Ready && Field(window, "proposed") is ArrangementSnapshot), "Actual candidate selection did not present a candidate.");
@@ -272,10 +346,21 @@ internal static class NativeArrangementLatencyChecks
             WaitWorker(() => Ui(() => observation.Ready && Field(window, "proposed") is null), "Candidate acceptance did not finish.");
             _ = observation.NextFrame(() => Ui(() => observation.Ready), acceptStart); acceptMs = FlushMilliseconds(acceptStart);
         }
-        return new { CandidateCount = count, Outcome = count > 0 ? "Feasible alternatives" : "No feasible objective improvement", SearchWallMilliseconds = searchMs,
-            CancellationRequested = cancellationRequested, CancellationOutcome = cancellationRequested ? "Cancelled in flight" : "Completed before cancellation could be sent",
-            CancellationMilliseconds = cancellationRequested ? (double?)cancellation : null, AcceptanceToCompositorFlushMilliseconds = acceptMs, DispatcherInputQueueDelay = Statistics(probes), CancellationPreservedAcceptedLayout = true };
+        return new { CandidateCount = freshCandidates ? count : 0, CandidateChoicesCount = count, Outcome = outcome, RawUiStatus = searchStatus, SearchWallMilliseconds = searchMs,
+            SearchOutcomeBoundary = "The UI reports user cancellation and resource deadline through the same status. The receipt preserves that ambiguity; zero choices alone never establish a completed no-improvement search. Choices retained from earlier searches are not counted as fresh alternatives.",
+            SearchPreservedAcceptedLayout = true,
+            CancellationRequested = cancellationRequested, CancellationOutcome = cancellationOutcome, CancellationRawUiStatus = cancellationStatus,
+            CancellationMilliseconds = cancellationRequested ? (double?)cancellation : null, AcceptanceToCompositorFlushMilliseconds = acceptMs,
+            AcceptanceVisibilityBoundary = "Accepted state reached a WPF presentation opportunity and compositor flush; final diagram pixels were not independently verified by this timing probe.",
+            DispatcherInputQueueDelay = Statistics(probes), CancellationPreservedAcceptedLayout = true };
         bool Completed(double start) => observation.Phases.Any(p => p.Name == "arrangement.candidates" && p.StartedMilliseconds >= start);
+        static string Classify(string status, int choices) => status.StartsWith("No safe improvement was found within the bounded search.", StringComparison.Ordinal)
+            ? "Completed search without a safe objective improvement"
+            : status.StartsWith("Arrangement work was cancelled or reached its bounded deadline.", StringComparison.Ordinal)
+                ? "Cancelled or resource deadline reached"
+                : choices > 0 && status.StartsWith("Current:", StringComparison.Ordinal)
+                    ? "Feasible alternatives"
+                    : "Failure or unclassified UI outcome";
         T Ui<T>(Func<T> action) => window.Dispatcher.Invoke(action);
         void Click(string automationId)
         {
@@ -344,8 +429,13 @@ internal static class NativeArrangementLatencyChecks
         private int observedFrameCount;
         private double lastInput;
         private string lastInputKind = "None";
+        private long inputSequence;
+        private long lastRecordedInputSequence;
+        private PixelPoint lastMoveScreen;
         private double lastInjectedMove;
         private double lastPresentedInjection;
+        public ButtonReceipt? LastButtonDown { get; private set; }
+        public ButtonReceipt? LastButtonUp { get; private set; }
         public object? DpiReceipt { get; private set; }
         public Observation(string source, string root, string file = "diagram.mmd")
         {
@@ -361,12 +451,17 @@ internal static class NativeArrangementLatencyChecks
                 }
             };
             ActivitySource.AddActivityListener(listener); CompositionTarget.Rendering += Frame;
-            Window.AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler((_, _) => { lastInput = Now(); lastInputKind = "Down"; }), true);
+            Window.AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler((_, e) =>
+            {
+                lastInput = Now(); lastInputKind = "Down"; Interlocked.Increment(ref inputSequence);
+                LastButtonDown = new(lastInput, inputSequence, Round(Window.PointToScreen(e.GetPosition(Window))));
+            }), true);
             Window.AddHandler(Mouse.PreviewMouseMoveEvent, new MouseEventHandler((_, e) =>
             {
                 lastInput = Now(); lastInputKind = "Move";
-                if (InjectedMoves.IsEmpty) return;
                 var screen = Round(Window.PointToScreen(e.GetPosition(Window)));
+                lastMoveScreen = screen; Interlocked.Increment(ref inputSequence);
+                if (InjectedMoves.IsEmpty) return;
                 if (!InjectedMoves.TryGetValue(screen, out var injected))
                 {
                     // Absolute SendInput normalisation can round by one physical pixel.
@@ -376,7 +471,11 @@ internal static class NativeArrangementLatencyChecks
                 if (injected > 0)
                 { lastInjectedMove = injected; StreamArrivals.Enqueue(new(injected, lastInput)); }
             }), true);
-            Window.AddHandler(Mouse.PreviewMouseUpEvent, new MouseButtonEventHandler((_, _) => { lastInput = Now(); lastInputKind = "Up"; }), true);
+            Window.AddHandler(Mouse.PreviewMouseUpEvent, new MouseButtonEventHandler((_, e) =>
+            {
+                lastInput = Now(); lastInputKind = "Up"; Interlocked.Increment(ref inputSequence);
+                LastButtonUp = new(lastInput, inputSequence, Round(Window.PointToScreen(e.GetPosition(Window))));
+            }), true);
         }
         public IntPtr Handle => Window.Dispatcher.Invoke(() => new WindowInteropHelper(Window).Handle);
         public ScrollViewer Viewport => (ScrollViewer)Window.FindName("Viewport");
@@ -394,10 +493,10 @@ internal static class NativeArrangementLatencyChecks
             return DpiReceipt = new { Win32Dpi = GetDpiForWindow(handle), WpfDpiX = dpi.PixelsPerInchX, WpfDpiY = dpi.PixelsPerInchY,
                 Awareness = GetAwarenessFromDpiAwarenessContext(GetWindowDpiAwarenessContext(handle)), MonitorCount = GetSystemMetrics(80), PhysicalTransitionsExercised = false };
         }
-        public Task<FrameSample> Request(Point expected, double injected)
+        public Task<FrameSample> Request(Point expected, PixelPoint target, double injected)
         {
             var completion = new TaskCompletionSource<FrameSample>(TaskCreationOptions.RunContinuationsAsynchronously);
-            pending = new(expected, injected, completion);
+            Volatile.Write(ref pending, new(expected, target, injected, Interlocked.Read(ref inputSequence), completion));
             return completion.Task.WaitAsync(TimeSpan.FromSeconds(25));
         }
         public double NextFrame(Func<bool> condition, double started)
@@ -411,15 +510,23 @@ internal static class NativeArrangementLatencyChecks
         {
             var now = Now();
             while (frameWaiters.TryDequeue(out var waiter)) waiter.TrySetResult(now);
-            if ((Ghost.Visibility == Visibility.Visible || Field(Window, "pointer") is Point) && Interlocked.Increment(ref observedFrameCount) <= 5000)
-                Frames.Enqueue(new { TimestampMilliseconds = now, GhostVisible = Ghost.Visibility == Visibility.Visible, InputKind = lastInputKind, InputEventArrivalToWpfFrameMilliseconds = now - lastInput });
+            if (lastRecordedInputSequence != inputSequence && (Ghost.Visibility == Visibility.Visible || Field(Window, "pointer") is Point)
+                && Interlocked.Increment(ref observedFrameCount) <= 5000)
+            {
+                lastRecordedInputSequence = inputSequence;
+                Frames.Enqueue(new { InputSequence = inputSequence, InputArrivalMilliseconds = lastInput, TimestampMilliseconds = now,
+                    GhostVisible = Ghost.Visibility == Visibility.Visible, InputKind = lastInputKind, InputEventArrivalToFirstWpfFrameMilliseconds = now - lastInput });
+            }
             if (Ghost.Visibility != Visibility.Visible) return;
             if (lastInjectedMove != 0 && lastPresentedInjection != lastInjectedMove)
             { lastPresentedInjection = lastInjectedMove; StreamFrames.Enqueue(new(lastInjectedMove, lastInput, now)); }
             var point = Ghost.PointToScreen(new(0, 0));
-            var request = pending;
-            if (request is null || Math.Abs(point.X - request.Expected.X) > 2 || Math.Abs(point.Y - request.Expected.Y) > 2) return;
-            pending = null; request.Completion.TrySetResult(new(now - request.Injected, now, true));
+            var request = Volatile.Read(ref pending);
+            if (request is null || inputSequence <= request.InputSequenceBeforeInjection || lastInputKind != "Move" || lastInput < request.Injected
+                || Math.Abs(lastMoveScreen.X - request.Target.X) > 1 || Math.Abs(lastMoveScreen.Y - request.Target.Y) > 1
+                || Math.Abs(point.X - request.Expected.X) > 2 || Math.Abs(point.Y - request.Expected.Y) > 2) return;
+            Volatile.Write(ref pending, null); request.Completion.TrySetResult(new(now - request.Injected, now, true,
+                request.Injected, lastInput, inputSequence, request.Target, lastMoveScreen));
         }
         public PixelProbes Probes(Point corner)
         {
@@ -449,9 +556,14 @@ internal static class NativeArrangementLatencyChecks
     internal sealed record Phase(string Name, double StartedMilliseconds, double Milliseconds, long? AllocatedBytes);
     internal sealed record StreamFrame(double InjectedMilliseconds, double ArrivalMilliseconds, double FrameMilliseconds);
     internal sealed record StreamArrival(double InjectedMilliseconds, double ArrivalMilliseconds);
-    private sealed record PendingFrame(Point Expected, double Injected, TaskCompletionSource<FrameSample> Completion);
-    internal sealed record FrameSample(double InputToFrameMilliseconds, double FrameTimestampMilliseconds, bool GhostMatchesExpected);
-    private sealed record PointerSample(int Ordinal, double InputToWpfFrameMilliseconds, double? InputToObservedPixelsMilliseconds, bool GhostMatchesExpected);
+    internal sealed record ButtonReceipt(double TimestampMilliseconds, long InputSequence, PixelPoint Point);
+    private sealed record PendingFrame(Point Expected, PixelPoint Target, double Injected, long InputSequenceBeforeInjection, TaskCompletionSource<FrameSample> Completion);
+    internal sealed record FrameSample(double InputToFrameMilliseconds, double FrameTimestampMilliseconds, bool GhostMatchesExpected,
+        double InjectedMilliseconds, double InputArrivalMilliseconds, long InputSequence, PixelPoint Target, PixelPoint ObservedPointer);
+    private sealed record PointerSample(int Ordinal, double InputToWpfFrameMilliseconds, double? InputToObservedPixelsMilliseconds, bool GhostMatchesExpected,
+        double BeforeInputScreenCaptureMilliseconds, double AfterInputScreenCaptureMilliseconds, double PixelProbeCompositorFlushMilliseconds, int PixelProbeCaptures,
+        double InjectedMilliseconds, double InputArrivalMilliseconds, double FrameTimestampMilliseconds, long InputSequence, PixelPoint Target, PixelPoint ObservedPointer);
+    private sealed record PixelObservation(double? InputToObservedPixelsMilliseconds, double ScreenCaptureMilliseconds, double CompositorFlushMilliseconds, int CaptureCount);
     internal sealed record PixelProbes(PixelPoint[] Points, uint Colour);
     internal readonly record struct PixelPoint(int X, int Y);
     private static PixelPoint Round(Point point) => new((int)Math.Round(point.X), (int)Math.Round(point.Y));
@@ -464,20 +576,40 @@ internal static class NativeArrangementLatencyChecks
     }
     private static uint[] ReadPixels(PixelPoint[] points)
     {
-        var dc = GetDC(IntPtr.Zero);
-        try { return points.Select(p => GetPixel(dc, p.X, p.Y)).ToArray(); }
-        finally { ReleaseDC(IntPtr.Zero, dc); }
+        var left = points.Min(p => p.X); var top = points.Min(p => p.Y);
+        var width = checked(points.Max(p => p.X) - left + 1); var height = checked(points.Max(p => p.Y) - top + 1);
+        if (width > 8192 || height > 8192 || (long)width * height > 4_000_000) throw new IOException("The screen pixel probe exceeded its bounded capture area.");
+        var screen = GetDC(IntPtr.Zero); if (screen == IntPtr.Zero) throw new IOException("The owned desktop did not supply a screen capture context.");
+        var memory = IntPtr.Zero; var bitmap = IntPtr.Zero; var previous = IntPtr.Zero;
+        try
+        {
+            memory = CreateCompatibleDC(screen); bitmap = CreateCompatibleBitmap(screen, width, height);
+            if (memory == IntPtr.Zero || bitmap == IntPtr.Zero) throw new IOException("The owned desktop could not prepare its bounded pixel probe.");
+            previous = SelectObject(memory, bitmap);
+            if (!BitBlt(memory, 0, 0, width, height, screen, left, top, 0x00CC0020)) throw new IOException("The owned desktop screen capture failed.");
+            // One screen capture avoids a potentially blocking desktop round-trip per pixel.
+            return points.Select(p => GetPixel(memory, p.X - left, p.Y - top)).ToArray();
+        }
+        finally
+        {
+            if (previous != IntPtr.Zero) _ = SelectObject(memory, previous);
+            if (bitmap != IntPtr.Zero) _ = DeleteObject(bitmap);
+            if (memory != IntPtr.Zero) _ = DeleteDC(memory);
+            _ = ReleaseDC(IntPtr.Zero, screen);
+        }
     }
     private static bool NearColour(uint a, uint b) => a != uint.MaxValue && Math.Abs((int)(a & 255) - (int)(b & 255)) < 36
         && Math.Abs((int)((a >> 8) & 255) - (int)((b >> 8) & 255)) < 36 && Math.Abs((int)((a >> 16) & 255) - (int)((b >> 16) & 255)) < 36;
-    private static double? ObservePixels(PixelProbes probes, uint[] before, double started)
+    private static PixelObservation ObservePixels(PixelProbes probes, uint[] before, double started)
     {
+        var captures = 0d; var flushes = 0d;
         for (var frame = 0; frame < 4; frame++)
         {
-            _ = DwmFlush(); var after = ReadPixels(probes.Points);
-            if (after.Where((value, i) => !NearColour(before[i], probes.Colour) && NearColour(value, probes.Colour)).Any()) return Now() - started;
+            var flushStart = Now(); _ = DwmFlush(); flushes += Now() - flushStart;
+            var captureStart = Now(); var after = ReadPixels(probes.Points); captures += Now() - captureStart;
+            if (after.Where((value, i) => !NearColour(before[i], probes.Colour) && NearColour(value, probes.Colour)).Any()) return new(Now() - started, captures, flushes, frame + 1);
         }
-        return null; // Never invent a visible-pixel sample from a WPF callback alone.
+        return new(null, captures, flushes, 4); // Never invent a visible-pixel sample from a WPF callback alone.
     }
     private static double FlushMilliseconds(double started) { _ = DwmFlush(); return Now() - started; }
     internal static object? Field(object target, string field) => target.GetType().GetField(field, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(target);
@@ -487,7 +619,7 @@ internal static class NativeArrangementLatencyChecks
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
         ThemeService.Apply(Application.Current!.Resources, "Light");
     }
-    internal static void Await(Task task) { Until(() => task.IsCompleted); task.GetAwaiter().GetResult(); }
+    internal static void Await(Task task, TimeSpan? timeout = null) { Until(() => task.IsCompleted, timeout); task.GetAwaiter().GetResult(); }
     internal static void Until(Func<bool> condition, TimeSpan? timeout = null)
     {
         if (condition()) return;
@@ -534,5 +666,11 @@ internal static class NativeArrangementLatencyChecks
     [DllImport("user32.dll")] private static extern IntPtr GetDC(IntPtr handle);
     [DllImport("user32.dll")] private static extern int ReleaseDC(IntPtr handle, IntPtr dc);
     [DllImport("gdi32.dll")] private static extern uint GetPixel(IntPtr dc, int x, int y);
+    [DllImport("gdi32.dll")] private static extern IntPtr CreateCompatibleDC(IntPtr dc);
+    [DllImport("gdi32.dll")] private static extern IntPtr CreateCompatibleBitmap(IntPtr dc, int width, int height);
+    [DllImport("gdi32.dll")] private static extern IntPtr SelectObject(IntPtr dc, IntPtr value);
+    [DllImport("gdi32.dll")] private static extern bool DeleteObject(IntPtr value);
+    [DllImport("gdi32.dll")] private static extern bool DeleteDC(IntPtr dc);
+    [DllImport("gdi32.dll")] private static extern bool BitBlt(IntPtr destination, int x, int y, int width, int height, IntPtr source, int sourceX, int sourceY, uint operation);
     [DllImport("dwmapi.dll")] private static extern int DwmFlush();
 }

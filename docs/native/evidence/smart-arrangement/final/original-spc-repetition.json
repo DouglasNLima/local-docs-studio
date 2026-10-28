@@ -1,0 +1,41 @@
+{
+  "Scope": "Sanitised original-source repetition; command-driven shown WPF windows, not pointer latency certification. No private identifiers, paths or source hashes.",
+  "ProductSourceCommit": "bf06755146e64c64378d183b1a338d5104094eb2",
+  "ValidationCommit": "91d65d319213de0a8e2a919bf93fd964bdd9fc6b",
+  "FullRepetition": {
+    "OriginalCases": 6,
+    "ManualSaveExportAndRestorationPassed": 6,
+    "FreshProcessOriginalAndCopiedWorkspaceRestorationPassed": 6,
+    "CandidateBudgetOutcome": {
+      "Case": "Complete detailed",
+      "EngineMilliseconds": 12024.2537,
+      "PublishedCandidates": 0,
+      "Classification": "Existing 12-second resource budget exhausted; not evidence that no feasible improvement exists.",
+      "PreviousAcceptedLayoutRetained": true,
+      "OriginalFailureReceiptRetainedPrivately": true
+    }
+  },
+  "FocusedUnchangedRepetition": {
+    "Case": "Complete detailed",
+    "Status": "PASS",
+    "CanonicalMilliseconds": 793.3365,
+    "CandidateSearchMilliseconds": 2084.8166,
+    "CandidateSearchCpuMilliseconds": 2828.125,
+    "CandidateSearchCumulativeAllocatedBytes": 602411760,
+    "CandidateSearchWorkingSetBytes": 439144448,
+    "CandidateSearchPeakWorkingSetBytes": 512937984,
+    "Compact": "generated",
+    "FewerCrossings": "no feasible improvement",
+    "PreviousAcceptedLayoutRetainedUntilAcceptance": true,
+    "ManualFinalRoutingMilliseconds": [220.8427, 215.7997],
+    "ManualNativePreparationMilliseconds": [1130.883, 1034.7557],
+    "ManualApplyAndPresentationMilliseconds": [1497.41, 1410.6996],
+    "ManualCumulativeAllocatedBytes": [638772352, 638926824],
+    "ManualMoves": 2,
+    "PinUndoRedo": true,
+    "SaveWindowReopen": true,
+    "WorkspaceCopy": true,
+    "SourceAndCanonicalExportsUnchanged": true,
+    "VectorSvgAndPngEquivalent": true
+  }
+}
