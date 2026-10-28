@@ -41,8 +41,6 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-remediation artifacts/native/arrangement-remediation
       - name: Verify coordinate transforms with separately labelled physical DPI and WPF simulations
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-coordinates artifacts/native/arrangement-coordinates
-      - name: Measure actual pointer feedback and separate drop and candidate phases
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-latency artifacts/native/arrangement-latency .
       - name: Verify actual pointer keyboard pins persistence and exports
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-input src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/arrangement-input
       - name: Verify arrangement with actual Windows High Contrast
@@ -54,6 +52,28 @@ jobs:
         with:
           name: native-diagram-arrangement
           path: artifacts/native/arrangement*/
+          include-hidden-files: true
+          retention-days: 14
+  arrangement-responsiveness:
+    if: ${{ !inputs.replay_original_853 }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build the native pointer acceptance harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Measure actual pointer feedback and separate drop and candidate phases
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --arrangement-latency artifacts/native/arrangement-latency .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-arrangement-responsiveness
+          path: artifacts/native/arrangement-latency/
           include-hidden-files: true
           retention-days: 14
   complex-er-preview:

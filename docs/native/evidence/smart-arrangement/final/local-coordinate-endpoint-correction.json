@@ -1,0 +1,55 @@
+{
+  "Status": "PASS",
+  "Checks": 596,
+  "Scenarios": 72,
+  "GhostObservations": 72,
+  "MaximumScreenEndpointErrorX": 0.0,
+  "MaximumScreenEndpointErrorY": 0.0,
+  "Method": "Unquantised WPF ghost-vector equality at 1e-5; two integer Win32 screen endpoints have a combined derived one-physical-pixel rounding bound. Original failed hosted observation retained in run 40692904866, job 122832025812. Product code unchanged.",
+  "Dpi": [
+    {
+      "Family": "ER",
+      "ActualOsDpi": {
+        "Win32Dpi": 144,
+        "WpfDpiX": 144,
+        "WpfDpiY": 144,
+        "Awareness": 2,
+        "MonitorCount": 1,
+        "PhysicalTransitionsExercised": false
+      },
+      "ActualPhysicalDpiConfigurations": [
+        150
+      ],
+      "PhysicalMonitorTransitions": "NOT VERIFIED",
+      "SimulationPercentages": [
+        100,
+        125,
+        150,
+        200
+      ],
+      "KeyboardAndCapture": "Actual input covered separately by the hosted pointer harness; these checks exercise WPF transforms and coordinate mathematics only."
+    },
+    {
+      "Family": "Flowchart",
+      "ActualOsDpi": {
+        "Win32Dpi": 144,
+        "WpfDpiX": 144,
+        "WpfDpiY": 144,
+        "Awareness": 2,
+        "MonitorCount": 1,
+        "PhysicalTransitionsExercised": false
+      },
+      "ActualPhysicalDpiConfigurations": [
+        150
+      ],
+      "PhysicalMonitorTransitions": "NOT VERIFIED",
+      "SimulationPercentages": [
+        100,
+        125,
+        150,
+        200
+      ],
+      "KeyboardAndCapture": "Actual input covered separately by the hosted pointer harness; these checks exercise WPF transforms and coordinate mathematics only."
+    }
+  ]
+}

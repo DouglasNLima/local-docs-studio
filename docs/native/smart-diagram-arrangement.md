@@ -325,6 +325,18 @@ locally. Actual local DPI is 150%, one monitor. Windows Settings did not expose
 a targetable window; no display setting was changed. Physical 125/200% and
 monitor transitions remain unverified; hosted physical DPI is recorded separately.
 
+The first final-head hosted attempt, run `40692904866`, job `122832025812`,
+passed the complete arrangement and remediation checks but stopped at a second
+integer-screen assertion: simulated 125%, zoom 200%, end scroll. Two independently
+rounded endpoints can differ by one physical pixel even though the unquantised
+WPF vector is exact. The corrected harness records both endpoints, checks the
+exact unquantised vector separately and uses that derived one-pixel bound only
+for screen endpoints. A [fresh local run](evidence/smart-arrangement/final/local-coordinate-endpoint-correction.json)
+passes 596 checks and all 72 scenarios at actual 150% OS DPI. Original failed
+logs/receipts are retained. Product code is unchanged by this correction.
+Pointer latency now runs in its own hosted job so coordinate-test failure cannot
+prevent independent input measurements; neither failure nor threshold is hidden.
+
 Two fresh reviewer contexts inspected implementation and ran their own probes.
 The [engine/storage report](evidence/smart-arrangement/final/independent-engine-storage-review.md)
 records resolved external-write race, collapsed parallel Flowchart occurrences,

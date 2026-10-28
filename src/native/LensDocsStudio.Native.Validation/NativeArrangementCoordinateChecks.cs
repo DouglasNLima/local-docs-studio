@@ -72,8 +72,20 @@ internal static class NativeArrangementCoordinateChecks
                         Check(Math.Abs(layoutDelta.X - viewportDelta.X / zoom) < .00001 && Math.Abs(layoutDelta.Y - viewportDelta.Y / zoom) < .00001,
                             "Viewport delta applies zoom once and does not double-apply DPI: " + family);
                         var expectedGhost = centre + new Vector(viewportDelta.X / zoom, viewportDelta.Y / zoom);
-                        Check(Near(view.Drawing.PointToScreen(expectedGhost), nextPhysical), "The drag-ghost equation reaches the intended physical point: " + family);
                         var toWindow = view.Drawing.TransformToAncestor(window);
+                        var unquantisedGhost = toWindow.Transform(expectedGhost) - toWindow.Transform(centre);
+                        var ghostScreen = view.Drawing.PointToScreen(expectedGhost);
+                        samples.Add(new { Kind = "ghost-vector-observation", Family = family, Simulated = simulated, Zoom = zoom, Scroll = scroll,
+                            ExpectedScreenX = nextPhysical.X, ExpectedScreenY = nextPhysical.Y, ActualScreenX = ghostScreen.X, ActualScreenY = ghostScreen.Y,
+                            ExpectedPhysicalDeltaX = 19, ExpectedPhysicalDeltaY = 13,
+                            UnquantisedPhysicalDeltaX = unquantisedGhost.X * dpi.DpiScaleX, UnquantisedPhysicalDeltaY = unquantisedGhost.Y * dpi.DpiScaleY,
+                            ScreenEndpointErrorX = Math.Abs(ghostScreen.X - nextPhysical.X), ScreenEndpointErrorY = Math.Abs(ghostScreen.Y - nextPhysical.Y) });
+                        Check(Math.Abs(unquantisedGhost.X * dpi.DpiScaleX - 19) < .00001 && Math.Abs(unquantisedGhost.Y * dpi.DpiScaleY - 13) < .00001,
+                            "The unquantised drag-ghost equation produces the exact physical movement vector: " + family);
+                        // Both source and destination cross Win32's integer pixel boundary.
+                        // Their independent half-pixel roundings can differ by one pixel.
+                        Check(Math.Abs(ghostScreen.X - nextPhysical.X) <= 1.00001 && Math.Abs(ghostScreen.Y - nextPhysical.Y) <= 1.00001,
+                            "The ghost screen endpoints stay within their derived one-pixel combined quantisation bound: " + family);
                         var oneUnit = toWindow.Transform(centre + new Vector(1, 1)) - toWindow.Transform(centre);
                         Check(Math.Abs(oneUnit.X * dpi.DpiScaleX - dpi.DpiScaleX * simulated * zoom) < .00001
                             && Math.Abs(oneUnit.Y * dpi.DpiScaleY - dpi.DpiScaleY * simulated * zoom) < .00001,
@@ -108,13 +120,12 @@ internal static class NativeArrangementCoordinateChecks
         {
             File.WriteAllText(System.IO.Path.Combine(output, "coordinates.json"), JsonSerializer.Serialize(new
             {
-                Status = passed ? "PASS" : "FAIL", Scope = "Shown WPF coordinate mathematics and explicit viewport ScaleTransform simulation; no simulated mouse event is presented as actual pointer input or physical DPI certification. Integer Win32 PointToScreen round trips permit only their derived half-physical-pixel quantisation; the independent unquantised WPF transform equations retain 1e-5 tolerances.",
+                Status = passed ? "PASS" : "FAIL", Scope = "Shown WPF coordinate mathematics and explicit viewport ScaleTransform simulation; no simulated mouse event is presented as actual pointer input or physical DPI certification. Integer Win32 PointToScreen round trips permit their derived half-physical-pixel quantisation and two independently rounded screen endpoints permit at most one physical pixel combined error; the independent unquantised WPF movement/transform equations retain 1e-5 tolerances.",
                 Checks = checks, Samples = samples
             }, new JsonSerializerOptions { WriteIndented = true }));
         }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
     }
-    private static bool Near(Point a, Point b) => Math.Abs(a.X - b.X) < .00001 && Math.Abs(a.Y - b.Y) < .00001;
     private static object? Call(object target, string name, params object[] arguments) => target.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(target, arguments);
     private static IEnumerable<(string Family, string Source)> Sources()
     {
