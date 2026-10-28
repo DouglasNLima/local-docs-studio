@@ -407,6 +407,28 @@ and the test now obtains pointers from the current preview. Product loading,
 rendering and appearance behaviour are unchanged. Hosted High Contrast remains
 a separate required result.
 
+On `5130446`, the corrected preview job passed 106 shown Light/Dark checks and
+57 actual High Contrast checks, including four and two deterministic queued
+supersession cases respectively. The full arrangement job also passed. The
+pointer test again reached closure after all small-ER measurements, this time
+with a clean saved state, active capture, no `Closing` event and no intervening
+layout application. [Microsoft's SetCapture contract](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcapture)
+states that keyboard accelerators do not operate during capture. Requiring
+Alt+F4 to close a captured drag was therefore an invalid test mechanism.
+The final lifecycle test posts `WM_CLOSE` to its owned window while the genuine
+pointer drag remains active, then requires `Closing` and `Closed`, released
+capture, a hidden ghost and unchanged clean saved state. It explicitly does
+**not** certify keyboard closure during capture. Both earlier failed attempts
+and their partial measurements remain evidence; a fresh four-workload run is
+still required.
+
+The same commit's PR Chromium run `40706644380` failed before the SVG-drop
+interaction because the application stylesheet request returned
+`net::ERR_NO_BUFFER_SPACE`; the startup check consequently observed an unstyled
+top bar. The original browser trace, screenshot and log are retained. Edge and
+the separate web push run `40706634418` passed on the same commit. No web source,
+startup assertion or timeout is changed in response to that transport failure.
+
 Two fresh reviewer contexts inspected implementation and ran their own probes.
 The [engine/storage report](evidence/smart-arrangement/final/independent-engine-storage-review.md)
 records resolved external-write race, collapsed parallel Flowchart occurrences,

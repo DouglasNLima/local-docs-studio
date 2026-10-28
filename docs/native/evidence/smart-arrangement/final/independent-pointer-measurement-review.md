@@ -93,3 +93,17 @@ Reviewed source SHA-256: `71F01E17879F7603BDCBD1B7E11B2694911D7E623D3469BCDF55AF
 **Ready for publication and a fresh hosted closure run.** The final source keeps the mouse held until closure is observed, verifies unchanged/clean accepted layout and released capture/ghost, and preserves closure diagnostics. Alt-up now executes in `finally`; a nested `finally` still attempts mouse-up if Alt-up injection throws. No product behaviour or acceptance deadline was changed by this correction.
 
 No remaining concrete defect was found in this close-sequence correction. This review is source-only: the author/coordinator owns the combined build result, and hosted `4461591` remains a preserved failure. The next hosted terminal result must establish actual closure acceptance. The separate test-only preview-request correction is outside this particular follow-up review.
+
+## Native lifecycle closure correction — final independent review
+
+Reviewed source SHA-256: `8EE6774E806F92EAF065D6D72D9DDD31E47A7E0EA604228B392066817EB6CCAB`.
+
+**Ready for publication and a fresh hosted run of lifecycle closure during a real drag.** No remaining concrete defect was found in this correction. This conclusion is source review only; no shared build, local input or product change was performed by this reviewer.
+
+The second retained hosted receipt, `artifacts/native/final-hosted-input-5130446/responsiveness/pointer-acceptance.json`, materially narrows the diagnosis. Its `closure-start` at `252869.3543 ms` records `IsDirty=false`, `Captured=true`, `GhostVisible=true`. It records no Closing event and no apply phase before timeout at `277873.8988 ms`. Thus the first run's premature drop is gone, but Alt+F4 still does not deliver the lifecycle close while capture is active. Both `4461591` and `5130446` remain **FAIL**, with their original observations preserved.
+
+Microsoft's [SetCapture documentation](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcapture), independently retrieved for this review, explicitly states that menu hotkeys and keyboard accelerators do not work while the mouse is captured. This supports changing the closure trigger; it does not imply that all ordinary keyboard input is unavailable, nor does it certify an Alt+F4 workflow.
+
+The corrected test posts `WM_CLOSE` only to the observed arrangement window's own HWND while the real pointer drag and mouse capture remain held. It requires both actual WPF `Closing` and `Closed`, checks released capture/ghost and unchanged, clean saved layout, and releases the mouse in `finally`. Its receipts explicitly identify a native lifecycle request and set `ActualKeyboardClose=false`. There is no fallback that turns a failed Alt+F4 attempt into a keyboard pass.
+
+This directly exercises cancellation of an active drag on window closure, which is the intended lifecycle contract. It is **not keyboard-close certification** and must retain that scope in all final reporting. The next hosted run must still demonstrate this mechanism's terminal outcome and the remaining workloads; this source review does not retroactively pass either retained failure.
