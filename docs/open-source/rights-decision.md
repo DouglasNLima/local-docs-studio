@@ -32,6 +32,10 @@ PinnedMermaider folder. Its header and that folder's notice establish a Mermaide
 adaptation; the new ledger explicitly classifies it **R6**. The old R1
 classification was not permission. Preserve Nullean's existing MIT attribution.
 Native machine evidence is R5; visible images also remain subject to R4 clearance.
+The dedicated vector artwork in
+`src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml` is explicitly R4,
+even though its XAML extension resembles implementation source. Its bytes are
+unchanged; no visual copyright clearance is inferred.
 
 Original test harnesses are R1 candidates, but embedded sample payloads are not
 automatically cleared. A text-marker scan is bounded evidence, not proof of

@@ -35,7 +35,7 @@
   "knownFailure": {
     "jobId": 123149324128,
     "job": "complex-er-preview",
-    "step": "Verify preview loading placeholder and lifecycle through UI Automation",
+    "step": "Verify shown Light and Dark preview loading with UI Automation",
     "exception": "System.TimeoutException: Preview lifecycle check exceeded its bounded wait.",
     "location": "NativePreviewLoadingChecks.cs:76 (Until at line 262)",
     "cause": "UNPROVED",

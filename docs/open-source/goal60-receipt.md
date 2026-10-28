@@ -119,6 +119,9 @@ reconstructed all 955,998 original bytes, SHA-256
 The first expanded link check rejected a literal README example as a live link;
 fenced/inline-code handling was corrected and regression-tested. Final local
 checks and git diff whitespace validation pass; CRLF checkout warnings are benign.
+All 14 external links checked across README/security/community/governance/signing
+documents returned HTTP 200. The exact scope/results and inspected GitHub OpenAPI
+document digest are retained in the read-only governance observation.
 
 The [baseline CI observation](evidence/goal60/baseline-ci.json) distinguishes the
 post-merge runs from this proposal. Web and OSS provenance succeeded.
@@ -141,6 +144,10 @@ Known inherited gaps: missing original dingbat notice, incomplete embedded
 Mammoth/PDF.js closure, historical legacy notice remediation, uncertified
 production signing/clean-machine/accessibility behaviour and Continuous 250 ms
 FAIL. No successful test count converts these into acceptance.
+
+Independent review found one dedicated XAML icon asset incorrectly included as
+an R1 candidate. It is now explicitly R4 with a regression control; no artwork
+bytes changed. The final receipt records the corrected-source delta review.
 
 ## Separate readiness and owner decisions
 

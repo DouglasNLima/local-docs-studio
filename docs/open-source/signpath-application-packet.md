@@ -64,7 +64,8 @@ DLLs, Core/Native DLLs, test executables, updater fixtures or arbitrary `**/*.ex
 
 Second stage: only `LensDocsStudio.Native-<approved-version>-win-x64-Setup.exe`,
 where `<approved-version>` is one owner-approved immutable release value. The
-current actual candidates are `0.1.0-preview.957` and `0.1.1-preview.957`, **not
+historical Goal #58 baseline examples are `0.1.0-preview.957` and
+`0.1.1-preview.957`, **not
 authorised signing requests**. Stage two follows independent verification of the
 signed apphost and rebuilding the installer around it. Inno's generated uninstaller
 and embedded compiler code require an explicit provider-supported arrangement;

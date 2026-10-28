@@ -2231,7 +2231,7 @@ src/native/LensDocsStudio.Native/Rendering/TableContextMenu.cs,R1,OWNER APPROVAL
 src/native/LensDocsStudio.Native/RequirementVisualEditorWindow.cs,R1,OWNER APPROVAL REQUIRED,Personal-project implementation candidate; exact notice/scope pending; embedded examples excluded
 src/native/LensDocsStudio.Native/Resources/Brand/application.ico,R4,OWNER APPROVAL REQUIRED,Excluded until separate visual copyright and branding review
 src/native/LensDocsStudio.Native/Resources/Brand/application.svg,R4,OWNER APPROVAL REQUIRED,Excluded until separate visual copyright and branding review
-src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml,R1,OWNER APPROVAL REQUIRED,Personal-project implementation candidate; exact notice/scope pending; embedded examples excluded
+src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml,R4,OWNER APPROVAL REQUIRED,Excluded until separate visual copyright and branding review
 src/native/LensDocsStudio.Native/Resources/DesktopStyles.xaml,R1,OWNER APPROVAL REQUIRED,Personal-project implementation candidate; exact notice/scope pending; embedded examples excluded
 src/native/LensDocsStudio.Native/Resources/FormStyles.xaml,R1,OWNER APPROVAL REQUIRED,Personal-project implementation candidate; exact notice/scope pending; embedded examples excluded
 src/native/LensDocsStudio.Native/Resources/MermaidEditorStyles.xaml,R1,OWNER APPROVAL REQUIRED,Personal-project implementation candidate; exact notice/scope pending; embedded examples excluded

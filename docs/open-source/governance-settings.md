@@ -124,8 +124,11 @@ enablement/testing. Verify MFA through account settings with status-only evidenc
 [Rules REST API](https://docs.github.com/en/rest/repos/rules),
 [available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets),
 [branch protection API](https://docs.github.com/en/rest/branches/branch-protection),
+[status-check conclusions](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks),
 [repository settings API](https://docs.github.com/en/rest/repos/repos#update-a-repository),
 [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
 and [environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
 Published schemas verify the proposed fields; live GET responses verify current
 state. Neither substitutes for the gated write/readback/behavioural test.
+The observation also records the SHA-256 of GitHub's published OpenAPI document
+used to inspect the exact rule fields, zero-review minimum and merge-method enum.

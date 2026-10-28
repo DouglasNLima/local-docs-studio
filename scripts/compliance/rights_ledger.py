@@ -20,7 +20,8 @@ def boundary(path):
     kind = category(path)
     if kind == 'recorded-evidence':
         return 'R5', 'NOT APPLICABLE', 'Historical machine evidence; visible artwork also requires R4 clearance; excluded from default MIT'
-    if kind == 'artwork-or-fixture':
+    if (kind == 'artwork-or-fixture'
+            or path == 'src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml'):
         return 'R4', 'OWNER APPROVAL REQUIRED', 'Excluded until separate visual copyright and branding review'
     if (kind == 'fixture' or path.startswith('assets/scripts/registries/')
             or path.endswith('.mmd') or '/templates/' in path

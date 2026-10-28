@@ -57,6 +57,7 @@ class GovernanceBoundaryTests(unittest.TestCase):
             ('src/native/LensDocsStudio.Core/Rendering/PinnedMermaider/CharWidths.cs', 'R6'),
             ('assets/vendor/mermaid.js', 'R6'),
             ('icon.svg', 'R4'),
+            ('src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml', 'R4'),
             ('tests/fixtures/sample.md', 'R3'),
             ('docs/native/evidence/receipt.json', 'R5'),
             ('docs/open-source/evidence/upstream-notices/grant.txt', 'R5'),
