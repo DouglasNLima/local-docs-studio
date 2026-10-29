@@ -1,0 +1,2978 @@
+[
+  {
+    "path": ".gitattributes",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cda12d49f46006a02375bf65903a3d1f9600700aae2ffdc58fc27eb95bfd9be8"
+  },
+  {
+    "path": ".github/ISSUE_TEMPLATE/lens-docs-studio-prerelease-feedback.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "12312027f5868ed1ce86d682c533b33707ff91846081ce753513a03667f69732"
+  },
+  {
+    "path": ".github/workflows/oss-provenance.yml",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "4b3b406d62c9c4939987e4f3f0669818b7275d02d755d7686ce97ae540d265a2"
+  },
+  {
+    "path": ".github/workflows/pages.yml",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "87b17c63ad85108074641f100ce8006039499847bb3990abb27024938e626869"
+  },
+  {
+    "path": ".gitignore",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5f589a36f759b07f08f5991ad32978578253b68cd2201262818f9c337b011e7d"
+  },
+  {
+    "path": "AGENTS.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cfe8bc143c8abcb704e5a5c7783dd3e0380253b554bb48c4b0c69fbfd9900904"
+  },
+  {
+    "path": "LICENSE",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "f4126eb8680101babaa6c1ee89b9693320eb204139f3ee3fcd08abb66eb31261"
+  },
+  {
+    "path": "LICENSING.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "83b6cd7934c3518535153acec56c1c4548b3c69d66926a7b138a2e148dc6a2a9"
+  },
+  {
+    "path": "README.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "f8cd8b406dd4d9ab1e9926bf57e375a8a12c7ecc18c70c573459b945a71aa31e"
+  },
+  {
+    "path": "SECURITY.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "79ea7ec7efc687bca2b79cd10f33eeeb7949d613501eb6684dce788f6ea75e87"
+  },
+  {
+    "path": "THIRD_PARTY_NOTICES.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "98a4b5051644df3518a06364b2a760b04ca3520101eb4ec4770351ec67694790"
+  },
+  {
+    "path": "assets/scripts/app-controller.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "1dfaedda9e5281363333e46c7ed6b86126f52fb254fdb89dc0588a65befe0025"
+  },
+  {
+    "path": "assets/scripts/document/document-navigation-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "c68b44a6aa822136f198ad6fcafea5d09d5478eb29cf7d4109d2680446bcebcb"
+  },
+  {
+    "path": "assets/scripts/document/document-sections.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d1b45cab618d63a73c15b64571ebeeca215c3af41fdaae2c1a6a3e5cf1542d55"
+  },
+  {
+    "path": "assets/scripts/document/document-ux-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cad67236ae58277f273e0d9002bc7ddcb75a78b0714e0eca9f90eb3e8fbc6dca"
+  },
+  {
+    "path": "assets/scripts/document/markdown-governance-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ba23b494112bde030dd8b3b81f486f11ebf156a1a2b452c80ba01e680817075e"
+  },
+  {
+    "path": "assets/scripts/document/scroll-sync-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ca64bcaba6d335eee5f2dee9a1b3303634c60dc41b654e727d8683a280493cbb"
+  },
+  {
+    "path": "assets/scripts/document/selection-sync-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "be692ba7c30fdab1099bfe4ca81997691d13dde1fefcd681c11691df11945752"
+  },
+  {
+    "path": "assets/scripts/dom.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "46b6d5f778f9c5edc9530c4a6aa4aabd2c1a4d7df78241234497077427049d6b"
+  },
+  {
+    "path": "assets/scripts/editor/document-link-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "1cdc47a7b74c86a43e59740bf29e2b396664e8077b58e9f4fb9c5f2761491b30"
+  },
+  {
+    "path": "assets/scripts/editor/draft-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "525df7629b73c96ed515a8fa5b732b40ef7131e4b49022d98966361dff6daff7"
+  },
+  {
+    "path": "assets/scripts/editor/editor-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "4c50e75907f0e3629aba561f5f26f94e72a30e879fea3b4a55404787f2abd5b2"
+  },
+  {
+    "path": "assets/scripts/editor/find-replace-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e8aaa362a5e346c1bc5b5d1cebc1cba1b5dc3f6750ac8d113d282d8b78cfbf79"
+  },
+  {
+    "path": "assets/scripts/editor/image-insertion-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5021fa8f70a79a3cdc250489d968e95a83f80c2399d1b29bb6d47ebf18819d37"
+  },
+  {
+    "path": "assets/scripts/editor/insert-helper-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "b2b52a257081bb2580853c1778728b3674cd38f4e06a55e8c582c27f9c8d9884"
+  },
+  {
+    "path": "assets/scripts/editor/paste-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "43a1ef35dff88bc6920896958aac6e4dad6272e0b3f4c7a231ed22c42ba070c9"
+  },
+  {
+    "path": "assets/scripts/editor/progress-bar-editor-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e65ac0a63638bce14a31025f8df512cc41d5bba702a635638babdcce8c658eb6"
+  },
+  {
+    "path": "assets/scripts/editor/table-editor-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5a4b0b9e395a5d8f3867c46e902151ef98d00c79975139ae25f57aa84c21d57f"
+  },
+  {
+    "path": "assets/scripts/editor/typewriter-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "95bfefa6228616d4269823cafc0ec179fe646a2d385e24f55e5b416b315e2fb3"
+  },
+  {
+    "path": "assets/scripts/editor/workspace-search-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "1d5a5f82295ca7c50702789a6513463eb29202c662c8ef9cf872bfe2a32ef541"
+  },
+  {
+    "path": "assets/scripts/exports/export-profile-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "b0762697ff2d1428372ce3b8b92c6ec4eb1da0643de105b2282a2fc2c18bc5d4"
+  },
+  {
+    "path": "assets/scripts/exports/export-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d1263b49cbf472a3daf500d071a60e664f0d0d7e294c2d86d9691e35f0c9791c"
+  },
+  {
+    "path": "assets/scripts/exports/word-document-exporter.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7fe47077bb5b5bf1c625f73fcf776e9c212662accc5903282a6dac1e49349f23"
+  },
+  {
+    "path": "assets/scripts/exports/word-template-package.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "4061dc0bd6a89077557c368e6aa245264a6094a0244b811e1ad756f2d714bad5"
+  },
+  {
+    "path": "assets/scripts/exports/word-template-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "b1b98beeedfcc5b4c5e6c5f0c39ac5c269bf4ae7ee753147142526d3906b7729"
+  },
+  {
+    "path": "assets/scripts/files/document-import-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "857f59cd7f7dfe84802afa7149ada21a7917b37f23165f48a418054649cc0af0"
+  },
+  {
+    "path": "assets/scripts/files/document-import-worker.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "f820ed682fc54c4bac5b6c4b448dc42941e252b2a342bc8a2136036707cf514a"
+  },
+  {
+    "path": "assets/scripts/files/file-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3cc3183fda25cc9c816465574ff5a7a74481bb748176b270118a20564e24b801"
+  },
+  {
+    "path": "assets/scripts/files/image-asset-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "26f0909e3dd74245f2efd505284ab0e556071a632de580ea954f3076e94d1df7"
+  },
+  {
+    "path": "assets/scripts/files/lens-artifact-bundle-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3df2d962c12820c52d558ac19819dc2c518c650da2c3e8c3ad2e69202ee0716d"
+  },
+  {
+    "path": "assets/scripts/main.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "015bf42c4e57c456466bcd6d791c93300b68cee65bb682cf81d0729ad7417445"
+  },
+  {
+    "path": "assets/scripts/native/native-bridge-client.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "56907c6b7f4983148d692379ed8c13b43d90a350aa8a18c91a6b115f9606e209"
+  },
+  {
+    "path": "assets/scripts/native/native-smoke-runner.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "4c8ea12e4e1876b04511fdb50378cca5c8bb3b09973976eb2a66ca499e9cc436"
+  },
+  {
+    "path": "assets/scripts/native/workspace-image-smoke.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "86a9bbd2c238033688db498dd40445fe1822f480f356ac9e4b28e4a7fbca5b8e"
+  },
+  {
+    "path": "assets/scripts/registries/content.js",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "12d6a48406ac6e5cd3c9a02ab7d4a605e7b05ebe5b5feb9e2def413fa39d9b01"
+  },
+  {
+    "path": "assets/scripts/rendering/render-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "23e9bbe77e2a50f354ef3c7f73b1914f41383441109367cfd318a684a3e2b594"
+  },
+  {
+    "path": "assets/scripts/state/config.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "a19abdc04b4d1b1bf55f445d98c62387051aaf254013c8e8b35f325fcec71066"
+  },
+  {
+    "path": "assets/scripts/ui/artifact-bundle-reader.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "15f300ad94b388de174ed9b5c06704fa7f3d0f6602754c3d90af5441b6f88a23"
+  },
+  {
+    "path": "assets/scripts/ui/context-menu-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "99ede6d4938502ba9e709d33fa1d3d76b85f19636496610827a4284aef0fd2bd"
+  },
+  {
+    "path": "assets/scripts/ui/dialog-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5c64ad61841bb770e79b62f3112761e5dae15872285db195785d9e8326bc8070"
+  },
+  {
+    "path": "assets/scripts/ui/support-bundle-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "9575d6b0c53d8159822a9fa52b1d0a8af64e1750bcdd3424e101e7bd679ecb03"
+  },
+  {
+    "path": "assets/scripts/ui/ui-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "773dae2dba400be9957b5f54baab25c0cc4f30741b6075e2615eb81db7dc8dd6"
+  },
+  {
+    "path": "assets/scripts/ui/windows-setup-service.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "a47143b01db11847c9c82c4a8724c30350c322989cc847e7b9e06c759d5d2dc1"
+  },
+  {
+    "path": "assets/scripts/utils/binary.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "59dfa4882eb00ed8c9c8af247c45d0fa4aac038f1b1b8b668b6552d99bd6905b"
+  },
+  {
+    "path": "assets/scripts/utils/browser.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "a15323cb14d8d97a45a01a8936383df0dea7659cfb07f7458dd9d500ac4c3684"
+  },
+  {
+    "path": "assets/scripts/utils/devops-markdown.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "98fc1b80e92a50382a454c07ba6cd432b43bed05ea0f35cf25a4f77b876091e5"
+  },
+  {
+    "path": "assets/scripts/utils/document-links.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "bdfcca121da65e3d30454dfa7946f591d446f331c4ab5ed1617d6fff3d13c849"
+  },
+  {
+    "path": "assets/scripts/utils/editor-viewport.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "246980f827124b61aabd6d2376bec77f0aa0ff49003efb560d41ccdd1a2f4822"
+  },
+  {
+    "path": "assets/scripts/utils/files.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "26bf45fcb56ab640c5659c96d96d0b545286412a77aa3e696a2a133fda3b4f12"
+  },
+  {
+    "path": "assets/scripts/utils/format.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "41e8467851c64ed5d5e6fd1e9d1e764cb1d7be4b9936d4c8aa6902ca588bd696"
+  },
+  {
+    "path": "assets/scripts/utils/front-matter.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3a7c2fa282ffa82ab33ac2146492301cbca760012b8c044326e6b79a02afc2c9"
+  },
+  {
+    "path": "assets/scripts/utils/html-markdown.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cccfed4d4306748c71ee51e5da71019b07a8fa459726f0705aa78d1917910c64"
+  },
+  {
+    "path": "assets/scripts/utils/idb.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "963117ad48c9b4f5933c7cd82cb9d1e8673ef3219bb01c648922339e3d2dc9bb"
+  },
+  {
+    "path": "assets/scripts/utils/image-references.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "01e9d0b2349725fedb8f8818705fe66f960b73cbde79fd4f8995a5d50eac8061"
+  },
+  {
+    "path": "assets/scripts/utils/markdown-clipboard.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "f1ea9e367055b1bd947cc65fe2f97a0cf25580b875f51218168b3baa337b8797"
+  },
+  {
+    "path": "assets/scripts/utils/markdown-table.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "9ce99516d9bd9c3a33a3f5de5b53f9609c6035498f149382bf61937ca9a147ae"
+  },
+  {
+    "path": "assets/scripts/utils/math.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "6a3ea9f25e364d4d7afd8db750965eca4aa08afd4331b8340c514e2ba1954f47"
+  },
+  {
+    "path": "assets/scripts/utils/search.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5a9701f606b998af69fc1d6f03f3f49967f53234cda4cf3979e31fd03e260139"
+  },
+  {
+    "path": "assets/scripts/utils/security.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "20bc21700d046eb53bf38de9d32fa5ebf088e1dd526b5dac195f8c3471fcf95b"
+  },
+  {
+    "path": "assets/scripts/utils/wikilinks.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3f61de57e9e1d16212071554385daa8a4a6c7c553ad407e3fc856c5b503b495a"
+  },
+  {
+    "path": "assets/scripts/utils/zip.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "245e141f18a27653b3d0d253bc427bc45dd7aa407d5e4e5ef891e448c03ba13b"
+  },
+  {
+    "path": "assets/styles/app.css",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "45161b72bea0b2d1fb3e72c5851da8fed77cfa1c5c382e53f80e94b8d91efe9b"
+  },
+  {
+    "path": "assets/vendor/THIRD-PARTY-NOTICES.txt",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "387a54aed7abe21f351aa9e309e3052c05472f06383cfbb381b5e2aba7ce8872"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/architecture-7EHR7CIX-6QZW5X65.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "75f6adb21c2a9eb7d95a107022d46e103a548861465cf6fc581e37b40a8cec8b"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/architecture-7EHR7CIX-6QZW5X65.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/architectureDiagram-UL44E2DR.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c3b099b6ae402a148838b552d4eff1c907c02514002ddd758d746a5c2780272a"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/architectureDiagram-UL44E2DR.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a165c62f33387f7fbdebfe514e03da7d7453977930e26f79c36f41f67c797f88"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/blockDiagram-7IZFK4PR.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7772eee390f9136a96e0fa029335be160c494e9b3857fa39c857760418d65161"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/blockDiagram-7IZFK4PR.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e892b7b82761c4be196605911e028d9ea4f7bf359f11864b8cc60e5734240b4c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/c4Diagram-Y2BXMSZH.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "bd17395ab347c6ffabd2c2340a49c5a00189917dc236b4419ad6b91d2e988f57"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/c4Diagram-Y2BXMSZH.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "cb473545febe681b99229a20aa7a40491c020aca7b9ae3b5cc47c3d32beff9cf"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-2T2R6R2M.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6c0bd363b05debd3211c0999104014f159dd6f6824e0cebe93a7eec576478ade"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-2T2R6R2M.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b88cd662d7f2baa8c8b31fb7d0f959561e6cb4eaca3aea3ee950d7cc5ad7b8ee"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-2UTLFMKG.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "78c52de73be80337d9c38128df7880e1dafce9940bacee191101be7ea8c50a2d"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-2UTLFMKG.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5006301a8cc4e4d26b82c951a261f8e4d608fdc222a64fe6f4742192de50d5b6"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-3SSMPTDK.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3a70f2b14507022b078eabe9a29acfc54b900fc12d3c048602c135e27b08beab"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-3SSMPTDK.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "12370780ac5b0d33b33e249e9b3084e31762919fdbcba58173a7b816337cf153"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-4R4BOZG6.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "afe8b70e8d00029ad2622843e76a9f39d79a7ad60975e075047bf8220a2c673d"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-4R4BOZG6.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "45b1a383b084a597395575d0c370c27511ea11397d522b12f7826f9b83c7f023"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-5IMINLNL.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "300160c9de468807e8a70d30c0b87e550445976aa99b0774f6abb47bc8ac8dba"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-5IMINLNL.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d1235158c8d7dd67332f7f93b3a84f084fb50d76365ea77ab9fc9fc700243411"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-5VCL7Z4A.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "fa9c0bc473aff7568445117be05889fa320396e45e6fde8e9be9a539ccea0c99"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-5VCL7Z4A.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6a01eb09065f809b965d99c7c34f4729b5c0a27d77a522f3fbfabd0c88225632"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-6764PJDD.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "67428b1468f7c2b219d34be7232fba50cc5a0a6f9bf14844f3bda99e0841e8f5"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-6764PJDD.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "66e2fdaeae7185f8f6c633f0a73d551a2768bb7fa2255e7cdb6c874d2d26964c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-67TQ5CYL.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e6331e43195a5d86a7afe1e424e611dcc464247f36b110cc17c2bedf1feecb8c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-67TQ5CYL.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b9085751afa1c5bb1c3ccb400392eb2e992534f135b56cc5d85bfa10661c9e34"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-7FYTHRHK.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "4811b11d3d627f6ea2a5bf9a8ef61137755676acdcb28e5465ebbf126d6008f0"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-7FYTHRHK.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "55bf79c92a85da162dfa601b9fd1a08f81445800c6fd16508a8ad31ff34e8155"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-7J6CGLKN.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "13883fdd57ec2c377f1cf4273de2344d8b66b0ea51cb31a80ed8cfb38945ec74"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-7J6CGLKN.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b03c002e116634ae832f0c695c3d98edd45865b40ac4c1484e3dd9ee7e0c27e9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "df380c32197962a9fd74302ad86ae23458b91f02ec72ca7133246d6d95531ba6"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-7W6UQGC5.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3e34c9209bfc202fe7826c237a22b05dd1f23aad25e81159a8f63d3322b8107e"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-AQ6EADP3.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "13f83482f9731f6ed320746bf4f69aaaff5e1efdda94f64cd9ea6d9030b868c2"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-AQ6EADP3.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-AZZRMDJM.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "97e73145071ffe4c04e8df5493f410077aab5c99a41d8b8f4b13e34d7e7d739b"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-AZZRMDJM.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "59509116fe374b54e9aa117b39a81b586420f912dfb98e665e144cc8ccc43e21"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-C62D2QBJ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "10f2c21281db7744a1e8f40779c4e7b8522d6956f16e523cbb8f85d032910f66"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-C62D2QBJ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "36b168da6eb0a802d8ae7b2cdbf804abca2339cb6559f3b71509de44578e85fc"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-CEXFNPSA.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a6c5fb16b4a68108083c1b4e06f55026e0b207006b248e183b51b7a92e749c65"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-CEXFNPSA.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e381bd00aa805cb55ab12d9101267e75af3428441260c43ff604773fcc7d1e15"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-INKRHTLW.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "27d6d513b9f97c22187783435c5eb91e30531ef923bb5adf3d72fb8b6e8d1615"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-INKRHTLW.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "965c8507d0453a59abfc66ce0ed6040ecbc43f76acd150f9a60c50cf6e05c398"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-J5EP6P6S.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c00f6fac68f7bb7cd1c46a5e9f388860f74a9f4d3bfb63cb6dca65423ab19165"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-J5EP6P6S.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "fff851e793740a0661ca47293e5dfd75419d6d19209284a6f106e0534b7b1f31"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-JQRUD6KW.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "eba0d9f9fc78e97cb94ed65aed3f1cf6ab726ff8c1d97a860f3b39bef66a09b0"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-JQRUD6KW.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2033a3976599648013765bce660af7d35f0f6c663214b293f596f4554931b2d8"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KGFNY3KK.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d6ab1977b7c1af74a756a23010297725d9e17aab60d63931f51ca71127319011"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KGFNY3KK.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "584022cb246aaba724a83450d726813ceddd213f7650228f07dc3564b8d110bd"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KGYTTC2M.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e1b9aa42a91c1d8530620a08b9e2dd0b1cf1e5ac3cfebb8884991940e0f1cb32"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KGYTTC2M.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "56180fc127545697c7ae2099e97382a204c91d1ec92f42f79696f006fa117894"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KNLZD3CH.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "50f1079ee8991442b285f77ef14b55b24d559130cf332062252990bc44af9612"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KNLZD3CH.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f8cb743da64ee9c44f929e9d1fbedf94290786a4240cdb4cede8522159afd06b"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KRXBNO2N.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "cb9e48be4001b9df6a8340c362ab31d8f8082251e5ca0561a25e3b90e8503acb"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-KRXBNO2N.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e6e395024f6605cf17787c7c59f43428bd9cd998d7b72c31e6b70263acad5b6d"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-LCXTWHL2.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "12b4a0cdc29492bbb7b2f0ded752c9f2ae8dc8fcdf7306ff969eaff1f1513413"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-LCXTWHL2.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "98bcce689022a2fa2ac4b2071f66cadf8dc0fb2164740e81dafd3b2d47f6e6ee"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-LII3EMHJ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "dc46adc1df6d184c8de8ab1dd4b6d901a379c547645b73ff91e887e408028a07"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-LII3EMHJ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ca5a2fc9da58651f9e2ba422db99c9c5e1f549c28d8ee3922a38f8037e0346e4"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-LRIF4GLE.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "41b0798473236097020c4177448e4066d311864c83ca1277c975370c077ac329"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-LRIF4GLE.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a2972a243d09826bb0eb76f8a9c81e453c231203382f3937b039e3012e38beb2"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-QA3QBVWF.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "778b589eaea5f82d965bdcd7fb8797c60a9a3f8f0cee563320de960d7118cbe7"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-QA3QBVWF.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "171b4100d74b031c7f5565643769c1decfe2e15d1ead6dfe2ee4969651c46218"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RERM46MO.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "8a16e5fee7e652e829c9912ec9b460e6fa9207775ed393db500998cecb825961"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RERM46MO.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a873373a6847e2bb2d8fe595e34384f3418db927a60c1fe204740a755f4fa851"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RG4AUYOV.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c366ba7f7583d47cdd2f3e8b221e7ed88b6125271880e13ff7df062aea30f359"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RG4AUYOV.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ef2a7442a0be73da4a03634fb029b75514d8d73b8e68b1e5a16ff54766f4cdb0"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RKZBBQEN.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "21d83d89976290c893f29b1868a5397b8cef68ac8ae2ef84aa0014395def4c79"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RKZBBQEN.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7d10217dbf96c6503b9b330c333b5fbc482418b43fe410783e46a9bb5f876e3d"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RLI5ZMPA.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a81730ff73d5ac04614508ab7c1baab1892d57e31579a2361a09537b99d31e49"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-RLI5ZMPA.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c5eab412da93f1d5a099663cf3068e22eab65e8d04f3d95a7abe2785e0721275"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-T2UQINTJ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "bbed6d33fcf7047d41b9fd00ea8e9ed9f8e892015f148b6855ef9237e4e318e3"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-T2UQINTJ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b23ec830e291083c56d26cea1839b2f4c11f32095f653d660a97bf1fc6b386b2"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-T5OCTHI4.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ba9d3fa3e038622a47e7ca89732ad6533fc16d40146019fffec167cd9897da0e"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-T5OCTHI4.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1e09581af0bcb31d1b6eb2e9a762107a97ea82b5042e6eb346aa39e537b35eb7"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-UP6H54XL.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "317356f8b96154d6fd6b20c47112545810315aaa06bbfcba535cf0eb1215e824"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-UP6H54XL.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2d19c7b37397e160aa044c340a3c96c6b97915c9580ccc4f3f41f1cc786580b5"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-UXSXWOXI.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed1215bf07a5e0533e3b7d5b92c85470e93bc7d3d528632bedbe3760eb5fea84"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-UXSXWOXI.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3ea476b2f2ebdb7b8672c1bbb5abfa01cd9516e882d528d72846be144dfcbda1"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-UY5QBCOK.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "33f15726492ac200c5fc0b602653f546459852b458d5df0a8d49e52315352031"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-UY5QBCOK.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "75887621bf331aa6ed7927c82abad433be228f9e9b4acd64194715c4b4bd07c8"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-VU6ZFW4Y.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d60097c7adebb813dc4f3ea740fdc63233622e4120c4f7423a2f74a7f7fd1a57"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-VU6ZFW4Y.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "182d84909379d2d6dd567f01b0190eafd209f5ae094763914f20e63eaa6388e6"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-W44A43WB.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "26bdbfbd49eef497095b7c5132e70d0e06103b244b6fae1133e574f47e0f00d3"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-W44A43WB.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3080636b39d221567185dc71b475021ea2e61a25d229f1183e80e01c338a7a72"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-ZXARS5L4.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "9cb0994db2e43d30454d69cb6e6085599acc9265f5b5ceaef9e0b3f7e98c22e6"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/chunk-ZXARS5L4.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "9c3a08ed80f153948c97516a37f00a6c9408526dc6794176b2d86a80852d6af6"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/classDiagram-KGZ6W3CR.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "73c56245837f385d157e04717e66d643f4f39862d492c2f8cb97e38828406235"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/classDiagram-KGZ6W3CR.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a3923505db353a0290535e86911997fc12db9df7a0f94669bbdef1a679d11382"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/classDiagram-v2-72OJOZXJ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "73c56245837f385d157e04717e66d643f4f39862d492c2f8cb97e38828406235"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/classDiagram-v2-72OJOZXJ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "900821f624177b7cf4bc8ace424f1c7e16040648ad32852f3e72541a3a26f7a5"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/cose-bilkent-UX7MHV2Q.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ac64665f96ecdef2cd7768c08b8cf3fa816270f196ec956db9fccadb6c084ede"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/cose-bilkent-UX7MHV2Q.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b2546b8d2c3d89a0c57e148081d0443d1cc3e544f7d732008205d2ae8cac798a"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/dagre-ND4H6XIP.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1d95af07563b85e9683932d751bdb3e4941eecf2619353a9014870f522ffb9d0"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/dagre-ND4H6XIP.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "47939d9d32272b74f2a1f087b0be5a22b999c0809037f400ac16ca53a7c0712c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-3NCE3AQN.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0dd98c39823d4845609c1d10ff667a1c4f78b12efb1e6dd01deb2492a561f234"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-3NCE3AQN.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5ef90b6a84feb8e265834e51145e49a20f3347bebcea605a6362c751bd31b9b7"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-GF46GFSD.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3469785c7fd3a6ca0407518da22c18c9554db7228ec501cfe5edb964802e0b24"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-GF46GFSD.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "fb92b8ebe391b06c2406af38ababd2d0abc604e49bf3a3437401600ad9adf854"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-HNR7UZ2L.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a92bd1bc92af1e91e3bde5336078b1e8b8257b03be5a55f16e495302878b6402"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-HNR7UZ2L.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d2f421c915fe17bb69ed500eae929522763708c16c091883f32fb82de7772beb"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-QXG6HAR7.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2cca38d38bc99a41d666565e688f2d2385c4deeaa53b05655175ddc5d0f1f00f"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-QXG6HAR7.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c5de448950124b5772ec46568617cd0e798ca0645e1bb8225b1b6e9d40c78c17"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-WEQXMOUZ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "60df75c7fc1f3286361376ee8724c684fcea122cab783a15e1b85ccb90b85d6e"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/diagram-WEQXMOUZ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ab4f3fdc108a2a169ddc80c3edf4e826bc90700e0c4cd4ac51bb22f8f470e774"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/erDiagram-L5TCEMPS.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "48212b9dc9ab57198a3d43175738213cf03bd7a97702cef03ef293f968ea451c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/erDiagram-L5TCEMPS.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "4da6691205177bc1e81f1a552f5ccb53da3c97a419f7c45836562ac502447143"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/eventmodeling-FCH6USID-MREXMVOE.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "eb2de8b20d7db61454f6d4ae6d93767b43824b413985fc31a9beb706ffe413a0"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/eventmodeling-FCH6USID-MREXMVOE.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/flowDiagram-H6V6AXG4.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e6996c92c9a0169eb3f39b79272ce39fc03e872cb0a985d70d326467652a036c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/flowDiagram-H6V6AXG4.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "4f8255a41e066f5b1dae76f6efb28f5265a70487253b02b84419888ce212958f"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/ganttDiagram-JCBTUEKG.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "bbbc8336166eb0f508f970e214bdd5720a927f19a6d748597e6574b887281769"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/ganttDiagram-JCBTUEKG.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "11faa1d3b703946d4e1013e7c514deec76e4d6d91cfeb7640e9d9f3695859ee4"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/gitGraph-WXDBUCRP-R675I2BI.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "9485f37f321b97acee8b28afb3f59cffb9e190b695448be04608c83380d13b1a"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/gitGraph-WXDBUCRP-R675I2BI.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/gitGraphDiagram-S2ZK5IYY.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "64aea4080a70095682d83a90ee0c7346af13f46478ee6530a57396f8ba70ba98"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/gitGraphDiagram-S2ZK5IYY.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "262c254e1740bab1408fb7ffd3e702224a4a99c2559bc0864722f0a2ad6d405f"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/info-J43DQDTF-KCYPFFUO.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "92caee7eea84ebff40862d8719893c5ff4ec3d65bd00401873a9520738ea57f6"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/info-J43DQDTF-KCYPFFUO.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/infoDiagram-3YFTVSEB.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "4506cf8228bb1daf0856d7d9eb1cd4944d3b0aad864e145758bbf4eea51319a5"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/infoDiagram-3YFTVSEB.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "cd91b90e14cea90ee94dac64c14af04069f14bfa60f35f18499d4c5cccb0fd77"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/ishikawaDiagram-BNXS4ZKH.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c073588d85be7be5f284ceb140cb2f29c34997321f8a52e49bf8ea6162a8f945"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/ishikawaDiagram-BNXS4ZKH.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7bd4e8f2edb4b37737b093a0cc4bb5e782e3e93d5112b85a96aeaf097f56c849"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/journeyDiagram-M6C3CM3L.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0750b2dfc1c8309c27d7ea992362a4c7eb87b5ed777631edda46acbe70fc6b5e"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/journeyDiagram-M6C3CM3L.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f0e308f59d62aac0ce34a2a9d177f38408f2c15a615e248b44b203b029f836e4"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/kanban-definition-75IXJCU3.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "724f4c822585bb49ca4acc2029e38618039f957cf6e0ca55e974eb34dcd55669"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/kanban-definition-75IXJCU3.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "eb7d9ddcf71414588f14771481036f77deb3103ef603a0e7b3a91df819fb7486"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/katex-K3KEBU37.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3bc46772d07702eb7780e5c88e313cd333212dcadd4792f050c74f9df627b4db"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/katex-K3KEBU37.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a05a283091f1be50502e4f1daacc9f9d648f0e44842478d349a875bb8fcab07c"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/mindmap-definition-2TDM6QVE.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "198c96073b24e3b3cfb8e53f93e86858d40de9501e953e057c59b99372ba2566"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/mindmap-definition-2TDM6QVE.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6eff815776aacf263b4338e21ee7e55cfa12fa3ea5c84778243a7578629e2407"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/packet-YPE3B663-LP52Z2RK.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "78c8af872d0173ce6358476293e224af3ffc576cded4a91d5e81c9a56d4b9cac"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/packet-YPE3B663-LP52Z2RK.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/pie-LRSECV5Y-TCRJHUBD.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d9d2b823a1eed3ba0bec2f03af934a2881412660ba25025da5affd53a55705b4"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/pie-LRSECV5Y-TCRJHUBD.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/pieDiagram-CU6KROY3.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c4a4c51d94440a46b32126a67b5677ef5323369f7f90abf1a4310796031fc883"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/pieDiagram-CU6KROY3.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7367a81fc1fea94dd292c7ffa7ad45bfdc0035f0d0560da187f0d61ff9f46d9e"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/quadrantDiagram-VICAPDV7.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "dbcec2cf232b609610c3751c858e2743661aae5284d0e22c040ef5c5d788c615"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/quadrantDiagram-VICAPDV7.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b7be346002874ef009577851b772bd54d60e2e7d68c8711e2b2c37c1b58576d9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/radar-GUYGQ44K-RDLRG3WG.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "32d8ae942b7479d4a3cb8132fb5f4c20b88f7cf48caaab3c1598cb8fc1f8748d"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/radar-GUYGQ44K-RDLRG3WG.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/requirementDiagram-JXO7QTGE.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a17fd0a7ea917a2de136679f2832fbec23a1d9273a7e35352a0f9be9c3c7d834"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/requirementDiagram-JXO7QTGE.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "dc8478d2cdba786d8a36269b58d91517dd99b80d6e1953d4fb9de8bd6cb64cce"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/sankeyDiagram-URQDO5SZ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b1ac088baf35bcc9a680db768bbdb8865ba59868228d5c3399ad0cbaa111a41f"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/sankeyDiagram-URQDO5SZ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "74c0fc367bb2332c8a08b5084e72c13d31d5a500881b7f8edd20bc152338f721"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/sequenceDiagram-VS2MUI6T.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "91d51a2797753f3bfc2dea9887e85a7ad33ddfab504f1da1165574ec1474b444"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/sequenceDiagram-VS2MUI6T.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a8c1d267ecceceba1cfa626630c2c7e84f3aa20af957a6610e4de71da7e8f376"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/stateDiagram-7D4R322I.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "45f3b04c11ab254e16ad5b1e9b81227bbdc2a3bd5d9d6305224100e4a1de4793"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/stateDiagram-7D4R322I.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c0963b14c050cfd1ef747586863a62e26051e8e712e6ccf496b2e93dd6332fb9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/stateDiagram-v2-36443NZ5.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "43823dfb7a514f40006f850cce1965a19e7e454942008d427f00d739eed6b353"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/stateDiagram-v2-36443NZ5.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d040e3e22a864029773a36eb0495a8e2a2e0dee5ecdb8ddb2ec2835bfaa4d032"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/timeline-definition-O6YCAMPW.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e2328aed06331ab68e6fcf8e91a09f35138a72ef5ab8c4b0b6e3c8ae635018d3"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/timeline-definition-O6YCAMPW.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a122bbecd3260e6538ae356aec81c47ff592d5b1bc3d1dd5d0f77636b81b7d8b"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/treeView-BLDUP644-QA4HXRO3.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "8ac4fd51f692ae3111e5113d76e0b55265135674d1861a7225336accf9b40874"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/treeView-BLDUP644-QA4HXRO3.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/treemap-LRROVOQU-LLAWBHMP.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2d1615a4bee0feae104a9136b3ce9a372e6c73e5311ecc62a342e45742c2898d"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/treemap-LRROVOQU-LLAWBHMP.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/vennDiagram-MWXL3ELB.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f5b828bc712fe7aeb1b83dee6316ad9e98ca0c3153ef272fa2acc55841719029"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/vennDiagram-MWXL3ELB.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "32fdac025feec213e6acab334afd5fdc12c965440f90e35afbf099cf9a5f18df"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/wardley-L42UT6IY-5TKZOOLJ.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "837f610a1160be5381ab1a599f6a7c503d5f9b508b02aa635c441bcf3de93389"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/wardley-L42UT6IY-5TKZOOLJ.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/wardleyDiagram-CUQ6CDDI.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "97cf7a42b7ea6f8f77fd4a00ad43b3c8380d13ad85fbdc322ed9d0496f64f870"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/wardleyDiagram-CUQ6CDDI.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "749d0f39da5a71a3970e974c34d3cbaaa6f396757d2cb6b72be8666e14ee3edb"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/xychartDiagram-N2JHSOCM.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "bdb7d6508a13a98ef07c00cdb2b9e86a486b3ed6e1d1de6fe40e570a978381a1"
+  },
+  {
+    "path": "assets/vendor/chunks/mermaid.esm.min/xychartDiagram-N2JHSOCM.mjs.map",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "092e3588c4be7b9e395d0cd99d2303a880fb4e578719c7ed708eaececb407d3e"
+  },
+  {
+    "path": "assets/vendor/dompurify-3.4.5.es.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "350eb3086ccb55b51d2b969f17f925317585ed58992fbceec5faa415ae87961d"
+  },
+  {
+    "path": "assets/vendor/fflate-0.8.2.browser.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "8cc1f687e0159e977addb6b85e274dbd11e622cf151f4fcb7b85d49622ea43e7"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_AMS-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_AMS-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_AMS-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Caligraphic-Bold.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Caligraphic-Bold.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Caligraphic-Bold.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Caligraphic-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Caligraphic-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Caligraphic-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Fraktur-Bold.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Fraktur-Bold.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Fraktur-Bold.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Fraktur-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Fraktur-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Fraktur-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Bold.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Bold.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Bold.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-BoldItalic.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-BoldItalic.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-BoldItalic.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Italic.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Italic.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Italic.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Main-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Math-BoldItalic.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Math-BoldItalic.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Math-BoldItalic.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Math-Italic.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Math-Italic.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Math-Italic.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Bold.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Bold.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Bold.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Italic.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Italic.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Italic.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_SansSerif-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Script-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Script-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Script-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size1-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size1-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size1-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size2-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size2-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size2-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size3-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size3-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size3-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "73d591271b1604960cb10bb90fee021670af7297017e0e98480b332d11f51995"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size4-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size4-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Size4-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Typewriter-Regular.ttf",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Typewriter-Regular.woff",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7"
+  },
+  {
+    "path": "assets/vendor/fonts/KaTeX_Typewriter-Regular.woff2",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b"
+  },
+  {
+    "path": "assets/vendor/highlight-11.11.1.esm.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0"
+  },
+  {
+    "path": "assets/vendor/katex-0.16.25.min.css",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0c8126645bb983a788b167b1b97abe2505a962ad45e049001463c46012012a9b"
+  },
+  {
+    "path": "assets/vendor/mammoth-1.12.0.browser.min.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5d4c0e7c9165d70b78f789c5274a2c7846d9e1c06ec19b69afa6ef45f789a3b9"
+  },
+  {
+    "path": "assets/vendor/manifest.json",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "77ed575a54735f1d08d4fe5cbb9d693e926b38cb85acf3de26d01896cfdf8bc6"
+  },
+  {
+    "path": "assets/vendor/marked-16.4.2.esm.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6540aa2544be84b3abdd9424fa287120e9ed7c7600512dd92c097493121a5951"
+  },
+  {
+    "path": "assets/vendor/mermaid-11.15.0.esm.min.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "048cd77757db0a0d38a27c543f35cd8e7faf53003c34216cbe323bdf9f03dcbd"
+  },
+  {
+    "path": "assets/vendor/pdfjs-5.7.284.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f36805aa525535f968b9df66c9925bb1410f71b76f16822a783dd2b2c54c14ee"
+  },
+  {
+    "path": "assets/vendor/pdfjs-5.7.284.worker.js",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "535304b72e8a4354480292070ffc0574be1106f571a6c3949768bd46f3923af6"
+  },
+  {
+    "path": "docs/architecture/lens-artifact-bundle-contract.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cd3510f72b6a11b27036d57a4e2c2849aac77ddc8c232de1237480bc11f5f7ab"
+  },
+  {
+    "path": "docs/architecture/lens-docs-studio-identity.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e2d93d869160033eb0ddc5ab92bfdbd4e6d456f49c64785eb972a92caedf0009"
+  },
+  {
+    "path": "docs/architecture/lens-docs-studio-support-bundle-design.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "13dd6bd4a49b9e771f2d0812cd4fcd21dee63c4290e3ebf613ee3ee4a8335527"
+  },
+  {
+    "path": "docs/architecture/lens-docs-studio-ui-definitions.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "c55065e89fc3d074979040de0e62045d969a555b4e9bd0416a3579606238880f"
+  },
+  {
+    "path": "docs/architecture/lens-docs-studio-ui-tokens.css",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "eff4b7f4258bbd6aceb08dda4a03f8a801fef64c0f524554485547f7a0db14bb"
+  },
+  {
+    "path": "docs/architecture/windows-installer-decision-gate.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "54ab6b71125692df8d500f894f5d87aee9ce0d27debf8b9f5316f84254f948f3"
+  },
+  {
+    "path": "docs/architecture/windows-installer-spike.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "81d1889a525bc49dd7661aff7faf5b0c6ea8b6fd81e49cf3886c1d6cc0694712"
+  },
+  {
+    "path": "docs/architecture/windows-offline-distribution-roadmap.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e7965bb76998868d7cde71acb63bd5dc231718ea98655361c55e0eaecad1f4b3"
+  },
+  {
+    "path": "docs/architecture/word-export-templates.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e7c27e9b2bb44b93256405f93468a09247ad708f90be91585206058ef9f886a0"
+  },
+  {
+    "path": "docs/architecture/workspace-images.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7e96b1b64ecb5b539e74cfd742aa079bef9776d13c5cdf863de71df5851f318d"
+  },
+  {
+    "path": "docs/integration/lens-artifact-bundle-producer-guide.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "63ae77fe480710a7ff6e55c56dceaee9a5eadb8c79d5ac3d641454545a70cbd7"
+  },
+  {
+    "path": "docs/open-source/licences/playwright-notice.txt",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6d602191187b35b9b01d2cffa01c8469c2c8d9de8a96f1bf868e0f264f51c81d"
+  },
+  {
+    "path": "docs/open-source/licences/playwright.txt",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb"
+  },
+  {
+    "path": "docs/open-source/licences/webview2-sdk.txt",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55"
+  },
+  {
+    "path": "docs/open-source/licences/windows-app-sdk.txt",
+    "category": "R6",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5b11e6347756e40fe0274bc08c97f89201b94f0d50181a09a00f1f4740840501"
+  },
+  {
+    "path": "docs/open-source/main-promotion.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5c3ff6dc9d248e000fa0cdb0a175470cbdae82c151ef7748b422a14d11facb57"
+  },
+  {
+    "path": "docs/open-source/main-provenance.json",
+    "category": "R5",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "5fb445765b97be4962ea080cf6c77e9ff18a708147aa22c210273278133fe0b4"
+  },
+  {
+    "path": "docs/open-source/main-rights-ledger.json",
+    "category": "R5",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "BOUND_BY_FINAL_GIT_TREE"
+  },
+  {
+    "path": "docs/open-source/main-scope.json",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "9b451ceef7789445f3ed1ba88a18a62a40a6f5c523846d1cf91a1b889e2f4e93"
+  },
+  {
+    "path": "docs/open-source/third-party-closeout.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "27ad53188a8314fe484cd91a695f5c644a4b5a76cc7d84501d594c73720792db"
+  },
+  {
+    "path": "docs/release/copy-markdown-with-images-azure-devops-fidelity.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "15c6fada0d01872a7f2a6578c711b359b47c3bc36c3b015b2ba0c15c334acce9"
+  },
+  {
+    "path": "docs/release/github-release-publication-flow.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "72cc0914e3f091443fc1047583cd273da1f90dc90011b7b27913604e1e73eee2"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "1af69ff1579d136f72c9df42dbf962d3b215b598dd4bc006f9b2c29525a569df"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-draft-release-review.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e0a9e67100f255a105adee9163b758555b3bb5e83d51680b63561bde122ac45d"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-final-internal-rc-review.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "aad089bfae027374918807ec46a2ce7b34409c82b56dd3df0ea2dd164cabdfd2"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-inno-installer-mvp.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7501ab89bfb1b1343b9f07765783e2816f8091c4942ac7910e9a6ab4cbb13e6a"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-installer-rc-asset-plan.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "2f537872289395b3871ea7e6dcc2beef81b9bc1c8b3086a0fb310c8e89debf68"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "c042a401e43c26aa7a6a529cda0bf668baebfd7a969269d092b05594dad1b39b"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-prerelease-feedback-intake.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "61e5143ad5c831b80019d04e0676c578b83d24849abb43724476e5679817b58f"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-prerelease-guidance.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cf803864037fe75466ad2ef9e89295cdf7d971e3efc4edd13019d61a607ca5d3"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "25eece2882580a3ac73755df3ebe6576486bc4bd11c8e0f850c193436458615a"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v0.1.0-dev-known-issues.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ac52863dfecfe24a75d5da9f4b74310744d31501a0b6942f86187898f289ff96"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d3dd63c63c0d1a743202140681fb6f92d5d13bb369a66596c925ea4773793987"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v0.1.0-dev.1-certification-plan.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "89ab274971eb4f32d3cd610bda74fdc4d5df7a505e83e68df16281667b43ba56"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d70bb58c8bb29a6236889163a4c0b0f09fcdfd255d2cd2a62293b08148e5e22b"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v0.1.0-dev.1-publication-evidence.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "bce7aa37bba1e7952135c4b38bc0d0adc91993bba7b46964b2999c408cbbe155"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev1-release-closure.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "0debd4aa6164295a89f91994b022b6dc7e8e8698ece189b2bbf357f7275fe328"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev2-manual-packaged-sanity.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "592ce456e5d3f646847b1afc47762311d0a53d2fbd299650e1bab9f450ac65a6"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev2-post-publication-verification.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5af4cc97f4dc0e18cf1c4da3b9f2941830a8778e60a0ab2a7c221ad5991d3e27"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev2-publication-bundle-freeze.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "2a80d58cc4cd60f684f95be93c19581612ff130eed466154f2f96c14ce0b64ff"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev2-publication-record.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "a8c3c87012ea70fbe0ef78ba6fdf7b14f35b54f41207299f420cf1dbc4f7dae2"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev2-release-candidate-readiness.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5d9ab5b81c0775d2173666c7a55abad29f898b35e864aea3a81005917aedae90"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev2-release-closure.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "0a6053caa357f6a1bf4124bf9b852abc4a1cca3dcfdc9d8685a7bf3b255fc4f6"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev3-post-publication-verification.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "11a9c3b4735c863c674c5b341a3b4db0884df35618b620cb31bab09d3cb0fd1d"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev3-publication-bundle-freeze.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3a81f8292a0bf4c6828eb821fd623dbc74c8783c812f858f27211a803cb1a766"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev3-publication-preflight.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "78c157692583a5bfa1155f4d6597e05fb2bbfad58e959362b7db84f223ecd8b7"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev3-publication-record.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "b9f9cdbe26001689fd169d7efe0d52b4f0458543492ec8d463632cd201f344c8"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev3-release-closure.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "af88bf4b4af40e924098eee2d258343758bca6a132fba34d1bc9b0fb3124262e"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev4-post-publication-verification.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "bb0373a2e21b983e2b70721eb88431a0dd3afdc2309c2f4bd406acb3dda8a425"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev4-publication-bundle-freeze.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "6d9faa0b4ec48e528da27a3a65b7952a0e3c3960883a5c368625ba12c3f555c2"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev4-publication-record.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "9c434e31f361745603f83a3dc219742e64c693e72eb979e08554894dc5bef4ba"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-v010-dev4-release-closure.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e870d433fb790264bafcf75fc437e7ea8e6c60ed8e60fc0e806034fe886622d5"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "95ade6e6675a2c7c1bdbeb2c8a90362f300d33d024982fd082fdeb6443a8e351"
+  },
+  {
+    "path": "docs/release/lens-docs-studio-windows-package-rc-checklist.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "c0ae01c2e809f371d22e0e63a4072fb4b99850b430eca11fbd7d36e30744c9f5"
+  },
+  {
+    "path": "docs/release/phase-3ac-release-publication-preflight.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e6c32042760a1b29065ef936a2fc781285528834ae6d9d69f68f414a673aebea"
+  },
+  {
+    "path": "docs/release/phase-3ad-publication-bundle-freeze.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "dc2f4b2e2e7ebd9368452e60b7feaf26200ebff0dcae632e791dd7fa8664da6a"
+  },
+  {
+    "path": "docs/release/phase-3af-post-publication-verification.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "dda4e0d2397cadf55ac944d714a4aa552d03646f20f444d189cb2943861222e4"
+  },
+  {
+    "path": "docs/release/phase-3ak-diagnostics-visibility-polish.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "0fecbd863f5d9f8fc130a37ccad888ca1be9f8ab7fab89fbac8948370d57bb2a"
+  },
+  {
+    "path": "docs/release/phase-3al-first-run-onboarding-copy-polish.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ea249287484928c57d241481ea8bc0157d319b1045f1614733cbb63d8d19521b"
+  },
+  {
+    "path": "docs/release/phase-3am-watcher-conflict-ux-copy-refinement.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ca76785c33f9be51eccaa55cf615d6c718ea423fe9ea00c4065357c61335aae8"
+  },
+  {
+    "path": "docs/release/phase-3aw-open-folder-picker-remediation.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "0c84c26178e5c5849763d861316a1d863377d76f598c73a3ba835aa70b156a46"
+  },
+  {
+    "path": "docs/release/phase-3be-support-bundle-implementation.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cebc901dc87599ca8e8295307e32a8d2d585121878c8bb14d45e9111445f73de"
+  },
+  {
+    "path": "docs/release/phase-3bg-diagnostics-export-copy-improvements.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "8a7d96876e9ab81b337828ea97c064e1ef22daa4ebca802985b53e1620e5d873"
+  },
+  {
+    "path": "docs/release/phase-3bh-installer-upgrade-evidence.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "09c768d39fca4f4fe2a3e1d133addf3f4bcb548c94d43f87867c922b183aaae0"
+  },
+  {
+    "path": "docs/release/phase-3bi-installer-payload-hygiene.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "a8137a97f5f24ab4f0b80473052b77deb42d9caa4b223d2a18848bb9228c127a"
+  },
+  {
+    "path": "docs/release/phase-3bp-manual-packaged-sanity-helper.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7e6a831ea20bfdad91f89b66090a279df2837a751d6188fd3bd9176b531e7648"
+  },
+  {
+    "path": "docs/release/templates/github-release-notes.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "497c94fa15e4882f6c85ba2f29b59f814dd480674319ff7f478f97504aeba5de"
+  },
+  {
+    "path": "docs/release/windows-file-associations-mvp.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "b02b552093ae0bb2047880e66aff08bbcbdb1581574231b4621547701f2f4a44"
+  },
+  {
+    "path": "docs/release/windows-first-run-setup-mvp.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "8cd5b85138751b0a6e1cb6f6405b0fbc3786992fa7a503b31d09b3be88de8020"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-post-v010-dev1-backlog.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "da1f1d0fc56b1a7c0104f49d56f3e10fe9c519ec52aca1e3a03822a0dbcc0a6f"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-post-v010-dev3-backlog.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3de35a7c04e2eb5bd197580135674675d62a617449d48d139b2f8d4948153701"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-post-v010-dev4-backlog.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "73a5d8ce8c8867dea4f77ccbd8998b548c187a198483af73848f4bcf56a39ca9"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-v010-dev2-candidate-scope.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "80e767f1dc87e2f8fdbbdaec5209e9cd122d80d53526aab624817fa1bec0337d"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-v010-dev2-implementation-readiness.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "8f263242d65950e31da99c0f16ee8436c264db652c54593517895fb65adf6d3c"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-v010-dev4-candidate-scope.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5d0baf50c2a0d32a35469ae95f934de0573ac7b5bbf412a738774bf4140c5a94"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cb7e6b0ce935ad10216c39b1d30886a1b145d2692414eb4808a8a50240ca0fc9"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-v010-dev5-candidate-scope.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "fb71d2041af91c8f9df5587cea3a3649383236ccd004c7515b48864e45a958fb"
+  },
+  {
+    "path": "docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "0ddd17d482c6bbfac753e891b628ce4c4027a88c911a13b44c81c6030e7d561b"
+  },
+  {
+    "path": "docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "c74f6a670e189ab145547227a4f38150cf27bb3eeae2ee8c2f837f42cc2b0526"
+  },
+  {
+    "path": "docs/testing/workspace-images-local-validation.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cdb100eef666aa66abb171237f7c5515a5978300f1e1d3a21e4378569f4e51bc"
+  },
+  {
+    "path": "docs/tool-guide.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "6290147d880fe50e3b810e6b6568df785e5cf3458d26b0961b01b88a771248a8"
+  },
+  {
+    "path": "icon.svg",
+    "category": "R4",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2a3a6bdc82671b8229ce49d4b9e5b92e97e28da854c004935124b632025f1b07"
+  },
+  {
+    "path": "index.html",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "284fee4dd0fd6beb1d3e6d9c5ebb2c08ba1dd5610ee168b4afbdf0e20767e24d"
+  },
+  {
+    "path": "installer/inno/LensDocsStudio.iss",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "4c97709b3849d95cc83503381244628b85943f4c5c812f9be5e8e9b196c9fe8e"
+  },
+  {
+    "path": "installer/inno/README.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d473bd4cf13711be23e6212ac6662af90e9131829d5bf39a0126d04b7b983f39"
+  },
+  {
+    "path": "installer/msix/README.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "65bc79178713f8288b7ec334ab449bfd8314814653fdd565f4c2bc0f0b0590da"
+  },
+  {
+    "path": "installer/wix/README.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "fa77ce4f277c547af950e0ae0fa2e09ec04d1d7044c274f05c2e78cc2cce8143"
+  },
+  {
+    "path": "manifest.webmanifest",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ae73fe8889fab49fd09770903a4de93a91aff855780f3a190337890f296a7986"
+  },
+  {
+    "path": "md-mmd-renderer-v5.html",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "c60176fb6da0cd9a77694d8566e0e77cb84ce54e99701832814af84e814cc620"
+  },
+  {
+    "path": "package-lock.json",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "61b6f00c1cfa7501f857162dcaed17bf536e99605a6dd4003f2bb65604528427"
+  },
+  {
+    "path": "package.json",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "a7fe3b874b94b18be000cbe694f90be927c57c0bf705987503408e624c929ad3"
+  },
+  {
+    "path": "playwright.config.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "61a244ac61f4d163882fbda98181485bba726aad5ac5e622d789eb9383364587"
+  },
+  {
+    "path": "scripts/compliance/main_provenance.py",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "46c305592e81f924edbc04942d5b3546d30e58da004499e9ba10b976c456067f"
+  },
+  {
+    "path": "scripts/compliance/test_main_provenance.py",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "17be2e9c32ed37131a4244f0d404dc911c7cda0e6233a952c53fee143a909a72"
+  },
+  {
+    "path": "scripts/windows/Build-WindowsInnoInstaller.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7793a5cc12a3f584c22b8a4335efb139d18442c4e5211e9e7e9281652105e463"
+  },
+  {
+    "path": "scripts/windows/Build-WindowsPackage.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "2d862c22a40cd942179b1d29ad1aa63ea940266d3f9038a14c6f998192c8124b"
+  },
+  {
+    "path": "scripts/windows/New-LocalDevSmokeZip.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "6eb0a61c05bf3d26440a685e26147020cdd3bd64bfc873c7a66ff0f835c1f3a5"
+  },
+  {
+    "path": "scripts/windows/New-WindowsLocalDevSmokePackage.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "2699f8f3afc0924f6340130c308e010cf16edae83f6696ac1191201da508e5af"
+  },
+  {
+    "path": "scripts/windows/New-WindowsManualPackagedSanityChecklist.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "8ecc5748dc0e250ba3aec8a6208770e1c45953663161ab9e1c619655ef9b62c6"
+  },
+  {
+    "path": "scripts/windows/Prepare-WindowsGitHubRelease.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ea12139208e3071712f387ee2bdfa77741903f63ebd90744cec9defbbf5fd69a"
+  },
+  {
+    "path": "scripts/windows/Register-WindowsFileAssociations.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "e056baa073fa57e77206ab30b740129111b165659525c1855b92dd097dfaac7c"
+  },
+  {
+    "path": "scripts/windows/Run-WindowsImagePortabilitySmoke.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "25bc05420c05641485edd7d564b1b03cbbf28adbe44e0e733360a7602eea900b"
+  },
+  {
+    "path": "scripts/windows/Run-WindowsNativeBridgeSmoke.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cd81b10c069fd79e6917838283f62e35a84203e396d1a18f0b6286bd28cbc4be"
+  },
+  {
+    "path": "scripts/windows/Test-LocalDevSmokeZip.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d7471dd3a1ff774941741377aa7c7aa6b9a74e738e60c064cb036e7220cb049b"
+  },
+  {
+    "path": "scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "fbef0e009197841591c37d9b4771f7279d80c32e786306b404a9c35cd8ddf533"
+  },
+  {
+    "path": "scripts/windows/Test-WindowsLocalDevSmokePackage.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "268ba91122cf2b967a8a31526dade5788f91fc82fbc57f85fc8aa39fd9c65fc7"
+  },
+  {
+    "path": "scripts/windows/Test-WindowsManualPackagedSanityChecklist.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "91a427d152faaf7ab3538db7b0e0258fd8061660307c913553c285dc189c8a24"
+  },
+  {
+    "path": "scripts/windows/Test-WindowsPackagePayloadHygiene.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "fdb306dd3fc1c888ab3016d8e342ddf2cc8b2b336c11e46129a517881c2626ed"
+  },
+  {
+    "path": "scripts/windows/Test-WindowsPackageReleaseCandidate.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cc63e409ccb8d74a4aa0d405af18a0e4ffdc5d1fd699360b371dee201d6b343d"
+  },
+  {
+    "path": "scripts/windows/Test-WindowsStaticAssets.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "b95947c53069f3bda646bdb7082e56615eaaa91bad1174f28559c0a949950e5e"
+  },
+  {
+    "path": "scripts/windows/Unregister-WindowsFileAssociations.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d364a4d0c8187d152c858ddf689e7d621f3359706387228ea4026cbbf70fcc85"
+  },
+  {
+    "path": "scripts/windows/WindowsPackagePayloadHygiene.ps1",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "2acf53ef1ce30cef64552c344ff4d217a94e54e4caaf417e296c7655e8fcb050"
+  },
+  {
+    "path": "service-worker.js",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "84a1b0e75d9a0c46e2c487f94e0f61a289b041ce8a20d37ddc5a9a81cd511a9b"
+  },
+  {
+    "path": "src/windows/.github/copilot-instructions.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "74b669abed9473b345b5e08ebe74a8b8cf2e48c6cff99a4bc0c8e5cdc3429ac7"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows.sln",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "fa78d9390881c5b103d805da366aef120e66b8043b4a9f33319bb80ca0962e6f"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/App.xaml",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "0907a251ed6e157805867177c8a1aec6daae07d262b8910dffc14ffd6c757b3f"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/App.xaml.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "558339c413aa36f569ce91ba6d780980226e87bc28fe54bc4ce0f3f38edf8b32"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3bc700a2278fbe632a7aae89254837cecd953499427c62a3ebb1a720fb930aec"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/MainWindow.xaml",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "90a5d07765633f2274ce4d42cd781a6fb688bed38fa7f0c7350a1da0454c2c84"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/MainWindow.xaml.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7d7124da396a76f857ae4595d34b02dfa778f032700b937689d2c4ac4567d377"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/README.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "fb756d471a444c97f9ad9f488d0617fcaa7ae81aa045db022523787280c79b86"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/NativeBridge.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d8e06b3740d894e4324b9bb612adf7b0a18bc5d4a5212b617ac53c07d4490998"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/NativeExplorerService.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d3f63ea75efc3b3a28ee8a67444ef5df7fa659cddcd93051362cc65f2548768e"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/NativeFileService.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "44980230abe35c02be3189e2a3565b858ca2f1be473b9391d3ce862bab15cc70"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/NativeWorkspaceService.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "ef624a9388cab47c0268aff8642f08c86126358868f41306d0bc10b43cff4bdb"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/StartupFileArguments.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5d7b5e1cf1fde63c887c9af3aae62bf3c83b3021294eaf7c5d0acc9b6efd0e7c"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/StaticAppLocator.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "d44564fd96f419a1c0d2d4ef0ac6a5aad8381815ab9a60465e74ad9886116d5d"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/WebViewBootstrapper.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "870f5801b505d55227e9ed5bb8993bf9cbca28dff901da6d575097890ac4bc58"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Services/WorkspaceImageStore.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "eeabce871361b4ca4aa241db906aa82fe2b7468d4d6ec529992cfaab9bfa0650"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Smoke/SmokeCompletionService.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "8f3dbb5fe375392d007552d077216f1c812567b9c7920b2c63839687f622c34f"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Smoke/SmokeFixtureService.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "1196711197c10ca9be8ad7cfa2275fea75fcda9fa12ae5872d1ecd51fee878c1"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/Smoke/SmokeOptions.cs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "2d8b09701aba53ef530ae13f2f6856f8718990e6b521693266fd17af1e53da8d"
+  },
+  {
+    "path": "src/windows/LensDocsStudio.Windows/app.manifest",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "77b754ff73ad5c9a7837a547f4de4e438098dc4c64ced19fcb63ba458fb76121"
+  },
+  {
+    "path": "tests/browser/app-smoke.spec.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "9250a2e6cca28717b8d615f00cdc103ad3d0bacd8633cce5bcd504091598519e"
+  },
+  {
+    "path": "tests/browser/helpers/fixtures.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "26a516e47631c729d65eaf69ddbb354118b7133b33287f64a2dd2429bfea71f5"
+  },
+  {
+    "path": "tests/browser/helpers/zip.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "34ceb2bd55a1ed407fc63976c23240f1b103fd15018a63ed0517a21ce837c696"
+  },
+  {
+    "path": "tests/browser/licensing-offline.spec.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "5218c39629a31829c3fdd731a0a618f43558055e302c394f03fdbbde66450c04"
+  },
+  {
+    "path": "tests/browser/real-pack-local.spec.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "234af6702087fabb2c26c2d7a084bb2b905d8820e349bbacd102be3a6d76c4ab"
+  },
+  {
+    "path": "tests/browser/workspace-images.spec.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "154e1f0227402f8d04917badc3d71f7d6c552a5839bc4725ce22ee5c2b86ba35"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/front-matter-precedence/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6849ce45b459f0cdd3f0e467abac5635dcc2763f934a7024b9abdc4cc2d76dfa"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/front-matter-precedence/findings/security-summary.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "750e75b30643741cf18c25a0cb7d41a6cca831928a9437c5da58b816dbd6646c"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/front-matter-precedence/lens-artifact-bundle.json",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0c7316fed68154b23b80cec2e132e7362ce1471834dfad4a5eb5a42611040840"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/generic-zip/__MACOSX/ignored.txt",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7b90c9deaad23857174d4a34aa54d65809d99ed892ddbc015f44e9e07aed8786"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/generic-zip/docs/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c1448c83783e4301baf4961ac7ca6b235e20d71ddbe179d7b3d2b22e0fea5048"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/generic-zip/docs/images/blocked.svg",
+    "category": "R4",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "677ac0259362f8be9feb2957f20f54e1e993f5db69b827f8d7135391f7986580"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/generic-zip/docs/images/logo.png",
+    "category": "R4",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "74ccddab26d9649bf133d18b9366c0ed5081ba1cfa70d6922b2db05fedb1e305"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/generic-zip/docs/story.mmd",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "0f534ced7fbf6212258b87c9033f073b9a6434117c1075344937bcf933e8572c"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/invalid-manifest/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a6ecd345b59c6731b08c61c858c33455209fd18059b022fccab6c05848275bbd"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/invalid-manifest/lens-artifact-bundle.json",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "8614d42d2fcfcd0c039386f1e8becdd12e6ed39642baf1e0119c6aaac9e6c3c7"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/invalid-manifest/notes.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6067ba33d0de2087a3dc55b2e0c91f66ecb17b4b403f3c3cec00dffddb5e2ef6"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/unsafe-paths/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "147bb5360222055105e5796f8cd61bf9c55ce742e16d03f468c835cfd419b204"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/unsafe-paths/lens-artifact-bundle.json",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e501fbbd2881da40e92048e886d921136f1be81bb69475f83990f22d35c43adf"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/unsafe-paths/safe/visible.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "f3b48e370b9c87e395c261203b25dbce6d276cc1509a76a1e85be53d303b12d2"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-basic/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b431ace49a34548d149a9c9413ae2d040ccf88faf097246fa2b9bd6cbc81f890"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-basic/diagrams/basic-flow.mmd",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "47ef30d1fbc7706ef87b1ccb81d23307631511fe583d51f93234c3c653ae3ba5"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-basic/findings/basic-finding.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c672a64026a79fb244c14561e2fe190b45fb912677fa458f7523e072f2477dc7"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-basic/lens-artifact-bundle.json",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1f7eb1eaad5e307a3e4752f34abbac13233a1537f333fd5c314d8a35eb927741"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "e874815f594c7a8545c68d391e60484faf9daf775513515fbc108b2a7a20cd02"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/adr/adr-001.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "469ce3be82bbdebad7bf1a52139904a8403ffde2a02b5b6b014e607fcc3aacca"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/assets/tiny.png",
+    "category": "R4",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2e95e13790603dc0c65ddc80941d0973c57114eb4e86c5e760f0b4d03caeab49"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/diagrams/trigger-timeline.mmd",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "dcd344b80632193c3674de550edef8284f435c6b66b6cd1cd3270db3511243a9"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/docs/runbook.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "17ae2179997c4991d0ea141d7abfb99c60c1e45bf9889ee57345949f50e01035"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/findings/candidate-risk.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "835cb7ad9e5d0c08003f20844c16f6f37048d9bf7e0d2ad6f4192187831b19c4"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/findings/confirmed-control.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3b4d8a3d20fcfed1dc2375d603cd9bbbe44613432bd7f6ed2ec546ebdc06aa0d"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/lens-artifact-bundle.json",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "1c5999f16ffc903ae46a63b10e61d8738a45f2f4cb362913fd929168e8e6eac7"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/release-notes/v1.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "89eb7df34f4739465519129dafca4467cd22f31e15f90f40149441b6015338cf"
+  },
+  {
+    "path": "tests/fixtures/artifact-bundles/valid-rich/summary/executive-summary.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "06237fe7c52fe49501ac89b3a3e7e6c20e8a85a25d44d014045c3058b4720f0b"
+  },
+  {
+    "path": "tests/fixtures/autocomplete.mmd",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2882ef129acc0553503594d769f6a1626524161eb951e25e3d33ffa46246727c"
+  },
+  {
+    "path": "tests/fixtures/azure-devops-markdown-fidelity.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "dba879701bf69ef3b86a908822035bf32d3760252c76a47a27ffc29dc447d82c"
+  },
+  {
+    "path": "tests/fixtures/broken-mermaid.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "6aa72711f8211b5c3e34b4a59595a9b411c83d3b897f5f26ea0d5be3d4f07f46"
+  },
+  {
+    "path": "tests/fixtures/devops-mermaid.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "90b00cc70172c25693f8df185a13e53a7f1a1146c3e42b59eee66e6d8e1c2ae1"
+  },
+  {
+    "path": "tests/fixtures/docs-site/README.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7076c4ca898b9be308899758ee6dbf553be8be3dca234eea2868c6ff04e997c2"
+  },
+  {
+    "path": "tests/fixtures/docs-site/large.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c1857a7f6c94b244cd7480f69f67975f827731585a2886bda1ac5bb06a17e691"
+  },
+  {
+    "path": "tests/fixtures/docs-site/mixed.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b3fe809ef333943144dbce7626773ebc2a749b8c840572dd4fb8570e2bd94225"
+  },
+  {
+    "path": "tests/fixtures/docs-site/plain.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a42a746d9d9223aabe4b197ad6baaf541acb4f9a5c45aa00dc5309032bebfd34"
+  },
+  {
+    "path": "tests/fixtures/document-navigation/workspace/Onboarding.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "63285d7e2f626c33ed8b04a8884675a22c3c5b631c7e0a7dc00b8129cb5f60cf"
+  },
+  {
+    "path": "tests/fixtures/document-navigation/workspace/docs/02-Developer-Integration.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "cbd60cc038e11aec04f74ad505e19fb2a01f9c3ceba85ebf5c8dd7c6ec9cb78b"
+  },
+  {
+    "path": "tests/fixtures/document-navigation/workspace/docs/12-Deployment-and-Validation.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "8b253671e1aa3ba49aed4db5ce2346aa4e419cba3e5058adfa4ebe225242f352"
+  },
+  {
+    "path": "tests/fixtures/document-navigation/workspace/docs/Café Guide (EU) [draft] #1 %.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "73f67d1e05bc230711acdf6a4ca2a0fe6fe2b2f40228618370a773455fb85743"
+  },
+  {
+    "path": "tests/fixtures/document-navigation/workspace/reference/Sources-and-Assurance.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "3ee049ccb30a0e30e4fb7e907155c9e3639ce12f07feae9eed9edbb4c7e7b73a"
+  },
+  {
+    "path": "tests/fixtures/document-ux.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "4de239cec9b6843ae7c80a78a94b890232c37afa618abc5f9d3373bb46b7072b"
+  },
+  {
+    "path": "tests/fixtures/large.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "c1857a7f6c94b244cd7480f69f67975f827731585a2886bda1ac5bb06a17e691"
+  },
+  {
+    "path": "tests/fixtures/mixed.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "b3fe809ef333943144dbce7626773ebc2a749b8c840572dd4fb8570e2bd94225"
+  },
+  {
+    "path": "tests/fixtures/no-h1.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "7d9d3f107d944ef4c065db5a830e726d472832f66b76841b3089f4efbf8f648a"
+  },
+  {
+    "path": "tests/fixtures/plain.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "a42a746d9d9223aabe4b197ad6baaf541acb4f9a5c45aa00dc5309032bebfd34"
+  },
+  {
+    "path": "tests/fixtures/scroll-sync.md",
+    "category": "R3",
+    "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
+    "sha256": "2eafa9a26e20884f88b8041d51a5794285461f341075a692ae56cf20ccd9af25"
+  },
+  {
+    "path": "tests/static/check-assets.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "7021031b93afad640120a73ef8af4233293d1ba77a65adaaefc66f9ea0edad5b"
+  },
+  {
+    "path": "tests/static/serve-for-playwright.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cc8d4c9367d135d7cf71f23dc4113fd27aeeff29f0511619ccee1dbc5d3c019b"
+  },
+  {
+    "path": "tests/unit/document-links.test.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "79e8fff05ec376af54acc8a7fe10781dd39df79aacdf839205b76c1646c8dce2"
+  },
+  {
+    "path": "tests/unit/image-references.test.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "6dc62b540e549d7199985d4f4f8f722a22247010590c7c5813db1095fb584be5"
+  },
+  {
+    "path": "tests/unit/service-worker.test.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "dda4a16d03fb96ac918f45982e7262a45ffd552f0263cd837ee26e8bfc7d5cae"
+  }
+]

@@ -1,0 +1,4 @@
+# Keep the approved licence and preserved upstream grants byte-exact.
+/LICENSE -text
+/assets/vendor/THIRD-PARTY-NOTICES.txt -text
+/docs/open-source/licences/*.txt -text

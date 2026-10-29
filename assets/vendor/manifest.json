@@ -148,5 +148,6 @@
   "./assets/vendor/fonts/KaTeX_Typewriter-Regular.ttf",
   "./assets/vendor/fonts/KaTeX_Typewriter-Regular.woff",
   "./assets/vendor/fonts/KaTeX_Typewriter-Regular.woff2",
-  "./assets/vendor/katex-0.16.25.min.css"
+  "./assets/vendor/katex-0.16.25.min.css",
+  "./assets/vendor/THIRD-PARTY-NOTICES.txt"
 ]

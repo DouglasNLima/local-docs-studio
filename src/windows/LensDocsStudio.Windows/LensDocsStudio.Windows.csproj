@@ -24,6 +24,10 @@
 
   <ItemGroup>
     <Content Include="$(RepositoryRoot)index.html" Link="StaticApp\index.html" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\index.html" />
+    <Content Include="$(RepositoryRoot)LICENSE" Link="StaticApp\LICENSE" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\LICENSE" />
+    <Content Include="$(RepositoryRoot)LICENSING.md" Link="StaticApp\LICENSING.md" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\LICENSING.md" />
+    <Content Include="$(RepositoryRoot)SECURITY.md" Link="StaticApp\SECURITY.md" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\SECURITY.md" />
+    <Content Include="$(RepositoryRoot)THIRD_PARTY_NOTICES.md" Link="StaticApp\THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\THIRD_PARTY_NOTICES.md" />
     <Content Include="$(RepositoryRoot)md-mmd-renderer-v5.html" Link="StaticApp\md-mmd-renderer-v5.html" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\md-mmd-renderer-v5.html" />
     <Content Include="$(RepositoryRoot)manifest.webmanifest" Link="StaticApp\manifest.webmanifest" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\manifest.webmanifest" />
     <Content Include="$(RepositoryRoot)icon.svg" Link="StaticApp\icon.svg" CopyToOutputDirectory="PreserveNewest" TargetPath="StaticApp\icon.svg" />

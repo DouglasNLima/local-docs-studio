@@ -54,7 +54,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path pages-artifact | Out-Null
-          Copy-Item -Path index.html, md-mmd-renderer-v5.html, manifest.webmanifest, service-worker.js, icon.svg -Destination pages-artifact
+          Copy-Item -Path index.html, md-mmd-renderer-v5.html, manifest.webmanifest, service-worker.js, icon.svg, LICENSE, LICENSING.md, SECURITY.md, THIRD_PARTY_NOTICES.md -Destination pages-artifact
           Copy-Item -Path assets -Destination pages-artifact -Recurse
           Copy-Item -Path docs -Destination pages-artifact -Recurse
           Set-Content -Path pages-artifact/.nojekyll -Value ''

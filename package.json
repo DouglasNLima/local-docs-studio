@@ -11,5 +11,6 @@
   },
   "devDependencies": {
     "@playwright/test": "1.60.0"
-  }
+  },
+  "license": "SEE LICENSE IN LICENSING.md"
 }
