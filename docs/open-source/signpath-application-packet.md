@@ -1,7 +1,9 @@
 # SignPath Foundation owner decision packet — not submitted
 
 Target: `DouglasNLima/local-docs-studio`, native .NET/WPF edition, free official
-distribution. Updated for Goal #62 after scoped MIT adoption in the feature branch.
+distribution. Updated on 29 October 2026 after scoped MIT adoption on `develop`, production
+protection activation and API-confirmed PVR enablement. The [current controls](governance-settings.md)
+link the execution evidence; historical stage receipts retain their original state.
 The technical preparation packet is **COMPLETE**; provider eligibility is
 **UNCONFIRMED**, and application submission remains **NOT AUTHORISED**. The official [terms](https://signpath.org/terms.html) (the page says
 Draft) and [application page](https://signpath.org/apply) were checked on 29 October
@@ -13,7 +15,7 @@ a verified list of every current form field.
 
 | Requirement | Evidence / missing decision | Owner decision |
 |---|---|---|
-| Permissive open-source project and component grants | MIT is operative for enumerated original R1/R2 portions in this branch; develop adoption awaits an authorised merge. R3–R7 and mixed portions are excluded; upstream grants stay separate | IMPLEMENTED in branch; component/release scope BLOCKED |
+| Permissive open-source project and component grants | MIT is operative for enumerated original R1/R2 portions on develop at `709564dda30a57cf1e98ba07566f510c1636e05c`; default-branch promotion remains separate. R3–R7 and mixed portions are excluded; upstream grants stay separate | ADOPTED on develop; component/release scope BLOCKED |
 | Maintained, documented project | Current source, user guides and exact-source hosted validation are inspectable; provider assesses reputation | NOT APPLICABLE to an owner approval; technical evidence supplied |
 | Already released in the form to be signed | Five historical legacy Windows releases are not the native WPF product. Actions previews are not a public native release | BLOCKED |
 | Eligible included components | Native package bytes and original notices are mapped. Ask about Knuth/OFL fonts, apphost/runtime exception, adapted Mermaider/dagre and Inno-generated components | BLOCKED pending provider interpretation |
@@ -111,8 +113,8 @@ No application, certificate, secret, pin, signed installer, tag, beta, RC or Sta
 release was created. Microsoft Store/MSIX remains the separately assessed fallback
 in [the earlier review](signpath-readiness.md), with no packaging work here.
 
-Separate verdicts: scoped MIT **IMPLEMENTED in branch**, technical packet
-**COMPLETE**, effective governance **OWNER APPROVAL REQUIRED**, provider eligibility
+Separate verdicts: scoped MIT **ADOPTED on develop**, technical packet
+**COMPLETE**, effective Solo Maintainer governance **ACTIVE AND VERIFIED**, provider eligibility
 **UNCONFIRMED**, application **NOT SUBMITTED**, Stable publication **BLOCKED**.
 
 ## Prepared enquiry and application inventory
@@ -127,11 +129,11 @@ sign a candidate. No recipient/account/contact channel has been authorised.
 |---|---|
 | Project | Lens Docs Studio — Local Markdown, Mermaid, and documentation studio |
 | Repository | https://github.com/DouglasNLima/local-docs-studio |
-| Source and first-party terms | Final PR SHA/tree and exact LICENSING.md manifest; MIT source grant is branch-local until merged |
+| Source and first-party terms | Final PR SHA/tree and exact LICENSING.md manifest; MIT is adopted on develop; a target-specific main promotion PR remains unmerged |
 | Download of released native Windows edition | MISSING; only five legacy v0.1.0-dev* releases exist; internal previews are not released-native evidence |
 | Responsible human | @DouglasNLima, all author/reviewer/approver roles; no independent human reviewer |
 | MFA | UNVERIFIED on GitHub; no SignPath account established; owner-approved private status check required |
-| Effective controls | Read-only observation: unprotected branches, no rulesets, PVR disabled; exact approval packet prepared |
+| Effective controls | Production rulesets 26127883/26127901 active, 30/two applicable checks, zero mandatory human approvals and no bypass; PVR_ENABLED_EXTERNAL_FLOW_UNVERIFIED |
 | Public policies | Repository README, code-signing-policy.md and privacy.md; no provider-credit claim before acceptance |
 | Component/source evidence | Current source ledger; preserved grants; historical .957 per-file binary SBOM explicitly labelled historical; final hosted candidate inspection recorded separately |
 | Build and artefact proof | Exact final PR/check run links in the consolidated receipt; no production reproducibility claim |
@@ -139,8 +141,12 @@ sign a candidate. No recipient/account/contact channel has been authorised.
 | Certificate/issuer/subject/fingerprint/rollover | UNKNOWN until independently verified provider evidence; empty production trust remains unchanged |
 | Embedded application form | Not verified: retrieved public apply page exposes no input fields; map prepared answers to the actual form only after authorised access |
 
-Missing values are blockers, not questions to answer by inference. Even after a
-merge, exclusions covering shipped examples/artwork and fonts can affect the
+PVR enablement is API-confirmed; external reporter submission, maintainer notification,
+confidentiality and acknowledgement remain unverified. No synthetic report was
+submitted. Native WPF previews remain unsigned internal candidates. There is no
+public native WPF release, provider acceptance or authorised enquiry dispatch.
+
+Missing values are blockers, not questions to answer by inference. Exclusions covering shipped examples/artwork and fonts can affect the
 provider's all-component requirement; first-party MIT alone cannot establish
 eligibility. The source manifest is not a licence for an entire assembly or
 installer. Follow-up after explicit approval is a provider response and authorised

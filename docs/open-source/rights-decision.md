@@ -27,8 +27,9 @@ complex-ER fixture generator are now explicitly R3; synthetic content alone
 does not establish rights. Original harness/implementation portions of mixed
 files are distinct from excluded samples, images and third-party quotations.
 
-The licence is effective in this branch's source copy. The final receipt records
-whether `develop` has adopted it; merge and publication are separate decisions.
+The licence is operative on `develop` at
+`709564dda30a57cf1e98ba07566f510c1636e05c`; default-branch promotion needs its own
+scope review and owner publication decision.
 MIT permits third-party commercial reuse/resale. Free official distribution is
 project policy, not a restriction added to MIT. No trademark endorsement or
 user-content licence is granted. Dependency redistribution gaps and production

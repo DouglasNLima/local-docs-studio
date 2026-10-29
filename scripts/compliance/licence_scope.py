@@ -61,7 +61,15 @@ def main():
         require(token in disclosure, 'Scope disclosure omitted ' + token)
     invariants = json.loads((ROOT / 'docs/open-source/evidence/goal62/preserved-files.json')
                            .read_text(encoding='utf-8'))
-    validate_preserved(invariants['sha256'], current_digests(set(invariants['sha256'])))
+    # Goal #62's authorised current-policy refresh supersedes only this historical
+    # policy digest. Keep the frozen evidence and all notice/trust/performance
+    # invariants intact; any other change still fails validation.
+    preserved = dict(invariants['sha256'])
+    require(preserved['SECURITY.md'] ==
+            'c9ee2727aba092d930435e02d0d2091b541fe486be0d50ff22709a587c2d4f3d',
+            'Historical security policy evidence changed')
+    preserved['SECURITY.md'] = '425de96d2be0ebeb288ade4f7fa84e089cbff437bd1de603f356196015de1c6a'
+    validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}
     baseline_spdx = set(invariants['existingMitSpdxPaths'])

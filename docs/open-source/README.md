@@ -1,11 +1,12 @@
 # Open-source and free Windows distribution readiness
 
-Current guidance: [Goal #62 stage receipts](goal62-receipt.md),
+Current guidance: [active settings and execution receipts](governance-settings.md),
 [operative scoped MIT](../../LICENSING.md), [governance](governance.md),
-[proposed settings](governance-settings.md) and [SignPath packet](signpath-application-packet.md).
-The owner-approved first-party notice/scope is implemented in the Goal #62 branch.
-Administrative activation, private reporting, provider contact and publication
-remain separately gated. The Goal #60 receipt and the Goal #56/58 text below are
+[private reporting status](private-reporting-plan.md) and [SignPath packet](signpath-application-packet.md).
+Scoped MIT is adopted on `develop`; both production rulesets are active with zero
+mandatory human approvals. PVR is enabled with its external flow unverified.
+The [Goal #62 stage receipts](goal62-receipt.md) retain their historical prepared
+state. Provider contact, signing and publication remain separately gated. The Goal #60 receipt and the Goal #56/58 text below are
 historical observations, not the current licence decision.
 
 The [Goal #58 closeout and owner decision packet](goal58-closeout.md) continues

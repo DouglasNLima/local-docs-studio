@@ -16,11 +16,18 @@ I maintain Lens Docs Studio, a free local Markdown, Mermaid and documentation
 studio: https://github.com/DouglasNLima/local-docs-studio.
 
 The proposed signing scope is its separate native .NET/WPF Windows edition.
-The owner has approved MIT for enumerated original source/documentation portions;
-the feature-branch adoption still awaits merge. Dependencies retain their grants,
-and examples, artwork, evidence and user content are excluded from that first-party
-grant. GitHub enforcement is prepared but not yet activated. This message requests
-eligibility clarification, not signing or acceptance of a release.
+Scoped MIT is already adopted on develop for enumerated original implementation
+and documentation portions. Dependencies retain their grants; examples, artwork,
+evidence and user content remain excluded from that first-party grant. Public
+default-branch licence/security promotion is still a separate owner decision.
+Production GitHub protections are active and Solo Maintainer governance has been
+verified: PRs, applicable CI, resolved conversations and no bypass, with zero
+mandatory human approvals. One human holds all roles; this is not independent
+human review. GitHub Private Vulnerability Reporting is enabled, but external
+submission, notification, confidentiality and acknowledgement remain unverified.
+Native WPF previews remain unsigned internal candidates; there is no public native
+WPF release and no SignPath acceptance. This message requests eligibility
+clarification, not signing or acceptance of a release.
 
 1. Can one human, @DouglasNLima, hold Author, reviewer of external contributions
    and manual signing Approver roles with MFA, recorded self-review and enforced

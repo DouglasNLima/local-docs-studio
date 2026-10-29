@@ -1,6 +1,11 @@
 # Private vulnerability reporting activation plan
 
-**OWNER APPROVAL REQUIRED. Disabled and not operationally verified.**
+**PVR_ENABLED_EXTERNAL_FLOW_UNVERIFIED**, updated 29 October 2026.
+The owner separately authorised activation; the real API returned `enabled: true`.
+The [execution receipt](https://github.com/DouglasNLima/local-docs-studio/issues/62#issuecomment-6501362732)
+records HTTP 204 enablement and HTTP 200 readback. No external reporter session or
+synthetic advisory was used. Submission, notification, confidentiality and private
+acknowledgement remain unverified; no operational intake or SLA is claimed.
 The sole security maintainer/intended recipient is **@DouglasNLima**.
 No second responder, email address or service level is invented.
 
@@ -8,18 +13,20 @@ GitHub's [configuration guide](https://docs.github.com/en/code-security/how-tos/
 documents Settings → Security and quality → Advanced Security → Private
 vulnerability reporting → Enable. Verify current UI labels. The API equivalent is
 `PUT /repos/DouglasNLima/local-docs-studio/private-vulnerability-reporting`
-without a body. Do not execute before separate authorisation.
+without a body. This activation is complete; do not repeat it as a verification test.
 
 The [exact administrative decision packet](goal62-github-receipt.md) records
 this bodyless PUT separately from branch/repository settings and from any test
 report. Rollback, if specifically authorised, is the bodyless DELETE on the same
 endpoint; preserve any existing private advisories and never publish them.
 
-After approval:
+Remaining verification plan (requires separate approval for a genuine tester and
+any submission/account or notification change):
 
-1. Recheck settings and owner access/MFA. Configure the owner's security-alert
-   notifications; no additional maintainer is needed.
-2. Enable reporting and require GET readback `enabled: true`.
+1. Recheck enabled status and owner access. MFA and actual notification delivery
+   remain unverified. Notification preferences were not changed; subscription
+   metadata could not be read with the available credential. Do not infer its state.
+2. Retain the completed enablement receipt and require GET readback `enabled: true`.
 3. Inspect Security → Advisories → Report a vulnerability from a genuine
    non-maintainer session. Without an authorised tester/session, record behavioural
    verification as BLOCKED. Do not invent an account or second maintainer.

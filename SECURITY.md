@@ -6,10 +6,13 @@ previews; the legacy shell and web/PWA have separate exposure.
 
 ## Private reporting status
 
-GitHub Private Vulnerability Reporting is proposed. The API returned **disabled
-on 28 October 2026**; this goal has not enabled or tested it.
+**PVR_ENABLED_EXTERNAL_FLOW_UNVERIFIED** — GitHub's API confirmed
+`enabled: true` on 29 October 2026 after authorised activation. See the
+[execution receipt](https://github.com/DouglasNLima/local-docs-studio/issues/62#issuecomment-6501362732).
 [Security Advisories](https://github.com/DouglasNLima/local-docs-studio/security/advisories)
-is the intended entry after activation, not an operational reporting promise.
+is the intended reporting entry. Reporter submission, maintainer notification,
+confidentiality and acknowledgement have **not been tested end-to-end** with a
+genuine external reporter. API enablement alone does not establish those outcomes.
 
 Until a confidential route is verified, request private contact from @DouglasNLima
 through [GitHub issues](https://github.com/DouglasNLima/local-docs-studio/issues)
@@ -17,7 +20,9 @@ without vulnerability details, exploits, credentials or personal data. This publ
 request is not confidential intake. No email/alternative responder is invented.
 A functioning private route remains a launch blocker. The
 [activation/synthetic-test plan](docs/open-source/private-reporting-plan.md)
-requires separate authorisation before settings or report submission.
+records the completed enablement and the remaining verification boundary.
+Any test report, notification/account change or later setting change needs
+separate owner authorisation. No synthetic advisory has been submitted.
 
 ## Intake, severity and responsible disclosure
 
