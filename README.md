@@ -4,6 +4,20 @@ Local Markdown, Mermaid, and documentation studio.
 
 Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime and an emerging Windows desktop shell. The primary product direction is a fully offline-capable Windows app built with WinUI 3 and WebView2, while the same core runtime must continue to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
 
+## Licence and security
+
+The [MIT licence](LICENSE) covers only the enumerated original first-party portions
+in [LICENSING.md](LICENSING.md); examples, artwork/branding, evidence, upstream
+material and user content retain separate rights. Preserve the
+[third-party notices](THIRD_PARTY_NOTICES.md) and the recorded distribution gaps.
+No whole-binary or historical-release licence claim is made.
+
+See [SECURITY.md](SECURITY.md): GitHub Private Vulnerability Reporting is enabled,
+but external submission, notification, confidentiality and acknowledgement remain
+unverified (`PVR_ENABLED_EXTERNAL_FLOW_UNVERIFIED`). @DouglasNLima is the sole
+security maintainer; no SLA is promised. The [promotion review](docs/open-source/main-promotion.md)
+keeps merge, Pages publication and any binary release as separate owner decisions.
+
 ## Use The App
 
 1. Open `index.html` through GitHub Pages or a local static server.

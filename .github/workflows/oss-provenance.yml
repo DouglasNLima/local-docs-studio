@@ -1,0 +1,23 @@
+name: Validate main OSS provenance
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  provenance:
+    name: OSS provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.12'
+      - name: Verify actual main scope, source bytes, notices and packaging
+        run: python scripts/compliance/main_provenance.py
+      - name: Reject widened grants, altered notices and unresolved paths
+        run: python scripts/compliance/test_main_provenance.py

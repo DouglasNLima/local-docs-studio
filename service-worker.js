@@ -1,6 +1,20 @@
-const CACHE_NAME = 'lens-docs-studio-v67';
+const CACHE_NAME = 'lens-docs-studio-v68';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
+  './LICENSE',
+  './LICENSING.md',
+  './SECURITY.md',
+  './THIRD_PARTY_NOTICES.md',
+  './docs/open-source/main-scope.json',
+  './docs/open-source/main-rights-ledger.json',
+  './docs/open-source/main-provenance.json',
+  './docs/open-source/main-promotion.md',
+  './docs/open-source/third-party-closeout.md',
+  './docs/open-source/licences/windows-app-sdk.txt',
+  './docs/open-source/licences/webview2-sdk.txt',
+  './docs/open-source/licences/playwright.txt',
+  './docs/open-source/licences/playwright-notice.txt',
+
   './',
   './index.html',
   './md-mmd-renderer-v5.html',
