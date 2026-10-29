@@ -1,6 +1,10 @@
-const CACHE_NAME = 'lens-docs-studio-v68';
+const CACHE_NAME = 'lens-docs-studio-v69';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
+  './docs/open-source/code-signing-policy.md',
+  './docs/open-source/privacy.md',
+  './docs/open-source/downloads.md',
+  './docs/open-source/public-policy-review.md',
   './LICENSE',
   './LICENSING.md',
   './SECURITY.md',

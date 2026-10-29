@@ -18,6 +18,13 @@ unverified (`PVR_ENABLED_EXTERNAL_FLOW_UNVERIFIED`). @DouglasNLima is the sole
 security maintainer; no SLA is promised. The [promotion review](docs/open-source/main-promotion.md)
 keeps merge, Pages publication and any binary release as separate owner decisions.
 
+Review the [Code signing policy](docs/open-source/code-signing-policy.md),
+[Privacy policy](docs/open-source/privacy.md) and
+[current download/release guidance](docs/open-source/downloads.md). These policies
+are drafts: SignPath eligibility is unconfirmed, there is no accepted production
+signing certificate or signed native Stable release, and legacy prereleases do
+not establish native WPF release history.
+
 ## Use The App
 
 1. Open `index.html` through GitHub Pages or a local static server.

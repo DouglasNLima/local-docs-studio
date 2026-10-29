@@ -20,7 +20,11 @@ PUBLIC_FILES = ['LICENSE', 'LICENSING.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.m
                 'docs/open-source/licences/windows-app-sdk.txt',
                 'docs/open-source/licences/webview2-sdk.txt',
                 'docs/open-source/licences/playwright.txt',
-                'docs/open-source/licences/playwright-notice.txt']
+                'docs/open-source/licences/playwright-notice.txt',
+                'docs/open-source/code-signing-policy.md',
+                'docs/open-source/privacy.md',
+                'docs/open-source/downloads.md',
+                'docs/open-source/public-policy-review.md']
 
 
 def require(condition, message):
@@ -139,10 +143,14 @@ def validate_links(doc, text, root=ROOT):
                 'Missing/escaping policy link: ' + doc + ': ' + target)
 
 
+def validate_policy_cache(sw):
+    require("const CACHE_NAME = 'lens-docs-studio-v69';" in sw, 'Review the cache version')
+    require(all("'./" + p + "'" in sw for p in PUBLIC_FILES), 'Public policy missing from offline cache')
+
+
 def validate_packaging():
     sw = (ROOT / 'service-worker.js').read_text(encoding='utf-8')
-    require("const CACHE_NAME = 'lens-docs-studio-v68';" in sw, 'Review the cache version')
-    require(all("'./" + p + "'" in sw for p in PUBLIC_FILES), 'Public policy missing from offline cache')
+    validate_policy_cache(sw)
     manifest = read_json('assets/vendor/manifest.json')
     require('./assets/vendor/THIRD-PARTY-NOTICES.txt' in manifest, 'Web notices not cached')
     workflow = (ROOT / '.github/workflows/pages.yml').read_text(encoding='utf-8')
@@ -170,7 +178,9 @@ def main(write=False):
     require(digest((ROOT / 'LICENSE').read_bytes()) == MIT_SHA256, 'Approved exact MIT bytes changed')
     validate_notices(read_json(PROVENANCE), hashes, (ROOT / 'assets/vendor/THIRD-PARTY-NOTICES.txt').read_bytes())
     for path in ['README.md', 'LICENSING.md', 'SECURITY.md', 'THIRD_PARTY_NOTICES.md',
-                 'docs/open-source/main-promotion.md', 'docs/open-source/third-party-closeout.md']:
+                 'docs/open-source/main-promotion.md', 'docs/open-source/third-party-closeout.md',
+                 'docs/open-source/code-signing-policy.md', 'docs/open-source/privacy.md',
+                 'docs/open-source/downloads.md', 'docs/open-source/public-policy-review.md']:
         validate_links(path, (ROOT / path).read_text(encoding='utf-8'))
     require(read_json('package.json')['license'] == read_json('package-lock.json')['packages']['']['license']
             == 'SEE LICENSE IN LICENSING.md', 'Package metadata overstates the grant')
