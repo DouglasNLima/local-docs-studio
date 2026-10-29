@@ -3,9 +3,9 @@
 Local Markdown, Mermaid, and documentation studio.
 
 The project direction is free software maintained with community contributions:
-no subscriptions, paid licences or features restricted by a plan. Adoption of an
-open-source licence is pending the [licensing review](docs/open-source/licence-audit.md).
-This document does not grant a licence or imply that MIT has already been adopted.
+no subscriptions, paid licences or features restricted by a plan. The original
+first-party portions enumerated in [LICENSING.md](LICENSING.md) use [MIT](LICENSE).
+Dependencies, mixed content and the R3–R7 exclusions retain their own treatment.
 
 Start a focused issue for a substantial change, then open a pull request against
 `develop`. Keep one purpose per change and explain the user outcome, validation
@@ -27,8 +27,10 @@ code, its exact upstream revision, copyright, licence, notices and modifications
 Keep upstream notices intact; do not add MIT headers to vendor files. Explain
 asset/font/sample provenance and exclude customer documents, private templates,
 credentials and personal screenshots. A commit author field is not proof of
-ownership. While licence approval is pending, new contributions require an
-explicit rights review; no automatic inbound licence or CLA is implied.
+ownership. Submit original contributions intended for the covered scope under
+MIT and identify any exceptions explicitly. The maintainer must review rights
+and update the explicit scope manifest for new paths; unreviewed files stay
+BLOCKED. No CLA, copyright assignment or clearance of excluded material is implied.
 
 The sole human maintainer, **@DouglasNLima**, reviews external contributions,
 including source, lockfiles, dependency rights and CI changes, before integration.

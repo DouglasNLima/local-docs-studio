@@ -1,10 +1,10 @@
 # SignPath Foundation owner decision packet — not submitted
 
 Target: `DouglasNLima/local-docs-studio`, native .NET/WPF edition, free official
-distribution. Updated for Goal #60's solo-maintainer model.
-This packet prepares evidence and unanswered decisions; **application readiness
-is NO-GO**. The official [terms](https://signpath.org/terms.html) (the page says
-Draft) and [application page](https://signpath.org/apply) were checked on 28 October
+distribution. Updated for Goal #62 after scoped MIT adoption in the feature branch.
+The technical preparation packet is **COMPLETE**; provider eligibility is
+**UNCONFIRMED**, and application submission remains **NOT AUTHORISED**. The official [terms](https://signpath.org/terms.html) (the page says
+Draft) and [application page](https://signpath.org/apply) were checked on 29 October
 2026. Their interpretation and acceptance remain with SignPath. The embedded form
 did not expose its fields in the inspected page/browser; do not describe this as
 a verified list of every current form field.
@@ -13,7 +13,7 @@ a verified list of every current form field.
 
 | Requirement | Evidence / missing decision | Owner decision |
 |---|---|---|
-| Permissive open-source project and component grants | First-party MIT is not adopted. See the exact rights/path proposal; upstream grants stay separate | OWNER ACTION REQUIRED |
+| Permissive open-source project and component grants | MIT is operative for enumerated original R1/R2 portions in this branch; develop adoption awaits an authorised merge. R3–R7 and mixed portions are excluded; upstream grants stay separate | IMPLEMENTED in branch; component/release scope BLOCKED |
 | Maintained, documented project | Current source, user guides and exact-source hosted validation are inspectable; provider assesses reputation | NOT APPLICABLE to an owner approval; technical evidence supplied |
 | Already released in the form to be signed | Five historical legacy Windows releases are not the native WPF product. Actions previews are not a public native release | BLOCKED |
 | Eligible included components | Native package bytes and original notices are mapped. Ask about Knuth/OFL fonts, apphost/runtime exception, adapted Mermaider/dagre and Inno-generated components | BLOCKED pending provider interpretation |
@@ -34,7 +34,7 @@ Windows App SDK/WebView2 scope is excluded from this native proposal.
 
 ### Solo-maintainer eligibility finding
 
-The official terms were re-read on 28 October 2026. They define trusted Authors,
+The official terms were re-read on 29 October 2026. They define trusted Authors,
 review of non-committer changes and human approval of each signing request, with
 MFA on both GitHub and SignPath. They do **not explicitly require different
 people** for these roles. This supports proposing the sole maintainer
@@ -42,7 +42,7 @@ people** for these roles. This supports proposing the sole maintainer
 approval and final release authorisation; it is not proof that SignPath accepts
 this project's allocation. The published terms do not give an explicit
 single-person acceptance commitment. Provider interpretation/acceptance is still
-BLOCKED, not a reason to invent a second person.
+UNCONFIRMED, not a reason to invent a second person.
 
 Prepared question for a later owner-authorised enquiry: “Will the Foundation
 accept @DouglasNLima as the sole trusted source author, external-contribution
@@ -111,5 +111,38 @@ No application, certificate, secret, pin, signed installer, tag, beta, RC or Sta
 release was created. Microsoft Store/MSIX remains the separately assessed fallback
 in [the earlier review](signpath-readiness.md), with no packaging work here.
 
-Separate verdicts: foundation review **CONDITIONAL GO**, MIT adoption **NO-GO**,
-SignPath application **NO-GO**, Stable publication **NO-GO**.
+Separate verdicts: scoped MIT **IMPLEMENTED in branch**, technical packet
+**COMPLETE**, effective governance **OWNER APPROVAL REQUIRED**, provider eligibility
+**UNCONFIRMED**, application **NOT SUBMITTED**, Stable publication **BLOCKED**.
+
+## Prepared enquiry and application inventory
+
+The [unsent enquiry](signpath-enquiry-draft.md) is the exact proposed message for
+owner review, with four focused questions covering combined roles, released
+native-product prerequisite, included/signable components and approved certificate
+identity/rotation. It is a clarification route, not an application or request to
+sign a candidate. No recipient/account/contact channel has been authorised.
+
+| Application input | Prepared value / honest gap |
+|---|---|
+| Project | Lens Docs Studio — Local Markdown, Mermaid, and documentation studio |
+| Repository | https://github.com/DouglasNLima/local-docs-studio |
+| Source and first-party terms | Final PR SHA/tree and exact LICENSING.md manifest; MIT source grant is branch-local until merged |
+| Download of released native Windows edition | MISSING; only five legacy v0.1.0-dev* releases exist; internal previews are not released-native evidence |
+| Responsible human | @DouglasNLima, all author/reviewer/approver roles; no independent human reviewer |
+| MFA | UNVERIFIED on GitHub; no SignPath account established; owner-approved private status check required |
+| Effective controls | Read-only observation: unprotected branches, no rulesets, PVR disabled; exact approval packet prepared |
+| Public policies | Repository README, code-signing-policy.md and privacy.md; no provider-credit claim before acceptance |
+| Component/source evidence | Current source ledger; preserved grants; historical .957 per-file binary SBOM explicitly labelled historical; final hosted candidate inspection recorded separately |
+| Build and artefact proof | Exact final PR/check run links in the consolidated receipt; no production reproducibility claim |
+| Signing selectors | Root LensDocsStudio.Native.exe, followed by one immutable versioned native Setup.exe; no recursive EXE/DLL allowlist |
+| Certificate/issuer/subject/fingerprint/rollover | UNKNOWN until independently verified provider evidence; empty production trust remains unchanged |
+| Embedded application form | Not verified: retrieved public apply page exposes no input fields; map prepared answers to the actual form only after authorised access |
+
+Missing values are blockers, not questions to answer by inference. Even after a
+merge, exclusions covering shipped examples/artwork and fonts can affect the
+provider's all-component requirement; first-party MIT alone cannot establish
+eligibility. The source manifest is not a licence for an entire assembly or
+installer. Follow-up after explicit approval is a provider response and authorised
+private MFA/control evidence, followed by separately scoped signing and
+clean-Windows certification under Goal #56.

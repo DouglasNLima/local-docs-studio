@@ -22,6 +22,30 @@ function Reject([string]$Name, [hashtable]$Changes, [string]$ExpectedError) {
 Reject 'wrong-source' @{ExpectedSourceRevision=('0' * 40)} 'identity does not match'
 Reject 'wrong-version' @{ExpectedVersion='99.99.99-preview.99999'} 'identity does not match'
 Reject 'wrong-independent-hash' @{ExpectedInstallerSha256=('0' * 64)} 'SHA-256 pin'
+$licenceCopy = Join-Path $OutputDirectory 'modified-licence-package'
+New-Item -ItemType Directory -Path $licenceCopy | Out-Null
+Get-ChildItem -LiteralPath $PackageDirectory -File | Where-Object { $_.Name -ne 'package-verification.json' } | Copy-Item -Destination $licenceCopy
+foreach ($notice in 'all-scoped-notices','LICENSE','LICENSING.md','FIRST-PARTY-SCOPE.json') {
+    $originalZip = @(Get-ChildItem -LiteralPath $PackageDirectory -Filter '*.zip' -File)
+    if ($originalZip.Count -ne 1) { throw 'Expected exactly one portable ZIP for licence controls.' }
+    $modifiedZip = Join-Path $licenceCopy $originalZip[0].Name
+    Copy-Item -LiteralPath $originalZip[0].FullName -Destination $modifiedZip -Force
+    $archive = [IO.Compression.ZipFile]::Open($modifiedZip, [IO.Compression.ZipArchiveMode]::Update)
+    try {
+        if ($notice -eq 'all-scoped-notices') {
+            foreach ($name in 'LICENSE','LICENSING.md','FIRST-PARTY-SCOPE.json') { $archive.GetEntry($name).Delete() }
+        } else {
+            $archive.GetEntry($notice).Delete()
+            $writer = [IO.StreamWriter]::new($archive.CreateEntry($notice).Open())
+            try { $writer.Write('Unauthorised replacement of scope or terms.') } finally { $writer.Dispose() }
+        }
+    } finally { $archive.Dispose() }
+    $sums = Get-Content -LiteralPath (Join-Path $PackageDirectory 'SHA256SUMS.txt') | ForEach-Object {
+        if ($_.EndsWith($originalZip[0].Name)) { "{0}  {1}" -f (Get-FileHash -LiteralPath $modifiedZip -Algorithm SHA256).Hash.ToLowerInvariant(), $originalZip[0].Name } else { $_ }
+    }
+    $sums | Set-Content -LiteralPath (Join-Path $licenceCopy 'SHA256SUMS.txt') -Encoding utf8NoBOM
+    Reject ('scoped-licence-' + $notice) @{PackageDirectory=$licenceCopy} '(?i)scoped licence entry'
+}
 $copy = Join-Path $OutputDirectory 'modified-package'; New-Item -ItemType Directory -Path $copy | Out-Null
 Get-ChildItem -LiteralPath $PackageDirectory -File | Where-Object { $_.Name -ne 'package-verification.json' } | Copy-Item -Destination $copy
 $changed = $metadataText | ConvertFrom-Json; $changed.sourceDirty = $true

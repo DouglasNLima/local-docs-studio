@@ -55,12 +55,13 @@ try {
         $name = $entry.FullName.Replace('\','/')
         if ($name.StartsWith('/') -or $name.Contains(':') -or $name.Split('/') -contains '..' -or $files.ContainsKey($name) -or
             $name -match '(?i)WebView2|ContinuousViewer|LayoutExperiment|(^|/)(spikes|tests|acceptance|obj|bin|node_modules)/|chrome|node\.exe|\.(pfx|pem|key|pdb|cs|csproj|slnx?|ps1|html)$' -or
-            ($name.EndsWith('.md') -and -not $name.StartsWith('licences/', [StringComparison]::OrdinalIgnoreCase) -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
+            ($name.EndsWith('.md') -and -not $name.StartsWith('licences/', [StringComparison]::OrdinalIgnoreCase) -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md','LICENSING.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
         $stream = $entry.Open()
         try { $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)).ToLowerInvariant() } finally { $stream.Dispose() }
         $files.Add($name, [ordered]@{ path=$name; bytes=$entry.Length; sha256=$hash })
     }
     foreach ($name in $required) { if (-not $files.ContainsKey($name) -or $files[$name].bytes -eq 0) { throw "Required native runtime or guidance is missing: $name" } }
+    $firstPartyLicence = & (Join-Path $PSScriptRoot 'Test-NativeLicence.ps1') -PortablePath $portable -ExpectedSourceRevision $ExpectedSourceRevision -ExpectedVersion $ExpectedVersion -InstallerSha256 $installerHash
     function Read-ZipText([string]$Name) {
         $entry = $archive.Entries | Where-Object { $_.FullName.Replace('\','/') -eq $Name }
         if ($entry.Length -gt 1MB) { throw 'Package metadata exceeds its verification budget.' }
@@ -121,7 +122,7 @@ try {
 $report = [ordered]@{ status='PASS'; version=$ExpectedVersion; sourceRevision=$ExpectedSourceRevision; sourceTree=$metadata.sourceTree; sourceKind=$metadata.sourceKind;
     ciRunId=$metadata.ciRunId; installerSha256=$installerHash; portableSha256=$zipHash; signature='NotSigned';
     trustedUpdates='BLOCKED: no production signing identity'; cleanMachineCertification='BLOCKED: separate clean image required';
-    executionPerformed=$false; binaryVersions=$binaryVersions; applicationIcon=$applicationIcon; installerIcon=$installerIcon; mermaidEditor=$mermaidEditor; payload=@($files.Values | Sort-Object path) }
+    executionPerformed=$false; firstPartyLicence=$firstPartyLicence; binaryVersions=$binaryVersions; applicationIcon=$applicationIcon; installerIcon=$installerIcon; mermaidEditor=$mermaidEditor; payload=@($files.Values | Sort-Object path) }
 $parent = Split-Path -Parent ([IO.Path]::GetFullPath($OutputPath)); [IO.Directory]::CreateDirectory($parent) | Out-Null
 $report | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 "Native preview package verification PASS: $ExpectedVersion ($ExpectedSourceRevision)"

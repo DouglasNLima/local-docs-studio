@@ -1,8 +1,12 @@
-const CACHE_NAME = 'lens-docs-studio-v71';
+const CACHE_NAME = 'lens-docs-studio-v72';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
   './index.html',
+  './LICENSE',
+  './LICENSING.md',
+  './THIRD_PARTY_NOTICES.md',
+  './docs/open-source/configuration/mit-scope.json',
   './md-mmd-renderer-v5.html',
   './assets/styles/app.css',
   './assets/scripts/main.js',

@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import subprocess
 
-from rights_ledger import boundary, OUTPUT
+from rights_ledger import boundary, OUTPUT, current_digests
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / 'docs/open-source/evidence/goal58'
@@ -70,7 +70,10 @@ def main():
     tracked = set(subprocess.check_output(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], cwd=ROOT).decode().split('\0')) - {''}
     rows = list(csv.DictReader((ROOT / OUTPUT).open(encoding='utf-8', newline='')))
     require(len(rows) == len({r['path'] for r in rows}) and {r['path'] for r in rows} == tracked, 'Rights ledger does not cover the current tracked/proposed paths')
+    digests = current_digests(tracked - {OUTPUT})
     for row in rows:
+        expected_hash = 'BOUND_BY_FINAL_GIT_TREE' if row['path'] == OUTPUT else digests[row['path']]
+        require(row['sha256'] == expected_hash, 'Rights ledger bytes are stale: ' + row['path'])
         decision, status, _ = boundary(row['path'])
         require((row['decisionId'], row['ownerDecision']) == (decision, status), 'Incorrect rights boundary: ' + row['path'])
     codeowners = (ROOT / '.github/CODEOWNERS').read_text(encoding='utf-8')
@@ -79,7 +82,7 @@ def main():
     checked_links = 0
     docs = list((ROOT / 'docs/open-source').glob('*.md')) + [ROOT / path for path in (
         'scripts/compliance/highlight/README.md', 'README.md', 'CONTRIBUTING.md',
-        'CODE_OF_CONDUCT.md', 'SECURITY.md', 'SUPPORT.md')]
+        'CODE_OF_CONDUCT.md', 'SECURITY.md', 'SUPPORT.md', 'LICENSING.md')]
     for doc in docs:
         for target in documentation_links(doc.read_text(encoding='utf-8')):
             if re.match(r'^[a-z]+:', target) or target.startswith('#'):
@@ -89,7 +92,7 @@ def main():
             checked_links += 1
     print(json.dumps(dict(highlight='exact historical bytes', originalWebNotices=len(pack['notices']),
                           nativeFiles=len(files), exactNativeMatches=522, rightsPaths=len(rows),
-                          localLinks=checked_links, operativeLicenceApproval=False)))
+                          localLinks=checked_links, operativeLicenceApproval=True)))
 
 
 if __name__ == '__main__':

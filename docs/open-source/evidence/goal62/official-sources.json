@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://signpath.org/terms.html",
+    "retrievedAt": "2026-10-29T06:50:25.673435+00:00",
+    "sha256": "6610cf889bbe0dc7533abaa310bc7a5cc9a61ae6c2ce0798a08109c925b46c51",
+    "bytes": 19630
+  },
+  {
+    "url": "https://signpath.org/apply",
+    "retrievedAt": "2026-10-29T06:50:25.825148+00:00",
+    "sha256": "70c969adb059ae7edf23073b0a9e9d8e7b8d0d7eebb00d66d22fd4c6c2315aec",
+    "bytes": 4990
+  },
+  {
+    "url": "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json",
+    "retrievedAt": "2026-10-29T06:50:27.833715+00:00",
+    "sha256": "b81f098026e98084a83f0a33db43502213919f68449b028543c373757766a758",
+    "bytes": 13897231
+  }
+]

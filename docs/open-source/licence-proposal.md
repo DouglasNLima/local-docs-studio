@@ -1,4 +1,9 @@
-# First-party licence proposal — not an operative licence
+# First-party licence proposal — historical Goal #56/#60 draft
+
+This preserved proposal predates the owner's Goal #62 approval. Its pending
+decisions below describe that earlier state only; current terms and scope are
+[LICENSE](../../LICENSE) and [LICENSING.md](../../LICENSING.md).
+The public notice, sole holder and R1/R2 scope are approved and need no reconfirmation.
 
 The [Goal #60 owner decision packet](rights-decision.md) supplies the proposed
 copyright line, path-level decision ledger and exact exclusions for this draft.

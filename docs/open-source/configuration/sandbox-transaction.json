@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT EXECUTED; TARGET-SPECIFIC OWNER APPROVAL REQUIRED",
+  "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62",
+  "refResolution": "Variables bind only IDs/SHAs returned by the immediately preceding approved sandbox operation; never interpolate arbitrary targets. Fresh target existence check must return 404; abort if it already exists.",
+  "create": {
+    "method": "POST",
+    "target": "/user/repos",
+    "body": {
+      "name": "local-docs-studio-governance-sandbox-62",
+      "description": "Disposable inert validation for local-docs-studio Goal 62; no product distribution",
+      "private": false,
+      "auto_init": true,
+      "has_issues": false,
+      "has_wiki": false,
+      "has_projects": false
+    }
+  },
+  "seedWorkflow": {
+    "method": "PUT",
+    "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/contents/.github/workflows/governance-test.yml",
+    "body": {
+      "message": "Seed inert solo-governance checks",
+      "branch": "main",
+      "content": "IyBJbmVydCBzYW5kYm94IGZpeHR1cmU7IG5ldmVyIGluc3RhbGwgaW4gdGhlIHByb2R1Y3QgcmVwb3NpdG9yeS4KbmFtZTogU29sbyBnb3Zlcm5hbmNlIHNhbmRib3gKb246CiAgcHVsbF9yZXF1ZXN0OgogICAgYnJhbmNoZXM6IFtkZXZlbG9wLCBtYWluXQpwZXJtaXNzaW9uczoKICBjb250ZW50czogcmVhZApqb2JzOgogIGluZXJ0LWNoZWNrczoKICAgIG5hbWU6ICR7eyBtYXRyaXguY29udGV4dCB9fQogICAgcnVucy1vbjogdWJ1bnR1LWxhdGVzdAogICAgc3RyYXRlZ3k6CiAgICAgIGZhaWwtZmFzdDogZmFsc2UKICAgICAgbWF0cml4OgogICAgICAgIGNvbnRleHQ6IFsiVGVzdCBzdGF0aWMgYXBwIiwgIk9TUyBwcm92ZW5hbmNlIiwgIm5hdGl2ZSIsICJkaWFncmFtLWFycmFuZ2VtZW50IiwgImFycmFuZ2VtZW50LXJlc3BvbnNpdmVuZXNzIiwgImNvbXBsZXgtZXItcHJldmlldyIsICJzdGF0ZS1pbnN0YWxsZWQtYXV0aG9yaW5nIiwgImVyLWluc3RhbGxlZC1hdXRob3JpbmciLCAiY2xhc3MtaW5zdGFsbGVkLWF1dGhvcmluZyIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoUGllKSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoTWluZG1hcCkiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKEZsb3djaGFydCkiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKEdhbnR0KSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoU2Fua2V5KSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoU2VxdWVuY2UpIiwgImNvbXBhbmlvbi1pbnN0YWxsZWQtYXV0aG9yaW5nIChRdWFkcmFudCkiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKFRpbWVsaW5lKSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoSm91cm5leSkiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKFh5KSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoUmVxdWlyZW1lbnQpIiwgImNvbXBhbmlvbi1pbnN0YWxsZWQtYXV0aG9yaW5nIChSYWRhcikiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKEJsb2NrKSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoQzQpIiwgImNvbXBhbmlvbi1pbnN0YWxsZWQtYXV0aG9yaW5nIChLYW5iYW4pIiwgImNvbXBhbmlvbi1pbnN0YWxsZWQtYXV0aG9yaW5nIChBcmNoaXRlY3R1cmUpIiwgImNvbXBhbmlvbi1pbnN0YWxsZWQtYXV0aG9yaW5nIChHaXRHcmFwaCkiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKFRyZWVWaWV3KSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoUGFja2V0KSIsICJjb21wYW5pb24taW5zdGFsbGVkLWF1dGhvcmluZyAoVHJlZW1hcCkiLCAiY29tcGFuaW9uLWluc3RhbGxlZC1hdXRob3JpbmcgKFZlbm4pIl0KICAgIHN0ZXBzOgogICAgICAtIHVzZXM6IGFjdGlvbnMvY2hlY2tvdXRAMTFkNTk2MGEzMjY3NTBkNTgzODA3OGUzNmNmMzhiODVhZjY3NzI2MgogICAgICAgIHdpdGg6CiAgICAgICAgICBwZXJzaXN0LWNyZWRlbnRpYWxzOiBmYWxzZQogICAgICAtIG5hbWU6IENvbnRyb2xsZWQgaW5lcnQgcmVzdWx0CiAgICAgICAgcnVuOiB0ZXN0ICEgLWUgZXhwZWN0ZWQtZmFpbHVyZS50eHQK"
+    }
+  },
+  "createDevelop": {
+    "method": "POST",
+    "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/git/refs",
+    "body": {
+      "ref": "refs/heads/develop",
+      "sha": "$seedWorkflow.commit.sha"
+    }
+  },
+  "applyRulesets": [
+    {
+      "method": "POST",
+      "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/rulesets",
+      "body": {
+        "name": "Solo maintainer develop",
+        "target": "branch",
+        "enforcement": "active",
+        "bypass_actors": [],
+        "conditions": {
+          "ref_name": {
+            "include": [
+              "refs/heads/develop"
+            ],
+            "exclude": []
+          }
+        },
+        "rules": [
+          {
+            "type": "deletion"
+          },
+          {
+            "type": "non_fast_forward"
+          },
+          {
+            "type": "pull_request",
+            "parameters": {
+              "dismiss_stale_reviews_on_push": true,
+              "require_code_owner_review": false,
+              "require_last_push_approval": false,
+              "required_approving_review_count": 0,
+              "required_review_thread_resolution": true,
+              "allowed_merge_methods": [
+                "merge"
+              ]
+            }
+          },
+          {
+            "type": "required_status_checks",
+            "parameters": {
+              "required_status_checks": [
+                {
+                  "context": "Test static app",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "OSS provenance",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "native",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "diagram-arrangement",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "arrangement-responsiveness",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "complex-er-preview",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "state-installed-authoring",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "er-installed-authoring",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "class-installed-authoring",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Pie)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Mindmap)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Flowchart)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Gantt)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Sankey)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Sequence)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Quadrant)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Timeline)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Journey)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Xy)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Requirement)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Radar)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Block)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (C4)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Kanban)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Architecture)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (GitGraph)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (TreeView)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Packet)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Treemap)",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "companion-installed-authoring (Venn)",
+                  "integration_id": 15368
+                }
+              ],
+              "strict_required_status_checks_policy": true,
+              "do_not_enforce_on_create": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/rulesets",
+      "body": {
+        "name": "Solo maintainer main",
+        "target": "branch",
+        "enforcement": "active",
+        "bypass_actors": [],
+        "conditions": {
+          "ref_name": {
+            "include": [
+              "refs/heads/main"
+            ],
+            "exclude": []
+          }
+        },
+        "rules": [
+          {
+            "type": "deletion"
+          },
+          {
+            "type": "non_fast_forward"
+          },
+          {
+            "type": "pull_request",
+            "parameters": {
+              "dismiss_stale_reviews_on_push": true,
+              "require_code_owner_review": false,
+              "require_last_push_approval": false,
+              "required_approving_review_count": 0,
+              "required_review_thread_resolution": true,
+              "allowed_merge_methods": [
+                "merge"
+              ]
+            }
+          },
+          {
+            "type": "required_status_checks",
+            "parameters": {
+              "required_status_checks": [
+                {
+                  "context": "Test static app",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "OSS provenance",
+                  "integration_id": 15368
+                }
+              ],
+              "strict_required_status_checks_policy": true,
+              "do_not_enforce_on_create": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "mergeOptions": {
+    "method": "PATCH",
+    "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62",
+    "body": {
+      "allow_auto_merge": false,
+      "allow_merge_commit": true,
+      "allow_squash_merge": false,
+      "allow_rebase_merge": false,
+      "delete_branch_on_merge": false
+    }
+  },
+  "testRefs": [
+    "refs/heads/goal62-pass",
+    "refs/heads/goal62-fail",
+    "refs/heads/goal62-review",
+    "refs/heads/goal62-stale"
+  ],
+  "testCommitTemplates": {
+    "pass": {
+      "message": "Inert passing change",
+      "file": "proof.txt",
+      "content": "Goal 62 inert sandbox proof.\n"
+    },
+    "fail": {
+      "message": "Inert deliberately failing check",
+      "file": "expected-failure.txt",
+      "content": "Expected test failure; no executable content.\n"
+    },
+    "stale": {
+      "message": "Inert new head invalidates previous checks",
+      "file": "proof.txt",
+      "content": "Goal 62 second inert head.\n"
+    },
+    "direct": {
+      "message": "Expected rejected direct update",
+      "tree": "$currentTargetTree",
+      "parents": [
+        "$currentTargetSha"
+      ]
+    },
+    "force": {
+      "sha": "$initialTargetSha",
+      "force": true
+    }
+  },
+  "pullRequestTemplate": {
+    "method": "POST",
+    "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/pulls",
+    "body": {
+      "title": "Goal 62 inert enforcement test",
+      "body": "Authorised disposable enforcement test; no production code, secrets or publication.",
+      "head": "$approvedTestRef",
+      "base": "$approvedTargetBranch",
+      "draft": false
+    }
+  },
+  "reviewThreadTemplate": {
+    "body": "Inert unresolved conversation used to verify the resolution rule.",
+    "commit_id": "$testHeadSha",
+    "path": "proof.txt",
+    "line": 1,
+    "side": "RIGHT"
+  },
+  "allowedTargetBranches": [
+    "develop",
+    "main"
+  ],
+  "mergeTemplate": {
+    "method": "PUT",
+    "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/pulls/$testPullNumber/merge",
+    "body": {
+      "merge_method": "merge",
+      "sha": "$observedTestHeadSha",
+      "commit_title": "Complete authorised inert governance test"
+    }
+  },
+  "deniedRefOperations": [
+    {
+      "method": "PATCH",
+      "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/git/refs/heads/$approvedTargetBranch",
+      "body": {
+        "sha": "$directTestCommit.sha",
+        "force": false
+      }
+    },
+    {
+      "method": "PATCH",
+      "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/git/refs/heads/$approvedTargetBranch",
+      "body": {
+        "sha": "$initialTargetSha",
+        "force": true
+      }
+    },
+    {
+      "method": "DELETE",
+      "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62/git/refs/heads/$approvedTargetBranch",
+      "body": null
+    }
+  ],
+  "outcomesRequired": [
+    "Reject direct push, non-fast-forward force update and target-branch deletion on main and develop",
+    "Reject missing/failing checks and unresolved conversation merge",
+    "Previous head checks do not authorise new head; use observed new head SHA",
+    "Owner PR merge succeeds with all current checks and resolved conversations, without approving reviews",
+    "Readback confirms no bypass and unchanged production repository"
+  ],
+  "cleanup": {
+    "method": "DELETE",
+    "target": "/repos/DouglasNLima/local-docs-studio-governance-sandbox-62",
+    "body": null,
+    "preconditions": [
+      "Owner explicitly approves this exact disposable repository deletion as part of the test transaction",
+      "Repository id equals the id created by this transaction",
+      "Preserve public status-only receipt before deletion; abort if unrelated content appears"
+    ]
+  },
+  "forbidden": [
+    "Production repository mutation",
+    "Secrets or provider credentials",
+    "Signing, tags, releases or Pages deployment",
+    "Synthetic private security reports",
+    "Execution of user-supplied code"
+  ],
+  "preconditions": [
+    "Authenticated owner is DouglasNLima; proposed target does not exist (verified 404)",
+    "Created repository response default_branch must equal main; otherwise abort and use only separately approved identity-bound cleanup",
+    "Before force-update rejection test, target must have advanced: initialTargetSha differs from and is an ancestor of currentTargetSha",
+    "All runtime substitutions originate from receipts for this exact repository id; no arbitrary target or external code input"
+  ]
+}

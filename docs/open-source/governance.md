@@ -8,7 +8,9 @@ separate-agent reviews are technical evidence, never independent human approval.
 The owner has confirmed an entirely personal project: no code was created for
 employers/customers and no employer/customer contractual restrictions apply.
 The project will remain free, without subscriptions or paid feature tiers.
-MIT still needs the exact copyright notice and cleared [scope](rights-decision.md).
+The owner approved the exact MIT notice and restricted R1/R2 [scope](rights-decision.md).
+[LICENSE](../../LICENSE) now grants the enumerated original portions in this source
+copy; [LICENSING.md](../../LICENSING.md) preserves all exclusions.
 
 | Role | Responsible |
 |---|---|
@@ -49,7 +51,8 @@ signer/trust verification and distribution scope.
 External contributions require the human maintainer's review of source,
 permissions, dependency provenance and tests before integration. An AI review
 cannot substitute. Contributor rights and original notices must be checked;
-there is no automatic inbound licence while MIT adoption is pending.
+new paths require explicit scope review; see CONTRIBUTING.md for inbound MIT
+contributions and separately identified exceptions.
 
 ## Controls and limitations
 

@@ -1,8 +1,8 @@
 # Third-party notices and attribution review
 
-This repository has no approved first-party licence yet. Third-party components
-retain their own licences; this file neither relicenses them nor certifies a
-complete distribution. See the [audit findings](docs/open-source/licence-audit.md).
+The original first-party grant is scoped by [LICENSING.md](LICENSING.md).
+Third-party components retain their own licences; this file neither relicenses
+them nor certifies a complete distribution. See the [audit findings](docs/open-source/licence-audit.md).
 
 Goal #58 adds an [exact Highlight.js reconstruction and payload review](docs/open-source/third-party-closeout.md),
 a [cached known web notice pack](assets/vendor/THIRD-PARTY-NOTICES.txt), and a

@@ -10,6 +10,11 @@ vulnerability reporting → Enable. Verify current UI labels. The API equivalent
 `PUT /repos/DouglasNLima/local-docs-studio/private-vulnerability-reporting`
 without a body. Do not execute before separate authorisation.
 
+The [exact administrative decision packet](goal62-github-receipt.md) records
+this bodyless PUT separately from branch/repository settings and from any test
+report. Rollback, if specifically authorised, is the bodyless DELETE on the same
+endpoint; preserve any existing private advisories and never publish them.
+
 After approval:
 
 1. Recheck settings and owner access/MFA. Configure the owner's security-alert
@@ -27,7 +32,9 @@ After approval:
    roles, enabled status, delivery/acknowledgement and privacy result publicly.
    Keep report IDs/URLs and account details private. Close/dismiss the synthetic
    report through the available private workflow; never publish it to finish.
-6. Advertise the route as operational in SECURITY.md only after success. Failed
+6. If only the API enablement is verified, record **ENABLED / EXTERNAL-FLOW
+   UNVERIFIED**. Actual alerts, reporter access and private delivery need evidence.
+   Advertise the route as operational in SECURITY.md only after success. Failed
    delivery, access or privacy checks leave it unverified.
 
 The intended entry is [Security Advisories](https://github.com/DouglasNLima/local-docs-studio/security/advisories).
