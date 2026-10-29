@@ -26,8 +26,8 @@ Additional conservative exclusions are dedicated DocsSiteTemplates resources,
 the complex-ER fixture generator, native built-in-catalogue.json and the issue
 submission template (R3), plus native-853-original-evidence.json (R5).
 No excluded content was edited or individually relicensed.
-The positive grant contains 1,076 paths for original portions, with three
-complete-file SPDX additions. The baseline preservation check covers 2,423 files.
+The positive grant contains 1,077 paths for original portions, with four
+complete-file SPDX additions. The baseline preservation check covers 2,421 files.
 
 Mixed files grant original portions only. Examples in
 `Sync-ContentCatalogue.mjs`, `MermaidDiagramCatalogue.cs`, test harnesses and
@@ -74,3 +74,19 @@ never presented as a Goal #62 binary. Known Mammoth/PDF.js notice closure, exclu
 artwork/examples, fonts/provider interpretation and legacy notice gaps remain
 BLOCKED for affected redistribution/release. Continuous 250 ms FAIL and clean
 Windows/signing limitations are unchanged.
+
+The first hosted Goal #62 run exposed a package-verifier integration omission:
+it rejected the newly delivered LICENSING.md. That failed run is retained at
+[40833257648](https://github.com/DouglasNLima/local-docs-studio/actions/runs/40833257648).
+The corrected verifier permits only that additional root Markdown file and
+requires LICENSE, FIRST-PARTY-SCOPE.json and the generated disclosure to match the
+independently pinned source commit. Missing source evidence fails explicitly;
+absence of all three files cannot masquerade as historical licensing. Only the
+existing original .853 source/version/installer/ZIP hash pairs retain their
+pre-adoption diagnostic treatment. Their workflow and bytes remain unchanged.
+
+Both actual .962 ZIPs passed the revised verifier locally, and all 29 package
+negative controls passed, including removal of all three files and individual
+notice/scope/disclosure tampering with recomputed ZIP checksums. The .962 files
+remain first-attempt product bytes; final hosted remediation-source results are
+recorded separately. No executable was run during this local package inspection.

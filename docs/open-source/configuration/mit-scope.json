@@ -27,12 +27,14 @@
     "docs/open-source/signpath-enquiry-draft.md",
     "scripts/compliance/licence_scope.py",
     "scripts/compliance/observe_governance.py",
-    "scripts/native/Copy-NativeLicence.ps1"
+    "scripts/native/Copy-NativeLicence.ps1",
+    "scripts/native/Test-NativeLicence.ps1"
   ],
   "spdxPaths": [
     "scripts/compliance/licence_scope.py",
     "scripts/compliance/observe_governance.py",
-    "scripts/native/Copy-NativeLicence.ps1"
+    "scripts/native/Copy-NativeLicence.ps1",
+    "scripts/native/Test-NativeLicence.ps1"
   ],
   "paths": [
     ".gitattributes",
@@ -341,6 +343,7 @@
     "scripts/native/Test-NativeFirstLaunch.ps1",
     "scripts/native/Test-NativeHistoricalPackage.ps1",
     "scripts/native/Test-NativeInstaller.ps1",
+    "scripts/native/Test-NativeLicence.ps1",
     "scripts/native/Test-NativeNotices.ps1",
     "scripts/native/Test-NativePreviewPackage.ps1",
     "scripts/native/Test-NativePreviewPackageControls.ps1",

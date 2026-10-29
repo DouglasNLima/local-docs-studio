@@ -20,3 +20,10 @@ Findings addressed before the first source commit:
 No upstream, updater trust or Continuous-threshold changes were found. The final
 review statement and exact source SHA/tree are recorded in the PR receipt after
 commit. The source receipt does not pretend to contain its own future Git hash.
+
+A later hosted package-verifier failure required a narrow remediation: allow
+LICENSING.md while verifying all three scoped-licence files against the pinned
+source, and retain only the exact historical .853 hash exception. The independent
+agent reviewed the approach and working delta; final committed delta review is
+recorded against its final SHA/tree in the PR receipt. Local revised verification
+of both original .962 candidates and 29 package rejection controls passed.

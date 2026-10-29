@@ -8,16 +8,16 @@
     "cacheAttemptedAssets": 212
   },
   "governance": {
-    "tests": 20,
-    "passed": 20,
+    "tests": 22,
+    "passed": 22,
     "developRequiredChecks": 30,
     "mainRequiredChecks": 2,
     "administrativeMutation": false
   },
   "licensing": {
-    "originalPortionPaths": 1076,
-    "newSpdxPaths": 3,
-    "preservedBaselineFiles": 2423,
+    "originalPortionPaths": 1077,
+    "newSpdxPaths": 4,
+    "preservedBaselineFiles": 2421,
     "noticeReferences": 68,
     "historicalNativeFiles": 537,
     "historicalNativeExactMatches": 522
@@ -29,11 +29,26 @@
     "sha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0"
   },
   "nativePayloadControl": "Actual temporary directory copy and missing-scope rejection; no installation/signature",
-  "browser": "In progress at engineering evidence freeze; terminal result in final PR receipt",
+  "browser": "270/270 Chromium/Edge passed at b05fe8f; no browser source changes in remediation; final hosted source results in PR receipt",
   "limits": [
     "Historical .957 SBOM is not a Goal62 binary",
     "MFA, GitHub enforcement, external private-report flow and provider eligibility unverified",
     "Continuous 250 ms inherited FAIL unchanged; release blocked",
     "No merge/tag/release/admin write/provider contact"
-  ]
+  ],
+  "packageRemediation": {
+    "originalRun": 40833257648,
+    "originalSource": "b05fe8f16c218f8cbd028d2ad93f0a435134ce7d",
+    "failure": "Existing package verifier rejected new LICENSING.md",
+    "localActualOldPackages": [
+      "0.1.0-preview.962",
+      "0.1.1-preview.962"
+    ],
+    "oldPackageVerifierResults": "PASS with revised verifier; no executables run",
+    "negativePackageControls": 29,
+    "perPackageFiles": 540,
+    "perPackageExactUpstreamMatches": 522,
+    "verifiedRegistryComponents": 20,
+    "finalSourceHostedCertification": "Required separately; .962 is not the remediation binary"
+  }
 }

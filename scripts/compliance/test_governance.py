@@ -4,6 +4,7 @@ import json
 import unittest
 import subprocess
 import tempfile
+import zipfile
 from pathlib import Path
 
 from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_packet
@@ -192,6 +193,50 @@ class ScopedLicenceTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('Missing required scoped licence material', result.stderr)
             self.assertEqual(list(output.iterdir()), [])
+
+    def test_package_licence_contract_rejects_removed_or_tampered_notices(self):
+        revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT,
+                                           text=True).strip()
+        source_paths = {'LICENSE': 'LICENSE',
+                        'FIRST-PARTY-SCOPE.json': 'docs/open-source/configuration/mit-scope.json',
+                        'LICENSING.md': 'docs/open-source/native-distribution-licensing.md'}
+        entries = {name: subprocess.check_output(['git', 'show', revision + ':' + path],
+                                                 cwd=ROOT).decode('utf-8')
+                   .replace('SOURCE_REVISION', revision) for name, path in source_paths.items()}
+        variants = [('valid', entries, True), ('missing-all', {}, False)]
+        for name in entries:
+            changed = dict(entries)
+            changed[name] += 'Unauthorised change.\n'
+            variants.append((name, changed, False))
+        with tempfile.TemporaryDirectory(prefix='lens-zip-licence-') as directory:
+            for label, files, accepted in variants:
+                with self.subTest(case=label):
+                    archive = Path(directory) / 'payload.zip'
+                    with zipfile.ZipFile(archive, 'w') as output:
+                        for name, content in files.items():
+                            output.writestr(name, content)
+                    result = subprocess.run([
+                        'pwsh', '-NoProfile', '-File', str(ROOT / 'scripts/native/Test-NativeLicence.ps1'),
+                        '-PortablePath', str(archive), '-ExpectedSourceRevision', revision,
+                        '-ExpectedVersion', '0.1.0-preview.1', '-InstallerSha256', '0' * 64],
+                        capture_output=True, text=True, encoding='utf-8')
+                    self.assertEqual(result.returncode == 0, accepted, result.stderr)
+                    if not accepted:
+                        self.assertRegex(result.stderr, 'scoped licence entry|Scoped licence entry')
+
+    def test_missing_source_cannot_masquerade_as_pre_adoption(self):
+        with tempfile.TemporaryDirectory(prefix='lens-unknown-source-') as directory:
+            archive = Path(directory) / 'payload.zip'
+            with zipfile.ZipFile(archive, 'w'):
+                pass
+            for revision, version in [('f' * 40, '0.1.0-preview.1'),
+                                      ('358147cd6da2265efb49e4922698796f9399fcf6', '0.1.0-preview.853')]:
+                result = subprocess.run([
+                    'pwsh', '-NoProfile', '-File', str(ROOT / 'scripts/native/Test-NativeLicence.ps1'),
+                    '-PortablePath', str(archive), '-ExpectedSourceRevision', revision,
+                    '-ExpectedVersion', version, '-InstallerSha256', '0' * 64],
+                    capture_output=True, text=True, encoding='utf-8')
+                self.assertNotEqual(result.returncode, 0, result.stdout)
 
 
 if __name__ == '__main__':
