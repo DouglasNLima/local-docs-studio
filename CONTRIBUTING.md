@@ -30,9 +30,16 @@ credentials and personal screenshots. A commit author field is not proof of
 ownership. While licence approval is pending, new contributions require an
 explicit rights review; no automatic inbound licence or CLA is implied.
 
-Maintainers review source, lockfiles, dependencies and CI changes. Signing and
-publication require separate human approval; a passing PR does not authorise
-either. Review the [governance proposal](docs/open-source/governance.md),
+The sole human maintainer, **@DouglasNLima**, reviews external contributions,
+including source, lockfiles, dependency rights and CI changes, before integration.
+For owner-authored changes, use a focused branch/PR, recorded source SHA/tree,
+change/risk assessment, relevant tests and hosted CI, then a recorded owner
+self-review decision before a merge commit. Refresh that decision after source
+changes. No second human or approving GitHub review is required for the owner's
+own PR; an AI review is technical evidence, not independent human approval.
+
+Signing and public release each require separate explicit owner decisions;
+a passing PR does not authorise either. Review the [governance policy](docs/open-source/governance.md),
 [Code signing policy](docs/open-source/code-signing-policy.md),
 [Security policy](SECURITY.md) and [Code of conduct](CODE_OF_CONDUCT.md).
 

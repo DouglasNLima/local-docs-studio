@@ -1,0 +1,160 @@
+{
+  "observedAt": "2026-10-28T23:18:04.481142+00:00",
+  "method": "Read-only gh api GET; connector lacks branch-protection/ruleset/private-reporting endpoints",
+  "repository": {
+    "full_name": "DouglasNLima/local-docs-studio",
+    "visibility": "public",
+    "default_branch": "main",
+    "allow_auto_merge": false,
+    "allow_merge_commit": true,
+    "allow_squash_merge": true,
+    "allow_rebase_merge": true,
+    "delete_branch_on_merge": false
+  },
+  "ownerPermission": {
+    "login": "DouglasNLima",
+    "permission": "admin"
+  },
+  "branchProtection": {
+    "develop": {
+      "message": "Branch not protected",
+      "documentation_url": "https://docs.github.com/rest/branches/branch-protection#get-branch-protection",
+      "status": "404"
+    },
+    "main": {
+      "message": "Branch not protected",
+      "documentation_url": "https://docs.github.com/rest/branches/branch-protection#get-branch-protection",
+      "status": "404"
+    }
+  },
+  "rulesets": [],
+  "privateVulnerabilityReporting": {
+    "enabled": false
+  },
+  "codeownersDevelop": {
+    "errors": []
+  },
+  "environments": [
+    {
+      "name": "github-pages",
+      "protection_rules": [
+        {
+          "id": 55527123,
+          "node_id": "GA_kwDOSmyM784DT0bT",
+          "type": "branch_policy"
+        }
+      ],
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true
+      }
+    }
+  ],
+  "mfa": {
+    "status": "UNKNOWN",
+    "reason": "Authenticated user API did not expose a value; verify privately through account settings."
+  },
+  "administrativeMutationsPerformed": false,
+  "externalLinkValidation": {
+    "scope": [
+      "README.md",
+      "SECURITY.md",
+      "CODE_OF_CONDUCT.md",
+      "CONTRIBUTING.md",
+      "SUPPORT.md",
+      "docs/open-source/governance-settings.md",
+      "docs/open-source/private-reporting-plan.md",
+      "docs/open-source/licence-proposal.md",
+      "docs/open-source/signpath-application-packet.md"
+    ],
+    "results": [
+      {
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "url": "https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository"
+      },
+      {
+        "url": "https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam"
+      },
+      {
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
+      },
+      {
+        "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners"
+      },
+      {
+        "url": "https://docs.github.com/en/rest/branches/branch-protection",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/rest/branches/branch-protection"
+      },
+      {
+        "url": "https://docs.github.com/en/rest/repos/repos",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/rest/repos/repos"
+      },
+      {
+        "url": "https://docs.github.com/en/rest/repos/rules",
+        "status": 200,
+        "resolvedUrl": "https://docs.github.com/en/rest/repos/rules"
+      },
+      {
+        "url": "https://github.com/DouglasNLima/local-docs-studio/issues",
+        "status": 200,
+        "resolvedUrl": "https://github.com/DouglasNLima/local-docs-studio/issues"
+      },
+      {
+        "url": "https://github.com/DouglasNLima/local-docs-studio/pull/29",
+        "status": 200,
+        "resolvedUrl": "https://github.com/DouglasNLima/local-docs-studio/pull/29"
+      },
+      {
+        "url": "https://github.com/DouglasNLima/local-docs-studio/security/advisories",
+        "status": 200,
+        "resolvedUrl": "https://github.com/DouglasNLima/local-docs-studio/security/advisories"
+      },
+      {
+        "url": "https://opensource.org/license/mit",
+        "status": 200,
+        "resolvedUrl": "https://opensource.org/license/mit"
+      },
+      {
+        "url": "https://signpath.org/apply",
+        "status": 200,
+        "resolvedUrl": "https://signpath.org/apply"
+      },
+      {
+        "url": "https://signpath.org/terms.html",
+        "status": 200,
+        "resolvedUrl": "https://signpath.org/terms.html"
+      }
+    ]
+  },
+  "schemaInspection": {
+    "source": "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json",
+    "documentSha256": "b81f098026e98084a83f0a33db43502213919f68449b028543c373757766a758",
+    "definitionsInspected": [
+      "repository-rule-pull-request",
+      "repository-rule-required-status-checks",
+      "repository-rule-deletion",
+      "repository-rule-non-fast-forward"
+    ],
+    "requiredApprovingReviewCountMinimum": 0,
+    "allowedMergeMethods": [
+      "merge",
+      "squash",
+      "rebase"
+    ],
+    "method": "Published GitHub OpenAPI definition/field inspection; no administrative write or enforcement test"
+  }
+}

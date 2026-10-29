@@ -1,0 +1,131 @@
+{
+  "observedAt": "2026-10-28T23:18:04.481142+00:00",
+  "protectedHeads": {
+    "develop": "4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0",
+    "main": "0d100cc29dde2ba80755fb1e8af60ffd9d006b16"
+  },
+  "tags": [
+    {
+      "ref": "refs/tags/v0.1.0-dev",
+      "node_id": "REF_kwDOSmyM77RyZWZzL3RhZ3MvdjAuMS4wLWRldg",
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/refs/tags/v0.1.0-dev",
+      "object": {
+        "sha": "8b215d039188af94d32857239e6829916f4b74fc",
+        "type": "commit",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/commits/8b215d039188af94d32857239e6829916f4b74fc"
+      }
+    },
+    {
+      "ref": "refs/tags/v0.1.0-dev.1",
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi4x",
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/refs/tags/v0.1.0-dev.1",
+      "object": {
+        "sha": "efc9b8bf26e8ada69ee58c90c8595e32eba72963",
+        "type": "tag",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/tags/efc9b8bf26e8ada69ee58c90c8595e32eba72963"
+      }
+    },
+    {
+      "ref": "refs/tags/v0.1.0-dev.2",
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi4y",
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/refs/tags/v0.1.0-dev.2",
+      "object": {
+        "sha": "24b700ed1e873d048cf381be8b7840a0275dbeff",
+        "type": "tag",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/tags/24b700ed1e873d048cf381be8b7840a0275dbeff"
+      }
+    },
+    {
+      "ref": "refs/tags/v0.1.0-dev.3",
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi4z",
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/refs/tags/v0.1.0-dev.3",
+      "object": {
+        "sha": "1e8f15bf177046333cdc86076487cee74f647170",
+        "type": "commit",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/commits/1e8f15bf177046333cdc86076487cee74f647170"
+      }
+    },
+    {
+      "ref": "refs/tags/v0.1.0-dev.4",
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi40",
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/refs/tags/v0.1.0-dev.4",
+      "object": {
+        "sha": "2555a7554e9e625af7e5d9da93725f77f4997ded",
+        "type": "commit",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/git/commits/2555a7554e9e625af7e5d9da93725f77f4997ded"
+      }
+    }
+  ],
+  "releases": [
+    {
+      "id": 338956207,
+      "tag_name": "v0.1.0-dev.4",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-13T11:21:35Z",
+      "updated_at": "2026-06-13T11:23:44Z"
+    },
+    {
+      "id": 338652856,
+      "tag_name": "v0.1.0-dev.3",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-12T15:14:36Z",
+      "updated_at": "2026-06-12T15:14:36Z"
+    },
+    {
+      "id": 338530846,
+      "tag_name": "v0.1.0-dev.2",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-12T11:22:37Z",
+      "updated_at": "2026-06-12T11:22:37Z"
+    },
+    {
+      "id": 338153041,
+      "tag_name": "v0.1.0-dev.1",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-11T18:18:59Z",
+      "updated_at": "2026-06-11T18:18:59Z"
+    },
+    {
+      "id": 337351356,
+      "tag_name": "v0.1.0-dev",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-10T20:14:14Z",
+      "updated_at": "2026-06-10T20:14:14Z"
+    }
+  ],
+  "pausedPullRequests": {
+    "38": {
+      "number": 38,
+      "state": "open",
+      "updated_at": "2026-10-19T21:19:38Z",
+      "head": {
+        "ref": "experiment/native-continuous-layout-architecture",
+        "sha": "31fa3ad12f3e0c87f5e45cea6f97801af53b67cb"
+      },
+      "base": {
+        "ref": "develop",
+        "sha": "8332ddc48e64d93e766b90ef03693146bcf6f9a6"
+      },
+      "draft": true
+    },
+    "50": {
+      "number": 50,
+      "state": "open",
+      "updated_at": "2026-10-26T19:24:28Z",
+      "head": {
+        "ref": "assessment/pr38-continuous-feasibility-2026-10",
+        "sha": "2fdfc4e4f2664a426428a388056f66940ad5f03a"
+      },
+      "base": {
+        "ref": "develop",
+        "sha": "0df86ad2bdae005d49be68096c2f784b49de8109"
+      },
+      "draft": true
+    }
+  }
+}

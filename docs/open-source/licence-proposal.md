@@ -1,6 +1,6 @@
 # First-party licence proposal — not an operative licence
 
-The [Goal #58 owner decision packet](rights-decision.md) supplies the proposed
+The [Goal #60 owner decision packet](rights-decision.md) supplies the proposed
 copyright line, path-level decision ledger and exact exclusions for this draft.
 
 **No licence is adopted by this file.** Do not rename it to `LICENSE`, set package
@@ -27,7 +27,7 @@ inventory and proposal, not a legal ownership opinion.
 ```text
 MIT License
 
-Copyright (c) <approved years> <confirmed copyright holder(s)>
+Copyright (c) 2026 DouglasNLima
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,11 @@ SOFTWARE.
 ```
 
 ## Boundaries and SPDX proposal
+
+The exact line above is **proposed, not approved**. DouglasNLima is a public
+GitHub handle, not a verified legal holder. The owner must approve or replace
+the name, year/range and any additional holders, plus the exact cleared scope.
+The personal-project declaration is already established and needs no reconfirmation.
 
 User-created/imported documentation, customer templates and workspace files keep
 their owners' rights; exporting through this application does not relicense them.

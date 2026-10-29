@@ -1,5 +1,13 @@
 # Goal #58 foundation decision receipt
 
+Historical receipt. PR #59 was subsequently merged at
+`4ffc8b1967aa58bff02aa65e2f3a6f4da986e5b0`, tree
+`6a8d27461d76b3cd21aba98e4ed67dcf5ba6daf9`.
+[Goal #60](goal60-receipt.md) supersedes the earlier staffing/governance proposal:
+the owner has confirmed personal development and one human maintainer. A second
+reviewer is not required for ordinary owner integration. Original evidence and
+unresolved provenance/performance limitations below are retained.
+
 Target outcome: **OPEN_SOURCE_FOUNDATION_READY_FOR_OWNER_DECISION**. This is an
 audit/provenance/governance proposal, not production certification. The final
 Draft PR receipt supplies the frozen source commit/tree, independent-review

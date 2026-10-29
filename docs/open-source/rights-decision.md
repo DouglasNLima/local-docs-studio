@@ -1,54 +1,77 @@
-# Exact first-party MIT decision proposal
+# Scoped MIT decision packet — non-operative
 
-Goal #58 prepares an owner decision; **no licence is adopted**. The
-[path ledger](evidence/goal58/rights-ledger.csv) names every tracked/proposed path
-at the final source freeze. It is a rights-review classification, not an ownership
-certificate. The final PR receipt binds it to a commit/tree. Git author names,
-public visibility, generated files and successful tests establish no copyright title.
+[Goal #60](https://github.com/DouglasNLima/local-docs-studio/issues/60) accepts the
+owner's personal-project declaration: no employer/customer code, no applicable
+employer/customer contractual restriction, free open-source intent and one human
+maintainer. These decisions need no reconfirmation. They do not identify the
+exact public copyright holder or clear third-party/visual/example material.
 
-## Decisions to approve or correct together
+The [current ledger](evidence/goal60/rights-ledger.csv) names every current
+tracked/proposed path. R1/R2 rows form the **candidate affected-file list**, subject
+to approval of that exact set and its exclusions. No row grants a licence.
+The final PR SHA/tree binds the paths to bytes. The
+[Goal #58 ledger](evidence/goal58/rights-ledger.csv) remains unchanged historical
+evidence, superseded for current classification.
 
-| ID | Exact proposed boundary | Decision and evidence needed |
+| ID | Proposed treatment | Disposition |
 |---|---|---|
-| R1 | Project implementation: `assets/scripts/**`, shell/style/config files, `src/native/**`, `src/windows/**`, `scripts/**`, `tests/**`, `installer/**`, `.github/**`, excluding the categories below | OWNER ACTION REQUIRED: identify the legal holder(s), employment/commission restrictions, contributor assignments or permissions, and copied fragments. Technical structure identifies project implementation only |
-| R2 | First-party `README.md`, root policy documents and `docs/**`, with original examples, excluding preserved upstream text, screenshots and third-party quotations | OWNER ACTION REQUIRED: confirm documentation and example rights; approve the same MIT grant for the cleared files |
-| R3 | `tests/fixtures/**`, `assets/scripts/registries/**` and examples within tests/docs | OWNER ACTION REQUIRED: confirm original/synthetic content or list upstream grants. Remove uncleared customer/private material from the adoption set; do not assume a synthetic file name proves permission |
-| R4 | SVG/PNG/ICO and other artwork; `docs/native/images/**`, visible screenshots in `docs/native/evidence/**`, generated native icon and its SVG input | OWNER ACTION REQUIRED: identify creator/input permissions and subjects; approve copyright separately. Proposed default: exclude branding and screenshots from MIT until individually cleared |
-| R5 | `docs/open-source/evidence/**` and historical machine evidence | OWNER ACTION REQUIRED: approve publishing permissions and the original report structure only; preserved upstream grants, captured content and metadata retain their separate status |
-| R6 | `assets/vendor/**` except its project catalogue; `src/native/LensDocsStudio.Core/Rendering/PinnedMermaider/**`; `docs/native/licences/**`; NuGet/runtime/installer binaries | NOT APPLICABLE to first-party MIT: preserve upstream licences, copyrights, local-modification descriptions and font conditions. No blanket SPDX MIT headers |
-| R7 | Customer/user-created or imported documents, private workspaces/templates, local state and exported user content | NOT APPLICABLE: ownership stays with the respective owners; using the app does not grant or change rights. No private workspace was inspected for this proposal |
+| R1 — implementation | Browser, native .NET/WPF, project Windows shell, original tests/build scripts/tooling/configuration, excluding R3–R6 material | OWNER APPROVAL REQUIRED for exact scope and notice |
+| R2 — documentation | Original first-party guides/policies, excluding preserved upstream text, quotations and uncleared content | OWNER APPROVAL REQUIRED for exact scope and notice |
+| R3 — fixtures/examples | Fixtures, registries, native corpus/samples and example/template/snippet content excluded by default, including embedded examples within R1/R2 files | OWNER APPROVAL REQUIRED for individual originality or appropriate upstream-grant evidence; synthetic names do not prove rights |
+| R4 — artwork/branding | Name, logos, graphical identity, screenshots and other uncleared visuals outside default MIT scope | OWNER APPROVAL REQUIRED for separate copyright/branding treatment; trademark reservation alone does not reserve visual copyright |
+| R5 — historical evidence | Recorded outputs, captured content, screenshots and upstream notice evidence retain provenance/original rights | NOT APPLICABLE to default first-party grant; any publication/relicensing change needs separate review |
+| R6 — dependencies/adaptations | Vendored web code, NuGet, pinned Mermaider, fonts/resources, .NET/WPF runtimes, Inno components and legacy Windows App SDK/WebView2 binaries retain upstream terms | NOT APPLICABLE to first-party MIT; preserve all grants/notices |
+| R7 — user content | Imported/created Markdown, templates, assets, workspaces, local state and exports retain their owners' rights | NOT APPLICABLE; app use transfers or relicenses no content |
 
-Proposed copyright line for approval, **not a statement of verified title**:
+R7 is a usage boundary, not an assertion that private workspaces were inventoried.
+No private user content was inspected.
+
+An attribution scan found
+`src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs` outside the
+PinnedMermaider folder. Its header and that folder's notice establish a Mermaider
+adaptation; the new ledger explicitly classifies it **R6**. The old R1
+classification was not permission. Preserve Nullean's existing MIT attribution.
+Native machine evidence is R5; visible images also remain subject to R4 clearance.
+The dedicated vector artwork in
+`src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml` is explicitly R4,
+even though its XAML extension resembles implementation source. Its bytes are
+unchanged; no visual copyright clearance is inferred.
+
+Original test harnesses are R1 candidates, but embedded sample payloads are not
+automatically cleared. A text-marker scan is bounded evidence, not proof of
+originality. Upstream licence text/quotations within R2 documents retain their
+own rights. No path rule overrides these content-level exclusions.
+
+## Exact proposed notice
 
 ```text
 Copyright (c) 2026 DouglasNLima
 ```
 
-`DouglasNLima` is the known public repository account, not a verified legal name.
-The owner must either approve that exact public attribution as the rights holder,
-replace it with the correct individual/entity name, or enumerate multiple holders.
-Observed repository commit years are 2026 only; the owner must correct the year
-range if pre-repository work or other rights require it. This observation does not
-prove the date of creation or ownership. Keep the proposal non-operative until
-both the copyright line and the exact cleared path set are approved.
+This repeats the earlier candidate to make the decision concrete.
+**DouglasNLima is a GitHub handle, not a verified legal copyright holder.**
+Approve only if correct, or replace with the correct individual/entity and any
+additional holders. Observed commit years are 2026; approve/correct the actual
+creation year/range. See the [complete MIT candidate](licence-proposal.md).
 
-The candidate grant is the unmodified MIT text already reproduced in
-[licence-proposal.md](licence-proposal.md), with only its placeholder copyright
-line replaced by the approved line above. The accompanying adoption scope file
-must list the cleared path ledger and all R3–R7 exclusions. A root MIT file without
-those boundaries would be misleading. There is no package licence metadata change
-or new first-party SPDX identifier in this goal.
+No root LICENSE, package licence metadata or new first-party SPDX identifier is
+added. Personal development does not silently authorise adoption.
 
-After approval, the separate adoption PR should add the operative root licence,
-the approved scope/exclusion file, and narrowly applicable SPDX identifiers.
-Keep upstream dual-licence choices and font terms intact. Use `NOASSERTION` for
-unresolved binary/file conclusions. Do not label the whole installer MIT.
+## Decision and subsequent adoption
 
-MIT would permit commercial reuse and resale by recipients. Free official project
-distribution is not an extra licence restriction. Copyright approval grants no
-trademark ownership, endorsement or permission to impersonate the project; branding
-treatment needs an explicit owner decision and must not silently restrict MIT code.
+Approve/correct the notice and the R1/R2 paths in the frozen ledger **with all
+content-level and R3–R7 exclusions**; list any further removals or individually
+cleared examples. R3/R4 additions require provenance evidence. Silence is not approval.
 
-Decision to return: approve/correct the holder and year line; identify cleared R1/R2
-paths and exceptions; supply provenance for R3/R4; confirm R5 publication scope;
-retain R6/R7 exclusions. **MIT adoption readiness: NO-GO until that decision.**
+After approval, a separate adoption change adds root LICENSE with the unmodified
+approved MIT text, LICENSING.md with the cleared scope/exclusions and frozen
+path reference, appropriate SPDX identifiers only on verified first-party files,
+and accurate README/package metadata. Preserve upstream dual grants, notices and
+asset conditions; unresolved file conclusions stay NOASSERTION. Do not label the
+whole installer or all included binaries MIT.
+
+MIT permits recipients' commercial reuse/resale. Free official distribution is
+project policy, not a restriction on recipients. No endorsement or impersonation
+permission is implied. **MIT adoption: OWNER APPROVAL REQUIRED, non-operative.**
+[Dependency redistribution gaps](third-party-closeout.md) remain unresolved and
+separate from the first-party candidate. Engineering checks do not certify title.

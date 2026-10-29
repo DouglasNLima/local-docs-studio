@@ -58,8 +58,10 @@ Minimum token scope for candidate/signing jobs is `contents: read` and, where
 needed, `actions: read`. No repository-wide write or PR secrets. Pin checkout,
 runtime setup and upload/download actions; disable persisted checkout credentials;
 bound timeouts; validate inputs before shell use; record approval/run/digest links.
-Retain failed attempts. The environment must actually require reviewers and
-disallow self-approval where available; naming an environment is not a gate.
+Retain failed attempts. Under the approved solo-maintainer model the future
+environment requires @DouglasNLima, leaves Prevent self-review disabled and
+disallows administrator bypass. This is manual owner approval, not independent
+human approval. Naming an environment is not a gate; no environment is activated.
 
 ## Artefact restrictions to review with SignPath
 

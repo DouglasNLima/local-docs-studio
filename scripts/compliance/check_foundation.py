@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import subprocess
 
-from rights_ledger import boundary
+from rights_ledger import boundary, OUTPUT
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / 'docs/open-source/evidence/goal58'
@@ -19,6 +19,13 @@ def read_json(path):
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def documentation_links(markdown):
+    # Literal Markdown examples are not navigable document links.
+    prose = re.sub(r'(?ms)^ {0,3}(`{3,}|~{3,})[^\n]*\n.*?^ {0,3}\1[ \t]*$', '', markdown)
+    prose = re.sub(r'`[^`\n]*`', '', prose)
+    return re.findall(r'\]\(([^)]+)\)', prose)
 
 
 def main():
@@ -61,7 +68,7 @@ def main():
     require(sbom['sourceRevision'] == sbom['versionMetadata']['sourceRevision'] and sbom['sourceTree'] == sbom['versionMetadata']['sourceTree'], 'Native source metadata mismatch')
 
     tracked = set(subprocess.check_output(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], cwd=ROOT).decode().split('\0')) - {''}
-    rows = list(csv.DictReader((EVIDENCE / 'rights-ledger.csv').open(encoding='utf-8', newline='')))
+    rows = list(csv.DictReader((ROOT / OUTPUT).open(encoding='utf-8', newline='')))
     require(len(rows) == len({r['path'] for r in rows}) and {r['path'] for r in rows} == tracked, 'Rights ledger does not cover the current tracked/proposed paths')
     for row in rows:
         decision, status, _ = boundary(row['path'])
@@ -70,9 +77,11 @@ def main():
     require('* @DouglasNLima' in codeowners and all(line.strip().endswith('@DouglasNLima') for line in codeowners.splitlines() if line.strip() and not line.startswith('#')), 'Unverified CODEOWNERS identity')
 
     checked_links = 0
-    docs = list((ROOT / 'docs/open-source').glob('*.md')) + [ROOT / 'scripts/compliance/highlight/README.md']
+    docs = list((ROOT / 'docs/open-source').glob('*.md')) + [ROOT / path for path in (
+        'scripts/compliance/highlight/README.md', 'README.md', 'CONTRIBUTING.md',
+        'CODE_OF_CONDUCT.md', 'SECURITY.md', 'SUPPORT.md')]
     for doc in docs:
-        for target in re.findall(r'\]\(([^)]+)\)', doc.read_text(encoding='utf-8')):
+        for target in documentation_links(doc.read_text(encoding='utf-8')):
             if re.match(r'^[a-z]+:', target) or target.startswith('#'):
                 continue
             path = target.split('#', 1)[0]

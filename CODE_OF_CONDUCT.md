@@ -1,24 +1,30 @@
 # Code of conduct
 
-Proposal for maintainer review; enforcement contacts must be confirmed before
-the community launch. This is original project guidance, not an adoption of an
-external code of conduct.
+Original project guidance. **@DouglasNLima** is the sole community and support
+maintainer. No independent appeal contact or confidential conduct service exists.
 
-Treat contributors and users with respect. Discuss ideas and evidence, welcome
-different experience levels, and make space for accessibility and language needs.
-Do not harass, threaten, discriminate, publish private information, make unwanted
-sexual advances or retaliate against someone who reports a concern. Criticism of
-technical work is welcome; personal attacks are not.
+Treat people with respect. Discuss ideas and evidence, welcome different
+experience levels, and consider accessibility and language needs. Do not harass,
+threaten, discriminate, disclose private information, make unwanted sexual
+advances or retaliate against reporters. Technical criticism is welcome.
 
-This applies to project issues, pull requests, discussions and other spaces where
-someone represents the project. Maintainers should explain moderation decisions,
-protect the privacy of reporters and affected people, and recuse themselves from
-cases involving their own conduct. Proportionate responses include a private
-warning, removal of content, temporary restrictions or exclusion for serious or
-repeated misconduct. Appeals need a reviewer who was not involved in the case.
+This applies to issues, PRs, discussions and project representation. The maintainer
+should protect privacy, explain moderation where possible and use proportionate
+responses: warning, content removal, temporary restriction or exclusion.
 
-A confidential conduct contact and independent appeal contact have not yet been
-appointed. Until they are, request a private contact from the repository owner
-without posting incident details or personal information in public. Appointing
-these contacts is an open [governance action](docs/open-source/governance.md), not
-a claim that a private reporting service already exists.
+Request private contact from @DouglasNLima through
+[GitHub issues](https://github.com/DouglasNLima/local-docs-studio/issues) **without
+incident details or personal information**. This public request is not private
+intake and guarantees no response. The proposed vulnerability channel is not
+advertised as a conduct channel.
+
+You may request reconsideration, but this is not an independent appeal. For a
+complaint about the maintainer there is no other project adjudicator; the conflict
+must be disclosed rather than represented as impartial review. Users may disengage
+and use [GitHub abuse reporting](https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam)
+for platform-policy violations. GitHub decides platform enforcement, not appeals
+against project technical/moderation decisions. Blocking and platform reporting
+remain available independently of participation.
+
+See [governance](docs/open-source/governance.md). No additional human is invented
+or required for ordinary project work.

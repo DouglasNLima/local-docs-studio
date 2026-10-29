@@ -1,7 +1,7 @@
 # SignPath Foundation owner decision packet — not submitted
 
 Target: `DouglasNLima/local-docs-studio`, native .NET/WPF edition, free official
-distribution. Objective: `OPEN_SOURCE_FOUNDATION_READY_FOR_OWNER_DECISION`.
+distribution. Updated for Goal #60's solo-maintainer model.
 This packet prepares evidence and unanswered decisions; **application readiness
 is NO-GO**. The official [terms](https://signpath.org/terms.html) (the page says
 Draft) and [application page](https://signpath.org/apply) were checked on 28 October
@@ -18,7 +18,7 @@ a verified list of every current form field.
 | Already released in the form to be signed | Five historical legacy Windows releases are not the native WPF product. Actions previews are not a public native release | BLOCKED |
 | Eligible included components | Native package bytes and original notices are mapped. Ask about Knuth/OFL fonts, apphost/runtime exception, adapted Mermaider/dagre and Inno-generated components | BLOCKED pending provider interpretation |
 | Own binaries and verifiable build origin | Proposed selectors below; build source/tree, immutable artefact digest and file SBOM supplied | OWNER ACTION REQUIRED to approve future scope |
-| Named Authors, Reviewers, Approvers and MFA | No team or signing identity is assigned or verified; no real manual signing approval has occurred | OWNER ACTION REQUIRED |
+| Named Authors, Reviewers, Approvers and MFA | @DouglasNLima is proposed for all roles; MFA verification and provider acceptance of this allocation remain unknown; no signing identity/request exists | OWNER APPROVAL REQUIRED for future activation; provider acceptance BLOCKED |
 | Public signing/privacy policies | Drafts exist and disclose network activity; approve responsibilities and provider wording after acceptance | OWNER ACTION REQUIRED |
 | Trusted build integration, product/version restrictions, manual release approval | Design only; no SignPath project, production secret or protected publication environment exists | BLOCKED |
 | No harmful or unwanted behaviour | Documentation purpose and source are visible; tests do not certify absence of all harmful behaviour | BLOCKED pending the actual provider/security assessment |
@@ -32,6 +32,31 @@ Windows App SDK/WebView2 scope is excluded from this native proposal.
 
 ## Proposed exact signing boundary
 
+### Solo-maintainer eligibility finding
+
+The official terms were re-read on 28 October 2026. They define trusted Authors,
+review of non-committer changes and human approval of each signing request, with
+MFA on both GitHub and SignPath. They do **not explicitly require different
+people** for these roles. This supports proposing the sole maintainer
+@DouglasNLima for source author, external contribution reviewer, each signing
+approval and final release authorisation; it is not proof that SignPath accepts
+this project's allocation. The published terms do not give an explicit
+single-person acceptance commitment. Provider interpretation/acceptance is still
+BLOCKED, not a reason to invent a second person.
+
+Prepared question for a later owner-authorised enquiry: “Will the Foundation
+accept @DouglasNLima as the sole trusted source author, external-contribution
+reviewer and manual approver of each signing request for Lens Docs Studio, with
+documented self-review, enforced CI and MFA? Please also confirm the proposed
+native component/signing boundaries and how the existing-release prerequisite
+applies to unsigned internal previews.” No enquiry/application was sent.
+
+Future GitHub environment review uses this real owner with Prevent self-review
+disabled and administrator bypass disabled. It is manual owner approval, not
+independent approval. No signing environment, secret or workflow is activated.
+
+### Binary selectors
+
 First stage: only the native apphost at the root of an approved clean publish
 directory, exact filename `LensDocsStudio.Native.exe`. It contains the SDK apphost
 template; provider approval of that boundary is pending. Do not submit upstream
@@ -39,7 +64,8 @@ DLLs, Core/Native DLLs, test executables, updater fixtures or arbitrary `**/*.ex
 
 Second stage: only `LensDocsStudio.Native-<approved-version>-win-x64-Setup.exe`,
 where `<approved-version>` is one owner-approved immutable release value. The
-current actual candidates are `0.1.0-preview.957` and `0.1.1-preview.957`, **not
+historical Goal #58 baseline examples are `0.1.0-preview.957` and
+`0.1.1-preview.957`, **not
 authorised signing requests**. Stage two follows independent verification of the
 signed apphost and rebuilding the installer around it. Inno's generated uninstaller
 and embedded compiler code require an explicit provider-supported arrangement;

@@ -1,5 +1,12 @@
 # Open-source and free Windows distribution readiness
 
+Current guidance: [Goal #60 solo-maintainer receipt](goal60-receipt.md),
+[governance](governance.md), [proposed settings](governance-settings.md) and
+[scoped MIT decision](rights-decision.md). The owner's personal-project and
+sole-maintainer declarations are established. MIT notice/scope approval,
+administrative controls, private reporting verification and provider acceptance
+remain separate. The older receipts below retain their historical observations.
+
 The [Goal #58 closeout and owner decision packet](goal58-closeout.md) continues
 this audit from the authorised PR #57 merge. The receipt below retains its original
 Goal #56 source and validation context.
