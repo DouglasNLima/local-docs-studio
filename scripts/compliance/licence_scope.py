@@ -61,14 +61,27 @@ def main():
         require(token in disclosure, 'Scope disclosure omitted ' + token)
     invariants = json.loads((ROOT / 'docs/open-source/evidence/goal62/preserved-files.json')
                            .read_text(encoding='utf-8'))
-    # Goal #62's authorised current-policy refresh supersedes only this historical
-    # policy digest. Keep the frozen evidence and all notice/trust/performance
+    # Goal #62's authorised current-policy refresh supersedes only these historical
+    # policy digests. Keep the frozen evidence and all notice/trust/performance
     # invariants intact; any other change still fails validation.
     preserved = dict(invariants['sha256'])
-    require(preserved['SECURITY.md'] ==
+    policy_refresh = {
+        'SECURITY.md': (
             'c9ee2727aba092d930435e02d0d2091b541fe486be0d50ff22709a587c2d4f3d',
-            'Historical security policy evidence changed')
-    preserved['SECURITY.md'] = '425de96d2be0ebeb288ade4f7fa84e089cbff437bd1de603f356196015de1c6a'
+            '425de96d2be0ebeb288ade4f7fa84e089cbff437bd1de603f356196015de1c6a'),
+        'SUPPORT.md': (
+            '52d230bfddcc85655d0c76830e7b5643042442ef8b33d755465658510d1d5667',
+            '2d0bea9170d75472c0c2e3cd313f1e76a6c6083b33256f83be089dfca450f7e1'),
+        'CODE_OF_CONDUCT.md': (
+            'a1ec3816a7e60e90b27cf913f6d238bcccc0ee2cbe661429c55158d3031f5a60',
+            '0d96e62ee9054c63b73cbd51106797b6ca293757d97abb05aa33d551a33c917c'),
+        'docs/open-source/code-signing-policy.md': (
+            '633c3225762226e1b2a1a5d4b17a2ddec4a560583020fd11c1067b05abfb0972',
+            '1939126363fc8daf1de624044ae4645f65582c794b9878517932b905783ee2e2'),
+    }
+    for path, (previous, current) in policy_refresh.items():
+        require(preserved[path] == previous, 'Historical policy evidence changed: ' + path)
+        preserved[path] = current
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}
