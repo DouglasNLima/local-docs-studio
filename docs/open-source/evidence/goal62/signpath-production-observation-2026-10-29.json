@@ -1,0 +1,553 @@
+{
+  "observedAtUTC": "2026-10-29T21:36:59.270117+00:00",
+  "method": "Read-only GitHub REST readback; no administrative mutation",
+  "repository": "DouglasNLima/local-docs-studio",
+  "refs": {
+    "main": "68f1dc955b27a47347a6fccc52a463472b601a1b",
+    "develop": "8fdcb5eba90347a829e88e8f30e4ab489b437038"
+  },
+  "rulesets": [
+    {
+      "id": 26127883,
+      "name": "Solo maintainer develop",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "DouglasNLima/local-docs-studio",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/develop"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": true,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge"
+            ]
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "Test static app",
+                "integration_id": 15368
+              },
+              {
+                "context": "OSS provenance",
+                "integration_id": 15368
+              },
+              {
+                "context": "native",
+                "integration_id": 15368
+              },
+              {
+                "context": "diagram-arrangement",
+                "integration_id": 15368
+              },
+              {
+                "context": "arrangement-responsiveness",
+                "integration_id": 15368
+              },
+              {
+                "context": "complex-er-preview",
+                "integration_id": 15368
+              },
+              {
+                "context": "state-installed-authoring",
+                "integration_id": 15368
+              },
+              {
+                "context": "er-installed-authoring",
+                "integration_id": 15368
+              },
+              {
+                "context": "class-installed-authoring",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Pie)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Mindmap)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Flowchart)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Gantt)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Sankey)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Sequence)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Quadrant)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Timeline)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Journey)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Xy)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Requirement)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Radar)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Block)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (C4)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Kanban)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Architecture)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (GitGraph)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (TreeView)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Packet)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Treemap)",
+                "integration_id": 15368
+              },
+              {
+                "context": "companion-installed-authoring (Venn)",
+                "integration_id": 15368
+              }
+            ]
+          }
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5KbIzvzgGOrgs",
+      "created_at": "2026-10-29T14:07:07.629+00:00",
+      "updated_at": "2026-10-29T14:07:07.885+00:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/DouglasNLima/local-docs-studio/rulesets/26127883"
+        },
+        "html": {
+          "href": "https://github.com/DouglasNLima/local-docs-studio/rules/26127883"
+        }
+      }
+    },
+    {
+      "id": 26127901,
+      "name": "Solo maintainer main",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "DouglasNLima/local-docs-studio",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/main"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": true,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge"
+            ]
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "Test static app",
+                "integration_id": 15368
+              },
+              {
+                "context": "OSS provenance",
+                "integration_id": 15368
+              }
+            ]
+          }
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5KbIzvzgGOrh0",
+      "created_at": "2026-10-29T14:07:23.676+00:00",
+      "updated_at": "2026-10-29T14:07:23.827+00:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/DouglasNLima/local-docs-studio/rulesets/26127901"
+        },
+        "html": {
+          "href": "https://github.com/DouglasNLima/local-docs-studio/rules/26127901"
+        }
+      }
+    }
+  ],
+  "effectiveRules": {
+    "main": [
+      {
+        "type": "deletion",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      },
+      {
+        "type": "non_fast_forward",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": true,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge"
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "Test static app",
+              "integration_id": 15368
+            },
+            {
+              "context": "OSS provenance",
+              "integration_id": 15368
+            }
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      }
+    ],
+    "develop": [
+      {
+        "type": "deletion",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      },
+      {
+        "type": "non_fast_forward",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": true,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge"
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "Test static app",
+              "integration_id": 15368
+            },
+            {
+              "context": "OSS provenance",
+              "integration_id": 15368
+            },
+            {
+              "context": "native",
+              "integration_id": 15368
+            },
+            {
+              "context": "diagram-arrangement",
+              "integration_id": 15368
+            },
+            {
+              "context": "arrangement-responsiveness",
+              "integration_id": 15368
+            },
+            {
+              "context": "complex-er-preview",
+              "integration_id": 15368
+            },
+            {
+              "context": "state-installed-authoring",
+              "integration_id": 15368
+            },
+            {
+              "context": "er-installed-authoring",
+              "integration_id": 15368
+            },
+            {
+              "context": "class-installed-authoring",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Pie)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Mindmap)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Flowchart)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Gantt)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Sankey)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Sequence)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Quadrant)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Timeline)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Journey)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Xy)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Requirement)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Radar)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Block)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (C4)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Kanban)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Architecture)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (GitGraph)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (TreeView)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Packet)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Treemap)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Venn)",
+              "integration_id": 15368
+            }
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      }
+    ]
+  },
+  "pvr": {
+    "enabled": true
+  },
+  "collaborators": [
+    {
+      "login": "DouglasNLima",
+      "role_name": "admin"
+    }
+  ],
+  "environmentNames": [
+    "github-pages"
+  ],
+  "actionsSecrets": {
+    "count": 0,
+    "scope": "Repository only; no secret values retrieved"
+  },
+  "releases": [
+    {
+      "tag_name": "v0.1.0-dev.4",
+      "draft": false,
+      "prerelease": true,
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4"
+    },
+    {
+      "tag_name": "v0.1.0-dev.3",
+      "draft": false,
+      "prerelease": true,
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3"
+    },
+    {
+      "tag_name": "v0.1.0-dev.2",
+      "draft": false,
+      "prerelease": true,
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2"
+    },
+    {
+      "tag_name": "v0.1.0-dev.1",
+      "draft": false,
+      "prerelease": true,
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1"
+    },
+    {
+      "tag_name": "v0.1.0-dev",
+      "draft": false,
+      "prerelease": true,
+      "html_url": "https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev"
+    }
+  ],
+  "priorDrafts": [
+    {
+      "number": 38,
+      "draft": true,
+      "state": "open",
+      "head": {
+        "ref": "experiment/native-continuous-layout-architecture",
+        "sha": "31fa3ad12f3e0c87f5e45cea6f97801af53b67cb"
+      }
+    },
+    {
+      "number": 50,
+      "draft": true,
+      "state": "open",
+      "head": {
+        "ref": "assessment/pr38-continuous-feasibility-2026-10",
+        "sha": "2fdfc4e4f2664a426428a388056f66940ad5f03a"
+      }
+    }
+  ],
+  "limits": [
+    "No MFA state verified",
+    "PVR external delivery, notification and privacy unverified",
+    "No unconnected SignPath account access; provider absence relies on owner/source record",
+    "No production destructive enforcement tests repeated"
+  ]
+}

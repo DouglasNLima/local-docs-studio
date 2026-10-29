@@ -62,7 +62,8 @@ def main():
     invariants = json.loads((ROOT / 'docs/open-source/evidence/goal62/preserved-files.json')
                            .read_text(encoding='utf-8'))
     # Goal #62's authorised current-policy refresh supersedes only these historical
-    # policy digests. Keep the frozen evidence and all notice/trust/performance
+    # policy digests (signing policy refreshed again for the dated eligibility review).
+    # Keep the frozen evidence and all notice/trust/performance
     # invariants intact; any other change still fails validation.
     preserved = dict(invariants['sha256'])
     policy_refresh = {
@@ -77,7 +78,10 @@ def main():
             '0d96e62ee9054c63b73cbd51106797b6ca293757d97abb05aa33d551a33c917c'),
         'docs/open-source/code-signing-policy.md': (
             '633c3225762226e1b2a1a5d4b17a2ddec4a560583020fd11c1067b05abfb0972',
-            '1939126363fc8daf1de624044ae4645f65582c794b9878517932b905783ee2e2'),
+            'b3df3c3cf0470c0be44c6754cfb80e954dd25e86a6ed63640251994b39120db6'),
+        'docs/open-source/privacy.md': (
+            'bfe3721da4981db13fb4c454c042e416cd571b68796371b1def4f1afd43ca2fe',
+            '8d45e76ce225814ffa4e336afb6303ac40778198945899a827c2a6d5eb62503c'),
     }
     for path, (previous, current) in policy_refresh.items():
         require(preserved[path] == previous, 'Historical policy evidence changed: ' + path)

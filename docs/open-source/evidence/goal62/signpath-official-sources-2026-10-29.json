@@ -1,0 +1,77 @@
+{
+  "access": "Read-only official-source retrieval; no form submission or consent",
+  "sources": [
+    {
+      "source": "https://signpath.org/terms",
+      "url": "https://signpath.org/terms",
+      "status": 200,
+      "scrapeId": "01a1898e-767c-73ef-8afe-668fac726ac2",
+      "cachedAt": null,
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://signpath.org/apply",
+      "url": "https://signpath.org/apply",
+      "status": 200,
+      "scrapeId": "01a1898b-aea3-723f-873a-97388481769c",
+      "cachedAt": "2026-10-29T15:24:54.712Z",
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://signpath.org/",
+      "url": "https://signpath.org/",
+      "status": 200,
+      "scrapeId": "01a1898b-ae9a-75fa-b34f-4c18d32fc9a2",
+      "cachedAt": "2026-10-29T15:24:56.363Z",
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://docs.signpath.io/",
+      "url": "https://docs.signpath.io/",
+      "status": 200,
+      "scrapeId": "01a1898b-ae8c-761f-8830-bcef51edb836",
+      "cachedAt": "2026-10-29T02:00:47.479Z",
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://docs.signpath.io/trusted-build-systems/github",
+      "url": "https://docs.signpath.io/trusted-build-systems/github",
+      "status": 200,
+      "scrapeId": "01a1898b-ae8b-721e-a914-36dc2e574e91",
+      "cachedAt": "2026-10-29T06:21:51.070Z",
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://signpath.org/apply",
+      "url": "https://signpath.org/apply",
+      "status": 200,
+      "scrapeId": "01a1898c-b7b7-765f-ad71-6b716e990754",
+      "cachedAt": null,
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://signpath.io/support",
+      "url": "https://signpath.io/support",
+      "status": 200,
+      "scrapeId": "01a1898d-7d85-77f8-863c-c80c6c837b97",
+      "cachedAt": null,
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://signpath.io/contact",
+      "url": "https://signpath.io/contact",
+      "status": 200,
+      "scrapeId": "01a1898d-ff99-75c9-be49-ff839d2ae77b",
+      "cachedAt": null,
+      "accessDate": "2026-10-29"
+    },
+    {
+      "source": "https://signpath.io/solutions/open-source-community",
+      "url": "https://signpath.io/solutions/open-source-community",
+      "status": 200,
+      "scrapeId": "01a1898e-0133-7111-b33b-f386ed205598",
+      "cachedAt": null,
+      "accessDate": "2026-10-29"
+    }
+  ]
+}

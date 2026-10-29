@@ -19,9 +19,10 @@ unchanged. No further administrative mutation is authorised by this document.
 - Sole-maintainer use requires no second human reviewer. Recorded owner self-review
   remains a human procedure; MFA, external reporting and signing are separate gaps.
 
-The default branch's missing `OSS provenance` workflow still needs the separately
-reviewed main promotion PR and real passing required checks. Active rules alone
-do not prove that the older main source produces both required contexts.
+PR #65 merged the target-specific main OSS provenance workflow and public
+licence/security documents. Both required contexts passed for that PR; main
+`68f1dc955b27a47347a6fccc52a463472b601a1b` then completed Pages run 40935627548.
+Active rules and passing documentation checks do not certify a native release.
 
 ## Historical pre-activation observation
 
@@ -88,9 +89,8 @@ on PR #61's exact head; see [check-context evidence](evidence/goal62/check-conte
   receipt in the owner decision.
 
 Pages validation runs on all PRs/pushes. Develop's OSS provenance workflow runs on
-PRs to develop/main and pushes to develop. The older main tree still needs its own
-workflow bootstrap; a workflow's presence on develop does not make it run for a
-main-based PR. It need not run after main pushes to gate main PRs.
+PRs to develop/main and pushes to develop. Main now has its independently validated workflow via PR #65; a workflow's
+presence on develop alone does not make it run for a main-based PR. It need not run after main pushes to gate main PRs.
 Native validation runs on develop PRs/pushes without path filters. Do not select
 deployment, historical replay or conditional diagnostic jobs as required checks.
 

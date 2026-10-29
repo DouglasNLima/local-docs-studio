@@ -9,8 +9,10 @@ scope in [Goal #62](https://github.com/DouglasNLima/local-docs-studio/issues/62)
 This is an owner declaration, not independent legal verification of title.
 
 The scoped licence was adopted on `develop` at
-`709564dda30a57cf1e98ba07566f510c1636e05c`. Default-branch promotion remains a
-separate, target-specific PR and publication decision.
+`709564dda30a57cf1e98ba07566f510c1636e05c`. Main's target-specific promotion was merged in PR #65 at
+`68f1dc955b27a47347a6fccc52a463472b601a1b`, with Pages publication verified.
+Its older browser/legacy-shell scope is independently enumerated and does not
+include this branch's native WPF source.
 It does not relicense earlier tags or third-party material. A hosting service's
 automatic MIT badge must not be read as a licence for the entire repository.
 
