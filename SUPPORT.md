@@ -18,6 +18,7 @@ paths, customer data, tokens and personal information from logs or screenshots.
 Do not upload an entire workspace by default.
 
 Use [SECURITY.md](SECURITY.md) for vulnerabilities and
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for conduct concerns. Licence adoption and
-signed Stable distribution are still under review; see the
-[readiness receipt](docs/open-source/README.md).
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for conduct concerns. Scoped first-party
+MIT is adopted on develop; default-branch promotion remains separate. Signed
+Stable distribution is still blocked. PVR is enabled with its external reporting
+flow unverified; see the [current readiness guidance](docs/open-source/README.md).

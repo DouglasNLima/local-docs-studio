@@ -15,8 +15,8 @@ responses: warning, content removal, temporary restriction or exclusion.
 Request private contact from @DouglasNLima through
 [GitHub issues](https://github.com/DouglasNLima/local-docs-studio/issues) **without
 incident details or personal information**. This public request is not private
-intake and guarantees no response. The proposed vulnerability channel is not
-advertised as a conduct channel.
+intake and guarantees no response. The enabled, externally unverified
+[vulnerability reporting channel](SECURITY.md) is not advertised as a conduct channel.
 
 You may request reconsideration, but this is not an independent appeal. For a
 complaint about the maintainer there is no other project adjudicator; the conflict

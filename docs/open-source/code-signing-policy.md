@@ -17,7 +17,9 @@ The proposed trusted Author, reviewer of external contributions, human approver
 of each signing request and final Release Authoriser is **@DouglasNLima**, the
 sole maintainer. These are multiple roles, not independent human approval.
 Provider acceptance of this allocation remains unconfirmed; no signing identity
-is invented. MFA and actual branch/environment controls need verification.
+is invented. Production branch controls are [active and verified](governance-settings.md).
+MFA remains unverified; a future signing environment needs separate approval and
+effective-control verification. No signing environment or secret exists today.
 A future owner-reviewed environment must leave Prevent self-review disabled,
 or the only maintainer could not approve their own initiated deployment.
 

@@ -8,8 +8,9 @@ ownership of his original material and authorised this notice and restricted
 scope in [Goal #62](https://github.com/DouglasNLima/local-docs-studio/issues/62).
 This is an owner declaration, not independent legal verification of title.
 
-The licence operates for this feature-branch copy. Adoption on `develop` requires
-the separately authorised merge; the Goal #62 receipt records that branch state.
+The scoped licence was adopted on `develop` at
+`709564dda30a57cf1e98ba07566f510c1636e05c`. Default-branch promotion remains a
+separate, target-specific PR and publication decision.
 It does not relicense earlier tags or third-party material. A hosting service's
 automatic MIT badge must not be read as a licence for the entire repository.
 

@@ -56,13 +56,13 @@ contributions and separately identified exceptions.
 
 ## Controls and limitations
 
-The [proposed configuration](governance-settings.md) requires PRs and CI with
+The [active configuration](governance-settings.md), verified on 29 October 2026, requires PRs and CI with
 **zero** mandatory approving reviews, no mandatory CODEOWNER/last-push approval
 and no bypass actors. GitHub cannot verify the meaning of a decision comment:
 recorded self-review is an auditable human procedure, not a technical approval gate.
 
 Continuous 250 ms **FAIL** remains a production/release acceptance blocker at the
-unchanged threshold. The proposed integration checks deliberately exclude that
+unchanged threshold. The active integration checks deliberately exclude that
 performance gate so ordinary technical work can continue, with its failed runs
 disclosed in any integration decision. No failure is waived or reclassified.
 
@@ -72,7 +72,7 @@ settings and retain only account/date/enabled status, never passwords, recovery
 codes or private credentials. Keep recovery information privately, use no shared
 accounts, review future appointments and remove obsolete access.
 
-Follow [SECURITY.md](../../SECURITY.md) for the disabled/unverified private reporting
+Follow [SECURITY.md](../../SECURITY.md) for the enabled, externally unverified private reporting
 route and emergency signing/publication suspension.
 [Conduct policy](../../CODE_OF_CONDUCT.md) states the lack of independent appeal.
 Provider acceptance and [release gates](release-gates.md) remain separate.
