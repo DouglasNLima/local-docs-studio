@@ -4,10 +4,12 @@ Local Markdown, Mermaid, and documentation studio.
 
 Lens Docs Studio is maintained by **@DouglasNLima**, its sole human maintainer,
 and is intended to remain free with community contributions, with no
-subscriptions, paid licences or features restricted by a plan. Open-source
-licensing is being prepared: MIT is proposed and has **not** been adopted.
-See the [solo-maintainer governance and decision packet](docs/open-source/goal60-receipt.md)
-and [exact proposed MIT scope](docs/open-source/rights-decision.md).
+subscriptions, paid licences or features restricted by a plan. The original
+first-party portions enumerated in [LICENSING.md](LICENSING.md) are licensed under
+[MIT](LICENSE), with R3–R7 and embedded-third-party exclusions. This is not a
+blanket licence for dependencies, branding, examples, evidence or user content.
+See the [Goal #62 stage receipts](docs/open-source/goal62-receipt.md) and
+[recorded rights decision](docs/open-source/rights-decision.md).
 See the [licence audit and readiness receipt](docs/open-source/README.md),
 [contribution guide](CONTRIBUTING.md), [support](SUPPORT.md),
 [security policy](SECURITY.md), [third-party notices](THIRD_PARTY_NOTICES.md) and

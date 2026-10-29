@@ -46,8 +46,14 @@ Run `python scripts/compliance/rights_ledger.py` after adding/removing source
 paths, then `python scripts/compliance/check_foundation.py`,
 `python scripts/compliance/check_governance.py` and
 `python scripts/compliance/test_governance.py`. The current ledger is under
-`evidence/goal60/`; the Goal #58 ledger is retained unchanged as historical
-evidence. Classification proposes scope, never legal title or an operative grant.
-Governance checks validate proposed JSON, observed context provenance and
-non-operative licence/trust boundaries. They do not apply GitHub settings or
-establish behavioural enforcement.
+`evidence/goal62/`; the Goal #58/#60 ledgers remain unchanged historical evidence.
+The explicit `configuration/mit-scope.json` allowlist records reviewed original
+portions; classification alone never grants rights. Canonical Git hashes bind the
+ledger to bytes, with its own row bound by the final tree. Add new paths only after
+rights review, then regenerate the ledger. Governance checks require the approved
+MIT text, scope/metadata, preserved notices/trust/performance bytes and observed
+check contexts. They do not apply GitHub settings or establish enforcement.
+
+Read-only settings reproduction (requires authenticated GitHub CLI):
+`python scripts/compliance/observe_governance.py --output artifacts/compliance/governance --check-source <reviewed-SHA>`.
+It sends only GET requests and retains no tokens, recovery codes or private reports.

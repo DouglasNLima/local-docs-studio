@@ -1,0 +1,21 @@
+# Inert sandbox fixture; never install in the product repository.
+name: Solo governance sandbox
+on:
+  pull_request:
+    branches: [develop, main]
+permissions:
+  contents: read
+jobs:
+  inert-checks:
+    name: ${{ matrix.context }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        context: ["Test static app", "OSS provenance", "native", "diagram-arrangement", "arrangement-responsiveness", "complex-er-preview", "state-installed-authoring", "er-installed-authoring", "class-installed-authoring", "companion-installed-authoring (Pie)", "companion-installed-authoring (Mindmap)", "companion-installed-authoring (Flowchart)", "companion-installed-authoring (Gantt)", "companion-installed-authoring (Sankey)", "companion-installed-authoring (Sequence)", "companion-installed-authoring (Quadrant)", "companion-installed-authoring (Timeline)", "companion-installed-authoring (Journey)", "companion-installed-authoring (Xy)", "companion-installed-authoring (Requirement)", "companion-installed-authoring (Radar)", "companion-installed-authoring (Block)", "companion-installed-authoring (C4)", "companion-installed-authoring (Kanban)", "companion-installed-authoring (Architecture)", "companion-installed-authoring (GitGraph)", "companion-installed-authoring (TreeView)", "companion-installed-authoring (Packet)", "companion-installed-authoring (Treemap)", "companion-installed-authoring (Venn)"]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Controlled inert result
+        run: test ! -e expected-failure.txt

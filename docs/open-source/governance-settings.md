@@ -5,12 +5,18 @@ JSON files are reviewable payloads, not applied settings or active workflows.
 
 ## Observed state
 
-[Read-only evidence](evidence/goal60/governance-observation.json) records a public
+[Read-only evidence](evidence/goal62/governance-observation.json) records a public
 personal repository, both branches unprotected (HTTP 404: Branch not protected),
 no rulesets, private vulnerability reporting disabled, auto-merge disabled, and
 merge/squash/rebase all allowed. @DouglasNLima resolves with admin access.
 CODEOWNERS on develop has no API errors. Only github-pages exists, with a branch
 policy and no required reviewer. MFA is unverified. No settings were changed.
+
+The [Stage B receipt](goal62-github-receipt.md) binds exact payload SHA-256 values,
+rollback and separate activation approvals. [GitHub's current availability
+documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
+supports branch rulesets for this public personal repository even on GitHub Free.
+Actual write acceptance and allowed/denied behaviour remain UNVERIFIED.
 
 ## Exact proposed configuration
 
@@ -49,7 +55,7 @@ deletion. Protected-branch deletion is separately blocked by the rulesets.
 ### Exact status checks
 
 All selected names were observed from GitHub Actions, integration ID **15368**,
-on PR #59's exact head; see [check-context evidence](evidence/goal60/check-contexts.json).
+on PR #61's exact head; see [check-context evidence](evidence/goal62/check-contexts.json).
 
 - Both branches: `Test static app` (the aggregate fails unless both Chromium and
   Edge succeed) and `OSS provenance`.
@@ -119,7 +125,7 @@ proposal and approval; no tag change is made here.
 Use the [private reporting plan](private-reporting-plan.md) for separately authorised
 enablement/testing. Verify MFA through account settings with status-only evidence.
 
-## Official semantics checked 28 October 2026
+## Official semantics checked 29 October 2026
 
 [Rules REST API](https://docs.github.com/en/rest/repos/rules),
 [available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets),

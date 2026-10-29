@@ -9,7 +9,8 @@
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <Version>0.1.0-preview.1</Version>
     <Company>Lens Docs Studio</Company>
-    <Copyright>Lens Docs Studio contributors</Copyright>
+    <!-- Original first-party portions only; see root LICENSING.md for exclusions. -->
+    <Copyright>Copyright (c) 2026 DouglasNLima</Copyright>
   </PropertyGroup>
   <ItemGroup><Using Include="System.IO" /></ItemGroup>
 </Project>

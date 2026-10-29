@@ -50,7 +50,7 @@ try {
     $metadata.ciRunAttempt = $env:GITHUB_RUN_ATTEMPT
     $metadata.checkoutRef = if ($env:GITHUB_EVENT_NAME -eq 'pull_request' -and -not $mergeCheckout) { 'refs/heads/' + $env:GITHUB_HEAD_REF } else { $env:GITHUB_REF }
     $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'version.json') -Encoding utf8NoBOM
-    if (Test-Path -LiteralPath (Join-Path $repo 'LICENSE')) { Copy-Item -LiteralPath (Join-Path $repo 'LICENSE') -Destination $payload }
+    & (Join-Path $PSScriptRoot 'Copy-NativeLicence.ps1') -RepositoryRoot $repo -PayloadDirectory $payload -SourceRevision $revision
     & (Join-Path $PSScriptRoot 'Write-NativeNotices.ps1') -PayloadDirectory $payload
     Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-guide.md') -Destination (Join-Path $payload 'PREVIEW-GUIDE.md')
     Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-release-notes.md') -Destination (Join-Path $payload 'PREVIEW-RELEASE-NOTES.md')

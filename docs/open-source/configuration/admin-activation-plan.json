@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT APPLIED",
+  "sourceBaseline": "0890ec9b2ade8af24b9b3fca6cbe98cd7fd329ba",
+  "preconditions": [
+    "Explicit owner approval of exact targets, payload hashes and rollback plan",
+    "Fresh GET snapshot must match recorded before-state; drift requires a new plan",
+    "Target-specific disposable route approval and allowed/denied-path tests before production activation",
+    "No bypass, second-human requirement, signing, publication, tag or environment changes"
+  ],
+  "actions": [
+    {
+      "id": "ruleset-develop",
+      "status": "OWNER APPROVAL REQUIRED",
+      "method": "POST",
+      "target": "/repos/DouglasNLima/local-docs-studio/rulesets",
+      "bodyFile": "develop-ruleset.json",
+      "bodySha256": "078c02d5a10f28230389ced7dd2958a98ef38052eb1cef06297cbf9e4d4e78f8",
+      "rollback": {
+        "method": "DELETE",
+        "target": "/repos/DouglasNLima/local-docs-studio/rulesets/{id-returned-by-this-approved-POST}",
+        "precondition": "Exact returned id, name, ref conditions and payload must match this operation; preserve unrelated rulesets"
+      }
+    },
+    {
+      "id": "ruleset-main",
+      "status": "OWNER APPROVAL REQUIRED",
+      "method": "POST",
+      "target": "/repos/DouglasNLima/local-docs-studio/rulesets",
+      "bodyFile": "main-ruleset.json",
+      "bodySha256": "c53d398d684d58bbe0d93bc264d2bb5f4facad2e92cad47888aea217ce05c47d",
+      "rollback": {
+        "method": "DELETE",
+        "target": "/repos/DouglasNLima/local-docs-studio/rulesets/{id-returned-by-this-approved-POST}",
+        "precondition": "Exact returned id, name, ref conditions and payload must match this operation; preserve unrelated rulesets"
+      }
+    },
+    {
+      "id": "repository-merge-settings",
+      "status": "OWNER APPROVAL REQUIRED",
+      "method": "PATCH",
+      "target": "/repos/DouglasNLima/local-docs-studio",
+      "bodyFile": "repository-settings.json",
+      "bodySha256": "411d16f925d5be7ff4eac9fc6ef62a5f36dc17b186f8da34cfc4e2f5c6556fd8",
+      "rollback": {
+        "method": "PATCH",
+        "target": "/repos/DouglasNLima/local-docs-studio",
+        "bodyFile": "repository-settings-rollback.json",
+        "bodySha256": "9b3b40c45f18df9643d46d43639116116c49acf828c3c17ab71ed1065f633609"
+      }
+    },
+    {
+      "id": "private-vulnerability-reporting",
+      "status": "SEPARATE OWNER APPROVAL REQUIRED",
+      "method": "PUT",
+      "target": "/repos/DouglasNLima/local-docs-studio/private-vulnerability-reporting",
+      "body": null,
+      "recipient": "DouglasNLima",
+      "rollback": {
+        "method": "DELETE",
+        "target": "/repos/DouglasNLima/local-docs-studio/private-vulnerability-reporting",
+        "body": null,
+        "precondition": "Separately approve disabling intake; preserve existing private advisories"
+      }
+    }
+  ],
+  "excludedActions": [
+    "Account/MFA settings changes",
+    "Notification preference changes without exact private approval",
+    "Synthetic report submission without authorised external tester and exact test approval",
+    "Any production branch push/merge, tag, release or provider contact"
+  ]
+}

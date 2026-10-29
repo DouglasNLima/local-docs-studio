@@ -1,5 +1,9 @@
 # SignPath eligibility review
 
+Current Goal #62 evidence and unresolved provider questions are in the
+[updated application packet](signpath-application-packet.md). The earlier
+baseline analysis below is retained with its original licence/governance state.
+
 See the [application decision packet updated for Goal #60](signpath-application-packet.md) for
 the current evidence, owner classifications, exact binary selectors and unanswered
 provider decisions. The observations below are retained as the Goal #56 baseline.

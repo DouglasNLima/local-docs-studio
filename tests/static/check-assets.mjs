@@ -143,6 +143,9 @@ const runtimeExternalReferencePatterns = [
 ];
 const runtimeFilesForExternalScan = [
   'index.html',
+  'LICENSE',
+  'LICENSING.md',
+  'THIRD_PARTY_NOTICES.md',
   'md-mmd-renderer-v5.html',
   'manifest.webmanifest',
   'service-worker.js',
@@ -304,6 +307,11 @@ const workflow = readFileSync(toRootPath('.github/workflows/pages.yml'), 'utf8')
 if (!workflow.includes('actions/deploy-pages@v4')) fail('Pages workflow must deploy with actions/deploy-pages@v4');
 if (!workflow.includes('npm test')) fail('Pages workflow must run npm test before deploy');
 if (!workflow.includes('pages-artifact')) fail('Pages workflow must upload the static Pages artefact');
+for (const notice of ['LICENSE', 'LICENSING.md', 'THIRD_PARTY_NOTICES.md']) {
+  if (!existsSync(toRootPath(notice)) || !workflow.includes(notice)) {
+    fail(`Pages publication must retain the scoped licence and notices: ${notice}`);
+  }
+}
 if (/^permissions:/m.test(workflow)) fail('Pages workflow permissions must be scoped per job');
 if (!/test:[\s\S]*?permissions:[\s\S]*?contents: read[\s\S]*?steps:/m.test(workflow)) fail('Test job must have contents: read permission only');
 if (!/deploy:[\s\S]*?permissions:[\s\S]*?contents: read[\s\S]*?pages: write[\s\S]*?id-token: write[\s\S]*?environment:/m.test(workflow)) fail('Deploy job must scope Pages and id-token write permissions');

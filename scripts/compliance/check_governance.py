@@ -1,13 +1,14 @@
-"""Validate proposed solo governance without applying settings or granting rights."""
-import hashlib
+"""Validate proposed solo governance and scoped MIT adoption without applying settings."""
 import json
+import base64
+import hashlib
 from pathlib import Path
-import re
 
 from rights_ledger import boundary
+from licence_scope import main as check_licence
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / 'docs/open-source/evidence/goal60'
+EVIDENCE = ROOT / 'docs/open-source/evidence/goal62'
 CONFIG = ROOT / 'docs/open-source/configuration'
 FAMILIES = ('Pie Mindmap Flowchart Gantt Sankey Sequence Quadrant Timeline Journey '
             'Xy Requirement Radar Block C4 Kanban Architecture GitGraph TreeView '
@@ -54,6 +55,53 @@ def validate_ruleset(payload, branch, observed):
             'Required check was not observed from GitHub Actions')
 
 
+def validate_admin_packet(plan):
+    repo = '/repos/DouglasNLima/local-docs-studio'
+    require(plan['status'] == 'NOT APPLIED', 'Administrative activation is not authorised')
+    actions = plan['actions']
+    require(len(actions) == 4, 'Unexpected administrative action')
+    expected = [('POST', repo + '/rulesets', 'develop-ruleset.json'),
+                ('POST', repo + '/rulesets', 'main-ruleset.json'),
+                ('PATCH', repo, 'repository-settings.json')]
+    for action, (method, target, name) in zip(actions[:3], expected, strict=True):
+        require((action['method'], action['target'], action['bodyFile']) ==
+                (method, target, name), 'Unexpected administrative target or payload')
+        digest = hashlib.sha256((CONFIG / name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+        require(action['bodySha256'] == digest, 'Administrative payload digest changed')
+    reporting = actions[3]
+    require((reporting['method'], reporting['target'], reporting['body'], reporting['recipient']) ==
+            ('PUT', repo + '/private-vulnerability-reporting', None, 'DouglasNLima'),
+            'Unexpected private reporting action')
+    rollback = actions[2]['rollback']
+    raw = (CONFIG / 'repository-settings-rollback.json').read_bytes().replace(b'\r\n', b'\n')
+    require(rollback == {'method': 'PATCH', 'target': repo,
+                         'bodyFile': 'repository-settings-rollback.json',
+                         'bodySha256': hashlib.sha256(raw).hexdigest()},
+            'Rollback is not bound to the exact observed settings')
+    before = json.loads((EVIDENCE / 'governance-observation.json').read_text(encoding='utf-8'))
+    require(json.loads(raw) == {k: before['repository'][k] for k in json.loads(raw)},
+            'Rollback differs from the recorded before-state')
+
+
+def validate_sandbox_packet():
+    sandbox = json.loads((CONFIG / 'sandbox-transaction.json').read_text(encoding='utf-8'))
+    target = '/repos/DouglasNLima/local-docs-studio-governance-sandbox-62'
+    require(sandbox['target'] == target and sandbox['create']['body']['name'] ==
+            'local-docs-studio-governance-sandbox-62', 'Unexpected disposable target')
+    require(sandbox['cleanup']['target'] == target, 'Unsafe sandbox cleanup target')
+    require(sandbox['status'] == 'NOT EXECUTED; TARGET-SPECIFIC OWNER APPROVAL REQUIRED',
+            'Sandbox execution is not authorised')
+    fixture = (CONFIG / 'sandbox-workflow.yml.txt').read_text(encoding='utf-8')
+    require(base64.b64decode(sandbox['seedWorkflow']['body']['content']).decode('utf-8')
+            == fixture, 'Encoded sandbox workflow differs from reviewed inert text')
+    require(sandbox['seedWorkflow']['target'].startswith(target + '/contents/'),
+            'Sandbox workflow targets another repository')
+    for action, branch in zip(sandbox['applyRulesets'], ('develop', 'main'), strict=True):
+        require(action == {'method': 'POST', 'target': target + '/rulesets',
+                           'body': json.loads((CONFIG / (branch + '-ruleset.json')).read_text())},
+                'Sandbox rules differ from the production proposal')
+
+
 def main():
     evidence = json.loads((EVIDENCE / 'check-contexts.json').read_text(encoding='utf-8'))
     observed = {(row['name'], row['integrationId']) for row in evidence['contexts']}
@@ -64,30 +112,22 @@ def main():
     require(settings == {'allow_auto_merge': False, 'allow_merge_commit': True,
                          'allow_squash_merge': False, 'allow_rebase_merge': False,
                          'delete_branch_on_merge': False}, 'Unexpected repository settings')
-    require(not any(p.name.upper() in {'LICENSE', 'LICENSE.MD', 'LICENSE.TXT',
-                                      'LICENCE', 'LICENCE.MD', 'LICENCE.TXT'}
-                    for p in ROOT.iterdir()), 'Operative root licence is not approved')
-    invariants = json.loads((EVIDENCE / 'baseline-invariants.json').read_text())
-    for name, expected in invariants['sha256'].items():
-        # Git text blobs use LF; avoid treating Windows checkout CRLF as a source change.
-        content = (ROOT / name).read_bytes().replace(b'\r\n', b'\n')
-        require(hashlib.sha256(content).hexdigest() == expected,
-                'Protected trust/package source changed: ' + name)
+    validate_admin_packet(json.loads((CONFIG / 'admin-activation-plan.json').read_text()))
+    validate_sandbox_packet()
+    schema = json.loads((EVIDENCE / 'github-rule-schema.json').read_text(encoding='utf-8'))
+    parameters = schema['schemas']['repository-rule-pull-request']['properties']['parameters']
+    require(parameters['properties']['required_approving_review_count']['minimum'] == 0,
+            'Published schema does not support zero reviews')
+    # Goal #60's no-LICENSE invariant is deliberately superseded by exact MIT,
+    # scope, metadata and preserved-byte checks. Its historical receipt is untouched.
+    check_licence()
     require(boundary('src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs')[0]
             == 'R6', 'Mermaider adaptation must remain outside first-party scope')
     require(boundary('docs/native/evidence/example.json')[0] == 'R5',
             'Historical evidence is not first-party implementation')
-    candidate = (ROOT / 'docs/open-source/licence-proposal.md').read_text(encoding='utf-8')
-    block = re.search(r'```text\n(.*?)\n```', candidate, re.S).group(1)
-    upstream = (ROOT / 'src/native/LensDocsStudio.Core/Rendering/PinnedMermaider/NOTICE.md'
-                ).read_text(encoding='utf-8')
-    mit = upstream[upstream.index('MIT License'):].strip()
-    require(block == mit.replace('Copyright (c) 2025 Nullean',
-                                'Copyright (c) 2026 DouglasNLima'),
-            'Candidate must preserve unmodified MIT terms with the proposed notice')
     print(json.dumps({'rulesets': 2, 'developChecks': len(COMMON | NATIVE),
-                      'mainChecks': len(COMMON), 'trustAndMetadata': 'unchanged',
-                      'mitCandidate': 'unmodified terms; non-operative',
+                      'mainChecks': len(COMMON), 'trust': 'unchanged', 'metadata': 'scoped licence pointer',
+                      'mitLicence': 'operative for enumerated original portions',
                       'administrativeMutation': False}))
 
 

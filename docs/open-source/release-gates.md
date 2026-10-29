@@ -8,7 +8,7 @@ The issue stays open. Existing unsigned internal-preview CI remains separate.
 |---|---|---|
 | Immutable source/dependency inventory | IMPLEMENTED / TESTED | Baseline source evidence only; ownership and remaining bundle provenance BLOCKED |
 | Native notice retention | IMPLEMENTED / TESTED | New candidate package inspection required; historical omissions remain recorded |
-| Community/security/licence policies | IMPLEMENTED as proposals | Owner decisions and functioning private reporting BLOCKED |
+| Community/security/licence policies | Scoped first-party MIT IMPLEMENTED in Goal #62 source; governance prepared | Administrative activation and functioning private reporting require separate approval |
 | SignPath eligibility/governance | Matrix and adapter plan IMPLEMENTED | Acceptance, role/MFA verification, released native distribution and actual CI integration BLOCKED |
 | Native manifest/channel controls | IMPLEMENTED / TESTED with ephemeral keys and inert bytes | No production identity or Windows signing certification |
 | Planned manifest rollover / RC precedence | TESTED in Core | Real certificate rollover, overlap and emergency recovery BLOCKED |
@@ -25,5 +25,6 @@ The issue stays open. Existing unsigned internal-preview CI remains separate.
 
 Technical distribution readiness: **NO-GO**. Audit/signing-design review: **READY
 FOR REVIEW with recorded findings**. SignPath eligibility: **NOT ESTABLISHED**.
-Production publication: **NOT AUTHORISED**. No licence activation, trust pins,
+Production publication: **NOT AUTHORISED**. Scoped first-party MIT is operative
+in the Goal #62 source copy only until merged. No production trust pins,
 signing request, tag, release, account application or merge occurs in this phase.

@@ -1,0 +1,39 @@
+{
+  "status": "PASS for completed local checks; final-source hosted CI required",
+  "static": {
+    "modules": 50,
+    "shellAssets": 61,
+    "vendorAssets": 151,
+    "runtimeDependencyScans": 59,
+    "cacheAttemptedAssets": 212
+  },
+  "governance": {
+    "tests": 20,
+    "passed": 20,
+    "developRequiredChecks": 30,
+    "mainRequiredChecks": 2,
+    "administrativeMutation": false
+  },
+  "licensing": {
+    "originalPortionPaths": 1076,
+    "newSpdxPaths": 3,
+    "preservedBaselineFiles": 2423,
+    "noticeReferences": 68,
+    "historicalNativeFiles": 537,
+    "historicalNativeExactMatches": 522
+  },
+  "highlight": {
+    "installedFilesVerified": 1559,
+    "exactHistoricalMapSources": 194,
+    "bytes": 955998,
+    "sha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0"
+  },
+  "nativePayloadControl": "Actual temporary directory copy and missing-scope rejection; no installation/signature",
+  "browser": "In progress at engineering evidence freeze; terminal result in final PR receipt",
+  "limits": [
+    "Historical .957 SBOM is not a Goal62 binary",
+    "MFA, GitHub enforcement, external private-report flow and provider eligibility unverified",
+    "Continuous 250 ms inherited FAIL unchanged; release blocked",
+    "No merge/tag/release/admin write/provider contact"
+  ]
+}
