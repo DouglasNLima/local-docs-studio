@@ -88,6 +88,19 @@ public sealed class InstallerUpdateChoiceTests : IDisposable
         Assert.False(File.Exists(Intent));
     }
 
+    [Fact]
+    public async Task Inno_lowercase_fingerprint_matches_the_same_saved_bytes()
+    {
+        var store = new SessionStore(root);
+        await store.WriteAsync("preferences.json", new UserPreferences(Theme: "Dark"));
+        var fingerprint = await store.PreferencesFingerprintAsync();
+        await ChoiceAsync("enable", fingerprint.ToLowerInvariant());
+        var restored = await store.InitialisePreferencesAsync(true);
+        Assert.True(restored.AutomaticUpdateChecks);
+        Assert.Equal("Dark", restored.Theme);
+        Assert.False(File.Exists(Intent));
+    }
+
     [Theory]
     [InlineData("null")]
     [InlineData("{}")]

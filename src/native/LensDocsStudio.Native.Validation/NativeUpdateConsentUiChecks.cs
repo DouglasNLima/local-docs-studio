@@ -48,7 +48,15 @@ internal static partial class NativeUiChecks
                 if (!previous.AutomaticUpdateChecks)
                 {
                     var instruction = JsonSerializer.Deserialize<InstallerUpdateChoice>(ReadObservedText(Path.Combine(state, SessionStore.InstallerChoiceFileName)));
-                    if (instruction is not { SchemaVersion: 1, Action: "enable" } || instruction.PreferencesSha256 != new SessionStore(state).PreferencesFingerprintAsync().GetAwaiter().GetResult()
+                    var fingerprint = new SessionStore(state).PreferencesFingerprintAsync().GetAwaiter().GetResult();
+                    File.WriteAllText(Path.Combine(output, "installer-choice-validation.json"), JsonSerializer.Serialize(new
+                    {
+                        instruction?.SchemaVersion, instruction?.Action, InstallerFingerprint = instruction?.PreferencesSha256,
+                        CurrentFingerprint = fingerprint, FingerprintMatches = string.Equals(instruction?.PreferencesSha256, fingerprint, StringComparison.OrdinalIgnoreCase),
+                        previous.LastUpdateCheck, BeforeApplicationLaunch = true
+                    }, new JsonSerializerOptions { WriteIndented = true }));
+                    if (instruction is not { SchemaVersion: 1, Action: "enable" }
+                        || !string.Equals(instruction.PreferencesSha256, fingerprint, StringComparison.OrdinalIgnoreCase)
                         || previous.LastUpdateCheck is not { } attempt || attempt < DateTimeOffset.UtcNow.AddDays(1))
                         throw new IOException("The installer opt-in fixture requires unchanged preferences and an already seeded future attempt time.");
                 }
