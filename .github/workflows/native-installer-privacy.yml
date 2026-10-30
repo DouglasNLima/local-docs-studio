@@ -51,6 +51,18 @@ jobs:
         if: always()
         with:
           name: native-installer-privacy-${{ matrix.mode }}
-          path: artifacts/native/
+          # Installed payloads are deliberately removed by the test uninstaller;
+          # its self-deleting files are not durable evidence. Retain the original
+          # immutable packages and all receipts, source fixtures, state and images.
+          path: |
+            artifacts/native/installer-privacy/
+            artifacts/native/installer-wizard/
+            artifacts/native/install-smoke/
+            artifacts/native/packages/*/*.exe
+            artifacts/native/packages/*/*.zip
+            artifacts/native/packages/*/*.json
+            artifacts/native/packages/*/SHA256SUMS.txt
+            !artifacts/native/installer-wizard/**/reviewed installation/**
+            !artifacts/native/install-smoke/*/installed/**
           include-hidden-files: true
           retention-days: 14
