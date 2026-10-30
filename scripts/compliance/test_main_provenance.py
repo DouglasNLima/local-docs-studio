@@ -48,6 +48,15 @@ class ProvenanceTests(unittest.TestCase):
         provenance = copy.deepcopy(self.provenance); provenance['completeEmbeddedClosure'] = True
         with self.assertRaises(ValueError): check.validate_notices(provenance, self.hashes, self.pack)
 
+    def test_public_policy_cache_cannot_omit_a_document(self):
+        sw = (check.ROOT / 'service-worker.js').read_text(encoding='utf-8')
+        check.validate_policy_cache(sw)
+        for path in ['docs/open-source/code-signing-policy.md',
+                     'docs/open-source/privacy.md', 'docs/open-source/downloads.md',
+                     'docs/open-source/public-policy-review.md']:
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                check.validate_policy_cache(sw.replace("'./" + path + "'", "'./missing.md'"))
+
     def test_missing_or_escaping_relative_links_fail(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

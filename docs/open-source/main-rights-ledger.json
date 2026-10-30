@@ -51,7 +51,7 @@
     "path": "README.md",
     "category": "R2",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "f8cd8b406dd4d9ab1e9926bf57e375a8a12c7ecc18c70c573459b945a71aa31e"
+    "sha256": "2c634486e14dcc3bf962e02f29f1c14bcfd6229802234d32c6b3c2677eaefa8e"
   },
   {
     "path": "SECURITY.md",
@@ -1896,6 +1896,18 @@
     "sha256": "63ae77fe480710a7ff6e55c56dceaee9a5eadb8c79d5ac3d641454545a70cbd7"
   },
   {
+    "path": "docs/open-source/code-signing-policy.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "cdeb59f7854313c45fb7911eeebeb1e1d703cd83b2544a5b28bc6009a8b87e0c"
+  },
+  {
+    "path": "docs/open-source/downloads.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "4edaa83e63736bb1b2dbaf06e48294afab11d5890edbd0cb8c45b8f04048c300"
+  },
+  {
     "path": "docs/open-source/licences/playwright-notice.txt",
     "category": "R6",
     "grant": "EXCLUDED_FROM_FIRST_PARTY_GRANT",
@@ -1941,7 +1953,19 @@
     "path": "docs/open-source/main-scope.json",
     "category": "R1",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "9b451ceef7789445f3ed1ba88a18a62a40a6f5c523846d1cf91a1b889e2f4e93"
+    "sha256": "7ed338c2b63959b1e25c69ca6bfd5f9537dec53ca1a5f618dd255e4aecc504a8"
+  },
+  {
+    "path": "docs/open-source/privacy.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "3391b2d51aed48ee99b0c0109d93bb9522ff2651f31d1c1f35f71257bb34a5a7"
+  },
+  {
+    "path": "docs/open-source/public-policy-review.md",
+    "category": "R2",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "05da19baf5b93edbc7fc6220e7cc0e4e4ed53af5cc9813b9dfafa30964c44a16"
   },
   {
     "path": "docs/open-source/third-party-closeout.md",
@@ -2325,7 +2349,7 @@
     "path": "index.html",
     "category": "R1",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "284fee4dd0fd6beb1d3e6d9c5ebb2c08ba1dd5610ee168b4afbdf0e20767e24d"
+    "sha256": "45b7b838c28a5cbd2653e17447879a3b416f5fda16edd3b988ee216c6fb21660"
   },
   {
     "path": "installer/inno/LensDocsStudio.iss",
@@ -2385,13 +2409,13 @@
     "path": "scripts/compliance/main_provenance.py",
     "category": "R1",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "46c305592e81f924edbc04942d5b3546d30e58da004499e9ba10b976c456067f"
+    "sha256": "ac9b168329f4eeb6cac19106b9c802ae1a5842d244df12c6794527e140b3c9a1"
   },
   {
     "path": "scripts/compliance/test_main_provenance.py",
     "category": "R1",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "17be2e9c32ed37131a4244f0d404dc911c7cda0e6233a952c53fee143a909a72"
+    "sha256": "229910a366acfa1618b0dc3841df44a4c8dc1d967c8d0441ac0b6190ebbff677"
   },
   {
     "path": "scripts/windows/Build-WindowsInnoInstaller.ps1",
@@ -2505,7 +2529,7 @@
     "path": "service-worker.js",
     "category": "R1",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "84a1b0e75d9a0c46e2c487f94e0f61a289b041ce8a20d37ddc5a9a81cd511a9b"
+    "sha256": "8d32b9fd8c67b5d2ffa40b7ebcf9f87c40df35212e58945eed67184f37960bb4"
   },
   {
     "path": "src/windows/.github/copilot-instructions.md",
@@ -2649,7 +2673,13 @@
     "path": "tests/browser/licensing-offline.spec.mjs",
     "category": "R1",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "5218c39629a31829c3fdd731a0a618f43558055e302c394f03fdbbde66450c04"
+    "sha256": "1ac2e3268c6530be5e5f0c676f281eab695c55672cc520c8b3ea1473dab6d6bc"
+  },
+  {
+    "path": "tests/browser/privacy-network.spec.mjs",
+    "category": "R1",
+    "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
+    "sha256": "67781a468813c846b5d1eb2a8926c01ba45ec515ba9a1cb84afccb373b57403e"
   },
   {
     "path": "tests/browser/real-pack-local.spec.mjs",
