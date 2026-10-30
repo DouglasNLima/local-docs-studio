@@ -1,9 +1,12 @@
 # Code signing policy
 
-**Draft: no signing provider has accepted this project, no production certificate
+**Current signing status: no signing provider has accepted this project, no production certificate
 or updater trust identity is configured, and no signed Stable release is offered.**
 The proposed route is SignPath Foundation with GitHub Releases. Free signing is
 conditional on external acceptance. See the [eligibility review](signpath-readiness.md).
+Public signing/privacy/download guidance was published on main through #67 and
+Pages run 40978852428 attempt 2. This develop policy describes the same current
+status with its own native source context; it is not a new Pages publication.
 
 The future signing scope is the native application apphost and its installer from
 the approved source/run. Never submit arbitrary paths, upstream DLLs, the legacy

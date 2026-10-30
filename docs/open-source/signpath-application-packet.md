@@ -1,19 +1,21 @@
 # SignPath Foundation owner decision packet — not submitted
 
-Current evidence: [eligibility matrix](signpath-eligibility-2026-10-29.md),
+Current evidence: [30 October review and eligibility matrix](signpath-preliminary-review-2026-10-30.md),
 [network audit](network-privacy-audit.md), [owner decision/contact review](signpath-owner-decisions.md).
 Foundation-specific preliminary route: SIGNPATH_CONTACT_ROUTE_UNVERIFIED.
 
 Target: `DouglasNLima/local-docs-studio`, native .NET/WPF edition, free official
-distribution. Updated on 29 October 2026 after scoped MIT adoption on `develop`, production
+distribution. Updated on 30 October 2026 after #66/#67 merged and public signing/privacy
+policies were published. Scoped MIT is adopted on both branches, with production
 protection activation and API-confirmed PVR enablement. The [current controls](governance-settings.md)
 link the execution evidence; historical stage receipts retain their original state.
 The technical preparation packet is **PREPARED FOR OWNER REVIEW**; provider eligibility is
 **UNCONFIRMED**, and application submission remains **NOT AUTHORISED**. The official [terms](https://signpath.org/terms.html) (the page says
-Draft) and [application page](https://signpath.org/apply) were checked on 29 October
-2026. Their interpretation and acceptance remain with SignPath. The embedded form
-did not expose its fields in the inspected page/browser; do not describe this as
-a verified list of every current form field.
+Draft) and [application page](https://signpath.org/apply) were checked on 30 October
+2026. Their interpretation and acceptance remain with SignPath. The current
+retrieval exposed application/account-contact fields and required terms/data
+consent; the earlier inability to retrieve fields remains historical evidence.
+No field was completed and no application or consent was submitted.
 
 ## Eligibility and evidence matrix
 
@@ -25,7 +27,7 @@ a verified list of every current form field.
 | Eligible included components | Native package bytes and original notices are mapped. Ask about Knuth/OFL fonts, apphost/runtime exception, adapted Mermaider/dagre and Inno-generated components | BLOCKED pending provider interpretation |
 | Own binaries and verifiable build origin | Proposed selectors below; build source/tree, immutable artefact digest and file SBOM supplied | OWNER ACTION REQUIRED to approve future scope |
 | Named Authors, Reviewers, Approvers and MFA | @DouglasNLima is proposed for all roles; MFA verification and provider acceptance of this allocation remain unknown; no signing identity/request exists | OWNER APPROVAL REQUIRED for future activation; provider acceptance BLOCKED |
-| Public signing/privacy policies | Drafts exist and disclose network activity; approve responsibilities and provider wording after acceptance | OWNER ACTION REQUIRED |
+| Public signing/privacy policies | Published via merged #67 and Pages run 40978852428 attempt 2; live HTTP content matches main after CRLF normalisation. No provider credit activated | PUBLISHED; installer presentation/disable controls and future provider wording still require separate work |
 | Trusted build integration, product/version restrictions, manual release approval | Design only; no SignPath project, production secret or protected publication environment exists | BLOCKED |
 | No harmful or unwanted behaviour | Documentation purpose and source are visible; tests do not certify absence of all harmful behaviour | BLOCKED pending the actual provider/security assessment |
 
@@ -40,7 +42,7 @@ Windows App SDK/WebView2 scope is excluded from this native proposal.
 
 ### Solo-maintainer eligibility finding
 
-The official terms were re-read on 29 October 2026. They define trusted Authors,
+The official terms were re-read on 30 October 2026. They define trusted Authors,
 review of non-committer changes and human approval of each signing request, with
 MFA on both GitHub and SignPath. They do **not explicitly require different
 people** for these roles. This supports proposing the sole maintainer
@@ -123,11 +125,13 @@ Separate verdicts: scoped MIT **ADOPTED on develop and main**, technical packet
 
 ## Prepared enquiry and application inventory
 
-The [unsent enquiry](signpath-enquiry-draft.md) is the exact proposed message for
-owner review, with four focused questions covering combined roles, released
+The [two unsent enquiries](signpath-enquiry-draft.md) contain the exact proposed
+routing message and full enquiry for owner review, with four questions covering combined roles, released
 native-product prerequisite, included/signable components and approved certificate
 identity/rotation. It is a clarification route, not an application or request to
-sign a candidate. No recipient/account/contact channel has been authorised.
+sign a candidate. Recommend support@signpath.io by email for routing first;
+info@signpath.io is the general fallback. Foundation reviewer access remains
+unverified. No recipient/account/contact channel has been authorised for dispatch.
 
 | Application input | Prepared value / honest gap |
 |---|---|
@@ -138,12 +142,12 @@ sign a candidate. No recipient/account/contact channel has been authorised.
 | Responsible human | @DouglasNLima, all author/reviewer/approver roles; no independent human reviewer |
 | MFA | UNVERIFIED on GitHub; no SignPath account established; owner-approved private status check required |
 | Effective controls | Production rulesets 26127883/26127901 active, 30/two applicable checks, zero mandatory human approvals and no bypass; PVR_ENABLED_EXTERNAL_FLOW_UNVERIFIED |
-| Public policies | Repository README, code-signing-policy.md and privacy.md; no provider-credit claim before acceptance |
+| Public policies | Main README links Code signing policy, Privacy policy and Downloads; #67 and Pages publication verified, no provider-credit claim before acceptance |
 | Component/source evidence | Current source ledger; preserved grants; historical .957 per-file binary SBOM explicitly labelled historical; final hosted candidate inspection recorded separately |
 | Build and artefact proof | Exact final PR/check run links in the consolidated receipt; no production reproducibility claim |
 | Signing selectors | Root LensDocsStudio.Native.exe, followed by one immutable versioned native Setup.exe; no recursive EXE/DLL allowlist |
 | Certificate/issuer/subject/fingerprint/rollover | UNKNOWN until independently verified provider evidence; empty production trust remains unchanged |
-| Embedded application form | Not verified: retrieved public apply page exposes no input fields; map prepared answers to the actual form only after authorised access |
+| Embedded application form | Public fields/required consent observed on 30 October; no submission, account creation or consent. Map answers and reverify actual form only for a separately authorised application |
 
 PVR enablement is API-confirmed; external reporter submission, maintainer notification,
 confidentiality and acknowledgement remain unverified. No synthetic report was

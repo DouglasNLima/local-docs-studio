@@ -1,6 +1,9 @@
 # Privacy policy
 
-**Draft for future public publication; reviewed 29 October 2026.**
+**Source-reviewed disclosure; publication status verified 30 October 2026.**
+The main-specific public policy was published via #67 and Pages run 40978852428
+attempt 2. This develop version retains its native source context; publication
+does not implement the missing native installer controls described below.
 The [source evidence matrix](network-privacy-audit.md) distinguishes the current
 browser/PWA, legacy WinUI/WebView2 shell and proposed native .NET/WPF edition.
 
@@ -59,8 +62,9 @@ Local does not imply encrypted storage. OS backups, synchronised folders and
 security software are outside the application's controls. Manage drafts/site
 data or native state deliberately; deletion can remove recovery.
 Uninstall does not remove user documents or private state. Support bundles and
-screenshots require the user's review before sharing. The owner must approve the
-public disclosure and installer presentation/disable option before signed release.
+screenshots require the user's review before sharing. The public disclosure is
+published; installer presentation/disable implementation still needs owner review
+and validation before signed release.
 The current native installer does not display this policy or persist an update
 opt-out before first launch. Those are missing implementation gates, including
 upgrade/silent-install behaviour; the post-launch checkbox is insufficient.

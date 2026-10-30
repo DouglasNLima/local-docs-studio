@@ -3,6 +3,9 @@
 Current guidance: [active settings and execution receipts](governance-settings.md),
 [operative scoped MIT](../../LICENSING.md), [governance](governance.md),
 [private reporting status](private-reporting-plan.md) and [SignPath packet](signpath-application-packet.md).
+The [30 October preliminary enquiry review](signpath-preliminary-review-2026-10-30.md)
+records #66/#67 integration, current public policies, provider routes and the two
+exact unsent messages. Foundation eligibility/routing remains unconfirmed.
 Scoped MIT is adopted on `develop`; both production rulesets are active with zero
 mandatory human approvals. PVR is enabled with its external flow unverified.
 The [Goal #62 stage receipts](goal62-receipt.md) retain their historical prepared

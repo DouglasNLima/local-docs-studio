@@ -1,0 +1,75 @@
+{
+  "verifiedDate": "2026-10-30",
+  "method": "Read-only live Firecrawl retrieval (maxAge 0); no form interaction or provider contact",
+  "sources": [
+    {
+      "url": "https://signpath.org/",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18be7-920d-73ca-a3e6-cfaf3f213e8d"
+    },
+    {
+      "url": "https://signpath.org/terms.html",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18be7-91b6-723b-ae92-3a884de79124"
+    },
+    {
+      "url": "https://signpath.org/apply",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18be7-919e-761a-983c-3f7d68c38440"
+    },
+    {
+      "url": "https://signpath.io/contact",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18be7-91a9-77c0-847e-b21acaf24e7e"
+    },
+    {
+      "url": "https://signpath.io/support",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18be7-9177-742e-8362-fd05677c75a7"
+    },
+    {
+      "url": "https://signpath.io/solutions/open-source-community",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18be7-917d-7107-aa0d-d94eff8d1aba"
+    },
+    {
+      "url": "https://signpath.org/about",
+      "retrievalDate": "2026-10-30",
+      "statusCode": 200,
+      "retrievalId": "01a18bea-8113-7432-a0dc-9dbec9829f1d"
+    }
+  ],
+  "primary": {
+    "recipient": "support@signpath.io",
+    "channel": "email",
+    "purpose": "Routing enquiry first",
+    "basis": "Official support page offers email for first interactions or individual requests",
+    "foundationReviewerDelivery": "UNVERIFIED"
+  },
+  "fallback": {
+    "recipient": "info@signpath.io",
+    "channel": "email",
+    "basis": "Official contact page identifies SignPath GmbH general contact"
+  },
+  "foundationOperator": "About page identifies current operation by SignPath GmbH; this does not confirm reviewer routing",
+  "application": {
+    "page": "https://signpath.org/apply",
+    "fieldsVisible": true,
+    "accountContactFieldsVisible": true,
+    "requiredCodeOfConductAndPersonalDataConsentVisible": true,
+    "submitted": false
+  },
+  "status": "SIGNPATH_CONTACT_ROUTE_UNVERIFIED",
+  "search": {
+    "query": "site:signpath.org Foundation contact eligibility email",
+    "webResults": 0,
+    "limit": "Bounded search; no exhaustive absence claim"
+  },
+  "externalActionsPerformed": []
+}
