@@ -19,6 +19,12 @@ See the [licence audit and readiness receipt](docs/open-source/README.md),
 
 ## Native Windows edition
 
+The native installer displays an offline privacy policy and a pre-launch
+**Automatically check for updates** choice. Fresh sessions default off; valid
+existing preferences are preserved on upgrade or silent setup. **Help > Updates**
+keeps manual checks and later changes available. See [privacy and preference
+precedence](docs/native/installer-privacy-and-consent.md).
+
 The [Smart diagram arrangement candidate](docs/native/smart-diagram-arrangement.md)
 adds explicit ER/Flowchart placement, measured layout alternatives, pins and an
 optional portable workspace sidecar. Its arranged SVG/PNG commands are separate

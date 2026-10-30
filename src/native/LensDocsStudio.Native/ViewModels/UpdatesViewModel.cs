@@ -17,6 +17,9 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
     private readonly Func<DownloadedUpdate, UpdateEnvironment, Task> install;
     private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(10) };
     private CancellationTokenSource? operation;
+    private int pendingSettingsWrites;
+    private bool settingsPersistenceFailed;
+    public Task SettingsSave { get; private set; } = Task.CompletedTask;
     [ObservableProperty] private bool automaticChecks;
     [ObservableProperty] private string channel;
     [ObservableProperty] private string status = "Updates are checked through public GitHub Releases. Local documents are never sent.";
@@ -47,14 +50,14 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
             service = new(transport, new(UpdateTrustConfiguration.Embedded()), new AuthenticodeVerifier());
         }
         else service = updateService;
-        timer.Tick += async (_, _) => { timer.Interval = TimeSpan.FromHours(1); await CheckAsync(false); };
-        timer.Start();
+        timer.Tick += async (_, _) => { timer.Interval = TimeSpan.FromHours(1); await CheckAutomaticallyAsync(); };
+        if (workspace.PreferencesInitialised) timer.Start();
     }
-    partial void OnAutomaticChecksChanged(bool value) => _ = SaveSettingsAsync();
+    partial void OnAutomaticChecksChanged(bool value) => SettingsSave = SaveSettingsAsync();
     partial void OnChannelChanged(string value)
     {
         // Changing away and back still abandons the old operation and its selection.
-        operation?.Cancel(); Candidate = null; Downloaded = null; _ = SaveSettingsAsync();
+        operation?.Cancel(); Candidate = null; Downloaded = null; SettingsSave = SaveSettingsAsync();
     }
     partial void OnIsBusyChanged(bool value) => RefreshCommands();
     partial void OnCandidateChanged(UpdateCandidate? value)
@@ -70,13 +73,18 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
     }
     private async Task SaveSettingsAsync()
     {
-        try { await workspace.UpdatePreferencesAsync(p => p with { AutomaticUpdateChecks = AutomaticChecks, UpdateChannel = Channel }); }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { Status = "Update preferences could not be saved: " + ex.Message; }
+        var enabled = AutomaticChecks; var selectedChannel = Channel;
+        pendingSettingsWrites++;
+        try { await workspace.UpdatePreferencesAsync(p => p with { AutomaticUpdateChecks = enabled, UpdateChannel = selectedChannel }); settingsPersistenceFailed = false; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { settingsPersistenceFailed = true; Status = "Update preferences could not be saved; automatic checks are paused: " + ex.Message; }
+        finally { pendingSettingsWrites--; }
     }
+    public Task CheckAutomaticallyAsync() => CheckAsync(false);
     [RelayCommand(CanExecute = nameof(CanCheck))] private Task CheckNowAsync() => CheckAsync(true);
     private async Task CheckAsync(bool manual)
     {
-        if (IsBusy || (!manual && (!AutomaticChecks || !UpdatePolicy.IsCheckDue(DateTimeOffset.UtcNow, workspace.Preferences.LastUpdateCheck)))) return;
+        if (IsBusy || !workspace.PreferencesInitialised || (!manual && (settingsPersistenceFailed || pendingSettingsWrites != 0 || !AutomaticChecks
+            || !workspace.Preferences.AutomaticUpdateChecks || !UpdatePolicy.IsCheckDue(DateTimeOffset.UtcNow, workspace.Preferences.LastUpdateCheck)))) return;
         await RunAsync(async token =>
         {
             Status = "Checking for compatible native updates…";

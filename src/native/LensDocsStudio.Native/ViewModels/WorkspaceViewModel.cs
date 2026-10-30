@@ -9,7 +9,7 @@ using LensDocsStudio.Native.Platform;
 
 namespace LensDocsStudio.Native.ViewModels;
 
-public partial class WorkspaceViewModel(DocumentStore documents, SessionStore session, WorkspaceService workspaces, DesktopDialogs dialogs) : ObservableObject, IDisposable
+public partial class WorkspaceViewModel(DocumentStore documents, SessionStore session, WorkspaceService workspaces, DesktopDialogs dialogs, bool acceptInstallerChoice = false) : ObservableObject, IDisposable
 {
     public ObservableCollection<DocumentViewModel> Documents { get; } = [];
     public ObservableCollection<WorkspaceEntryViewModel> Entries { get; } = [];
@@ -28,6 +28,24 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     private readonly SemaphoreSlim operationGate = new(1, 1);
     private int queuedOperations;
     public UserPreferences Preferences { get; private set; } = new();
+    public bool PreferencesInitialised { get; private set; }
+    private bool preferencesInitialisationFailed;
+    private bool preferencesInitialising;
+    private bool sessionWritesBlocked;
+
+    public async Task InitialisePreferencesAsync()
+    {
+        PreferencesInitialised = false;
+        preferencesInitialising = true;
+        try
+        {
+            Preferences = await session.InitialisePreferencesAsync(acceptInstallerChoice);
+            PreferencesInitialised = true;
+            preferencesInitialisationFailed = false;
+        }
+        catch { preferencesInitialisationFailed = true; sessionWritesBlocked = true; throw; }
+        finally { preferencesInitialising = false; }
+    }
     public event EventHandler? DocumentChanged;
     public event Action<Guid, string>? DocumentRelocated;
     partial void OnActiveDocumentChanged(DocumentViewModel? value) => DocumentChanged?.Invoke(this, EventArgs.Empty);
@@ -36,11 +54,15 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
 
     public async Task InitialiseAsync(string[] paths)
     {
+        sessionWritesBlocked = true;
         await RunAsync(async () =>
         {
             var pending = await documents.ReadPendingWritesAsync();
             if (pending.Count != 0) Status = $"{pending.Count} interrupted saves are available in recovery.";
-            Preferences = await session.ReadAsync<UserPreferences>("preferences.json", validate: WorkspaceSettings.ArePreferencesValid) ?? new();
+            string? preferenceWarning = null;
+            try { await InitialisePreferencesAsync(); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            { preferenceWarning = "Update/settings initialisation failed; automatic checks and preference writes remain blocked. " + ex.Message; }
             RefreshRecentPaths();
             Theme = Preferences.Theme;
             Layout = Preferences.Layout;
@@ -90,6 +112,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     var tab = new DocumentViewModel(draft.Text) { DisplayName = draft.Name, RecoveryKey = draft.Key };
                     Attach(tab); ActiveDocument = tab;
                 }
+            sessionWritesBlocked = false;
             if (interruptedMoves.Items.Count != 0)
             {
                 await PersistSessionAsync();
@@ -102,6 +125,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             }
             if (Documents.Count == 0) NewDocument();
             var warnings = documents.RecoveryWarnings.Concat(session.ReadWarnings).Concat(interruptedMoves.Warnings).ToList();
+            if (preferenceWarning is not null) warnings.Add(preferenceWarning);
             if (interruptedMoves.Items.Count != 0) warnings.Add("Interrupted file moves were recovered into named draft tabs. Review the original and planned text before saving; no workspace files were automatically changed.");
             if (warnings.Count != 0) dialogs.Error("Some saved state needs review. Original files have been retained.\n\n" + string.Join("\n", warnings));
         });
@@ -269,11 +293,15 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     public async Task<bool> PrepareCloseAsync()
     {
         foreach (var tab in Documents) if (!await CanCloseAsync(tab)) return false;
+        // A startup failure may leave the prior session entirely unread. Ordinary
+        // closure of an unedited shell must retain those bytes without rotation.
+        if (sessionWritesBlocked && Documents.All(tab => !tab.IsDirty)) return true;
         await PersistSessionAsync();
         return true;
     }
     public async Task PersistSessionAsync()
     {
+        if (sessionWritesBlocked) throw new IOException("The saved session has not been restored safely. Existing drafts and recovery are preserved; resolve the startup error before saving new recovery.");
         // Capture UI-owned text before awaiting IO.
         var state = new SessionState(1, WorkspaceRoot, ActiveDocument?.Id, Documents.Select(d => d.Recovery()).ToArray());
         await recoveryGate.WaitAsync();
@@ -285,6 +313,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         await preferencesGate.WaitAsync();
         try
         {
+            if (preferencesInitialising || preferencesInitialisationFailed) throw new IOException("Preferences have not initialised safely. Saved settings are preserved; restart after resolving the reported state failure.");
             var changed = update(Preferences);
             if (!WorkspaceSettings.ArePreferencesValid(changed)) throw new ArgumentException("The selected preferences are unsupported.");
             await session.WriteAsync("preferences.json", changed);

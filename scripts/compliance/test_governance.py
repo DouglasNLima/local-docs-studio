@@ -11,7 +11,7 @@ from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_
 from rights_ledger import boundary
 from check_foundation import documentation_links
 from licence_scope import (ROOT, SCOPE, validate_licence, validate_scope,
-                           validate_metadata, validate_preserved)
+                           validate_metadata, validate_preserved, validate_source_refresh)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -22,6 +22,21 @@ class GovernanceBoundaryTests(unittest.TestCase):
 
     def test_valid_solo_proposal(self):
         validate_ruleset(self.payload, 'develop', self.observed)
+
+    def test_privacy_refresh_rejects_trust_scope_and_altered_historical_evidence(self):
+        preserved = json.loads((ROOT / 'docs/open-source/evidence/goal62/preserved-files.json').read_text())['sha256']
+        refresh = json.loads((CONFIG / 'goal56-privacy-source-refresh.json').read_text())
+        accepted = validate_source_refresh(preserved, refresh)
+        trust = 'src/native/LensDocsStudio.Core/Updates/update-trust.json'
+        self.assertEqual(accepted[trust], preserved[trust])
+        changed = copy.deepcopy(refresh)
+        changed['files'][0]['path'] = trust
+        with self.assertRaises(ValueError):
+            validate_source_refresh(preserved, changed)
+        changed = copy.deepcopy(refresh)
+        changed['files'][0]['previousSha256'] = '0' * 64
+        with self.assertRaises(ValueError):
+            validate_source_refresh(preserved, changed)
 
     def test_admin_packet_requires_exact_target_payload_and_rollback(self):
         original = json.loads((CONFIG / 'admin-activation-plan.json').read_text())

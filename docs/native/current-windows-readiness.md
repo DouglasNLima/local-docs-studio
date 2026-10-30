@@ -1,5 +1,14 @@
 # Current native Windows readiness
 
+## Goal #56 privacy implementation — 30 October 2026
+
+Installer disclosure and first-launch update controls are implemented in an
+isolated branch. [Design, precedence and evidence limits](installer-privacy-and-consent.md)
+are recorded separately; the exact-source review and hosted installed/CI outcomes
+belong to the Goal #56 engineering receipt. The owner's application is not replaced.
+Continuous 250 ms remains FAIL, the post-PR #68 arrangement failure is independently
+preserved, SignPath eligibility is unconfirmed and Native Stable remains NO-GO.
+
 ## Goal VIII-F owner acceptance and library transition — 26 October 2026
 
 Source `0204b4089ed7bb4f2aca51a16b0db92b61c56584`, tree

@@ -1,5 +1,12 @@
 # Native architecture decisions
 
+## Goal #56 - installer privacy and update consent (30 October 2026)
+
+Keep preferences authoritative. Setup writes a bounded completed-install instruction
+tied to the original fingerprint; Core applies one field through SessionStore.
+Consume opt-in before writing; retain opt-out until false is durable. Gate the
+updater on initialised and persisted consent. See [precedence and failures](installer-privacy-and-consent.md).
+
 ## Goal 54 — smart diagram arrangement (28 October 2026)
 
 The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.

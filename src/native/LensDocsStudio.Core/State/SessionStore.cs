@@ -5,12 +5,13 @@ namespace LensDocsStudio.Core.State;
 public sealed record RecoveredDocument(Guid Id, string? Path, string Text, string? SavedFingerprint, bool Utf8Bom, int CaretOffset, double VerticalOffset, string? SavedText = null, string? AssetWorkspace = null, string? RecoveryKey = null, string? DisplayName = null, string? WorkspaceRoot = null, bool IsPinned = false, int PreviewSourceOffset = 0);
 public sealed record SessionState(int SchemaVersion, string? Workspace, Guid? ActiveDocument, IReadOnlyList<RecoveredDocument> Documents);
 public sealed record WindowBounds(int Left, int Top, int Right, int Bottom, bool Maximised);
-public sealed record UserPreferences(string Theme = "System", string Layout = "Split", bool AutomaticUpdateChecks = true,
+public sealed record UserPreferences(string Theme = "System", string Layout = "Split", bool AutomaticUpdateChecks = false,
     string UpdateChannel = "Stable", DateTimeOffset? LastUpdateCheck = null, string? IgnoredVersion = null,
     string[]? RecentDocuments = null, string[]? RecentWorkspaces = null, WindowBounds? Window = null,
-    EditorPreferences? Editor = null, PreviewPreferences? Preview = null, bool ShowOutline = true, DesktopPreferences? Desktop = null);
+    EditorPreferences? Editor = null, PreviewPreferences? Preview = null, bool ShowOutline = true, DesktopPreferences? Desktop = null,
+    string? AppliedInstallerChoice = null);
 
-public sealed class SessionStore
+public sealed partial class SessionStore
 {
     public const long DefaultMaximumStateBytes = 512L * 1024 * 1024;
     private readonly SemaphoreSlim gate = new(1, 1);
@@ -18,6 +19,7 @@ public sealed class SessionStore
     public long MaximumStateBytes { get; }
     public List<string> ReadWarnings { get; } = [];
     private readonly HashSet<string> blockedWrites = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> readProblems = new(StringComparer.OrdinalIgnoreCase);
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
 
     public SessionStore(string directory, long maximumStateBytes = DefaultMaximumStateBytes)
@@ -66,6 +68,7 @@ public sealed class SessionStore
         ValidateName(name);
         await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try { return await Task.Run(() => ReadFileAsync(name, cancellationToken, validate), cancellationToken).ConfigureAwait(false); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { readProblems.Add(name); throw; }
         finally { gate.Release(); }
     }
 
@@ -75,7 +78,9 @@ public sealed class SessionStore
         {
             cancellationToken.ThrowIfCancellationRequested();
             var path = Path.Combine(DirectoryPath, name + suffix);
-            if (!File.Exists(path)) continue;
+            try { File.GetAttributes(path); }
+            catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException) { continue; }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { blockedWrites.Add(name); readProblems.Add(name); throw; }
             // Keep saves blocked after an I/O failure until a retry reads or retains the state.
             blockedWrites.Add(name);
             await using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, FileOptions.Asynchronous);
@@ -86,10 +91,12 @@ public sealed class SessionStore
                 var value = await JsonSerializer.DeserializeAsync<T>(file, Options, cancellationToken).ConfigureAwait(false);
                 if (value is null || validate is not null && !validate(value)) throw new JsonException("The saved state is incomplete or unsupported.");
                 blockedWrites.Remove(name);
+                if (suffix.Length != 0) readProblems.Add(name);
                 return value;
             }
             catch (JsonException ex)
             {
+                readProblems.Add(name);
                 // Retain malformed and oversized legacy state before any backup rotation.
                 // The open handle also prevents replacement while this copy is made.
                 var retained = path + ".unreadable-" + Guid.NewGuid().ToString("N") + ".json";

@@ -1,5 +1,14 @@
 # Windows internal preview guide
 
+## Goal #56 - installer privacy and update consent (30 October 2026)
+
+Setup displays the local policy and Privacy and updates page. New installations
+default **Automatically check for updates** to off. Existing choices are kept
+unless you clear Keep and explicitly change them. Silent setup keeps valid
+settings and otherwise leaves checks off. Use **Help > Updates** for later changes
+or manual checks. Both payloads contain `PRIVACY.md`; uninstall retains documents
+and private settings/recovery.
+
 ## Current status - 24 October 2026
 
 See [Current native Windows readiness](current-windows-readiness.md) for the

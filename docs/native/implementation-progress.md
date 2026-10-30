@@ -1,5 +1,12 @@
 # Native implementation progress
 
+## Goal #56 - installer privacy and update consent (30 October 2026)
+
+Implemented local policy, pre-launch choice, fresh/silent defaults, fingerprinted
+atomic transfer and updater readiness/persistence gates. The exact-source receipt
+records local and hosted results. See [scope and NOT TESTED scenarios](installer-privacy-and-consent.md).
+Performance FAIL, SignPath unconfirmed and Native Stable NO-GO remain separate.
+
 ## Goal 54 — smart diagram arrangement (28 October 2026)
 
 The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.

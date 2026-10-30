@@ -20,4 +20,11 @@ export function checkNativeAcceptancePolicy(root) {
     assert.ok(command.endsWith(` \${{ env.LENS_NATIVE_${argument}_ARGUMENTS }}`), 'Installer exclusion must use the unconditional job-purpose policy');
     assert.doesNotMatch(command, /head_ref|ref_name|contains\(|&&|\|\|/, 'Source branch must not change internal acceptance tasks');
   }
+  const privacy = readFileSync(new URL('.github/workflows/native-installer-privacy.yml', root), 'utf8');
+  assert.match(privacy, /mode: \[interactive, silent\]/, 'Privacy choices need separate fresh interactive and silent Windows runners');
+  assert.match(privacy, /LENS_NATIVE_ACCEPTANCE_POLICY: internal-no-associations/);
+  for (const command of privacy.split(/\r?\n/).filter(line => /^\s+run:/.test(line) && /--installer-wizard|Test-NativeInstaller\.ps1/.test(line))) {
+    const argument = command.includes('--installer-wizard') ? 'WIZARD' : 'LIFECYCLE';
+    assert.ok(command.endsWith(` \${{ env.LENS_NATIVE_${argument}_ARGUMENTS }}`), 'Privacy validation must retain the hosted association-exclusion policy');
+  }
 }

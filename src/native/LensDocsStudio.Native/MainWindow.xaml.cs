@@ -733,7 +733,8 @@ public partial class MainWindow : Window
                       if (!classEditor.CloseForOwner()) return;
                 SaveViewport();
                 if (!await model.PrepareCloseAsync()) return;
-                await model.UpdatePreferencesAsync(p => p with { Window = fullScreen ? previousWindow : WindowStateService.Capture(this) });
+                if (model.PreferencesInitialised)
+                    await model.UpdatePreferencesAsync(p => p with { Window = fullScreen ? previousWindow : WindowStateService.Capture(this) });
                 CompleteClose();
             }
             catch (Exception ex) when (ex is not OutOfMemoryException) { dialogs.Error(ex.Message); }

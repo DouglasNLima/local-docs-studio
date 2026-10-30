@@ -39,6 +39,13 @@ internal static class NativeUpdateInteractionChecks
         var outcomes = new List<object>(); var failures = new List<string>();
         using var key = RSA.Create(2048);
         var root = Path.Combine(output, "update-interactions-" + Guid.NewGuid().ToString("N"));
+        var standardState = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LensDocsStudio.Native");
+        var restartSafe = NativeUpdateLauncher.RestartStateArguments(standardState + Path.DirectorySeparatorChar).Length == 0
+            && NativeUpdateLauncher.RestartStateArguments(root).SequenceEqual(new[] { "--state-directory", root });
+        outcomes.Add(new { Name = "updater-restart-consumes-default-installer-choice-and-isolates-validation", Passed = restartSafe });
+        if (!restartSafe) failures.Add("updater-restart-state-routing");
+        await CheckConsentAsync(root, key, outcomes, failures);
+        await CheckInitialisationFailureAsync(root, outcomes, failures);
         foreach (var scenario in new[] { "channel-during-download", "channel-round-trip", "cancel-verification", "channel-during-install", "accepted-selection", "unsigned-selection" })
         {
             using var fixture = await Fixture.CreateAsync(Path.Combine(root, scenario), key, scenario == "unsigned-selection");
@@ -100,6 +107,114 @@ internal static class NativeUpdateInteractionChecks
         if (failures.Count != 0) throw new IOException("Update interaction checks failed: " + string.Join(", ", failures));
     }
 
+    private static async Task CheckInitialisationFailureAsync(string root, List<object> outcomes, List<string> failures)
+    {
+        const string scenario = "failed-initialisation-preserves-later-shutdown-settings";
+        var state = Path.Combine(root, scenario); Directory.CreateDirectory(state);
+        const string original = "{\"Theme\":\"Dark\",\"AutomaticUpdateChecks\":true,\"RecentWorkspaces\":[\"retained\"]}";
+        await File.WriteAllTextAsync(Path.Combine(state, "preferences.json"), original);
+        var retainedSession = JsonSerializer.SerializeToUtf8Bytes(new SessionState(1, null, null,
+            [new(Guid.NewGuid(), null, "Unread private recovery draft", null, false, 0, 0)]));
+        var sessionPath = Path.Combine(state, "session.json");
+        await File.WriteAllBytesAsync(sessionPath, retainedSession);
+        await File.WriteAllBytesAsync(sessionPath + ".bak", retainedSession);
+        var store = new SessionStore(state, 128);
+        await File.WriteAllTextAsync(Path.Combine(state, SessionStore.InstallerChoiceFileName), JsonSerializer.Serialize(new InstallerUpdateChoice(1, "disable", await store.PreferencesFingerprintAsync())));
+        using var workspace = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), store, new WorkspaceService(), new DesktopDialogs(), true);
+        var refused = 0; var callbackRan = false;
+        try { await workspace.InitialisePreferencesAsync(); } catch (IOException) { refused++; }
+        // Normal close saves window bounds through the same method. It must not
+        // replace the loaded file with the view model's fallback/default fields.
+        try { await workspace.UpdatePreferencesAsync(p => { callbackRan = true; return p with { Window = new(0, 0, 800, 600, false) }; }); }
+        catch (IOException) { refused++; }
+        try { await workspace.PersistSessionAsync(); } catch (IOException) { refused++; }
+        var safeClose = await workspace.PrepareCloseAsync() && await workspace.PrepareCloseAsync();
+        var recoveryIntact = (await File.ReadAllBytesAsync(sessionPath)).SequenceEqual(retainedSession)
+            && (await File.ReadAllBytesAsync(sessionPath + ".bak")).SequenceEqual(retainedSession);
+        var handler = new FixtureHandler(); using var observedTransport = new UpdateTransport(handler);
+        using var updates = new UpdatesViewModel(workspace, (_, _) => Task.CompletedTask, new UpdateService(observedTransport, new(new(1, [], [])), new HeldTrust()));
+        await updates.CheckAutomaticallyAsync();
+        var intact = await File.ReadAllTextAsync(Path.Combine(state, "preferences.json")) == original;
+        var retried = await new SessionStore(state).InitialisePreferencesAsync(true);
+        var passed = refused == 3 && safeClose && recoveryIntact && !callbackRan && !workspace.PreferencesInitialised && handler.Requests == 0 && intact
+            && !retried.AutomaticUpdateChecks && retried.Theme == "Dark" && retried.RecentWorkspaces!.SequenceEqual(new[] { "retained" });
+        outcomes.Add(new { Name = scenario, Passed = passed, WritesRefused = refused, SourcePreferencesIntact = intact,
+            SafeNormalClose = safeClose, UnreadSessionAndBackupPreserved = recoveryIntact, Requests = handler.Requests });
+        if (!passed) failures.Add(scenario);
+    }
+
+    private static async Task CheckConsentAsync(string root, RSA key, List<object> outcomes, List<string> failures)
+    {
+        foreach (var scenario in new[] { "before-initialisation", "disabled-and-manual", "persisted-enable-and-restart", "failed-consent-write", "pending-consent-write" })
+        {
+            using var fixture = await Fixture.CreateAsync(Path.Combine(root, scenario), key, false, initialise: false);
+            var model = fixture.Model; var workspace = fixture.Workspace;
+            var passed = false;
+            await workspace.UpdatePreferencesAsync(p => p with { AutomaticUpdateChecks = false });
+            if (scenario == "before-initialisation")
+            {
+                model.AutomaticChecks = true; await model.SettingsSave;
+                await model.CheckAutomaticallyAsync();
+                passed = !workspace.PreferencesInitialised && fixture.Handler.Requests == 0;
+            }
+            else
+            {
+                await workspace.InitialisePreferencesAsync();
+                if (scenario == "disabled-and-manual")
+                {
+                    await model.CheckAutomaticallyAsync();
+                    var none = fixture.Handler.Requests == 0;
+                    await model.CheckNowCommand.ExecuteAsync(null);
+                    passed = none && fixture.Handler.Requests == 1 && !workspace.Preferences.AutomaticUpdateChecks;
+                }
+                else if (scenario == "persisted-enable-and-restart")
+                {
+                    model.AutomaticChecks = true; await model.SettingsSave;
+                    var durable = (await new SessionStore(fixture.StateRoot).InitialisePreferencesAsync()).AutomaticUpdateChecks;
+                    await model.CheckAutomaticallyAsync();
+                    using var restarted = new UpdatesViewModel(workspace, (_, _) => Task.CompletedTask, new UpdateService(fixture.Transport, new(new(1, [], [])), fixture.Trust));
+                    await restarted.CheckAutomaticallyAsync();
+                    passed = durable && restarted.AutomaticChecks && fixture.Handler.Requests == 1; // persisted attempt still limits the restart
+                }
+                else if (scenario == "failed-consent-write")
+                {
+                    using (var held = new FileStream(Path.Combine(fixture.StateRoot, "preferences.json"), FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        model.AutomaticChecks = true; await model.SettingsSave;
+                        await model.CheckAutomaticallyAsync();
+                        passed = !workspace.Preferences.AutomaticUpdateChecks && fixture.Handler.Requests == 0
+                            && model.Status.Contains("could not be saved", StringComparison.Ordinal);
+                    }
+                    using var restarted = new UpdatesViewModel(workspace, (_, _) => Task.CompletedTask, new UpdateService(fixture.Transport, new(new(1, [], [])), fixture.Trust));
+                    passed &= !restarted.AutomaticChecks;
+                }
+                else
+                {
+                    var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                    var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                    // Hold the real serial preference transaction on a worker, then queue opt-in.
+                    var blocker = Task.Run(() => workspace.UpdatePreferencesAsync(p => { entered.TrySetResult(); gate.Task.GetAwaiter().GetResult(); return p; }));
+                    await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+                    int before;
+                    try
+                    {
+                        model.AutomaticChecks = true;
+                        await model.CheckAutomaticallyAsync();
+                        before = fixture.Handler.Requests;
+                    }
+                    finally { gate.TrySetResult(); }
+                    await blocker;
+                    await model.SettingsSave;
+                    await model.CheckAutomaticallyAsync();
+                    passed = before == 0 && fixture.Handler.Requests == 1;
+                }
+            }
+            outcomes.Add(new { Name = scenario, Passed = passed, Requests = fixture.Handler.Requests, workspace.PreferencesInitialised,
+                PersistedAutomaticChecks = workspace.Preferences.AutomaticUpdateChecks, model.Status });
+            if (!passed) failures.Add(scenario);
+        }
+    }
+
     private sealed class HeldVerification
     {
         public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -125,7 +240,8 @@ internal static class NativeUpdateInteractionChecks
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested(); Requests++;
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(Fixture.Bytes) });
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(
+                request.RequestUri!.AbsolutePath.EndsWith("/releases", StringComparison.Ordinal) ? "[]"u8.ToArray() : Fixture.Bytes) });
         }
     }
     private sealed class Fixture : IDisposable
@@ -143,13 +259,14 @@ internal static class NativeUpdateInteractionChecks
         public DownloadedUpdate? Installed { get; private set; }
         public UpdateEnvironment? InstalledEnvironment { get; private set; }
 
-        public static async Task<Fixture> CreateAsync(string root, RSA key, bool unsigned)
+        public static async Task<Fixture> CreateAsync(string root, RSA key, bool unsigned, bool initialise = true)
         {
             Directory.CreateDirectory(root);
             var state = Path.Combine(root, "state"); var source = Path.Combine(root, "source.md");
             await File.WriteAllTextAsync(source, Source);
             var workspace = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), new DesktopDialogs());
             await workspace.UpdatePreferencesAsync(preferences => preferences with { AutomaticUpdateChecks = false });
+            if (initialise) await workspace.InitialisePreferencesAsync();
             var handler = new FixtureHandler(); var transport = new UpdateTransport(handler); var verifier = new HeldTrust();
             var policy = new UpdatePolicy(unsigned ? new(1, [], []) : new(1,
                 new() { ["interaction-fixture"] = key.ExportSubjectPublicKeyInfoPem() }, [new("CN=Test fixture only", new string('A', 64))]));

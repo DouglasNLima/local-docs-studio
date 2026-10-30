@@ -1,0 +1,56 @@
+name: Validate native installer privacy
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-installer-privacy-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  LENS_NATIVE_ACCEPTANCE_POLICY: internal-no-associations
+  LENS_NATIVE_WIZARD_ARGUMENTS: --no-file-associations
+  LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
+jobs:
+  installer-privacy:
+    name: Installer privacy (${{ matrix.mode }})
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [interactive, silent]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build native consent validation
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Prove state precedence and synthetic update requests
+        run: |
+          dotnet test src/native/LensDocsStudio.Core.Tests -c Release --no-build --filter 'FullyQualifiedName~InstallerUpdateChoiceTests|FullyQualifiedName~SessionStoreTests|FullyQualifiedName~Update' --logger 'trx;LogFileName=privacy-state.trx' --results-directory artifacts/native/installer-privacy
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --update-interactions artifacts/native/installer-privacy
+      - name: Build unsigned private installer lifecycle fixtures
+        run: |
+          & scripts/native/Build-NativePackage.ps1 -Version "0.1.0-preview.${{ github.run_number }}"
+          & scripts/native/Build-NativePackage.ps1 -Version "0.1.1-preview.${{ github.run_number }}"
+      - name: Verify fresh interactive disclosure choices cancellation and first launch
+        if: matrix.mode == 'interactive'
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard ${{ env.LENS_NATIVE_WIZARD_ARGUMENTS }}
+      - name: Verify fresh silent consent upgrade retention and reinstall
+        if: matrix.mode == 'silent'
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" ${{ env.LENS_NATIVE_LIFECYCLE_ARGUMENTS }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-installer-privacy-${{ matrix.mode }}
+          path: artifacts/native/
+          include-hidden-files: true
+          retention-days: 14

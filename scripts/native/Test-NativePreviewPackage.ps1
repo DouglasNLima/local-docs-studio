@@ -45,7 +45,7 @@ if ($update.productId -ne $metadata.product -or $update.version -ne $ExpectedVer
     $update.sha256 -ne $installerHash -or $update.releaseTag -ne "native-v$ExpectedVersion") { throw 'Update metadata does not describe the same installer.' }
 $required = @('LensDocsStudio.Native.exe','LensDocsStudio.Native.dll','LensDocsStudio.Core.dll','LensDocsStudio.Native.deps.json',
     'LensDocsStudio.Native.runtimeconfig.json','coreclr.dll','hostfxr.dll','hostpolicy.dll','PresentationFramework.dll','PresentationCore.dll',
-    'WindowsBase.dll','wpfgfx_cor3.dll','version.json','PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')
+    'WindowsBase.dll','wpfgfx_cor3.dll','version.json','PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','PRIVACY.md','THIRD-PARTY-NOTICES.md')
 $files = [Collections.Generic.Dictionary[string,object]]::new([StringComparer]::OrdinalIgnoreCase)
 $archive = [IO.Compression.ZipFile]::OpenRead($portable)
 try {
@@ -55,7 +55,7 @@ try {
         $name = $entry.FullName.Replace('\','/')
         if ($name.StartsWith('/') -or $name.Contains(':') -or $name.Split('/') -contains '..' -or $files.ContainsKey($name) -or
             $name -match '(?i)WebView2|ContinuousViewer|LayoutExperiment|(^|/)(spikes|tests|acceptance|obj|bin|node_modules)/|chrome|node\.exe|\.(pfx|pem|key|pdb|cs|csproj|slnx?|ps1|html)$' -or
-            ($name.EndsWith('.md') -and -not $name.StartsWith('licences/', [StringComparison]::OrdinalIgnoreCase) -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md','LICENSING.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
+            ($name.EndsWith('.md') -and -not $name.StartsWith('licences/', [StringComparison]::OrdinalIgnoreCase) -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','PRIVACY.md','THIRD-PARTY-NOTICES.md','LICENSING.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
         $stream = $entry.Open()
         try { $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)).ToLowerInvariant() } finally { $stream.Dispose() }
         $files.Add($name, [ordered]@{ path=$name; bytes=$entry.Length; sha256=$hash })

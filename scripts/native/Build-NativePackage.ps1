@@ -54,6 +54,7 @@ try {
     & (Join-Path $PSScriptRoot 'Write-NativeNotices.ps1') -PayloadDirectory $payload
     Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-guide.md') -Destination (Join-Path $payload 'PREVIEW-GUIDE.md')
     Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-release-notes.md') -Destination (Join-Path $payload 'PREVIEW-RELEASE-NOTES.md')
+    Copy-Item -LiteralPath (Join-Path $repo 'docs/open-source/privacy.md') -Destination (Join-Path $payload 'PRIVACY.md')
     & $IsccPath "/DAppVersion=$Version" "/DPackageSource=$payload" "/DOutputDir=$output" (Join-Path $repo 'installer/inno/LensDocsStudio.Native.iss')
     if ($LASTEXITCODE -ne 0) { throw 'Native installer compilation failed.' }
     $installer = Join-Path $output "LensDocsStudio.Native-$Version-win-x64-Setup.exe"

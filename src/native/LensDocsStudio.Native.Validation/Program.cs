@@ -444,6 +444,9 @@ internal static class Program
             try { NativeUpdateInteractionChecks.Run(updateOutput); Console.WriteLine("Native update interaction checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() is "--portable-update-consent-ui" or "--installed-update-consent-ui")
+            return NativeUiChecks.RunUpdateConsent(args[1], args[2], args.ElementAtOrDefault(3) == "true", args[0] == "--installed-update-consent-ui",
+                args.ElementAtOrDefault(4) is "true" or "false" ? args[4] == "true" : null);
         if (args.FirstOrDefault() == "--inline-layout")
         {
             var inlineOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/inline-layout"); Directory.CreateDirectory(inlineOutput);
