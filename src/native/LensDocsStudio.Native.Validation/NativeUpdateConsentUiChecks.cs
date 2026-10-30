@@ -67,7 +67,8 @@ internal static partial class NativeUiChecks
                 }
             }
             var previousAttempt = previous?.LastUpdateCheck;
-            var source = Path.Combine(output, "consent.md"); const string text = "# Update consent\n\nLocal synthetic document.\n";
+            var source = Path.Combine(output, "consent.md");
+            var text = "# Update consent\n\nLocal synthetic document: " + Path.GetFileName(output) + ".\n";
             File.WriteAllText(source, text);
             var sourceHash = SHA256.HashData(File.ReadAllBytes(source));
             var start = new ProcessStartInfo(executable) { UseShellExecute = false };
@@ -82,9 +83,25 @@ internal static partial class NativeUiChecks
             try
             {
                 window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The consent fixture has no main window.");
-                Wait(() => ReadEditorText(Find(window, "MarkdownEditor")) == text, "The consent fixture did not finish workspace initialisation.");
-                Find(window, "HelpMenu").Patterns.ExpandCollapse.Pattern.Expand();
-                Find(window, "UpdatesMenu").Patterns.Invoke.Pattern.Invoke();
+                // Restored tabs can contain the previous phase's consent document.
+                // Observe this phase's text and completion before opening a real menu.
+                Wait(() => ReadEditorText(Find(window, "MarkdownEditor")) == text
+                    && ObserveWindow(window).FindFirstDescendant(cf => cf.ByAutomationId("CancelOperation"))?.IsEnabled != true,
+                    "The consent fixture did not finish workspace initialisation.");
+                FocusWindow(window);
+                Find(window, "HelpMenu").Click();
+                var updatesCommand = Find(window, "UpdatesMenu");
+                Wait(() => updatesCommand.IsEnabled && !updatesCommand.Properties.IsOffscreen.Value,
+                    "The consent fixture's Updates command did not become visible.");
+                File.WriteAllText(Path.Combine(output, "updates-command.json"), JsonSerializer.Serialize(new
+                {
+                    updatesCommand.AutomationId, updatesCommand.Name, updatesCommand.IsEnabled,
+                    IsOffscreen = updatesCommand.Properties.IsOffscreen.Value,
+                    Bounds = updatesCommand.BoundingRectangle.ToString(), InvokeSupported = updatesCommand.Patterns.Invoke.IsSupported,
+                    Procedure = "Focus the owned ready window, click Help once and invoke its visible Updates command once."
+                }, new JsonSerializerOptions { WriteIndented = true }));
+                if (!updatesCommand.Patterns.Invoke.IsSupported) throw new IOException("The consent fixture's Updates command has no supported invocation.");
+                updatesCommand.Patterns.Invoke.Pattern.Invoke();
                 Window? updates = null;
                 Wait(() => (updates = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process.Id).And(cf.ByName("Lens Docs Studio updates")))?.AsWindow()) is not null,
                     "The update preference window did not open.");
