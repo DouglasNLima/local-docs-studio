@@ -52,7 +52,7 @@
     {
       "path": "scripts/native/Test-NativeInstaller.ps1",
       "previousSha256": "6648689764415e8c7a3ee26ed22b1c7461ddec1ca2102b276b1d3ab58538fc81",
-      "currentSha256": "a463623bdc67c7f32bf584d9e0cc90619099660faa096d340a8ed08f28231eb2"
+      "currentSha256": "9a70a8ddb9e99c40295c4c053b6136bca82677ec11558eadc5310fd394f225c4"
     },
     {
       "path": "src/native/LensDocsStudio.Core/State/SessionStore.cs",

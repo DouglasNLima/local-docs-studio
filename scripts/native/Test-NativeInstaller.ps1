@@ -103,6 +103,7 @@ function Assert-NoFileAssociations {
 }
 if ($NoFileAssociations) { Assert-NoFileAssociations }
 function Run-Installer([string]$Path, [string]$Phase) {
+    Write-Output "Native installer lifecycle: $Phase"
     $expectedIdentity = Get-PackageIdentity $Path
     $tasks = if ($NoFileAssociations) { '/TASKS="desktopicon"' } else { '/TASKS="fileassoc,desktopicon"' }
     $process = Start-Process -FilePath $Path -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),$tasks,('/LOG="' + (Join-Path $root ($Phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
@@ -191,10 +192,24 @@ try {
     if (-not $HistoricalValidationProject) {
         $defaultState = Join-Path $env:LOCALAPPDATA 'LensDocsStudio.Native'
         $defaultBeforeFailure = if (Test-Path -LiteralPath $defaultState) { Get-StateSnapshot $defaultState } else { @{} }
-        $blockedDestination = Join-Path $root 'destination-is-a-file'
-        [IO.File]::WriteAllText($blockedDestination, 'An installation cannot replace this file.')
-        $failed = Start-Process -FilePath $Installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $blockedDestination + '"'),('/LOG="' + (Join-Path $root 'failed-before-install.log') + '"')) -WindowStyle Hidden -Wait -PassThru
-        if ($failed.ExitCode -eq 0 -or (Test-Path -LiteralPath $uninstallKey)) { throw 'The invalid installation destination did not fail safely.' }
+        $blockedDestination = Join-Path $root 'failed-extraction'
+        # A valid destination with an existing directory at the executable path
+        # forces a real payload failure without changing ACLs or machine settings.
+        New-Item -ItemType Directory -Path (Join-Path $blockedDestination 'LensDocsStudio.Native.exe') | Out-Null
+        Write-Output 'Native installer failure control: executable path occupied by a disposable directory'
+        $failed = Start-Process -FilePath $Installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $blockedDestination + '"'),('/LOG="' + (Join-Path $root 'failed-extraction.log') + '"')) -WindowStyle Hidden -PassThru
+        if (-not $failed.WaitForExit(60000)) {
+            # Only terminate this exact owned failure-control process tree. This
+            # deadline belongs to the new fault probe, never a performance check.
+            $failed.Kill($true)
+            [void]$failed.WaitForExit(10000)
+            throw 'The installer extraction failure control exceeded its 60-second deadline.'
+        }
+        if ($failed.ExitCode -eq 0 -or (Test-Path -LiteralPath $uninstallKey)) { throw 'The obstructed payload did not fail safely.' }
+        $failedLog = Get-Content -LiteralPath (Join-Path $root 'failed-extraction.log') -Raw
+        if (-not $failedLog.Contains(('Dest filename: ' + (Join-Path $blockedDestination 'LensDocsStudio.Native.exe')), [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'The failed installer log did not reach the obstructed executable target.'
+        }
         $defaultAfterFailure = if (Test-Path -LiteralPath $defaultState) { Get-StateSnapshot $defaultState } else { @{} }
         if ($defaultBeforeFailure.Count -ne $defaultAfterFailure.Count) { throw 'Failed Setup changed private state inventory.' }
         foreach ($name in $defaultBeforeFailure.Keys) {
