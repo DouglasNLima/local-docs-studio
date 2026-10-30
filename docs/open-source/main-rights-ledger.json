@@ -1899,13 +1899,13 @@
     "path": "docs/open-source/code-signing-policy.md",
     "category": "R2",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "7bb4243068c85e03655df41ca37fc4be97db03c7656309bfbf2d5f9036970e05"
+    "sha256": "cdeb59f7854313c45fb7911eeebeb1e1d703cd83b2544a5b28bc6009a8b87e0c"
   },
   {
     "path": "docs/open-source/downloads.md",
     "category": "R2",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "84a1e0b51ca4302eb3bbaf44e8f7676417699ef1520f0910f082a915a81125c8"
+    "sha256": "4edaa83e63736bb1b2dbaf06e48294afab11d5890edbd0cb8c45b8f04048c300"
   },
   {
     "path": "docs/open-source/licences/playwright-notice.txt",
@@ -1959,13 +1959,13 @@
     "path": "docs/open-source/privacy.md",
     "category": "R2",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "1807e6cb238a5caafd6533fe41ef7cee7402150a41e1b5c21ab5347553b4dd96"
+    "sha256": "3391b2d51aed48ee99b0c0109d93bb9522ff2651f31d1c1f35f71257bb34a5a7"
   },
   {
     "path": "docs/open-source/public-policy-review.md",
     "category": "R2",
     "grant": "MIT_ORIGINAL_PORTIONS_ONLY",
-    "sha256": "40b29d955d4fd2ae752fe18f17a5571925c2e51cc2ccd58fbd82bc415f4c8af8"
+    "sha256": "05da19baf5b93edbc7fc6220e7cc0e4e4ed53af5cc9813b9dfafa30964c44a16"
   },
   {
     "path": "docs/open-source/third-party-closeout.md",

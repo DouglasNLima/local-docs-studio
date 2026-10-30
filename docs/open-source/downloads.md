@@ -1,6 +1,6 @@
 # Downloads and signing status
 
-**Draft current guidance — owner review required before publication.**
+**Public download and signing guidance — source reviewed 29 October 2026.**
 
 Lens Docs Studio is a free Local Markdown, Mermaid, and documentation studio.
 The public [browser/PWA](../../index.html) works from GitHub Pages or a local

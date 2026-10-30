@@ -1,6 +1,6 @@
 # Privacy policy
 
-**Draft for future public publication; reviewed 29 October 2026.**
+**Public privacy disclosure — source reviewed 29 October 2026.**
 The [source evidence matrix](public-policy-review.md) distinguishes the current
 browser/PWA, legacy WinUI/WebView2 shell and proposed native .NET/WPF edition.
 

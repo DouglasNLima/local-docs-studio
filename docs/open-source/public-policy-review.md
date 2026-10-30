@@ -3,7 +3,8 @@
 This narrow proposal targets main `68f1dc955b27a47347a6fccc52a463472b601a1b`.
 Its older browser/PWA and legacy WinUI/WebView2 source was inspected independently;
 it does not import native WPF source from develop. PR #65 already published scoped
-MIT/licensing/security documents; the new signing/privacy documents remain drafts.
+MIT/licensing/security documents. This records the signing/privacy policy
+proposal before a separately authorised merge or deployment.
 Goal [#62](https://github.com/DouglasNLima/local-docs-studio/issues/62) carries the
 final SHA/tree, independent agent review, terminal CI, merge simulation and owner
 decision receipt. No policy publication is authorised by a passing test.
@@ -62,7 +63,8 @@ requires all four cache entries; mutation tests retain missing-path/grant/notice
 failures and add a missing-policy-cache failure.
 
 The owner must approve exact text and R2 scope additions, then separately approve
-the actual merge/Pages publication with final source and checks. Current PR is
-draft and unmerged. Enquiry text/recipient dispatch, provider application, MFA
+the actual merge/Pages publication with final source and checks. At the time of this review the PR was draft and unmerged; any subsequent merge
+and Pages deployment require independently verified receipts. Enquiry dispatch,
+provider application, MFA
 verification, signing setup and native release decisions remain separate.
 No tags/releases, historical descriptions, environments/secrets or rulesets change.

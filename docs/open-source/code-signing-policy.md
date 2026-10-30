@@ -1,6 +1,6 @@
 # Code signing policy
 
-**Draft: no signing provider has accepted this project, no production certificate
+**Current signing status: no signing provider has accepted this project, no production certificate
 or updater trust identity is configured, and no signed Stable release is offered.**
 The proposed route is SignPath Foundation with GitHub Releases. Free signing is
 conditional on external acceptance. See the [policy evidence review](public-policy-review.md).
