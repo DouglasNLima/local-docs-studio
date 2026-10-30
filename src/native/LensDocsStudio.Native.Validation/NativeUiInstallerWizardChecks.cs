@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 using LensDocsStudio.Core.State;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
@@ -294,7 +295,7 @@ internal static partial class NativeUiChecks
         AutomationElement Choice(string name)
         {
             AutomationElement? choice = null;
-            Wait(() => (choice = wizard!.FindAllDescendants().FirstOrDefault(element => WizardVisible(element) && Label(element.Name) == name
+            Wait(() => (choice = wizard!.FindAllDescendants().FirstOrDefault(element => WizardVisible(wizard, element) && Label(element.Name) == name
                 && (element.Patterns.Toggle.IsSupported || element.Patterns.LegacyIAccessible.IsSupported))) is not null,
                 "The wizard choice is not accessible: " + name);
             return choice!;
@@ -307,6 +308,8 @@ internal static partial class NativeUiChecks
                 Name = element.Properties.Name.ValueOrDefault, Type = element.Properties.ControlType.ValueOrDefault.ToString(), Class = element.Properties.ClassName.ValueOrDefault,
                 IsEnabled = element.Properties.IsEnabled.TryGetValue(out var enabled) ? (bool?)enabled : null,
                 IsOffscreen = element.Properties.IsOffscreen.TryGetValue(out var offscreen) ? (bool?)offscreen : null,
+                NativeWindowHandle = element.Properties.NativeWindowHandle.TryGetValue(out var nativeHandle) ? (int?)nativeHandle : null,
+                VerifiedVisible = WizardVisible(target, element),
                 Bounds = element.Properties.BoundingRectangle.TryGetValue(out var bounds) ? bounds.ToString() : null,
                 Value = element.Patterns.Value.IsSupported ? element.Patterns.Value.Pattern.Value.Value : null,
                 Text = element.Patterns.Text.IsSupported ? element.Patterns.Text.Pattern.DocumentRange.GetText(-1) : null,
@@ -333,11 +336,30 @@ internal static partial class NativeUiChecks
         ? element.Patterns.Toggle.Pattern.ToggleState.Value == ToggleState.On
         : element.Patterns.LegacyIAccessible.Pattern.State.Value.HasFlag(AccessibilityState.STATE_SYSTEM_CHECKED);
     private static string Label(string? value) => (value ?? "").Replace("&", "", StringComparison.Ordinal).Trim();
-    // Rich Edit exposes text descendants without a visibility property. They cannot
-    // establish visible disclosure; require affirmative visibility from the parent
-    // controls instead, and retain unsupported properties as null in the evidence.
-    private static bool WizardVisible(AutomationElement element) => element.Properties.IsOffscreen.TryGetValue(out var offscreen) && !offscreen;
-    private static string WizardText(Window wizard) => string.Join('\n', wizard.FindAllDescendants().Where(WizardVisible)
+    // Inno's document provider exposes full Value/Text and real bounds but omits
+    // IsOffscreen. Verify that exact native child with Windows instead of guessing
+    // that an unsupported Boolean means visible. Other unknown providers fail shut.
+    private static bool WizardVisible(Window wizard, AutomationElement element)
+    {
+        if (element.Properties.IsOffscreen.TryGetValue(out var offscreen)) return !offscreen;
+        if (element.Properties.ClassName.ValueOrDefault != "TRichEditViewer"
+            || !element.Properties.NativeWindowHandle.TryGetValue(out var nativeHandle) || nativeHandle == 0
+            || !element.Properties.BoundingRectangle.TryGetValue(out var bounds) || bounds.Width <= 0 || bounds.Height <= 0) return false;
+        var root = (nint)wizard.Properties.NativeWindowHandle.Value;
+        var child = (nint)nativeHandle;
+        GetWindowThreadProcessId(child, out var owner);
+        var parentBounds = wizard.BoundingRectangle;
+        return owner == wizard.Properties.ProcessId.Value && WizardIsChild(root, child)
+            && WizardWindowVisible(root) && WizardWindowVisible(child) && GetForegroundWindow() == root
+            && bounds.Left >= parentBounds.Left && bounds.Top >= parentBounds.Top
+            && bounds.Right <= parentBounds.Right && bounds.Bottom <= parentBounds.Bottom;
+    }
+    [DllImport("user32.dll", EntryPoint = "IsChild")]
+    [return: MarshalAs(UnmanagedType.Bool)] private static extern bool WizardIsChild(nint parent, nint child);
+    [DllImport("user32.dll", EntryPoint = "IsWindowVisible")]
+    [return: MarshalAs(UnmanagedType.Bool)] private static extern bool WizardWindowVisible(nint window);
+
+    private static string WizardText(Window wizard) => string.Join('\n', wizard.FindAllDescendants().Where(element => WizardVisible(wizard, element))
         .Select(element => element.Properties.Name.ValueOrDefault + "\n" + (element.Patterns.Value.IsSupported ? element.Patterns.Value.Pattern.Value.Value
             : element.Patterns.Text.IsSupported ? element.Patterns.Text.Pattern.DocumentRange.GetText(-1) : "")));
     private static string? RegistrySnapshot(string path)

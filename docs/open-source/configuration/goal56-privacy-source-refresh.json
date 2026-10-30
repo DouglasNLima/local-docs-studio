@@ -62,7 +62,7 @@
     {
       "path": "src/native/LensDocsStudio.Native.Validation/NativeUiInstallerWizardChecks.cs",
       "previousSha256": "f0e502687ac5198f0e45f47dd0b41ee8790de1a062aaccfb1b7b9f71aa0a5a0f",
-      "currentSha256": "d6b041832816e1c1b1e01715d6d90f44116b8b93cf31e6d1be5576ca4ba1d752"
+      "currentSha256": "e3185586226022abdbde94cf74503fbb4478bb9f5ab8bb547f5b8c98e7d984ca"
     },
     {
       "path": "src/native/LensDocsStudio.Native.Validation/NativeUpdateInteractionChecks.cs",
