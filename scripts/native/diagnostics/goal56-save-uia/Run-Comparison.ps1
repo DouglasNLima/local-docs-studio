@@ -6,6 +6,13 @@ $protocol = Join-Path $PWD protocol
 $original = Join-Path $PWD original
 $diagnostic = Join-Path $PWD diagnostic
 $outcomes = [ordered]@{}
+function Write-Inventory([string]$Directory) {
+    $manifest = Join-Path $Directory 'file-hashes.json'
+    $rows = @(Get-ChildItem -LiteralPath $Directory -Recurse -File |
+        Where-Object FullName -ne $manifest | Sort-Object FullName | Get-FileHash |
+        Select-Object Algorithm,Hash,@{N='File';E={[IO.Path]::GetRelativePath($Directory, $_.Path)}})
+    $rows | ConvertTo-Json | Set-Content -LiteralPath $manifest
+}
 function Run([string]$Name, [string]$Directory, [scriptblock]$Action) {
     Push-Location -LiteralPath $Directory
     try {
@@ -45,5 +52,5 @@ if ($outcomes['diagnostic-build'] -eq 0 -and $outcomes.Contains('diagnostic-buil
     $env:LENS_DIAGNOSTIC_SESSION = "$SourceName-synthetic"
     Run synthetic $diagnostic { & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --goal56-save-race src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe $env:LENS_DIAGNOSTIC_DIRECTORY }
 }
-Get-ChildItem -LiteralPath $evidence -Recurse -File | Get-FileHash | Select-Object Algorithm,Hash,@{N='File';E={[IO.Path]::GetRelativePath($evidence, $_.Path)}} | ConvertTo-Json > (Join-Path $evidence file-hashes.json)
+Write-Inventory $evidence
 if ($outcomes.Count -ne 9 -or @($outcomes.Values | Where-Object { $_ -ne 0 }).Count -ne 0) { exit 1 }
