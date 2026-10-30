@@ -1,5 +1,16 @@
 # Network and local-data evidence — 29 October 2026
 
+## Native controls revision — 30 October 2026
+
+The historical matrix retains its inspected revision. Goal #56 changes fresh
+native automatic checks to **off**, embeds this policy in Setup and adds a
+pre-launch choice with silent/upgrade handling. Preferences must initialise before
+the timer; pending/failed consent saves prevent automatic requests. Manual checks
+remain explicit. See the [current design and evidence limits](../native/installer-privacy-and-consent.md).
+No destination, trust identity, signing provider or telemetry endpoint changes.
+The historical missing-control gates below are implemented on this branch;
+production certification and provider acceptance remain outstanding.
+
 This audit supports the [Privacy policy](privacy.md) and [eligibility matrix](signpath-eligibility-2026-10-29.md).
 It reviews develop `8fdcb5eba90347a829e88e8f30e4ab489b437038` and independently
 main `68f1dc955b27a47347a6fccc52a463472b601a1b`. Main has a different browser

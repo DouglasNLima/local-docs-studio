@@ -86,8 +86,15 @@ public static class NativeUpdateLauncher
         {
             WorkspacePath.RejectReparsePoints(ticket.OriginalExecutable);
             var restart = new ProcessStartInfo(ticket.OriginalExecutable) { UseShellExecute = false };
-            restart.ArgumentList.Add("--state-directory"); restart.ArgumentList.Add(ticket.StateDirectory);
+            foreach (var argument in RestartStateArguments(ticket.StateDirectory)) restart.ArgumentList.Add(argument);
             Process.Start(restart);
         }
+    }
+
+    public static string[] RestartStateArguments(string stateDirectory)
+    {
+        var standard = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LensDocsStudio.Native");
+        return string.Equals(Path.TrimEndingDirectorySeparator(Path.GetFullPath(stateDirectory)), Path.TrimEndingDirectorySeparator(standard), StringComparison.OrdinalIgnoreCase)
+            ? [] : ["--state-directory", stateDirectory];
     }
 }

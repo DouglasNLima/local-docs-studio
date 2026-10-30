@@ -103,10 +103,15 @@ function Assert-NoFileAssociations {
 }
 if ($NoFileAssociations) { Assert-NoFileAssociations }
 function Run-Installer([string]$Path, [string]$Phase) {
+    Write-Output "Native installer lifecycle: $Phase"
     $expectedIdentity = Get-PackageIdentity $Path
     $tasks = if ($NoFileAssociations) { '/TASKS="desktopicon"' } else { '/TASKS="fileassoc,desktopicon"' }
     $process = Start-Process -FilePath $Path -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),$tasks,('/LOG="' + (Join-Path $root ($Phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
     if ($process.ExitCode -ne 0) { throw "$Phase failed with exit code $($process.ExitCode)." }
+    $applicationPath = Join-Path $installDirectory 'LensDocsStudio.Native.exe'
+    foreach ($running in Get-Process -Name 'LensDocsStudio.Native' -ErrorAction SilentlyContinue) {
+        if ($running.Path -eq $applicationPath) { throw "${Phase}: unattended Setup launched the application." }
+    }
     if (-not (Test-Path -LiteralPath $uninstallKey)) { throw 'The native uninstall registration is missing.' }
     if (-not (Test-Path -LiteralPath $shortcut) -or -not (Test-Path -LiteralPath $desktopShortcut)) { throw 'Installer shortcuts are missing.' }
     $applicationPath = Join-Path $installDirectory 'LensDocsStudio.Native.exe'
@@ -138,6 +143,22 @@ function Run-Installer([string]$Path, [string]$Phase) {
     Assert-InstalledPayload $Path $Phase
     $checks.Add($(if ($NoFileAssociations) { "${Phase}: installed self-contained application and shortcuts; optional associations absent" } else { "${Phase}: installed self-contained application, shortcuts and Open with registration" }))
     Assert-PreservedState $Phase
+    # Use the installed executable's ordinary default-state route, separately from
+    # the existing isolated workspace/state preservation workflows below.
+    if (-not $HistoricalValidationProject) {
+        $defaultState = Join-Path $env:LOCALAPPDATA 'LensDocsStudio.Native'
+        $pendingChoice = Get-Content -LiteralPath (Join-Path $defaultState 'installer-update-choice.json') -Raw | ConvertFrom-Json
+        if ($pendingChoice.SchemaVersion -ne 1 -or $pendingChoice.Action -ne 'preserve') { throw "${Phase}: silent Setup inferred an explicit update choice." }
+        $preferencePath = Join-Path $defaultState 'preferences.json'
+        $enabled = (Test-Path -LiteralPath $preferencePath) -and ((Get-Content -LiteralPath $preferencePath -Raw | ConvertFrom-Json).AutomaticUpdateChecks -eq $true)
+        $consentArguments = @('--installed-update-consent-ui', $applicationPath, (Join-Path $root ($Phase + '-update-consent')), $enabled.ToString().ToLowerInvariant())
+        # First launch proves the safe default, then the user enables checks in the
+        # actual UI. Upgrade and reinstall must retain that persisted decision.
+        if ($Phase -eq 'install') { $consentArguments += 'true' }
+        & dotnet run --project (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation') -c Release --no-build -- @consentArguments
+        if ($LASTEXITCODE -ne 0) { throw "${Phase}: installed update consent validation failed." }
+        $checks.Add("${Phase}: installed executable applied the effective update decision before its timer; explicit user changes persisted")
+    }
 }
 function Run-NativeUi([string]$Phase) {
     Push-Location $repo
@@ -168,6 +189,34 @@ function Uninstall-Native([string]$Phase) {
     Assert-PreservedState $Phase
 }
 try {
+    if (-not $HistoricalValidationProject) {
+        $defaultState = Join-Path $env:LOCALAPPDATA 'LensDocsStudio.Native'
+        $defaultBeforeFailure = if (Test-Path -LiteralPath $defaultState) { Get-StateSnapshot $defaultState } else { @{} }
+        $blockedDestination = Join-Path $root 'failed-extraction'
+        # A valid destination with an existing directory at the executable path
+        # forces a real payload failure without changing ACLs or machine settings.
+        New-Item -ItemType Directory -Path (Join-Path $blockedDestination 'LensDocsStudio.Native.exe') | Out-Null
+        Write-Output 'Native installer failure control: executable path occupied by a disposable directory'
+        $failed = Start-Process -FilePath $Installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $blockedDestination + '"'),('/LOG="' + (Join-Path $root 'failed-extraction.log') + '"')) -WindowStyle Hidden -PassThru
+        if (-not $failed.WaitForExit(60000)) {
+            # Only terminate this exact owned failure-control process tree. This
+            # deadline belongs to the new fault probe, never a performance check.
+            $failed.Kill($true)
+            [void]$failed.WaitForExit(10000)
+            throw 'The installer extraction failure control exceeded its 60-second deadline.'
+        }
+        if ($failed.ExitCode -eq 0 -or (Test-Path -LiteralPath $uninstallKey)) { throw 'The obstructed payload did not fail safely.' }
+        $failedLog = Get-Content -LiteralPath (Join-Path $root 'failed-extraction.log') -Raw
+        if (-not $failedLog.Contains(('Dest filename: ' + (Join-Path $blockedDestination 'LensDocsStudio.Native.exe')), [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'The failed installer log did not reach the obstructed executable target.'
+        }
+        $defaultAfterFailure = if (Test-Path -LiteralPath $defaultState) { Get-StateSnapshot $defaultState } else { @{} }
+        if ($defaultBeforeFailure.Count -ne $defaultAfterFailure.Count) { throw 'Failed Setup changed private state inventory.' }
+        foreach ($name in $defaultBeforeFailure.Keys) {
+            if ($defaultBeforeFailure[$name] -ne $defaultAfterFailure[$name]) { throw "Failed Setup changed private state: $name" }
+        }
+        $checks.Add('A real silent installation failure leaves preferences and pending consent unchanged')
+    }
     Run-Installer $Installer 'install'
     Run-NativeUi 'first-launch'
     $firstLaunchRoots = @(Get-ChildItem -LiteralPath (Join-Path $root 'first-launch') -Directory -Filter 'ui-*')

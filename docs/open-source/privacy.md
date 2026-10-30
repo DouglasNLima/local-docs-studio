@@ -1,9 +1,9 @@
 # Privacy policy
 
-**Source-reviewed disclosure; publication status verified 30 October 2026.**
+**Source-reviewed disclosure; native controls revised 30 October 2026.**
 The main-specific public policy was published via #67 and Pages run 40978852428
 attempt 2. This develop version retains its native source context; publication
-does not implement the missing native installer controls described below.
+is separate from this develop version's native installer controls.
 The [source evidence matrix](network-privacy-audit.md) distinguishes the current
 browser/PWA, legacy WinUI/WebView2 shell and proposed native .NET/WPF edition.
 
@@ -12,13 +12,21 @@ analytics service is required by the inspected application code. This is a sourc
 review of the recorded baseline, not a guarantee about every third-party service
 or every future version.
 
-The native application's automatic checks default to enabled, with Stable channel.
-Its first timer tick is about ten seconds after initialisation, then eligibility
+Fresh native installations and portable sessions default automatic checks to
+**off**, with Stable channel. The installer embeds this policy locally and offers
+**Automatically check for updates** before first launch. Existing valid preferences
+are kept unless the user explicitly chooses a change. Silent setup preserves valid
+preferences and otherwise leaves checks off. A bounded one-time instruction is
+applied through the application's atomic preferences store; a newer saved decision
+wins over an older installer selection. Unreadable or incomplete consent cannot
+authorise automatic requests. See the [preference precedence and failure design](../native/installer-privacy-and-consent.md).
+Its first timer tick is about ten seconds after preference initialisation, then eligibility
 is checked hourly; network attempts are limited to one per 24 hours, including
 failed attempts. It requests the public GitHub Releases API and may fetch
 `native-update.json` release metadata through GitHub download/asset hosts.
 Manual checks bypass the interval and the automatic-check preference.
-Disable automatic checks in **Help > Updates**. Requests include network/IP information,
+Change automatic checks in **Help > Updates**. Pending or failed preference saves
+pause automatic checks and report the failure. Requests include network/IP information,
 requested URLs, timing
 and `LensDocsStudio.Native/0.1` user agent. The update transport does not attach
 workspace files, local paths or credentials. Download and installation are separate
@@ -63,11 +71,10 @@ security software are outside the application's controls. Manage drafts/site
 data or native state deliberately; deletion can remove recovery.
 Uninstall does not remove user documents or private state. Support bundles and
 screenshots require the user's review before sharing. The public disclosure is
-published; installer presentation/disable implementation still needs owner review
-and validation before signed release.
-The current native installer does not display this policy or persist an update
-opt-out before first launch. Those are missing implementation gates, including
-upgrade/silent-install behaviour; the post-launch checkbox is insufficient.
+published separately on main. This branch implements native installer disclosure
+and the pre-launch update choice. Exact-source validation and owner review remain
+necessary before release. The wizard requires no browser or Internet access to
+display this policy. Both installed and portable payloads include `PRIVACY.md`.
 Installers make per-user file/shortcut/optional association changes and provide
 uninstall; the native package includes its runtime.
 

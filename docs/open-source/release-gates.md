@@ -4,6 +4,12 @@ This milestone ends at the licence audit and signing preparation requested by th
 owner. It does not complete every workstream in [Goal #56](https://github.com/DouglasNLima/local-docs-studio/issues/56).
 The issue stays open. Existing unsigned internal-preview CI remains separate.
 
+Goal #56 implements installer privacy and pre-launch update consent on its isolated
+branch. See [design and evidence limits](../native/installer-privacy-and-consent.md)
+and its exact-source receipt. Historical missing-control entries below describe
+the earlier milestone. Production signing, provider acceptance, clean Windows and
+Stable release gates remain blocked.
+
 | Criterion | Implementation / test status | Certification and next requirement |
 |---|---|---|
 | Immutable source/dependency inventory | IMPLEMENTED / TESTED | Baseline source evidence only; ownership and remaining bundle provenance BLOCKED |

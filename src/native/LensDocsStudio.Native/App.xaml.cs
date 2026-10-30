@@ -20,7 +20,8 @@ public partial class App : Application
             catch (Exception ex) when (ex is not OutOfMemoryException) { MessageBox.Show("The native update could not proceed safely.\n\n" + ex.Message, "Lens Docs Studio update"); }
             Shutdown(); return;
         }
-        var stateRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LensDocsStudio.Native");
+        var standardStateRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LensDocsStudio.Native");
+        var stateRoot = standardStateRoot;
         var args = e.Args.ToList();
         var stateOption = args.IndexOf("--state-directory");
         if (stateOption >= 0 && stateOption + 1 < args.Count)
@@ -37,7 +38,10 @@ public partial class App : Application
         }
         var session = new SessionStore(stateRoot);
         var dialogs = new DesktopDialogs();
-        var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(stateRoot, "write-recovery")), session, new WorkspaceService(), dialogs);
+        // Older update launchers also pass the default path explicitly. Resolve its
+        // identity; only genuinely isolated state must ignore the installed choice.
+        var standardState = string.Equals(Path.TrimEndingDirectorySeparator(stateRoot), standardStateRoot, StringComparison.OrdinalIgnoreCase);
+        var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(stateRoot, "write-recovery")), session, new WorkspaceService(), dialogs, acceptInstallerChoice: standardState);
         var initialTheme = "System";
         try { initialTheme = (await session.ReadAsync<UserPreferences>("preferences.json", validate: WorkspaceSettings.ArePreferencesValid))?.Theme ?? "System"; }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { /* The normal session recovery reports unreadable preferences. */ }

@@ -1,5 +1,14 @@
 # Native update trust and packaging
 
+## Goal #56 privacy controls — 30 October 2026
+
+Fresh automatic checks now default off. Setup embeds the local policy and offers
+a pre-launch choice. Existing valid preferences win unless explicitly changed
+against an unchanged fingerprint; silent setup preserves them. `SessionStore`
+applies a bounded one-time instruction before the timer. See [the current design](installer-privacy-and-consent.md).
+Historical default-enabled descriptions below retain their original revision.
+No signing, trust or release boundary changes.
+
 ## Current status - 24 October 2026
 
 The authoritative [Current Windows readiness](current-windows-readiness.md) records

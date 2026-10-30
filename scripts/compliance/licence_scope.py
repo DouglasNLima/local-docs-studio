@@ -10,6 +10,23 @@ from rights_ledger import ROOT, SCOPE, boundary, current_paths, current_digests
 MIT_SHA256 = 'f4126eb8680101babaa6c1ee89b9693320eb204139f3ee3fcd08abb66eb31261'
 SCOPED_METADATA = 'SEE LICENSE IN LICENSING.md'
 SCOPE_TEXT = 'Original first-party portions only; embedded R3-R7 content excluded'
+GOAL56_SOURCE_PATHS = {
+    'docs/native/architecture-decisions.md', 'docs/native/current-windows-readiness.md',
+    'docs/native/functional-parity-matrix.md', 'docs/native/implementation-progress.md',
+    'docs/native/native-experience-improvements.md', 'docs/native/update-and-packaging.md',
+    'docs/native/validation-report.md', 'docs/native/windows-preview-guide.md',
+    'installer/inno/LensDocsStudio.Native.iss', 'scripts/native/Test-NativeInstaller.ps1',
+    'src/native/LensDocsStudio.Core/State/SessionStore.cs',
+    'src/native/LensDocsStudio.Native.Validation/NativeUiInstallerWizardChecks.cs',
+    'src/native/LensDocsStudio.Native.Validation/NativeUpdateInteractionChecks.cs',
+    'src/native/LensDocsStudio.Native.Validation/Program.cs',
+    'src/native/LensDocsStudio.Native/App.xaml.cs',
+    'src/native/LensDocsStudio.Native/MainWindow.xaml.cs',
+    'src/native/LensDocsStudio.Native/Platform/NativeUpdateLauncher.cs',
+    'src/native/LensDocsStudio.Native/ViewModels/UpdatesViewModel.cs',
+    'src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.cs',
+    'tests/static/check-native-acceptance-policy.mjs',
+}
 
 
 def require(condition, message):
@@ -47,6 +64,28 @@ def validate_preserved(expected, actual):
         require(actual.get(name) == digest, 'Protected notice/trust/performance bytes changed: ' + name)
 
 
+def validate_source_refresh(preserved, refresh):
+    # Goal #62 froze almost the whole repository for its licence-only operation.
+    # Goal #56 explicitly authorises these native privacy changes. Keep the original
+    # evidence immutable and bind replacements to exact bytes. This grants no rights
+    # and authorises no trust, performance, notice or GitHub administration mutation.
+    require(refresh.get('schemaVersion') == 1
+            and refresh.get('goal') == 'https://github.com/DouglasNLima/local-docs-studio/issues/56'
+            and refresh.get('sourceBaseline') == '86d60322f6f1f1dec06974bf5f9e1738a3bb80c7',
+            'Unexpected native privacy refresh authority/baseline')
+    rows = refresh.get('files', [])
+    require(len(rows) == len(GOAL56_SOURCE_PATHS)
+            and {row['path'] for row in rows} == GOAL56_SOURCE_PATHS,
+            'Native privacy refresh exceeds or omits its exact source scope')
+    result = dict(preserved)
+    for row in rows:
+        path = row['path']
+        require(preserved.get(path) == row['previousSha256'], 'Historical source evidence changed: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', row['currentSha256']), 'Invalid current source digest: ' + path)
+        result[path] = row['currentSha256']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -62,7 +101,7 @@ def main():
     invariants = json.loads((ROOT / 'docs/open-source/evidence/goal62/preserved-files.json')
                            .read_text(encoding='utf-8'))
     # Goal #62's authorised current-policy refresh supersedes only these historical
-    # policy digests (signing/privacy refreshed after verified #67 publication).
+    # policy digests (signing/privacy after #67; Goal #56 revises native privacy).
     # Keep the frozen evidence and all notice/trust/performance
     # invariants intact; any other change still fails validation.
     preserved = dict(invariants['sha256'])
@@ -81,11 +120,13 @@ def main():
             'b1d0e06a86e5d08e3e2b394b9568ed1e7c2079ea8d952e17ccc284590e88cc43'),
         'docs/open-source/privacy.md': (
             'bfe3721da4981db13fb4c454c042e416cd571b68796371b1def4f1afd43ca2fe',
-            'e18a9ce1cb048a49f3bbfa5a819aa609e7f512db7b5c28b6e143e45b58431343'),
+            'b4be27f036a466b0e25f01b4423f6c59526e26f020b29a83884792d1f895ec83'),
     }
     for path, (previous, current) in policy_refresh.items():
         require(preserved[path] == previous, 'Historical policy evidence changed: ' + path)
         preserved[path] = current
+    refresh = json.loads((ROOT / 'docs/open-source/configuration/goal56-privacy-source-refresh.json').read_text(encoding='utf-8'))
+    preserved = validate_source_refresh(preserved, refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

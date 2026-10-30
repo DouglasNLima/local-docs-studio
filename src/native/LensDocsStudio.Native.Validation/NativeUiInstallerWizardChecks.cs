@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Security.Cryptography;
+using System.Runtime.InteropServices;
+using LensDocsStudio.Core.State;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
@@ -49,6 +52,9 @@ internal static partial class NativeUiChecks
             throw new IOException("An existing native installation or shortcut must be preserved; use a fresh runner.");
         if (noFileAssociations) AssertNoWizardAssociations();
         var legacyBefore = RegistrySnapshot(LegacyUninstallKey);
+        var stateRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LensDocsStudio.Native");
+        var stateBefore = PrivateStateSnapshot();
+        var keepExisting = File.Exists(Path.Combine(stateRoot, "preferences.json")) || File.Exists(Path.Combine(stateRoot, "preferences.json.bak"));
         var markdownBefore = DefaultMarkdownAssociation();
         var root = Path.Combine(output, "wizard-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
         var destination = Path.Combine(root, "reviewed installation");
@@ -63,9 +69,20 @@ internal static partial class NativeUiChecks
         Exception? wizardFailure = null;
         try
         {
-            foreach (var cancel in new[] { true, false })
+            foreach (var phase in new[] { "cancel", "install", "opt-in-reinstall" })
             {
-                var phase = cancel ? "cancel" : "install";
+                var cancel = phase == "cancel";
+                var optIn = phase == "opt-in-reinstall";
+                if (optIn)
+                {
+                    var retained = PrivateStateSnapshot();
+                    RemoveTestInstallation("before-opt-in");
+                    if (PrivateStateSnapshot() != retained) throw new IOException("Uninstall changed private consent/session state.");
+                    var store = new SessionStore(stateRoot);
+                    var saved = store.InitialisePreferencesAsync().GetAwaiter().GetResult();
+                    store.WriteAsync("preferences.json", saved with { LastUpdateCheck = DateTimeOffset.UtcNow.AddDays(7) }).GetAwaiter().GetResult();
+                    keepExisting = true;
+                }
                 if (FindWizard() is not null) throw new IOException("A native installation wizard already exists; leave it untouched.");
                 var start = new ProcessStartInfo(installer) { UseShellExecute = true, WindowStyle = ProcessWindowStyle.Normal };
                 foreach (var argument in new[] { "/SP-", "/NORESTART", "/LANG=english", "/LOG=" + Path.Combine(root, phase + ".log") })
@@ -82,6 +99,22 @@ internal static partial class NativeUiChecks
                     && WizardText(wizard).Contains("Workspace documents", StringComparison.Ordinal), "Welcome did not expose the version and preservation guidance.");
                 Capture(phase + "-welcome");
                 Next("Next");
+                Wait(() => WizardText(wizard).Contains("Privacy policy", StringComparison.Ordinal)
+                    && WizardText(wizard).Contains("GitHub", StringComparison.Ordinal), "The embedded local privacy policy was not accessible.");
+                Capture(phase + "-local-policy"); Next("Next");
+                Wait(() => WizardText(wizard).Contains("Privacy and updates", StringComparison.Ordinal)
+                    && WizardText(wizard).Contains("Uninstall retains", StringComparison.Ordinal), "The privacy/network disclosure was not visible.");
+                var keep = Choice("Keep my saved update preference (off if none is valid)");
+                var automatic = Choice("Automatically check for updates");
+                if (Checked(keep) != keepExisting || Checked(automatic) || automatic.IsEnabled == keepExisting)
+                    throw new IOException("The initial update choices do not preserve existing preferences or default fresh checks off.");
+                if (Checked(keep)) { keep.Focus(); Keyboard.Type(VirtualKeyShort.SPACE); }
+                Wait(() => Choice("Automatically check for updates").IsEnabled, "The explicit update choice could not be enabled.");
+                automatic.Focus(); Wait(() => automatic.Properties.HasKeyboardFocus.Value, "The update option cannot receive keyboard focus.");
+                Keyboard.Type(VirtualKeyShort.SPACE);
+                Wait(() => Checked(Choice("Automatically check for updates")), "Keyboard opt-in was not retained.");
+                if (!cancel && !optIn) { automatic.Focus(); Keyboard.Type(VirtualKeyShort.SPACE); Wait(() => !Checked(Choice("Automatically check for updates")), "Keyboard opt-out was not retained."); }
+                Capture(phase + "-privacy-choice"); Next("Next");
                 var destinationEdit = DestinationEdit();
                 if (!string.Equals(Path.GetFullPath(destinationEdit.Text), originalDestination, StringComparison.OrdinalIgnoreCase))
                     throw new IOException("The wizard did not default to the isolated native per-user location.");
@@ -119,9 +152,10 @@ internal static partial class NativeUiChecks
                     Keyboard.Type(VirtualKeyShort.SPACE);
                     Wait(() => wizardProcess.HasExited, "The cancelled wizard did not exit.");
                     if (Directory.Exists(destination) || Directory.Exists(originalDestination) || RegistrySnapshot(NativeUninstallKey) is not null
-                        || File.Exists(startShortcut) || File.Exists(desktopShortcut) || DefaultMarkdownAssociation() != markdownBefore)
+                        || File.Exists(startShortcut) || File.Exists(desktopShortcut) || DefaultMarkdownAssociation() != markdownBefore || PrivateStateSnapshot() != stateBefore)
                         throw new IOException("Cancelling the wizard created installation files, shortcuts or registration.");
                     checks.Add("Keyboard navigation, reviewed path/tasks, Back and confirmed Cancel preserve the uninstalled state");
+                    checks.Add("Cancelling an explicit update opt-in leaves all private state and pending installer choices byte-for-byte unchanged");
                 }
                 else
                 {
@@ -132,6 +166,10 @@ internal static partial class NativeUiChecks
                     Wait(() => !Checked(Choice("Launch " + WizardProduct)), "The launch choice could not be disabled.");
                     Capture("install-finished"); Next("Finish");
                     Wait(() => wizardProcess.HasExited, "Finish did not close the installation wizard.");
+                    using (var intent = JsonDocument.Parse(ReadObservedText(Path.Combine(stateRoot, SessionStore.InstallerChoiceFileName))))
+                        if (intent.RootElement.GetProperty("SchemaVersion").GetInt32() != 1 || intent.RootElement.GetProperty("Action").GetString() != (optIn ? "enable" : "disable"))
+                            throw new IOException("The explicit wizard update choice was not transferred after successful installation.");
+                    checks.Add("Local privacy policy and network disclosure are visible; keyboard opt-in and opt-out produce a bounded completed-install instruction");
                     var installedExe = Path.Combine(destination, "LensDocsStudio.Native.exe");
                     var installedDll = Path.Combine(destination, "LensDocsStudio.Native.dll");
                     foreach (var process in Process.GetProcessesByName("LensDocsStudio.Native"))
@@ -158,6 +196,10 @@ internal static partial class NativeUiChecks
                     checks.Add(noFileAssociations
                         ? "Visible Install and Finish produce matching native files/version and selected shortcuts; optional associations absent"
                         : "Visible Install and Finish produce matching native files/version, selected shortcuts and Open with registration");
+                    if (RunUpdateConsent(installedExe, Path.Combine(root, phase + "-first-launch-consent"), optIn, true, optIn ? false : null) != 0)
+                        throw new IOException("The installed executable did not honour the wizard update choice through its first timer interval.");
+                    checks.Add(optIn ? "Successful wizard opt-in survives reinstall; actual first launch sees it and a later in-app opt-out persists"
+                        : "Actual fresh interactive first launch consumes the wizard opt-out before its timer and preserves it through shutdown");
                 }
                 wizard = null; wizardProcess.Dispose(); wizardProcess = null; launcher.Dispose(); launcher = null;
             }
@@ -225,6 +267,16 @@ internal static partial class NativeUiChecks
         AutomationElement? Button(string name) => wizard!.FindAllDescendants(cf => cf.ByControlType(ControlType.Button))
             // Inno 6.7's modern buttons omit the arrows used by older wizard styles.
             .FirstOrDefault(element => !element.IsOffscreen && Label(element.Name).Trim('<', '>', ' ') == name);
+        string PrivateStateSnapshot() => !Directory.Exists(stateRoot) ? "{}" : JsonSerializer.Serialize(Directory.GetFiles(stateRoot, "*", SearchOption.AllDirectories)
+            .Order(StringComparer.Ordinal).ToDictionary(path => Path.GetRelativePath(stateRoot, path), path => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)))));
+        void RemoveTestInstallation(string phase)
+        {
+            var cleanup = new ProcessStartInfo(Path.Combine(destination, "unins000.exe")) { UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
+            foreach (var argument in new[] { "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/LOG=" + Path.Combine(root, phase + ".log") }) cleanup.ArgumentList.Add(argument);
+            using var process = Process.Start(cleanup) ?? throw new IOException("The owned test installation could not be removed.");
+            if (!process.WaitForExit(60000)) { process.Kill(entireProcessTree: true); throw new TimeoutException("Owned test uninstall exceeded its deadline."); }
+            if (process.ExitCode != 0 || RegistrySnapshot(NativeUninstallKey) is not null) throw new IOException("Owned test uninstall did not remove its registration.");
+        }
         void Next(string name)
         {
             AutomationElement? button = null;
@@ -243,7 +295,7 @@ internal static partial class NativeUiChecks
         AutomationElement Choice(string name)
         {
             AutomationElement? choice = null;
-            Wait(() => (choice = wizard!.FindAllDescendants().FirstOrDefault(element => !element.IsOffscreen && Label(element.Name) == name
+            Wait(() => (choice = wizard!.FindAllDescendants().FirstOrDefault(element => WizardVisible(wizard, element) && Label(element.Name) == name
                 && (element.Patterns.Toggle.IsSupported || element.Patterns.LegacyIAccessible.IsSupported))) is not null,
                 "The wizard choice is not accessible: " + name);
             return choice!;
@@ -253,9 +305,14 @@ internal static partial class NativeUiChecks
             target ??= wizard!; target.CaptureToFile(Path.Combine(root, name + ".png"));
             var elements = target.FindAllDescendants().Take(512).Select(element => new
             {
-                element.Name, Type = element.ControlType.ToString(), Class = element.Properties.ClassName.ValueOrDefault,
-                element.IsEnabled, element.IsOffscreen, Bounds = element.BoundingRectangle,
+                Name = element.Properties.Name.ValueOrDefault, Type = element.Properties.ControlType.ValueOrDefault.ToString(), Class = element.Properties.ClassName.ValueOrDefault,
+                IsEnabled = element.Properties.IsEnabled.TryGetValue(out var enabled) ? (bool?)enabled : null,
+                IsOffscreen = element.Properties.IsOffscreen.TryGetValue(out var offscreen) ? (bool?)offscreen : null,
+                NativeWindowHandle = element.Properties.NativeWindowHandle.TryGetValue(out var nativeHandle) ? (int?)nativeHandle : null,
+                VerifiedVisible = WizardVisible(target, element),
+                Bounds = element.Properties.BoundingRectangle.TryGetValue(out var bounds) ? bounds.ToString() : null,
                 Value = element.Patterns.Value.IsSupported ? element.Patterns.Value.Pattern.Value.Value : null,
+                Text = element.Patterns.Text.IsSupported ? element.Patterns.Text.Pattern.DocumentRange.GetText(-1) : null,
                 Role = element.Patterns.LegacyIAccessible.IsSupported ? element.Patterns.LegacyIAccessible.Pattern.Role.Value.ToString() : null,
                 State = element.Patterns.LegacyIAccessible.IsSupported ? element.Patterns.LegacyIAccessible.Pattern.State.Value.ToString() : null
             });
@@ -279,8 +336,32 @@ internal static partial class NativeUiChecks
         ? element.Patterns.Toggle.Pattern.ToggleState.Value == ToggleState.On
         : element.Patterns.LegacyIAccessible.Pattern.State.Value.HasFlag(AccessibilityState.STATE_SYSTEM_CHECKED);
     private static string Label(string? value) => (value ?? "").Replace("&", "", StringComparison.Ordinal).Trim();
-    private static string WizardText(Window wizard) => string.Join('\n', wizard.FindAllDescendants().Where(element => !element.IsOffscreen)
-        .Select(element => element.Name + "\n" + (element.Patterns.Value.IsSupported ? element.Patterns.Value.Pattern.Value.Value : "")));
+    // Inno's document provider exposes full Value/Text and real bounds but omits
+    // IsOffscreen. Verify that exact native child with Windows instead of guessing
+    // that an unsupported Boolean means visible. Other unknown providers fail shut.
+    private static bool WizardVisible(Window wizard, AutomationElement element)
+    {
+        if (element.Properties.IsOffscreen.TryGetValue(out var offscreen)) return !offscreen;
+        if (element.Properties.ClassName.ValueOrDefault != "TRichEditViewer"
+            || !element.Properties.NativeWindowHandle.TryGetValue(out var nativeHandle) || nativeHandle == 0
+            || !element.Properties.BoundingRectangle.TryGetValue(out var bounds) || bounds.Width <= 0 || bounds.Height <= 0) return false;
+        var root = (nint)wizard.Properties.NativeWindowHandle.Value;
+        var child = (nint)nativeHandle;
+        GetWindowThreadProcessId(child, out var owner);
+        var parentBounds = wizard.BoundingRectangle;
+        return owner == wizard.Properties.ProcessId.Value && WizardIsChild(root, child)
+            && WizardWindowVisible(root) && WizardWindowVisible(child) && GetForegroundWindow() == root
+            && bounds.Left >= parentBounds.Left && bounds.Top >= parentBounds.Top
+            && bounds.Right <= parentBounds.Right && bounds.Bottom <= parentBounds.Bottom;
+    }
+    [DllImport("user32.dll", EntryPoint = "IsChild")]
+    [return: MarshalAs(UnmanagedType.Bool)] private static extern bool WizardIsChild(nint parent, nint child);
+    [DllImport("user32.dll", EntryPoint = "IsWindowVisible")]
+    [return: MarshalAs(UnmanagedType.Bool)] private static extern bool WizardWindowVisible(nint window);
+
+    private static string WizardText(Window wizard) => string.Join('\n', wizard.FindAllDescendants().Where(element => WizardVisible(wizard, element))
+        .Select(element => element.Properties.Name.ValueOrDefault + "\n" + (element.Patterns.Value.IsSupported ? element.Patterns.Value.Pattern.Value.Value
+            : element.Patterns.Text.IsSupported ? element.Patterns.Text.Pattern.DocumentRange.GetText(-1) : "")));
     private static string? RegistrySnapshot(string path)
     {
         using var key = Registry.CurrentUser.OpenSubKey(path);

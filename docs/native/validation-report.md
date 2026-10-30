@@ -1,5 +1,13 @@
 # Native validation report
 
+## Goal #56 - installer privacy and update consent (30 October 2026)
+
+Core/state/updater tests and synthetic transports exercise the [consent design](installer-privacy-and-consent.md).
+Actual isolated executable UI observes disabled checks through the first timer
+interval and unchanged attempt history. Wizard/lifecycle checks require disposable
+hosted Windows; the exact-source receipt records terminal results and failures.
+Clean Windows, physical readers and forced extraction interruption are NOT TESTED.
+
 ## Goal 54 — smart diagram arrangement (28 October 2026)
 
 The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "goal": "https://github.com/DouglasNLima/local-docs-studio/issues/56",
+  "sourceBaseline": "86d60322f6f1f1dec06974bf5f9e1738a3bb80c7",
+  "purpose": "Exact native privacy implementation refresh; no rights grant, trust/performance or GitHub administration change.",
+  "files": [
+    {
+      "path": "docs/native/architecture-decisions.md",
+      "previousSha256": "f6ac00d1f6d12c28f6e9b6887a73dbc407509468ad9311941b9977f3bc80e134",
+      "currentSha256": "25afddbfc571fa23d119f927a508e3ba1b06cfe0be63b8824c8a37f928da0e47"
+    },
+    {
+      "path": "docs/native/current-windows-readiness.md",
+      "previousSha256": "58ac638126222f60bfd877b1c878940c2a5eb875276bc4bcb9f8e65e795bc7f3",
+      "currentSha256": "c2879940e364db7345283bd16e588f6b68b1717e6707fa74decdb5743fba7c7b"
+    },
+    {
+      "path": "docs/native/functional-parity-matrix.md",
+      "previousSha256": "5568914bdbde64395812aaabbf6055685f0278ee30da7b8dd9eded06899d0452",
+      "currentSha256": "7c4a5df9e37681108ead3c25bf83ff2bf6484f9a215ea9b27659651134fe9366"
+    },
+    {
+      "path": "docs/native/implementation-progress.md",
+      "previousSha256": "4aa23816ef6ebb9be401927d40b1c42ab480ce7d395bd251bb92c8b8beaa52e4",
+      "currentSha256": "0f9504c8e210247bd18e4fb0166e5f901f12e1ca35f7f9b62e34b4eee2207158"
+    },
+    {
+      "path": "docs/native/native-experience-improvements.md",
+      "previousSha256": "45f3152b5f7ca2b3c522e733947ea8aa3fcd2c220d8bc94971d4bff19d29dc07",
+      "currentSha256": "291b7deab5fa1c850a8da33fe3003538b66ead8abc14c1dd0ea49b9e00dd18b4"
+    },
+    {
+      "path": "docs/native/update-and-packaging.md",
+      "previousSha256": "b6036cf877007a4070307720035f4791183d8eaa2dbef8c6c4384e86c906eca8",
+      "currentSha256": "a4d6ace2b44b207140c8cc77379a3161c707d763fc4842ef2d3dc96e1c173cdf"
+    },
+    {
+      "path": "docs/native/validation-report.md",
+      "previousSha256": "1a22df66957f97b8d81da6a280356378dca5036968550bce214e2da2a8f06b86",
+      "currentSha256": "3648fa4cb10fe95ddd342bc1f6b09a995d1ab0734b7c9fdb81d199c2262526ba"
+    },
+    {
+      "path": "docs/native/windows-preview-guide.md",
+      "previousSha256": "a03a51355186efe73183c62f299ae00004b4e874da054e9b3907a2ee1b5fcaba",
+      "currentSha256": "49e4344b10fedca883639c05eaba94d206a96ac329588239946965d130ed0cc6"
+    },
+    {
+      "path": "installer/inno/LensDocsStudio.Native.iss",
+      "previousSha256": "73a5a7bea26bc773cf13ca02ac87ea85d3aead7788da9823f67e9961ea61e932",
+      "currentSha256": "53f357d1294c07214ac01f0fc795e4c5df36a0b06a28dc119dee41a656728b3d"
+    },
+    {
+      "path": "scripts/native/Test-NativeInstaller.ps1",
+      "previousSha256": "6648689764415e8c7a3ee26ed22b1c7461ddec1ca2102b276b1d3ab58538fc81",
+      "currentSha256": "9a70a8ddb9e99c40295c4c053b6136bca82677ec11558eadc5310fd394f225c4"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/State/SessionStore.cs",
+      "previousSha256": "a0979395eb16eaa89a73faf8ba1b58d3216edc1f6155146ab68b56b94b2cb3f1",
+      "currentSha256": "014ae5d0454f5fde313476428429b553c6869963723c294f89dfeede229a07fe"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native.Validation/NativeUiInstallerWizardChecks.cs",
+      "previousSha256": "f0e502687ac5198f0e45f47dd0b41ee8790de1a062aaccfb1b7b9f71aa0a5a0f",
+      "currentSha256": "e3185586226022abdbde94cf74503fbb4478bb9f5ab8bb547f5b8c98e7d984ca"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native.Validation/NativeUpdateInteractionChecks.cs",
+      "previousSha256": "1ac3d4e5a0b9c3a4b85444cd20849ffe16948c1d0a2cfa45c0fde83097c6cfa8",
+      "currentSha256": "7a4e6a5aab59017f74c925810088c957c2b027ee8d745149e355042df02da4b9"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native.Validation/Program.cs",
+      "previousSha256": "00288b43cf8bddcd82f53c4befbb2428f8bb32b3d05eff65dbfec8b6fc295ddf",
+      "currentSha256": "99b0569f7979143c324722d82e39b57cc9b5bd7cfd20749bcedf16dc198ddc6c"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native/App.xaml.cs",
+      "previousSha256": "a321825dc4d76f795a8c69bd47896ecdf6732a7ecaa5809258cee2c431ca2ba5",
+      "currentSha256": "2d647e4a4ff7892d23c3a34140490b58084a68b2c7286f5598e4c9d8c6d12253"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native/MainWindow.xaml.cs",
+      "previousSha256": "c57d22adb243bd9952b31e690af18539bf49b4bd4ebd32fd3f9dfc812545a53a",
+      "currentSha256": "1d135e9760108bcf0b30d5443d026dcad5384a5e6405ea147c69812abba80c6b"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native/Platform/NativeUpdateLauncher.cs",
+      "previousSha256": "4562ff16bb347c26dadec2f21f91763f8bc27f4e60559ff182c02a7ab168c085",
+      "currentSha256": "328dda717256e2d16afc3d98bf2347186e13f853588ac69a19c7d1c87707663a"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native/ViewModels/UpdatesViewModel.cs",
+      "previousSha256": "b86555c08d18d083f1498d9036968a994bce9c98d6cedfbe56af660e12a66e76",
+      "currentSha256": "f3c203b92d2d66e5e627528a0fa9597a1812e90c684ec367232481241b0cf2d9"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.cs",
+      "previousSha256": "3dcb3a424a8a2c95aef1f029f5d6888cfb53211ecc2d934fb1cd0c886b86a393",
+      "currentSha256": "cd4cb03c860be190b69e2f2836b5645eff6a5f8224be50787f748bc42c8488e6"
+    },
+    {
+      "path": "tests/static/check-native-acceptance-policy.mjs",
+      "previousSha256": "54ff3817152884c6f6502f61cee363523c26e1ce462fbf2845d3f67b7553654e",
+      "currentSha256": "95ed5fa67ee5af10c93d1e57fcaab874e9b3cc9792b184f8c18a27497cc6c444"
+    }
+  ]
+}
