@@ -1,5 +1,13 @@
 # SignPath eligibility review
 
+Current assessment: [29 October 2026 eligibility matrix](signpath-eligibility-2026-10-29.md),
+[network audit](network-privacy-audit.md) and [owner decisions](signpath-owner-decisions.md).
+Main's scoped licence/security promotion is merged via #65 and Pages publication
+was verified. The baseline analysis below is historical; its old BLOCKED licence
+statement is not the current licensing status.
+
+## Historical Goal #56 baseline
+
 Current Goal #62 evidence and unresolved provider questions are in the
 [updated application packet](signpath-application-packet.md). The earlier
 baseline analysis below is retained with its original licence/governance state.

@@ -1,10 +1,14 @@
 # SignPath Foundation owner decision packet — not submitted
 
+Current evidence: [eligibility matrix](signpath-eligibility-2026-10-29.md),
+[network audit](network-privacy-audit.md), [owner decision/contact review](signpath-owner-decisions.md).
+Foundation-specific preliminary route: SIGNPATH_CONTACT_ROUTE_UNVERIFIED.
+
 Target: `DouglasNLima/local-docs-studio`, native .NET/WPF edition, free official
 distribution. Updated on 29 October 2026 after scoped MIT adoption on `develop`, production
 protection activation and API-confirmed PVR enablement. The [current controls](governance-settings.md)
 link the execution evidence; historical stage receipts retain their original state.
-The technical preparation packet is **COMPLETE**; provider eligibility is
+The technical preparation packet is **PREPARED FOR OWNER REVIEW**; provider eligibility is
 **UNCONFIRMED**, and application submission remains **NOT AUTHORISED**. The official [terms](https://signpath.org/terms.html) (the page says
 Draft) and [application page](https://signpath.org/apply) were checked on 29 October
 2026. Their interpretation and acceptance remain with SignPath. The embedded form
@@ -15,7 +19,7 @@ a verified list of every current form field.
 
 | Requirement | Evidence / missing decision | Owner decision |
 |---|---|---|
-| Permissive open-source project and component grants | MIT is operative for enumerated original R1/R2 portions on develop at `709564dda30a57cf1e98ba07566f510c1636e05c`; default-branch promotion remains separate. R3–R7 and mixed portions are excluded; upstream grants stay separate | ADOPTED on develop; component/release scope BLOCKED |
+| Permissive open-source project and component grants | MIT is operative for enumerated original R1/R2 portions on develop at `709564dda30a57cf1e98ba07566f510c1636e05c`; target-specific main promotion via PR #65 and Pages publication are verified. R3–R7 and mixed portions are excluded; upstream grants stay separate | ADOPTED on develop and main; component/release scope BLOCKED |
 | Maintained, documented project | Current source, user guides and exact-source hosted validation are inspectable; provider assesses reputation | NOT APPLICABLE to an owner approval; technical evidence supplied |
 | Already released in the form to be signed | Five historical legacy Windows releases are not the native WPF product. Actions previews are not a public native release | BLOCKED |
 | Eligible included components | Native package bytes and original notices are mapped. Ask about Knuth/OFL fonts, apphost/runtime exception, adapted Mermaider/dagre and Inno-generated components | BLOCKED pending provider interpretation |
@@ -113,8 +117,8 @@ No application, certificate, secret, pin, signed installer, tag, beta, RC or Sta
 release was created. Microsoft Store/MSIX remains the separately assessed fallback
 in [the earlier review](signpath-readiness.md), with no packaging work here.
 
-Separate verdicts: scoped MIT **ADOPTED on develop**, technical packet
-**COMPLETE**, effective Solo Maintainer governance **ACTIVE AND VERIFIED**, provider eligibility
+Separate verdicts: scoped MIT **ADOPTED on develop and main**, technical packet
+**PREPARED FOR OWNER REVIEW**, effective Solo Maintainer governance **ACTIVE AND VERIFIED**, provider eligibility
 **UNCONFIRMED**, application **NOT SUBMITTED**, Stable publication **BLOCKED**.
 
 ## Prepared enquiry and application inventory
@@ -129,7 +133,7 @@ sign a candidate. No recipient/account/contact channel has been authorised.
 |---|---|
 | Project | Lens Docs Studio — Local Markdown, Mermaid, and documentation studio |
 | Repository | https://github.com/DouglasNLima/local-docs-studio |
-| Source and first-party terms | Final PR SHA/tree and exact LICENSING.md manifest; MIT is adopted on develop; a target-specific main promotion PR remains unmerged |
+| Source and first-party terms | Final PR SHA/tree and exact LICENSING.md manifest; scoped MIT adopted on develop and independently enumerated main via merged PR #65; Pages publication verified |
 | Download of released native Windows edition | MISSING; only five legacy v0.1.0-dev* releases exist; internal previews are not released-native evidence |
 | Responsible human | @DouglasNLima, all author/reviewer/approver roles; no independent human reviewer |
 | MFA | UNVERIFIED on GitHub; no SignPath account established; owner-approved private status check required |

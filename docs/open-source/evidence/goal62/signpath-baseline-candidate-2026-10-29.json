@@ -1,0 +1,35 @@
+{
+  "accessDate": "2026-10-29",
+  "runId": 40932816467,
+  "artifactId": 12925830225,
+  "artifactName": "native-validation",
+  "sourceRevision": "8fdcb5eba90347a829e88e8f30e4ab489b437038",
+  "sourceTree": "afa63df5c3f5dd39798da2afee5922944e510fc6",
+  "version": "0.1.0-preview.967",
+  "portableSha256": "c350c3306d4ea27aa4ac0c026bc3c658f17d4aa75d9934d636346876dd76aaef",
+  "installerSha256": "e6664bb9019193f68f64eff90a74f1ad3af4b3281afae7f1f83f2ccc8fbbc649",
+  "sbomSha256": "5d19baf7ddcae997e251d7414281517105988b9a1b7f439da39fcac786eeda5a",
+  "portableFilesVerified": 540,
+  "upstreamMatchedFiles": 522,
+  "componentCount": 20,
+  "noticeFiles": 22,
+  "signature": "NotSigned",
+  "verification": "Downloaded Actions artefact; every portable file hash checked against supplied SBOM; installer hash checked. No execution or independent Inno decompression.",
+  "limitations": [
+    "Source/dependency attribution is distinct from proof of the shipped bytes.",
+    "Exact package matches do not prove independent upstream source-to-binary reproducibility or ownership.",
+    "Embedded resources retain component notices, including WpfMath font and runtime subcomponent terms.",
+    "The portable ZIP is fully enumerated. Installer container provenance is recorded separately.",
+    "No malware verdict, licence-compatibility certification or production-signing approval."
+  ],
+  "nativeStable": "NO_GO",
+  "observedApphostMetadata": {
+    "ProductName": "LensDocsStudio.Native",
+    "ProductVersion": "0.1.0-preview.967+8fdcb5eba90347a829e88e8f30e4ab489b437038",
+    "FileVersion": "0.1.0.0",
+    "CompanyName": "Lens Docs Studio",
+    "OriginalFilename": "LensDocsStudio.Native.dll",
+    "WindowsAuthenticodeStatus": "NotSigned",
+    "Method": "Windows FileVersionInfo and Get-AuthenticodeSignature; no execution"
+  }
+}
