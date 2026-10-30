@@ -1,0 +1,92 @@
+name: Goal 56 fixed High Contrast comparison
+on:
+  push:
+    branches: [experiment/goal56-pr69-high-contrast-rca]
+    paths:
+      - .github/workflows/goal56-high-contrast-rca.yml
+      - scripts/native/diagnostics/goal56/**
+permissions:
+  contents: read
+jobs:
+  comparison:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        source: [baseline, candidate]
+        repetition: [1, 2]
+        include:
+          - source: baseline
+            revision: 86d60322f6f1f1dec06974bf5f9e1738a3bb80c7
+          - source: candidate
+            revision: c85a51118ac0f175cb21c79c3f7503ee1bc8ecd0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: protocol
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.revision }}
+          path: original
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.revision }}
+          path: diagnostic
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.403
+      - name: Capture exact source and environment identities
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory evidence | Out-Null
+          dotnet --info > evidence/dotnet-info.txt
+          Get-ComputerInfo -Property WindowsProductName,WindowsVersion,OsBuildNumber | ConvertTo-Json > evidence/windows.json
+          [ordered]@{ Source = '${{ matrix.source }}'; Repetition = '${{ matrix.repetition }}'; Revision = (git -C original rev-parse HEAD); Tree = (git -C original rev-parse 'HEAD^{tree}'); ImageOS = $env:ImageOS; ImageVersion = $env:ImageVersion; ProtocolRevision = '${{ github.sha }}' } | ConvertTo-Json > evidence/identity.json
+          git -C original status --porcelain=v1 > evidence/original-status.txt
+          Get-FileHash original/src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs,original/src/native/LensDocsStudio.Native.Validation/NativeTestHighContrast.cs,original/src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs,original/src/native/LensDocsStudio.Core/Mermaid/MermaidDiagramCatalogue.cs | ConvertTo-Json > evidence/fixture-hashes.json
+      - name: Build unchanged source
+        working-directory: original
+        run: |
+          dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore -warnaserror
+          exit $LASTEXITCODE
+      - name: Unchanged session checks
+        working-directory: original
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-creation-sessions ../evidence/sessions
+      - name: Unchanged High Contrast attempt
+        id: original
+        continue-on-error: true
+        working-directory: original
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-creation-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe ../evidence/original --high-contrast
+      - name: Add read-only diagnostics to independent validation copy
+        run: ./protocol/scripts/native/diagnostics/goal56/Add-CreationDiagnostics.ps1 -Source diagnostic
+      - name: Build diagnostic client and unchanged product
+        working-directory: diagnostic
+        run: |
+          dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore -warnaserror
+          exit $LASTEXITCODE
+      - name: Diagnostic High Contrast attempt
+        id: diagnostic
+        continue-on-error: true
+        working-directory: diagnostic
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-creation-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe ../evidence/diagnostic --high-contrast
+      - name: Retain harness differences and both outcomes
+        if: always()
+        shell: pwsh
+        run: |
+          git -C diagnostic diff > evidence/diagnostic.patch
+          [ordered]@{ Original = '${{ steps.original.outcome }}'; Diagnostic = '${{ steps.diagnostic.outcome }}' } | ConvertTo-Json > evidence/outcomes.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: goal56-hc-${{ matrix.source }}-${{ matrix.repetition }}
+          path: evidence/
+          retention-days: 30
+      - name: Preserve failure status
+        if: always()
+        run: |
+          if ('${{ steps.original.outcome }}' -ne 'success' -or '${{ steps.diagnostic.outcome }}' -ne 'success') { exit 1 }
