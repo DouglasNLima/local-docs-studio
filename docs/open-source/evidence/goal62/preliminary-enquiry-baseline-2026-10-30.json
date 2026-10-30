@@ -1,0 +1,444 @@
+{
+  "observedAt": "2026-10-30T08:26:07.974732+00:00",
+  "method": "Git fetch and authenticated GitHub GET only; direct public Pages HTTP GET",
+  "repository": {
+    "full_name": "DouglasNLima/local-docs-studio",
+    "visibility": "public",
+    "default_branch": "main",
+    "allow_auto_merge": false,
+    "allow_merge_commit": true,
+    "allow_squash_merge": false,
+    "allow_rebase_merge": false,
+    "delete_branch_on_merge": false
+  },
+  "branches": {
+    "develop": {
+      "sha": "327b35cbc016795edc35a2307c347434c09a3e9b",
+      "tree": "b62335d09043163bc6acc6128b46ac87f3effae1",
+      "protected": true
+    },
+    "main": {
+      "sha": "d9b903a504ace622abe99c7f4c34f5d15d331b7b",
+      "tree": "44df7c520e14ee0c55194e2d77c4db48c68a3e58",
+      "protected": true
+    }
+  },
+  "effectiveRules": {
+    "develop": [
+      {
+        "type": "deletion",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      },
+      {
+        "type": "non_fast_forward",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": true,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge"
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "Test static app",
+              "integration_id": 15368
+            },
+            {
+              "context": "OSS provenance",
+              "integration_id": 15368
+            },
+            {
+              "context": "native",
+              "integration_id": 15368
+            },
+            {
+              "context": "diagram-arrangement",
+              "integration_id": 15368
+            },
+            {
+              "context": "arrangement-responsiveness",
+              "integration_id": 15368
+            },
+            {
+              "context": "complex-er-preview",
+              "integration_id": 15368
+            },
+            {
+              "context": "state-installed-authoring",
+              "integration_id": 15368
+            },
+            {
+              "context": "er-installed-authoring",
+              "integration_id": 15368
+            },
+            {
+              "context": "class-installed-authoring",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Pie)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Mindmap)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Flowchart)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Gantt)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Sankey)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Sequence)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Quadrant)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Timeline)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Journey)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Xy)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Requirement)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Radar)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Block)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (C4)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Kanban)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Architecture)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (GitGraph)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (TreeView)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Packet)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Treemap)",
+              "integration_id": 15368
+            },
+            {
+              "context": "companion-installed-authoring (Venn)",
+              "integration_id": 15368
+            }
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127883
+      }
+    ],
+    "main": [
+      {
+        "type": "deletion",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      },
+      {
+        "type": "non_fast_forward",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": true,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge"
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "Test static app",
+              "integration_id": 15368
+            },
+            {
+              "context": "OSS provenance",
+              "integration_id": 15368
+            }
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "DouglasNLima/local-docs-studio",
+        "ruleset_id": 26127901
+      }
+    ]
+  },
+  "rulesets": {
+    "develop": {
+      "id": 26127883,
+      "enforcement": "active",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-10-29T14:07:07.885+00:00"
+    },
+    "main": {
+      "id": 26127901,
+      "enforcement": "active",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-10-29T14:07:23.827+00:00"
+    }
+  },
+  "pvr": {
+    "enabled": true
+  },
+  "pages": {
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/pages",
+    "status": null,
+    "cname": null,
+    "custom_404": false,
+    "html_url": "https://douglasnlima.github.io/local-docs-studio/",
+    "build_type": "workflow",
+    "source": {
+      "branch": "main",
+      "path": "/"
+    },
+    "public": true,
+    "protected_domain_state": null,
+    "pending_domain_unverified_at": null,
+    "https_enforced": true
+  },
+  "environments": [
+    "github-pages"
+  ],
+  "repositoryActionsSecretNameCount": 0,
+  "mfa": "UNVERIFIED",
+  "providerAccount": "Not independently inspected",
+  "releases": [
+    {
+      "id": 338956207,
+      "tag_name": "v0.1.0-dev.4",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-13T11:21:35Z"
+    },
+    {
+      "id": 338652856,
+      "tag_name": "v0.1.0-dev.3",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-12T15:14:36Z"
+    },
+    {
+      "id": 338530846,
+      "tag_name": "v0.1.0-dev.2",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-12T11:22:37Z"
+    },
+    {
+      "id": 338153041,
+      "tag_name": "v0.1.0-dev.1",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-11T18:18:59Z"
+    },
+    {
+      "id": 337351356,
+      "tag_name": "v0.1.0-dev",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-06-10T20:14:14Z"
+    }
+  ],
+  "tags": [
+    {
+      "name": "v0.1.0-dev.4",
+      "zipball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/zipball/refs/tags/v0.1.0-dev.4",
+      "tarball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/tarball/refs/tags/v0.1.0-dev.4",
+      "commit": {
+        "sha": "2555a7554e9e625af7e5d9da93725f77f4997ded",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/commits/2555a7554e9e625af7e5d9da93725f77f4997ded"
+      },
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi40"
+    },
+    {
+      "name": "v0.1.0-dev.3",
+      "zipball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/zipball/refs/tags/v0.1.0-dev.3",
+      "tarball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/tarball/refs/tags/v0.1.0-dev.3",
+      "commit": {
+        "sha": "1e8f15bf177046333cdc86076487cee74f647170",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/commits/1e8f15bf177046333cdc86076487cee74f647170"
+      },
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi4z"
+    },
+    {
+      "name": "v0.1.0-dev.2",
+      "zipball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/zipball/refs/tags/v0.1.0-dev.2",
+      "tarball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/tarball/refs/tags/v0.1.0-dev.2",
+      "commit": {
+        "sha": "5602358ef241c144fccae13e980c9eb2920126d8",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/commits/5602358ef241c144fccae13e980c9eb2920126d8"
+      },
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi4y"
+    },
+    {
+      "name": "v0.1.0-dev.1",
+      "zipball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/zipball/refs/tags/v0.1.0-dev.1",
+      "tarball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/tarball/refs/tags/v0.1.0-dev.1",
+      "commit": {
+        "sha": "c776fffdc8364c2c978f8106869a2d6bf50477ff",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/commits/c776fffdc8364c2c978f8106869a2d6bf50477ff"
+      },
+      "node_id": "REF_kwDOSmyM77ZyZWZzL3RhZ3MvdjAuMS4wLWRldi4x"
+    },
+    {
+      "name": "v0.1.0-dev",
+      "zipball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/zipball/refs/tags/v0.1.0-dev",
+      "tarball_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/tarball/refs/tags/v0.1.0-dev",
+      "commit": {
+        "sha": "8b215d039188af94d32857239e6829916f4b74fc",
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/commits/8b215d039188af94d32857239e6829916f4b74fc"
+      },
+      "node_id": "REF_kwDOSmyM77RyZWZzL3RhZ3MvdjAuMS4wLWRldg"
+    }
+  ],
+  "pausedPullRequests": {
+    "38": {
+      "state": "open",
+      "draft": true,
+      "headSha": "31fa3ad12f3e0c87f5e45cea6f97801af53b67cb",
+      "updatedAt": "2026-10-19T21:19:38Z"
+    },
+    "50": {
+      "state": "open",
+      "draft": true,
+      "headSha": "2fdfc4e4f2664a426428a388056f66940ad5f03a",
+      "updatedAt": "2026-10-26T19:24:28Z"
+    }
+  },
+  "livePages": [
+    {
+      "path": "docs/open-source/code-signing-policy.md",
+      "liveBytes": 4539,
+      "gitBytes": 4479,
+      "liveCRLF": 60,
+      "normalisedMatches": true,
+      "liveSHA256": "e856564671df33640e48f8e4fc6f12989bcf67a870495d3381afa4e8072cbc2d",
+      "gitSHA256": "cdeb59f7854313c45fb7911eeebeb1e1d703cd83b2544a5b28bc6009a8b87e0c"
+    },
+    {
+      "path": "docs/open-source/privacy.md",
+      "liveBytes": 5247,
+      "gitBytes": 5171,
+      "liveCRLF": 76,
+      "normalisedMatches": true,
+      "liveSHA256": "39d93d186fb727f375e40c6630c1e5d2a74563539e43816c294cb475d51077a8",
+      "gitSHA256": "3391b2d51aed48ee99b0c0109d93bb9522ff2651f31d1c1f35f71257bb34a5a7"
+    },
+    {
+      "path": "docs/open-source/downloads.md",
+      "liveBytes": 1993,
+      "gitBytes": 1961,
+      "liveCRLF": 32,
+      "normalisedMatches": true,
+      "liveSHA256": "804c1661e47b914553dae8444ab35fd71b3599b469cc6e5b2a41a76d099cfeac",
+      "gitSHA256": "4edaa83e63736bb1b2dbaf06e48294afab11d5890edbd0cb8c45b8f04048c300"
+    },
+    {
+      "path": "LICENSING.md",
+      "liveBytes": 3620,
+      "gitBytes": 3574,
+      "liveCRLF": 46,
+      "normalisedMatches": true,
+      "liveSHA256": "2036bf709a3488fc780b48828b3e1d0aea22ae3831ae563de3f1f215d66f009a",
+      "gitSHA256": "83b6cd7934c3518535153acec56c1c4548b3c69d66926a7b138a2e148dc6a2a9"
+    },
+    {
+      "path": "SECURITY.md",
+      "liveBytes": 3129,
+      "gitBytes": 3081,
+      "liveCRLF": 48,
+      "normalisedMatches": true,
+      "liveSHA256": "ef8ff42999da033a2a8b4f491a78cef873b8be0d79dd90a394c2604b3c6bf57c",
+      "gitSHA256": "79ea7ec7efc687bca2b79cd10f33eeeb7949d613501eb6684dce788f6ea75e87"
+    },
+    {
+      "path": "service-worker.js",
+      "liveBytes": 7007,
+      "gitBytes": 6820,
+      "liveCRLF": 187,
+      "normalisedMatches": true,
+      "liveSHA256": "908f1001e1881de5ab7f98ae8ddaa142d3847af92e260bae9bc2d55143ebc3ed",
+      "gitSHA256": "8d32b9fd8c67b5d2ffa40b7ebcf9f87c40df35212e58945eed67184f37960bb4"
+    }
+  ]
+}

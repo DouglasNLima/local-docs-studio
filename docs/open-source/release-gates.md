@@ -8,7 +8,7 @@ The issue stays open. Existing unsigned internal-preview CI remains separate.
 |---|---|---|
 | Immutable source/dependency inventory | IMPLEMENTED / TESTED | Baseline source evidence only; ownership and remaining bundle provenance BLOCKED |
 | Native notice retention | IMPLEMENTED / TESTED | New candidate package inspection required; historical omissions remain recorded |
-| Community/security/licence policies | Scoped first-party MIT adopted on develop; production solo-maintainer protections ACTIVE AND VERIFIED; PVR enabled | External reporting flow UNVERIFIED; main licence/security promotion and Pages publication verified via #65; new policy publication remains a separate decision; see [current controls and receipts](governance-settings.md) |
+| Community/security/licence policies | Scoped first-party MIT adopted; production solo-maintainer protections ACTIVE AND VERIFIED; PVR enabled | External reporting flow UNVERIFIED; main licence/security publication via #65 and signing/privacy/download publication via #67 verified. Installer privacy controls remain BLOCKED; see [current review](signpath-preliminary-review-2026-10-30.md) |
 | SignPath eligibility/governance | Matrix and adapter plan IMPLEMENTED | Acceptance, role/MFA verification, released native distribution and actual CI integration BLOCKED |
 | Native manifest/channel controls | IMPLEMENTED / TESTED with ephemeral keys and inert bytes | No production identity or Windows signing certification |
 | Planned manifest rollover / RC precedence | TESTED in Core | Real certificate rollover, overlap and emergency recovery BLOCKED |
@@ -27,5 +27,6 @@ Technical distribution readiness: **NO-GO**. Audit/signing-design review: **READ
 FOR REVIEW with recorded findings**. SignPath eligibility: **NOT ESTABLISHED**.
 Production publication: **NOT AUTHORISED**. Scoped first-party MIT is operative
 on develop at `709564dda30a57cf1e98ba07566f510c1636e05c`; main's target-specific licence/security promotion and Pages publication were verified via #65.
-New signing/privacy policy publication remains a separate owner decision. No production trust pins,
+Signing/privacy/download guidance was published via #67 and Pages run 40978852428
+attempt 2; future changes/publication still need appropriate authority. No production trust pins,
 signing request, tag, release, account application or merge occurs in this phase.
