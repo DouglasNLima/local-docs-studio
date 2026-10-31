@@ -1,0 +1,25 @@
+name: Goal 56 diagnostic inventory validation
+on:
+  push:
+    branches: [fix/goal56-diagnostic-inventory]
+    paths:
+      - .github/workflows/goal56-inventory-validation.yml
+      - scripts/native/diagnostics/goal56-save-uia/Run-Comparison.ps1
+      - scripts/native/diagnostics/goal56-save-uia/Test-Inventory.ps1
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify actual inventory function with disposable files
+        shell: pwsh
+        run: ./scripts/native/diagnostics/goal56-save-uia/Test-Inventory.ps1 -Output evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: goal56-inventory-validation
+          path: evidence/
+          retention-days: 30

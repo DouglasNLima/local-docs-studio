@@ -7,11 +7,21 @@ $original = Join-Path $PWD original
 $diagnostic = Join-Path $PWD diagnostic
 $outcomes = [ordered]@{}
 function Write-Inventory([string]$Directory) {
+    $Directory = (Resolve-Path -LiteralPath $Directory -ErrorAction Stop).Path
     $manifest = Join-Path $Directory 'file-hashes.json'
-    $rows = @(Get-ChildItem -LiteralPath $Directory -Recurse -File |
-        Where-Object FullName -ne $manifest | Sort-Object FullName | Get-FileHash |
-        Select-Object Algorithm,Hash,@{N='File';E={[IO.Path]::GetRelativePath($Directory, $_.Path)}})
-    $rows | ConvertTo-Json | Set-Content -LiteralPath $manifest
+    # Finish enumeration and every read before opening the destination, including on repeat runs.
+    [string[]]$paths = @(Get-ChildItem -LiteralPath $Directory -Recurse -File -Force -ErrorAction Stop |
+        Where-Object { -not [StringComparer]::OrdinalIgnoreCase.Equals($_.FullName, $manifest) } |
+        ForEach-Object FullName)
+    [Array]::Sort($paths, [StringComparer]::Ordinal)
+    $rows = @(foreach ($path in $paths) {
+        $inputFile = [IO.File]::Open($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+        try {
+            [ordered]@{ Algorithm = 'SHA256'; Hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($inputFile));
+                File = [IO.Path]::GetRelativePath($Directory, $path); Length = $inputFile.Length }
+        } finally { $inputFile.Dispose() }
+    })
+    ConvertTo-Json -InputObject $rows | Set-Content -LiteralPath $manifest -Encoding utf8NoBOM -ErrorAction Stop
 }
 function Run([string]$Name, [string]$Directory, [scriptblock]$Action) {
     Push-Location -LiteralPath $Directory
