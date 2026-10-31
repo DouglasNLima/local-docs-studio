@@ -12,6 +12,11 @@ internal static class MermaidCreationSessionChecks
     public static void Run(string output)
     {
         Directory.CreateDirectory(output); var checks = new List<string>();
+        foreach (var (remaining, expected) in new[] { (-1d, -1d), (0d, -1d), (49.999d, -1d), (50d, 50d), (50.999d, 50d), (3001d, 3000d) })
+        {
+            var timeout = NativeUiChecks.EditorSaveReadiness.ProviderTimeout(TimeSpan.FromMilliseconds(remaining));
+            Check((timeout?.TotalMilliseconds ?? -1) == expected, "Save readiness provider timeout respects supported whole milliseconds and the remaining deadline: " + remaining);
+        }
         foreach (var definition in MermaidDiagramCatalogue.All)
         foreach (var variant in definition.Variants)
         foreach (var original in new[] { "", "Before Ω😀\nAfter", "\uFEFFBefore\r\nAfter\r\n", "```mermaid\nflowchart TD\n```\n\nAfter" })

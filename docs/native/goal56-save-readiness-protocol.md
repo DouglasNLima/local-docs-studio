@@ -19,10 +19,11 @@ the state of the original failed SetValue call.
   `b7b4774a05428e279f1c5b96c957fa4b5cd020ee`; its workflow runs only synthetic
   inventory files. Historical run `41091786808` remains FAILURE.
 
-One comparison workflow, two fresh windows-latest jobs, no repetitions or blind
+Initial comparison: one workflow, two fresh windows-latest jobs, no blind
 reruns. Pin SDK 10.0.403 and capture actual image, OS, CPU, SDK/runtime, source
-commit/tree, harness commit/tree, patch and helper hashes. Copy the same two
-validation files into clean copies of both sources. No product change in ordinary
+commit/tree, harness commit/tree, patch and helper hashes. Initially copy the same
+two validation files into clean copies of both sources; the corrective amendment
+below adds a third file. No product change in ordinary
 Creation runs. Run sessions and actual High Contrast once per source; candidate
 also runs Light and Dark once. Build separate diagnostic copies for released and
 never-completing controls, one of each per source, with actual High Contrast.
@@ -53,6 +54,39 @@ editor replacement or application API is introduced by readiness. Every original
 SetValue site still forwards exactly once and is counted. Per-Save receipts retain
 first observed matching disk state, final postconditions, deadline and failures.
 Sequential UIA observations are not an atomic snapshot or a global-idleness proof.
+
+## Corrective verification amendment — fixed before its hosted execution
+
+Initial harness `a504eebe3dd6144bbc69929fc12a5c1d2afe62d2`, tree
+`0a9592ac51d8b9ad1c70db0e3f21cf2c1f76ba85`, ran once in
+[41179427126](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41179427126).
+It remains FAILURE. Baseline passed all eight stages; candidate passed ordinary
+High Contrast/Light/Dark and the released control, but its never-completing control
+failed with ArgumentException from UIA TransactionTimeout at 19,995.0805 ms.
+The client attempted to set a provider timeout below the supported range near
+the unchanged deadline. This is an evidenced harness defect requiring correction,
+not a product fault or a reason to rerun unchanged source.
+
+The corrected helper uses whole-millisecond provider limits of at least 50 ms.
+If less than 50 ms remains it makes no provider request, records an incomplete
+observation and returns false to the existing shared Wait. That Wait expires at
+its original 20 seconds. No UIA exception is caught or relabelled. Six pure boundary
+checks cover negative/zero, 49.999, 50, 50.999 and 3001 ms; the existing 1,481
+session checks remain, giving 1,487 total. The session test file is the third
+equivalent validation overlay; product source remains unchanged.
+
+Exactly one new corrected comparison is justified by this concrete code defect:
+the same two sources and stage counts, one attempt each, no repetition matrix or
+blind rerun. Retain both original archives, failed negative receipt and successful
+stage evidence. New successes cannot relabel the first workflow. Normal final-head
+PR CI runs separately after the correction.
+
+Required OSS validation also exposed omitted source bookkeeping. Regenerate only
+the rights ledger (new paths remain BLOCKED) and add exact historical/current
+digest pairs for the two authorised, independently reviewed validation files in
+the existing integrity validator. Keep frozen historical evidence, the 1,081-path
+grant allowlist and every other notice/trust/performance invariant unchanged.
+Retain the initial failed OSS workflow and report this maintenance explicitly.
 
 ## Deterministic controls
 

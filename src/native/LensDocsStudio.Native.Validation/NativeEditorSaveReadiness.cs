@@ -22,8 +22,17 @@ internal static partial class NativeUiChecks
         private readonly string evidence;
         private object? firstDiskReady, last;
         private int observations;
+        private bool observationBudgetExhausted;
         private Stopwatch? clock;
         private static readonly TimeSpan budget = TimeSpan.FromSeconds(20);
+
+        internal static TimeSpan? ProviderTimeout(TimeSpan remaining)
+        {
+            // UIA rejects transaction timeouts below 50 ms. Never round up past the
+            // remaining deadline: leave the existing Wait to finish its bounded wait.
+            var milliseconds = Math.Floor(Math.Min(remaining.TotalMilliseconds, 3000));
+            return milliseconds >= 50 ? TimeSpan.FromMilliseconds(milliseconds) : null;
+        }
 
         internal EditorSaveReadiness(Window window, AutomationElement editor, int processId, string path, string expected, string evidence)
         {
@@ -41,22 +50,27 @@ internal static partial class NativeUiChecks
             hwnd = window.Properties.NativeWindowHandle.Value;
             windowId = window.FrameworkAutomationElement.RuntimeId.Value.ToArray();
             editorId = editor.FrameworkAutomationElement.RuntimeId.Value.ToArray(); tabId = tab.FrameworkAutomationElement.RuntimeId.Value.ToArray();
-            VerifyIdentity();
+            if (!VerifyIdentity()) throw new InvalidOperationException("Save readiness could not capture source identity.");
             if (!editor.Patterns.Value.IsSupported || editor.Patterns.Value.Pattern.Value.Value != expected)
                 throw new InvalidOperationException("Save readiness captured an unexpected editor source.");
         }
 
         internal bool Observe()
         {
-            VerifyIdentity();
+            if (!VerifyIdentity()) return false;
             var diskMatches = ReadBytes().SequenceEqual(bytes);
-            var enabled = Provider(() => editor.IsEnabled);
-            var valueSupported = Provider(() => editor.Patterns.Value.IsSupported);
-            var value = valueSupported ? Provider(() => editor.Patterns.Value.Pattern) : null;
-            bool? readOnly = value is not null ? Provider(() => value.IsReadOnly.Value) : null;
-            var sourceMatches = value is not null && Provider(() => value.Value.Value) == expected;
-            var saveEnabled = Provider(() => save.IsEnabled);
-            var savedStatus = Provider(() => status.Name) == "Saved " + Path.GetFileName(path);
+            if (!Provider(() => editor.IsEnabled, out var enabled)
+                || !Provider(() => editor.Patterns.Value.IsSupported, out var valueSupported)) return false;
+            bool? readOnly = null; var sourceMatches = false;
+            if (valueSupported)
+            {
+                if (!Provider(() => editor.Patterns.Value.Pattern, out var value)
+                    || !Provider(() => value.IsReadOnly.Value, out var actualReadOnly)
+                    || !Provider(() => value.Value.Value, out var source)) return false;
+                readOnly = actualReadOnly; sourceMatches = source == expected;
+            }
+            if (!Provider(() => save.IsEnabled, out var saveEnabled) || !Provider(() => status.Name, out var saved)) return false;
+            var savedStatus = saved == "Saved " + Path.GetFileName(path);
             last = new { Utc = DateTimeOffset.UtcNow, DiskMatches = diskMatches, Enabled = enabled,
                 ValuePattern = valueSupported, ReadOnly = readOnly, SourceMatches = sourceMatches,
                 SaveCommandEnabled = saveEnabled, SavedStatus = savedStatus, Pid = pid, Hwnd = hwnd.ToInt64(),
@@ -82,7 +96,8 @@ internal static partial class NativeUiChecks
                 automation.TransactionTimeout = transactionTimeout; automation.ConnectionTimeout = connectionTimeout;
                 File.WriteAllText(evidence, JsonSerializer.Serialize(new { Status = error is null ? "PASS" : "FAIL",
                     DeadlineMilliseconds = 20000, ElapsedMilliseconds = elapsed, Observations = observations,
-                    FirstDiskReady = firstDiskReady, Last = last, Error = error }, new JsonSerializerOptions { WriteIndented = true }));
+                    FirstDiskReady = firstDiskReady, Last = last, ObservationBudgetExhausted = observationBudgetExhausted,
+                    Error = error }, new JsonSerializerOptions { WriteIndented = true }));
             }
         }
 
@@ -93,32 +108,40 @@ internal static partial class NativeUiChecks
         }
         private AutomationElement Required(string id) => window.FindFirstDescendant(cf => cf.ByAutomationId(id))
             ?? throw new InvalidOperationException("Save readiness control unavailable: " + id);
-        private T Provider<T>(Func<T> read)
+        private bool Provider<T>(Func<T> read, out T value)
         {
             if (clock is not null)
             {
-                var remaining = budget - clock.Elapsed;
-                if (remaining <= TimeSpan.Zero) throw new InvalidOperationException("Save readiness failed: the original deadline expired.");
-                var limit = remaining < TimeSpan.FromSeconds(3) ? remaining : TimeSpan.FromSeconds(3);
-                editor.Automation.TransactionTimeout = limit; editor.Automation.ConnectionTimeout = limit;
+                var limit = ProviderTimeout(budget - clock.Elapsed);
+                if (limit is null) { observationBudgetExhausted = true; value = default!; return false; }
+                editor.Automation.TransactionTimeout = limit.Value; editor.Automation.ConnectionTimeout = limit.Value;
             }
-            return read();
+            value = read(); return true;
         }
-        private void VerifyIdentity()
+        private bool VerifyIdentity()
         {
-            if (Provider(() => window.Properties.ProcessId.Value) != pid || Provider(() => editor.Properties.ProcessId.Value) != pid
-                || Provider(() => window.Properties.NativeWindowHandle.Value) != hwnd
-                || !Provider(() => window.FrameworkAutomationElement.RuntimeId.Value).SequenceEqual(windowId)
-                || !Provider(() => editor.FrameworkAutomationElement.RuntimeId.Value).SequenceEqual(editorId)
-                || !Provider(() => tab.FrameworkAutomationElement.RuntimeId.Value).SequenceEqual(tabId)
-                || !Provider(() => tab.Patterns.SelectionItem.Pattern.IsSelected.Value)
-                || !string.Equals(Provider(() => location.Properties.HelpText.Value), path, StringComparison.OrdinalIgnoreCase)
-                || !string.Equals(Provider(() => tab.Properties.HelpText.Value), path, StringComparison.OrdinalIgnoreCase))
+            if (!Provider(() => window.Properties.ProcessId.Value, out var windowPid)
+                || !Provider(() => editor.Properties.ProcessId.Value, out var editorPid)
+                || !Provider(() => window.Properties.NativeWindowHandle.Value, out var currentHwnd)
+                || !Provider(() => window.FrameworkAutomationElement.RuntimeId.Value, out var currentWindowId)
+                || !Provider(() => editor.FrameworkAutomationElement.RuntimeId.Value, out var currentEditorId)
+                || !Provider(() => tab.FrameworkAutomationElement.RuntimeId.Value, out var currentTabId)
+                || !Provider(() => tab.Patterns.SelectionItem.Pattern.IsSelected.Value, out var selected)
+                || !Provider(() => location.Properties.HelpText.Value, out var locationPath)
+                || !Provider(() => tab.Properties.HelpText.Value, out var tabPath)) return false;
+            if (windowPid != pid || editorPid != pid || currentHwnd != hwnd
+                || !currentWindowId.SequenceEqual(windowId) || !currentEditorId.SequenceEqual(editorId) || !currentTabId.SequenceEqual(tabId)
+                || !selected || !string.Equals(locationPath, path, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(tabPath, path, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("Save readiness lost the original application, window, editor or source identity.");
             var walker = editor.Automation.TreeWalkerFactory.GetRawViewWalker();
             AutomationElement? ancestor = editor;
-            for (var depth = 0; ancestor is not null && depth < 32; depth++, ancestor = Provider(() => walker.GetParent(ancestor)))
-                if (Provider(() => ancestor.FrameworkAutomationElement.RuntimeId.Value).SequenceEqual(windowId)) return;
+            for (var depth = 0; ancestor is not null && depth < 32; depth++)
+            {
+                if (!Provider(() => ancestor.FrameworkAutomationElement.RuntimeId.Value, out var ancestorId)) return false;
+                if (ancestorId.SequenceEqual(windowId)) return true;
+                if (!Provider(() => walker.GetParent(ancestor), out ancestor)) return false;
+            }
             throw new InvalidOperationException("Save readiness editor is no longer owned by its original window.");
         }
     }

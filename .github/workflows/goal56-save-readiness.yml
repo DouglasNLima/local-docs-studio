@@ -6,6 +6,7 @@ on:
       - .github/workflows/goal56-save-readiness.yml
       - scripts/native/diagnostics/goal56-readiness/**
       - src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs
+      - src/native/LensDocsStudio.Native.Validation/MermaidCreationSessionChecks.cs
       - src/native/LensDocsStudio.Native.Validation/NativeEditorSaveReadiness.cs
 permissions:
   contents: read

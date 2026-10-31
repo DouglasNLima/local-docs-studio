@@ -27,12 +27,12 @@ $identity | ConvertTo-Json > (Join-Path $evidence identity.json)
 if ($identity.Revision -ne $Revision -or (git -C $diagnostic rev-parse HEAD) -ne $Revision) { throw 'Exact product source identity mismatch.' }
 foreach ($copy in @($source, $diagnostic)) {
     if (git -C $copy status --porcelain=v1) { throw 'Comparison source was not clean before the equivalent harness overlay.' }
-    foreach ($file in @('MermaidCreationUiChecks.cs','NativeEditorSaveReadiness.cs')) {
+    foreach ($file in @('MermaidCreationUiChecks.cs','NativeEditorSaveReadiness.cs','MermaidCreationSessionChecks.cs')) {
         Copy-Item -LiteralPath (Join-Path $protocol "src/native/LensDocsStudio.Native.Validation/$file") -Destination (Join-Path $copy "src/native/LensDocsStudio.Native.Validation/$file")
     }
-    if (@(git -C $copy diff --name-only | Where-Object { $_ -ne 'src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs' }).Count) { throw 'Unexpected product change in harness overlay.' }
+    if (@(git -C $copy diff --name-only | Where-Object { $_ -notin @('src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs','src/native/LensDocsStudio.Native.Validation/MermaidCreationSessionChecks.cs') }).Count) { throw 'Unexpected product change in harness overlay.' }
 }
-Get-FileHash -LiteralPath (Join-Path $source src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs),(Join-Path $source src/native/LensDocsStudio.Native.Validation/NativeEditorSaveReadiness.cs) | ConvertTo-Json > (Join-Path $evidence harness-files.json)
+Get-FileHash -LiteralPath (Join-Path $source src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs),(Join-Path $source src/native/LensDocsStudio.Native.Validation/NativeEditorSaveReadiness.cs),(Join-Path $source src/native/LensDocsStudio.Native.Validation/MermaidCreationSessionChecks.cs) | ConvertTo-Json > (Join-Path $evidence harness-files.json)
 git -C $source diff > (Join-Path $evidence harness.patch)
 Run restore $source { dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode }
 if ($outcomes.restore -eq 0) { Run build $source { dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore -warnaserror } }
