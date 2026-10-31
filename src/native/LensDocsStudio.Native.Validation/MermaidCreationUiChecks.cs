@@ -25,7 +25,7 @@ internal static partial class NativeUiChecks
         var path = Path.Combine(root, "creation.md"); const string original = "# Mermaid creation Ω😀\r\n\r\nKeep selected text intact.\r\n";
         File.WriteAllText(path, original); var checks = new List<string>(); var phases = new List<object>();
         Application? app = null; Window? main = null, picker = null, visual = null; var standaloneLaunch = 1;
-        var captures = new List<object>();
+        var captures = new List<object>(); var saveOrdinal = 0; var setValueCalls = 0;
         try
         {
             if (highContrast) Check(NativeTestHighContrast.IsEnabledNow, "Actual OS High Contrast enabled on disposable Windows");
@@ -86,7 +86,7 @@ internal static partial class NativeUiChecks
             foreach (var definition in MermaidDiagramCatalogue.All)
             foreach (var variant in definition.Variants)
             {
-                owner.Patterns.Value.Pattern.SetValue(original); FocusWindow(main); owner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+                SetOwnerValue(owner, original); FocusWindow(main); owner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
                 OpenPicker(); Choose(definition, variant);
                 foreach (var (width, height) in new[] { (880, 600), (1280, 800) })
                 {
@@ -122,33 +122,36 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(owner) == original, "One Undo did not restore exact owner.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
                 Wait(() => ReadEditorText(owner) == expected, "Redo did not restore exact insertion.");
+                var savedOwner = SaveReadiness(owner, path, expected);
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-                Wait(() => ReadObservedText(path) == expected, "Ordinary Save did not persist exact source.");
+                savedOwner.Await();
                 Check(true, definition.Name + "/" + variant.Id + " Apply, one Undo, Redo and explicit Save");
 
                 // Select the second of two identical source bodies. The toolbar must edit that occurrence.
                 var block = MermaidBlockSource.Find(new MarkdownService().Parse(expected)).Single();
                 var duplicate = expected + "\r\n" + expected[block.Container.Start..block.Container.End];
-                owner.Patterns.Value.Pattern.SetValue(duplicate); owner.Focus();
+                SetOwnerValue(owner, duplicate); owner.Focus();
                 var range = owner.Patterns.Text.Pattern.DocumentRange.FindText(draft.TrimEnd('\r', '\n'), true, false);
                 range.Select(); Find(main, "MermaidCreation").AsButton().Invoke(); visual = WaitWindow(prefix + "VisualEditor");
                 Check(Draft(definition.Family).TrimEnd('\r', '\n') == draft.TrimEnd('\r', '\n'), "Contextual toolbar preserves second duplicate " + definition.Name + " source");
                 Find(visual, prefix + "Cancel").AsButton().Invoke(); WaitGone(prefix + "VisualEditor"); visual = null;
                 Check(ReadEditorText(owner) == duplicate, "Contextual Cancel leaves both occurrences unchanged");
-                owner.Patterns.Value.Pattern.SetValue(original); FocusWindow(main); owner.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-                Wait(() => ReadObservedText(path) == original, "Fixture reset Save failed.");
+                SetOwnerValue(owner, original); FocusWindow(main); owner.Focus();
+                var resetOwner = SaveReadiness(owner, path, original);
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+                resetOwner.Await();
                 phases.Add(new { Family = definition.Id, Variant = variant.Id, Editor = prefix + "VisualEditor", Status = "PASS" });
             }
             foreach (var (source, selection) in new[] { ("```csharp\ncode\n```\n", "code"), ("```mermaid\nC4Deployment\n```\n", "C4Deployment"), ("```mermaid\nflowchart TD\n", "flowchart"), ("```mermaid\nflowchart TD\n```\n", "```mermaid"), ("- List item\n    ```mermaid\n    flowchart TD\n    ```\n", "flowchart TD") })
             {
-                owner.Patterns.Value.Pattern.SetValue(source); FocusWindow(main); owner.Focus();
+                SetOwnerValue(owner, source); FocusWindow(main); owner.Focus();
                 owner.Patterns.Text.Pattern.DocumentRange.FindText(selection, false, false).Select();
                 Find(main, "MermaidCreation").AsButton().Invoke();
                 Wait(() => Find(main, "Status").Name.Contains("source", StringComparison.OrdinalIgnoreCase), "Protected boundary has no actionable source feedback.");
                 Check(ReadEditorText(owner) == source && WindowNow("MermaidDiagramPicker") is null, "Protected/ordinary/unclosed fence does not open a new starter");
             }
             // The established source command is still invokable from the same toolbar.
-            owner.Patterns.Value.Pattern.SetValue(""); FocusWindow(main); owner.Focus();
+            SetOwnerValue(owner, ""); FocusWindow(main); owner.Focus();
             Find(main, "MermaidCreationActions").AsButton().Invoke();
             AutomationElement? raw = null;
             Wait(() => (raw = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("Formatmermaid")))) is not null, "Legacy Formatmermaid action missing.");
@@ -169,15 +172,16 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(owner) == "", "Standalone Apply is not one Undo.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
                 Wait(() => ReadEditorText(owner) == pieSource, "Standalone Redo differs.");
+                var standaloneOwner = SaveReadiness(owner, fixture, pieSource);
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-                Wait(() => ReadObservedText(fixture) == pieSource, "Standalone Save differs.");
+                standaloneOwner.Await();
                 LaunchStandalone(fixture); owner = Find(main!, "MarkdownEditor");
                 Check(ReadEditorText(owner) == pieSource, "Saved standalone reopens exactly " + extension);
                 Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertC4").AsMenuItem().Invoke();
                 visual = WaitWindow("PieVisualEditor");
                 Check(Draft(MermaidDiagramFamily.Pie) == pieSource, "Choosing C4 cannot replace a nonempty standalone Pie");
                 Wait(() => Find(visual!, "PieApply").IsEnabled, "Existing standalone did not validate.");
-                FocusWindow(main!); owner.Patterns.Value.Pattern.SetValue("external standalone source\n"); FocusWindow(visual!);
+                FocusWindow(main!); SetOwnerValue(owner, "external standalone source\n"); FocusWindow(visual!);
                 Find(visual!, "PieApply").AsButton().Invoke();
                 Wait(() => Find(visual!, "PieStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Captured stale standalone owner was not rejected.");
                 Check(Draft(MermaidDiagramFamily.Pie) == pieSource && ReadEditorText(owner) == "external standalone source\n" && File.ReadAllText(fixture) == pieSource,
@@ -186,7 +190,7 @@ internal static partial class NativeUiChecks
                 Find(main!, "MermaidCreation").AsButton().Invoke();
                 Wait(() => Find(main!, "Status").Name.Contains("source-only", StringComparison.Ordinal), "Unsupported standalone did not offer source inspection.");
                 Check(WindowNow("MermaidDiagramPicker") is null && ReadEditorText(owner) == "external standalone source\n", "Unsupported standalone is never replaced by a starter");
-                owner.Patterns.Value.Pattern.SetValue(""); OpenPicker(); Find(picker!, "MermaidPickerCode").AsButton().Invoke(); WaitGone("MermaidDiagramPicker"); picker = null;
+                SetOwnerValue(owner, ""); OpenPicker(); Find(picker!, "MermaidPickerCode").AsButton().Invoke(); WaitGone("MermaidDiagramPicker"); picker = null;
                 Wait(() => ReadEditorText(owner) == "flowchart TD\n", "Standalone source alternative must stay raw Mermaid.");
                 Check(true, "Standalone source alternative retains raw format " + extension);
             }
@@ -199,6 +203,9 @@ internal static partial class NativeUiChecks
         }
         finally { if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); } }
 
+        void SetOwnerValue(AutomationElement owner, string text) { setValueCalls++; owner.Patterns.Value.Pattern.SetValue(text); }
+        EditorSaveReadiness SaveReadiness(AutomationElement owner, string source, string expected) => new(main!, owner, app!.ProcessId,
+            source, expected, Path.Combine(output, $"save-readiness-{++saveOrdinal:D3}.json"));
         Window? WindowNow(string id) => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(id)))?.AsWindow();
         Window WaitWindow(string id) { Window? result = null; Wait(() => (result = WindowNow(id)) is not null, "Missing owned window " + id); return result!; }
         void WaitGone(string id) => Wait(() => WindowNow(id) is null, "Window did not close: " + id);
@@ -311,7 +318,8 @@ internal static partial class NativeUiChecks
         void Receipt(string status, string? error) => File.WriteAllText(Path.Combine(output, "creation-ui.json"), JsonSerializer.Serialize(new
         {
             Status = status, SourceRevision = typeof(MermaidDiagramPickerWindow).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion,
-            HighContrast = highContrast, Dark = dark, Checks = checks, Phases = phases, Captures = captures, Error = error
+            HighContrast = highContrast, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Dark = dark,
+            SaveReadinessChecks = saveOrdinal, SetValueCalls = setValueCalls, Checks = checks, Phases = phases, Captures = captures, Error = error
         }, new JsonSerializerOptions { WriteIndented = true }));
     }).GetAwaiter().GetResult();
 

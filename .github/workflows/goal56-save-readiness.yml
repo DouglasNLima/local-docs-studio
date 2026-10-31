@@ -1,0 +1,52 @@
+name: Goal 56 bounded Save readiness comparison
+on:
+  push:
+    branches: [fix/goal56-mermaid-creation-save-readiness]
+    paths:
+      - .github/workflows/goal56-save-readiness.yml
+      - scripts/native/diagnostics/goal56-readiness/**
+      - src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs
+      - src/native/LensDocsStudio.Native.Validation/MermaidCreationSessionChecks.cs
+      - src/native/LensDocsStudio.Native.Validation/NativeEditorSaveReadiness.cs
+permissions:
+  contents: read
+jobs:
+  comparison:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source: baseline
+            revision: 86d60322f6f1f1dec06974bf5f9e1738a3bb80c7
+          - source: candidate
+            revision: c85a51118ac0f175cb21c79c3f7503ee1bc8ecd0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: protocol
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.revision }}
+          path: source
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.revision }}
+          path: diagnostic
+      - uses: actions/checkout@v4
+        with:
+          ref: b7b4774a05428e279f1c5b96c957fa4b5cd020ee
+          path: inventory-protocol
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.403
+      - name: Execute the fixed protocol once per exact product source
+        shell: pwsh
+        run: ./protocol/scripts/native/diagnostics/goal56-readiness/Run-ReadinessComparison.ps1 -SourceName '${{ matrix.source }}' -Revision '${{ matrix.revision }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: goal56-save-readiness-${{ matrix.source }}
+          path: evidence/
+          retention-days: 30

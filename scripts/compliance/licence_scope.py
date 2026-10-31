@@ -61,12 +61,20 @@ def main():
         require(token in disclosure, 'Scope disclosure omitted ' + token)
     invariants = json.loads((ROOT / 'docs/open-source/evidence/goal62/preserved-files.json')
                            .read_text(encoding='utf-8'))
-    # Goal #62's authorised current-policy refresh supersedes only these historical
-    # policy digests (signing/privacy refreshed after verified #67 publication).
+    # Authorised current-policy and Goal #56 validation-source refreshes supersede
+    # only these exact historical digests; signing/privacy follows verified #67.
     # Keep the frozen evidence and all notice/trust/performance
     # invariants intact; any other change still fails validation.
     preserved = dict(invariants['sha256'])
     policy_refresh = {
+        # Goal #56 authorises this exact independently reviewed validation correction.
+        # Keep the historical evidence and every other trust/performance digest frozen.
+        'src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs': (
+            '1154b7eaf1b61aaea7c272b560173dc06a304189d8d43840954bf4bca2de7ed5',
+            '88f54cdd8a3d706cc837527df199eb7078f64fec0f23740f9d505a013d6802d1'),
+        'src/native/LensDocsStudio.Native.Validation/MermaidCreationSessionChecks.cs': (
+            'add5a2b8a04a354848c58f6f1826ef27a3ca83635445ef24503d83a7066147bc',
+            '7dfa51726c6ca561f2e121cbeca8a71619b9de517a6c26cb26d3550ffe5a7e78'),
         'SECURITY.md': (
             'c9ee2727aba092d930435e02d0d2091b541fe486be0d50ff22709a587c2d4f3d',
             '425de96d2be0ebeb288ade4f7fa84e089cbff437bd1de603f356196015de1c6a'),
