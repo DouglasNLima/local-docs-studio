@@ -1,0 +1,45 @@
+name: Goal 56 bounded preview loading comparison
+on:
+  push:
+    branches: [experiment/goal56-preview-loading-lifecycle]
+    paths:
+      - .github/workflows/goal56-preview-loading.yml
+      - scripts/native/diagnostics/goal56-preview/**
+permissions:
+  contents: read
+jobs:
+  comparison:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source: baseline
+            revision: 86d60322f6f1f1dec06974bf5f9e1738a3bb80c7
+          - source: candidate
+            revision: 460be40d42c1c7248249e4b10a677078db474baa
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: protocol
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.revision }}
+          path: source
+      - uses: actions/checkout@v4
+        with:
+          ref: b7b4774a05428e279f1c5b96c957fa4b5cd020ee
+          path: inventory-protocol
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.403
+      - name: Execute one fixed comparison per exact product source
+        shell: pwsh
+        run: ./protocol/scripts/native/diagnostics/goal56-preview/Run-PreviewComparison.ps1 -SourceName '${{ matrix.source }}' -Revision '${{ matrix.revision }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: goal56-preview-loading-${{ matrix.source }}
+          path: evidence/
+          retention-days: 30
