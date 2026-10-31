@@ -39,8 +39,10 @@ try {
     & (Join-Path $PSScriptRoot 'Apply-PreviewOverlay.ps1') -SourceRoot $source -Evidence $evidence
     $changed = @(git -C $source diff --name-only)
     if ($changed.Count -ne 1 -or $changed[0] -ne 'src/native/LensDocsStudio.Native.Validation/NativePreviewLoadingChecks.cs') { throw 'Unexpected tracked change in validation overlay.' }
-    git -C $source diff -- src/native/LensDocsStudio.Core src/native/LensDocsStudio.Native | Set-Content (Join-Path $evidence 'product-source.diff')
-    if ((Get-Item (Join-Path $evidence 'product-source.diff')).Length -ne 0) { throw 'Product source changed.' }
+    $productDiff = git -C $source diff -- src/native/LensDocsStudio.Core src/native/LensDocsStudio.Native | Out-String
+    if ($LASTEXITCODE -ne 0) { throw 'Product source comparison failed.' }
+    [IO.File]::WriteAllText((Join-Path $evidence 'product-source.diff'), $productDiff)
+    if ($productDiff.Length -ne 0) { throw 'Product source changed.' }
     Run build { dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true -warnaserror }
     if ($outcomes.build -eq 0) {
         $client = Join-Path $source 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'

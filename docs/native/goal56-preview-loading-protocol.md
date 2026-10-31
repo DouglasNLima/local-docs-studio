@@ -129,3 +129,28 @@ and preservation of PR #70 before final publication under Goal #56. This is not
 human approval. Preserve `PR69_INTEGRATION_NO_GO`,
 `NATIVE_CONTINUOUS_250MS_FAIL`, `SIGNPATH_ELIGIBILITY_UNCONFIRMED` and
 `NATIVE_STABLE_NO_GO`, paused PRs #38/#50 and all historical failures.
+
+## Pre-execution diagnostic correction — fixed before replacement comparison
+
+Initial protocol `e25d3d6ffcb99660bf874d8fc325b4c305fdf1ac`, tree
+`ea400801e7f1fef00a19bd36afab3cd9ef931941`, ran once in **41186571384**.
+Both jobs failed before build or validation invocation. The empty `git diff`
+pipeline did not create `product-source.diff`; the following Get-Item threw.
+This is an evidence-writer defect, not a preview failure. Exact SDK/source/helper
+identities and overlays were captured, but **zero** validation processes ran.
+
+The correction explicitly writes the captured diff even when empty, checks git's
+exit code and retains the zero-diff product-source requirement. No C# overlay,
+ordinary assertion, deadline, control or product source changes. The information
+gain is reaching the first actual lifecycle boundary observations, which the
+initial attempt never executed. Authorise exactly **one replacement paired
+comparison**, same immutable sources, six validation invocations maximum, no
+automatic retry. An additional failure stops this amendment; further execution
+requires a new specific committed justification. Retain the initial FAILURE.
+
+Independently rehashed original failed diagnostic archives:
+
+| Source | Artefact | ZIP SHA-256 |
+|---|---|---|
+| Baseline | `13037255901` | `bee3d37036f376febb3b588fff90620cd91f1eff3a1718a350c9bfa133a08974` |
+| Candidate | `13035924636` | `74cf0387c1edc1b89cfcc9cb8044c0c494323bddb6a3648e3049edd0c363a70f` |
