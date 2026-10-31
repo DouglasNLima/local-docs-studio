@@ -42,7 +42,7 @@ an externally versioned renderer SDK.
 | `Rendering/PreviewSemanticAnchors.cs` | Source `TextElement` dictionary, pointer parent/tag, native character rectangles, page paginator | Replace anchor, viewport and geometry queries together for a new engine. |
 | `Rendering/PreviewNavigationService.cs` | `FlowDocumentReader`, `FlowDocumentScrollViewer`, `TextPointer`, selection, native page paginator; cancellation tied to reader/document identity | Need equivalent generation-owned navigation and selection. Never use an old pointer with a new document. |
 | `Rendering/PreviewFindIndex.cs`, `MainWindow.Find.cs` | Traverses `FlowDocument` pointer contexts; embeds formula source; maps matches to pointer ranges | Alternative search must preserve structural separators, exact occurrence, next/previous and focus. |
-| `MainWindow.Synchronisation.cs` | `TextSelection`, source-version mapping, retained selection, source anchors, `PreviewSourceHit`, scroll events, highlight adorner | Cannot retain this code by drawing an unrelated visual over a hidden FlowDocument. |
+| `MainWindow.Synchronisation.cs` | `TextSelection`, source-version mapping, retained selection, source-map/semantic-anchor hit queries, scroll events, highlight adorner | Cannot retain this code by drawing an unrelated visual over a hidden FlowDocument. |
 | `MainWindow.Navigation.cs`, `MainWindow.xaml.cs` | Heading/link source element lookup, `ContentStart`, viewport restoration, tab identity, selected source revision | Adapter must expose source navigation and viewport restoration without making layout lazy. |
 | `Rendering/DocumentPreview.cs` automation peer | `FlowDocumentReaderAutomationPeer` delegates TextPattern to the real document's `ContentElementAutomationPeer` | Drawn glyphs have no automatic document TextPattern. A real new text provider and range provider are necessary. |
 | Renderer native controls | Hyperlinks, details expanders, media actions, code/table context menus, formulae and diagrams | Retain keyboard, native control and accessibility semantics, not only text labels. |
@@ -50,8 +50,9 @@ an externally versioned renderer SDK.
 | `MainWindow.PreviewLoading.cs` / Core `PreviewLoadingState` | Request/generation-owned progress through parsing, media, building, attachment, completion; cancellation preserves previous complete preview | Do not equate a first viewport with completion. Keep the independent 25-second loading test unchanged. |
 | Validation `NativeContinuousPerformanceChecks.cs` | Complete text, source hashes, native element structure/styles, pointer selection/navigation, PNGs; original queued Input boundary | Preserve the existing oracle. Add independent semantic and geometry checks for the experiment. |
 
-`PreviewSourceHit` is declared in `MainWindow.Synchronisation.cs`; it is not a
-separate source file in this baseline. Source and preview operations also depend
+The requested `PreviewSourceHit` type/file is absent in this baseline. Actual
+preview hit operations use `PreviewSourceMap` and `PreviewSemanticAnchors`.
+Source and preview operations also depend
 on AvalonEdit's document revision identity. Selection is focus-sensitive and
 deferred navigation is cancelled by real input or a newer document.
 
@@ -195,3 +196,103 @@ diagnostic; visible tests use the existing disposable hosted environments.
 certificate installation, RC/beta/Stable or native package publication is part of
 this investigation. New diagnostic paths do not extend the frozen licence grant;
 licensing checks must retain their explicit non-granted classification.
+
+## Implemented diagnostic and retained local observations
+
+The standalone project is
+`scripts/native/experiments/ContinuousTextFormatter/ContinuousTextFormatter.csproj`.
+`ListSnapshot.cs` owns immutable literal/style/source and list hierarchy data;
+`ListSurface.cs` owns complete native lines and their formatter on one dispatcher.
+`Program.cs` provides the independent original-renderer/tree/source oracle,
+retained-run/glyph oracle, generation/affinity checks, hidden-HWND samples and PNGs.
+`Test-ContinuousTextFormatterPrototype.ps1` pairs the original product and the
+prototype through the same compiled executable and unchanged product assemblies.
+Its separate workflow reverses engine order on two independent Windows hosts.
+Neither project nor surface is referenced by the application or native solution.
+There is no production integration adapter because the feasibility gate is open.
+
+Every native line is formatted before Input delivery. The spike also reads
+`Extent`, all overhangs, marker height/baseline and actual text bounds for every
+line within that interval. In the inspected [WPF 10.0.12 implementation](https://github.com/dotnet/wpf/blob/v10.0.12/src/Microsoft.DotNet.Wpf/src/PresentationCore/MS/internal/TextFormatting/FullTextLine.cs),
+`Extent` calls `CheckBoundingBox`, which invokes `DrawTextLine(null, ...)` when
+needed. This forces lazy ink geometry even for offscreen lines. Only drawing
+commands are recycled by viewport. Retained line/formatter ownership is required
+for subsequent drawing and geometry queries. Format-call counts before and after
+distant navigation must match.
+
+The independent oracle compares the exact WPF logical text, including generated
+markers and tabs, literal styles/source endpoints, list nesting/parentage/starts,
+item membership and paragraph source identity. A separate oracle checks the
+actual retained TextLine run properties and indexed glyph characters, including
+complete wrapped/offscreen coverage. Deterministic cases exercise duplicate
+words, adjacent styles with source delimiter gaps, both endpoint affinities,
+nested numbering, continuation paragraphs, Unicode/combining marks, CRLF,
+wrapping, replacement, stale generation rejection, cancelled preparation and
+explicit rejection of unsupported content. These are scoped correctness checks,
+not mouse/keyboard selection, clipboard or actual UIA acceptance.
+
+| Original fixture | UTF-8 bytes | SHA-256 |
+|---|---:|---|
+| list: 4,000 bold native items | 58,892 | `A4A19DCD4319BA96D909C117F779EB5EEBC1733F73F831E16D44E63658490EBA` |
+| table: header + 1,000 rows | 21,811 | `60E067F7F7E4E389AC60E4C64138AC6795CCD1B2097CD0A4A755928DDBDFDCCA` |
+| quote: 1,200 entries | 16,890 | `009A991AFD3E653D673D4873C8D21B44BF62BA19AE8E5D23B0E2B3239C682104` |
+| details: 1,200 paragraphs in one open section | 13,352 | `4285BEF2028067CF644E2635D50FA3A93BEC3DB1929B211958373B60C48E1EA5` |
+| paragraphs: 1,200 rich paragraphs | 73,291 | `FD5CE761F06BD340C76A67F94D2D51BE0FA10C7317048A7AFEB89783C561200A` |
+| mixed: lists/table/nested details/Unicode/images/Mermaid | 36,425 | `289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180` |
+
+The source fixture implementation is linked, unchanged, into the diagnostic;
+original fixture bytes, actual revised sources and inventories are saved in each
+evidence directory. The list-only diagnostic's fresh revisions keep list grammar:
+they are explicitly **not** the protected six-fixture fresh-source group, whose
+heading/appended-content policy remains unchanged. The other five prototype
+fixtures are `NOT IMPLEMENTED`; their original protected measurements still run.
+
+Exploratory local observations on Windows 10.0.26300, official framework-dependent
+.NET 10.0.12, SDK 10.0.401, 144 DPI, remain distinct from controlled hosted data:
+
+| Local sample | First-layout Input | Result / limitation |
+|---|---:|---|
+| Original diagnostic FlowDocument, first process | 2,308.93 ms | FAIL; exploratory |
+| First prototype recording every offscreen drawing | 2,964.29 ms | FAIL; exploratory |
+| Viewport-drawing prototype with retained formatter | 434.46 ms | FAIL; intermediate advance geometry only |
+| Complete native ink/text/marker geometry | 464.60 ms | FAIL; 4,000 retained lines/markers, distant navigation without reformatting |
+
+These are individual, evolving-source diagnostic samples, not a paired
+improvement estimate or representative medians. Original logs/JSON/PNGs stay in
+ignored `artifacts/goal56-*`. The first recycled-drawing attempt failed with WPF
+`ClientAbort` because the formatter was disposed before retained lines were
+drawn; preserving owner lifetime corrected that source defect. Initial builds
+also retained missing-import/local-name errors. Early correctness failures
+exposed WPF's generated marker/tab behaviour; the whole-text oracle now includes
+those characters and literal checks use the exact mapped Run. The first actual
+run oracle used buffer-reference equality, which is not a text-content oracle;
+the corrected check reads actual indexed glyph characters. No negative sample
+was relabelled or removed.
+
+The visible spacing is **not equivalent**: local rasters show approximately
+37-pixel item advance in the prototype versus 33 in FlowDocument, with a lower
+first line. The spike currently adds paragraph margins rather than reproducing
+WPF margin collapse. The deviation remains a fidelity gap, not a corrected or
+accepted alternative presentation. Diagnostic screenshots receive identical
+white raster backing outside timing. No selection/copy provider, document
+TextPattern, mouse/keyboard interaction, live theme/zoom adapter or cancellation
+during synchronous layout has been implemented. Only immutable preparation
+cancellation and synchronous replacement/generation ownership are checked.
+
+Build/static checks pass locally. The first local full Core run retains 2,297
+passing tests and one `complete-detailed` complex-ER six-second resource timeout;
+it overlapped the full native corpus. Its source is unchanged and causality is
+not established. No deadline or assertion is adjusted and no timing retry is
+used to discard that failure. Exact hosted results, final commit/tree, evidence
+archive hashes, all temperatures and final independent review belong to the
+[engineering receipt under Goal #56](https://github.com/DouglasNLima/local-docs-studio/issues/56).
+Keeping the final hosted receipt there avoids an evidence-only source push that
+would trigger another protected performance comparison.
+
+Current classification: **`CONTINUOUS_NATIVE_PROTOTYPE_PARTIAL`**. The bounded
+architecture is unaccepted, with a measurable full-line cost still above the
+target locally and substantial interaction/accessibility/fidelity work remaining.
+If corrected hosted cold observations still fail, stop this bounded experiment
+at the owner decision on further native text-control/provider investment. Do not
+infer that all native alternatives are impossible. Milestone two, production
+integration, `PROTOTYPE_PERFORMANCE_VERIFIED` and full acceptance are not earned.

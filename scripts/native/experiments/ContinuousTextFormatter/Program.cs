@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.TextFormatting;
 using System.Windows.Threading;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Native.Rendering;
@@ -23,11 +24,13 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        string? evidenceOutput = null;
         try
         {
             var output = Path.GetFullPath(args[1]);
             if (Directory.Exists(output)) throw new IOException("Use a new evidence directory; unsuccessful samples are retained.");
             Directory.CreateDirectory(output);
+            evidenceOutput = output;
             var dispatcher = Dispatcher.CurrentDispatcher;
             SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(dispatcher));
             var fixtures = ContinuousPreviewFixtures.Create(output, "all");
@@ -58,17 +61,26 @@ internal static class Program
             });
             return 0;
         }
-        catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine(error);
+            if (evidenceOutput is not null)
+            {
+                try { Write(evidenceOutput, "failure.json", new { Status = "FAIL", Error = error.ToString(), Acceptance = "NOT ESTABLISHED" }); }
+                catch (Exception evidenceError) { Console.Error.WriteLine("Cannot write failure receipt: " + evidenceError.Message); }
+            }
+            return 1;
+        }
     }
 
     private static bool Sample(string engine, string output, string source, string original, int repetition, bool edited)
     {
         var dispatcher = Dispatcher.CurrentDispatcher;
+        File.WriteAllText(Path.Combine(output, $"source-{repetition}.md"), source, new UTF8Encoding(false));
         var readiness = Stopwatch.StartNew();
         var totalAllocation = GC.GetTotalAllocatedBytes();
         var parsing = Stopwatch.StartNew();
         var parsed = new MarkdownService().Parse(source); parsing.Stop();
-        File.WriteAllText(Path.Combine(output, $"source-{repetition}.md"), source, new UTF8Encoding(false));
         var viewer = new ScrollViewer { CanContentScroll = false, VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, Background = Brushes.White };
         var native = engine == "baseline" ? new FlowDocumentScrollViewer { IsToolBarVisible = false, Background = Brushes.White } : null;
@@ -143,6 +155,7 @@ internal static class Program
             object geometry;
             if (engine == "prototype")
             {
+                VerifyRetainedLines(surface, snapshot);
                 var last = surface.Lines.Last();
                 var lastX = last.Native.GetDistanceFromCharacterHit(new(last.Start, 0));
                 var sourceHit = surface.HitSource(last, lastX);
@@ -221,23 +234,47 @@ internal static class Program
 
     private static bool Verify(ListSnapshot snapshot, PreviewResult original)
     {
-        var nativeParagraphs = new List<Paragraph>(); var lists = new List<System.Windows.Documents.List>();
-        void Walk(BlockCollection blocks)
+        var nativeParagraphs = new List<(Paragraph Element, int ListId, int ItemId, int Depth, int Number, bool Marker)>();
+        var nativeLists = new List<ListNode>();
+        var nativeItems = new List<(int ListId, int Number)>();
+        void Walk(System.Windows.Documents.List list, int depth, int? parentItem)
         {
-            foreach (var block in blocks)
-                if (block is Paragraph paragraph) nativeParagraphs.Add(paragraph);
-                else if (block is System.Windows.Documents.List list) { lists.Add(list); foreach (var item in list.ListItems) Walk(item.Blocks); }
-                else throw new InvalidDataException("Unexpected structure in independent original renderer.");
+            var listId = nativeLists.Count;
+            if (list.MarkerStyle is not (TextMarkerStyle.Disc or TextMarkerStyle.Decimal))
+                throw new InvalidDataException("The original renderer has an unsupported native marker style.");
+            nativeLists.Add(new(listId, parentItem, depth, list.MarkerStyle == TextMarkerStyle.Decimal, list.StartIndex, list.ListItems.Count));
+            var number = list.StartIndex;
+            foreach (var item in list.ListItems)
+            {
+                var itemId = nativeItems.Count;
+                nativeItems.Add((listId, number));
+                var first = true;
+                foreach (var child in item.Blocks)
+                    if (child is Paragraph paragraph) { nativeParagraphs.Add((paragraph, listId, itemId, depth, number, first)); first = false; }
+                    else if (child is System.Windows.Documents.List nested) Walk(nested, depth + 1, itemId);
+                    else throw new InvalidDataException("Unexpected child in the original native list.");
+                number++;
+            }
         }
-        Walk(original.Document.Blocks);
+        foreach (var block in original.Document.Blocks)
+            if (block is System.Windows.Documents.List list) Walk(list, 0, null);
+            else throw new InvalidDataException("Unexpected root structure in the original renderer.");
         if (original.ReadText() != snapshot.Text)
             throw new InvalidDataException("Logical text differs: " + JsonSerializer.Serialize(new { Actual = original.ReadText(), Expected = snapshot.Text }));
-        if (original.Warnings.Count != 0 || lists.Count != snapshot.Lists.Length
-            || lists.Sum(list => list.ListItems.Count) != snapshot.Items.Length || nativeParagraphs.Count != snapshot.Paragraphs.Length)
+        if (original.Warnings.Count != 0 || !nativeLists.SequenceEqual(snapshot.Lists)
+            || nativeItems.Count != snapshot.Items.Length || nativeParagraphs.Count != snapshot.Paragraphs.Length)
             throw new InvalidDataException("List, item or paragraph structure differs from the original renderer.");
+        for (var index = 0; index < nativeItems.Count; index++)
+            if (snapshot.Items[index].Id != index || nativeItems[index] != (snapshot.Items[index].ListId, snapshot.Items[index].Number))
+                throw new InvalidDataException("Item-to-list membership or numbering differs from the original renderer.");
         for (var i = 0; i < snapshot.Paragraphs.Length; i++)
         {
             var paragraph = snapshot.Paragraphs[i];
+            var actual = nativeParagraphs[i];
+            if (actual.ListId != paragraph.ListId || actual.ItemId != paragraph.ItemId || actual.Depth != paragraph.Depth
+                || actual.Number != paragraph.Number || actual.Marker != paragraph.Marker
+                || actual.Element.Tag is not SourceReference reference || reference.Start != paragraph.SourceStart || reference.End + 1 != paragraph.SourceEnd)
+                throw new InvalidDataException("Paragraph hierarchy, marker placement or source identity differs from the original renderer.");
             foreach (var span in paragraph.Spans)
             {
                 if (!original.TextMap.TryPreviewRange(span.SourceStart, span.Text.Length, out var from, out var to)
@@ -266,6 +303,7 @@ internal static class Program
             "- **Repeated** plain *italic*\n- **Repeated** Café 😀 é",
             "7. **First**\n   - Nested\n   - Wrapped " + string.Join(" ", Enumerable.Repeat("Café 😀 é", 80)) + "\n8. Last",
             "- Windows\r\n- **Line endings**\r\n",
+            "- **bold***italic*plain\n\n  Continuation paragraph\n\n  5. Nested numbered\n  6. Next nested\n\n- Last parent",
             "- Original\n- Revised distant source"
         };
         var receipts = new List<object>();
@@ -278,6 +316,7 @@ internal static class Program
             if (!Verify(snapshot, original)) throw new InvalidDataException("The independent original-renderer oracle failed.");
             using var surface = new ListSurface();
             surface.Attach(snapshot); surface.Measure(new Size(250, 300)); surface.Arrange(new Rect(0, 0, 250, surface.FullHeight)); surface.UpdateLayout();
+            VerifyRetainedLines(surface, snapshot);
             var count = surface.FormatCalls;
             foreach (var line in surface.Lines)
             {
@@ -285,12 +324,31 @@ internal static class Program
                 var hit = surface.HitSource(line, distance);
                 if (hit < line.Paragraph.SourceStart || hit >= line.Paragraph.SourceEnd) throw new InvalidDataException("Native hit/source range escaped its paragraph.");
             }
+            foreach (var paragraph in snapshot.Paragraphs)
+            {
+                var displayOffset = 0;
+                for (var index = 0; index + 1 < paragraph.Spans.Length; index++)
+                {
+                    displayOffset += paragraph.Spans[index].Text.Length;
+                    var line = surface.Lines.Last(value => value.Paragraph == paragraph && value.Start <= displayOffset);
+                    var distance = line.Native.GetDistanceFromCharacterHit(new(displayOffset, 0));
+                    if (surface.HitSource(line, distance) != paragraph.Spans[index + 1].SourceStart
+                        || surface.HitSource(line, distance, false) != paragraph.Spans[index].SourceStart + paragraph.Spans[index].Text.Length)
+                        throw new InvalidDataException("Exact style-boundary source affinity was lost.");
+                }
+            }
             if (!surface.Complete || surface.FormatCalls != count || surface.MarkerCount != snapshot.Items.Length)
                 throw new InvalidDataException("Full geometry was deferred or lost markers.");
             var priorWidth = surface.FullHeight; surface.Measure(new Size(150, 300));
             if (!surface.Complete || surface.FullHeight < priorWidth) throw new InvalidDataException("Wrapping did not reformat the complete document.");
+            var replacement = ListSnapshot.Create(new MarkdownService().Parse("- Replacement"), snapshot.Generation + 1);
+            surface.Attach(replacement); surface.Measure(new Size(250, 300));
+            if (surface.Snapshot != replacement || surface.Lines.Any(line => !replacement.Paragraphs.Contains(line.Paragraph)))
+                throw new InvalidDataException("A replaced source retained the previous layout.");
+            try { surface.Attach(snapshot); throw new InvalidDataException("A stale generation replaced the current source."); }
+            catch (InvalidOperationException) { }
             receipts.Add(new { snapshot.Sha256, snapshot.Generation, Lists = snapshot.Lists.Length, Items = snapshot.Items.Length,
-                Lines = surface.Lines.Count, TextStyleAndExactSourceOracle = "PASS", CompleteNativeGeometry = "PASS" });
+                LinesBeforeReplacement = count, TextStyleAndExactSourceOracle = "PASS", CompleteNativeGeometry = "PASS", ReplacementAndStaleGeneration = "PASS" });
         }
         var rejected = 0;
         foreach (var source in new[] { "# Heading", "- [Link](target.md)", "- &amp;", "- ~~strike~~" })
@@ -306,6 +364,50 @@ internal static class Program
             CancelledPreparation = "PASS", Selection = "NOT IMPLEMENTED", ActualUIA = "NOT TESTED", ProductIntegration = "ABSENT" });
     }
 
+    private static void VerifyRetainedLines(ListSurface surface, ListSnapshot snapshot)
+    {
+        foreach (var paragraph in snapshot.Paragraphs)
+        {
+            var covered = 0;
+            foreach (var line in surface.Lines.Where(line => ReferenceEquals(line.Paragraph, paragraph)))
+            {
+                if (line.Start != covered || line.DisplayText != paragraph.Text)
+                    throw new InvalidDataException("Actual native line text or wrapping coverage differs from the semantic oracle.");
+                var runOffset = line.Start;
+                foreach (var run in line.Native.GetTextRunSpans())
+                {
+                    var length = Math.Min(run.Length, line.Start + line.Length - runOffset);
+                    if (length <= 0) continue; // Native end-of-paragraph is not a literal.
+                    var spanOffset = 0;
+                    var expected = paragraph.Spans.First(span => { var contains = runOffset < spanOffset + span.Text.Length; if (!contains) spanOffset += span.Text.Length; return contains; });
+                    var properties = run.Value.Properties;
+                    if (run.Value is not TextCharacters
+                        || runOffset + length > spanOffset + expected.Text.Length
+                        || properties.Typeface.Weight != (expected.Style.HasFlag(MarkdownEmphasis.Bold) ? FontWeights.Bold : FontWeights.Normal)
+                        || properties.Typeface.Style != (expected.Style.HasFlag(MarkdownEmphasis.Italic) ? FontStyles.Italic : FontStyles.Normal)
+                        || properties.Typeface.FontFamily.Source != "Segoe UI" || properties.FontRenderingEmSize != 15)
+                        throw new InvalidDataException("Actual retained TextLine style differs from the original-renderer-verified spans at " + runOffset);
+                    runOffset += length;
+                }
+                if (runOffset != line.Start + line.Length) throw new InvalidDataException("Actual native line lost text-run coverage.");
+                var glyphCoverage = new bool[line.Length];
+                foreach (var glyph in line.Native.GetIndexedGlyphRuns())
+                {
+                    var start = glyph.TextSourceCharacterIndex;
+                    var characters = glyph.GlyphRun.Characters;
+                    if (start < line.Start || start + glyph.TextSourceLength > line.Start + line.Length) continue; // Generated marker/end-of-paragraph.
+                    if (characters is null || characters.Count != glyph.TextSourceLength
+                        || !new string(characters.ToArray()).AsSpan().SequenceEqual(paragraph.Text.AsSpan(start, glyph.TextSourceLength)))
+                        throw new InvalidDataException("Actual native glyph characters differ from the independent literal text oracle.");
+                    for (var index = start; index < start + glyph.TextSourceLength; index++) glyphCoverage[index - line.Start] = true;
+                }
+                if (glyphCoverage.Any(value => !value)) throw new InvalidDataException("Actual native glyph text does not cover the complete line.");
+                covered += line.Length;
+            }
+            if (covered != paragraph.Text.Length) throw new InvalidDataException("Required offscreen text is missing from retained native lines.");
+        }
+    }
+
     private static void Pump(Task task)
     {
         while (!task.IsCompleted)
@@ -318,7 +420,10 @@ internal static class Program
     }
     private static void Raster(Visual visual, string path)
     {
-        var bitmap = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32); bitmap.Render(visual);
+        var bitmap = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32);
+        var backing = new DrawingVisual();
+        using (var context = backing.RenderOpen()) context.DrawRectangle(Brushes.White, null, new Rect(0, 0, 640, 300));
+        bitmap.Render(backing); bitmap.Render(visual);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
         using var file = File.Create(path); encoder.Save(file);
     }

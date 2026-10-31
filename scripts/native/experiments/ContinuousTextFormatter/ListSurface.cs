@@ -12,11 +12,13 @@ internal sealed class ListSurface : FrameworkElement, IDisposable
 {
     internal sealed record InkGeometry(double Extent, double OverhangLeading, double OverhangTrailing,
         double OverhangAfter, double MarkerHeight, double MarkerBaseline);
-    internal sealed record Line(ListParagraph Paragraph, TextLine Native, int Start, int Length, Point Origin,
+    internal sealed record Line(ListParagraph Paragraph, string DisplayText, TextLine Native, int Start, int Length, Point Origin,
         InkGeometry Ink, IReadOnlyList<TextBounds> TextBounds);
     private readonly List<Line> lines = [];
     private TextFormatter? formatter;
     private ListSnapshot? snapshot;
+    private long lastGeneration = -1;
+    private bool disposed;
     private double layoutWidth = double.NaN;
     public IReadOnlyList<Line> Lines => lines;
     public double FullHeight { get; private set; }
@@ -37,8 +39,10 @@ internal sealed class ListSurface : FrameworkElement, IDisposable
     public void Attach(ListSnapshot value)
     {
         VerifyAccess();
+        ObjectDisposedException.ThrowIf(disposed, this);
+        if (value.Generation <= lastGeneration) throw new InvalidOperationException("An older layout generation cannot replace the current snapshot.");
         DisposeLayout();
-        snapshot = value;
+        snapshot = value; lastGeneration = value.Generation;
         InvalidateMeasure(); InvalidateVisual();
     }
 
@@ -105,7 +109,7 @@ internal sealed class ListSurface : FrameworkElement, IDisposable
                             bounds = visibleLength > 0 ? line.GetTextBounds(position, visibleLength).ToArray() : [];
                         }
                         catch { line.Dispose(); throw; }
-                        lines.Add(new(paragraph, line, position, visibleLength, new(x, y), ink, bounds));
+                        lines.Add(new(paragraph, text.Text, line, position, visibleLength, new(x, y), ink, bounds));
                         FormatCalls++;
                         previous?.Dispose(); previous = line.GetTextLineBreak();
                         y += line.Height;
@@ -140,20 +144,25 @@ internal sealed class ListSurface : FrameworkElement, IDisposable
             lines[index].Native.Draw(context, lines[index].Origin, InvertAxes.None);
     }
 
-    public int HitSource(Line line, double distance)
+    public int HitSource(Line line, double distance, bool forwardAffinity = true)
     {
         VerifyAccess();
         var hit = line.Native.GetCharacterHitFromDistance(distance);
         var offset = Math.Clamp(hit.FirstCharacterIndex + hit.TrailingLength, 0, line.Paragraph.Text.Length);
         foreach (var span in line.Paragraph.Spans)
         {
-            if (offset <= span.Text.Length) return span.SourceStart + offset;
+            if (offset < span.Text.Length || !forwardAffinity && offset == span.Text.Length) return span.SourceStart + offset;
             offset -= span.Text.Length;
+        }
+        if (offset == 0 && line.Paragraph.Spans.Length > 0)
+        {
+            var last = line.Paragraph.Spans[^1];
+            return last.SourceStart + last.Text.Length;
         }
         throw new InvalidDataException("The hit lies outside retained source intervals.");
     }
 
-    public void Dispose() { VerifyAccess(); DisposeLayout(); snapshot = null; }
+    public void Dispose() { VerifyAccess(); DisposeLayout(); snapshot = null; disposed = true; }
     private void DisposeLayout()
     {
         foreach (var line in lines) line.Native.Dispose();
