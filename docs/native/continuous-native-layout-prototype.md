@@ -279,7 +279,10 @@ TextPattern, mouse/keyboard interaction, live theme/zoom adapter or cancellation
 during synchronous layout has been implemented. Only immutable preparation
 cancellation and synchronous replacement/generation ownership are checked.
 
-Build/static checks pass locally. The first local full Core run retains 2,297
+Build/static checks pass locally, and the full native corpus completes 202
+diagram cases plus export checks with zero failures. Five adversarial prototype
+cases pass the independent text/style/hierarchy/source/retained-geometry and
+ownership oracles. The first local full Core run retains 2,297
 passing tests and one `complete-detailed` complex-ER six-second resource timeout;
 it overlapped the full native corpus. Its source is unchanged and causality is
 not established. No deadline or assertion is adjusted and no timing retry is
@@ -288,6 +291,15 @@ archive hashes, all temperatures and final independent review belong to the
 [engineering receipt under Goal #56](https://github.com/DouglasNLima/local-docs-studio/issues/56).
 Keeping the final hosted receipt there avoids an evidence-only source push that
 would trigger another protected performance comparison.
+
+Pre-hosted independent technical agent review found and corrected an inaccurate
+dependency-map type, source-boundary affinity, incomplete hierarchy comparison,
+missing actual retained-run/glyph checks and unequal raster backing. The reviewer
+verified the corrected five-case receipt, protected-source isolation and native
+geometry boundary, with no remaining actionable blocker to the single hosted
+comparison. The reviewer explicitly retained the spacing gap and PARTIAL
+classification. This is agent review, not human GitHub approval; final review
+must bind the committed source and hosted evidence separately.
 
 Current classification: **`CONTINUOUS_NATIVE_PROTOTYPE_PARTIAL`**. The bounded
 architecture is unaccepted, with a measurable full-line cost still above the
