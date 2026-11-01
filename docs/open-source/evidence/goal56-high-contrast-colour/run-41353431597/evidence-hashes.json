@@ -1,0 +1,182 @@
+[
+  {
+    "path": "attempts.json",
+    "bytes": 426,
+    "sha256": "EEE7192123BC7F324556D7DF113CE5AE4F7F0343ECB4E69B2464103FEDD19269"
+  },
+  {
+    "path": "baseline-build.log",
+    "bytes": 1725,
+    "sha256": "FDEA2DBBEEB00DD585484F69ED24BA495829F1956747C7D6FE35F561137BA0AF"
+  },
+  {
+    "path": "baseline-checkout.log",
+    "bytes": 1372,
+    "sha256": "9DBB4B73C7B5B7658996A52F6EA1B342DD9A7EC3A713C96C9BA5FE9A97766DCC"
+  },
+  {
+    "path": "baseline-identity.json",
+    "bytes": 237,
+    "sha256": "837AC3359D365C8E329F8030DCC8F241DE4C6498EC7EF08D69EE80A51CA3E9EB"
+  },
+  {
+    "path": "baseline-overlay-build.log",
+    "bytes": 804,
+    "sha256": "36B325A7600DDD6BC656CDD37F3B994C936C7471DBBE55BD025BF73C19F0B404"
+  },
+  {
+    "path": "baseline-overlay.diff",
+    "bytes": 681,
+    "sha256": "AAEDEAAA37A3C3716C2C8B4B458CE9C6778074CE35B49EAE56116AF5D68771D8"
+  },
+  {
+    "path": "baseline-transition.log",
+    "bytes": 0,
+    "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  {
+    "path": "cpu.json",
+    "bytes": 125,
+    "sha256": "B3BCA5D2728AC6932C4474F231461D75EDCF2035125EF81970ECCEBC089957D8"
+  },
+  {
+    "path": "dotnet-info.txt",
+    "bytes": 5566,
+    "sha256": "94E20341498D3E962FEAA04C54681708C5723F5392247B869FF666889A866999"
+  },
+  {
+    "path": "observer-build.log",
+    "bytes": 413,
+    "sha256": "68E888C065A977853E30C43AE3D99B15973643311DAA9C388EBC1045CED0B49E"
+  },
+  {
+    "path": "os.json",
+    "bytes": 149,
+    "sha256": "5087196810A3A17AAE8DB532A81CE0C189318AC5BDB446AF944EEEC459231D5A"
+  },
+  {
+    "path": "runner.json",
+    "bytes": 6798,
+    "sha256": "EA3F191FF52AC7F80E65ABD6949184D5BBC39370E706FFFB2B11D106377DD3AC"
+  },
+  {
+    "path": "baseline-transition\\A-normal.json",
+    "bytes": 1643,
+    "sha256": "54D76B0C0DB75EBFAE228F92C493894FF943E2667A64C5818325B2A2C9E844F8"
+  },
+  {
+    "path": "baseline-transition\\B-after-SPI.json",
+    "bytes": 1645,
+    "sha256": "5DD6D85129E50C83DBC2D85AE0670DD42ED0CA04CB0E0D0D56EF116BB99AC6CD"
+  },
+  {
+    "path": "baseline-transition\\C-after-Apply.json",
+    "bytes": 4713,
+    "sha256": "A61EF06C3D91D8D9D2B6F4A0280785E379B1BC8D7C42CBD2D943E48671DA0ED4"
+  },
+  {
+    "path": "baseline-transition\\D-after-actual-notifications.json",
+    "bytes": 4764,
+    "sha256": "18BE5B1257EEBFD4677ABF0C5661835267AEA49D890691C81C748C09EDA52AC0"
+  },
+  {
+    "path": "baseline-transition\\D-after-single-idle.json",
+    "bytes": 4719,
+    "sha256": "89A43DC4DD698186EA0AED38495645341DD0B1338B92740F9CD4479AF7EF12DE"
+  },
+  {
+    "path": "baseline-transition\\exception.json",
+    "bytes": 547,
+    "sha256": "925E21C66BE320A5DC184B7203C012FEC7446E1A40E411EB6AFBC486DD60F617"
+  },
+  {
+    "path": "baseline-transition\\identity.json",
+    "bytes": 2456,
+    "sha256": "ECC17108314AF9102F6E004DE7616B481FA4A72E3AD8074C168C80C203663C83"
+  },
+  {
+    "path": "baseline-transition\\loaded-modules.json",
+    "bytes": 19730,
+    "sha256": "FBD0ADED4D997A3D2E438C4B9B81A81425DD314F29D327B4B00F3257D056A319"
+  },
+  {
+    "path": "baseline-transition\\notifications.json",
+    "bytes": 11284,
+    "sha256": "00F099924642C592973C77DE5309670CA07FCD2E4A55D8F72D2EAAFBCFD8E2EE"
+  },
+  {
+    "path": "baseline-transition\\restoration.json",
+    "bytes": 600,
+    "sha256": "6DAAEA1E0BF56B471408A7E96414F2A7F6AC421C6136E5ECEF10111D4E4B1593"
+  },
+  {
+    "path": "baseline-transition\\restored.json",
+    "bytes": 4748,
+    "sha256": "3C52490949A227DBB26FF51A70266B6234230C57CACDB9BB8B01108A89C2CDE0"
+  },
+  {
+    "path": "baseline-transition\\result.json",
+    "bytes": 253,
+    "sha256": "47E8257C7408D8CDBAB13DDC75550D50178B9D25CA5399EFED57C2F434D46C04"
+  },
+  {
+    "path": "baseline-transition\\fresh\\E-fresh-after-apply.json",
+    "bytes": 4752,
+    "sha256": "3259EBE79056C8178E053A0EF9E972B6EA39772FE20F4010442E03B1ACF67AFB"
+  },
+  {
+    "path": "baseline-transition\\fresh\\E-fresh-before-apply.json",
+    "bytes": 1691,
+    "sha256": "A2DA08D8C536B06E00288B50F727B81CD05A37DD92FC7B82D28A2B44187C5B95"
+  },
+  {
+    "path": "baseline-transition\\fresh\\identity.json",
+    "bytes": 2469,
+    "sha256": "E57C01CB52C04591812068463DC5A41059042A9267CBDACF6815E709F399772B"
+  },
+  {
+    "path": "baseline-transition\\fresh\\loaded-modules.json",
+    "bytes": 16368,
+    "sha256": "6A9EDAF62FE842F174E8E64AB61A82DFA4F9A8FB8C1549043D3BC43207D7E16D"
+  },
+  {
+    "path": "baseline-transition\\fresh\\notifications.json",
+    "bytes": 2,
+    "sha256": "4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945"
+  },
+  {
+    "path": "baseline-transition\\fresh\\result.json",
+    "bytes": 213,
+    "sha256": "4296F283C38BB27A4D53C4E557EB019855C935BFCAC6598CF369C79039571D53"
+  },
+  {
+    "path": "baseline-transition\\surface\\actual-pressed-command.png",
+    "bytes": 44205,
+    "sha256": "F6D05FF2F219C1900F66D882D223B11602DE2B097A0889C0FB103656F3625193"
+  },
+  {
+    "path": "baseline-transition\\surface\\loaded.json",
+    "bytes": 2449,
+    "sha256": "3D5F6E49FB808E06CB447DEB1A7ED93C8CD6712AD151A97BD7A023596E9D98CB"
+  },
+  {
+    "path": "baseline-transition\\surface\\pressed.json",
+    "bytes": 2490,
+    "sha256": "ED24D0E8CF2C13038F2268324C584041FBC989EC534FF061EE3A15F4E3B41B78"
+  },
+  {
+    "path": "baseline-transition\\surface\\uia.json",
+    "bytes": 479,
+    "sha256": "19D45D98AC35BA991FB89578DBF171733564D3C890EE30DE12875B0C47C0C2FF"
+  },
+  {
+    "path": "baseline-transition\\surface\\state\\preferences.json",
+    "bytes": 259,
+    "sha256": "09390D182D8D3E2DA25B944DB04E93E4D9D7D32116CA58EE94A9E512D168F127"
+  },
+  {
+    "path": "baseline-transition\\surface\\state\\session.json",
+    "bytes": 552,
+    "sha256": "98E0702A837CE7A7FAA082E6EB9F0925A483C4A42B03EF6D0AD0BC30F4A4AC1D"
+  }
+]

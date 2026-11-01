@@ -1,0 +1,157 @@
+{
+  "boundary": "E-fresh-after-apply",
+  "start": {
+    "utc": "2026-11-01T21:39:28.4471686+00:00",
+    "ticks": 3542257322,
+    "frequency": 10000000
+  },
+  "nonAtomic": true,
+  "readOrder": "OS before; WPF flag; WPF highlight text/background; other WPF colours; palette; OS after",
+  "osBefore": {
+    "enabled": true,
+    "Flags": 127,
+    "scheme": "High Contrast Black",
+    "highlight": "#FF8EE3F0",
+    "highlightText": "#FF263B50",
+    "window": "#FF202020",
+    "control": "#FF202020",
+    "windowText": "#FFFFFFFF",
+    "activeBorder": "#FFFFFF00"
+  },
+  "wpfFlag": true,
+  "wpfHighlightText": "#FF263B50",
+  "wpfHighlight": "#FF8EE3F0",
+  "other": {
+    "window": "#FF202020",
+    "control": "#FF202020",
+    "windowText": "#FFFFFFFF",
+    "activeBorder": "#FFFFFF00",
+    "accent": "#FF8EE3F0"
+  },
+  "palette": {
+    "WindowBrush": {
+      "effective": "#FF202020",
+      "requested": "#FF202020",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 58682725
+    },
+    "PanelBrush": {
+      "effective": "#FF202020",
+      "requested": "#FF202020",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 24677933
+    },
+    "TextBrush": {
+      "effective": "#FFFFFFFF",
+      "requested": "#FFFFFFFF",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 52377683
+    },
+    "MutedTextBrush": {
+      "effective": "#FFFFFFFF",
+      "requested": "#FFFFFFFF",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 9821246
+    },
+    "HoverBrush": {
+      "effective": "#FF202020",
+      "requested": "#FF202020",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 60567340
+    },
+    "PressedBrush": {
+      "effective": "#FF8EE3F0",
+      "requested": "#FF8EE3F0",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 49177928
+    },
+    "BorderBrush": {
+      "effective": "#FFFFFF00",
+      "requested": "#FFFFFF00",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 35333288
+    },
+    "AccentBrush": {
+      "effective": "#FF8EE3F0",
+      "requested": "#FF8EE3F0",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 56679560
+    },
+    "PressedTextBrush": {
+      "effective": "#FF263B50",
+      "requested": "#FF263B50",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 65745642
+    },
+    "AccentTextBrush": {
+      "effective": "#FF263B50",
+      "requested": "#FF263B50",
+      "bindingSource": "LensDocsStudio.Native.Platform.ThemeService\u002BColourSlot",
+      "bindingPath": "Colour",
+      "bindingStatus": "Active",
+      "IsFrozen": false,
+      "identity": 49386989
+    }
+  },
+  "effectiveRatio": 7.893273424942036,
+  "wpfRatio": 7.893273424942036,
+  "requiredContrast": 4.5,
+  "win32Ratio": 7.893273424942036,
+  "dictionaries": [
+    {
+      "identity": 10121706,
+      "source": null
+    },
+    {
+      "identity": 38051083,
+      "source": null
+    },
+    {
+      "identity": 24902036,
+      "source": "pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.HC.xaml"
+    }
+  ],
+  "osAfter": {
+    "enabled": true,
+    "Flags": 127,
+    "scheme": "High Contrast Black",
+    "highlight": "#FF8EE3F0",
+    "highlightText": "#FF263B50",
+    "window": "#FF202020",
+    "control": "#FF202020",
+    "windowText": "#FFFFFFFF",
+    "activeBorder": "#FFFFFF00"
+  },
+  "end": {
+    "utc": "2026-11-01T21:39:28.4494648+00:00",
+    "ticks": 3542280283,
+    "frequency": 10000000
+  }
+}

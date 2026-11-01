@@ -1,0 +1,10 @@
+{
+  "exits": {},
+  "originalFailure": "FAILURE retained",
+  "diagnosticAcceptance": false,
+  "at": {
+    "utc": "2026-11-01T21:39:28.4553403+00:00",
+    "ticks": 3542339038,
+    "frequency": 10000000
+  }
+}

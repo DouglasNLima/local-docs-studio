@@ -1,0 +1,352 @@
+[
+  {
+    "path": "C:\\Program Files\\dotnet\\host\\fxr\\10.0.14\\hostfxr.dll",
+    "sha256": "5B9358572DAA76176F97F1BB80FE764B24EE1BC2CCE0579230E7F9A28E3FBBED",
+    "version": "10.0.14 @Commit: 0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\hostpolicy.dll",
+    "sha256": "84275DC570382246B4B36EBB3094C2B38190C2FD80998D1DA20B95DFCAE1C546",
+    "version": "10.0.14 @Commit: 0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\coreclr.dll",
+    "sha256": "1BC65B8D45474B19ADF3CA85CE881087AFF599FFC72B2C1A323E878227757B65",
+    "version": "10,0,1426,52326 @Commit: 0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll",
+    "sha256": "69D56E12535D3A8F2F8F89AC8F97577E6DC788D26F2E7B69BE8FB5F6FF17FF28",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\clrjit.dll",
+    "sha256": "E33038C23F32074683E170B0EA74DAE6EE74A05BB5E8EF6C9FD4CC43771B34CF",
+    "version": "10,0,1426,52326 @Commit: 0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Runtime.dll",
+    "sha256": "D6B4189C8E9AFCE3629B27C902C198A54AD3A355EC8409D3880B3B68FB1CF445",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Linq.dll",
+    "sha256": "1C6886FB239A6AF59DA0DC1561D9F010E2E983A1E826D6E8F8A61F7EA42A3AF1",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Console.dll",
+    "sha256": "8BE68E4CB2F0B64B5F37F7A7AA82DB2AE1648115A9B7B9381A3CFAC7CDB4AEB5",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Memory.dll",
+    "sha256": "5BBEC55D9B01C664055180840B651B1B1F01C15F7F45EE84192B95A09F2C355B",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Collections.dll",
+    "sha256": "78D429A901A73A09CDA6037BEFAA56B79BFA557000B2A69BA1C1210253C0B21D",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationCore.dll",
+    "sha256": "131FAA87BCE352C2C7EA02FA6D6C36533992FD77A3BF429D1145D21EF3650F1D",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\WindowsBase.dll",
+    "sha256": "E960804A80A3623EF7F4DE714C008DCC3333A154E38FCAE44CAD2A65204B7277",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Diagnostics.Process.dll",
+    "sha256": "1ACAEE1D612A45F2F287675B5B84DEFED1B34A90CC659641F97043F45076FBE7",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.ComponentModel.Primitives.dll",
+    "sha256": "953DB884B5EDFC396ED4036413240E538CDBB858C06354D976D7B2E6CCCE7167",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationFramework.dll",
+    "sha256": "15EC7AC7EAECDEABF3BFB378711F2C45BCD8A59D77BCD8254B9E90B776385189",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.Xaml.dll",
+    "sha256": "614FD9EBB6C12A2D7F52ABCDC2E63EC5FC277793D417C5A8D5A8BD017376BEFD",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Runtime.InteropServices.dll",
+    "sha256": "BDE2BB33524A73E2964CD47DDF753150D685B31EBB1C4779E66CA426B2B419BF",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\Microsoft.Win32.Primitives.dll",
+    "sha256": "637ADB956E9E80549239F1707DB3885683504EFBFC2ED8EA93A3D187EF53789C",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\DirectWriteForwarder.dll",
+    "sha256": "84A254D16D68BDEA52981338CB9ED5A2CC52369B51C8C91E72C4714EE2AD199E",
+    "version": "10.0.14-servicing.26522.126 @Commit: 0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Runtime.Extensions.dll",
+    "sha256": "F7E44A3F016421AF7130CCDD913C57419D3CD2A0F48E34BDD1295797F2535CF8",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Diagnostics.Debug.dll",
+    "sha256": "BA04477089EE6FC9AE8C2A8E711905FE1D7A113C785CB168D28ECCAED435400B",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Runtime.CompilerServices.VisualC.dll",
+    "sha256": "657ABF22F77265E6E111FA0C6F55FA176373DD447FCC0F0C4145DA91FCDDA047",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Threading.dll",
+    "sha256": "6C2137FB877E647A6C0F8909DB8CA7AF1E6FE95F19C6E531F6A74539FABCC6AD",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Collections.NonGeneric.dll",
+    "sha256": "82AB716AB740669598D8CDA36A92690BCC4B01EBBA8B21C0C4F0A7A8EE1D9248",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\Microsoft.Win32.Registry.dll",
+    "sha256": "143A613FC7C87E09C02CAC0CC1469F850120BED98C5A1602AD84FC42B6C1AE63",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Text.Json.dll",
+    "sha256": "FF440FD7D4AE3D5A6D080C1EBAAAE7D5F4145EA162AB12BF8931E92B4311F469",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.ObjectModel.dll",
+    "sha256": "16F21D6DA2DB3CE7A1C0B904BC2F3658685156A2155E5AABA8A3D45F4BC06C74",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.Uri.dll",
+    "sha256": "EB07DE9B8F80DBC1C2CAD80598E184A8369F6CBD9D105D50BCC6CD3428E61CE8",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Security.Cryptography.dll",
+    "sha256": "B043B1ED136164FD69606A9E7F26F1FC05D0C7CB888C0C00E3B58544623CC7E5",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Diagnostics.FileVersionInfo.dll",
+    "sha256": "B86967674838E9E7465E171D334F6B970720EBCF005326E45C1C08E5720A0054",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Text.Encoding.Extensions.dll",
+    "sha256": "FBBC0DDE38272605B8B95271CCA7202CA04D5FA115ACBCEE936E1BED611FD23C",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Text.Encodings.Web.dll",
+    "sha256": "319EB068C30AE985653A31911086141F5BA26B99E0CE7FF083F455AD42D4C584",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Numerics.Vectors.dll",
+    "sha256": "2025FBC96C75D61D82CEE26CCACB100D773A4E393630E2697A5C7BC6C4EE5A8E",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Collections.Concurrent.dll",
+    "sha256": "7F2AC0EC3BB9425017006CC750DC94A3C37ED175BA2F4EAA3F8F8E5CF35472E0",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Reflection.Emit.Lightweight.dll",
+    "sha256": "F43856D942AF20CD256A7358AFAD7FDB50DF4E9E307E29BEB34DFF8DBD094B6C",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Reflection.Primitives.dll",
+    "sha256": "9CC0088B3E2D6A0771063DAFD2C924538DFF5087C20610F7826A088A38C27AE0",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Reflection.Emit.ILGeneration.dll",
+    "sha256": "3F8D14D45F250218D9C66F158B7A218AC73D1F2DF75DBCF71A09F12F1711BF5F",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.IO.Pipelines.dll",
+    "sha256": "0306263C46F0FE7EBE87F4427D3365A23E92FAED787B81C54337349688662629",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.IO.Packaging.dll",
+    "sha256": "31C2DA0CBC8DB6BDD13F644A1A6C45CC04F590708824FDE9555827C22550F9F3",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Collections.Specialized.dll",
+    "sha256": "D9ED158EF29DF6146151D13260DDBB2310DA7150EB98C2637CE91D057F7786CB",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Threading.Thread.dll",
+    "sha256": "5E1C4834ABD41D88F79872557C69D20502E2D220BDE333870E31D1A1EB4EACD2",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationNative_cor3.dll",
+    "sha256": "091609705A031D5832F21548291C2670F06EADD781D465D3E1A5FAD3772ADC91",
+    "version": "10.0.7-servicing.26452.2 @Commit: 71ed74777b50c201c68f9f1c0576f5b3a969c395"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.Configuration.ConfigurationManager.dll",
+    "sha256": "89F3FBF13708E1BAAD3E47ED53B66DEF64FB9E0858E8E025A96A48C770D64E66",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Xml.ReaderWriter.dll",
+    "sha256": "496DC55783342234033FE7162F618938691F25DD818633CDD386DBA6E4E1C271",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.Xml.dll",
+    "sha256": "3467185933C682C10A67EB6B4EB78DF5A1DEBC63D4DEF7708D23DB9FB79780FC",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Net.WebClient.dll",
+    "sha256": "8CD16344C501AB69EE11EB1108EFB37D4C789DE9BF421BB3E8703800CA1A8B1D",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.ComponentModel.dll",
+    "sha256": "72B3608363E47F2CF3CF3FC9FE2FCEFB760E5292EBB9D650FA4CED3896DAB5F9",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\UIAutomationTypes.dll",
+    "sha256": "058D422DC28F4EF9DA309FEBF4D896F53FEBC01E72A78F50F2C2D58254A94811",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\wpfgfx_cor3.dll",
+    "sha256": "48A8E8100FD38183A0FABFE7FAD0BF9E9D28D65A0827298EF0910B31E6E94CBD",
+    "version": "10.0.14-servicing.26522.126 @Commit: 0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\D3DCompiler_47_cor3.dll",
+    "sha256": "A05F99734F7C4822FEFC12B367AF21FD0976ED6608752FB1E1E80B6ECE7ECBBB",
+    "version": "10.0.26100.7705"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Diagnostics.TraceSource.dll",
+    "sha256": "248C392F7DF6BD5DE9BE9411DFBBD61FD6AE9EA6F896EB8A9DD6445CB54AF2F2",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Diagnostics.Tracing.dll",
+    "sha256": "B8274D672EE21B7AB2B579AEC0C55795CB9FB3E1F15E9B3C2EE07D90260A3FA2",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.ComponentModel.TypeConverter.dll",
+    "sha256": "8FAABCF0EA88A11425D247B19D9CC8A64A78A7C07FF977854CF4A9166E0415B7",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Net.Requests.dll",
+    "sha256": "5E462536C5B743DBEF0522174A576ECB7BE0DD52C5074E64B7CA73BC7DC570D0",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Net.Primitives.dll",
+    "sha256": "01D8BEF670AC4265708686D37076D8D21DAF3152CD0E7B2AA264302C369F70BE",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Net.WebHeaderCollection.dll",
+    "sha256": "F5973C353B9204E5C1CCEEC843707C7BE368293428D52F62BC746400346103B3",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Threading.ThreadPool.dll",
+    "sha256": "2135197F9CBC09004CA02055BF54B5E3D0E2D7A9D61C477E4EF129321EB0B4C2",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationFramework.Fluent.dll",
+    "sha256": "502E8904DFCCCBC8376373637E57D7F2F2158B0206959C13618D64E0030B0D47",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.Windows.Extensions.dll",
+    "sha256": "1466D104DFF2DFB0A71C1E081A202D0EA0D448F5EFC1A366585DFE94AC6561FB",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationFramework.Aero2.dll",
+    "sha256": "E376AD95948844888CEF95741D1C14ED72CFFEE13E6D50E88D46C2EC8FB57535",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Runtime.Loader.dll",
+    "sha256": "B55E68BF26539914D8EB80718DC5B183F36D53C7FA20103F52C06796D33AA0C6",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Drawing.Primitives.dll",
+    "sha256": "5F04571DE46D5DEFEC5E946B618B7B1B10B9C613492A8089BA926D3DAD0C6916",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\mscorlib.dll",
+    "sha256": "5FF7B9C14324371CAB67E190165015103701045EBC36EDCB8A829E5505C2C765",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.Drawing.Common.dll",
+    "sha256": "F674F108DEB97B3BD7BCA94A444F06053F15ABFE69A0C14611FD8A9E8B4756BB",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.Private.Windows.GdiPlus.dll",
+    "sha256": "4F00CC57380834AC704D86A7D22AE5035B7D171C3BD7A0E3A7DD0DD901054F7C",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\System.Private.Windows.Core.dll",
+    "sha256": "F4C8F8218280630E2D44C185F70DA7BCA716D058CD6EA9411B55873FBF34BD23",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Diagnostics.StackTrace.dll",
+    "sha256": "C464FF65BB7A1EF7E70B0C610AEA951E8F71045CFDE50602832969AA02253B6E",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Reflection.Metadata.dll",
+    "sha256": "5AF6E802D91F1E404A95C55E23310185E7DE09ADAC62FFD6FD56B98A6B31B15D",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Collections.Immutable.dll",
+    "sha256": "CE2385891F525991C59D99A86CFAF8D5A81C56F24B01A433F42EB85071832121",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  },
+  {
+    "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.IO.MemoryMappedFiles.dll",
+    "sha256": "1C60D7B873037F161663CC1F98CCADAD1493195952B3F8DD318468AC451AC4AE",
+    "version": "10.0.14\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+  }
+]

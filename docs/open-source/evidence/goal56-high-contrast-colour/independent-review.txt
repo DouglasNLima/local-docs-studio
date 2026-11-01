@@ -1,0 +1,152 @@
+Independent technical review — Goal #56 High Contrast colour RCA
+Reviewer: /root/independent_high_contrast_review
+Review type: read-only source/evidence inspection; no native process, UI input,
+Windows setting mutation, workflow execution, push, merge or GitHub comment.
+
+Decision
+========
+Agree HIGH_CONTRAST_ROOT_CAUSE_INCONCLUSIVE.
+Agree HIGH_CONTRAST_CORRECTION_NO_GO and PR73_INTEGRATION_NO_GO.
+No product or existing Desktop UX harness correction is justified by the
+available causal evidence. The newly demonstrated transition ordering is relevant
+but does not establish the cause of the historical mixed highlight pair.
+Candidate controls and a same-host baseline/candidate comparison were NOT
+EXECUTED. No candidate behaviour is inferred from identical source.
+
+Independently checked identities and original evidence
+====================================================
+Git source/tree inspection:
+- Baseline ab21919a42ec8b3d17d9ba2e39b4e7e41459e206 /
+  f74345a61d0e9320a8826da8cb2ca3478ee3125e.
+- PR #73 0e80946eaf15bfd5b6dcf02a3bd16b00d5306569 /
+  ea571be730c48b20a1c70b90f1bcb1883f4dde73.
+- Diagnostic fc143791c47baa78d7de80268d5ebbc27e464e78 /
+  1c2edb1b204c61e6dcc06a230a0afac0909be748.
+- Independently fetched PR metadata still reports open, Draft, unmerged, with
+  those baseline/head commits.
+- Recomputed all nine source comparison SHA-256 values directly from Git
+  objects. ThemeService, DesktopStyles, CommandIcons, FormStyles, CommandIcon,
+  NativeUxScreenshots, NativeTestHighContrast, NativeSyntaxChecks and native-ux.yml
+  are identical between baseline and PR #73. The diagnostic branch has no
+  src/native diff and no diff to the original native-ux workflow, installer,
+  LICENSE or frozen mit-scope.json. Equality does not prove runtime equivalence.
+
+Independently rehashed original archive:
+5abffd2f92594d61856c9f9aea6d284ec69f6def3e5b1c268597b70bd2ee439e
+All 47 extracted members are byte-identical to the original ZIP members.
+The archive contains no ux-high-contrast PNG. Its 36 other PNGs do not certify
+the failed High Contrast capture. Raw original job log records the command,
+IOException and archive upload digest/ID 13099735465.
+
+Original failure is the validation process before the target application's
+launch: source ordering, capturesStarted=false and empty failure Observations
+agree. WPF/resource foreground #FF263B50 and background #FF0078D4 have matching
+requested/effective values, active bindings and unfrozen brushes. Both flags are
+true and Fluent.HC is selected. Win32 subsequently reports #FF263B50/#FF8EE3F0.
+Independently recalculated ratios are exactly 2.542596386238992 and
+7.893273424942036. All relevant colours are opaque, so these calculations are
+valid. The existing equality/4.5 assertion and its source remain unchanged.
+
+New archives, attempts and restoration
+=====================================
+Run 41352895301 / job 124986700604 / artifact 13102560763:
+77ea8db7ff7bfb5ae2ef8a6b830754c3619d0f4fdf49bfc279968570e972c0d0
+All 44 extracted members match ZIP bytes; five PNGs: four baseline passive
+captures plus one baseline pressed-command capture. Passive baseline exit 0,
+7.893273424942036, does not pass the old failed invocation. Transition exit 1.
+Restoration snapshot retains HC colours despite restored false OS flag, while
+WPF is still true. Job log separately proves the evidence-indexer self-output
+hash failure. Candidate was not reached.
+
+Run 41353431597 / job 124988327267 / artifact 13101779489:
+87e9a791059518de4141cf14694d3d9dd9e2365fe0b87f4f2721da922bc65b4d
+All 37 extracted members match ZIP bytes. Independently rehashed all 36 entries
+in its completed evidence-hashes.json. One PNG: baseline pressed command.
+Passive baseline was explicitly not repeated. Transition exit 1. Actual native
+WM_THEMECHANGED and WPF HighContrast events precede the amended snapshot.
+At restoration, both flags and all six sampled Win32 colours return to normal,
+but lpszDefaultScheme changes from empty to High Contrast Black. Exact state
+comparison fails and is preserved. Candidate was again not reached.
+The field is default-scheme metadata, not a complete active-theme identifier:
+https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-highcontrastw
+This does not authorise relabelling restoration PASS or asserting persistent
+user-theme damage. No third run is warranted by the declared budget.
+
+Timing, cache ownership and causal limits
+========================================
+The passive first process uses the unchanged prelaunch order and no overlay.
+The transition process intentionally primes WPF caches before enabling HC and
+creates an extra HWND. It is therefore a controlled alternative lifecycle, not
+a reconstruction of the old invocation. Its snapshots are sequential/non-atomic.
+
+Attempt 1 D ended at process ticks 3534792456. The WPF HighContrast event arrived
+at 3537703577 and native WM_THEMECHANGED at 3537835115. Thus one idle operation
+preceded actual settings completion in this experiment. B observes OS HC=true
+while OS colours and WPF state are still normal. C/D observe HC Win32 colours
+while WPF caches remain normal. The amended boundary in attempt 2 requires real
+events followed by an idle operation within 20 seconds, not a passing colour or
+ratio. It then observes matching HC WPF/Win32 values.
+
+Inspected WPF version-tag source uses independently cached SystemColors slots
+fed by GetSysColor and invalidates caches on theme/system-colour messages.
+Its source mechanics support a cache/transition hypothesis, not proof of which
+read populated the historical blue highlight slot or when that happened.
+The original failed invocation has no such initial-state or notification trace.
+The precise original dark-foreground/normal-blue hybrid was not reproduced by
+these new controls. Runtime 10.0.14 versus package 10.0.13 remains untested as
+a causal comparator.
+
+The one-shot diagnostic dictionary remains Fluent.Light and normal palette
+12.256016681911959 after its WPF caches catch up. This dictionary is not the
+real MainWindow, which has a UserPreferenceChanged/ApplyTheme path. No second
+Apply is performed by design. This retention is not demonstrated product failure.
+
+Actual application evidence and limitations
+==========================================
+Both attempts launch baseline product bytes under actual HC with a startup
+observer, then hold the real New document toolbar command. Native IsPressed and
+IsMouseOver=true, TemplateTrigger owns foreground, foreground/icon #FF263B50,
+opaque Surface #FF8EE3F0, both independently recomputed 7.893273424942036.
+UIA reports visible/enabled; keyboard focus=false is consistent with this
+non-focusable toolbar command. It is icon-only, so this is not rendered label
+text testing. One capture attempted/completed per attempt. Both PNGs inspected.
+Independent read-only pixel inspection of each 36x32 command rectangle finds
+848 exact cyan pixels and 26 exact dark icon pixels, consistent with metadata.
+
+Product assembly SHA-256 is A590D0F6A41A681AE70C69E20E5C9AA22EE6F7723A2A688B5873C189E07CC87F.
+The startup hook affects process loading/event timing even though it delays
+explicit colour reads until Loaded. These are instrumented real application
+observations, not proof of uninstrumented startup timing or a lifetime transition.
+No complete app, normal/hover/focus matrix, Light/Dark, transition-out, installed
+package, physical assistive-technology or complete Desktop UX PASS is established.
+
+Both diagnostic hosts record Windows Server 2025 build 26100, image
+20261021.278.1, AMD EPYC 7763, four logical processors, session 2 and .NET10.0.14.
+Actual diagnostic-parent/fresh framework paths/versions/hashes are recorded.
+PresentationFramework SHA-256 matches the old failure's
+15EC7AC7EAECDEABF3BFB378711F2C45BCD8A59D77BCD8254B9E90B776385189.
+Parent modules coreclr/wpfgfx/Fluent hashes agree across the diagnostic hosts.
+Actual application's observer records its Native assembly, but not a complete
+independent loaded-module runtime inventory; do not infer that missing inventory.
+
+Actionable reporting findings
+=============================
+1. surface/loaded.json contrast=1 is not valid normal-state contrast: its Surface
+   is transparent #00FFFFFF and the observer calculation ignores alpha and the
+   underlying panel. Preserve raw data, label the normal observation unsupported
+   for contrast, and do not call this a normal-state failure or PASS. Pressed
+   colours are opaque; their accepted calculation is unaffected.
+2. Observer endTicks is captured before subsequent HighContrast/SystemColors,
+   dictionaries and assembly hashing reads. It bounds earlier command/palette
+   collection, not the full snapshot. Preserve this limitation; do not claim
+   precise later-read timing or use it to reconstruct an original boundary.
+3. styleMatchesDesktopCommand=false is a direct-reference comparison. Source
+   uses a toolbar style BasedOn Desktop.CommandButton; false is not proof of the
+   wrong style. Report the actual template trigger and derived-style ownership.
+
+These can be addressed by accurate reporting without another execution. The
+current diagnostic helper must not be promoted into an acceptance fix. No hidden
+Win32 fallback, fixed-colour substitution, weakened threshold, OS setting bypass,
+theme-application loop, injected notification or contrast-driven retry was found.
+Retain all failures and NO-GO decisions. This review is technical agent review,
+not human approval, legal clearance or GitHub approval.

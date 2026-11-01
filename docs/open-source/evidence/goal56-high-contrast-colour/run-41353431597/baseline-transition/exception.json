@@ -1,0 +1,8 @@
+{
+  "at": {
+    "utc": "2026-11-01T21:45:49.9181489+00:00",
+    "ticks": 2741938023,
+    "frequency": 10000000
+  },
+  "error": "System.IO.IOException: Original High Contrast flag, scheme or system colours were not restored.\r\n   at LensDocsStudio.Native.Validation.NativeHighContrastColourRca.Run(String executable, String directory, String mode) in D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\goal56-colour-rca\\baseline-source\\src\\native\\LensDocsStudio.Native.Validation\\NativeHighContrastColourRca.cs:line 175"
+}

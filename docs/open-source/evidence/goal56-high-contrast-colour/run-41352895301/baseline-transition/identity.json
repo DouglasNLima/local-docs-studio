@@ -1,0 +1,47 @@
+{
+  "mode": "transition",
+  "at": {
+    "utc": "2026-11-01T21:39:27.0622004+00:00",
+    "ticks": 3528408079,
+    "frequency": 10000000
+  },
+  "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+  "tree": "f74345a61d0e9320a8826da8cb2ca3478ee3125e",
+  "overlay": "4b1aaea2d97805af419210e166667a4e00f4e4c1",
+  "overlayTree": "06ca75ef470afb472d7896ec8e379dbdbfcb7547",
+  "originalFailure": "41345774785/124965136051 FAILURE retained",
+  "processId": 1200,
+  "sessionId": 2,
+  "image": "win25-vs2026",
+  "imageVersion": "20261021.278.1",
+  "os": "Microsoft Windows 10.0.26100",
+  "runtime": ".NET 10.0.14",
+  "assemblies": [
+    {
+      "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll",
+      "sha256": "69D56E12535D3A8F2F8F89AC8F97577E6DC788D26F2E7B69BE8FB5F6FF17FF28",
+      "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+    },
+    {
+      "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationFramework.dll",
+      "sha256": "15EC7AC7EAECDEABF3BFB378711F2C45BCD8A59D77BCD8254B9E90B776385189",
+      "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+    },
+    {
+      "path": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationCore.dll",
+      "sha256": "131FAA87BCE352C2C7EA02FA6D6C36533992FD77A3BF429D1145D21EF3650F1D",
+      "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa"
+    },
+    {
+      "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\goal56-colour-rca\\baseline-source\\src\\native\\LensDocsStudio.Native.Validation\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.dll",
+      "sha256": "A590D0F6A41A681AE70C69E20E5C9AA22EE6F7723A2A688B5873C189E07CC87F",
+      "version": "0.1.0-preview.1\u002Bab21919a42ec8b3d17d9ba2e39b4e7e41459e206"
+    },
+    {
+      "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\goal56-colour-rca\\baseline-source\\src\\native\\LensDocsStudio.Native.Validation\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.Validation.dll",
+      "sha256": "2CE88F6B1C7FE1A54D4B76441BAD67285236FED4F31613DF9A831CC5F45BE107",
+      "version": "0.1.0-preview.1\u002Bab21919a42ec8b3d17d9ba2e39b4e7e41459e206"
+    }
+  ],
+  "currentTheme": "C:\\Windows\\resources\\Themes\\aero.theme"
+}

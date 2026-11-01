@@ -1,0 +1,25 @@
+{
+  "original": {
+    "enabled": false,
+    "Flags": 126,
+    "scheme": "High Contrast Black",
+    "highlight": "#FF0078D4",
+    "highlightText": "#FFFFFFFF",
+    "window": "#FFFFFFFF",
+    "control": "#FFF0F0F0",
+    "windowText": "#FF000000",
+    "activeBorder": "#FFB4B4B4"
+  },
+  "restored": {
+    "enabled": false,
+    "Flags": 126,
+    "scheme": "High Contrast Black",
+    "highlight": "#FF8EE3F0",
+    "highlightText": "#FF263B50",
+    "window": "#FF202020",
+    "control": "#FF202020",
+    "windowText": "#FFFFFFFF",
+    "activeBorder": "#FFFFFF00"
+  },
+  "exactOsStateRestored": false
+}

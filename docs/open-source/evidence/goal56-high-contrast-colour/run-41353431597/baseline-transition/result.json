@@ -1,0 +1,13 @@
+{
+  "exits": {
+    "fresh": 0,
+    "surface": 0
+  },
+  "originalFailure": "FAILURE retained",
+  "diagnosticAcceptance": false,
+  "at": {
+    "utc": "2026-11-01T21:45:50.0216317+00:00",
+    "ticks": 2742972856,
+    "frequency": 10000000
+  }
+}

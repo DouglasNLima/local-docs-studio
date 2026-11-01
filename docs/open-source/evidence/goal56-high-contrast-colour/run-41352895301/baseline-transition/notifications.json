@@ -1,0 +1,432 @@
+[
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.6846467+00:00",
+      "ticks": 3534632113,
+      "frequency": 10000000
+    },
+    "message": 21,
+    "wParam": 0,
+    "handle": 393240
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.6885711+00:00",
+      "ticks": 3534671358,
+      "frequency": 10000000
+    },
+    "message": 26,
+    "wParam": 4131,
+    "handle": 393240
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.6912135+00:00",
+      "ticks": 3534697781,
+      "frequency": 10000000
+    },
+    "message": 26,
+    "wParam": 67,
+    "handle": 393240
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9917931+00:00",
+      "ticks": 3537703577,
+      "frequency": 10000000
+    },
+    "wpfProperty": "HighContrast"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9925027+00:00",
+      "ticks": 3537710669,
+      "frequency": 10000000
+    },
+    "wpfProperty": "KeyboardCues"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928067+00:00",
+      "ticks": 3537713710,
+      "frequency": 10000000
+    },
+    "wpfProperty": "NonClientMetrics"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928106+00:00",
+      "ticks": 3537713745,
+      "frequency": 10000000
+    },
+    "wpfProperty": "Border"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928108+00:00",
+      "ticks": 3537713747,
+      "frequency": 10000000
+    },
+    "wpfProperty": "ThinHorizontalBorderHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.992811+00:00",
+      "ticks": 3537713748,
+      "frequency": 10000000
+    },
+    "wpfProperty": "ThinVerticalBorderWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928123+00:00",
+      "ticks": 3537713762,
+      "frequency": 10000000
+    },
+    "wpfProperty": "CursorWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928125+00:00",
+      "ticks": 3537713764,
+      "frequency": 10000000
+    },
+    "wpfProperty": "CursorHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928127+00:00",
+      "ticks": 3537713765,
+      "frequency": 10000000
+    },
+    "wpfProperty": "ThickHorizontalBorderHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928128+00:00",
+      "ticks": 3537713767,
+      "frequency": 10000000
+    },
+    "wpfProperty": "ThickVerticalBorderWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.992813+00:00",
+      "ticks": 3537713768,
+      "frequency": 10000000
+    },
+    "wpfProperty": "FixedFrameHorizontalBorderHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928131+00:00",
+      "ticks": 3537713770,
+      "frequency": 10000000
+    },
+    "wpfProperty": "FixedFrameVerticalBorderWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928133+00:00",
+      "ticks": 3537713772,
+      "frequency": 10000000
+    },
+    "wpfProperty": "HorizontalScrollBarButtonWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928135+00:00",
+      "ticks": 3537713773,
+      "frequency": 10000000
+    },
+    "wpfProperty": "HorizontalScrollBarHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928139+00:00",
+      "ticks": 3537713777,
+      "frequency": 10000000
+    },
+    "wpfProperty": "HorizontalScrollBarThumbWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928613+00:00",
+      "ticks": 3537714253,
+      "frequency": 10000000
+    },
+    "wpfProperty": "IconWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928619+00:00",
+      "ticks": 3537714258,
+      "frequency": 10000000
+    },
+    "wpfProperty": "IconHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928621+00:00",
+      "ticks": 3537714259,
+      "frequency": 10000000
+    },
+    "wpfProperty": "IconGridWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928623+00:00",
+      "ticks": 3537714261,
+      "frequency": 10000000
+    },
+    "wpfProperty": "IconGridHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928624+00:00",
+      "ticks": 3537714263,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MaximumWindowTrackWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928626+00:00",
+      "ticks": 3537714264,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MaximumWindowTrackHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928628+00:00",
+      "ticks": 3537714266,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MenuCheckmarkWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928629+00:00",
+      "ticks": 3537714268,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MenuCheckmarkHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928631+00:00",
+      "ticks": 3537714269,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MenuButtonWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928632+00:00",
+      "ticks": 3537714271,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MenuButtonHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928634+00:00",
+      "ticks": 3537714273,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimumWindowWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928636+00:00",
+      "ticks": 3537714274,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimumWindowHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928638+00:00",
+      "ticks": 3537714276,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimizedWindowWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928639+00:00",
+      "ticks": 3537714278,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimizedWindowHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9928679+00:00",
+      "ticks": 3537714672,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimizedGridWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929113+00:00",
+      "ticks": 3537714754,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimizedGridHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929118+00:00",
+      "ticks": 3537714757,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimumWindowTrackWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.992912+00:00",
+      "ticks": 3537714758,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MinimumWindowTrackHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929121+00:00",
+      "ticks": 3537714760,
+      "frequency": 10000000
+    },
+    "wpfProperty": "WindowCaptionButtonWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929123+00:00",
+      "ticks": 3537715048,
+      "frequency": 10000000
+    },
+    "wpfProperty": "WindowCaptionButtonHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929419+00:00",
+      "ticks": 3537715057,
+      "frequency": 10000000
+    },
+    "wpfProperty": "ResizeFrameHorizontalBorderHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.992942+00:00",
+      "ticks": 3537715059,
+      "frequency": 10000000
+    },
+    "wpfProperty": "ResizeFrameVerticalBorderWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929421+00:00",
+      "ticks": 3537715060,
+      "frequency": 10000000
+    },
+    "wpfProperty": "SmallIconWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929423+00:00",
+      "ticks": 3537715061,
+      "frequency": 10000000
+    },
+    "wpfProperty": "SmallIconHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929424+00:00",
+      "ticks": 3537715063,
+      "frequency": 10000000
+    },
+    "wpfProperty": "SmallWindowCaptionButtonWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929426+00:00",
+      "ticks": 3537715064,
+      "frequency": 10000000
+    },
+    "wpfProperty": "SmallWindowCaptionButtonHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929427+00:00",
+      "ticks": 3537715066,
+      "frequency": 10000000
+    },
+    "wpfProperty": "VerticalScrollBarWidth"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929429+00:00",
+      "ticks": 3537715068,
+      "frequency": 10000000
+    },
+    "wpfProperty": "VerticalScrollBarButtonHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929431+00:00",
+      "ticks": 3537715069,
+      "frequency": 10000000
+    },
+    "wpfProperty": "MenuBarHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:27.9929432+00:00",
+      "ticks": 3537715070,
+      "frequency": 10000000
+    },
+    "wpfProperty": "VerticalScrollBarThumbHeight"
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:28.0049472+00:00",
+      "ticks": 3537835115,
+      "frequency": 10000000
+    },
+    "message": 794,
+    "wParam": 917509,
+    "handle": 393240
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:28.0496962+00:00",
+      "ticks": 3538282610,
+      "frequency": 10000000
+    },
+    "message": 26,
+    "wParam": 0,
+    "handle": 393240
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:28.1450105+00:00",
+      "ticks": 3539235752,
+      "frequency": 10000000
+    },
+    "message": 26,
+    "wParam": 0,
+    "handle": 393240
+  },
+  {
+    "at": {
+      "utc": "2026-11-01T21:39:31.7853938+00:00",
+      "ticks": 3575639532,
+      "frequency": 10000000
+    },
+    "message": 800,
+    "wParam": 2264924160,
+    "handle": 393240
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "label": "baseline",
+    "exitCode": 0,
+    "control": "original-order"
+  },
+  {
+    "productSha256": "A590D0F6A41A681AE70C69E20E5C9AA22EE6F7723A2A688B5873C189E07CC87F",
+    "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "label": "baseline",
+    "exitCode": 1,
+    "control": "transition"
+  }
+]

@@ -1,0 +1,91 @@
+{
+  "boundary": "loaded",
+  "nonAtomic": true,
+  "startTicks": 3556236125,
+  "endTicks": 3556283794,
+  "frequency": 10000000,
+  "utc": "2026-11-01T21:39:29.8498242+00:00",
+  "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+  "tree": "f74345a61d0e9320a8826da8cb2ca3478ee3125e",
+  "overlay": "4b1aaea2d97805af419210e166667a4e00f4e4c1",
+  "processId": 7580,
+  "sessionId": 2,
+  "commands": [
+    {
+      "name": "New document (Ctrl\u002BN)",
+      "IsPressed": false,
+      "IsMouseOver": false,
+      "IsKeyboardFocused": false,
+      "IsKeyboardFocusWithin": false,
+      "foreground": "#FFFFFFFF",
+      "background": "#00FFFFFF",
+      "contrast": 1,
+      "requiredContrast": 4.5,
+      "foregroundSource": "Style",
+      "styleMatchesDesktopCommand": false,
+      "icons": [
+        {
+          "foreground": "#FFFFFFFF",
+          "contrast": 1
+        }
+      ]
+    }
+  ],
+  "palette": {
+    "PressedTextBrush": {
+      "colour": "#FF263B50",
+      "requested": "#FF263B50",
+      "status": "Active",
+      "IsFrozen": false,
+      "identity": 45731498
+    },
+    "PressedBrush": {
+      "colour": "#FF8EE3F0",
+      "requested": "#FF8EE3F0",
+      "status": "Active",
+      "IsFrozen": false,
+      "identity": 57638565
+    }
+  },
+  "highContrast": true,
+  "wpfHighlightText": "#FF263B50",
+  "wpfHighlight": "#FF8EE3F0",
+  "dictionaries": [
+    {
+      "identity": 27809721,
+      "source": null
+    },
+    {
+      "identity": 11103852,
+      "source": "Resources/CommandIcons.xaml"
+    },
+    {
+      "identity": 10132353,
+      "source": "Resources/DesktopStyles.xaml"
+    },
+    {
+      "identity": 64611726,
+      "source": "Resources/FormStyles.xaml"
+    },
+    {
+      "identity": 34646073,
+      "source": "CommandIcons.xaml"
+    },
+    {
+      "identity": 47745765,
+      "source": "DesktopStyles.xaml"
+    },
+    {
+      "identity": 16715179,
+      "source": null
+    },
+    {
+      "identity": 15970745,
+      "source": "pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.HC.xaml"
+    }
+  ],
+  "applicationAssembly": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\goal56-colour-rca\\baseline-source\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.dll",
+    "sha256": "A590D0F6A41A681AE70C69E20E5C9AA22EE6F7723A2A688B5873C189E07CC87F"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "boundary": "B-after-SPI",
+  "start": {
+    "utc": "2026-11-01T21:45:44.3507255+00:00",
+    "ticks": 2686263332,
+    "frequency": 10000000
+  },
+  "nonAtomic": true,
+  "readOrder": "OS before; WPF flag; WPF highlight text/background; other WPF colours; palette; OS after",
+  "osBefore": {
+    "enabled": true,
+    "Flags": 127,
+    "scheme": "",
+    "highlight": "#FF0078D4",
+    "highlightText": "#FFFFFFFF",
+    "window": "#FFFFFFFF",
+    "control": "#FFF0F0F0",
+    "windowText": "#FF000000",
+    "activeBorder": "#FFB4B4B4"
+  },
+  "wpfFlag": false,
+  "wpfHighlightText": "#FFFFFFFF",
+  "wpfHighlight": "#FF0078D4",
+  "other": {
+    "window": "#FFFFFFFF",
+    "control": "#FFF0F0F0",
+    "windowText": "#FF000000",
+    "activeBorder": "#FFB4B4B4",
+    "accent": "#FF0078D4"
+  },
+  "palette": {
+    "WindowBrush": null,
+    "PanelBrush": null,
+    "TextBrush": null,
+    "MutedTextBrush": null,
+    "HoverBrush": null,
+    "PressedBrush": null,
+    "BorderBrush": null,
+    "AccentBrush": null,
+    "PressedTextBrush": null,
+    "AccentTextBrush": null
+  },
+  "effectiveRatio": null,
+  "wpfRatio": 4.528515190218159,
+  "requiredContrast": 4.5,
+  "win32Ratio": 4.528515190218159,
+  "dictionaries": null,
+  "osAfter": {
+    "enabled": true,
+    "Flags": 127,
+    "scheme": "",
+    "highlight": "#FF0078D4",
+    "highlightText": "#FFFFFFFF",
+    "window": "#FFFFFFFF",
+    "control": "#FFF0F0F0",
+    "windowText": "#FF000000",
+    "activeBorder": "#FFB4B4B4"
+  },
+  "end": {
+    "utc": "2026-11-01T21:45:44.3511937+00:00",
+    "ticks": 2686268011,
+    "frequency": 10000000
+  }
+}

@@ -1,0 +1,410 @@
+[
+  {
+    "Theme": "System",
+    "RequestedWidth": 860,
+    "RequestedHeight": 540,
+    "Bounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 860,
+        "Height": 540
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 860,
+      "Height": 540,
+      "Left": 0,
+      "Top": 0,
+      "Right": 860,
+      "Bottom": 540,
+      "IsEmpty": false
+    },
+    "DesktopBounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1920,
+        "Height": 1080
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 1080,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1920,
+      "Bottom": 1080,
+      "IsEmpty": false
+    },
+    "Revision": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "Screenshot": "native-high-contrast-860x540.png",
+    "HighContrast": true,
+    "OverflowCommands": [
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 130,
+            "Y": 199
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 130,
+          "Y": 199,
+          "Width": 24,
+          "Height": 36,
+          "Left": 130,
+          "Top": 199,
+          "Right": 154,
+          "Bottom": 235,
+          "IsEmpty": false
+        }
+      },
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 393,
+            "Y": 186
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 393,
+          "Y": 186,
+          "Width": 24,
+          "Height": 36,
+          "Left": 393,
+          "Top": 186,
+          "Right": 417,
+          "Bottom": 222,
+          "IsEmpty": false
+        }
+      },
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 655,
+            "Y": 186
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 655,
+          "Y": 186,
+          "Width": 24,
+          "Height": 36,
+          "Left": 655,
+          "Top": 186,
+          "Right": 679,
+          "Bottom": 222,
+          "IsEmpty": false
+        }
+      }
+    ],
+    "PhysicalDpiCertified": false,
+    "AccessibilityCertified": false
+  },
+  {
+    "Theme": "System",
+    "RequestedWidth": 1280,
+    "RequestedHeight": 800,
+    "Bounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1280,
+        "Height": 800
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1280,
+      "Height": 800,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1280,
+      "Bottom": 800,
+      "IsEmpty": false
+    },
+    "DesktopBounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1920,
+        "Height": 1080
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 1080,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1920,
+      "Bottom": 1080,
+      "IsEmpty": false
+    },
+    "Revision": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "Screenshot": "native-high-contrast-1280x800.png",
+    "HighContrast": true,
+    "OverflowCommands": [
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 603,
+            "Y": 145
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 603,
+          "Y": 145,
+          "Width": 24,
+          "Height": 36,
+          "Left": 603,
+          "Top": 145,
+          "Right": 627,
+          "Bottom": 181,
+          "IsEmpty": false
+        }
+      },
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 997,
+            "Y": 145
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 997,
+          "Y": 145,
+          "Width": 24,
+          "Height": 36,
+          "Left": 997,
+          "Top": 145,
+          "Right": 1021,
+          "Bottom": 181,
+          "IsEmpty": false
+        }
+      }
+    ],
+    "PhysicalDpiCertified": false,
+    "AccessibilityCertified": false
+  },
+  {
+    "Theme": "System",
+    "RequestedWidth": 1440,
+    "RequestedHeight": 900,
+    "Bounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1440,
+        "Height": 900
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1440,
+      "Height": 900,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1440,
+      "Bottom": 900,
+      "IsEmpty": false
+    },
+    "DesktopBounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1920,
+        "Height": 1080
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 1080,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1920,
+      "Bottom": 1080,
+      "IsEmpty": false
+    },
+    "Revision": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "Screenshot": "native-high-contrast-1440x900.png",
+    "HighContrast": true,
+    "OverflowCommands": [
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 683,
+            "Y": 145
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 683,
+          "Y": 145,
+          "Width": 24,
+          "Height": 36,
+          "Left": 683,
+          "Top": 145,
+          "Right": 707,
+          "Bottom": 181,
+          "IsEmpty": false
+        }
+      },
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 1157,
+            "Y": 145
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 1157,
+          "Y": 145,
+          "Width": 24,
+          "Height": 36,
+          "Left": 1157,
+          "Top": 145,
+          "Right": 1181,
+          "Bottom": 181,
+          "IsEmpty": false
+        }
+      }
+    ],
+    "PhysicalDpiCertified": false,
+    "AccessibilityCertified": false
+  },
+  {
+    "Theme": "System",
+    "RequestedWidth": 1920,
+    "RequestedHeight": 1080,
+    "Bounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1920,
+        "Height": 1080
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 1080,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1920,
+      "Bottom": 1080,
+      "IsEmpty": false
+    },
+    "DesktopBounds": {
+      "Location": {
+        "IsEmpty": true,
+        "X": 0,
+        "Y": 0
+      },
+      "Size": {
+        "IsEmpty": false,
+        "Width": 1920,
+        "Height": 1080
+      },
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 1080,
+      "Left": 0,
+      "Top": 0,
+      "Right": 1920,
+      "Bottom": 1080,
+      "IsEmpty": false
+    },
+    "Revision": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "Screenshot": "native-high-contrast-1920x1080.png",
+    "HighContrast": true,
+    "OverflowCommands": [
+      {
+        "IsOffscreen": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 923,
+            "Y": 145
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 24,
+            "Height": 36
+          },
+          "X": 923,
+          "Y": 145,
+          "Width": 24,
+          "Height": 36,
+          "Left": 923,
+          "Top": 145,
+          "Right": 947,
+          "Bottom": 181,
+          "IsEmpty": false
+        }
+      }
+    ],
+    "PhysicalDpiCertified": false,
+    "AccessibilityCertified": false
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "control": "original-order",
+    "label": "baseline",
+    "status": "NOT REPEATED; retained run 41352895301"
+  },
+  {
+    "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "control": "transition",
+    "label": "baseline",
+    "exitCode": 1,
+    "productSha256": "A590D0F6A41A681AE70C69E20E5C9AA22EE6F7723A2A688B5873C189E07CC87F"
+  }
+]

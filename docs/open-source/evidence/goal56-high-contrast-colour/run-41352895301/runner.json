@@ -1,0 +1,200 @@
+[
+  {
+    "Key": "GITHUB_RUN_ATTEMPT",
+    "Value": "1",
+    "PSPath": "Microsoft.PowerShell.Core\\Environment::GITHUB_RUN_ATTEMPT",
+    "PSDrive": {
+      "CurrentLocation": "",
+      "Name": "Env",
+      "Provider": "Microsoft.PowerShell.Core\\Environment",
+      "Root": "",
+      "Description": "Drive that contains a view of the environment variables for the process",
+      "MaximumSize": null,
+      "Credential": "System.Management.Automation.PSCredential",
+      "DisplayRoot": null,
+      "VolumeSeparatedByColon": true
+    },
+    "PSProvider": {
+      "ImplementingType": "Microsoft.PowerShell.Commands.EnvironmentProvider",
+      "HelpFile": "System.Management.Automation.dll-Help.xml",
+      "Name": "Environment",
+      "PSSnapIn": "Microsoft.PowerShell.Core",
+      "ModuleName": "Microsoft.PowerShell.Core",
+      "Module": null,
+      "Description": "",
+      "Capabilities": 16,
+      "Home": "",
+      "Drives": "Env",
+      "VolumeSeparatedByColon": true,
+      "ItemSeparator": "\\",
+      "AltItemSeparator": "/"
+    },
+    "PSIsContainer": false,
+    "Name": "GITHUB_RUN_ATTEMPT"
+  },
+  {
+    "Key": "GITHUB_RUN_ID",
+    "Value": "41352895301",
+    "PSPath": "Microsoft.PowerShell.Core\\Environment::GITHUB_RUN_ID",
+    "PSDrive": {
+      "CurrentLocation": "",
+      "Name": "Env",
+      "Provider": "Microsoft.PowerShell.Core\\Environment",
+      "Root": "",
+      "Description": "Drive that contains a view of the environment variables for the process",
+      "MaximumSize": null,
+      "Credential": "System.Management.Automation.PSCredential",
+      "DisplayRoot": null,
+      "VolumeSeparatedByColon": true
+    },
+    "PSProvider": {
+      "ImplementingType": "Microsoft.PowerShell.Commands.EnvironmentProvider",
+      "HelpFile": "System.Management.Automation.dll-Help.xml",
+      "Name": "Environment",
+      "PSSnapIn": "Microsoft.PowerShell.Core",
+      "ModuleName": "Microsoft.PowerShell.Core",
+      "Module": null,
+      "Description": "",
+      "Capabilities": 16,
+      "Home": "",
+      "Drives": "Env",
+      "VolumeSeparatedByColon": true,
+      "ItemSeparator": "\\",
+      "AltItemSeparator": "/"
+    },
+    "PSIsContainer": false,
+    "Name": "GITHUB_RUN_ID"
+  },
+  {
+    "Key": "ImageOS",
+    "Value": "win25-vs2026",
+    "PSPath": "Microsoft.PowerShell.Core\\Environment::ImageOS",
+    "PSDrive": {
+      "CurrentLocation": "",
+      "Name": "Env",
+      "Provider": "Microsoft.PowerShell.Core\\Environment",
+      "Root": "",
+      "Description": "Drive that contains a view of the environment variables for the process",
+      "MaximumSize": null,
+      "Credential": "System.Management.Automation.PSCredential",
+      "DisplayRoot": null,
+      "VolumeSeparatedByColon": true
+    },
+    "PSProvider": {
+      "ImplementingType": "Microsoft.PowerShell.Commands.EnvironmentProvider",
+      "HelpFile": "System.Management.Automation.dll-Help.xml",
+      "Name": "Environment",
+      "PSSnapIn": "Microsoft.PowerShell.Core",
+      "ModuleName": "Microsoft.PowerShell.Core",
+      "Module": null,
+      "Description": "",
+      "Capabilities": 16,
+      "Home": "",
+      "Drives": "Env",
+      "VolumeSeparatedByColon": true,
+      "ItemSeparator": "\\",
+      "AltItemSeparator": "/"
+    },
+    "PSIsContainer": false,
+    "Name": "ImageOS"
+  },
+  {
+    "Key": "ImageVersion",
+    "Value": "20261021.278.1",
+    "PSPath": "Microsoft.PowerShell.Core\\Environment::ImageVersion",
+    "PSDrive": {
+      "CurrentLocation": "",
+      "Name": "Env",
+      "Provider": "Microsoft.PowerShell.Core\\Environment",
+      "Root": "",
+      "Description": "Drive that contains a view of the environment variables for the process",
+      "MaximumSize": null,
+      "Credential": "System.Management.Automation.PSCredential",
+      "DisplayRoot": null,
+      "VolumeSeparatedByColon": true
+    },
+    "PSProvider": {
+      "ImplementingType": "Microsoft.PowerShell.Commands.EnvironmentProvider",
+      "HelpFile": "System.Management.Automation.dll-Help.xml",
+      "Name": "Environment",
+      "PSSnapIn": "Microsoft.PowerShell.Core",
+      "ModuleName": "Microsoft.PowerShell.Core",
+      "Module": null,
+      "Description": "",
+      "Capabilities": 16,
+      "Home": "",
+      "Drives": "Env",
+      "VolumeSeparatedByColon": true,
+      "ItemSeparator": "\\",
+      "AltItemSeparator": "/"
+    },
+    "PSIsContainer": false,
+    "Name": "ImageVersion"
+  },
+  {
+    "Key": "RUNNER_ENVIRONMENT",
+    "Value": "github-hosted",
+    "PSPath": "Microsoft.PowerShell.Core\\Environment::RUNNER_ENVIRONMENT",
+    "PSDrive": {
+      "CurrentLocation": "",
+      "Name": "Env",
+      "Provider": "Microsoft.PowerShell.Core\\Environment",
+      "Root": "",
+      "Description": "Drive that contains a view of the environment variables for the process",
+      "MaximumSize": null,
+      "Credential": "System.Management.Automation.PSCredential",
+      "DisplayRoot": null,
+      "VolumeSeparatedByColon": true
+    },
+    "PSProvider": {
+      "ImplementingType": "Microsoft.PowerShell.Commands.EnvironmentProvider",
+      "HelpFile": "System.Management.Automation.dll-Help.xml",
+      "Name": "Environment",
+      "PSSnapIn": "Microsoft.PowerShell.Core",
+      "ModuleName": "Microsoft.PowerShell.Core",
+      "Module": null,
+      "Description": "",
+      "Capabilities": 16,
+      "Home": "",
+      "Drives": "Env",
+      "VolumeSeparatedByColon": true,
+      "ItemSeparator": "\\",
+      "AltItemSeparator": "/"
+    },
+    "PSIsContainer": false,
+    "Name": "RUNNER_ENVIRONMENT"
+  },
+  {
+    "Key": "RUNNER_OS",
+    "Value": "Windows",
+    "PSPath": "Microsoft.PowerShell.Core\\Environment::RUNNER_OS",
+    "PSDrive": {
+      "CurrentLocation": "",
+      "Name": "Env",
+      "Provider": "Microsoft.PowerShell.Core\\Environment",
+      "Root": "",
+      "Description": "Drive that contains a view of the environment variables for the process",
+      "MaximumSize": null,
+      "Credential": "System.Management.Automation.PSCredential",
+      "DisplayRoot": null,
+      "VolumeSeparatedByColon": true
+    },
+    "PSProvider": {
+      "ImplementingType": "Microsoft.PowerShell.Commands.EnvironmentProvider",
+      "HelpFile": "System.Management.Automation.dll-Help.xml",
+      "Name": "Environment",
+      "PSSnapIn": "Microsoft.PowerShell.Core",
+      "ModuleName": "Microsoft.PowerShell.Core",
+      "Module": null,
+      "Description": "",
+      "Capabilities": 16,
+      "Home": "",
+      "Drives": "Env",
+      "VolumeSeparatedByColon": true,
+      "ItemSeparator": "\\",
+      "AltItemSeparator": "/"
+    },
+    "PSIsContainer": false,
+    "Name": "RUNNER_OS"
+  }
+]
