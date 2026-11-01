@@ -105,6 +105,20 @@ internal static class NativeFindRoutingChecks
             PumpUntil(() => pending.IsCompleted); pending.GetAwaiter().GetResult();
             Check(editor.CaretOffset == 0 && editor.SelectionLength == 0,
                 "New editor keyboard interaction cancels delayed navigation even without a source edit");
+            editor.Document.Text = source; editor.Select(source.Length, 0);
+            query.Text = ""; query.Text = "Café";
+            pending = (Task)typeof(MainWindow).GetMethod("NavigateFindAsync", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, [1])!;
+            RaiseKey(editor.TextArea, Keyboard.PreviewKeyDownEvent, Key.V, handled: true);
+            PumpUntil(() => pending.IsCompleted); pending.GetAwaiter().GetResult();
+            Check(editor.CaretOffset == source.Length && editor.SelectionLength == 0 && editor.Document.Text == source,
+                "A handled editor shortcut cancels delayed navigation before its asynchronous edit changes the document");
+            query.Text = ""; query.Text = "Café";
+            var routedNavigation = RaiseKey(editor.TextArea, Keyboard.PreviewKeyDownEvent, Key.F3, handled: true);
+            pending = (Task)typeof(MainWindow).GetMethod("NavigateFindAsync", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, [1])!;
+            editor.TextArea.RaiseEvent(routedNavigation);
+            PumpUntil(() => pending.IsCompleted); pending.GetAwaiter().GetResult();
+            Check(editor.SelectionStart == 2 && editor.SelectedText == "Café",
+                "A second phase of the same routed key preserves its newly authorised navigation");
             editor.Document.Text = source; query.Text = "Café";
             pending = (Task)typeof(MainWindow).GetMethod("NavigateFindAsync", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, [1])!;
             PumpUntil(() => pending.IsCompleted); pending.GetAwaiter().GetResult();

@@ -17,6 +17,7 @@ public partial class MainWindow
     private int findCurrent = -1;
     private long findGeneration;
     private long findInteraction;
+    private KeyEventArgs? observedEditorFindKey;
     private enum FindRefreshCause { Query, Source, ActiveDocument, Preview, Navigation, Replacement, Closed }
     private sealed record FindRequest(long Generation, long Interaction, FindRefreshCause Cause);
     private FindRequest? pendingFindRequest;
@@ -37,14 +38,14 @@ public partial class MainWindow
         // The bound AvalonEdit document is the sole source-text invalidation path.
         Editor.TextChanged += (_, _) => InvalidateFind(FindRefreshCause.Source);
         Editor.GotKeyboardFocus += (_, _) => CancelFindNavigation();
-        Editor.TextArea.PreviewKeyDown += (_, _) => CancelFindNavigation();
+        Editor.TextArea.AddHandler(Keyboard.PreviewKeyDownEvent, new KeyEventHandler(ObserveEditorFindKey), true);
         Editor.PreviewMouseDown += (_, _) => CancelFindNavigation();
         Editor.PreviewMouseWheel += (_, _) => CancelFindNavigation();
         Editor.TextArea.SelectionChanged += (_, _) => UpdateEditorFindSelection();
         Editor.TextArea.Caret.PositionChanged += (_, _) => UpdateEditorFindSelection();
         Preview.GotKeyboardFocus += (_, _) => CancelFindNavigation();
         Preview.PreviewMouseDown += (_, _) => CancelFindNavigation();
-        Closed += (_, _) => { findTimer.Stop(); findCancellation?.Cancel(); CancelFindNavigation(); };
+        Closed += (_, _) => { findTimer.Stop(); findCancellation?.Cancel(); CancelFindNavigation(); observedEditorFindKey = null; };
     }
     private void OpenFind(object sender, RoutedEventArgs e) => ShowFind(false);
     private void OpenReplace(object sender, RoutedEventArgs e) => ShowFind(true);
@@ -64,6 +65,14 @@ public partial class MainWindow
         if (searchPreview) Preview.Focus(); else Editor.Focus();
     }
     private void FindQueryChanged(object sender, TextChangedEventArgs e) => InvalidateFind(FindRefreshCause.Query);
+    private void ObserveEditorFindKey(object sender, KeyEventArgs e)
+    {
+        // The window observes before dispatching commands; TextArea also receives
+        // handled input. One routed key must not revoke its own new navigation.
+        if (ReferenceEquals(observedEditorFindKey, e)) return;
+        observedEditorFindKey = e;
+        CancelFindNavigation();
+    }
     private void CancelFindNavigation()
     {
         findInteraction++;

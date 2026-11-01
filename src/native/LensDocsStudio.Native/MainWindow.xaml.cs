@@ -675,6 +675,7 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (Editor.IsKeyboardFocusWithin) ObserveEditorFindKey(sender, e);
         // Native command surfaces consume Escape before Find and viewing modes.
         if (e.Key == Key.Escape && CommandSurfaceOpen) return;
         if (HandleDesktopKey(e)) { e.Handled = true; return; }

@@ -52,15 +52,15 @@
     },
     "src/native/LensDocsStudio.Native.Validation/NativeFindRoutingChecks.cs": {
       "previous": "75b7dacd29eb999e9deadbce4fca1943a1b953c1bae3cddbc8ed58225dc6d05e",
-      "current": "d82e5f19e6d3eb23266c7738fcf723d9a9049dc2d24800b6ffc2dafcdc90253c"
+      "current": "f16070792d79a324445eed1f2fac871489fa509059f024566e049d2a2254acc9"
     },
     "src/native/LensDocsStudio.Native/MainWindow.Find.cs": {
       "previous": "eaed995f42c3773df3e4bc9954741e4313e2690e8d238a4c3780481a1c08b17c",
-      "current": "3e0a1d5d251025bba6b8bdb5b7d44f2ea355537787b2f27792a4f83e1e5eea2a"
+      "current": "9e8bcd8b2fbbcdf7d073a61f98b500e54c2c58dd6341e9dc506fab5fa6e7ac7e"
     },
     "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
       "previous": "c57d22adb243bd9952b31e690af18539bf49b4bd4ebd32fd3f9dfc812545a53a",
-      "current": "b5339b43b9a3d1142133068e1bf70779e245550a80223157ae99da5cffce0977"
+      "current": "6c51297b336ebac1f4bb7a9e879f2bf651efa9c0ccedbea679760e6286e85da0"
     },
     "tests/browser/app-smoke.spec.mjs": {
       "previous": "cbd6e90757247513143f39fc3874cf46f28dfbddae6539746b4e189e48b12268",
