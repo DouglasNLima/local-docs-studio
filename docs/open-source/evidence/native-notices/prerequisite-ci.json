@@ -1,0 +1,300 @@
+[
+  {
+    "conclusion": "success",
+    "created_at": "2026-11-01T18:00:17Z",
+    "head_sha": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320896",
+    "id": 41334320896,
+    "name": "Publish Lens Docs Studio",
+    "run_attempt": 1,
+    "status": "completed",
+    "updated_at": "2026-11-01T18:06:51Z",
+    "jobs": [
+      {
+        "id": 124930797754,
+        "name": "Test static app (edge)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320896/job/124930797754"
+      },
+      {
+        "id": 124930797935,
+        "name": "Test static app (chromium)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320896/job/124930797935"
+      },
+      {
+        "id": 124932501230,
+        "name": "Test static app",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320896/job/124932501230"
+      },
+      {
+        "id": 124932525285,
+        "name": "Deploy to GitHub Pages",
+        "status": "completed",
+        "conclusion": "skipped",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320896/job/124932525285"
+      }
+    ]
+  },
+  {
+    "conclusion": "success",
+    "created_at": "2026-11-01T18:00:17Z",
+    "head_sha": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320982",
+    "id": 41334320982,
+    "name": "Validate OSS provenance",
+    "run_attempt": 1,
+    "status": "completed",
+    "updated_at": "2026-11-01T18:00:47Z",
+    "jobs": [
+      {
+        "id": 124930797607,
+        "name": "OSS provenance",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334320982/job/124930797607"
+      }
+    ]
+  },
+  {
+    "conclusion": "success",
+    "created_at": "2026-11-01T18:00:17Z",
+    "head_sha": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+    "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013",
+    "id": 41334321013,
+    "name": "Validate native Windows edition",
+    "run_attempt": 1,
+    "status": "completed",
+    "updated_at": "2026-11-01T18:38:13Z",
+    "jobs": [
+      {
+        "id": 124930798009,
+        "name": "find-editor-caret (high-contrast)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930798009"
+      },
+      {
+        "id": 124930798186,
+        "name": "diagram-arrangement",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930798186"
+      },
+      {
+        "id": 124930798228,
+        "name": "complex-er-preview",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930798228"
+      },
+      {
+        "id": 124930798248,
+        "name": "arrangement-responsiveness",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930798248"
+      },
+      {
+        "id": 124930798274,
+        "name": "find-editor-caret (normal)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930798274"
+      },
+      {
+        "id": 124930798351,
+        "name": "native",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930798351"
+      },
+      {
+        "id": 124930799246,
+        "name": "Original .853 diagnostic replay (${{ matrix.associations }})",
+        "status": "completed",
+        "conclusion": "skipped",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124930799246"
+      },
+      {
+        "id": 124938554698,
+        "name": "er-installed-authoring",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554698"
+      },
+      {
+        "id": 124938554704,
+        "name": "class-installed-authoring",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554704"
+      },
+      {
+        "id": 124938554795,
+        "name": "state-installed-authoring",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554795"
+      },
+      {
+        "id": 124938554941,
+        "name": "companion-installed-authoring (Sequence)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554941"
+      },
+      {
+        "id": 124938554947,
+        "name": "companion-installed-authoring (Kanban)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554947"
+      },
+      {
+        "id": 124938554950,
+        "name": "companion-installed-authoring (Sankey)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554950"
+      },
+      {
+        "id": 124938554951,
+        "name": "companion-installed-authoring (Timeline)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554951"
+      },
+      {
+        "id": 124938554953,
+        "name": "companion-installed-authoring (Xy)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554953"
+      },
+      {
+        "id": 124938554955,
+        "name": "companion-installed-authoring (Flowchart)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554955"
+      },
+      {
+        "id": 124938554965,
+        "name": "companion-installed-authoring (Requirement)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554965"
+      },
+      {
+        "id": 124938554974,
+        "name": "companion-installed-authoring (Block)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554974"
+      },
+      {
+        "id": 124938554985,
+        "name": "companion-installed-authoring (TreeView)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554985"
+      },
+      {
+        "id": 124938554994,
+        "name": "companion-installed-authoring (Gantt)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938554994"
+      },
+      {
+        "id": 124938555004,
+        "name": "companion-installed-authoring (Architecture)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555004"
+      },
+      {
+        "id": 124938555009,
+        "name": "companion-installed-authoring (GitGraph)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555009"
+      },
+      {
+        "id": 124938555010,
+        "name": "companion-installed-authoring (Venn)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555010"
+      },
+      {
+        "id": 124938555017,
+        "name": "companion-installed-authoring (Journey)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555017"
+      },
+      {
+        "id": 124938555021,
+        "name": "companion-installed-authoring (Pie)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555021"
+      },
+      {
+        "id": 124938555044,
+        "name": "companion-installed-authoring (Quadrant)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555044"
+      },
+      {
+        "id": 124938555048,
+        "name": "companion-installed-authoring (Radar)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555048"
+      },
+      {
+        "id": 124938555050,
+        "name": "companion-installed-authoring (Packet)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555050"
+      },
+      {
+        "id": 124938555083,
+        "name": "companion-installed-authoring (C4)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555083"
+      },
+      {
+        "id": 124938555094,
+        "name": "companion-installed-authoring (Treemap)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555094"
+      },
+      {
+        "id": 124938555184,
+        "name": "companion-installed-authoring (Mindmap)",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938555184"
+      },
+      {
+        "id": 124938556460,
+        "name": "Historical upgrade (${{ matrix.preview }})",
+        "status": "completed",
+        "conclusion": "skipped",
+        "html_url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41334321013/job/124938556460"
+      }
+    ]
+  }
+]

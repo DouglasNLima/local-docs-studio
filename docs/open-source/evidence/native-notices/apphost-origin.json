@@ -1,0 +1,22 @@
+{
+  "id": "Microsoft.NETCore.App.Host.win-x64/10.0.13",
+  "source": "https://api.nuget.org/v3-flatcontainer/microsoft.netcore.app.host.win-x64/10.0.13/microsoft.netcore.app.host.win-x64.10.0.13.nupkg",
+  "archiveSha256": "503712375103bd93aa6ab51d1b64c134ac131e002540ec818b447dfe72c52174",
+  "registryArchiveVerified": true,
+  "templateSha256": "0db58d6c63a9323451ad65ccfc771ede03ca816125558189063ce053112effd0",
+  "repositoryCommit": "4099f83977f4d29604a9aeb971fb0a7bc1d5f699",
+  "notices": [
+    {
+      "path": "LICENSE.TXT",
+      "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b",
+      "matchesAlreadyShippedRuntimeNotice": true
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.TXT",
+      "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21",
+      "matchesAlreadyShippedRuntimeNotice": true
+    }
+  ],
+  "classification": "PROVENANCE_UNCONFIRMED",
+  "limit": "Exact official template archive is verified; generated apphost is patched by the SDK with assembly path, icon, version and GUI settings. No full-file byte equality or independent source-to-binary proof is asserted. Existing 20-component SBOM labels apphost among generated project outputs; this companion record supplies its omitted template identity."
+}

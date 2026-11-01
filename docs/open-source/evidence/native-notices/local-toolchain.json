@@ -1,0 +1,56 @@
+{
+  "compilerEngine": "Inno Setup 6.7.3",
+  "identitySource": "Original baseline-build.log compiler banner",
+  "files": [
+    {
+      "file": "ISCC.exe",
+      "bytes": 1456272,
+      "sha256": "0a8757031b33777e4c9cbffee40f11a5062b36d25cbe144c1db73b6102b80ad7"
+    },
+    {
+      "file": "ISCmplr.dll",
+      "bytes": 1524880,
+      "sha256": "85a1e3090d3a5b85319f001b7c8f9ecfad45f37eff030a67bbe29ef58b7aa2c3"
+    },
+    {
+      "file": "Setup.e32",
+      "bytes": 4427264,
+      "sha256": "a80d75ba8d8c336050c37f7707de8bb017cc93597329e0ea18d474156b3e0da5"
+    },
+    {
+      "file": "SetupLdr.e32",
+      "bytes": 950272,
+      "sha256": "5475964893adbb33ccc420ad4d88bbdff27dfaaca7580cd6058ea2798893490d"
+    },
+    {
+      "file": "SetupLdr.e64",
+      "bytes": 1422336,
+      "sha256": "e38f2140e6bfd86c6ddc69c98f46475080c75fd5ee4be701ceff9c842c6c5019"
+    },
+    {
+      "file": "Default.isl",
+      "bytes": 21993,
+      "sha256": "42a5f6f7dbbddf26cc278f67db5d894235ce1d126a6856702e31bd02023a1316"
+    },
+    {
+      "file": "islzma.dll",
+      "bytes": 139408,
+      "sha256": "8af307ce3738ab1d37cc7e76b2f76615e2045597d4367c3e40d52b5f2fbd353d"
+    },
+    {
+      "file": "islzma64.exe",
+      "bytes": 226448,
+      "sha256": "87a50495aff580b78cad57906a765d3cf28ca508cfa95c24c1247c286ddf71b2"
+    },
+    {
+      "file": "license.txt",
+      "bytes": 1521,
+      "sha256": "2e5346868c2a18434489824e11d65c3031620f792fefc415d05f19cd441abf5c"
+    }
+  ],
+  "limits": [
+    "Locally installed toolchain; no independently verified official installer/source rebuild of the compiler.",
+    "Original 6.7.1 historical container evidence remains unchanged.",
+    "Compiler artefacts and generated installers retain upstream terms; not blanket first-party MIT."
+  ]
+}
