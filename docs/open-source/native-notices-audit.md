@@ -44,7 +44,7 @@ These immutable baseline files are not represented as final corrected packages.
 The [component findings](evidence/native-notices/component-findings.json) record
 the baseline classification and exact archive hash for each component. The
 [supplement manifest](../../docs/native/licences/native-notice-supplements.json)
-binds the same 20 archives and 24 original source-text references. It contains 16
+binds the same 20 archives and 34 original source-text references. It contains 26
 unique preserved texts, including one already retained in the historical notice
 evidence. There is no dependency upgrade or binary removal.
 
@@ -60,10 +60,10 @@ evidence. There is no dependency upgrade or binary removal.
 | Microsoft.Extensions.Logging.Abstractions | 8.0.3 | Package licence and third-party notices retained |
 | Microsoft.Extensions.ObjectPool | 10.0.3 | Package third-party notice retained; exact source primary MIT notice added |
 | PDFsharp-WPF / PDFsharp-MigraDoc-WPF | 6.2.4 | Exact version-tagged primary MIT and BigGustave Unlicense added; sample fonts remain under review |
-| PdfPig | 0.1.16 | Full upstream LICENSE, NOTICES.txt, original Adobe glyph resources and AFM accompanying file added |
-| SharpVectors.Wpf | 1.8.6 | Package lib/License.txt, including Brotli/MinIoC attribution, retained |
+| PdfPig | 0.1.16 | Full upstream LICENSE, NOTICES.txt, original Adobe glyph resources, AFM accompanying file and four distinct CMap notice variants added |
+| SharpVectors.Wpf | 1.8.6 | Package lib/License.txt, including Brotli/MinIoC attribution, and readable original W3C SVG DTD retained |
 | System.IO.Hashing | 10.0.12 | Package third-party notice retained; exact source primary MIT notice added |
-| WpfMath / XamlMath.Shared | 2.1.0 | Primary MIT notice added; original FONT-LICENSES.md and OFL reference retained |
+| WpfMath / XamlMath.Shared | 2.1.0 | Primary MIT and five original Gent/JMathTeX dataset headers added; original FONT-LICENSES.md and OFL reference retained |
 | Microsoft.NETCore.App.Runtime.win-x64 | 10.0.13 | Exact published pack LICENSE.TXT and THIRD-PARTY-NOTICES.TXT retained |
 | Microsoft.WindowsDesktop.App.Runtime.win-x64 | 10.0.13 | Exact published pack LICENSE retained |
 
@@ -76,6 +76,21 @@ HTML asset is introduced. `NOTICE_INCOMPLETE` covers the demonstrated primary
 attribution differences; other exact primary licences are included conservatively.
 This is not an opinion that every previous metadata-plus-reference combination
 necessarily infringed a licence.
+
+The additional resource pass found four distinct complete CMap copyright blocks
+across all 92 resources: 86 Adobe 1990-2009, three 1990-2010, two 1990-2015 and
+one 1990-2019. The composite LICENSE alone covers only the first group. Four
+complete immutable source representatives now retain every original notice
+variant in readable files, without rewriting copyright text.
+
+Five XamlMath XML datasets retain Universiteit Gent 2004-2007 attribution,
+GPL-2.0-or-later wording and the supplier's explicit statement that the JMathTeX
+authors granted permission to redistribute those XML files under MIT. All five
+complete original source files are retained verbatim as `.txt` notices. That
+supplier statement is recorded faithfully; its underlying author-permission
+history is not independently established here. No GPL infringement or new
+project licensing entitlement is inferred. This permission-history question
+remains a redistribution review item.
 
 Original source notices are fetched during review and checked into the existing
 byte-preserving evidence directory. Packaging makes no upstream requests. It
@@ -104,12 +119,12 @@ Every non-runtime third-party DLL maps to an official archive member in the SBOM
 | Payload material | Supported classification | Evidence / limits |
 |---|---|---|
 | WpfMath five TTF resources | VERIFIED_COMPLETE for retained notices and package identity | Computer Modern cmex10/cmmi10/cmr10/cmsy10 retain Knuth copying/renaming conditions; jlm_msam10 retains AMS/OFL reserved-name terms. No project font modification. Provider eligibility interpretation remains separate |
-| XamlMath mathematics XML datasets | VERIFIED_COMPLETE for primary attribution and package identity | Six embedded datasets; no additional font resource in this assembly |
-| PdfPig AFMs, glyph lists and 92 CMaps | NOTICE_MISSING in baseline; supplied by correction | Full upstream external terms and original Adobe texts; exact assembly/resource hashes retained |
+| XamlMath mathematics XML datasets | REDISTRIBUTION_REVIEW_REQUIRED for permission history; readable notices corrected | Six embedded datasets; five Gent/JMathTeX headers preserved, including original supplier MIT-permission statement; no additional font resource in this assembly |
+| PdfPig AFMs, glyph lists and 92 CMaps | NOTICE_MISSING in baseline; supplied by correction | Full upstream external terms, original Adobe texts and all four distinct CMap notice variants; exact assembly/resource hashes retained |
 | PdfPig / PDFsharp sRGB2014.icc | VERIFIED_COMPLETE for supplier identity and retained embedded attribution | Copyright ICC 2015; profile terms remain distinct from Apache/MIT. [ICC profile terms](https://registry.color.org/profile-library/) and [sRGB2014 identification](https://registry.color.org/rgb-registry/srgbprofiles) require a separate interpretation for modified profiles |
 | PDFsharp six Segoe WP fonts | REDISTRIBUTION_REVIEW_REQUIRED | Microsoft 2010 copyright; name-table terms refer to the originating product EULA. No general application redistribution grant established |
 | PDFsharp Oblivious.ttf and xfiles.ttf | REDISTRIBUTION_REVIEW_REQUIRED | Oblivious contains PizzaDude/free-distribution wording; xfiles lacks a clear embedded grant. No invented author/grant |
-| SharpVectors embedded schemas/DTD | VERIFIED_COMPLETE for retained notices and exact package bytes | W3C notice retained inside SVG DTD; no demonstrated stripping |
+| SharpVectors embedded schemas/DTD | PROVENANCE_UNCONFIRMED for nested schema permission history | Exact package and version-tag resource bytes; original W3C notice also delivered as readable DTD source; no blanket BSD ownership inferred |
 | Native application/installer icon and command artwork | REDISTRIBUTION_REVIEW_REQUIRED | Frozen R4 owner decision unchanged; original-looking source labels do not expand rights |
 | Built-in catalogue/examples/templates/snippets | REDISTRIBUTION_REVIEW_REQUIRED | Frozen R3 exclusions unchanged; embedded in first-party Core assembly |
 | First-party assemblies/apphost | REDISTRIBUTION_REVIEW_REQUIRED for their excluded resources | Existing original-portion MIT applies only within the frozen scope. Apphost includes upstream .NET code. No independent deterministic binary rebuild is claimed |
@@ -147,8 +162,16 @@ only for paths/bytes; all existing ownership decisions remain. New helper/test/C
 paths stay ungranted under the frozen allowlist, rather than silently extending
 first-party MIT to new work. Upstream snapshots remain excluded evidence.
 
-The independent reviewer re-downloaded all 17 unique source URLs and compared
-them with the declared hashes and local bytes; [original comparison](evidence/native-notices/supplement-source-comparison.json).
+The independent reviewer re-downloaded the original 17 unique source URLs and
+compared them with declared hashes and local bytes; [original comparison](evidence/native-notices/supplement-source-comparison.json).
+The additional ten resource source texts and their source/resource-byte
+comparisons are retained separately: [CMap/dataset comparison](evidence/native-notices/additional-resource-source-comparison.json),
+[SharpVectors comparison](evidence/native-notices/sharpvectors-resource-source-comparison.json),
+[all 92 CMap notice blocks](evidence/native-notices/pdfpig-cmap-notices.json) and
+[bounded subresource pass](evidence/native-notices/bounded-subresource-pass.json).
+The additional original SVG DTD conservatively makes its embedded W3C grant
+readable; its inclusion does not assert an earlier infringement. The original
+comparison and intermediate `.1102`/`.1103` packages remain unchanged.
 The final issue receipt records the independent review of the final source,
 actual corrected package contents, CI and engineering claims. This is technical
 agent review, not human legal advice or GitHub approval.

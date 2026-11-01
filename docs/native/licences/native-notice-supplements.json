@@ -217,13 +217,49 @@
           "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig.Fonts/Resources/AdobeFontMetrics/MustRead.html",
           "sourceCommit": "a7bb35662bbbf405efddad50aedc9bcdcf515afc",
           "upstreamPath": "src/UglyToad.PdfPig.Fonts/Resources/AdobeFontMetrics/MustRead.html"
+        },
+        {
+          "file": "1c5ae69b98af36325cc8539f4cbe4d041f8b55b497b1e9ea45b3a75c484ed5c2.txt",
+          "sha256": "1c5ae69b98af36325cc8539f4cbe4d041f8b55b497b1e9ea45b3a75c484ed5c2",
+          "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/Identity-V",
+          "sourceCommit": "a7bb35662bbbf405efddad50aedc9bcdcf515afc",
+          "upstreamPath": "src/UglyToad.PdfPig/Resources/CMap/Identity-V"
+        },
+        {
+          "file": "d2fd8b3c6001ea398c04e0f910e0bc63819405e5ae63a167d93d2a2160466afa.txt",
+          "sha256": "d2fd8b3c6001ea398c04e0f910e0bc63819405e5ae63a167d93d2a2160466afa",
+          "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/UniJIS-UTF16-H",
+          "sourceCommit": "a7bb35662bbbf405efddad50aedc9bcdcf515afc",
+          "upstreamPath": "src/UglyToad.PdfPig/Resources/CMap/UniJIS-UTF16-H"
+        },
+        {
+          "file": "6a9a490592a6a014b61b8e778da66f27f837558e4de8b40081c821909afd88cf.txt",
+          "sha256": "6a9a490592a6a014b61b8e778da66f27f837558e4de8b40081c821909afd88cf",
+          "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/H",
+          "sourceCommit": "a7bb35662bbbf405efddad50aedc9bcdcf515afc",
+          "upstreamPath": "src/UglyToad.PdfPig/Resources/CMap/H"
+        },
+        {
+          "file": "7290cf1ef3c5f4c1d2efd7c6ef32c18fafc33ded7154b99b37386aa8b3b7ccdd.txt",
+          "sha256": "7290cf1ef3c5f4c1d2efd7c6ef32c18fafc33ded7154b99b37386aa8b3b7ccdd",
+          "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/Adobe-Japan1-7",
+          "sourceCommit": "a7bb35662bbbf405efddad50aedc9bcdcf515afc",
+          "upstreamPath": "src/UglyToad.PdfPig/Resources/CMap/Adobe-Japan1-7"
         }
       ]
     },
     {
       "id": "SharpVectors.Wpf/1.8.6",
       "archiveSha256": "8da7c26ce92ec9bbe42345b6f926705b98bf8ceaa5cfa967b8eefac0c1d6aeb0",
-      "supplements": []
+      "supplements": [
+        {
+          "file": "bfab58a79eaceb87d6c6b8321c75f076fa387938f5d393c44bb6cd23bf162921.txt",
+          "sha256": "bfab58a79eaceb87d6c6b8321c75f076fa387938f5d393c44bb6cd23bf162921",
+          "source": "https://raw.githubusercontent.com/ElinamLLC/SharpVectors/39a793adf45ef0e36308e0b5c00cc4fcc4ab9c4f/Source/SharpVectorModel/Resources/svg11.dtd",
+          "sourceCommit": "39a793adf45ef0e36308e0b5c00cc4fcc4ab9c4f",
+          "upstreamPath": "Source/SharpVectorModel/Resources/svg11.dtd"
+        }
+      ]
     },
     {
       "id": "Sugiyama/0.15.1",
@@ -281,6 +317,41 @@
           "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/LICENSE.md",
           "sourceCommit": "d6f576345998777dcf7ad112da1add9bd7ad9674",
           "upstreamPath": "LICENSE.md"
+        },
+        {
+          "file": "a72830f10b0c5ec9501bab54203287abc54d3605982a9d01e430eb56b7ea7405.txt",
+          "sha256": "a72830f10b0c5ec9501bab54203287abc54d3605982a9d01e430eb56b7ea7405",
+          "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/DefaultTexFont.xml",
+          "sourceCommit": "d6f576345998777dcf7ad112da1add9bd7ad9674",
+          "upstreamPath": "src/XamlMath.Shared/Data/DefaultTexFont.xml"
+        },
+        {
+          "file": "44e42a65931e292ac8e5a7a177e42d393f8f3f2c4f1a98e3fbf74df630564f52.txt",
+          "sha256": "44e42a65931e292ac8e5a7a177e42d393f8f3f2c4f1a98e3fbf74df630564f52",
+          "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/GlueSettings.xml",
+          "sourceCommit": "d6f576345998777dcf7ad112da1add9bd7ad9674",
+          "upstreamPath": "src/XamlMath.Shared/Data/GlueSettings.xml"
+        },
+        {
+          "file": "7bdec48c3fbd1ead3e4ffbe67e7fd44ee43deb9cae826d3dd8fd3d07b36bfee5.txt",
+          "sha256": "7bdec48c3fbd1ead3e4ffbe67e7fd44ee43deb9cae826d3dd8fd3d07b36bfee5",
+          "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/PredefinedTexFormulas.xml",
+          "sourceCommit": "d6f576345998777dcf7ad112da1add9bd7ad9674",
+          "upstreamPath": "src/XamlMath.Shared/Data/PredefinedTexFormulas.xml"
+        },
+        {
+          "file": "8b005c6b85a8a50972e6f472cea825a4ee7745e3afd9ed66c4b40d4174ff93e6.txt",
+          "sha256": "8b005c6b85a8a50972e6f472cea825a4ee7745e3afd9ed66c4b40d4174ff93e6",
+          "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/TexFormulaSettings.xml",
+          "sourceCommit": "d6f576345998777dcf7ad112da1add9bd7ad9674",
+          "upstreamPath": "src/XamlMath.Shared/Data/TexFormulaSettings.xml"
+        },
+        {
+          "file": "d09359d9bd330bae8f047dfc011107b98263b691b65b2b92238cf95b4d622eba.txt",
+          "sha256": "d09359d9bd330bae8f047dfc011107b98263b691b65b2b92238cf95b4d622eba",
+          "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/TexSymbols.xml",
+          "sourceCommit": "d6f576345998777dcf7ad112da1add9bd7ad9674",
+          "upstreamPath": "src/XamlMath.Shared/Data/TexSymbols.xml"
         }
       ]
     }

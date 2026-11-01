@@ -1,0 +1,478 @@
+[
+  {
+    "Assembly": "DocumentFormat.OpenXml.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "DocumentFormat.OpenXml.Framework.dll",
+    "Resource": "DocumentFormat.OpenXml.Resources.ExceptionMessages.resources",
+    "SubresourceKeys": [
+      "DocumentTooBig",
+      "InvalidOuterXmlForMiscNode",
+      "NamespaceIdNotAvailable",
+      "PartIsDestroyed",
+      "NoSpecifiedExternalRelationship",
+      "ExtendedPartNotAllowed",
+      "ForeignOpenXmlPart",
+      "PackageRelatedArgumentNullException",
+      "TextIsInvalidOnOffValue",
+      "ForeignMediaDataPart",
+      "ReferenceRelationshipIsNotReferenced",
+      "PartNotInSamePackage",
+      "PartRootAlreadyHasAssociation",
+      "FeatureNotRegistered",
+      "DataPartIsInUse",
+      "EmptyCollection",
+      "DocumentFileFormatVersionMismatch",
+      "UseAddHyperlinkRelationship",
+      "CannotValidateMiscNode",
+      "FileNotFound",
+      "DataPartReferenceIsNotAllowed",
+      "FileFormatNotSupported",
+      "ImplicitConversionExceptionOnNull",
+      "MediaDataPartShouldNotReferenceOtherParts",
+      "InvalidContentTypePart",
+      "AddedPartIsNotAllowed",
+      "InvalidPackageType",
+      "CannotChangeDocumentType",
+      "TextIsInvalidTrueFalseValue",
+      "MalformedUri",
+      "ExternalRelationshipIsNotReferenced",
+      "PartIsEmpty",
+      "CannotSetAttribute",
+      "SamePartWithDifferentRelationshipType",
+      "PackageAccessModeIsReadonly",
+      "StringArgumentEmptyException",
+      "NonCompositeNoChild",
+      "ReaderInEofState",
+      "CannotValidateAcbElement",
+      "InvalidXmlIDStringException",
+      "PropertyMutualExclusive",
+      "Fmt_PartRootIsInvalid",
+      "StreamAccessModeShouldRead",
+      "DuplicatedPrefix",
+      "InvalidEnumValue",
+      "ElementIsNotInOfficeVersion",
+      "UnknownError",
+      "ValidationException",
+      "UnknowMCContent",
+      "ExtendedPartIsOpenXmlPart",
+      "NoSpecifiedReferenceRelationship",
+      "CannotChangeDocumentTypeSerious",
+      "CannotReloadDomTreeWithoutAssociatedPart",
+      "ElementIsNotChild",
+      "PartUnknown",
+      "RootElementIsNull",
+      "LocalNameIsNull",
+      "InvalidPartContentType",
+      "UnexpectedReentrancy",
+      "InvalidMCMode",
+      "HyperlinkRelationshipIsNotReferenced",
+      "CannotLoadRootElement",
+      "OnlyOnePartAllowed",
+      "PartExistsWithDifferentRelationshipId",
+      "ReaderInEndState",
+      "SpecifiedPartNotFound",
+      "AnyParticleTypeNotSupported",
+      "UnknownPackage",
+      "InnerXmlCannotBeSet",
+      "StringIsEmpty",
+      "PackageMustCanBeRead",
+      "PartIsNotInOfficeVersion",
+      "LeafElementInnerXmlCannotBeSet",
+      "CannotValidateUnknownElement",
+      "TextIsInvalidTrueFalseBlankValue",
+      "StreamAccessModeShouldBeWrite",
+      "InvalidOuterXml",
+      "ParentIsNull",
+      "RequiredPartDoNotExist",
+      "NonImplemented",
+      "ErrorContentType",
+      "NoSpecifiedHyperlinkRelationship",
+      "ForeignDataPart",
+      "MainPartIsDifferent",
+      "PartIsNotAllowed",
+      "MultipleRelationshipsToSamePart",
+      "ElementIsPartOfTree",
+      "TextIsInvalidEnumValue",
+      "CycleReference",
+      "FailedToOpenPackage",
+      "InvalidWriteStringCall",
+      "EncryptedPackageNotSupported",
+      "CannotFindAttribute",
+      "CannotSaveDomTreeWithoutAssociatedPart",
+      "StrictReadOnly",
+      "InvalidMainPartContentType",
+      "RelationshipIdConflict",
+      "NsNotUnderStand",
+      "ReaderInNullState"
+    ],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "DocumentFormat.OpenXml.Framework.dll",
+    "Resource": "DocumentFormat.OpenXml.Validation.ValidationResources.resources",
+    "SubresourceKeys": [
+      "Sch_TotalDigitsConstraintFailed",
+      "Sch_InvalidChildinLeafElement",
+      "Sem_AttributeRequiredConditionToValue",
+      "Sem_AttributeValueConditionToAnother",
+      "MC_InvalidPreserveElementsAttribute",
+      "Sch_MaxInclusiveConstraintFailed",
+      "Sem_AttributeAbsentConditionToNonValue",
+      "Sch_MissingPartRootElement",
+      "TypeName_QName",
+      "TypeName_token",
+      "MC_ShallNotContainAlternateContent",
+      "MC_InvalidPreserveAttributesAttribute",
+      "Sch_MaxLengthConstraintFailed",
+      "Sem_AttributeValueUniqueInDocument",
+      "MC_InvalidMustUnderstandAttribute",
+      "Sem_MaxLengthConstraintFailed",
+      "Sch_EmptyElementValue",
+      "Sem_AttributeValueLessEqualToAnother",
+      "Sch_UndeclaredAttribute",
+      "MC_MissedRequiresAttribute",
+      "Sch_AllElement",
+      "TypeName_NCName",
+      "Sch_EmptyAttributeValue",
+      "Fmt_ListOfPossibleElements",
+      "TypeName_nonNegativeInteger",
+      "Sch_InvalidElementContentExpectingComplex",
+      "Sch_IncompleteContentExpectingComplex",
+      "Fmt_AnyElementInNamespace",
+      "Sch_InvalidElementContentWrongType",
+      "Sem_MissingReferenceElement",
+      "Sem_AttributeMutualExclusive",
+      "Sem_CellValue",
+      "MC_InvalidXmlAttributeWithProcessContent",
+      "MC_InvalidXmlAttribute",
+      "Sch_AttributeUnionFailedEx",
+      "Sch_AttributeValueDataTypeDetailed",
+      "Sem_InvalidRelationshipId",
+      "MoreThanOnePartForOneUri",
+      "Sch_ElementUnionFailedEx",
+      "Sem_AttributeValueDataTypeDetailed",
+      "Sch_MinLengthConstraintFailed",
+      "ExceptionError",
+      "Pkg_RequiredPartDoNotExist",
+      "TypeName_base64Binary",
+      "Sch_ElementValueDataTypeDetailed",
+      "TypeName_positiveInteger",
+      "Sem_IncorrectRelationshipType",
+      "Sch_MinInclusiveConstraintFailed",
+      "Pkg_ExtendedPartIsOpenXmlPart",
+      "MC_InvalidProcessContentAttribute",
+      "MC_InvalidIgnorableAttribute",
+      "Sem_MinLengthConstraintFailed",
+      "Sch_PatternConstraintFailed",
+      "Sem_MissingIndexedElement",
+      "MC_ShallContainChoice",
+      "Sch_UnexpectedElementContentExpectingComplex",
+      "MC_ErrorOnUnprefixedAttributeName",
+      "Sch_MaxExclusiveConstraintFailed",
+      "TypeName_Integer",
+      "Sch_StringIsNotValidValue",
+      "TypeName_ID",
+      "Pkg_DataPartReferenceIsNotAllowed",
+      "TypeName_hexBinary",
+      "TypeName_language",
+      "MC_InvalidRequiresAttribute",
+      "Sch_MinExclusiveConstraintFailed",
+      "Sch_EnumerationConstraintFailed",
+      "Sch_MissRequiredAttribute",
+      "Fmt_ElementName",
+      "Fmt_ElementNameSeparator",
+      "Sem_UniqueAttributeValue",
+      "Pkg_OnlyOnePartAllowed",
+      "Sem_AttributeValueLessEqualToAnotherEx",
+      "Sch_LengthConstraintFailed",
+      "Pkg_PartIsNotAllowed",
+      "Sem_AttributeAbsentConditionToValue"
+    ],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.g.resources",
+    "SubresourceKeys": [
+      "codecompletion/completionlist.baml",
+      "search/dropdownbutton.baml",
+      "themes/generic.baml",
+      "search/next.png",
+      "texteditor.baml",
+      "themes/rightarrow.cur",
+      "codecompletion/insightwindow.baml",
+      "highlighting/resources/resources.cs",
+      "search/searchpanel.baml",
+      "search/prev.png"
+    ],
+    "LegalKeywordKeys": [
+      "highlighting/resources/resources.cs"
+    ]
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.ASPX.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Boo.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Coco-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.CPP-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.CSharp-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.CSS-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.HTML-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Java-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.JavaScript-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Json.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.MarkDown-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.MarkDownWithFontSize-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Patch-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.PHP-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.PowerShell.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Python-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.Tex-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.TSQL-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.VB-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.XML-Mode.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.XmlDoc.xshd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.ModeV1.xsd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "ICSharpCode.AvalonEdit.dll",
+    "Resource": "ICSharpCode.AvalonEdit.Highlighting.Resources.ModeV2.xsd",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "Mermaider.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "MigraDoc.DocumentObjectModel.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "MigraDoc.Rendering-wpf.dll",
+    "Resource": "MigraDoc.Rendering-wpf.g.resources",
+    "SubresourceKeys": [
+      "rendering.windows/documentpreview.baml"
+    ],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "MigraDoc.RtfRendering-wpf.dll",
+    "Resource": "MigraDoc.RtfRendering.Resources.PDF.png",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp-wpf.dll",
+    "Resource": "PdfSharp-wpf.g.resources",
+    "SubresourceKeys": [
+      "windows/pagepreview.baml"
+    ],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp-wpf.dll",
+    "Resource": "PdfSharp.Resources.sRGB2014.icc",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.BarCodes-wpf.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.Charting-wpf.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.Cryptography.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.Quality-wpf.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.Shared.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.Snippets-wpf.dll",
+    "Resource": "PdfSharp.Snippets.assets.fonts.Oblivious.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.Snippets-wpf.dll",
+    "Resource": "PdfSharp.Snippets.assets.fonts.xfiles.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.System.dll",
+    "Resource": null,
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.WPFonts.dll",
+    "Resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Black.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.WPFonts.dll",
+    "Resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Bold.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.WPFonts.dll",
+    "Resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Light.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.WPFonts.dll",
+    "Resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Semibold.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.WPFonts.dll",
+    "Resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Semilight.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  },
+  {
+    "Assembly": "PdfSharp.WPFonts.dll",
+    "Resource": "PdfSharp.WPFonts.Fonts.SegoeWP.ttf",
+    "SubresourceKeys": [],
+    "LegalKeywordKeys": []
+  }
+]

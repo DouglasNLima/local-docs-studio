@@ -89,13 +89,13 @@
     {
       "id": "PdfPig/0.1.16",
       "baselineClassification": "NOTICE_MISSING",
-      "reason": "Pinned source LICENSE external terms, NOTICES, Adobe glyph headers and AFM accompanying file missing from readable notices.",
+      "reason": "Composite LICENSE, NOTICES, original Adobe glyph headers/AFM file and four distinct CMap copyright blocks absent from complete readable attribution.",
       "archiveSha256": "d67171846ea8c28f50359137065fec4514266d7a32b23eae6c5f2ebed8ffcfc4"
     },
     {
       "id": "SharpVectors.Wpf/1.8.6",
-      "baselineClassification": "VERIFIED_COMPLETE",
-      "reason": "Official archive identity and package notices verified; component-specific primary attribution supplement retained where needed.",
+      "baselineClassification": "PROVENANCE_UNCONFIRMED",
+      "reason": "Exact official package and version-tag resource bytes are verified; original W3C SVG DTD notice is retained and made readable conservatively, while other nested schema permission history remains unconfirmed.",
       "archiveSha256": "8da7c26ce92ec9bbe42345b6f926705b98bf8ceaa5cfa967b8eefac0c1d6aeb0"
     },
     {
@@ -119,7 +119,7 @@
     {
       "id": "XamlMath.Shared/2.1.0",
       "baselineClassification": "NOTICE_INCOMPLETE",
-      "reason": "Original source copyright or primary notice text absent; generic SPDX template and nuspec metadata alone retained.",
+      "reason": "Five Gent/JMathTeX XML dataset headers and original supplier MIT-permission statement absent from readable notices; retain exact source text and leave author-permission history for redistribution review.",
       "archiveSha256": "e64a64e7a1827b8186c79a78cac50cf118a02009341e109a89c02808f5d5bc8f"
     }
   ],

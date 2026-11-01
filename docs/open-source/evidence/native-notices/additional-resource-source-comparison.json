@@ -1,0 +1,83 @@
+[
+  {
+    "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/Identity-V",
+    "resource": "UglyToad.PdfPig.Resources.CMap.Identity-V",
+    "sourceBytes": 2688,
+    "sourceSha256": "1c5ae69b98af36325cc8539f4cbe4d041f8b55b497b1e9ea45b3a75c484ed5c2",
+    "resourceSha256": "e1ea53c46757205476738630bf56788af41afd119d1235952af5622d7cc8f8c8",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/UniJIS-UTF16-H",
+    "resource": "UglyToad.PdfPig.Resources.CMap.UniJIS-UTF16-H",
+    "sourceBytes": 187728,
+    "sourceSha256": "d2fd8b3c6001ea398c04e0f910e0bc63819405e5ae63a167d93d2a2160466afa",
+    "resourceSha256": "4a9a40ba0275db6a15bbd3387a1f3a37af6406ed36f9efa938bb8fa9771fd5a0",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/H",
+    "resource": "UglyToad.PdfPig.Resources.CMap.H",
+    "sourceBytes": 5010,
+    "sourceSha256": "6a9a490592a6a014b61b8e778da66f27f837558e4de8b40081c821909afd88cf",
+    "resourceSha256": "c8a8de55dc182d56ca145743f1a9682abdbb7bb93e484370894eb9b975be4e33",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/UglyToad/PdfPig/a7bb35662bbbf405efddad50aedc9bcdcf515afc/src/UglyToad.PdfPig/Resources/CMap/Adobe-Japan1-7",
+    "resource": "UglyToad.PdfPig.Resources.CMap.Adobe-Japan1-7",
+    "sourceBytes": 4444,
+    "sourceSha256": "7290cf1ef3c5f4c1d2efd7c6ef32c18fafc33ded7154b99b37386aa8b3b7ccdd",
+    "resourceSha256": "afc67ff1e7d3f5271bd111714f64f86af63bd24d5d308820249b27e753cd307a",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/DefaultTexFont.xml",
+    "resource": "XamlMath.Data.DefaultTexFont.xml",
+    "sourceBytes": 94817,
+    "sourceSha256": "a72830f10b0c5ec9501bab54203287abc54d3605982a9d01e430eb56b7ea7405",
+    "resourceSha256": "a72830f10b0c5ec9501bab54203287abc54d3605982a9d01e430eb56b7ea7405",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/GlueSettings.xml",
+    "resource": "XamlMath.Data.GlueSettings.xml",
+    "sourceBytes": 6854,
+    "sourceSha256": "44e42a65931e292ac8e5a7a177e42d393f8f3f2c4f1a98e3fbf74df630564f52",
+    "resourceSha256": "44e42a65931e292ac8e5a7a177e42d393f8f3f2c4f1a98e3fbf74df630564f52",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/PredefinedTexFormulas.xml",
+    "resource": "XamlMath.Data.PredefinedTexFormulas.xml",
+    "sourceBytes": 21304,
+    "sourceSha256": "7bdec48c3fbd1ead3e4ffbe67e7fd44ee43deb9cae826d3dd8fd3d07b36bfee5",
+    "resourceSha256": "7bdec48c3fbd1ead3e4ffbe67e7fd44ee43deb9cae826d3dd8fd3d07b36bfee5",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/TexFormulaSettings.xml",
+    "resource": "XamlMath.Data.TexFormulaSettings.xml",
+    "sourceBytes": 3250,
+    "sourceSha256": "8b005c6b85a8a50972e6f472cea825a4ee7745e3afd9ed66c4b40d4174ff93e6",
+    "resourceSha256": "8b005c6b85a8a50972e6f472cea825a4ee7745e3afd9ed66c4b40d4174ff93e6",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ForNeVeR/xaml-math/d6f576345998777dcf7ad112da1add9bd7ad9674/src/XamlMath.Shared/Data/TexSymbols.xml",
+    "resource": "XamlMath.Data.TexSymbols.xml",
+    "sourceBytes": 15661,
+    "sourceSha256": "d09359d9bd330bae8f047dfc011107b98263b691b65b2b92238cf95b4d622eba",
+    "resourceSha256": "d09359d9bd330bae8f047dfc011107b98263b691b65b2b92238cf95b4d622eba",
+    "normalisedBytesEqual": true,
+    "noticeSource": "Exact immutable full upstream file; embedded bytes differ only in line endings where shown"
+  }
+]
