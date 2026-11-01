@@ -96,10 +96,10 @@ installed test user. No new application command or installation choice is added.
 ## Embedded assets and unresolved rights
 
 The independent metadata-only [resource inventory](evidence/native-notices/baseline-1101-resources.json)
-enumerates 708 manifest resources in non-runtime managed payload assemblies;
+enumerates 708 manifest resources across all managed payload assemblies;
 the complete external file inventory additionally covers .NET/WPF assemblies and
 satellites. Resource enumeration does not load or execute the distributed code.
-Every non-runtime DLL maps to an official archive member in the SBOM.
+Every non-runtime third-party DLL maps to an official archive member in the SBOM.
 
 | Payload material | Supported classification | Evidence / limits |
 |---|---|---|
