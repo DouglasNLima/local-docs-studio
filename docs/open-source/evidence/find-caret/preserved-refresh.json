@@ -12,7 +12,7 @@
     },
     "assets/scripts/editor/find-replace-service.js": {
       "previous": "58d6215fe60771cb0407183185f0d1f73f0ad966a0d2dddcad6c6364493323e6",
-      "current": "ca0448259df31735c582b5501b9b058e884efc220d2a6ae8be4346c858a293ee"
+      "current": "b4f7d58b43c56deebb4e490399bb4c8554e6f17e2aa22c7dd618eb339a8c9176"
     },
     "docs/native/architecture-decisions.md": {
       "previous": "f6ac00d1f6d12c28f6e9b6887a73dbc407509468ad9311941b9977f3bc80e134",
@@ -64,7 +64,7 @@
     },
     "tests/browser/app-smoke.spec.mjs": {
       "previous": "cbd6e90757247513143f39fc3874cf46f28dfbddae6539746b4e189e48b12268",
-      "current": "ff75b981a6054b6a7e157365a2423395788453833fa87be9d26124cd4a3fc17a"
+      "current": "abee2b5033359030900829977f5181cc7b47728b8ab5fd397f2582250b09595e"
     }
   }
 }

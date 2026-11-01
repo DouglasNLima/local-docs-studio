@@ -353,8 +353,8 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     if (!editorFindCount) return;
     const total = editorFindState.matches.length;
     editorFindCount.textContent = total && editorFindState.activeIndex >= 0 ? `${editorFindState.activeIndex + 1}/${total}` : `0/${total}`;
-    if (editorFindPrevButton) editorFindPrevButton.disabled = total < 2;
-    if (editorFindNextButton) editorFindNextButton.disabled = total < 2;
+    if (editorFindPrevButton) editorFindPrevButton.disabled = total < 1;
+    if (editorFindNextButton) editorFindNextButton.disabled = total < 1;
   }
 
   return {

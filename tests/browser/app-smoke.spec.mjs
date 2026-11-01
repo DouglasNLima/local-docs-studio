@@ -4214,6 +4214,20 @@ test('Find updates Unicode matches through paste, Undo, Redo and deletion withou
   await page.keyboard.press('Shift+F3');
   await page.keyboard.press('Delete');
   await assertSource(source, source.length, 4);
+  const singleSource = 'Café\n\nEditable paragraph.\n';
+  await page.locator('#fileInput').setInputFiles({ name: 'single-match.md', mimeType: 'text/markdown', buffer: Buffer.from(singleSource) });
+  await expect(editor).toHaveValue(singleSource);
+  await editor.focus(); await page.keyboard.press('Control+End'); await page.keyboard.type('x');
+  await expect(page.locator('#editorFindCount')).toHaveText('0/1');
+  for (const button of ['#editorFindNextButton', '#editorFindPrevButton']) {
+    await editor.focus(); await page.keyboard.press('Control+End');
+    await expect(page.locator('#editorFindCount')).toHaveText('0/1');
+    await expect(page.locator(button)).toBeEnabled();
+    await page.locator(button).click();
+    await expect(page.locator('#editorFindCount')).toHaveText('1/1');
+    await expect.poll(() => editor.evaluate(element => [element.selectionStart, element.selectionEnd, element.value.slice(element.selectionStart, element.selectionEnd)])).toEqual([0, 4, 'Café']);
+    await expect(editor).toHaveValue(singleSource + 'x');
+  }
 
   async function assertSource(value, caret, total) {
     await expect(editor).toHaveValue(value);
