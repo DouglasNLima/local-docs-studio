@@ -26,7 +26,8 @@ internal static partial class NativeUiChecks
         var checks = new List<string>(); var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(AutomaticUpdateChecks: false, Theme: "Dark")));
         var er = File.ReadAllText(Path.Combine(root, "tests/fixtures/native-desktop-ux/inspection.mmd"));
-        var source = "# Inspection\n\nContact **contact** and con**tact**. Another CONTACT.\n\n$x_{contact}$\n\n```mermaid\n" + er + "\n```\n";
+        var source = "# Inspection\n\nContact **contact** and con**tact**. Another CONTACT.\n\n$x_{contact}$\n\n```mermaid\n" + er + "\n```\n"
+            + string.Concat(Enumerable.Repeat("Unrelated editable paragraph.\n\n", 60));
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
         var saved = File.ReadAllBytes(path); var info = new ProcessStartInfo(executable) { UseShellExecute = false };
         foreach (var arg in new[] { "--state-directory", state, path }) info.ArgumentList.Add(arg);
@@ -64,6 +65,7 @@ internal static partial class NativeUiChecks
                 AssertEditing(edited, edited.Length);
             }
             var scroll = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
+            Check(scroll > 0, "Visible keyboard editing occurs in a scrolled editor distant from the first search occurrence");
             Keyboard.Type("x"); edited += "x"; AssertEditing(edited, edited.Length);
             Check(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value == scroll,
                 "Passive Find refresh does not move the editor viewport while typing on the same line");
