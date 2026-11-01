@@ -47,6 +47,36 @@ def validate_preserved(expected, actual):
         require(actual.get(name) == digest, 'Protected notice/trust/performance bytes changed: ' + name)
 
 
+def apply_find_caret_refresh(preserved, refresh):
+    # Keep the Goal #62 snapshot immutable. This focused correction replaces only
+    # exact reviewed source/doc digests; attribution, trust and performance pins remain.
+    allowed = {
+        '.github/workflows/native.yml',
+        'assets/scripts/app-controller.js',
+        'assets/scripts/editor/find-replace-service.js',
+        'docs/native/architecture-decisions.md', 'docs/native/engineering-handover.md',
+        'docs/native/functional-parity-matrix.md', 'docs/native/implementation-progress.md',
+        'docs/native/user-guide.md', 'docs/native/validation-report.md', 'docs/tool-guide.md',
+        'src/native/LensDocsStudio.Native/MainWindow.Find.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.xaml.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeDesktopUxChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeDesktopUxUiChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeFindRoutingChecks.cs',
+        'tests/browser/app-smoke.spec.mjs',
+    }
+    require(refresh['baseCommit'] == '86d60322f6f1f1dec06974bf5f9e1738a3bb80c7',
+            'Find amendment must identify the inspected develop baseline')
+    require(set(refresh['files']) == allowed, 'Find amendment must retain its exact reviewed path scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'Find amendment changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'Find amendment requires an exact canonical source digest: ' + path)
+        result[path] = entry['current']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -86,6 +116,8 @@ def main():
     for path, (previous, current) in policy_refresh.items():
         require(preserved[path] == previous, 'Historical policy evidence changed: ' + path)
         preserved[path] = current
+    refresh = json.loads((ROOT / 'docs/open-source/evidence/find-caret/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_find_caret_refresh(preserved, refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

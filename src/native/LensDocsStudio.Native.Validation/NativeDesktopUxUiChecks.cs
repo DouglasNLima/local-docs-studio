@@ -25,8 +25,9 @@ internal static partial class NativeUiChecks
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         var checks = new List<string>(); var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(AutomaticUpdateChecks: false, Theme: "Dark")));
-        var er = File.ReadAllText(Path.Combine(root, "tests/fixtures/native-desktop-ux/inspection.mmd"));
-        var source = "# Inspection\n\nContact **contact** and con**tact**. Another CONTACT.\n\n$x_{contact}$\n\n```mermaid\n" + er + "\n```\n";
+        var er = File.ReadAllText(Path.Combine(root, "tests/fixtures/native-desktop-ux/inspection.mmd")).ReplaceLineEndings("\n");
+        var source = "# Inspection\n\nContact **contact** and con**tact**. Another CONTACT.\n\n$x_{contact}$\n\n```mermaid\n" + er + "\n```\n"
+            + string.Concat(Enumerable.Repeat("Unrelated editable paragraph.\n\n", 60));
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
         var saved = File.ReadAllBytes(path); var info = new ProcessStartInfo(executable) { UseShellExecute = false };
         foreach (var arg in new[] { "--state-directory", state, path }) info.ArgumentList.Add(arg);
@@ -37,6 +38,11 @@ internal static partial class NativeUiChecks
             main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native UX window did not open.");
             FocusWindow(main); var editor = Find(main, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == source && Find(main, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The exact source/preview did not load.");
+            // AvalonEdit delegates TextPattern to its child peer. Use the established
+            // UIA descendant discovery before inspecting the real parent selection.
+            _ = editor.FindAllDescendants();
+            Wait(() => editor.Patterns.Text.IsSupported, "The observed source editor has no TextPattern provider.");
+            Check(editor.Patterns.Text.Pattern.DocumentRange.GetText(-1) == source, "Observed TextPattern belongs to the exact loaded editor source");
             Check(!highContrast || System.Windows.SystemParameters.HighContrast, "Requested operating-system High Contrast is active");
             foreach (var theme in new[] { "Dark", "Light", "System", "Dark" })
             {
@@ -108,10 +114,82 @@ internal static partial class NativeUiChecks
             Find(diagram, "DiagramReset").AsButton().Invoke(); Wait(() => Find(diagram, "DiagramZoomLabel").Name == "100%", "Reset zoom indicator is stale.");
             diagram.Close(); diagram = null;
             Check(ReadEditorText(editor) == source && File.ReadAllBytes(path).SequenceEqual(saved), "Inspection, pan, zoom and copy preserve source and saved bytes");
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            // Leave a query refresh pending, then take real keyboard ownership of the editor.
+            query.Text = "cont";
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            var edited = source;
+            foreach (var character in "editable")
+            {
+                Keyboard.Type(character.ToString()); edited += character;
+                AssertEditing(edited, edited.Length);
+            }
+            (double Left, double Top)? beforeTypingOrigin = null;
+            Wait(() => (beforeTypingOrigin = EditableOrigin()) is not null,
+                "The actual typed text did not become visible in the editor");
+            var firstOccurrence = editor.Patterns.Text.Pattern.DocumentRange.FindText("Contact", false, true)!;
+            Check(!firstOccurrence.GetBoundingRectangles().Any(VisibleInEditor),
+                "Visible keyboard editing occurs distant from the off-screen first search occurrence");
+            Keyboard.Type("x"); edited += "x"; AssertEditing(edited, edited.Length);
+            Check(EditableOrigin() == beforeTypingOrigin,
+                "Passive Find refresh does not move the editor viewport while typing on the same line");
+            Keyboard.Type(VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
+            Keyboard.Type("yz"); edited += "yz"; AssertEditing(edited, edited.Length);
+            Keyboard.Type(VirtualKeyShort.BACK); edited = edited[..^1]; AssertEditing(edited, edited.Length);
+            Keyboard.Type(VirtualKeyShort.LEFT); Keyboard.Type(VirtualKeyShort.DELETE); edited = edited[..^1]; AssertEditing(edited, edited.Length);
+            var beforePaste = edited;
+            NativeUiClipboard.SetText(" Café CONTACT"); clipboardSequence = GetClipboardSequenceNumber();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V); edited += " Café CONTACT"; AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); AssertEditing(beforePaste, beforePaste.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); AssertEditing(edited, edited.Length);
+            main.CaptureToFile(Path.Combine(output, "find-passive-editing.png"));
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F3);
+            Counter((count + 1) + " of " + (count + 1));
+            Check(editor.Patterns.Text.Pattern.GetSelection().Single().GetText(-1) == "CONT",
+                "Explicit Shift+F3 still selects the last exact Unicode-aware source occurrence from the editor");
+            Check(File.ReadAllBytes(path).SequenceEqual(saved), "Continuous Find editing and history preserve the saved fixture bytes");
             File.WriteAllText(Path.Combine(output, "desktop-ux-ui.json"), JsonSerializer.Serialize(new { Passed = true, ActualHighContrast = System.Windows.SystemParameters.HighContrast, Checks = checks, CanonicalClipboardPixelSha256 = canonical }, new JsonSerializerOptions { WriteIndented = true }));
             return 0;
 
             void Counter(string expected) => Wait(() => Find(main, "FindCounter").Name == expected, "Find counter did not become " + expected);
+            bool VisibleInEditor(System.Drawing.Rectangle rectangle)
+            {
+                var bounds = editor.BoundingRectangle;
+                return rectangle.Width > 0 && rectangle.Height > 0 && rectangle.Right > bounds.Left
+                    && rectangle.Left < bounds.Right && rectangle.Bottom > bounds.Top && rectangle.Top < bounds.Bottom;
+            }
+            (double Left, double Top)? EditableOrigin()
+            {
+                var range = editor.Patterns.Text.Pattern.DocumentRange.FindText("editable", true, false);
+                if (range is null) return null;
+                foreach (var rectangle in range.GetBoundingRectangles())
+                    if (VisibleInEditor(rectangle)) return (rectangle.Left, rectangle.Top);
+                return null;
+            }
+            void AssertEditing(string expected, int caret)
+            {
+                var total = LensDocsStudio.Core.Parsing.FindMatches.Collect(expected, "cont").Offsets.Count;
+                Wait(() => ReadEditorText(editor) == expected && editor.Properties.HasKeyboardFocus.Value
+                    && Find(main, "FindCounter").Name == "0 of " + total && ExactCaret(),
+                    "Keyboard edit and passive Find refresh did not settle at the exact insertion point " + caret);
+                Check(ReadEditorText(editor) == expected && editor.Properties.HasKeyboardFocus.Value,
+                    "Exact typed source and editor focus survive passive Find refresh at UTF-16 " + caret);
+                var selection = editor.Patterns.Text.Pattern.GetSelection().Single();
+                var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+                prefix.MoveEndpointByRange(FlaUI.Core.Definitions.TextPatternRangeEndpoint.End, selection, FlaUI.Core.Definitions.TextPatternRangeEndpoint.Start);
+                Check(selection.GetText(-1).Length == 0 && prefix.GetText(-1).Length == caret,
+                    "Actual UIA selection remains collapsed at the natural insertion point " + caret);
+                Check(!Find(main, "FindText").IsOffscreen, "Find remains visible throughout keyboard editing");
+                bool ExactCaret()
+                {
+                    var ranges = editor.Patterns.Text.Pattern.GetSelection();
+                    if (ranges.Length != 1 || ranges[0].GetText(-1).Length != 0) return false;
+                    var before = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+                    before.MoveEndpointByRange(FlaUI.Core.Definitions.TextPatternRangeEndpoint.End, ranges[0], FlaUI.Core.Definitions.TextPatternRangeEndpoint.Start);
+                    return before.GetText(-1).Length == caret;
+                }
+            }
             void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
             void Move(double x, double y)
             {

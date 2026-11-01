@@ -1,5 +1,10 @@
 # Native Windows engineering handover
 
+## Find editor caret stability — 1 November 2026
+
+Search refresh is passive during editing; explicit navigation and still-focused query changes own result selection. The native 180 ms debounce and existing release/performance decisions remain unchanged. See the [focused Web/Native correction and validation receipt](../release/find-editor-caret-stability.md); final-source hosted evidence and approval remain recorded on its Draft PR.
+
+
 ## Expansion VI implementation and accepted precondition — 23 October 2026
 
 PR #45 was merged and accepted on current develop `7b21fa62f58b10e79c74302b4b9e887be3aceadc`, tree `604fb3f6abfb6fae200166e53148eb354679cea7`. Native push run 39991049058 and web push run 39991048987 both succeeded on attempt 1. That prerequisite is satisfied. The earlier .853 PDF/Journey/intermediate ER root causes remain INCONCLUSIVE, with original failure evidence retained. PR #38 stays open/draft/paused at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`; stock Continuous remains ordinary default.

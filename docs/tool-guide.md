@@ -30,6 +30,8 @@ Formatting buttons insert Markdown for headings, emphasis, links, lists, task li
 
 Right-click in the editor or rendered preview to open context actions for the current selection, code block, table, or diagram.
 
+**Ctrl/Cmd+F** opens Find. Keep it open while editing: matches and highlights update without selecting text or moving your caret. Enter and Shift+Enter in the editor retain normal editing behaviour. In the Find field, Enter and Shift+Enter navigate forwards and backwards; the arrow buttons and F3/Shift+F3 also navigate. The counter shows `0/total` when the editor has no selected occurrence. **Ctrl/Cmd+H** opens Find and Replace.
+
 Rendered tables include a Copy button that places tab-separated text on the clipboard so it can be pasted directly into Excel or another spreadsheet.
 
 Formatted content copied from rich editors pastes back into the editor as Markdown when the clipboard includes HTML. Tables copied from Excel or another spreadsheet paste as Markdown tables when the clipboard includes HTML table data or tab-separated text. Use **Edit > Paste Special** to force paste as a table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block.

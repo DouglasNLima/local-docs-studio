@@ -11,7 +11,7 @@ from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_
 from rights_ledger import boundary
 from check_foundation import documentation_links
 from licence_scope import (ROOT, SCOPE, validate_licence, validate_scope,
-                           validate_metadata, validate_preserved)
+                           validate_metadata, validate_preserved, apply_find_caret_refresh)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -149,6 +149,30 @@ class ScopedLicenceTests(unittest.TestCase):
         for actual in [{}, {'upstream-notice': 'changed-digest'}]:
             with self.subTest(actual=actual), self.assertRaises(ValueError):
                 validate_preserved(expected, actual)
+
+    def test_find_amendment_preserves_historical_hashes_and_rejects_unreviewed_paths(self):
+        preserved = json.loads((EVIDENCE / 'preserved-files.json').read_text())['sha256']
+        refresh = json.loads((ROOT / 'docs/open-source/evidence/find-caret/preserved-refresh.json').read_text())
+        updated = apply_find_caret_refresh(preserved, refresh)
+        for path in set(preserved) - set(refresh['files']):
+            self.assertEqual(updated[path], preserved[path])
+        for mutation in ('baseline', 'missing', 'notice', 'digest'):
+            changed = copy.deepcopy(refresh)
+            path = 'assets/scripts/editor/find-replace-service.js'
+            if mutation == 'baseline':
+                changed['files'][path]['previous'] = '0' * 64
+            elif mutation == 'missing':
+                del changed['files'][path]
+            elif mutation == 'notice':
+                changed['files']['LICENSE'] = {'previous': '0' * 64, 'current': '1' * 64}
+            else:
+                changed['files'][path]['current'] = 'not-a-digest'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                apply_find_caret_refresh(preserved, changed)
+        actual = dict(updated)
+        actual['assets/scripts/editor/find-replace-service.js'] = '0' * 64
+        with self.assertRaises(ValueError):
+            validate_preserved(updated, actual)
 
     def test_rejects_continuous_check_in_ordinary_integration(self):
         payload = json.loads((CONFIG / 'develop-ruleset.json').read_text())
