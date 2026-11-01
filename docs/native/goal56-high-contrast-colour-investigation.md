@@ -247,6 +247,10 @@ is introduced into those components.
   frozen current-readiness/validation documents. Those additions were removed and
   the protected bytes restored exactly; the findings remain in this separate
   report. No protected digest or licence boundary was changed to accept them.
+- A Git round-trip check found line-ending normalisation in new evidence copies.
+  Byte-preserving attributes are scoped to this new evidence directory only;
+  original archive/log bytes are rechecked against committed blobs. Existing
+  protected attributes and evidence remain unchanged.
 - Local static integrity PASS: 50 modules, 61 shell assets, 151 vendor assets,
   59 external-dependency scans; service-worker controls cover 212 attempted
   assets with six concurrent fetches and the intentional optional failure.
