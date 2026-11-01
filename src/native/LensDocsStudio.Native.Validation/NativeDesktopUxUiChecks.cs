@@ -25,7 +25,7 @@ internal static partial class NativeUiChecks
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         var checks = new List<string>(); var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(AutomaticUpdateChecks: false, Theme: "Dark")));
-        var er = File.ReadAllText(Path.Combine(root, "tests/fixtures/native-desktop-ux/inspection.mmd"));
+        var er = File.ReadAllText(Path.Combine(root, "tests/fixtures/native-desktop-ux/inspection.mmd")).ReplaceLineEndings("\n");
         var source = "# Inspection\n\nContact **contact** and con**tact**. Another CONTACT.\n\n$x_{contact}$\n\n```mermaid\n" + er + "\n```\n"
             + string.Concat(Enumerable.Repeat("Unrelated editable paragraph.\n\n", 60));
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
@@ -84,11 +84,11 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V); edited += " Café CONTACT"; AssertEditing(edited, edited.Length);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); AssertEditing(beforePaste, beforePaste.Length);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); AssertEditing(edited, edited.Length);
+            main.CaptureToFile(Path.Combine(output, "find-passive-editing.png"));
             Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F3);
             Counter((count + 1) + " of " + (count + 1));
             Check(editor.Patterns.Text.Pattern.GetSelection().Single().GetText(-1) == "CONT",
                 "Explicit Shift+F3 still selects the last exact Unicode-aware source occurrence from the editor");
-            main.CaptureToFile(Path.Combine(output, "find-passive-editing.png"));
             // Restore the synthetic buffer through actual editing, leaving the saved fixture untouched.
             editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
             NativeUiClipboard.SetText(source); clipboardSequence = GetClipboardSequenceNumber();
