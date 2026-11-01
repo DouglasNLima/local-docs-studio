@@ -1,0 +1,251 @@
+{
+  "originalRun": 41345774785,
+  "originalJob": 124965136051,
+  "attempt": 1,
+  "status": "FAILURE",
+  "archiveId": 13099735465,
+  "archiveBytes": 3487686,
+  "archiveSha256": "5abffd2f92594d61856c9f9aea6d284ec69f6def3e5b1c268597b70bd2ee439e",
+  "members": [
+    {
+      "path": "mermaid-baseline/display-restoration.json",
+      "bytes": 54,
+      "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-dark.png",
+      "bytes": 117508,
+      "sha256": "9461eb1b62b8213286133d3ffbeae72e95470c36dc46f34db3e8c1055f6efc4b"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-edge-properties.png",
+      "bytes": 112669,
+      "sha256": "4c5260e579d06d4798768d691898751c4de65bbbc116342a7b4099a418ca9c58"
+    },
+    {
+      "path": "mermaid-baseline/display.json",
+      "bytes": 510,
+      "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-empty-new-md.png",
+      "bytes": 55310,
+      "sha256": "4469aa1308f129a9f75b6f68f6e18349d64c36126fb48520a08f44c946e448d6"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-empty-new-mermaid.png",
+      "bytes": 55889,
+      "sha256": "11d98c44f80fbe44781c5e8a217eb8080d701352abdcfe27f2a02702866c809d"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-existing-light.png",
+      "bytes": 94894,
+      "sha256": "3c148a6d3016158432a0663999d995f7727a43099f9de779dac0f5270e2e32d4"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-inline-label-result-md.png",
+      "bytes": 65447,
+      "sha256": "a071296b3ea1580b17e09aed1f4c04633012be528fa26b50fee883191069107a"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-inline-label-result-mermaid.png",
+      "bytes": 65803,
+      "sha256": "bc52b04f51debc239697acef9e0f20d0134530e3050bda9f859e1480834972a2"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-invalid-source.png",
+      "bytes": 109208,
+      "sha256": "292578ec293d6eff88961308113d6f140ca589946c1fdc1c7f0f8d2fd5c5689e"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-live-dark-theme.png",
+      "bytes": 115422,
+      "sha256": "5083d72a71e1784e82bf04af6c640b1c7e521d2b3548193781f7eee214dfec85"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-main-preview.png",
+      "bytes": 142133,
+      "sha256": "f3a5b64d1728cc2f75d73ee1afdb7bdff843bbe06f1692ac9971128a964b48f4"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-narrow.png",
+      "bytes": 71169,
+      "sha256": "c52d9ca3620566e2a59e432fdb447658e882f6fd4d931231efd435c18639f96f"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-node-properties.png",
+      "bytes": 97566,
+      "sha256": "f2cb2de543b37655c3cd356e1562746840a5da72b341c2b4c1da752b3033fabf"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-palette-drop-md.png",
+      "bytes": 70889,
+      "sha256": "c27311a57d84086b42e4fbb473118bedd14690c2d80bf9867a75dd5461e227fe"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-palette-drop-mermaid.png",
+      "bytes": 71235,
+      "sha256": "47622a128e37defad1483ad34154152c758f1c25c8b6911e04158fa22208ef39"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-protected-source.png",
+      "bytes": 10594,
+      "sha256": "32e285c67110fd17eee9b87c5f39f350928181e21a2927ff1958252bb91083c2"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-source-and-canvas.png",
+      "bytes": 121371,
+      "sha256": "233fe6f3ed30196c915375728854aef4b0ab7842e6dad1137e4338e1bf787381"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-source-conflict.png",
+      "bytes": 117317,
+      "sha256": "b1cf8d2d6a871fd19f87e47203e4cf86ab02157afb283d3365176e13ac292819"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-standalone.png",
+      "bytes": 73951,
+      "sha256": "1b455170769c43a36d95f910f2411f7af5a23e819eeac671433157318f6b3183"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-subgraph-properties.png",
+      "bytes": 116433,
+      "sha256": "1d890bdedb852109b4177cfe0a50cd20537d507d6863c08c80ead357a9b57849"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-ui.json",
+      "bytes": 5536,
+      "sha256": "128020e9c49d7e598492c1a4b9210c18509735d759602dcb8a29b281dd7dda37"
+    },
+    {
+      "path": "mermaid-baseline/mermaid-wide.png",
+      "bytes": 134105,
+      "sha256": "ef9223e21e3d4a30b5cc3f3a8ca0898e09a5d3505ca58e4d1cabcd168334549e"
+    },
+    {
+      "path": "ux-baseline/display-restoration.json",
+      "bytes": 54,
+      "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
+    },
+    {
+      "path": "ux-baseline/display.json",
+      "bytes": 510,
+      "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
+    },
+    {
+      "path": "ux-baseline/native-dark-1280x800.png",
+      "bytes": 144462,
+      "sha256": "41bab78397bd35da88a3715a8d055636ce56b57b5eee882149696bf3d040bfcd"
+    },
+    {
+      "path": "ux-baseline/native-dark-1440x900.png",
+      "bytes": 151995,
+      "sha256": "3959ce9e7a2dbe6c283bb4661ddba4bb994fae9cfe2d8d02119a966ee4e6fcfb"
+    },
+    {
+      "path": "ux-baseline/native-dark-1920x1080.png",
+      "bytes": 166948,
+      "sha256": "a5857f527ee36dac037bbfe0ac2ab4d623e1fde65e054ce31a4136287cc045f2"
+    },
+    {
+      "path": "ux-baseline/native-dark-860x540.png",
+      "bytes": 73409,
+      "sha256": "6134becd5d6469cb22c10dfe57b17f18b68718987c8237be24e32deead431532"
+    },
+    {
+      "path": "ux-baseline/native-light-1280x800.png",
+      "bytes": 144929,
+      "sha256": "4f1797a0de115c35c5066d997dfb9d3bc7ca1e28c828a119433507bbcbbe4b5e"
+    },
+    {
+      "path": "ux-baseline/native-light-1440x900.png",
+      "bytes": 152360,
+      "sha256": "fa6fe2709d465f9e93c232490f16e91e65810d28e7639b318a860606d9f22bb7"
+    },
+    {
+      "path": "ux-baseline/native-light-1920x1080.png",
+      "bytes": 167230,
+      "sha256": "5b27ee979c177f1659e31fd461e9dcb7da93a70ff8290006cf64b0b6540b86ff"
+    },
+    {
+      "path": "ux-baseline/native-light-860x540.png",
+      "bytes": 73785,
+      "sha256": "33a73e36f37ddb6f11f73e56cb53f4dccf5ef22a70aec3cf656bf9dd6ed3c69c"
+    },
+    {
+      "path": "ux-baseline/screenshots.json",
+      "bytes": 16501,
+      "sha256": "132f0e8084424af5625f9deec70246ff7be4a0dd6a5af816041ccc2cf2a5c883"
+    },
+    {
+      "path": "ux-current/display-restoration.json",
+      "bytes": 54,
+      "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
+    },
+    {
+      "path": "ux-current/display.json",
+      "bytes": 510,
+      "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
+    },
+    {
+      "path": "ux-current/native-dark-1280x800.png",
+      "bytes": 144161,
+      "sha256": "4fd22ac49807338f58ca9defc723fb14af00ffb41e119c19028897647e94e8c1"
+    },
+    {
+      "path": "ux-current/native-dark-1440x900.png",
+      "bytes": 151724,
+      "sha256": "6cff003efda006d8f6e8f2f1e5e47a22486e3ddfb31c4879119ea5155d29df11"
+    },
+    {
+      "path": "ux-current/native-dark-1920x1080.png",
+      "bytes": 167837,
+      "sha256": "30d6cbfa48974eae8bc2165e0f8f770a87f7daa99e56d1c687118db4db73ed22"
+    },
+    {
+      "path": "ux-current/native-dark-860x540.png",
+      "bytes": 70837,
+      "sha256": "3f89ba051196e409467828fc1e8cdf8e6dd3f37a1180414a4896061102a21363"
+    },
+    {
+      "path": "ux-current/native-light-1280x800.png",
+      "bytes": 144715,
+      "sha256": "8605778d347bc03bf6cbad060b60283f95fabf3fb2b6ab651c3e17cfbe03defb"
+    },
+    {
+      "path": "ux-current/native-light-1440x900.png",
+      "bytes": 152305,
+      "sha256": "0702e8dc5dccfa5bd091e1252bbabf61c3e591695aa4de7114d8414a66c5a0f5"
+    },
+    {
+      "path": "ux-current/native-light-1920x1080.png",
+      "bytes": 168284,
+      "sha256": "6a332e3b3ee5044dc91daa695739a188813dfab58a29a5b2cfcb6cb1c67d1eca"
+    },
+    {
+      "path": "ux-current/native-light-860x540.png",
+      "bytes": 71194,
+      "sha256": "82179c7a4dc7ef01513d87d30d461c84e966a8271959f9b7ba09f720d1a2b19a"
+    },
+    {
+      "path": "ux-current/screenshots.json",
+      "bytes": 17573,
+      "sha256": "794a7cd7b4e5ed6ae1feaed9b79093819345489bfe4ca869ae7ab8f5b65c2f1d"
+    },
+    {
+      "path": "ux-high-contrast/failure.json",
+      "bytes": 418,
+      "sha256": "e6bed73a974dbd6b44b479054048e205cbc8a2ac17b5d73fe2bdb812b0be72a2"
+    },
+    {
+      "path": "ux-high-contrast/high-contrast-pre-assertion.json",
+      "bytes": 4065,
+      "sha256": "6db6139b9eda2d5b1cd4ae33dd8434e47b5f08407a08c09bc0ffdee7efaf6557"
+    }
+  ],
+  "rawJobLogSha256": "91c6fe9e334ed2e02e35866afbf2038511607d480a64e196d75ee5f6218fa568",
+  "decodedConnectorLogSha256": "d41177fc827e0c4d0dba0e03a9c61f096bd5d7b1da659853361e29728e9a49c9",
+  "originalSnapshotAtomic": false,
+  "originalMonotonicTimestamps": "NOT RECORDED",
+  "archivePreservedAt": "C:\\Code\\goal56-high-contrast-evidence\\original-13099735465.zip"
+}

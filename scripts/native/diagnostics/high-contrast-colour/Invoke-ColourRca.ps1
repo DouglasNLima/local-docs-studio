@@ -36,8 +36,12 @@ try {
         $productDll = [IO.Path]::ChangeExtension($product, '.dll')
         $before = (Get-FileHash -LiteralPath $productDll -Algorithm SHA256).Hash
         # Passive control: exact original command and code, no diagnostic overlay loaded.
-        & $validation --ux-screenshots $product (Join-Path $evidence ($label + '-original-order')) $source --high-contrast *> (Join-Path $evidence ($label + '-original-order.log'))
-        $attempts.Add(@{ label=$label; control='original-order'; source=$source; exitCode=$LASTEXITCODE })
+        if ($label -eq 'candidate') {
+            & $validation --ux-screenshots $product (Join-Path $evidence ($label + '-original-order')) $source --high-contrast *> (Join-Path $evidence ($label + '-original-order.log'))
+            $attempts.Add(@{ label=$label; control='original-order'; source=$source; exitCode=$LASTEXITCODE })
+        } else {
+            $attempts.Add(@{ label=$label; control='original-order'; source=$source; status='NOT REPEATED; retained run 41352895301' })
+        }
         $validationSource = Join-Path $worktree 'src/native/LensDocsStudio.Native.Validation'
         Copy-Item -LiteralPath (Join-Path $instrumentation 'NativeHighContrastColourRca.cs') -Destination $validationSource
         $program = Join-Path $validationSource 'Program.cs'
@@ -60,7 +64,8 @@ try {
 }
 finally {
     $attempts | ConvertTo-Json -Depth 8 | Out-File (Join-Path $evidence 'attempts.json')
-    Get-ChildItem -LiteralPath $evidence -File -Recurse | Where-Object FullName -notlike '*-source\*' | ForEach-Object {
+    $hashes = @(Get-ChildItem -LiteralPath $evidence -File -Recurse | Where-Object { $_.FullName -notlike '*-source\*' -and $_.Name -ne 'evidence-hashes.json' } | ForEach-Object {
         @{ path=[IO.Path]::GetRelativePath($evidence,$_.FullName); sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash; bytes=$_.Length }
-    } | ConvertTo-Json | Out-File (Join-Path $evidence 'evidence-hashes.json')
+    })
+    $hashes | ConvertTo-Json -Depth 8 | Out-File (Join-Path $evidence 'evidence-hashes.json')
 }

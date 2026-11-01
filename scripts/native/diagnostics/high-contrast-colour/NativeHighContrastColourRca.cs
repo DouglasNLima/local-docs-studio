@@ -82,6 +82,33 @@ internal static class NativeHighContrastColourRca
         try { Dispatcher.PushFrame(frame); } finally { timeout.Stop(); }
         if (expired) throw new TimeoutException("The single dispatcher idle boundary was not reached within 20 seconds.");
     }
+    private static void NotificationBoundary(int since)
+    {
+        // Attempt 1 proved that queue idle can precede the actual settings messages.
+        // Observe a real WPF HighContrast change and a native theme notification,
+        // then complete one idle operation. Never wait for a colour or ratio to pass.
+        var frame = new DispatcherFrame();
+        var complete = false;
+        void Check()
+        {
+            var observed = notifications.Skip(since).Select(item => JsonSerializer.SerializeToElement(item)).ToArray();
+            if (observed.Any(item => item.TryGetProperty("wpfProperty", out var property) && property.GetString() == "HighContrast")
+                && observed.Any(item => item.TryGetProperty("message", out var message) && message.GetInt32() == 0x31A))
+            { complete = true; frame.Continue = false; }
+        }
+        EventHandler operation = (_, _) => Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(Check));
+        // The notifications below invoke this completion check only on relevant
+        // native/WPF events. No polling loop or self-queuing dispatcher operation.
+        notificationObserved += operation;
+        var timeout = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromSeconds(20) };
+        timeout.Tick += (_, _) => frame.Continue = false;
+        timeout.Start();
+        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(Check));
+        try { Dispatcher.PushFrame(frame); }
+        finally { timeout.Stop(); notificationObserved -= operation; }
+        if (!complete) throw new TimeoutException("Actual WPF HighContrast and native WM_THEMECHANGED notifications were not both observed within 20 seconds.");
+    }
+    private static event EventHandler? notificationObserved;
     private static int Child(string mode, string executable, string childOutput)
     {
         var info = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false };
@@ -120,17 +147,28 @@ internal static class NativeHighContrastColourRca
             hwnd.AddHook((IntPtr handle, int message, IntPtr wp, IntPtr lp, ref bool handled) =>
             {
                 if (message is 0x15 or 0x1A or 0x31A or 0x320)
+                {
                     notifications.Add(new { at = Stamp(), message, wParam = wp.ToInt64(), handle = handle.ToInt64() });
+                    notificationObserved?.Invoke(null, EventArgs.Empty);
+                }
                 return IntPtr.Zero;
             });
-            SystemParameters.StaticPropertyChanged += (_, e) => notifications.Add(new { at = Stamp(), wpfProperty = e.PropertyName });
+            SystemParameters.StaticPropertyChanged += (_, e) =>
+            {
+                notifications.Add(new { at = Stamp(), wpfProperty = e.PropertyName });
+                notificationObserved?.Invoke(null, EventArgs.Empty);
+            };
+            var transitionStart = notifications.Count;
             using (var highContrast = new NativeTestHighContrast())
             {
                 Snapshot("B-after-SPI"); resources = new(); ThemeService.Apply(resources, "System"); Snapshot("C-after-Apply");
                 IdleBoundary(); Snapshot("D-after-single-idle");
+                NotificationBoundary(transitionStart); Snapshot("D-after-actual-notifications");
                 exits["fresh"] = Child("fresh", executable, Path.Combine(output, "fresh"));
                 exits["surface"] = NativeUiChecks.ObserveHighContrastCommand(executable, Path.Combine(output, "surface"));
+                transitionStart = notifications.Count;
             }
+            NotificationBoundary(transitionStart);
             IdleBoundary(); Snapshot("restored");
             var restored = JsonSerializer.Serialize(OsState());
             Write("restoration", new { original = JsonSerializer.Deserialize<JsonElement>(original), restored = JsonSerializer.Deserialize<JsonElement>(restored), exactOsStateRestored = original == restored });

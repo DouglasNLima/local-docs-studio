@@ -1,0 +1,146 @@
+[
+  {
+    "path": "src/native/LensDocsStudio.Native/Platform/ThemeService.cs",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "f682451791f0b6aeaffc6923685af2ea5f78ff71",
+        "sha256": "971039bbf8765e9405a2e563b97636d5a7a914e241f95b90ebcef2b4676d961a"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "f682451791f0b6aeaffc6923685af2ea5f78ff71",
+        "sha256": "971039bbf8765e9405a2e563b97636d5a7a914e241f95b90ebcef2b4676d961a"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native/Resources/DesktopStyles.xaml",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "f74fcbbd022ab173cefb1137a073b09e81a35bad",
+        "sha256": "8cf05d42487eee9aef6becf8304e34c26f375ca08abab8ef436a8fe41dcb4486"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "f74fcbbd022ab173cefb1137a073b09e81a35bad",
+        "sha256": "8cf05d42487eee9aef6becf8304e34c26f375ca08abab8ef436a8fe41dcb4486"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "f462e732115d86882b8d4b67d96115ed1b8817ff",
+        "sha256": "c26e3ab29b6bf54b73a8b4fac5db97cd261081c9889098a34de4279b5372b1dc"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "f462e732115d86882b8d4b67d96115ed1b8817ff",
+        "sha256": "c26e3ab29b6bf54b73a8b4fac5db97cd261081c9889098a34de4279b5372b1dc"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native/Resources/FormStyles.xaml",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "19b1cb28d8f1d74cebdcc351906f549070d8434e",
+        "sha256": "81fbd5809109bce890f2ceaf5b40263aca0e8490f3b8923bae343b661c620004"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "19b1cb28d8f1d74cebdcc351906f549070d8434e",
+        "sha256": "81fbd5809109bce890f2ceaf5b40263aca0e8490f3b8923bae343b661c620004"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native/Controls/CommandIcon.cs",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "f5e40963582c86491b48a5560039f4d7e720c30d",
+        "sha256": "f0cab25edeaa79e73c8fc46ae4a03fcd903e56c314cc8596c51bcb2017b6f912"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "f5e40963582c86491b48a5560039f4d7e720c30d",
+        "sha256": "f0cab25edeaa79e73c8fc46ae4a03fcd903e56c314cc8596c51bcb2017b6f912"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native.Validation/NativeUxScreenshots.cs",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "ae100a8a4a2d3b0a7d602749bfa21f824cda7790",
+        "sha256": "040eba9126624e984db3166a4541073d9044efc11a64ee7da95b86298fe30b6f"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "ae100a8a4a2d3b0a7d602749bfa21f824cda7790",
+        "sha256": "040eba9126624e984db3166a4541073d9044efc11a64ee7da95b86298fe30b6f"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native.Validation/NativeTestHighContrast.cs",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "a2a0bc1cc550e314c09dc69eb3ce99b04fb93f2a",
+        "sha256": "1580f005c075e338c84883877bd9e9587a1b8cbdae60c4c9bb5c83a6a3d960fe"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "a2a0bc1cc550e314c09dc69eb3ce99b04fb93f2a",
+        "sha256": "1580f005c075e338c84883877bd9e9587a1b8cbdae60c4c9bb5c83a6a3d960fe"
+      }
+    ]
+  },
+  {
+    "path": "src/native/LensDocsStudio.Native.Validation/NativeSyntaxChecks.cs",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "f6f076c4cffd26343a1752cd3eead3d19125c695",
+        "sha256": "3a77436a8447a2ee049f52de90748d0931b8e39d71693a41b295f90afc8f4e8a"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "f6f076c4cffd26343a1752cd3eead3d19125c695",
+        "sha256": "3a77436a8447a2ee049f52de90748d0931b8e39d71693a41b295f90afc8f4e8a"
+      }
+    ]
+  },
+  {
+    "path": ".github/workflows/native-ux.yml",
+    "identical": true,
+    "identities": [
+      {
+        "source": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+        "blob": "abf681fa326157c2b2e0f6c600a5ad9adfee9650",
+        "sha256": "91f0b3a67f3796332c24fef9a04b6187772bf29bdaf93011ea9c1a1901e6f21a"
+      },
+      {
+        "source": "0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+        "blob": "abf681fa326157c2b2e0f6c600a5ad9adfee9650",
+        "sha256": "91f0b3a67f3796332c24fef9a04b6187772bf29bdaf93011ea9c1a1901e6f21a"
+      }
+    ]
+  }
+]

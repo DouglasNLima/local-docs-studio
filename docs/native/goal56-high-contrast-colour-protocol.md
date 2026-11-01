@@ -89,3 +89,30 @@ correction/integration NO-GO and publish the missing causal evidence under #56.
 Independent agent review follows the investigation. No diagnostic PASS substitutes
 for Desktop UX acceptance. Preserve `NATIVE_CONTINUOUS_250MS_FAIL`,
 `SIGNPATH_ELIGIBILITY_UNCONFIRMED` and `NATIVE_STABLE_NO_GO`.
+
+## Bounded amendment after interrupted run 41352895301
+
+The first run executed baseline A–F but did not reach candidate. Its restoration
+assertion ran after one idle operation and observed the restored OS flag/scheme
+with HC colours still present. Earlier B likewise observed OS HC=true while OS
+colours and WPF flag were normal. Actual WM_THEMECHANGED and WPF HighContrast
+notifications arrived later. Queue idle is demonstrably not transition completion.
+The failed run also has a separate evidence-indexing defect: the pipeline created
+its output before enumerating inputs and attempted to hash that open output.
+
+Use the one predeclared tooling-repair execution to complete the interrupted
+comparison. Preserve attempt 1 and all its observations. Do not repeat baseline's
+unchanged prelaunch acceptance. Run candidate's missing acceptance once. Run
+equivalent baseline/candidate transition controls on the new shared host with an
+additional, explicit boundary: both a real WM_THEMECHANGED and a real WPF
+HighContrast property-change notification since the transition must be observed,
+then one dispatcher idle operation completes, within the existing 20 seconds.
+Record the earlier single-idle snapshot as well. Never wait for colours or contrast
+to pass, reapply a palette, inject notifications or retry input. Restoration uses
+the same actual-notification condition before the unchanged exact original-state
+comparison. Missing notifications or failed restoration stop the experiment.
+
+This changes diagnostic readiness only. It is not a correction to the existing
+Desktop UX assertion, product or historical failure. The two passive controls are
+on different hosts and must be labelled as such; the amended instrumented source
+comparison is on one host. No third hosted execution is authorised by this protocol.
