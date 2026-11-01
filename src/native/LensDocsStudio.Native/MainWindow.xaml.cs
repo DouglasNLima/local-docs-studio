@@ -74,7 +74,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; InvalidateFind(); CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -139,7 +139,7 @@ public partial class MainWindow : Window
             Editor.ScrollToVerticalOffset(displayedTab?.VerticalOffset ?? 0);
         }
         finally { bindingViewport = false; }
-        InvalidateFind();
+        InvalidateFind(FindRefreshCause.ActiveDocument);
         UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();
@@ -280,7 +280,7 @@ public partial class MainWindow : Window
             Phase("attachment-start");
             using var attachmentPhase = MermaidDiagnostics.Measure("preview.attachment-first-layout");
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
-            if (searchPreview) InvalidateFind();
+            if (searchPreview) InvalidateFind(FindRefreshCause.Preview);
             Phase("attachment-end");
             Phase("installed");
             Phase("sync-install-start");
