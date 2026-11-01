@@ -38,6 +38,11 @@ internal static partial class NativeUiChecks
             main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native UX window did not open.");
             FocusWindow(main); var editor = Find(main, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == source && Find(main, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The exact source/preview did not load.");
+            // AvalonEdit delegates TextPattern to its child peer. Use the established
+            // UIA descendant discovery before inspecting the real parent selection.
+            _ = editor.FindAllDescendants();
+            Wait(() => editor.Patterns.Text.IsSupported, "The observed source editor has no TextPattern provider.");
+            Check(editor.Patterns.Text.Pattern.DocumentRange.GetText(-1) == source, "Observed TextPattern belongs to the exact loaded editor source");
             Check(!highContrast || System.Windows.SystemParameters.HighContrast, "Requested operating-system High Contrast is active");
             foreach (var theme in new[] { "Dark", "Light", "System", "Dark" })
             {
