@@ -124,10 +124,14 @@ internal static partial class NativeUiChecks
                 Keyboard.Type(character.ToString()); edited += character;
                 AssertEditing(edited, edited.Length);
             }
-            var scroll = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
-            Check(scroll > 0, "Visible keyboard editing occurs in a scrolled editor distant from the first search occurrence");
+            (double Left, double Top)? beforeTypingOrigin = null;
+            Wait(() => (beforeTypingOrigin = EditableOrigin()) is not null,
+                "The actual typed text did not become visible in the editor");
+            var firstOccurrence = editor.Patterns.Text.Pattern.DocumentRange.FindText("Contact", false, true)!;
+            Check(!firstOccurrence.GetBoundingRectangles().Any(VisibleInEditor),
+                "Visible keyboard editing occurs distant from the off-screen first search occurrence");
             Keyboard.Type("x"); edited += "x"; AssertEditing(edited, edited.Length);
-            Check(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value == scroll,
+            Check(EditableOrigin() == beforeTypingOrigin,
                 "Passive Find refresh does not move the editor viewport while typing on the same line");
             Keyboard.Type(VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
             Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
@@ -149,6 +153,20 @@ internal static partial class NativeUiChecks
             return 0;
 
             void Counter(string expected) => Wait(() => Find(main, "FindCounter").Name == expected, "Find counter did not become " + expected);
+            bool VisibleInEditor(System.Drawing.Rectangle rectangle)
+            {
+                var bounds = editor.BoundingRectangle;
+                return rectangle.Width > 0 && rectangle.Height > 0 && rectangle.Right > bounds.Left
+                    && rectangle.Left < bounds.Right && rectangle.Bottom > bounds.Top && rectangle.Top < bounds.Bottom;
+            }
+            (double Left, double Top)? EditableOrigin()
+            {
+                var range = editor.Patterns.Text.Pattern.DocumentRange.FindText("editable", true, false);
+                if (range is null) return null;
+                foreach (var rectangle in range.GetBoundingRectangles())
+                    if (VisibleInEditor(rectangle)) return (rectangle.Left, rectangle.Top);
+                return null;
+            }
             void AssertEditing(string expected, int caret)
             {
                 var total = LensDocsStudio.Core.Parsing.FindMatches.Collect(expected, "cont").Offsets.Count;
