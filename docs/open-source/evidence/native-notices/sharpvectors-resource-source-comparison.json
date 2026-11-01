@@ -1,0 +1,30 @@
+[
+  {
+    "source": "https://raw.githubusercontent.com/ElinamLLC/SharpVectors/39a793adf45ef0e36308e0b5c00cc4fcc4ab9c4f/Source/SharpVectorModel/Resources/svg11.dtd",
+    "sourceBytes": 193673,
+    "sourceSha256": "bfab58a79eaceb87d6c6b8321c75f076fa387938f5d393c44bb6cd23bf162921",
+    "resourceSha256": "40ea870ef1449a4b87913b1a93879e29ef0a357553c7e7695e8543b5b2e3f922",
+    "normalisedBytesEqual": true
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ElinamLLC/SharpVectors/39a793adf45ef0e36308e0b5c00cc4fcc4ab9c4f/Source/SharpVectorModel/Resources/svg.xsd",
+    "sourceBytes": 129611,
+    "sourceSha256": "8a6b038bdc032b0a7e05c159982c132c2e09a117b6c6f3cff4594be7696aec2f",
+    "resourceSha256": "4f1a0092fbf03dcfe73340d9de6821ffd2b313f479a224e355282843667a6d6d",
+    "normalisedBytesEqual": true
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ElinamLLC/SharpVectors/39a793adf45ef0e36308e0b5c00cc4fcc4ab9c4f/Source/SharpVectorModel/Resources/xlink.xsd",
+    "sourceBytes": 8052,
+    "sourceSha256": "4f4ff6a0d61d7b9b7d4d50a1693ebb5532e0a5bcd63bcc00a1b18798d8a1d083",
+    "resourceSha256": "c3dbbaa28b884377ecd4a6c49d1f12566d8227cb0dce8ced10c0f66f8fa266e3",
+    "normalisedBytesEqual": true
+  },
+  {
+    "source": "https://raw.githubusercontent.com/ElinamLLC/SharpVectors/39a793adf45ef0e36308e0b5c00cc4fcc4ab9c4f/Source/SharpVectorModel/Resources/xml.xsd",
+    "sourceBytes": 8836,
+    "sourceSha256": "61960fb3131e38022caad5360e2f33a3382578ab3c80cd58bd74320ede61b20c",
+    "resourceSha256": "61960fb3131e38022caad5360e2f33a3382578ab3c80cd58bd74320ede61b20c",
+    "normalisedBytesEqual": true
+  }
+]

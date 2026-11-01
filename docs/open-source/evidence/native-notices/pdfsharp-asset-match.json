@@ -1,0 +1,64 @@
+{
+  "source": "https://assets.pdfsharp.net/pdfsharp-6.x/pdfsharp-6.x.zip",
+  "observed": "2026-11-01",
+  "archiveSha256": "2e8c5049b8b8acfcc3e02687deddb3b8eb79b211d9cdf26366406f721778dcc6",
+  "matches": [
+    {
+      "resource": "PdfSharp.Snippets.assets.fonts.Oblivious.ttf",
+      "assetMember": "fonts/SampleFonts/Oblivious.ttf",
+      "payloadSha256": "c6d9b143fcbdb9848f381eae4f6f3dda5df885f591abb617ee2e90f28ad4eee4",
+      "assetSha256": "c6d9b143fcbdb9848f381eae4f6f3dda5df885f591abb617ee2e90f28ad4eee4",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.Snippets.assets.fonts.xfiles.ttf",
+      "assetMember": "fonts/SampleFonts/xfiles.ttf",
+      "payloadSha256": "f6a1427a11e5365020f4515eddc168ff38658fb0ce8f5f5da71df8c5cc4a25ef",
+      "assetSha256": "f6a1427a11e5365020f4515eddc168ff38658fb0ce8f5f5da71df8c5cc4a25ef",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Black.ttf",
+      "assetMember": "fonts/SegoeWP/SegoeWP-Black.ttf",
+      "payloadSha256": "655385bd072d7edfc89f0437ef3fd17763925fada5c49484497bd5091df7b820",
+      "assetSha256": "655385bd072d7edfc89f0437ef3fd17763925fada5c49484497bd5091df7b820",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Bold.ttf",
+      "assetMember": "fonts/SegoeWP/SegoeWP-Bold.ttf",
+      "payloadSha256": "5ee01398c07e1c8c3d46684b31caa516c75fcc0a58b7a01d0474c9c9ec4f2fa9",
+      "assetSha256": "5ee01398c07e1c8c3d46684b31caa516c75fcc0a58b7a01d0474c9c9ec4f2fa9",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Light.ttf",
+      "assetMember": "fonts/SegoeWP/SegoeWP-Light.ttf",
+      "payloadSha256": "d518eecd719e5c6e5ef0bd3480bbf07c28f449097d7845f98487a4e81d7d86fc",
+      "assetSha256": "d518eecd719e5c6e5ef0bd3480bbf07c28f449097d7845f98487a4e81d7d86fc",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Semibold.ttf",
+      "assetMember": "fonts/SegoeWP/SegoeWP-Semibold.ttf",
+      "payloadSha256": "34df8b07ec1c5ee1d4f8f359412800d8fa80a31479d65de439a98cacc12877a5",
+      "assetSha256": "34df8b07ec1c5ee1d4f8f359412800d8fa80a31479d65de439a98cacc12877a5",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.WPFonts.Fonts.SegoeWP-Semilight.ttf",
+      "assetMember": "fonts/SegoeWP/SegoeWP-Semilight.ttf",
+      "payloadSha256": "19660b3d50f45009e5d884d3e213af82956952b9a9ade3b67a960559c4b32634",
+      "assetSha256": "19660b3d50f45009e5d884d3e213af82956952b9a9ade3b67a960559c4b32634",
+      "exactMatch": true
+    },
+    {
+      "resource": "PdfSharp.WPFonts.Fonts.SegoeWP.ttf",
+      "assetMember": "fonts/SegoeWP/SegoeWP.ttf",
+      "payloadSha256": "18dd3ff9b9b44f76584fca8659e79e3cba7e4e7429bbeba0ba4d164d165ca9d0",
+      "assetSha256": "18dd3ff9b9b44f76584fca8659e79e3cba7e4e7429bbeba0ba4d164d165ca9d0",
+      "exactMatch": true
+    }
+  ],
+  "limitation": "Mutable observed asset URL; not immutable version applicability or a legal grant. No licence/notice/readme named files in archive."
+}

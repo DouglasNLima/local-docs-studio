@@ -1,0 +1,24 @@
+name: Validate native notice supplements
+on:
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  notice-controls:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Preserve original notice controls
+        run: pwsh -NoProfile -File scripts/native/Test-NativeNotices.ps1
+      - name: Validate offline upstream supplements and rejection controls
+        run: pwsh -NoProfile -File scripts/native/Test-NativeNoticeSupplements.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-notice-controls
+          path: artifacts/native/notice-supplement-controls/**/results.json

@@ -1,0 +1,306 @@
+[
+  {
+    "file": "PdfSharp.Snippets.assets.fonts.Oblivious.ttf",
+    "sha256": "c6d9b143fcbdb9848f381eae4f6f3dda5df885f591abb617ee2e90f28ad4eee4",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 Jakob Fischer / PizzaDude [distribute freely]"
+      },
+      {
+        "id": 1,
+        "text": "Oblivious font"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": ""
+      },
+      {
+        "id": 0,
+        "text": "\u00a9 Jakob Fischer / PizzaDude [distribute freely]"
+      },
+      {
+        "id": 1,
+        "text": "Oblivious font"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": ""
+      },
+      {
+        "id": 0,
+        "text": "\u00a9 Jakob Fischer / PizzaDude [distribute freely]"
+      },
+      {
+        "id": 1,
+        "text": "Oblivious font"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": ""
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.Snippets.assets.fonts.xfiles.ttf",
+    "sha256": "f6a1427a11e5365020f4515eddc168ff38658fb0ce8f5f5da71df8c5cc4a25ef",
+    "names": [
+      {
+        "id": 1,
+        "text": "Overexposed"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 1,
+        "text": "X-Files"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.WPFonts.Fonts.SegoeWP-Black.ttf",
+    "sha256": "655385bd072d7edfc89f0437ef3fd17763925fada5c49484497bd5091df7b820",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 2010 Microsoft Corporation. All Rights Reserved."
+      },
+      {
+        "id": 1,
+        "text": "Segoe WP Black"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": "Segoe is either a registered trademark or a trademark of Microsoft Corporation in the United States and/or other countries."
+      },
+      {
+        "id": 8,
+        "text": "Microsoft Corporation"
+      },
+      {
+        "id": 11,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      },
+      {
+        "id": 13,
+        "text": "You may use this font as permitted by the EULA for the product in which this font is included to display and print content. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content."
+      },
+      {
+        "id": 14,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.WPFonts.Fonts.SegoeWP-Bold.ttf",
+    "sha256": "5ee01398c07e1c8c3d46684b31caa516c75fcc0a58b7a01d0474c9c9ec4f2fa9",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 2010 Microsoft Corporation. All Rights Reserved."
+      },
+      {
+        "id": 1,
+        "text": "Segoe WP"
+      },
+      {
+        "id": 2,
+        "text": "Bold"
+      },
+      {
+        "id": 7,
+        "text": "Segoe is either a registered trademark or a trademark of Microsoft Corporation in the United States and/or other countries."
+      },
+      {
+        "id": 8,
+        "text": "Microsoft Corporation"
+      },
+      {
+        "id": 11,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      },
+      {
+        "id": 13,
+        "text": "You may use this font as permitted by the EULA for the product in which this font is included to display and print content. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content."
+      },
+      {
+        "id": 14,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.WPFonts.Fonts.SegoeWP-Light.ttf",
+    "sha256": "d518eecd719e5c6e5ef0bd3480bbf07c28f449097d7845f98487a4e81d7d86fc",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 2010 Microsoft Corporation. All Rights Reserved."
+      },
+      {
+        "id": 1,
+        "text": "Segoe WP Light"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": "Segoe is either a registered trademark or a trademark of Microsoft Corporation in the United States and/or other countries."
+      },
+      {
+        "id": 8,
+        "text": "Microsoft Corporation"
+      },
+      {
+        "id": 11,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      },
+      {
+        "id": 13,
+        "text": "You may use this font as permitted by the EULA for the product in which this font is included to display and print content. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content."
+      },
+      {
+        "id": 14,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.WPFonts.Fonts.SegoeWP-Semibold.ttf",
+    "sha256": "34df8b07ec1c5ee1d4f8f359412800d8fa80a31479d65de439a98cacc12877a5",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 2010 Microsoft Corporation. All Rights Reserved."
+      },
+      {
+        "id": 1,
+        "text": "Segoe WP Semibold"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": "Segoe is either a registered trademark or a trademark of Microsoft Corporation in the United States and/or other countries."
+      },
+      {
+        "id": 8,
+        "text": "Microsoft Corporation"
+      },
+      {
+        "id": 11,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      },
+      {
+        "id": 13,
+        "text": "You may use this font as permitted by the EULA for the product in which this font is included to display and print content. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content."
+      },
+      {
+        "id": 14,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.WPFonts.Fonts.SegoeWP-Semilight.ttf",
+    "sha256": "19660b3d50f45009e5d884d3e213af82956952b9a9ade3b67a960559c4b32634",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 2010 Microsoft Corporation. All Rights Reserved."
+      },
+      {
+        "id": 1,
+        "text": "Segoe WP SemiLight"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": "Segoe is either a registered trademark or a trademark of Microsoft Corporation in the United States and/or other countries."
+      },
+      {
+        "id": 8,
+        "text": "Microsoft Corporation"
+      },
+      {
+        "id": 11,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      },
+      {
+        "id": 13,
+        "text": "You may use this font as permitted by the EULA for the product in which this font is included to display and print content. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content."
+      },
+      {
+        "id": 14,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      }
+    ]
+  },
+  {
+    "file": "PdfSharp.WPFonts.Fonts.SegoeWP.ttf",
+    "sha256": "18dd3ff9b9b44f76584fca8659e79e3cba7e4e7429bbeba0ba4d164d165ca9d0",
+    "names": [
+      {
+        "id": 0,
+        "text": "\u00a9 2010 Microsoft Corporation. All Rights Reserved."
+      },
+      {
+        "id": 1,
+        "text": "Segoe WP"
+      },
+      {
+        "id": 2,
+        "text": "Regular"
+      },
+      {
+        "id": 7,
+        "text": "Segoe is either a registered trademark or a trademark of Microsoft Corporation in the United States and/or other countries."
+      },
+      {
+        "id": 8,
+        "text": "Microsoft Corporation"
+      },
+      {
+        "id": 11,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      },
+      {
+        "id": 13,
+        "text": "You may use this font as permitted by the EULA for the product in which this font is included to display and print content. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content."
+      },
+      {
+        "id": 14,
+        "text": "http://www.microsoft.com/typography/fonts/"
+      }
+    ]
+  }
+]

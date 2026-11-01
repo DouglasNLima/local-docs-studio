@@ -1,0 +1,131 @@
+{
+  "sourceRevision": "ab21919a42ec8b3d17d9ba2e39b4e7e41459e206",
+  "sourceTree": "f74345a61d0e9320a8826da8cb2ca3478ee3125e",
+  "components": [
+    {
+      "id": "AngleSharp/1.8.4",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Exact source primary notice absent from the generated distribution; retained conservatively by the supplement without asserting every previous metadata/reference combination was legally insufficient.",
+      "archiveSha256": "9c2e71b31d95eff4ff7d95ee61ce09f3a8e6e64e517616a8ddaa216819afff61"
+    },
+    {
+      "id": "AvalonEdit/6.3.1.120",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Original source copyright or primary notice text absent; generic SPDX template and nuspec metadata alone retained.",
+      "archiveSha256": "8ac3e5aa2bb6178d92cbe72c7900a683fab0aee66a8eafa481611c444dbee3e3"
+    },
+    {
+      "id": "CommunityToolkit.Mvvm/8.4.2",
+      "baselineClassification": "VERIFIED_COMPLETE",
+      "reason": "Official archive identity and package notices verified; component-specific primary attribution supplement retained where needed.",
+      "archiveSha256": "8cb4b5be8e95f9f1ec26cf341d84fbee8244e88102ebc7c88242e960e0e35805"
+    },
+    {
+      "id": "DocumentFormat.OpenXml.Framework/3.5.1",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Original source copyright or primary notice text absent; generic SPDX template and nuspec metadata alone retained.",
+      "archiveSha256": "d317d974986a90d8f6de1832a48fb1052d771ea475a37a2f4e3be85c497fa9c5"
+    },
+    {
+      "id": "DocumentFormat.OpenXml/3.5.1",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Original source copyright or primary notice text absent; generic SPDX template and nuspec metadata alone retained.",
+      "archiveSha256": "71375a11a53eeb554005477ce6ca127909aebed474900e92298360b49a68307f"
+    },
+    {
+      "id": "Markdig/1.4.0",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Original source copyright or primary notice text absent; generic SPDX template and nuspec metadata alone retained.",
+      "archiveSha256": "bdd84353a3f499f989f3111b33aceebd9434f8a069ca8b3da2a065f2230e7baf"
+    },
+    {
+      "id": "Mermaider/0.15.1",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Exact source primary notice absent from the generated distribution; retained conservatively by the supplement without asserting every previous metadata/reference combination was legally insufficient.",
+      "archiveSha256": "0dfb57fa49924facd9a7e5a2d18083972ef1c5b73e9a3c8d6fdf66817252e182"
+    },
+    {
+      "id": "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2",
+      "baselineClassification": "VERIFIED_COMPLETE",
+      "reason": "Official archive identity and package notices verified; component-specific primary attribution supplement retained where needed.",
+      "archiveSha256": "51f2df1100245f10da54f0bb7e813f277155117777d4fbbab902214e27372606"
+    },
+    {
+      "id": "Microsoft.Extensions.Logging.Abstractions/8.0.3",
+      "baselineClassification": "VERIFIED_COMPLETE",
+      "reason": "Official archive identity and package notices verified; component-specific primary attribution supplement retained where needed.",
+      "archiveSha256": "e4c498d5a13051b4577a148f1d8c3470167215c507e2392069b75dc61322bb74"
+    },
+    {
+      "id": "Microsoft.Extensions.ObjectPool/10.0.3",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Exact source primary notice absent from the generated distribution; retained conservatively by the supplement without asserting every previous metadata/reference combination was legally insufficient.",
+      "archiveSha256": "21e03c68b7a86d3a192d37a690cc0f745e791097d006d9650b89cb67a22205a6"
+    },
+    {
+      "id": "Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+      "baselineClassification": "VERIFIED_COMPLETE",
+      "reason": "Official archive identity and package notices verified; component-specific primary attribution supplement retained where needed.",
+      "archiveSha256": "c66885d464697be75676b4d1fbca38b8806f3af01d65d27205b3f06add094444"
+    },
+    {
+      "id": "Microsoft.WindowsDesktop.App.Runtime.win-x64/10.0.13",
+      "baselineClassification": "VERIFIED_COMPLETE",
+      "reason": "Official archive identity and package notices verified; component-specific primary attribution supplement retained where needed.",
+      "archiveSha256": "af044758d6bc23eca96b60c9ce13b38f211c3e736eef9458de3cadbbd3e20ff2"
+    },
+    {
+      "id": "PDFsharp-MigraDoc-WPF/6.2.4",
+      "baselineClassification": "REDISTRIBUTION_REVIEW_REQUIRED",
+      "reason": "Actual PDFsharp companion DLLs embed eight fonts without established version-applicable general application redistribution terms; source primary licence also omitted.",
+      "archiveSha256": "a0550d30fd8686d8caa43a8f62557e7fe323c43462bfa21c89d4166734df3c48"
+    },
+    {
+      "id": "PDFsharp-WPF/6.2.4",
+      "baselineClassification": "REDISTRIBUTION_REVIEW_REQUIRED",
+      "reason": "Actual PDFsharp companion DLLs embed eight fonts without established version-applicable general application redistribution terms; source primary licence also omitted.",
+      "archiveSha256": "138109ddeeea62eeb7844b0c8ebf5eb05ec5acd51f464f4dcd8d653b6bd4f807"
+    },
+    {
+      "id": "PdfPig/0.1.16",
+      "baselineClassification": "NOTICE_MISSING",
+      "reason": "Composite LICENSE, NOTICES, original Adobe glyph headers/AFM file and four distinct CMap copyright blocks absent from complete readable attribution.",
+      "archiveSha256": "d67171846ea8c28f50359137065fec4514266d7a32b23eae6c5f2ebed8ffcfc4"
+    },
+    {
+      "id": "SharpVectors.Wpf/1.8.6",
+      "baselineClassification": "PROVENANCE_UNCONFIRMED",
+      "reason": "Exact official package and version-tag resource bytes are verified; original W3C SVG DTD notice is retained and made readable conservatively, while other nested schema permission history remains unconfirmed.",
+      "archiveSha256": "8da7c26ce92ec9bbe42345b6f926705b98bf8ceaa5cfa967b8eefac0c1d6aeb0"
+    },
+    {
+      "id": "Sugiyama/0.15.1",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Exact source primary notice absent from the generated distribution; retained conservatively by the supplement without asserting every previous metadata/reference combination was legally insufficient.",
+      "archiveSha256": "3d6fe14e8de9ea4d7ee49349eca395bbecc49d987b390d1d7c1c56a311b70243"
+    },
+    {
+      "id": "System.IO.Hashing/10.0.12",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Exact source primary notice absent from the generated distribution; retained conservatively by the supplement without asserting every previous metadata/reference combination was legally insufficient.",
+      "archiveSha256": "d918de044168a48e148a73e84c6db6f8fea570963848dc4c03631aad97958dd1"
+    },
+    {
+      "id": "WpfMath/2.1.0",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Original source copyright or primary notice text absent; generic SPDX template and nuspec metadata alone retained.",
+      "archiveSha256": "37622fa45d0dd18a312744eed4da8bf55a7b297606be87169c2bedb443eb7bad"
+    },
+    {
+      "id": "XamlMath.Shared/2.1.0",
+      "baselineClassification": "NOTICE_INCOMPLETE",
+      "reason": "Five Gent/JMathTeX XML dataset headers and original supplier MIT-permission statement absent from readable notices; retain exact source text and leave author-permission history for redistribution review.",
+      "archiveSha256": "e64a64e7a1827b8186c79a78cac50cf118a02009341e109a89c02808f5d5bc8f"
+    }
+  ],
+  "limits": [
+    "VERIFIED_COMPLETE is scoped to reviewed notice and official archive identity, not legal clearance, independent upstream rebuild or a whole-binary MIT grant.",
+    "Every payload file and exact match is enumerated in baseline-sbom.json; embedded resources in baseline-1101-resources.json.",
+    "Final package results are bound to the final reviewed commit in the Goal #56 receipt; this baseline remains immutable."
+  ]
+}

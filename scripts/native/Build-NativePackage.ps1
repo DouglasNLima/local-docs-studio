@@ -52,6 +52,7 @@ try {
     $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'version.json') -Encoding utf8NoBOM
     & (Join-Path $PSScriptRoot 'Copy-NativeLicence.ps1') -RepositoryRoot $repo -PayloadDirectory $payload -SourceRevision $revision
     & (Join-Path $PSScriptRoot 'Write-NativeNotices.ps1') -PayloadDirectory $payload
+    & (Join-Path $PSScriptRoot 'Write-NativeNoticeSupplements.ps1') -PayloadDirectory $payload
     Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-guide.md') -Destination (Join-Path $payload 'PREVIEW-GUIDE.md')
     Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-release-notes.md') -Destination (Join-Path $payload 'PREVIEW-RELEASE-NOTES.md')
     & $IsccPath "/DAppVersion=$Version" "/DPackageSource=$payload" "/DOutputDir=$output" (Join-Path $repo 'installer/inno/LensDocsStudio.Native.iss')

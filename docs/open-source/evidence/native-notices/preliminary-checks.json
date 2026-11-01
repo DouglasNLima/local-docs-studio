@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "check": "foundation",
+      "result": "FAIL",
+      "cause": "Ledger regeneration pending for newly proposed paths"
+    },
+    {
+      "check": "governance",
+      "result": "FAIL",
+      "cause": "Attempted new .gitattributes byte-preservation rule changed protected bytes; reverted and used existing -text evidence directory"
+    },
+    {
+      "check": "governance negative controls",
+      "result": "PASS",
+      "tests": 23
+    },
+    {
+      "check": "static",
+      "result": "PASS"
+    }
+  ],
+  "historicalFailuresPreserved": true
+}
