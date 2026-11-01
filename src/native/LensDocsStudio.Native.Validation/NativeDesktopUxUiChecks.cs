@@ -60,41 +60,6 @@ internal static partial class NativeUiChecks
             Find(main, "FindPrevious").AsButton().Invoke(); Counter(count + " of " + count);
             Keyboard.Type(VirtualKeyShort.F3); Counter("1 of " + count);
             main.CaptureToFile(Path.Combine(output, "find-editor.png"));
-            // Leave a query refresh pending, then take real keyboard ownership of the editor.
-            query.Text = "cont";
-            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            var edited = source;
-            foreach (var character in "editable")
-            {
-                Keyboard.Type(character.ToString()); edited += character;
-                AssertEditing(edited, edited.Length);
-            }
-            var scroll = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
-            Check(scroll > 0, "Visible keyboard editing occurs in a scrolled editor distant from the first search occurrence");
-            Keyboard.Type("x"); edited += "x"; AssertEditing(edited, edited.Length);
-            Check(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value == scroll,
-                "Passive Find refresh does not move the editor viewport while typing on the same line");
-            Keyboard.Type(VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
-            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
-            Keyboard.Type("yz"); edited += "yz"; AssertEditing(edited, edited.Length);
-            Keyboard.Type(VirtualKeyShort.BACK); edited = edited[..^1]; AssertEditing(edited, edited.Length);
-            Keyboard.Type(VirtualKeyShort.LEFT); Keyboard.Type(VirtualKeyShort.DELETE); edited = edited[..^1]; AssertEditing(edited, edited.Length);
-            var beforePaste = edited;
-            NativeUiClipboard.SetText(" Café CONTACT"); clipboardSequence = GetClipboardSequenceNumber();
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V); edited += " Café CONTACT"; AssertEditing(edited, edited.Length);
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); AssertEditing(beforePaste, beforePaste.Length);
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); AssertEditing(edited, edited.Length);
-            main.CaptureToFile(Path.Combine(output, "find-passive-editing.png"));
-            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F3);
-            Counter((count + 1) + " of " + (count + 1));
-            Check(editor.Patterns.Text.Pattern.GetSelection().Single().GetText(-1) == "CONT",
-                "Explicit Shift+F3 still selects the last exact Unicode-aware source occurrence from the editor");
-            // Restore the synthetic buffer through actual editing, leaving the saved fixture untouched.
-            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-            NativeUiClipboard.SetText(source); clipboardSequence = GetClipboardSequenceNumber();
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
-            Wait(() => ReadEditorText(editor) == source, "Synthetic source restoration failed.");
-            query.Focus(); query.Text = "contact"; Counter("1 of " + count);
             query.Text = "missing-unique-query"; Counter("0 of 0"); query.Text = ""; Counter("0 of 0");
             Keyboard.Type(VirtualKeyShort.ESCAPE);
             var preview = Find(main, "DocumentPreview");
@@ -149,6 +114,37 @@ internal static partial class NativeUiChecks
             Find(diagram, "DiagramReset").AsButton().Invoke(); Wait(() => Find(diagram, "DiagramZoomLabel").Name == "100%", "Reset zoom indicator is stale.");
             diagram.Close(); diagram = null;
             Check(ReadEditorText(editor) == source && File.ReadAllBytes(path).SequenceEqual(saved), "Inspection, pan, zoom and copy preserve source and saved bytes");
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            // Leave a query refresh pending, then take real keyboard ownership of the editor.
+            query.Text = "cont";
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            var edited = source;
+            foreach (var character in "editable")
+            {
+                Keyboard.Type(character.ToString()); edited += character;
+                AssertEditing(edited, edited.Length);
+            }
+            var scroll = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
+            Check(scroll > 0, "Visible keyboard editing occurs in a scrolled editor distant from the first search occurrence");
+            Keyboard.Type("x"); edited += "x"; AssertEditing(edited, edited.Length);
+            Check(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value == scroll,
+                "Passive Find refresh does not move the editor viewport while typing on the same line");
+            Keyboard.Type(VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
+            Keyboard.Type("yz"); edited += "yz"; AssertEditing(edited, edited.Length);
+            Keyboard.Type(VirtualKeyShort.BACK); edited = edited[..^1]; AssertEditing(edited, edited.Length);
+            Keyboard.Type(VirtualKeyShort.LEFT); Keyboard.Type(VirtualKeyShort.DELETE); edited = edited[..^1]; AssertEditing(edited, edited.Length);
+            var beforePaste = edited;
+            NativeUiClipboard.SetText(" Café CONTACT"); clipboardSequence = GetClipboardSequenceNumber();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V); edited += " Café CONTACT"; AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); AssertEditing(beforePaste, beforePaste.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); AssertEditing(edited, edited.Length);
+            main.CaptureToFile(Path.Combine(output, "find-passive-editing.png"));
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F3);
+            Counter((count + 1) + " of " + (count + 1));
+            Check(editor.Patterns.Text.Pattern.GetSelection().Single().GetText(-1) == "CONT",
+                "Explicit Shift+F3 still selects the last exact Unicode-aware source occurrence from the editor");
+            Check(File.ReadAllBytes(path).SequenceEqual(saved), "Continuous Find editing and history preserve the saved fixture bytes");
             File.WriteAllText(Path.Combine(output, "desktop-ux-ui.json"), JsonSerializer.Serialize(new { Passed = true, ActualHighContrast = System.Windows.SystemParameters.HighContrast, Checks = checks, CanonicalClipboardPixelSha256 = canonical }, new JsonSerializerOptions { WriteIndented = true }));
             return 0;
 
