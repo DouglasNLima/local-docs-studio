@@ -2147,6 +2147,7 @@ ${unresolvedRows}
     }
 
     function syncEditorReadOnly() {
+      findReplaceTools.refreshEditorFind();
       const readOnly = isActiveReadOnly();
       editor.readOnly = readOnly;
       editor.setAttribute('aria-readonly', String(readOnly));
