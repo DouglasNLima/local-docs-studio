@@ -1,0 +1,70 @@
+{
+  "baseCommit": "86d60322f6f1f1dec06974bf5f9e1738a3bb80c7",
+  "purpose": "Find editor caret stability; exact source amendment without changing frozen notice, trust or performance evidence",
+  "files": {
+    ".github/workflows/native.yml": {
+      "previous": "1bc656f702713426a56b8cc7faf01a12cb295daddf709759c43b93b913a59860",
+      "current": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70"
+    },
+    "assets/scripts/app-controller.js": {
+      "previous": "3ad823e5f74b0fd9ec567126b65c496b98df269aefe3df75ce5906067c651449",
+      "current": "346bd413a4faaa696d339e84fcb4a322840c71495d490cd0a6ac890a049dd0d1"
+    },
+    "assets/scripts/editor/find-replace-service.js": {
+      "previous": "58d6215fe60771cb0407183185f0d1f73f0ad966a0d2dddcad6c6364493323e6",
+      "current": "ca0448259df31735c582b5501b9b058e884efc220d2a6ae8be4346c858a293ee"
+    },
+    "docs/native/architecture-decisions.md": {
+      "previous": "f6ac00d1f6d12c28f6e9b6887a73dbc407509468ad9311941b9977f3bc80e134",
+      "current": "7d417854f955df5bf9f7833156beb98d07607a66d704841c5a5cebd90ae7872d"
+    },
+    "docs/native/engineering-handover.md": {
+      "previous": "a005dc89e745494421eef1966828d37cd13697ed9cff3e64c87098787bc04da9",
+      "current": "354bde30f72714e924f619116cb75225a6554f6a3f68ab5efa5f1ea961ca7293"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "previous": "5568914bdbde64395812aaabbf6055685f0278ee30da7b8dd9eded06899d0452",
+      "current": "cb68355123d27272a366387a3693d9eab65a8da41b12d18c5f5efdd8c7dc18cc"
+    },
+    "docs/native/implementation-progress.md": {
+      "previous": "4aa23816ef6ebb9be401927d40b1c42ab480ce7d395bd251bb92c8b8beaa52e4",
+      "current": "2fd31c5962db57958fe9b409b4596ec112acaf1eb98601f6b32d694dad39c546"
+    },
+    "docs/native/user-guide.md": {
+      "previous": "8a9df635cb660ff780ceb7ea05a2bf7ec075579aac410eed0d74d47893efd1e7",
+      "current": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327"
+    },
+    "docs/native/validation-report.md": {
+      "previous": "1a22df66957f97b8d81da6a280356378dca5036968550bce214e2da2a8f06b86",
+      "current": "c2add28c6a53a132fe9b45f4316d799e1a1157cb425cfe8fabea66f6fe8000f0"
+    },
+    "docs/tool-guide.md": {
+      "previous": "37800ef39c23ce189baae4ec4561c5d5703da46e66e18b29c1f4f0a53e8e7f9c",
+      "current": "70945830852bf75c68f35284fe56416a1422fdfa5af731c26e27ac2039833d04"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeDesktopUxChecks.cs": {
+      "previous": "436b9e67e03c15a17d697a39db887638468edc9c4c29437fd2e04a1baf8be12d",
+      "current": "a6008c31a5ebce341cc4533f1fe217f3032b2b1aa67c36ecfbe7b0c1e9ba0fb9"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeDesktopUxUiChecks.cs": {
+      "previous": "a6c8b7240f5dbb2feb96771ddc6f7f097d196879db3ddcbfe25b4d6ef7043f8d",
+      "current": "1a0c51c3f127fa49326a693c68f0552cf72107d20654d12680481216da45fc6b"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeFindRoutingChecks.cs": {
+      "previous": "75b7dacd29eb999e9deadbce4fca1943a1b953c1bae3cddbc8ed58225dc6d05e",
+      "current": "d82e5f19e6d3eb23266c7738fcf723d9a9049dc2d24800b6ffc2dafcdc90253c"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Find.cs": {
+      "previous": "eaed995f42c3773df3e4bc9954741e4313e2690e8d238a4c3780481a1c08b17c",
+      "current": "3e0a1d5d251025bba6b8bdb5b7d44f2ea355537787b2f27792a4f83e1e5eea2a"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+      "previous": "c57d22adb243bd9952b31e690af18539bf49b4bd4ebd32fd3f9dfc812545a53a",
+      "current": "b5339b43b9a3d1142133068e1bf70779e245550a80223157ae99da5cffce0977"
+    },
+    "tests/browser/app-smoke.spec.mjs": {
+      "previous": "cbd6e90757247513143f39fc3874cf46f28dfbddae6539746b4e189e48b12268",
+      "current": "ff75b981a6054b6a7e157365a2423395788453833fa87be9d26124cd4a3fc17a"
+    }
+  }
+}

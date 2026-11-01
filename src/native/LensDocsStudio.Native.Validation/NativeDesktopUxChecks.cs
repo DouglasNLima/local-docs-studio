@@ -53,7 +53,9 @@ internal static class NativeDesktopUxChecks
             var bar = (FrameworkElement)main.FindName("FindBar"); var counter = (TextBlock)main.FindName("FindCounter");
             bar.Visibility = Visibility.Visible; editor.Text = "contact Contact contact"; query.Text = "contact";
             Await((Task<bool>)Call(main, "RefreshFindAsync")!);
-            Check(counter.Text == "1 of 3" && editor.SelectionStart == 0, "Initial editor query selects first occurrence with accurate counter");
+            Check(counter.Text == "0 of 3" && editor.SelectionLength == 0, "Passive editor refresh counts without claiming an active selection");
+            Await((Task)Call(main, "NavigateFindAsync", 1)!);
+            Check(counter.Text == "1 of 3" && editor.SelectedText == "contact", "Explicit navigation selects the first occurrence");
             Await((Task)Call(main, "NavigateFindAsync", -1)!);
             Check(counter.Text == "3 of 3" && editor.SelectionStart == 16, "Previous wraps to last occurrence");
             Await((Task)Call(main, "NavigateFindAsync", 1)!);
@@ -61,14 +63,16 @@ internal static class NativeDesktopUxChecks
             editor.Document.Replace(0, 7, "changed");
             Check(counter.Text == "0 of 0", "Source edit synchronously invalidates stale matches");
             Await((Task<bool>)Call(main, "RefreshFindAsync")!);
-            Check(counter.Text == "1 of 2" && editor.SelectionStart == 8, "Edited source recalculates actual results");
-            editor.Document = new("no matches"); Call(main, "InvalidateFind"); Await((Task<bool>)Call(main, "RefreshFindAsync")!);
+            Check(counter.Text == "0 of 2" && editor.SelectionStart != 8, "Edited source recalculates results without selecting the next occurrence");
+            editor.Document = new("no matches"); Await((Task<bool>)Call(main, "RefreshFindAsync")!);
             Check(counter.Text == "0 of 0", "Document replacement cannot retain outgoing matches");
             query.Text = "missing"; Await((Task<bool>)Call(main, "RefreshFindAsync")!); Check(counter.Text == "0 of 0", "No results have no invalid current index");
             var preview = (DocumentPreview)main.FindName("Preview"); preview.Document = document;
             preview.MinZoom = 50; preview.MaxZoom = 200;
             Field(main, "searchPreview", true); query.Text = "contact"; Await((Task<bool>)Call(main, "RefreshFindAsync")!);
-            Check(counter.Text == "1 of 2", "Preview counts its FlowDocument text independently of source; formula source requires metadata");
+            Check(counter.Text == "0 of 2", "Passive preview refresh counts FlowDocument text independently of source; formula source requires metadata");
+            Await((Task)Call(main, "NavigateFindAsync", 1)!);
+            Check(counter.Text == "1 of 2", "Explicit preview navigation retains its independent occurrence state");
             foreach (var zoom in new[] { 50d, 125d, 200d, 100d })
             {
                 preview.Zoom = zoom; Pump();

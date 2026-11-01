@@ -22,6 +22,54 @@ env:
   LENS_NATIVE_WIZARD_ARGUMENTS: --no-file-associations
   LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
 jobs:
+  find-editor-caret:
+    if: ${{ !inputs.replay_original_853 }}
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source Find regression harness
+        id: find-build
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Reproduce the original caret defect in a visible baseline editor
+        run: |
+          git fetch origin 86d60322f6f1f1dec06974bf5f9e1738a3bb80c7
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/native/find-baseline 86d60322f6f1f1dec06974bf5f9e1738a3bb80c7
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/find-baseline/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --desktop-ux-interactions artifacts/native/find-baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/find-caret/baseline . $appearance
+          $baselineExit = $LASTEXITCODE
+          $evidence = Get-Content artifacts/native/find-caret/baseline/desktop-ux-ui.json -Raw | ConvertFrom-Json
+          if ($baselineExit -eq 0 -or $evidence.Error -notlike '*Keyboard edit and passive Find refresh did not settle at the exact insertion point*') { throw 'Expected baseline typing defect was not independently reproduced; retain evidence.' }
+          exit 0
+      - name: Verify exact-source Find core, routing and visible keyboard editing
+        if: ${{ !cancelled() && steps.find-build.outcome == 'success' }}
+        run: |
+          dotnet test src/native/LensDocsStudio.Core.Tests -c Release --no-build --filter FullyQualifiedName~FindMatchesTests --logger "trx;LogFileName=find-core.trx" --results-directory artifacts/native/find-caret
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --find-routing artifacts/native/find-caret/routing
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --desktop-ux-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/find-caret/candidate . $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-find-caret-${{ matrix.appearance }}
+          path: artifacts/native/find-caret/
+          retention-days: 14
   diagram-arrangement:
     if: ${{ !inputs.replay_original_853 }}
     runs-on: windows-latest

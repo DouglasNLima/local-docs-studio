@@ -2,6 +2,8 @@
 
 Local Markdown, Mermaid, and documentation studio.
 
+Find can stay open while you edit in Web/PWA and Native: document changes update matches without moving the caret or navigating. Enter inserts a newline in the editor; Enter/Shift+Enter in the query and F3/Shift+F3 explicitly navigate. See the [Find correction receipt](docs/release/find-editor-caret-stability.md) for source-specific validation and remaining gates.
+
 Lens Docs Studio is maintained by **@DouglasNLima**, its sole human maintainer,
 and is intended to remain free with community contributions, with no
 subscriptions, paid licences or features restricted by a plan. The original

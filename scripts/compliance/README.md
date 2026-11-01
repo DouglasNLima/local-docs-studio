@@ -54,6 +54,14 @@ rights review, then regenerate the ledger. Governance checks require the approve
 MIT text, scope/metadata, preserved notices/trust/performance bytes and observed
 check contexts. They do not apply GitHub settings or establish enforcement.
 
+The Find caret correction retains the frozen Goal #62 preserved-file snapshot.
+Its narrow `evidence/find-caret/preserved-refresh.json` amendment records previous
+and current canonical SHA-256 digests for the exact allowlisted Find source,
+tests and documentation. Validation rejects other paths and changed historical
+digests, then applies the same strict current-byte check to every protected file.
+The rights ledger still records the full current tree; the amendment grants no
+new copyright or licence scope.
+
 Read-only settings reproduction (requires authenticated GitHub CLI):
 `python scripts/compliance/observe_governance.py --output artifacts/compliance/governance --check-source <reviewed-SHA>`.
 It sends only GET requests and retains no tokens, recovery codes or private reports.

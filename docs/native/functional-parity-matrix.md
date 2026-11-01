@@ -1,5 +1,10 @@
 # Functional parity matrix
 
+## Find editor caret stability — 1 November 2026
+
+Search refresh is passive during editing; explicit navigation and still-focused query changes own result selection. The native 180 ms debounce and existing release/performance decisions remain unchanged. See the [focused Web/Native correction and validation receipt](../release/find-editor-caret-stability.md); final-source hosted evidence and approval remain recorded on its Draft PR.
+
+
 ## Original SPC acceptance - 28 October 2026
 
 The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.

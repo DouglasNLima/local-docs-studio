@@ -4121,6 +4121,148 @@ test('editor line numbers, Mermaid autocomplete, and layout modes work', async (
   await expect(page.locator('#mermaidAutocomplete')).toBeHidden();
 });
 
+test('Find remains passive during editor typing and deletion', async ({ page }) => {
+  await gotoApp(page);
+  const source = '# Example\n\nAlpha first.\n\nEditable paragraph.\n\nAlpha again.\n\nAlpha final.\n';
+  const editor = page.locator('#editor');
+  await setEditorValueAndSelection(page, source, 0, 0);
+  await editor.focus();
+  await page.keyboard.press('Control+F');
+  await page.locator('#editorFindInput').fill('Alpha');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await editor.click();
+  let caret = source.indexOf('Editable') + 'Editable'.length;
+  await editor.evaluate((element, offset) => element.setSelectionRange(offset, offset), caret);
+  let expected = source;
+  const scroll = await editor.evaluate(element => element.scrollTop);
+  async function assertEditing() {
+    await expect(editor).toHaveValue(expected);
+    await expect(editor).toBeFocused();
+    await expect.poll(() => editor.evaluate(element => [element.selectionStart, element.selectionEnd])).toEqual([caret, caret]);
+    await expect(page.locator('#editorFindCount')).toHaveText('0/3');
+    await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(3);
+    await expect(page.locator('#editorFindLayer .active')).toHaveCount(0);
+    await expect(page.locator('#editorFindPanel')).toBeVisible();
+    expect(await editor.evaluate(element => element.scrollTop)).toBe(scroll);
+  }
+  for (const character of ' xyz') {
+    await page.keyboard.type(character);
+    expected = expected.slice(0, caret) + character + expected.slice(caret);
+    caret += character.length;
+    await assertEditing();
+  }
+  await page.keyboard.press('Backspace');
+  expected = expected.slice(0, caret - 1) + expected.slice(caret); caret -= 1;
+  await assertEditing();
+  await page.keyboard.press('Delete');
+  expected = expected.slice(0, caret) + expected.slice(caret + 1);
+  await assertEditing();
+  await page.keyboard.press('Shift+ArrowLeft');
+  await page.keyboard.type('Q');
+  expected = expected.slice(0, caret - 1) + 'Q' + expected.slice(caret);
+  await assertEditing();
+});
+
+test('Find leaves Enter and Shift+Enter in the editor', async ({ page }) => {
+  await gotoApp(page);
+  const source = 'Alpha\n\nEditable paragraph.\n\nAlpha\n';
+  const editor = page.locator('#editor');
+  await setEditorValueAndSelection(page, source, 0, 0);
+  await editor.focus();
+  await page.keyboard.press('Control+F');
+  await page.locator('#editorFindInput').fill('Alpha');
+  await editor.click();
+  const caret = source.indexOf('Editable') + 8;
+  await editor.evaluate((element, offset) => element.setSelectionRange(offset, offset), caret);
+  await page.keyboard.press('Enter');
+  await expect(editor).toHaveValue(source.slice(0, caret) + '\n' + source.slice(caret));
+  await page.keyboard.press('Shift+Enter');
+  await expect(editor).toHaveValue(source.slice(0, caret) + '\n\n' + source.slice(caret));
+  await expect.poll(() => editor.evaluate(element => [element.selectionStart, element.selectionEnd])).toEqual([caret + 2, caret + 2]);
+  await expect(editor).toBeFocused();
+  await expect(page.locator('#editorFindCount')).toHaveText('0/2');
+  await page.keyboard.type('continued');
+  await expect(editor).toHaveValue(source.slice(0, caret) + '\n\ncontinued' + source.slice(caret));
+});
+
+test('Find updates Unicode matches through paste, Undo, Redo and deletion without taking the caret', async ({ page, context }) => {
+  await gotoApp(page);
+  const source = '# Café\n\nCaféCafé and CAFÉ.\n\nEditable paragraph.\n';
+  const editor = page.locator('#editor');
+  await setEditorValueAndSelection(page, source, 0, 0);
+  await editor.focus(); await page.keyboard.press('Control+F');
+  await page.locator('#editorFindInput').fill('Café');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/4');
+  await editor.click(); await page.keyboard.press('Control+End');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.evaluate(() => navigator.clipboard.writeText('Café'));
+  await page.keyboard.press('Control+V');
+  await assertSource(source + 'Café', source.length + 4, 5);
+  await page.keyboard.press('Control+z');
+  // The app's history restores the preceding saved snapshot (including its caret).
+  await assertSource(source, 0, 4);
+  await page.keyboard.press('Control+y');
+  await assertSource(source + 'Café', source.length + 4, 5);
+  await page.keyboard.press('Backspace');
+  await assertSource(source + 'Caf', source.length + 3, 4);
+  await page.keyboard.insertText('é');
+  await assertSource(source + 'Café', source.length + 4, 5);
+  await page.keyboard.press('Shift+F3');
+  await expect(page.locator('#editorFindCount')).toHaveText('5/5');
+  await page.keyboard.press('F3');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/5');
+  await page.keyboard.press('Shift+F3');
+  await page.keyboard.press('Delete');
+  await assertSource(source, source.length, 4);
+
+  async function assertSource(value, caret, total) {
+    await expect(editor).toHaveValue(value);
+    await expect(editor).toBeFocused();
+    await expect.poll(() => editor.evaluate(element => [element.selectionStart, element.selectionEnd])).toEqual([caret, caret]);
+    await expect(page.locator('#editorFindCount')).toHaveText(`0/${total}`);
+    await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(total);
+    await expect(page.locator('#editorFindPanel')).toBeVisible();
+  }
+});
+
+test('Find query activity cannot later override editor selection or a distant viewport', async ({ page }) => {
+  await gotoApp(page);
+  const source = 'Alpha first\n\n' + 'Unrelated editable paragraph.\n'.repeat(100) + '\nAlpha last\n';
+  const editor = page.locator('#editor');
+  await setEditorValueAndSelection(page, source, 0, 0);
+  await editor.focus(); await page.keyboard.press('Control+F');
+  // Query input and the return to editing share one task, before queued selection/paint events.
+  await page.evaluate(() => {
+    const query = document.querySelector('#editorFindInput');
+    query.value = 'Alpha'; query.dispatchEvent(new Event('input', { bubbles: true }));
+    const editor = document.querySelector('#editor');
+    editor.focus();
+  });
+  await page.keyboard.press('Control+End');
+  await page.keyboard.press('ArrowUp'); await page.keyboard.press('Home');
+  const caret = await editor.evaluate(element => element.selectionStart);
+  const scroll = await editor.evaluate(element => element.scrollTop);
+  await page.keyboard.type('xyz');
+  await expect(editor).toHaveValue(source.slice(0, caret) + 'xyz' + source.slice(caret));
+  await expect.poll(() => editor.evaluate(element => [element.selectionStart, element.selectionEnd])).toEqual([caret + 3, caret + 3]);
+  await expect(page.locator('#editorFindCount')).toHaveText('0/2');
+  expect(scroll).toBeGreaterThan(0);
+  expect(await editor.evaluate(element => element.scrollTop)).toBe(scroll);
+  expect(await page.locator('#editorFindLayer').evaluate(element => element.scrollTop)).toBe(scroll);
+  const composing = await page.locator('#editorFindInput').evaluate(element => {
+    element.focus();
+    const event = new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true });
+    return element.dispatchEvent(event);
+  });
+  expect(composing).toBe(true);
+  await expect(page.locator('#editorFindCount')).toHaveText('0/2');
+  await page.locator('#fileInput').setInputFiles({ name: 'independent.md', mimeType: 'text/markdown', buffer: Buffer.from('# Independent document\n\nNo search occurrences here.\n') });
+  await expect(page.locator('#activeFileLabel')).toContainText('independent.md');
+  await expect(page.locator('#editorFindPanel')).toBeVisible();
+  await expect(page.locator('#editorFindCount')).toHaveText('0/0');
+  await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(0);
+});
+
 test('editor find icon opens inline search with keyboard navigation', async ({ page }) => {
   await gotoApp(page);
   await setEditorValueAndSelection(page, '# Review\n\nFirst review note.\n\nSecond review note.\n\n[Source only](editor-only-target)', 0, 0);

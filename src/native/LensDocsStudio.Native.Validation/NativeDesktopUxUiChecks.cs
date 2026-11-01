@@ -54,6 +54,40 @@ internal static partial class NativeUiChecks
             Find(main, "FindPrevious").AsButton().Invoke(); Counter(count + " of " + count);
             Keyboard.Type(VirtualKeyShort.F3); Counter("1 of " + count);
             main.CaptureToFile(Path.Combine(output, "find-editor.png"));
+            // Leave a query refresh pending, then take real keyboard ownership of the editor.
+            query.Text = "cont";
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            var edited = source;
+            foreach (var character in "editable")
+            {
+                Keyboard.Type(character.ToString()); edited += character;
+                AssertEditing(edited, edited.Length);
+            }
+            var scroll = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
+            Keyboard.Type("x"); edited += "x"; AssertEditing(edited, edited.Length);
+            Check(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value == scroll,
+                "Passive Find refresh does not move the editor viewport while typing on the same line");
+            Keyboard.Type(VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.RETURN); edited += "\n"; AssertEditing(edited, edited.Length);
+            Keyboard.Type("yz"); edited += "yz"; AssertEditing(edited, edited.Length);
+            Keyboard.Type(VirtualKeyShort.BACK); edited = edited[..^1]; AssertEditing(edited, edited.Length);
+            Keyboard.Type(VirtualKeyShort.LEFT); Keyboard.Type(VirtualKeyShort.DELETE); edited = edited[..^1]; AssertEditing(edited, edited.Length);
+            var beforePaste = edited;
+            NativeUiClipboard.SetText(" Café CONTACT"); clipboardSequence = GetClipboardSequenceNumber();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V); edited += " Café CONTACT"; AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); AssertEditing(beforePaste, beforePaste.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); AssertEditing(edited, edited.Length);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F3);
+            Counter((count + 1) + " of " + (count + 1));
+            Check(editor.Patterns.Text.Pattern.GetSelection().Single().GetText(-1) == "CONT",
+                "Explicit Shift+F3 still selects the last exact Unicode-aware source occurrence from the editor");
+            main.CaptureToFile(Path.Combine(output, "find-passive-editing.png"));
+            // Restore the synthetic buffer through actual editing, leaving the saved fixture untouched.
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+            NativeUiClipboard.SetText(source); clipboardSequence = GetClipboardSequenceNumber();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+            Wait(() => ReadEditorText(editor) == source, "Synthetic source restoration failed.");
+            query.Focus(); query.Text = "contact"; Counter("1 of " + count);
             query.Text = "missing-unique-query"; Counter("0 of 0"); query.Text = ""; Counter("0 of 0");
             Keyboard.Type(VirtualKeyShort.ESCAPE);
             var preview = Find(main, "DocumentPreview");
@@ -112,6 +146,29 @@ internal static partial class NativeUiChecks
             return 0;
 
             void Counter(string expected) => Wait(() => Find(main, "FindCounter").Name == expected, "Find counter did not become " + expected);
+            void AssertEditing(string expected, int caret)
+            {
+                var total = LensDocsStudio.Core.Parsing.FindMatches.Collect(expected, "cont").Offsets.Count;
+                Wait(() => ReadEditorText(editor) == expected && editor.Properties.HasKeyboardFocus.Value
+                    && Find(main, "FindCounter").Name == "0 of " + total && ExactCaret(),
+                    "Keyboard edit and passive Find refresh did not settle at the exact insertion point " + caret);
+                Check(ReadEditorText(editor) == expected && editor.Properties.HasKeyboardFocus.Value,
+                    "Exact typed source and editor focus survive passive Find refresh at UTF-16 " + caret);
+                var selection = editor.Patterns.Text.Pattern.GetSelection().Single();
+                var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+                prefix.MoveEndpointByRange(FlaUI.Core.Definitions.TextPatternRangeEndpoint.End, selection, FlaUI.Core.Definitions.TextPatternRangeEndpoint.Start);
+                Check(selection.GetText(-1).Length == 0 && prefix.GetText(-1).Length == caret,
+                    "Actual UIA selection remains collapsed at the natural insertion point " + caret);
+                Check(!Find(main, "FindText").IsOffscreen, "Find remains visible throughout keyboard editing");
+                bool ExactCaret()
+                {
+                    var ranges = editor.Patterns.Text.Pattern.GetSelection();
+                    if (ranges.Length != 1 || ranges[0].GetText(-1).Length != 0) return false;
+                    var before = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+                    before.MoveEndpointByRange(FlaUI.Core.Definitions.TextPatternRangeEndpoint.End, ranges[0], FlaUI.Core.Definitions.TextPatternRangeEndpoint.Start);
+                    return before.GetText(-1).Length == caret;
+                }
+            }
             void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
             void Move(double x, double y)
             {

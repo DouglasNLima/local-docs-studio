@@ -1,5 +1,10 @@
 # Native architecture decisions
 
+## Find editor caret stability — 1 November 2026
+
+Search refresh is passive during editing; explicit navigation and still-focused query changes own result selection. The native 180 ms debounce and existing release/performance decisions remain unchanged. See the [focused Web/Native correction and validation receipt](../release/find-editor-caret-stability.md); final-source hosted evidence and approval remain recorded on its Draft PR.
+
+
 ## Goal 54 — smart diagram arrangement (28 October 2026)
 
 The separate ER/Flowchart arranged-presentation candidate preserves authored source and canonical exports. See [design, format, support matrix and current acceptance evidence](smart-diagram-arrangement.md). Hosted interaction and installed lifecycle evidence must be reviewed before acceptance; earlier milestones below retain their source-specific scope.
