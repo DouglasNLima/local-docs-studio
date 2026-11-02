@@ -40,19 +40,20 @@ internal static partial class NativeUiChecks
                 {
                     var occurrence = (row - 1) * (word == "planning" ? 4 : word == "within" ? 3 : word == "validity" ? 3 : 2) + 2;
                     // Heading capitalisation differs, so literal case-sensitive counts start in row Q-01.
+                    FocusPreview();
                     var target = Occurrence(editor, word, occurrence); target.ScrollIntoView(true);
                     var rectangle = target.GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0 && editor.BoundingRectangle.IntersectsWith(box));
                     // Start with keyboard focus in the actual preview. No editor Focus/Select
                     // call precedes this single completed mouse word-selection operation.
-                    preview.Focus();
                     var watch = System.Diagnostics.Stopwatch.StartNew();
                     Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
                     AssertSelection(word, occurrence, "double-click", watch);
                 }
                 // A single drag, followed by keyboard selection, at a repeated occurrence.
+                FocusPreview();
                 var dragTarget = Occurrence(editor, "planning", 2); dragTarget.ScrollIntoView(true);
                 var box = dragTarget.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
-                preview.Focus(); var dragWatch = System.Diagnostics.Stopwatch.StartNew();
+                var dragWatch = System.Diagnostics.Stopwatch.StartNew();
                 Mouse.MoveTo((int)box.Left, (int)(box.Top + box.Height / 2)); Mouse.Down(MouseButton.Left);
                 try { Mouse.MoveTo((int)box.Right, (int)(box.Top + box.Height / 2)); }
                 finally { Mouse.Up(MouseButton.Left); }
@@ -62,9 +63,9 @@ internal static partial class NativeUiChecks
                 AssertSelection("planning", 2, "keyboard", keyWatch, allowTrailingSpace: true);
                 var zoom = window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Zoom in")));
                 zoom?.AsButton().Invoke();
-                Occurrence(editor, "validity", 2).ScrollIntoView(true);
+                FocusPreview(); Occurrence(editor, "validity", 2).ScrollIntoView(true);
                 var zoomBox = Occurrence(editor, "validity", 2).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
-                preview.Focus(); var zoomWatch = System.Diagnostics.Stopwatch.StartNew();
+                var zoomWatch = System.Diagnostics.Stopwatch.StartNew();
                 Mouse.DoubleClick(new System.Drawing.Point((int)(zoomBox.Left + zoomBox.Width / 2), (int)(zoomBox.Top + zoomBox.Height / 2)));
                 AssertSelection("validity", 2, "zoom", zoomWatch);
                 Find(window, "PreviewZoomLabel").AsButton().Invoke();
@@ -95,6 +96,12 @@ internal static partial class NativeUiChecks
                     Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true, ActionCount = 1 });
             }
             string modeName() => Find(window, "PreviewReadingMode").AsComboBox().SelectedItem?.Text ?? "unknown";
+            void FocusPreview()
+            {
+                var visible = preview.Patterns.Text.Pattern.GetVisibleRanges().SelectMany(range => range.GetBoundingRectangles())
+                    .First(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.Contains(rect));
+                Mouse.Click(new System.Drawing.Point((int)(visible.Left + Math.Min(4, visible.Width / 2)), (int)(visible.Top + visible.Height / 2)));
+            }
         }
         catch (Exception error)
         {
