@@ -48,6 +48,8 @@ public partial class MainWindow
         if (!selectionDiagnostics || selectionDiagnosticCount++ >= 2000) return;
         try
         {
+            var mouse = PresentationSource.FromVisual(this) is not null
+                ? PointToScreen(System.Windows.Input.Mouse.GetPosition(this)) : (Point?)null;
             if (!ReferenceEquals(selectionDiagnosticDocument, Preview.Document))
             { selectionDiagnosticDocument = Preview.Document; selectionDiagnosticRenderRevision++; }
             Directory.CreateDirectory(model.StateDirectory);
@@ -59,6 +61,7 @@ public partial class MainWindow
                 Start = Editor.SelectionStart, Length = Editor.SelectionLength, Caret = Editor.CaretOffset,
                 EditorFocus = Editor.IsKeyboardFocusWithin, PreviewFocus = Preview.IsKeyboardFocusWithin,
                 Mouse = System.Windows.Input.Mouse.LeftButton.ToString(),
+                MouseScreen = mouse is { } point ? new[] { point.X, point.Y } : null,
                 ReadingMode = Preview.ViewingMode.ToString(), Zoom = Preview.Zoom,
                 SourceVersion = Editor.Document.Version.GetHashCode(),
                 RenderedVersion = renderedVersion?.GetHashCode(),

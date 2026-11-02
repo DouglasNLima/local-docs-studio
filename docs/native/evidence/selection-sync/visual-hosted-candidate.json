@@ -1,0 +1,81 @@
+{
+  "ProbeSha256": "95DD6C2CA49C3656A70A6E5D75009258E685E45BBEE4D1E988E6EDCB97F95F4A",
+  "ProductSha256": "AD4BB8DB72777960CED8F64AF960CC8C41C680100B8FA29E4C9A1EA4760B2B45",
+  "ProductVersion": "0.1.0-preview.1\u002B3003ca3dc25b23cd8f9df3ad5e3f7142393df74a",
+  "Observations": [
+    {
+      "Mode": "Continuous",
+      "SourceStart": 21,
+      "SourceLength": 8,
+      "MappedStart": 21,
+      "MappedLength": 8,
+      "Exact": true,
+      "UiaMatchesLogical": true,
+      "LogicalStart": 23,
+      "LogicalEnd": 31,
+      "EditorFocus": true,
+      "ReaderInactiveHighlight": true,
+      "ViewerInactiveHighlight": true,
+      "ColdUiaMatchesLogical": true,
+      "FocusPreservedRange": true,
+      "ColdCaretVisualPresent": false,
+      "WarmCaretVisualPresent": true,
+      "ColdChangedPixels": 0,
+      "WarmChangedPixels": 1240,
+      "RestoredChangedPixels": 1240,
+      "ColdHighlightVisible": false,
+      "WarmHighlightVisible": true,
+      "PreviewAcceptedFocus": true,
+      "FocusInitialisationChangedPixels": 1240,
+      "ScreenStart": [
+        663,
+        94
+      ],
+      "UiaRectangles": [
+        [
+          663,
+          94,
+          62,
+          20
+        ]
+      ]
+    },
+    {
+      "Mode": "Pages",
+      "SourceStart": 21,
+      "SourceLength": 8,
+      "MappedStart": 21,
+      "MappedLength": 8,
+      "Exact": true,
+      "UiaMatchesLogical": true,
+      "LogicalStart": 23,
+      "LogicalEnd": 31,
+      "EditorFocus": true,
+      "ReaderInactiveHighlight": true,
+      "ViewerInactiveHighlight": true,
+      "ColdUiaMatchesLogical": true,
+      "FocusPreservedRange": true,
+      "ColdCaretVisualPresent": false,
+      "WarmCaretVisualPresent": true,
+      "ColdChangedPixels": 0,
+      "WarmChangedPixels": 1240,
+      "RestoredChangedPixels": 1240,
+      "ColdHighlightVisible": false,
+      "WarmHighlightVisible": true,
+      "PreviewAcceptedFocus": true,
+      "FocusInitialisationChangedPixels": 1240,
+      "ScreenStart": [
+        663,
+        94
+      ],
+      "UiaRectangles": [
+        [
+          663,
+          94,
+          62,
+          20
+        ]
+      ]
+    }
+  ]
+}

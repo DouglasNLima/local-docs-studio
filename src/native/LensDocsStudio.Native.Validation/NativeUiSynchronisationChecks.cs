@@ -21,7 +21,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(
             AutomaticUpdateChecks: false, Theme: "Light", Desktop: new(ShowSidebar: false, FollowCaret: true, SyncScroll: true, SyncSelection: true))));
         var source = SelectionTableFixture.Create(); var path = Path.Combine(output, "table.md"); File.WriteAllText(path, source);
-        var saved = File.ReadAllBytes(path); var observations = new List<object>();
+        var saved = File.ReadAllBytes(path); var observations = new List<object>(); var inputTargets = new List<object>();
         var info = new System.Diagnostics.ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
         info.Environment["LENS_NATIVE_SELECTION_DIAGNOSTICS"] = diagnostics ? "1" : "0";
         foreach (var argument in new[] { "--state-directory", state, path }) info.ArgumentList.Add(argument);
@@ -167,7 +167,7 @@ internal static partial class NativeUiChecks
             if (ReadEditorText(editor) != source || !saved.SequenceEqual(File.ReadAllBytes(path))) throw new IOException("Selection input changed source contents.");
             window.CaptureToFile(Path.Combine(output, "selection-table.png"));
             if (!diagnostics && File.Exists(Path.Combine(state, "selection-events.jsonl"))) throw new IOException("Disabled selection diagnostics still wrote an event log.");
-            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Diagnostics = diagnostics, Observations = observations, SourceBytesPreserved = true, SelectionActionRetries = 0 });
+            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Diagnostics = diagnostics, Observations = observations, InputTargets = inputTargets, SourceBytesPreserved = true, SelectionActionRetries = 0 });
             return 0;
 
             void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch)
@@ -175,12 +175,15 @@ internal static partial class NativeUiChecks
                 var expected = Occurrence(preview, word, occurrence);
                 bool Matches(FlaUI.Core.ITextRange selected) => selected.CompareEndpoints(TextPatternRangeEndpoint.Start, expected, TextPatternRangeEndpoint.Start) == 0
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.End, expected, TextPatternRangeEndpoint.End) == 0;
-                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == word), "The single mouse/keyboard operation did not select its source word.", 2);
+                var expectedSource = Occurrence(editor, word, occurrence);
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == word
+                    && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, expectedSource, TextPatternRangeEndpoint.Start) == 0
+                    && selected.CompareEndpoints(TextPatternRangeEndpoint.End, expectedSource, TextPatternRangeEndpoint.End) == 0),
+                    "Source input did not select its intended occurrence; preview mapping has not been assessed.", 2);
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(Matches), $"Single {input} failed: {modeName()} {word} occurrence {occurrence}.", 2);
                 var selectedSource = editor.Patterns.Text.Pattern.GetSelection().Single();
                 var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, selectedSource, TextPatternRangeEndpoint.Start);
                 var offset = prefix.GetText(-1).Length;
-                var expectedSource = Occurrence(editor, word, occurrence);
                 if (selectedSource.CompareEndpoints(TextPatternRangeEndpoint.Start, expectedSource, TextPatternRangeEndpoint.Start) != 0
                     || !editor.Properties.HasKeyboardFocus.Value) throw new IOException("Selection occurrence or originating editor focus changed.");
                 var geometry = preview.Patterns.Text.Pattern.GetSelection().SelectMany(range => range.GetBoundingRectangles()).ToArray();
@@ -216,24 +219,28 @@ internal static partial class NativeUiChecks
                 Thread.Sleep(180); Select(VisibleWord(), "natural-editor-wheel");
                 Mouse.MoveTo(preview.BoundingRectangle.Left + 90, preview.BoundingRectangle.Top + 150); Mouse.Scroll(-2);
                 Thread.Sleep(180); Select(VisibleWord(), "natural-preview-wheel");
-                var first = VisibleWord(); var last = VisibleWord(last: true);
-                watch.Restart(); DoubleClick(Box(first.Occurrence)); DoubleClick(Box(last.Occurrence));
+                var first = VisibleWord();
+                watch.Restart(); DoubleClick(first.Rectangle);
+                // Observe the next visible word after the first input. AvalonEdit
+                // may realise wrapped lines during that input; an old distant box
+                // must never turn into Point.Empty and repeat the previous click.
+                var last = VisibleWord(exceptOccurrence: first.Occurrence);
+                inputTargets.Add(new { Mode = mode, Input = "natural-rapid", First = new { first.Occurrence, first.Rectangle }, Last = new { last.Occurrence, last.Rectangle } });
+                DoubleClick(last.Rectangle);
                 AssertSelection("planning", last.Occurrence, "natural-rapid", watch);
                 window!.CaptureToFile(Path.Combine(output, mode + "-natural-selection.png"));
 
-                (int Occurrence, System.Drawing.Rectangle Rectangle) VisibleWord(bool last = false)
+                (int Occurrence, System.Drawing.Rectangle Rectangle) VisibleWord(int exceptOccurrence = 0)
                 {
-                    var visible = new List<(int Occurrence, System.Drawing.Rectangle Rectangle)>();
                     var remaining = editor.Patterns.Text.Pattern.DocumentRange.Clone();
                     for (var occurrence = 1; occurrence <= 60; occurrence++)
                     {
                         var match = remaining.FindText("planning", false, false) ?? throw new IOException("Natural fixture word is absent.");
                         remaining.MoveEndpointByRange(TextPatternRangeEndpoint.Start, match, TextPatternRangeEndpoint.End);
                         var rectangle = match.GetBoundingRectangles().FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
-                        if (rectangle.Width > 0) visible.Add((occurrence, rectangle));
+                        if (rectangle.Width > 0 && occurrence != exceptOccurrence) return (occurrence, rectangle);
                     }
-                    if (visible.Count == 0) throw new IOException("Natural sequence has no fully visible source word; no preparation was attempted.");
-                    return last ? visible[^1] : visible[0];
+                    throw new IOException("Natural sequence has no fully visible source word; no preparation was attempted.");
                 }
                 System.Drawing.Rectangle Box(int occurrence) => Occurrence(editor, "planning", occurrence).GetBoundingRectangles()
                     .FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
@@ -241,11 +248,16 @@ internal static partial class NativeUiChecks
                 {
                     var current = Box(item.Occurrence);
                     if (current.Width == 0) throw new IOException("Natural source word moved before its single input; no retry was attempted.");
+                    inputTargets.Add(new { Mode = mode, Input = input, item.Occurrence, Rectangle = current });
                     var timer = System.Diagnostics.Stopwatch.StartNew(); DoubleClick(current);
                     AssertSelection("planning", item.Occurrence, input, timer);
                 }
             }
-            void DoubleClick(System.Drawing.Rectangle rectangle) => Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
+            void DoubleClick(System.Drawing.Rectangle rectangle)
+            {
+                if (rectangle.Width <= 0 || rectangle.Height <= 0) throw new IOException("Source input has no current geometry; no click or retry was attempted.");
+                Mouse.DoubleClick(new System.Drawing.Point(rectangle.Left + rectangle.Width / 2, rectangle.Top + rectangle.Height / 2));
+            }
             void ClickSourceStart(FlaUI.Core.ITextRange target)
             {
                 var rectangle = target.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.IntersectsWith(rect));
@@ -281,7 +293,7 @@ internal static partial class NativeUiChecks
         catch (Exception error)
         {
             window?.CaptureToFile(Path.Combine(output, "selection-table-failure.png"));
-            Write(new { Passed = false, Error = error.ToString(), Diagnostics = diagnostics, Observations = observations, SelectionActionRetries = 0 });
+            Write(new { Passed = false, Error = error.ToString(), Diagnostics = diagnostics, Observations = observations, InputTargets = inputTargets, SelectionActionRetries = 0 });
             return 1;
         }
         finally { if (!app.HasExited) app.Kill(); RestoreClipboard(previousClipboard, ownedClipboard); }
