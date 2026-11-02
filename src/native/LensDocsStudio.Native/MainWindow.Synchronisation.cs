@@ -265,7 +265,7 @@ public partial class MainWindow
                     if (Preview.Selection is { } previous) previous.Select(previous.Start, previous.Start);
                     if (syncAnchors?.AtSource(start) is { } block)
                     {
-                        var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, block.ContentStart,
+                        var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, block.ContentStart, selectionEnd: null, diagnostic: null,
                             isCurrent: () => syncGeneration == generation && SyncCurrent && BothPanesVisible && Editor.IsKeyboardFocusWithin
                                 && Editor.SelectionStart == start && Editor.SelectionLength == length);
                         if (shown && SyncCurrent && syncGeneration == generation) { semanticHighlight?.Show(block); model.Status = "Selection synchronised as a preview block."; }

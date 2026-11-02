@@ -21,7 +21,7 @@ internal static class NativeSelectionNavigationChecks
         LensDocsStudio.Native.Platform.ThemeService.Apply(app.Resources, "Light");
         var styles = new ResourceDictionary { Source = new Uri("pack://application:,,,/LensDocsStudio.Native;component/Rendering/DocumentPreview.xaml") };
         var navigate = typeof(PreviewNavigationService).GetMethods().Single(method => method.Name == "BringIntoViewAsync"
-            && method.GetParameters()[0].ParameterType == typeof(FlowDocumentReader));
+            && method.GetParameters().Length == 4 && method.GetParameters()[0].ParameterType == typeof(FlowDocumentReader));
         var observations = new List<object>(); var publishedAny = false;
         foreach (var mode in new[] { "Continuous", "Pages" })
         {
@@ -90,11 +90,11 @@ internal static class NativeSelectionNavigationChecks
             viewer.Zoom = 110; Layout();
             Check(!Complete(old), "Zoom invalidates queued selection");
             var sourceCurrent = true;
-            old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!, isCurrent: () => sourceCurrent);
+            old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!, diagnostic: null, isCurrent: () => sourceCurrent);
             sourceCurrent = false;
             Check(!Complete(old), "New source interaction invalidates queued selection before publication");
             var validityChecks = 0;
-            old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!, isCurrent: () => ++validityChecks < 2);
+            old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!, diagnostic: null, isCurrent: () => ++validityChecks < 2);
             Check(!Complete(old) && validityChecks >= 2, "Source validity is checked again after deferred layout or pagination");
             old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!);
             var replacement = Render(); viewer.SetPreview(replacement, source.Length, mode); Layout();

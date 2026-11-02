@@ -1,0 +1,24 @@
+{
+  "ProductSha256": "AD0836F6361AA4ADBEC4EC2A494B65B4C064E712FC8F0F9AA0271517CDF4AF0D",
+  "ProbeSha256": "65B293AAAA087DFEDEA00EB2BADBD5B9A850E1EF9F904063E386B45090D266F2",
+  "ExpectObsoletePublication": false,
+  "ObsoletePublished": false,
+  "Observations": [
+    {
+      "Mode": "Continuous",
+      "ZoomBefore": 100,
+      "ZoomAfter": 110,
+      "ObsoletePublished": false,
+      "RenderedSelection": "planning",
+      "TextOffset": 0
+    },
+    {
+      "Mode": "Pages",
+      "ZoomBefore": 100,
+      "ZoomAfter": 110,
+      "ObsoletePublished": false,
+      "RenderedSelection": "planning",
+      "TextOffset": 0
+    }
+  ]
+}

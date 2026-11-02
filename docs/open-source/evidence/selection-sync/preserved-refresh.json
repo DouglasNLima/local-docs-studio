@@ -36,7 +36,7 @@
     },
     "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
       "previous": "76aa1d383f20a096822b7691138e620d5debd9a21e066f8a1209a3dd233606ca",
-      "current": "39ac52ef305c6c9c4b8e76a16a9155a0445c6b6bc56eba09b84e603398f55eeb"
+      "current": "58ac92f07a58248e70d71652053a8731dbe749126e1635585ef261f47ca43af2"
     },
     "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
       "previous": "6c51297b336ebac1f4bb7a9e879f2bf651efa9c0ccedbea679760e6286e85da0",
@@ -48,7 +48,7 @@
     },
     "src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs": {
       "previous": "0685f71f243f99b0e762ef393ae61657cfe03872ddf046789620c07817490302",
-      "current": "9b2f367f38bdc58d5598a361432ffb11d67c1ada3bc8d0371b93cb69f5cbaea8"
+      "current": "616209575f97b92d7552a34c4da631505e3fe65858c9b3f2e0ef913d3003fc37"
     }
   }
 }

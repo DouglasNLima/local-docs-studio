@@ -17,7 +17,11 @@ public static class PreviewNavigationService
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
-    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null, Func<bool>? isCurrent = null)
+    // Keep the existing compiled entry point for paired validation of older products.
+    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
+        => BringIntoViewAsync(viewer, position, selectionEnd, diagnostic, null);
+
+    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd, Action<string>? diagnostic, Func<bool>? isCurrent)
     {
         viewer.VerifyAccess();
         var document = viewer.Document;

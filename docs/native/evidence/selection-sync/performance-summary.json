@@ -1,0 +1,98 @@
+{
+  "sourceRevision": "8a94d3cb12c99ffaa2d0bfb32ea73633dd77a9ed",
+  "workflowRun": 41444279957,
+  "thresholdMilliseconds": 250,
+  "decision": "FAIL",
+  "replications": [
+    {
+      "replication": "continuous-performance-1",
+      "performance": "FAIL",
+      "correctness": "PASS",
+      "candidateSamples": 66,
+      "failedSamples": 38,
+      "firstExecution": [
+        {
+          "Name": "list",
+          "FirstLayoutMilliseconds": 2509.9507,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "table",
+          "FirstLayoutMilliseconds": 355.98900000000003,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "quote",
+          "FirstLayoutMilliseconds": 141.1025,
+          "FirstLayoutAcceptance": "PASS",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "details",
+          "FirstLayoutMilliseconds": 138.2594,
+          "FirstLayoutAcceptance": "PASS",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "paragraphs",
+          "FirstLayoutMilliseconds": 280.05219999999997,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "mixed",
+          "FirstLayoutMilliseconds": 488.30840000000006,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        }
+      ]
+    },
+    {
+      "replication": "continuous-performance-2",
+      "performance": "FAIL",
+      "correctness": "PASS",
+      "candidateSamples": 66,
+      "failedSamples": 29,
+      "firstExecution": [
+        {
+          "Name": "list",
+          "FirstLayoutMilliseconds": 1262.5414,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "table",
+          "FirstLayoutMilliseconds": 506.6405,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "quote",
+          "FirstLayoutMilliseconds": 99.1812,
+          "FirstLayoutAcceptance": "PASS",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "details",
+          "FirstLayoutMilliseconds": 135.025,
+          "FirstLayoutAcceptance": "PASS",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "paragraphs",
+          "FirstLayoutMilliseconds": 190.8415,
+          "FirstLayoutAcceptance": "PASS",
+          "Correctness": "PASS"
+        },
+        {
+          "Name": "mixed",
+          "FirstLayoutMilliseconds": 1004.1225000000001,
+          "FirstLayoutAcceptance": "FAIL",
+          "Correctness": "PASS"
+        }
+      ]
+    }
+  ]
+}

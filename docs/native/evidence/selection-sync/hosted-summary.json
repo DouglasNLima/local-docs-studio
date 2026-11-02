@@ -1,0 +1,131 @@
+{
+  "sourceRevision": "8a94d3cb12c99ffaa2d0bfb32ea73633dd77a9ed",
+  "baselineRevision": "ccfce7d8a1c444517e1bc4f4d39992e30e29af1d",
+  "workflowRun": 41444280009,
+  "originalDefectReproduced": false,
+  "decision": "NO_GO_ORIGINAL_DEFECT_INCONCLUSIVE",
+  "runs": [
+    {
+      "appearance": "normal",
+      "variant": "baseline",
+      "passed": true,
+      "diagnostics": true,
+      "actualHighContrast": false,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "normal",
+      "variant": "interactions",
+      "passed": true,
+      "diagnostics": true,
+      "actualHighContrast": false,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "normal",
+      "variant": "baseline-no-diagnostics",
+      "passed": true,
+      "diagnostics": false,
+      "actualHighContrast": false,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "normal",
+      "variant": "no-diagnostics",
+      "passed": true,
+      "diagnostics": false,
+      "actualHighContrast": false,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "baseline",
+      "passed": true,
+      "diagnostics": true,
+      "actualHighContrast": true,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "interactions",
+      "passed": true,
+      "diagnostics": true,
+      "actualHighContrast": true,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "baseline-no-diagnostics",
+      "passed": true,
+      "diagnostics": false,
+      "actualHighContrast": true,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "no-diagnostics",
+      "passed": true,
+      "diagnostics": false,
+      "actualHighContrast": true,
+      "observations": 82,
+      "modes": [
+        "Continuous",
+        "Pages"
+      ],
+      "singleWordDoubleClicks": 60,
+      "selectionActionRetries": 0,
+      "sourceBytesPreserved": true
+    }
+  ],
+  "totalObservations": 656,
+  "totalSingleWordDoubleClicks": 480
+}
