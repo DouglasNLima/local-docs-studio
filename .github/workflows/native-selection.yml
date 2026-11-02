@@ -25,6 +25,21 @@ jobs:
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify source mapping
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-mapping artifacts/selection/mapping
+      - name: Verify dispatcher cancellation and exact navigation
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-navigation artifacts/selection/navigation
+      - name: Build diagnostic baseline without the correction
+        run: |
+          git fetch origin ccfce7d8a1c444517e1bc4f4d39992e30e29af1d
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/selection-baseline-source ccfce7d8a1c444517e1bc4f4d39992e30e29af1d
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj -c Release -p:RestoreLockedMode=true
+      - name: Observe identical mouse operations against the diagnostic baseline
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline $appearance
+          @{ exitCode=$LASTEXITCODE; sourceRevision='ccfce7d8a1c444517e1bc4f4d39992e30e29af1d'; diagnosticOnly=$true } | ConvertTo-Json | Set-Content artifacts/selection/baseline-exit.json
+          exit 0
       - name: Exercise single completed mouse selections and focus transitions
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }

@@ -233,17 +233,35 @@ public partial class MainWindow
                 {
                     semanticHighlight?.Show(null);
                     if (result.TextMap.TryPreviewRange(Editor.CaretOffset, 0, out var caret, out _) && Preview.Selection is { } empty) empty.Select(caret!, caret!);
+                    else if (Preview.Selection is { } previous) previous.Select(previous.Start, previous.Start);
                     return;
                 }
                 result.RevealSource(start);
                 TraceSelection("map " + result.TextMap.TryPreviewRange(start, length, out _, out _));
                 if (result.TextMap.TryPreviewRange(start, length, out var from, out var to) && Preview.Selection is { } target)
-                { semanticHighlight?.Show(null); var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!, diagnostic: selectionDiagnostics ? message => TraceSelection("navigation " + message) : null); TraceSelection("navigation " + shown); }
-                else if (syncAnchors?.AtSource(start) is { } block)
                 {
-                    Preview.Selection?.Select(block.ContentStart, block.ContentStart);
-                    await PreviewNavigationService.BringIntoViewAsync(Preview, block.ContentStart);
-                    if (SyncCurrent && syncGeneration == generation) { semanticHighlight?.Show(block); model.Status = "Selection synchronised as a preview block."; }
+                    semanticHighlight?.Show(null);
+                    var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!,
+                        diagnostic: selectionDiagnostics ? message => TraceSelection("navigation " + message) : null,
+                        isCurrent: () => syncGeneration == generation && SyncCurrent && BothPanesVisible && Editor.IsKeyboardFocusWithin
+                            && Editor.SelectionStart == start && Editor.SelectionLength == length);
+                    TraceSelection("navigation " + shown);
+                }
+                else
+                {
+                    // Syntax-only or transformed endpoints have no exact literal range.
+                    // Collapse the previous text highlight before showing a source block;
+                    // never retain an unrelated old word or search for matching text.
+                    semanticHighlight?.Show(null);
+                    if (Preview.Selection is { } previous) previous.Select(previous.Start, previous.Start);
+                    if (syncAnchors?.AtSource(start) is { } block)
+                    {
+                        var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, block.ContentStart,
+                            isCurrent: () => syncGeneration == generation && SyncCurrent && BothPanesVisible && Editor.IsKeyboardFocusWithin
+                                && Editor.SelectionStart == start && Editor.SelectionLength == length);
+                        if (shown && SyncCurrent && syncGeneration == generation) { semanticHighlight?.Show(block); model.Status = "Selection synchronised as a preview block."; }
+                    }
+                    else { semanticHighlight?.Show(null); model.Status = "This source selection has no rendered text."; }
                 }
             }
             else if (origin == "preview-scroll" && DesktopState.SyncScroll && VisiblePreviewSource() is { } previewSource)

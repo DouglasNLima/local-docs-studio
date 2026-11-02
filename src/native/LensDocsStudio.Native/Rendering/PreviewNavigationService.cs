@@ -17,10 +17,11 @@ public static class PreviewNavigationService
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
-    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
+    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null, Func<bool>? isCurrent = null)
     {
         viewer.VerifyAccess();
         var document = viewer.Document;
+        var viewingMode = viewer.ViewingMode; var zoom = viewer.Zoom;
         if (document is null || !position.IsInSameDocument(document.ContentStart)
             || selectionEnd is not null && !selectionEnd.IsInSameDocument(document.ContentStart)) return Task.FromResult(false);
         var state = States.GetOrCreateValue(viewer);
@@ -35,11 +36,17 @@ public static class PreviewNavigationService
         // Actual user input cancels Pending; a newer selected range always supersedes us.
         bool Current()
         {
+            if (cancellation.IsCancellationRequested || viewer.Document != document || viewer.ViewingMode != viewingMode
+                || viewer.Zoom != zoom || !(isCurrent?.Invoke() ?? true))
+            {
+                diagnostic?.Invoke($"obsolete: cancelled {cancellation.IsCancellationRequested}, document {viewer.Document == document}, mode {viewer.ViewingMode == viewingMode}, zoom {viewer.Zoom == zoom}");
+                return false;
+            }
             var selectionCurrent = originalSelectionStart is null || viewer.Selection is { } selection
+                && selection.Start.IsInSameDocument(originalSelectionStart)
                 && (selectionEnd is null && originalSelectionEmpty && selection.IsEmpty
                     || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0);
-            var current = !cancellation.IsCancellationRequested && viewer.Document == document
-                && position.IsInSameDocument(document.ContentStart) && selectionCurrent;
+            var current = position.IsInSameDocument(document.ContentStart) && selectionCurrent;
             if (!current) diagnostic?.Invoke($"obsolete: cancelled {cancellation.IsCancellationRequested}, document {viewer.Document == document}, selection {selectionCurrent}");
             return current;
         }

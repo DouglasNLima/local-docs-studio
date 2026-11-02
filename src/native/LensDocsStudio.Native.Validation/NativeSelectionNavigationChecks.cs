@@ -16,12 +16,15 @@ internal static class NativeSelectionNavigationChecks
     public static void Run(string output)
     {
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+        var application = Application.Current ?? new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        LensDocsStudio.Native.Platform.ThemeService.Apply(application.Resources, "Light");
+        var styles = new ResourceDictionary { Source = new Uri("pack://application:,,,/LensDocsStudio.Native;component/Rendering/DocumentPreview.xaml") };
         Directory.CreateDirectory(output); var observations = new List<object>();
         var source = SelectionTableFixture.Create();
         foreach (var mode in new[] { "Continuous", "Pages" })
         {
             var result = Render();
-            var viewer = new DocumentPreview(); viewer.SetPreview(result, source.Length, mode);
+            var viewer = new DocumentPreview { Style = (Style)styles["DocumentPreviewStyle"] }; viewer.SetPreview(result, source.Length, mode);
             using var host = new HwndSource(new HwndSourceParameters("Hidden selection navigation checks") {
                 Width = 850, Height = 550, WindowStyle = unchecked((int)0x80000000) });
             host.RootVisual = viewer; Layout();
@@ -45,6 +48,13 @@ internal static class NativeSelectionNavigationChecks
             old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!);
             viewer.Zoom = 110; Layout();
             Check(!Complete(old), "Zoom invalidates queued selection");
+            var sourceCurrent = true;
+            old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!, isCurrent: () => sourceCurrent);
+            sourceCurrent = false;
+            Check(!Complete(old), "New source interaction invalidates queued selection before publication");
+            var validityChecks = 0;
+            old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!, isCurrent: () => ++validityChecks < 2);
+            Check(!Complete(old) && validityChecks >= 2, "Source validity is checked again after deferred layout or pagination");
             old = PreviewNavigationService.BringIntoViewAsync(viewer, a!, b!);
             var replacement = Render(); viewer.SetPreview(replacement, source.Length, mode); Layout();
             Check(!Complete(old) && viewer.Document == replacement.Document, "Render completion invalidates old pointers");

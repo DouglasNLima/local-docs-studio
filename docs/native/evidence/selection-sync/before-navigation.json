@@ -1,0 +1,22 @@
+[
+  {
+    "Mode": "Continuous",
+    "Name": "Newest repeated occurrence wins",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Explicit cancellation preserves the newer selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "View replacement and return invalidate queued selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Zoom invalidates queued selection",
+    "Passed": false
+  }
+]

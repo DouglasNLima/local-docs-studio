@@ -35,7 +35,7 @@ internal static partial class NativeUiChecks
             foreach (var mode in new[] { "Continuous", "Pages" })
             {
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
-                foreach (var row in new[] { 1, 2, 8, 15, 2, 1 })
+                foreach (var row in new[] { 15, 1, 8, 2, 15, 1 })
                 foreach (var word in new[] { "planning", "within", "proposer", "RED", "validity" })
                 {
                     var occurrence = (row - 1) * (word == "planning" ? 4 : word == "within" ? 3 : word == "validity" ? 3 : 2) + 2;
@@ -53,7 +53,12 @@ internal static partial class NativeUiChecks
                 var box = dragTarget.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
                 var dragWatch = System.Diagnostics.Stopwatch.StartNew();
                 Mouse.MoveTo((int)box.Left, (int)(box.Top + box.Height / 2)); Mouse.Down(MouseButton.Left);
-                try { Mouse.MoveTo((int)box.Right, (int)(box.Top + box.Height / 2)); }
+                try
+                {
+                    Mouse.MoveTo((int)(box.Left + box.Width / 2), (int)(box.Top + box.Height / 2));
+                    Thread.Sleep(120); // Deliberately cross the unchanged 60 ms timer while dragging.
+                    Mouse.MoveTo((int)box.Right, (int)(box.Top + box.Height / 2));
+                }
                 finally { Mouse.Up(MouseButton.Left); }
                 AssertSelection("planning", 2, "drag", dragWatch);
                 Keyboard.Type(VirtualKeyShort.LEFT); var keyWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -67,6 +72,42 @@ internal static partial class NativeUiChecks
                 Mouse.DoubleClick(new System.Drawing.Point((int)(zoomBox.Left + zoomBox.Width / 2), (int)(zoomBox.Top + zoomBox.Height / 2)));
                 AssertSelection("validity", 2, "zoom", zoomWatch);
                 Find(window, "PreviewZoomLabel").AsButton().Invoke();
+
+                PrepareSource(Occurrence(editor, "planning", 1));
+                var firstBox = Occurrence(editor, "planning", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                var lastBox = Occurrence(editor, "planning", 3).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                var rapidWatch = System.Diagnostics.Stopwatch.StartNew();
+                DoubleClick(firstBox); DoubleClick(lastBox);
+                AssertSelection("planning", 3, "rapid-alternation", rapidWatch);
+                Thread.Sleep(180);
+                AssertSelection("planning", 3, "rapid-settled", rapidWatch);
+
+                // Replace the selected word immediately, before waiting for selection
+                // navigation, then select its new literal after preview regeneration.
+                PrepareSource(Occurrence(editor, "planning", 1));
+                var editBox = Occurrence(editor, "planning", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                DoubleClick(editBox); Keyboard.Type("revised");
+                var original = source; var changedAt = source.IndexOf("planning", StringComparison.Ordinal);
+                source = source.Remove(changedAt, 8).Insert(changedAt, "revised");
+                Wait(() => ReadEditorText(editor) == source && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("revised", StringComparison.Ordinal), "Source edit during pending navigation did not regenerate the preview.");
+                PrepareSource(Occurrence(editor, "revised", 1));
+                var revisedBox = Occurrence(editor, "revised", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                var editWatch = System.Diagnostics.Stopwatch.StartNew(); DoubleClick(revisedBox);
+                AssertSelection("revised", 1, "regenerated-preview", editWatch);
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); source = original;
+                Wait(() => ReadEditorText(editor) == source && !preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("revised", StringComparison.Ordinal), "The selection edit did not retain exact Undo.");
+
+                // Syntax-only selections must remove literal highlighting and identify
+                // the source block rather than reuse a previous matching word.
+                PrepareSource(Occurrence(editor, "**", 1));
+                var syntax = Occurrence(editor, "**", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                Mouse.MoveTo((int)syntax.Left, (int)(syntax.Top + syntax.Height / 2)); Mouse.Down(MouseButton.Left);
+                try { Mouse.MoveTo((int)syntax.Right, (int)(syntax.Top + syntax.Height / 2)); }
+                finally { Mouse.Up(MouseButton.Left); }
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "**")
+                    && preview.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0)
+                    && Find(window, "Status").Name == "Selection synchronised as a preview block.", "Syntax-only selection did not use its semantic block fallback.", 2);
+                observations.Add(new { Mode = mode, Input = "syntax-drag", ExactSource = "**", PreviewLiteralCleared = true, SemanticFallback = true, ActionCount = 1 });
             }
             if (ReadEditorText(editor) != source || !saved.SequenceEqual(File.ReadAllBytes(path))) throw new IOException("Selection input changed source contents.");
             window.CaptureToFile(Path.Combine(output, "selection-table.png"));
@@ -94,15 +135,19 @@ internal static partial class NativeUiChecks
                     Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true, ActionCount = 1 });
             }
             string modeName() => Find(window, "PreviewReadingMode").AsComboBox().SelectedItem?.Text ?? "unknown";
+            void DoubleClick(System.Drawing.Rectangle rectangle) => Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
             void PrepareSource(FlaUI.Core.ITextRange target)
             {
-                // AvalonEdit's UIA ScrollIntoView does not reveal distant wrapped lines.
-                // Prepare its viewport using the real caret, then collapse the preview
-                // selection by clicking it. A stale preparatory highlight cannot pass.
-                editor.Focus(); target.Select(); Keyboard.Type(VirtualKeyShort.LEFT);
-                Wait(() => target.GetBoundingRectangles().Any(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.IntersectsWith(rect)), "Source viewport preparation did not expose its target.", 2);
                 FocusPreview();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0), "Preview focus click did not clear the preparatory selection.", 2);
+                // AvalonEdit's UIA Select does not move its caret; ScrollIntoView is
+                // also ineffective for distant wrapped lines. Use its real scroll
+                // pattern solely to prepare geometry, without selecting any text.
+                var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, target, TextPatternRangeEndpoint.Start);
+                var scroll = editor.Patterns.Scroll.Pattern; var viewSize = scroll.VerticalViewSize.Value;
+                var percent = Math.Clamp((100d * prefix.GetText(-1).Length / source.Length - viewSize / 2) / Math.Max(1, 100 - viewSize) * 100, 0, 100);
+                scroll.SetScrollPercent(-1, percent);
+                Wait(() => target.GetBoundingRectangles().Any(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.IntersectsWith(rect)), "Source viewport preparation did not expose its target.", 2);
             }
             void FocusPreview()
             {

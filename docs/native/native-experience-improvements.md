@@ -1,5 +1,10 @@
 # Native experience improvements
 
+## Editor-to-preview selection reliability â€” 2 November 2026
+
+Draft PR #74 investigates first-operation WPF selection synchronisation. Exact repeated-table mapping passes; a queued selection surviving zoom is independently reproduced and corrected. The reported intermittent mouse failure remains unconfirmed: **NO-GO**, pending hosted comparison and final-source checks. The 60 ms timer and 250 ms Continuous gate are unchanged. See the [engineering receipt](editor-preview-selection-reliability.md); PR #73 and existing release blockers remain independent.
+
+
 ## Original SPC acceptance - 28 October 2026
 
 The six original private ER diagrams now pass exact counts, source/semantic/export/inspection verification and shown WPF loading checks. Acceptance exposed routes crossing taller neighbouring entities; a scoped outgoing-bend correction removes all detected intersections without changing the six-second ER allowance or Continuous 250 ms gate. Core: 2,255 passed. Native corpus: 202 passed. Private sources and captures remain outside the repository; only aggregate evidence is committed. Earlier receipts remain historical. See the [Original SPC Acceptance Addendum](complex-er-preview-loading.md#original-spc-acceptance-addendum--28-october-2026); PR #53 records the final commit/tree and terminal hosted results.
@@ -46,7 +51,7 @@ source and package attribution. Stock Continuous timing is paused; .749 remains
 unresolved. No production signing or public release is authorised.
 
 
-## Fourteen native Mermaid editors — Expansion III
+## Fourteen native Mermaid editors ï¿½ Expansion III
 
 XY Chart, Radar and Sankey add category comparisons, positional profiles and weighted
 flows through the shared source editor, canonical native output and owner Apply
