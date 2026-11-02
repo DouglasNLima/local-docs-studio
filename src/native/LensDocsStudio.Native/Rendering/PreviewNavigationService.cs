@@ -77,8 +77,13 @@ public static class PreviewNavigationService
                             selection.Select(position, selectionEnd);
                         }
                         BringIntoScrollView(scrolling, position, diagnostic);
-                        if (selectionEnd is not null && viewer.Selection is { } selected && !PreviewSelectionVisuals.Refresh(selected))
-                            diagnostic?.Invoke("native selection visual is not ready");
+                        if (selectionEnd is not null && viewer.Selection is { } selected)
+                        {
+                            // ScrollToVerticalOffset queues arrange work. Paint
+                            // against its committed selection viewport.
+                            scrolling.UpdateLayout();
+                            if (!PreviewSelectionVisuals.Refresh(selected)) diagnostic?.Invoke("native selection visual is not ready");
+                        }
                         shown = true;
                     }, DispatcherPriority.Loaded);
                     return shown && !cancellation.IsCancellationRequested && viewer.Document == document;
