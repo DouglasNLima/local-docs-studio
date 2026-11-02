@@ -4,23 +4,23 @@
   "files": {
     "docs/native/architecture-decisions.md": {
       "previous": "7d417854f955df5bf9f7833156beb98d07607a66d704841c5a5cebd90ae7872d",
-      "current": "1bb555274c735faeb45114a0cf47dcd7cdaf9f316e86af91418c7bfb2d2aaa2a"
+      "current": "cb0d61dfdc8eafe099a4dbb6187d70a21bbd469ac9937f1128c32b6b66d2344d"
     },
     "docs/native/functional-parity-matrix.md": {
       "previous": "cb68355123d27272a366387a3693d9eab65a8da41b12d18c5f5efdd8c7dc18cc",
-      "current": "3be50ff9fee38ddeb8e6f927be1c9af443a81569a72180d0d327882f661fe5cd"
+      "current": "08adfc66845072c2e888cf67d5e848ae23a2011e8bc137935de19c48cab44b35"
     },
     "docs/native/implementation-progress.md": {
       "previous": "2fd31c5962db57958fe9b409b4596ec112acaf1eb98601f6b32d694dad39c546",
-      "current": "f171b19a111c6b395d223200ddd6378bfc2f48f6ac9f34cbf7858788ff365d0b"
+      "current": "ee467492412f442179d794778e74008a294b7602c1e462e8978eae154d21ad18"
     },
     "docs/native/native-experience-improvements.md": {
       "previous": "45f3152b5f7ca2b3c522e733947ea8aa3fcd2c220d8bc94971d4bff19d29dc07",
-      "current": "ed1c35f6062aade704976c4a458e457dbbc57085f4f1e6d611adb80ece0d204c"
+      "current": "3df2eac3423b40d268f9b417f0b674c78ed1a60ea9bbe04d4f5d5442fc0b7869"
     },
     "docs/native/validation-report.md": {
       "previous": "c2add28c6a53a132fe9b45f4316d799e1a1157cb425cfe8fabea66f6fe8000f0",
-      "current": "997183f3f1600dd6877af47a4d767f2d2b8091b13a1537e13383bc36c4d3cb37"
+      "current": "72d84615092c8d587c4a0ce57060338a1f4bfe72f606d3ec77bf02c7b585dfdf"
     },
     "src/native/LensDocsStudio.Native.Validation/NativeSelectionMappingChecks.cs": {
       "previous": "09bfa642b5f5486aba3006f0d1209cf440676678b90e3bcfd24f68460b17cb28",

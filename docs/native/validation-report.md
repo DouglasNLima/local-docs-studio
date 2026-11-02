@@ -2,7 +2,7 @@
 
 ## Editor-to-preview selection reliability — 2 November 2026
 
-Draft PR #74 investigates first-operation WPF selection synchronisation. Exact repeated-table mapping passes; a queued selection surviving zoom is independently reproduced and corrected. The reported intermittent mouse failure remains unconfirmed: **NO-GO**, pending hosted comparison and final-source checks. The 60 ms timer and 250 ms Continuous gate are unchanged. See the [engineering receipt](editor-preview-selection-reliability.md); PR #73 and existing release blockers remain independent.
+Draft PR #74 corrects independently reproduced obsolete preview navigation and adds real mouse/focus coverage. The reported intermittent first-selection defect remains unconfirmed: **NO-GO**. Baseline and candidate passed 480 single completed word double-clicks across Continuous/Pages, normal/actual OS High Contrast and diagnostics on/off. The 60 ms timer and 250 ms gate are unchanged; performance acceptance remains failed. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). PR #73 and existing release blockers remain independent.
 
 ## Find editor caret stability — 1 November 2026
 
