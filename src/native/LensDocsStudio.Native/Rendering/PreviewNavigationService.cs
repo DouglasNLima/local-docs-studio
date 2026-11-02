@@ -33,11 +33,16 @@ public static class PreviewNavigationService
 
         // Plain navigation may outlive deferred restoration of an empty reader caret.
         // Actual user input cancels Pending; a newer selected range always supersedes us.
-        bool Current() => !cancellation.IsCancellationRequested && viewer.Document == document
-            && position.IsInSameDocument(document.ContentStart)
-            && (originalSelectionStart is null || viewer.Selection is { } selection
+        bool Current()
+        {
+            var selectionCurrent = originalSelectionStart is null || viewer.Selection is { } selection
                 && (selectionEnd is null && originalSelectionEmpty && selection.IsEmpty
-                    || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0));
+                    || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0);
+            var current = !cancellation.IsCancellationRequested && viewer.Document == document
+                && position.IsInSameDocument(document.ContentStart) && selectionCurrent;
+            if (!current) diagnostic?.Invoke($"obsolete: cancelled {cancellation.IsCancellationRequested}, document {viewer.Document == document}, selection {selectionCurrent}");
+            return current;
+        }
 
         async Task<bool> Navigate()
         {

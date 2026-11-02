@@ -194,6 +194,7 @@ public partial class MainWindow
     }
     private void QueueFocusedSynchronisation(string origin)
     {
+        TraceSelection("focused-queue " + origin);
         // Only the originating pane has keyboard focus. Programmatic changes in the
         // other pane cannot feed back, while fresh input supersedes viewport restoration.
         if (applyingSync) CancelSynchronisation();
@@ -237,7 +238,7 @@ public partial class MainWindow
                 result.RevealSource(start);
                 TraceSelection("map " + result.TextMap.TryPreviewRange(start, length, out _, out _));
                 if (result.TextMap.TryPreviewRange(start, length, out var from, out var to) && Preview.Selection is { } target)
-                { semanticHighlight?.Show(null); var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!); TraceSelection("navigation " + shown); }
+                { semanticHighlight?.Show(null); var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!, diagnostic: selectionDiagnostics ? message => TraceSelection("navigation " + message) : null); TraceSelection("navigation " + shown); }
                 else if (syncAnchors?.AtSource(start) is { } block)
                 {
                     Preview.Selection?.Select(block.ContentStart, block.ContentStart);
