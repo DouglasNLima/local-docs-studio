@@ -38,6 +38,10 @@ internal static partial class NativeUiChecks
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
                 Wait(() => (window.FindFirstDescendant(cf => cf.ByAutomationId("PreviewPageNumber")) is { IsOffscreen: false }) == (mode == "Pages"),
                     "The native reader did not apply its requested reading mode.");
+                // Keep the viewports left by the preceding interaction. Read-only
+                // UIA lookup chooses an already visible word; no Find, Select,
+                // Focus, ScrollIntoView or viewport preparation occurs per input.
+                NaturalSelections(mode);
                 foreach (var row in new[] { 15, 1, 8, 2, 15, 1 })
                 foreach (var word in new[] { "planning", "within", "proposer", "RED", "validity" })
                 {
@@ -185,9 +189,62 @@ internal static partial class NativeUiChecks
                 observations.Add(new { Mode = modeName(), Input = input, Word = word, Occurrence = occurrence, SourceOffset = offset,
                     SourceLength = selectedSource.GetText(-1).Length, Rendered = preview.Patterns.Text.Pattern.GetSelection().Single().GetText(-1),
                     Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true,
-                    ActionCount = input == "rapid-alternation" ? 2 : input == "rapid-settled" ? 0 : 1 });
+                    ActionCount = input is "rapid-alternation" or "natural-rapid" ? 2 : input == "rapid-settled" ? 0 : 1 });
             }
             string modeName() => Find(window, "PreviewReadingMode").AsComboBox().SelectedItem?.Text ?? "unknown";
+            void NaturalSelections(string mode)
+            {
+                var target = VisibleWord();
+                Select(target, "natural-inherited");
+                window!.CaptureToFile(Path.Combine(output, mode + "-natural-first.png"));
+                Select(target, "natural-repeat");
+                var box = Box(target.Occurrence);
+                Mouse.Click(new System.Drawing.Point(box.Left, box.Top + box.Height / 2));
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0)
+                    && preview.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0),
+                    "Natural single-click caret retained a stale highlight.", 2);
+                observations.Add(new { Mode = mode, Input = "natural-caret", ActionCount = 1, PreviewLiteralCleared = true });
+                box = Box(target.Occurrence); var watch = System.Diagnostics.Stopwatch.StartNew();
+                Mouse.MoveTo(box.Left, box.Top + box.Height / 2); Mouse.Down(MouseButton.Left);
+                try { Thread.Sleep(120); Mouse.MoveTo(box.Right, box.Top + box.Height / 2); }
+                finally { Mouse.Up(MouseButton.Left); }
+                AssertSelection("planning", target.Occurrence, "natural-drag", watch);
+                // One explicit focus transition is itself part of the sequence.
+                // No source row is prepared after it.
+                FocusPreview(); Select(VisibleWord(), "natural-preview-focus");
+                Mouse.MoveTo(editor.BoundingRectangle.Left + 90, editor.BoundingRectangle.Top + 150); Mouse.Scroll(-3);
+                Thread.Sleep(180); Select(VisibleWord(), "natural-editor-wheel");
+                Mouse.MoveTo(preview.BoundingRectangle.Left + 90, preview.BoundingRectangle.Top + 150); Mouse.Scroll(-2);
+                Thread.Sleep(180); Select(VisibleWord(), "natural-preview-wheel");
+                var first = VisibleWord(); var last = VisibleWord(last: true);
+                watch.Restart(); DoubleClick(Box(first.Occurrence)); DoubleClick(Box(last.Occurrence));
+                AssertSelection("planning", last.Occurrence, "natural-rapid", watch);
+                window!.CaptureToFile(Path.Combine(output, mode + "-natural-selection.png"));
+
+                (int Occurrence, System.Drawing.Rectangle Rectangle) VisibleWord(bool last = false)
+                {
+                    var visible = new List<(int Occurrence, System.Drawing.Rectangle Rectangle)>();
+                    var remaining = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+                    for (var occurrence = 1; occurrence <= 60; occurrence++)
+                    {
+                        var match = remaining.FindText("planning", false, false) ?? throw new IOException("Natural fixture word is absent.");
+                        remaining.MoveEndpointByRange(TextPatternRangeEndpoint.Start, match, TextPatternRangeEndpoint.End);
+                        var rectangle = match.GetBoundingRectangles().FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
+                        if (rectangle.Width > 0) visible.Add((occurrence, rectangle));
+                    }
+                    if (visible.Count == 0) throw new IOException("Natural sequence has no fully visible source word; no preparation was attempted.");
+                    return last ? visible[^1] : visible[0];
+                }
+                System.Drawing.Rectangle Box(int occurrence) => Occurrence(editor, "planning", occurrence).GetBoundingRectangles()
+                    .FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
+                void Select((int Occurrence, System.Drawing.Rectangle Rectangle) item, string input)
+                {
+                    var current = Box(item.Occurrence);
+                    if (current.Width == 0) throw new IOException("Natural source word moved before its single input; no retry was attempted.");
+                    var timer = System.Diagnostics.Stopwatch.StartNew(); DoubleClick(current);
+                    AssertSelection("planning", item.Occurrence, input, timer);
+                }
+            }
             void DoubleClick(System.Drawing.Rectangle rectangle) => Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
             void ClickSourceStart(FlaUI.Core.ITextRange target)
             {

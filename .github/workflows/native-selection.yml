@@ -27,6 +27,11 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-mapping artifacts/selection/mapping
       - name: Verify dispatcher cancellation and exact navigation
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-navigation artifacts/selection/navigation
+      # The visual probe observes an unresolved cold-highlight anomaly; a
+      # successful probe validates the correlation, not first-selection repair.
+      - name: Correlate cold logical selection with actual screen pixels
+        if: matrix.appearance == 'normal'
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-visual artifacts/selection/visual-candidate
       - name: Build diagnostic baseline without the correction
         run: |
           git fetch origin ccfce7d8a1c444517e1bc4f4d39992e30e29af1d
@@ -41,6 +46,10 @@ jobs:
           Copy-Item "$validation/*" artifacts/selection-baseline-probe -Recurse
           Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.dll artifacts/selection-baseline-probe -Force
           Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Core.dll artifacts/selection-baseline-probe -Force
+          if ('${{ matrix.appearance }}' -eq 'normal') {
+            & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-visual artifacts/selection/visual-baseline
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
           & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-zoom-probe artifacts/selection/baseline-zoom --expect-obsolete
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & "$validation/LensDocsStudio.Native.Validation.exe" --selection-zoom-probe artifacts/selection/candidate-zoom

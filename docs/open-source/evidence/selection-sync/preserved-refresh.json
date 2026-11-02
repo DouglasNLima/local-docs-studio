@@ -28,15 +28,15 @@
     },
     "src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs": {
       "previous": "64dd397a74eac792bfab7a474b49a8ed948d76444021c35c48b4debe760cc8ca",
-      "current": "3e0b414b3b670282c1d85a5a11b962063227839db8bf50be50679871fa28a17e"
+      "current": "1307fa273ee8f02938978d4b8c23e8317d4bc1e52bb1c5a6674d728fd0be4f2c"
     },
     "src/native/LensDocsStudio.Native.Validation/Program.cs": {
       "previous": "00288b43cf8bddcd82f53c4befbb2428f8bb32b3d05eff65dbfec8b6fc295ddf",
-      "current": "f0b372b85359c7c07889c246d608a82632d54b4dc0bd544234b7723d1115944c"
+      "current": "8120ed500a288fe497688d1ea74cc498432067982579bd125239bdfecd002a8d"
     },
     "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
       "previous": "76aa1d383f20a096822b7691138e620d5debd9a21e066f8a1209a3dd233606ca",
-      "current": "58ac92f07a58248e70d71652053a8731dbe749126e1635585ef261f47ca43af2"
+      "current": "9e9a615e8ba14fc0a3ff22ff00467d60cdfa59d8c71649d284ec370d23cfa375"
     },
     "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
       "previous": "6c51297b336ebac1f4bb7a9e879f2bf651efa9c0ccedbea679760e6286e85da0",

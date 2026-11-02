@@ -6,9 +6,54 @@ Engineering receipt — 2 November 2026. Draft PR [#74](https://github.com/Dougl
 
 **NO-GO for the reported intermittent first mouse-selection defect.** The final synthetic matrix passed in both baseline and candidate, so it does not establish the cause of that report or prove it fixed. A separate obsolete-navigation defect is reproduced and corrected. Keep this PR in Draft.
 
+**Follow-up classification: INCONCLUSIVE for the original report.** A new, independently reproduced cold-preview paint anomaly shows why logical selection and UIA geometry cannot certify visible highlighting. No selection behaviour correction is added by this follow-up; the zoom correction remains intact.
+
 The reproducible selection evidence below is pinned to `8a94d3cb12c99ffaa2d0bfb32ea73633dd77a9ed` and diagnostic baseline `ccfce7d8a1c444517e1bc4f4d39992e30e29af1d`. The subsequent compatibility correction restores the original compiled API without changing selection mapping or the timer. Final receipt-only revalidation pins and terminal CI outcomes are recorded in the [Draft PR](https://github.com/DouglasNLima/local-docs-studio/pull/74).
 
 No merge, publication, signing or release is authorised. Governance maintenance uses a separate amendment for the twelve changed frozen source/tracking files; the original Goal #62 evidence, Find amendment, licence scope and all unrelated trust/performance digests stay intact. The rights ledger retains existing classifications and introduces no new grant. PR #73 is untouched. Existing SignPath, High Contrast, Continuous 250 ms and Native Stable blockers remain independent.
+
+## Real-world and visual follow-up — 2 November 2026
+
+### Binary provenance and historical gap
+
+The machine has a self-contained, unsigned **installed Native Preview `0.1.0-preview.909`**, built 25 October 2026 from clean source `16c9e4e67bbc287f991115358beba5274a978109`, CI run `40235825189`. Its executable SHA-256 is `FE7C63085EFF584ED1492416D1A93C1FB0493961759DD974E984811BE0DADF43`; its native DLL SHA-256 is `42949BA72F4D48F049F26D935A48A21FB0EF9BBF79DE1FE700A57F2532B21001`. This is an installed preview, not a Native Stable release or the PR development build. The earlier browser/Windows-bridge edition is a separate product. No installed files or default user state were replaced.
+
+The original report did not pin its process, executable hash, version or launch shortcut. **The installed preview discovered here cannot be asserted to be the original affected binary.** Confirmation was requested during this investigation and remains outstanding. Matching a product name is insufficient.
+
+The prior diagnostic baseline `ccfce7d` already includes the inner-viewer inactive-highlight assignment introduced by `69e4814` on 27 October; the installed preview predates it. Neither that setting nor the independent zoom correction proves a cause for the original report. The earlier 480 word operations also prepared every source row through Find and warmed preview focus. They never established a cold, visibly painted first selection.
+
+The identical compiled visual probe is run against the unchanged installed native/Core DLLs and a diagnostics-only development build over `aa25f94`. [Installed DLL correlation](evidence/selection-sync/visual-installed.json) and [development correlation](evidence/selection-sync/visual-development.json) pin probe/product SHA-256 values. The latter product digest identifies the actual working-tree assembly, not a claim that its bytes equal a clean `aa25f94` build. The probe uses its own .NET validation host; it does not reproduce the installed self-contained runtime or the full application session.
+
+### Actual local reproduction matrix
+
+| Binary / surface | Input and inherited state | Actual observation | Limit |
+| --- | --- | --- | --- |
+| Installed preview, full application, synthetic six-column table, Continuous, diagnostics absent | First double-click on row Q-01 `planning`, followed by a second double-click on its bold occurrence; no Find, UIA Select, focus call or viewport preparation | Source word visibly selected; no visible preview highlight in the captured application view | Source UIA text corroborates the selected word; installed application internals were not instrumented, so these two observations alone do not establish mapping failure |
+| Same installed session | Click preview heading, then double-click preview `proposer`, retaining preceding viewports | Preview word highlight and the corresponding source word become visible | Reverse-direction/focus observation; not evidence that all editor selections work |
+| Unchanged installed DLLs, shown synthetic visual-isolation window, Continuous and Pages | Actual AvalonEdit source span `(21, 8)`; normal navigation into a preview which has never had focus | Exact source map, logical native range and UIA range; cold highlight absent | Programmatic isolation probe, not counted as natural mouse reproduction |
+| Development DLL, same probe and same source span, Continuous and Pages | Same cold state, followed by one preview/editor focus round trip without changing the range | Same exact logical/UIA range before and after; paint appears only after focus initialisation | Confirms a surviving visual anomaly, not its causal identity with the original customer report |
+| Development application, local natural mouse sequence | Fresh isolated state and synthetic document launched | Not executed: computer-use helper repeatedly rejected current ownership of a newly launched same-name executable, including after refresh and reset | Recorded as tooling failure, never a product selection failure or pass |
+| Original customer document/session | Two local SPC Markdown candidates were located by filename and structural checks performed locally | No contents, paths, hashes or customer screenshots retained in repository evidence; original-document identity is unconfirmed and interactive coverage is incomplete | Cannot count synthetic coverage as customer-session reproduction |
+
+All local launches used isolated state directories. The user-owned source documents were not edited. Natural hosted coverage and terminal outcomes are recorded below when complete; the local limitations remain independent of hosted results.
+
+### Logical versus visual correlation
+
+The visual probe separately reads AvalonEdit's actual selection, `PreviewSourceMap`'s source round trip, `FlowDocumentReader.Selection`'s native pointer offsets, the preview UIA provider and actual screen pixels within that provider's screen rectangle. It first observes the untouched product, then establishes warm and collapsed references. No screenshot or UIA geometry alone is treated as proof of paint. The source is a tiny first-party synthetic fixture; customer content is never used by this probe or uploaded to CI.
+
+In both reading modes, source `(21, 8)` maps back exactly, native pointer offsets are `23..31`, and the cold UIA range is correct. The cold screen crop is identical to the collapsed reference: **zero changed pixels**. One preview/editor focus round trip preserves those endpoints but produces a visible highlight across the selected screen rectangle. Local 150% display observations report rectangle `94 × 30` physical pixels and **2,820 changed pixels** after focus; absolute screen coordinates are retained in the source-labelled JSON. A repeat selection in the warmed viewer remains painted. The probe reads WPF's private caret-visual field only as optional test evidence; production code never depends on private WPF APIs.
+
+This is a confirmed logical-versus-painted discrepancy in a controlled cold reader. It is not proof of dropped input, wrong source offsets, stale preview selection, a timer race or a cancellation defect. It also does not prove the original intermittent report has been reproduced. Microsoft's [TextSelection implementation](https://github.com/dotnet/wpf/blob/main/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Documents/TextSelection.cs) separates caret/highlight activation from the logical range; that source is supporting context, not a substitute for the measured runtime observations. The exact public-API correction remains an investigation task.
+
+### Validation improvements and next action
+
+The hosted mouse sequence now starts from inherited source/preview positions and adds repeated double-clicks, a single caret click, a sustained drag crossing the unchanged 60 ms timer, an explicit preview-focus transition, editor and preview wheel scrolling, and rapid selections. Read-only UIA lookup chooses an already visible source word; it never uses Find, UIA Select, SetFocus or ScrollIntoView to prepare each input. The original prepared-row matrix remains separately useful. First and final natural-sequence screenshots contain synthetic content only.
+
+Opt-in `LENS_NATIVE_SELECTION_DIAGNOSTICS=1` remains local-only and capped at 2,000 combined event/observation records per window. It now records cancellation callers, source-version identities, source/accepted generations, render request/revision, native and mapped endpoints, layout/dispatcher counters, both panes' focus, scroll offsets, screen geometry and a bounded transient UIA/logical equality comparison. It records no document or selected text, names, titles, paths or screenshots. Deferred observations run at ContextIdle, without focus, selection, scrolling or forced layout. A source-version hash is a session identity, not a content hash. Disabled diagnostics attach no new hooks and write no log. These diagnostics are not latency acceptance evidence.
+
+**Recommended next action:** confirm the original executable/shortcut and document locally, then observe a fresh full-application session with the bounded diagnostics while the user repeats their ordinary mouse workflow. Establish whether the first invisible highlight has correct mapped/logical/UIA endpoints and whether any prior preview focus or render replacement changes it. Independently investigate public WPF highlight initialisation without stealing focus or replacing the native selection contract. Do not ship a focus-stealing workaround, increase the 60 ms timer or relax the 250 ms gate. Until that correlation is complete, retain **INCONCLUSIVE / NO-GO** for the original report.
+
+Follow-up local validation: Release build with zero warnings/errors; 2,298 Core tests passed with no skips; exact source-mapping checks and all 16 dispatcher/navigation checks passed; static web integrity passed; foundation/governance checks and all 24 governance tests passed. The paired visual probe completed against both source-labelled products. The web UI and exports are unchanged, so browser regressions were left to the hosted native/static workflows. Hosted outcomes must be inspected to completion before treating this follow-up as validated.
 
 ## Investigation and before evidence
 

@@ -54,6 +54,7 @@ public partial class MainWindow
 
     private void InitialiseSynchronisation()
     {
+        InitialiseSelectionDiagnostics();
         syncTimer.Tick += SyncTick;
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
         Editor.TextArea.Caret.PositionChanged += EditorCaretChanged;
@@ -148,8 +149,9 @@ public partial class MainWindow
                 finally { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; } }
             }, DispatcherPriority.Loaded);
     }
-    private void CancelSynchronisation()
+    private void CancelSynchronisation([System.Runtime.CompilerServices.CallerMemberName] string reason = "")
     {
+        TraceSelection("cancel " + reason);
         syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false; applyingSyncOrigin = null;
         PreviewNavigationService.CancelPending(Preview); EditorNavigationService.CancelPending(Editor); semanticHighlight?.Show(null);
     }
