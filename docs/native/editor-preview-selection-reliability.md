@@ -4,7 +4,7 @@ Engineering receipt — 2 November 2026. Draft PR [#74](https://github.com/Dougl
 
 ## Decision
 
-**REPRODUCED on the reported `0.1.0-preview.1104`: editor-first selection has correct source, mapped, native and UIA ranges while its native highlight is invisible.** A preview focus visit makes the highlight work. The cause is native WPF selection-visual initialisation when the focused editor is AvalonEdit. The scoped correction refreshes WPF's existing selection geometry without moving focus, changing the range or changing WPF's native focus owner. Keep this PR in Draft until final checks are inspected; existing release blockers remain independent.
+**REPRODUCED on the reported `0.1.0-preview.1104`: editor-first selection has correct source, mapped, native and UIA ranges while its native highlight is invisible.** A preview focus visit makes the highlight work. The cause is native WPF selection-visual initialisation when the focused editor is AvalonEdit. The scoped correction refreshes WPF's existing selection geometry without moving focus, changing the range or changing WPF's native focus owner. The final-source cold-paint matrix passes. Keep this PR in Draft; existing release blockers remain independent.
 
 The earlier **INCONCLUSIVE / NO-GO** classification was correct for the Find-prepared matrix. The later version identification, local mouse reproduction on `.1104`, the user's independent preview-first/editor-first observation and source-labelled pixel counterfactual establish the reproduced cold-paint failure. Other unobserved intermittent scenarios remain inconclusive; this is not a claim that every possible selection problem is fixed. The independently validated zoom correction remains intact.
 
@@ -50,6 +50,38 @@ At source `3a4448e`, [run 41468114409](https://github.com/DouglasNLima/local-doc
 
 The final pre-correction harness, source `ad21abe`, [run 41469782304](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41469782304), completed all eight sessions: 98 observations each, 784 total, including 128 natural observations and 592 completed word double-clicks. All source/native/UIA endpoint assertions passed; there were zero mouse retries and five bounded passive geometry-read retries. This still did not certify cold paint: the unfixed baseline and candidate both passed logical checks. The corrected harness additionally compares the first native highlight's actual pixels with its later collapsed reference, requiring visible paint in the candidate and retaining explicit expected-invisible baseline evidence.
 
+### Final-source selection validation
+
+Correction source `e7530c1aadbd3b0dff6dd7a47e4c0265ecead4a9`, [hosted run 41479254613](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254613), is terminal **PASS** in both jobs. All eight underlying sessions were inspected individually, including diagnostic baselines rather than relying on job colour. The [machine-readable matrix](evidence/selection-sync/final-selection-validation.json) records 800 observations, including 144 natural-sequence observations and 16 first-highlight pixel comparisons; 480 prepared-row word double-clicks and 112 natural word double-click actions are separately labelled subsets. Source bytes and exact endpoints were retained. There were **zero mouse action retries** and five bounded read-only geometry retries.
+
+Each session covers Continuous and Pages. A baseline row means the known invisible cold highlight was reproduced as expected; it is not a paint-correctness pass for the old product.
+
+| Appearance | Product | Diagnostics | Observations | Cold changed pixels, Continuous / Pages |
+| --- | --- | --- | ---: | --- |
+| Normal | Baseline `ccfce7d` | On | 100 | 0 / 0, expected invisible |
+| Normal | Baseline `ccfce7d` | Off | 100 | 0 / 0, expected invisible |
+| Normal | Corrected `e7530c1` | On | 100 | 580 / 580, visible |
+| Normal | Corrected `e7530c1` | Off | 100 | 580 / 580, visible |
+| Actual OS High Contrast | Baseline `ccfce7d` | On | 100 | 0 / 0, expected invisible |
+| Actual OS High Contrast | Baseline `ccfce7d` | Off | 100 | 0 / 0, expected invisible |
+| Actual OS High Contrast | Corrected `e7530c1` | On | 100 | 580 / 580, visible |
+| Actual OS High Contrast | Corrected `e7530c1` | Off | 100 | 580 / 580, visible |
+
+The first wrapped-word rectangle is `29 × 20` physical pixels: the corrected product changes **all 580 expected pixels**, while the old product changes zero. These captures precede any preview focus visit: [normal](evidence/selection-sync/final-normal-first-selection-synthetic.png), [High Contrast](evidence/selection-sync/final-high-contrast-first-selection-synthetic.png). The separate [final baseline](evidence/selection-sync/final-baseline-visual.json) and [final candidate](evidence/selection-sync/final-candidate-visual.json) share one compiled probe hash and record distinct product hashes, unchanged source/native/UIA endpoints, no prior preview focus, preserved editor/native focus-owner state and 0 versus 1,240 cold pixels in the `62 × 20` isolation rectangle. Both reading modes pass. This is rendered-highlight evidence, not just UIA geometry or a longer timeout.
+
+The original obsolete-zoom comparison and all 16 navigation/cancellation checks also pass on this source. Other inspected terminal outcomes on this source are:
+
+| Workflow | Terminal outcome | Interpretation |
+| --- | --- | --- |
+| [OSS provenance](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254625) | PASS | Existing grants and preserved evidence remain intact |
+| [Static application](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254581) | PASS | Chromium and Edge pass; Pages deployment is **skipped** |
+| [Mermaid creation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254644) | PASS | Independent native creation checks |
+| [Workspace interactions](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254652) | PASS | Independent native workspace checks |
+| [Desktop UX](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254467) | PASS | Fourteen successful jobs and one intentionally skipped diagnostic job; does not certify High Contrast release readiness |
+| [Continuous 250 ms acceptance](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254504) | **FAIL** | Two controlled replications reject 40 and 37 candidate samples at the unchanged 250 ms limit; correctness and both visible-interaction jobs pass |
+
+The broader [native edition run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254632) was still building isolated preview packages when this immutable evidence was written. Its eventual terminal outcome, and the receipt commit's checks, are recorded in the [PR validation status](https://github.com/DouglasNLima/local-docs-studio/pull/74). Selection-specific success does not clear independent release blockers.
+
 ### Logical versus visual correlation
 
 The visual probe separately reads AvalonEdit's actual selection, `PreviewSourceMap`'s source round trip, `FlowDocumentReader.Selection`'s native pointer offsets, the preview UIA provider and actual screen pixels within that provider's screen rectangle. It first observes the untouched product, then establishes warm and collapsed references. No screenshot or UIA geometry alone is treated as proof of paint. The source is a tiny first-party synthetic fixture; customer content is never used by this probe or uploaded to CI.
@@ -76,9 +108,9 @@ The hosted mouse sequence now starts from inherited source/preview positions and
 
 Opt-in `LENS_NATIVE_SELECTION_DIAGNOSTICS=1` remains local-only and capped at 2,000 combined event/observation records per window. It now records cancellation callers, source-version identities, source/accepted generations, render request/revision, native and mapped endpoints, layout/dispatcher counters, both panes' focus, scroll offsets, screen geometry and a bounded transient UIA/logical equality comparison. It records no document or selected text, names, titles, paths or screenshots. Deferred observations run at ContextIdle, without focus, selection, scrolling or forced layout. A source-version hash is a session identity, not a content hash. Disabled diagnostics attach no new hooks and write no log. These diagnostics are not latency acceptance evidence.
 
-**Recommended next action:** inspect final-source hosted pixel/mouse checks to completion, then repeat editor-first selection on a fresh `.1104`-runtime correction window, after a document replacement and after preview focus, with diagnostics both on and off. The original SPC document is unavailable and is not needed for the reported any-document sequence. Keep the PR Draft and resolve High Contrast appearance, performance, SignPath and Native Stable readiness separately. Preserve **INCONCLUSIVE** for any remaining intermittent scenario whose source/logical/visual correlation has not been reproduced; do not generalise this cold-paint correction to every selection symptom.
+**Recommended next action:** retain the cold-paint matrix as a required check for supported WPF runtime updates, finish the independent native package checks and evaluate the corrected candidate in the user's ordinary any-document workflow. Fresh `.1104`-runtime correction windows passed with diagnostics enabled and disabled; document replacement passed locally, and the hosted matrix separately covers preview focus, scrolling, drag, rapid selection and both reading modes. The original SPC document is unavailable and is not needed for this reproduction. Keep the PR Draft and resolve High Contrast appearance, performance, SignPath and Native Stable readiness separately. Preserve **INCONCLUSIVE** for any remaining intermittent scenario whose source/logical/visual correlation has not been reproduced; do not generalise this cold-paint correction to every selection symptom.
 
-Follow-up local validation: Release build with zero warnings/errors; 2,298 Core tests passed with no skips; exact source-mapping checks and all 16 dispatcher/navigation checks passed; static web integrity passed; foundation/governance checks and all 24 governance tests passed. The paired visual probe completed against both source-labelled products. The web UI and exports are unchanged, so browser regressions were left to the hosted native/static workflows. Hosted outcomes must be inspected to completion before treating this follow-up as validated.
+Follow-up local validation: Release build with zero warnings/errors; 2,298 Core tests passed with no skips; exact source-mapping checks and all 16 dispatcher/navigation checks passed; static web integrity passed; foundation/governance checks and all 24 governance tests passed. The paired visual probe completed against both source-labelled products. The web UI and exports are unchanged, so browser regressions were left to the hosted native/static workflows. Final-source selection and static-application terminal outcomes are recorded above; broader package outcomes are tracked separately on the PR.
 
 A later local full Core run had 2,297 passes and one `complete-detailed` complex-ER rendering deadline failure at the existing six-second limit. Core source and that deadline were unchanged. Its focused rerun passed all 17 complex-ER tests; the failed full-run observation is retained rather than presented as an uninterrupted full pass. Final hosted Core and native outcomes are recorded separately. The six-second ER limit and Continuous 250 ms acceptance gate remain independent of selection-paint correctness.
 
