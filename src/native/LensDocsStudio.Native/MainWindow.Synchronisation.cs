@@ -54,6 +54,7 @@ public partial class MainWindow
 
     private void InitialiseSynchronisation()
     {
+        InitialiseSelectionDiagnostics();
         syncTimer.Tick += SyncTick;
         Editor.TextArea.SelectionChanged += EditorSelectionChanged;
         Editor.TextArea.Caret.PositionChanged += EditorCaretChanged;
@@ -62,6 +63,8 @@ public partial class MainWindow
         Preview.LayoutUpdated += PreviewLayoutUpdated;
         Editor.PreviewMouseWheel += UserScrollInput; Preview.PreviewMouseWheel += UserScrollInput;
         Editor.PreviewMouseDown += UserSelectionInput; Preview.PreviewMouseDown += UserSelectionInput;
+        Editor.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
+        Preview.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
         Closed += (_, _) =>
         {
             CancelSynchronisation(); syncTimer.Tick -= SyncTick;
@@ -71,6 +74,8 @@ public partial class MainWindow
             Preview.RemoveHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(PreviewScrollChanged));
             Editor.PreviewMouseWheel -= UserScrollInput; Preview.PreviewMouseWheel -= UserScrollInput;
             Editor.PreviewMouseDown -= UserSelectionInput; Preview.PreviewMouseDown -= UserSelectionInput;
+            Editor.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
+            Preview.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
         };
     }
@@ -80,6 +85,7 @@ public partial class MainWindow
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
         if (Preview.Selection != observedSelection)
         {
+            TraceSelection("preview-selection-hook");
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
             observedSelection = Preview.Selection;
             if (observedSelection is not null) observedSelection.Changed += PreviewSelectionChanged;
@@ -92,6 +98,7 @@ public partial class MainWindow
     }
     private void InstallSyncPreview(ITextSourceVersion version)
     {
+        TraceSelection("install-map");
         CancelSynchronisation(); renderedVersion = version;
         syncAnchors = rendered is null ? null : new(rendered);
         semanticHighlight?.Show(null);
@@ -142,8 +149,9 @@ public partial class MainWindow
                 finally { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; } }
             }, DispatcherPriority.Loaded);
     }
-    private void CancelSynchronisation()
+    private void CancelSynchronisation([System.Runtime.CompilerServices.CallerMemberName] string reason = "")
     {
+        TraceSelection("cancel " + reason);
         syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false; applyingSyncOrigin = null;
         PreviewNavigationService.CancelPending(Preview); EditorNavigationService.CancelPending(Editor); semanticHighlight?.Show(null);
     }
@@ -152,9 +160,13 @@ public partial class MainWindow
         CancelSynchronisation();
         if (DesktopState.SyncScroll && BothPanesVisible) QueueSynchronisation(ReferenceEquals(sender, Editor) ? "editor-scroll" : "preview-scroll");
     }
-    private void UserSelectionInput(object sender, MouseButtonEventArgs e) => CancelSynchronisation();
+    private void UserSelectionInput(object sender, MouseButtonEventArgs e)
+    { TraceSelection("mouse-down " + (ReferenceEquals(sender, Editor) ? "editor" : "preview")); CancelSynchronisation(); }
+    private void SelectionInputCompleted(object sender, MouseButtonEventArgs e)
+        => TraceSelection("mouse-up " + (ReferenceEquals(sender, Editor) ? "editor" : "preview"));
     private void EditorSelectionChanged(object? sender, EventArgs e)
     {
+        TraceSelection("editor-selection-changed");
         if (BothPanesVisible && DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin) QueueFocusedSynchronisation("editor-selection");
     }
     private void EditorCaretChanged(object? sender, EventArgs e)
@@ -172,6 +184,8 @@ public partial class MainWindow
     }
     private void PreviewSelectionChanged(object? sender, EventArgs e)
     {
+        TraceSelection("preview-selection-changed");
+        if (!Preview.IsKeyboardFocusWithin && Preview.Selection is { } selection) PreviewSelectionVisuals.Refresh(selection);
         if (BothPanesVisible && DesktopState.SyncSelection && Preview.IsKeyboardFocusWithin) QueueFocusedSynchronisation("preview-selection");
     }
     private void PreviewScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -184,6 +198,7 @@ public partial class MainWindow
     }
     private void QueueSynchronisation(string origin)
     {
+        TraceSelection("queue " + origin);
         if (restoringNavigation || bindingViewport || pendingViewportDocument is not null || !SyncCurrent) return;
         if (pendingSync?.EndsWith("selection", StringComparison.Ordinal) == true && origin.EndsWith("scroll", StringComparison.Ordinal)) return;
         pendingSync = origin;
@@ -191,6 +206,7 @@ public partial class MainWindow
     }
     private void QueueFocusedSynchronisation(string origin)
     {
+        TraceSelection("focused-queue " + origin);
         // Only the originating pane has keyboard focus. Programmatic changes in the
         // other pane cannot feed back, while fresh input supersedes viewport restoration.
         if (applyingSync) CancelSynchronisation();
@@ -207,6 +223,7 @@ public partial class MainWindow
     }
     private async void SyncTick(object? sender, EventArgs e)
     {
+        TraceSelection("timer");
         syncTimer.Stop(); var origin = pendingSync; pendingSync = null;
         if (restoringNavigation || origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
         var generation = ++syncGeneration; var result = rendered!;
@@ -228,16 +245,35 @@ public partial class MainWindow
                 {
                     semanticHighlight?.Show(null);
                     if (result.TextMap.TryPreviewRange(Editor.CaretOffset, 0, out var caret, out _) && Preview.Selection is { } empty) empty.Select(caret!, caret!);
+                    else if (Preview.Selection is { } previous) previous.Select(previous.Start, previous.Start);
                     return;
                 }
                 result.RevealSource(start);
+                if (selectionDiagnostics) TraceSelection("map " + result.TextMap.TryPreviewRange(start, length, out _, out _));
                 if (result.TextMap.TryPreviewRange(start, length, out var from, out var to) && Preview.Selection is { } target)
-                { semanticHighlight?.Show(null); await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!); }
-                else if (syncAnchors?.AtSource(start) is { } block)
                 {
-                    Preview.Selection?.Select(block.ContentStart, block.ContentStart);
-                    await PreviewNavigationService.BringIntoViewAsync(Preview, block.ContentStart);
-                    if (SyncCurrent && syncGeneration == generation) { semanticHighlight?.Show(block); model.Status = "Selection synchronised as a preview block."; }
+                    semanticHighlight?.Show(null);
+                    var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!,
+                        diagnostic: selectionDiagnostics ? message => TraceSelection("navigation " + message) : null,
+                        isCurrent: () => syncGeneration == generation && SyncCurrent && BothPanesVisible && Editor.IsKeyboardFocusWithin
+                            && Editor.SelectionStart == start && Editor.SelectionLength == length);
+                    TraceSelection("navigation " + shown);
+                }
+                else
+                {
+                    // Syntax-only or transformed endpoints have no exact literal range.
+                    // Collapse the previous text highlight before showing a source block;
+                    // never retain an unrelated old word or search for matching text.
+                    semanticHighlight?.Show(null);
+                    if (Preview.Selection is { } previous) previous.Select(previous.Start, previous.Start);
+                    if (syncAnchors?.AtSource(start) is { } block)
+                    {
+                        var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, block.ContentStart, selectionEnd: null, diagnostic: null,
+                            isCurrent: () => syncGeneration == generation && SyncCurrent && BothPanesVisible && Editor.IsKeyboardFocusWithin
+                                && Editor.SelectionStart == start && Editor.SelectionLength == length);
+                        if (shown && SyncCurrent && syncGeneration == generation) { semanticHighlight?.Show(block); model.Status = "Selection synchronised as a preview block."; }
+                    }
+                    else { semanticHighlight?.Show(null); model.Status = "This source selection has no rendered text."; }
                 }
             }
             else if (origin == "preview-scroll" && DesktopState.SyncScroll && VisiblePreviewSource() is { } previewSource)

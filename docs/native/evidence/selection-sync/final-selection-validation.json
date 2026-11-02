@@ -1,0 +1,576 @@
+{
+  "sourceRevision": "e7530c1aadbd3b0dff6dd7a47e4c0265ecead4a9",
+  "workflowRun": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/41479254613",
+  "classification": "Reproduced cold native highlight failure; corrected candidate paints before preview focus",
+  "reportedVersion": "0.1.0-preview.1104",
+  "sessions": [
+    {
+      "appearance": "normal",
+      "variant": "baseline",
+      "sourceRevision": "ccfce7d8a1c444517e1bc4f4d39992e30e29af1d",
+      "passed": true,
+      "diagnostics": true,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 0,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        }
+      ]
+    },
+    {
+      "appearance": "normal",
+      "variant": "interactions",
+      "sourceRevision": "e7530c1aadbd3b0dff6dd7a47e4c0265ecead4a9",
+      "passed": true,
+      "diagnostics": true,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 0,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        }
+      ]
+    },
+    {
+      "appearance": "normal",
+      "variant": "baseline-no-diagnostics",
+      "sourceRevision": "ccfce7d8a1c444517e1bc4f4d39992e30e29af1d",
+      "passed": true,
+      "diagnostics": false,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 0,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        }
+      ]
+    },
+    {
+      "appearance": "normal",
+      "variant": "no-diagnostics",
+      "sourceRevision": "e7530c1aadbd3b0dff6dd7a47e4c0265ecead4a9",
+      "passed": true,
+      "diagnostics": false,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 1,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        }
+      ]
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "baseline",
+      "sourceRevision": "ccfce7d8a1c444517e1bc4f4d39992e30e29af1d",
+      "passed": true,
+      "diagnostics": true,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 1,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        }
+      ]
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "interactions",
+      "sourceRevision": "e7530c1aadbd3b0dff6dd7a47e4c0265ecead4a9",
+      "passed": true,
+      "diagnostics": true,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 1,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        }
+      ]
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "baseline-no-diagnostics",
+      "sourceRevision": "ccfce7d8a1c444517e1bc4f4d39992e30e29af1d",
+      "passed": true,
+      "diagnostics": false,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 1,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 0,
+          "HighlightVisible": false,
+          "ExpectedInvisible": true
+        }
+      ]
+    },
+    {
+      "appearance": "high-contrast",
+      "variant": "no-diagnostics",
+      "sourceRevision": "e7530c1aadbd3b0dff6dd7a47e4c0265ecead4a9",
+      "passed": true,
+      "diagnostics": false,
+      "observations": 100,
+      "naturalObservations": 18,
+      "preparedRowWordDoubleClicks": 60,
+      "naturalWordDoubleClicks": 14,
+      "mouseActionRetries": 0,
+      "geometryObservationRetries": 1,
+      "sourceBytesPreserved": true,
+      "paint": [
+        {
+          "Mode": "Continuous",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 365
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 365,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 365,
+            "Right": 511,
+            "Bottom": 385,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        },
+        {
+          "Mode": "Pages",
+          "ScreenRectangle": {
+            "Location": {
+              "IsEmpty": false,
+              "X": 482,
+              "Y": 383
+            },
+            "Size": {
+              "IsEmpty": false,
+              "Width": 29,
+              "Height": 20
+            },
+            "X": 482,
+            "Y": 383,
+            "Width": 29,
+            "Height": 20,
+            "Left": 482,
+            "Top": 383,
+            "Right": 511,
+            "Bottom": 403,
+            "IsEmpty": false
+          },
+          "ChangedPixels": 580,
+          "HighlightVisible": true,
+          "ExpectedInvisible": false
+        }
+      ]
+    }
+  ],
+  "allSessionsPassed": true,
+  "totalObservations": 800,
+  "naturalObservations": 144,
+  "preparedRowWordDoubleClicks": 480,
+  "naturalWordDoubleClicks": 112,
+  "mouseActionRetries": 0,
+  "geometryObservationRetries": 5,
+  "sourceBytesPreserved": true
+}

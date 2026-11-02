@@ -92,6 +92,8 @@ public sealed class DocumentPreview : FlowDocumentReader
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (e.Property == DocumentProperty || e.Property == ViewingModeProperty || e.Property == ZoomProperty)
+            PreviewNavigationService.CancelPending(this);
         if (replacing) return;
         if (e.Property == DocumentProperty)
         {

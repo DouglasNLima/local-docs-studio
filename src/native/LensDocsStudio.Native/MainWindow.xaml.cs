@@ -327,9 +327,9 @@ public partial class MainWindow : Window
         if (opened) model.MoveDocumentCommand.Execute(null);
     }
     private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e)
-    { CancelSynchronisation(); previewFocused = false; QueueCurrentEditorInput(); }
+    { TraceSelection("editor-focus"); CancelSynchronisation(); previewFocused = false; QueueCurrentEditorInput(); }
     private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e)
-    { CancelSynchronisation(); previewFocused = true; }
+    { TraceSelection("preview-focus"); CancelSynchronisation(); previewFocused = true; }
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         previewFocused = true;

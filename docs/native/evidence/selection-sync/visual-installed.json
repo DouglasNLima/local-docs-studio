@@ -1,0 +1,81 @@
+{
+  "ProbeSha256": "42AC00E8181E25E16D7B0D898B128A8BEF0A7AE656E67D84A7BB36939438508A",
+  "ProductSha256": "42949BA72F4D48F049F26D935A48A21FB0EF9BBF79DE1FE700A57F2532B21001",
+  "ProductVersion": "0.1.0-preview.909\u002B16c9e4e67bbc287f991115358beba5274a978109",
+  "Observations": [
+    {
+      "Mode": "Continuous",
+      "SourceStart": 21,
+      "SourceLength": 8,
+      "MappedStart": 21,
+      "MappedLength": 8,
+      "Exact": true,
+      "UiaMatchesLogical": true,
+      "LogicalStart": 23,
+      "LogicalEnd": 31,
+      "EditorFocus": true,
+      "ReaderInactiveHighlight": true,
+      "ViewerInactiveHighlight": false,
+      "ColdUiaMatchesLogical": true,
+      "FocusPreservedRange": true,
+      "ColdCaretVisualPresent": false,
+      "WarmCaretVisualPresent": true,
+      "ColdChangedPixels": 0,
+      "WarmChangedPixels": 2820,
+      "RestoredChangedPixels": 2820,
+      "ColdHighlightVisible": false,
+      "WarmHighlightVisible": true,
+      "PreviewAcceptedFocus": true,
+      "FocusInitialisationChangedPixels": 2820,
+      "ScreenStart": [
+        1506,
+        364
+      ],
+      "UiaRectangles": [
+        [
+          1506,
+          364,
+          94,
+          30
+        ]
+      ]
+    },
+    {
+      "Mode": "Pages",
+      "SourceStart": 21,
+      "SourceLength": 8,
+      "MappedStart": 21,
+      "MappedLength": 8,
+      "Exact": true,
+      "UiaMatchesLogical": true,
+      "LogicalStart": 23,
+      "LogicalEnd": 31,
+      "EditorFocus": true,
+      "ReaderInactiveHighlight": true,
+      "ViewerInactiveHighlight": false,
+      "ColdUiaMatchesLogical": true,
+      "FocusPreservedRange": true,
+      "ColdCaretVisualPresent": false,
+      "WarmCaretVisualPresent": true,
+      "ColdChangedPixels": 0,
+      "WarmChangedPixels": 2820,
+      "RestoredChangedPixels": 2820,
+      "ColdHighlightVisible": false,
+      "WarmHighlightVisible": true,
+      "PreviewAcceptedFocus": true,
+      "FocusInitialisationChangedPixels": 2820,
+      "ScreenStart": [
+        1506,
+        364
+      ],
+      "UiaRectangles": [
+        [
+          1506,
+          364,
+          94,
+          30
+        ]
+      ]
+    }
+  ]
+}

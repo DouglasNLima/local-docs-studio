@@ -1,0 +1,93 @@
+{
+  "ProbeSha256": "BFC28DE2C27477BC06A0289BA9C963ED075A37B4278FC9B954F774EA82CB3B2F",
+  "ProductSha256": "AD13B7D402606E731690BF83F6DB8336FEB2F4EEF332D163A52CF9D0AC422121",
+  "ProductVersion": "0.1.0-preview.1104\u002B0e80946eaf15bfd5b6dcf02a3bd16b00d5306569",
+  "Observations": [
+    {
+      "Mode": "Continuous",
+      "SourceStart": 21,
+      "SourceLength": 8,
+      "MappedStart": 21,
+      "MappedLength": 8,
+      "Exact": true,
+      "UiaMatchesLogical": true,
+      "LogicalStart": 23,
+      "LogicalEnd": 31,
+      "EditorFocus": true,
+      "ReaderInactiveHighlight": true,
+      "ViewerInactiveHighlight": true,
+      "ColdUiaMatchesLogical": true,
+      "FocusPreservedRange": true,
+      "ColdCaretVisualPresent": false,
+      "WarmCaretVisualPresent": true,
+      "ActivationCaretVisualPresent": true,
+      "ActivationFocusPreserved": true,
+      "ActivationRangePreserved": true,
+      "ActivationChangedPixels": 2820,
+      "NativeFocusSelectionPresentBefore": false,
+      "NativeFocusOwnerPreserved": true,
+      "ColdChangedPixels": 0,
+      "WarmChangedPixels": 2820,
+      "RestoredChangedPixels": 2820,
+      "ColdHighlightVisible": false,
+      "WarmHighlightVisible": true,
+      "PreviewAcceptedFocus": true,
+      "FocusInitialisationChangedPixels": 2820,
+      "ScreenStart": [
+        1506,
+        364
+      ],
+      "UiaRectangles": [
+        [
+          1506,
+          364,
+          94,
+          30
+        ]
+      ]
+    },
+    {
+      "Mode": "Pages",
+      "SourceStart": 21,
+      "SourceLength": 8,
+      "MappedStart": 21,
+      "MappedLength": 8,
+      "Exact": true,
+      "UiaMatchesLogical": true,
+      "LogicalStart": 23,
+      "LogicalEnd": 31,
+      "EditorFocus": true,
+      "ReaderInactiveHighlight": true,
+      "ViewerInactiveHighlight": true,
+      "ColdUiaMatchesLogical": true,
+      "FocusPreservedRange": true,
+      "ColdCaretVisualPresent": false,
+      "WarmCaretVisualPresent": true,
+      "ActivationCaretVisualPresent": true,
+      "ActivationFocusPreserved": true,
+      "ActivationRangePreserved": true,
+      "ActivationChangedPixels": 2820,
+      "NativeFocusSelectionPresentBefore": true,
+      "NativeFocusOwnerPreserved": true,
+      "ColdChangedPixels": 0,
+      "WarmChangedPixels": 2820,
+      "RestoredChangedPixels": 2820,
+      "ColdHighlightVisible": false,
+      "WarmHighlightVisible": true,
+      "PreviewAcceptedFocus": true,
+      "FocusInitialisationChangedPixels": 2820,
+      "ScreenStart": [
+        1506,
+        364
+      ],
+      "UiaRectangles": [
+        [
+          1506,
+          364,
+          94,
+          30
+        ]
+      ]
+    }
+  ]
+}

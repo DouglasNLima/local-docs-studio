@@ -11,7 +11,7 @@ from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_
 from rights_ledger import boundary
 from check_foundation import documentation_links
 from licence_scope import (ROOT, SCOPE, validate_licence, validate_scope,
-                           validate_metadata, validate_preserved, apply_find_caret_refresh)
+                           validate_metadata, validate_preserved, apply_find_caret_refresh, apply_selection_sync_refresh)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -173,6 +173,30 @@ class ScopedLicenceTests(unittest.TestCase):
         actual['assets/scripts/editor/find-replace-service.js'] = '0' * 64
         with self.assertRaises(ValueError):
             validate_preserved(updated, actual)
+
+    def test_selection_amendment_preserves_unrelated_trust_and_performance_pins(self):
+        preserved = json.loads((EVIDENCE / 'preserved-files.json').read_text())['sha256']
+        find = json.loads((ROOT / 'docs/open-source/evidence/find-caret/preserved-refresh.json').read_text())
+        preserved = apply_find_caret_refresh(preserved, find)
+        refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text())
+        updated = apply_selection_sync_refresh(preserved, refresh)
+        for path in set(preserved) - set(refresh['files']):
+            self.assertEqual(updated[path], preserved[path])
+        for mutation in ('baseline', 'previous', 'missing', 'notice', 'digest'):
+            changed = copy.deepcopy(refresh)
+            path = 'src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs'
+            if mutation == 'baseline':
+                changed['baseCommit'] = '0' * 40
+            elif mutation == 'previous':
+                changed['files'][path]['previous'] = '0' * 64
+            elif mutation == 'missing':
+                del changed['files'][path]
+            elif mutation == 'notice':
+                changed['files']['LICENSE'] = changed['files'][path]
+            else:
+                changed['files'][path]['current'] = 'not-a-digest'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                apply_selection_sync_refresh(preserved, changed)
 
     def test_rejects_continuous_check_in_ordinary_integration(self):
         payload = json.loads((CONFIG / 'develop-ruleset.json').read_text())

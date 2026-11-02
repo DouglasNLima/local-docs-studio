@@ -1,0 +1,85 @@
+name: Native editor selection reliability
+on:
+  pull_request:
+    branches: [develop]
+    paths: ['src/native/**', '.github/workflows/native-selection.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  selection:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source native checks
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify source mapping
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-mapping artifacts/selection/mapping
+      - name: Verify dispatcher cancellation and exact navigation
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-navigation artifacts/selection/navigation
+      # Verify actual paint before the preview has ever had focus.
+      - name: Correlate cold logical selection with actual screen pixels
+        if: matrix.appearance == 'normal'
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-visual artifacts/selection/visual-candidate
+      - name: Build diagnostic baseline without the correction
+        run: |
+          git fetch origin ccfce7d8a1c444517e1bc4f4d39992e30e29af1d
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/selection-baseline-source ccfce7d8a1c444517e1bc4f4d39992e30e29af1d
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj -c Release -p:RestoreLockedMode=true
+      - name: Prove zoom invalidation with the identical probe against both product assemblies
+        run: |
+          $validation = 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows'
+          New-Item -ItemType Directory -Force artifacts/selection-baseline-probe | Out-Null
+          Copy-Item "$validation/*" artifacts/selection-baseline-probe -Recurse
+          Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.dll artifacts/selection-baseline-probe -Force
+          Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Core.dll artifacts/selection-baseline-probe -Force
+          if ('${{ matrix.appearance }}' -eq 'normal') {
+            & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-visual artifacts/selection/visual-baseline --expect-cold-invisible
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-zoom-probe artifacts/selection/baseline-zoom --expect-obsolete
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & "$validation/LensDocsStudio.Native.Validation.exe" --selection-zoom-probe artifacts/selection/candidate-zoom
+          exit $LASTEXITCODE
+      - name: Observe identical mouse operations against the diagnostic baseline
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline $appearance --expect-cold-invisible
+          @{ exitCode=$LASTEXITCODE; sourceRevision='ccfce7d8a1c444517e1bc4f4d39992e30e29af1d'; diagnosticOnly=$true } | ConvertTo-Json | Set-Content artifacts/selection/baseline-exit.json
+          exit 0
+      - name: Exercise single completed mouse selections and focus transitions
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/interactions $appearance
+          exit $LASTEXITCODE
+      - name: Observe the baseline with diagnostics disabled
+        if: ${{ !cancelled() }}
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline-no-diagnostics $appearance --no-diagnostics --expect-cold-invisible
+          @{ exitCode=$LASTEXITCODE; sourceRevision='ccfce7d8a1c444517e1bc4f4d39992e30e29af1d'; diagnosticOnly=$true } | ConvertTo-Json | Set-Content artifacts/selection/baseline-no-diagnostics-exit.json
+          exit 0
+      - name: Verify the candidate with diagnostics disabled
+        if: ${{ !cancelled() }}
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/no-diagnostics $appearance --no-diagnostics
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-selection-${{ matrix.appearance }}
+          path: artifacts/selection/
+          retention-days: 30

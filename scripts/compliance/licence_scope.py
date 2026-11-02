@@ -77,6 +77,34 @@ def apply_find_caret_refresh(preserved, refresh):
     return result
 
 
+def apply_selection_sync_refresh(preserved, refresh):
+    # Only this native investigation's source and tracking notes may supersede
+    # their develop pins. Original evidence, notices and performance gates remain.
+    allowed = {
+        'docs/native/architecture-decisions.md', 'docs/native/functional-parity-matrix.md',
+        'docs/native/implementation-progress.md', 'docs/native/native-experience-improvements.md',
+        'docs/native/validation-report.md',
+        'src/native/LensDocsStudio.Native.Validation/NativeSelectionMappingChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/Program.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.xaml.cs',
+        'src/native/LensDocsStudio.Native/Rendering/DocumentPreview.cs',
+        'src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs',
+    }
+    require(refresh['baseCommit'] == 'ab21919a42ec8b3d17d9ba2e39b4e7e41459e206',
+            'Selection amendment must identify the inspected develop baseline')
+    require(set(refresh['files']) == allowed, 'Selection amendment must retain its exact reviewed path scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'Selection amendment changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'Selection amendment requires an exact canonical source digest: ' + path)
+        result[path] = entry['current']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -118,6 +146,8 @@ def main():
         preserved[path] = current
     refresh = json.loads((ROOT / 'docs/open-source/evidence/find-caret/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_find_caret_refresh(preserved, refresh)
+    selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_selection_sync_refresh(preserved, selection_refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

@@ -17,10 +17,15 @@ public static class PreviewNavigationService
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
+    // Keep the existing compiled entry point for paired validation of older products.
     public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
+        => BringIntoViewAsync(viewer, position, selectionEnd, diagnostic, null);
+
+    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd, Action<string>? diagnostic, Func<bool>? isCurrent)
     {
         viewer.VerifyAccess();
         var document = viewer.Document;
+        var viewingMode = viewer.ViewingMode; var zoom = viewer.Zoom;
         if (document is null || !position.IsInSameDocument(document.ContentStart)
             || selectionEnd is not null && !selectionEnd.IsInSameDocument(document.ContentStart)) return Task.FromResult(false);
         var state = States.GetOrCreateValue(viewer);
@@ -33,11 +38,22 @@ public static class PreviewNavigationService
 
         // Plain navigation may outlive deferred restoration of an empty reader caret.
         // Actual user input cancels Pending; a newer selected range always supersedes us.
-        bool Current() => !cancellation.IsCancellationRequested && viewer.Document == document
-            && position.IsInSameDocument(document.ContentStart)
-            && (originalSelectionStart is null || viewer.Selection is { } selection
+        bool Current()
+        {
+            if (cancellation.IsCancellationRequested || viewer.Document != document || viewer.ViewingMode != viewingMode
+                || viewer.Zoom != zoom || !(isCurrent?.Invoke() ?? true))
+            {
+                diagnostic?.Invoke($"obsolete: cancelled {cancellation.IsCancellationRequested}, document {viewer.Document == document}, mode {viewer.ViewingMode == viewingMode}, zoom {viewer.Zoom == zoom}");
+                return false;
+            }
+            var selectionCurrent = originalSelectionStart is null || viewer.Selection is { } selection
+                && selection.Start.IsInSameDocument(originalSelectionStart)
                 && (selectionEnd is null && originalSelectionEmpty && selection.IsEmpty
-                    || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0));
+                    || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0);
+            var current = position.IsInSameDocument(document.ContentStart) && selectionCurrent;
+            if (!current) diagnostic?.Invoke($"obsolete: cancelled {cancellation.IsCancellationRequested}, document {viewer.Document == document}, selection {selectionCurrent}");
+            return current;
+        }
 
         async Task<bool> Navigate()
         {
@@ -61,6 +77,13 @@ public static class PreviewNavigationService
                             selection.Select(position, selectionEnd);
                         }
                         BringIntoScrollView(scrolling, position, diagnostic);
+                        if (selectionEnd is not null && viewer.Selection is { } selected)
+                        {
+                            // ScrollToVerticalOffset queues arrange work. Paint
+                            // against its committed selection viewport.
+                            scrolling.UpdateLayout();
+                            if (!PreviewSelectionVisuals.Refresh(selected)) diagnostic?.Invoke("native selection visual is not ready");
+                        }
                         shown = true;
                     }, DispatcherPriority.Loaded);
                     return shown && !cancellation.IsCancellationRequested && viewer.Document == document;
@@ -88,6 +111,8 @@ public static class PreviewNavigationService
                     // The exact text position already chose the page. Bringing its parent
                     // paragraph into view would jump back to that paragraph's first page.
                     paged.UpdateLayout();
+                    if (selectionEnd is not null && viewer.Selection is { } selectedRange && !PreviewSelectionVisuals.Refresh(selectedRange))
+                        diagnostic?.Invoke("native selection visual is not ready");
                     selected = true;
                 }, DispatcherPriority.Loaded);
                 return selected && !cancellation.IsCancellationRequested && viewer.Document == document;

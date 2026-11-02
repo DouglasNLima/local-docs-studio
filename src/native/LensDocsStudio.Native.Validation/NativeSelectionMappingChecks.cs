@@ -84,6 +84,27 @@ internal static class NativeSelectionMappingChecks
             observations.Add(new { Coalesced = true, LineEnding = newline == "\n" ? "LF" : "CRLF", SourceSelection = true, NativeRtf = true });
         }
         Directory.CreateDirectory(output);
+        foreach (var newline in new[] { "\n", "\r\n" })
+        {
+            var table = SelectionTableFixture.Create(newline);
+            var preview = new NativeMarkdownRenderer(new NativeSvgService()).Render(new MarkdownService().Parse(table), false,
+                new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
+            foreach (var word in new[] { "planning", "within", "proposer", "RED", "validity", "Café 😀 é" })
+            for (var start = table.IndexOf(word, StringComparison.Ordinal); start >= 0; start = table.IndexOf(word, start + word.Length, StringComparison.Ordinal))
+            {
+                if (!preview.TextMap.TryPreviewRange(start, word.Length, out var from, out var to) || new TextRange(from!, to!).Text != word
+                    || !preview.TextMap.TrySourceRange(from!, to!, out var restored, out var length) || restored != start || length != word.Length)
+                    throw new IOException($"Table literal {word} at {start} lost its exact source occurrence ({newline.Length}-character newline).");
+            }
+            var cross = table.IndexOf("planning **planning** and *planning", StringComparison.Ordinal);
+            var crossLength = "planning **planning** and *planning".Length;
+            if (!preview.TextMap.TryPreviewRange(cross, crossLength, out var first, out var last)
+                || new TextRange(first!, last!).Text != "planning planning and planning")
+                throw new IOException("Cross-inline table selection did not preserve its exact visible text.");
+            var delimiter = table.IndexOf("**planning", StringComparison.Ordinal);
+            if (preview.TextMap.TryPreviewRange(delimiter, 2, out _, out _)) throw new IOException("A table delimiter claimed literal text mapping.");
+            observations.Add(new { Table = true, Rows = 15, Columns = 6, Newline = newline.Length, ExactRepeatedOccurrences = true, CrossInline = true, SyntaxRequiresSemanticFallback = true });
+        }
         File.WriteAllText(Path.Combine(output, "native-selection-mapping.json"), JsonSerializer.Serialize(new { Passed = true, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
