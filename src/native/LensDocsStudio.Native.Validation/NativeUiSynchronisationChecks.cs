@@ -36,6 +36,8 @@ internal static partial class NativeUiChecks
             foreach (var mode in new[] { "Continuous", "Pages" })
             {
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
+                Wait(() => (window.FindFirstDescendant(cf => cf.ByAutomationId("PreviewPageNumber")) is { IsOffscreen: false }) == (mode == "Pages"),
+                    "The native reader did not apply its requested reading mode.");
                 foreach (var row in new[] { 15, 1, 8, 2, 15, 1 })
                 foreach (var word in new[] { "planning", "within", "proposer", "RED", "validity" })
                 {
@@ -81,6 +83,7 @@ internal static partial class NativeUiChecks
                 observations.Add(new { Mode = mode, Input = "cross-inline-keyboard", SourceOffset = source.IndexOf(crossSource, StringComparison.Ordinal), SourceLength = crossSource.Length, Rendered = "planning planning and planning", ActionCount = 1 });
                 var zoom = window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Zoom in")));
                 zoom?.AsButton().Invoke();
+                Wait(() => Find(window, "PreviewZoomLabel").Name.Contains("110 percent", StringComparison.Ordinal), "Preview zoom did not reach 110 percent.", 2);
                 PrepareSource(Occurrence(editor, "validity", 2));
                 var zoomBox = Occurrence(editor, "validity", 2).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
                 var zoomWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -211,8 +214,10 @@ internal static partial class NativeUiChecks
             }
             void FocusPreview()
             {
-                var visible = preview.Patterns.Text.Pattern.GetVisibleRanges().SelectMany(range => range.GetBoundingRectangles())
-                    .First(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.Contains(rect));
+                System.Drawing.Rectangle visible = default;
+                Wait(() => (visible = preview.Patterns.Text.Pattern.GetVisibleRanges().SelectMany(range => range.GetBoundingRectangles())
+                    .FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.Contains(rect))).Width > 0,
+                    "Preview focus preparation has no visible native text.", 5);
                 Mouse.Click(new System.Drawing.Point((int)(visible.Left + Math.Min(4, visible.Width / 2)), (int)(visible.Top + visible.Height / 2)));
             }
         }

@@ -34,6 +34,17 @@ jobs:
           git worktree add --detach artifacts/selection-baseline-source ccfce7d8a1c444517e1bc4f4d39992e30e29af1d
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet build artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj -c Release -p:RestoreLockedMode=true
+      - name: Prove zoom invalidation with the identical probe against both product assemblies
+        run: |
+          $validation = 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows'
+          New-Item -ItemType Directory -Force artifacts/selection-baseline-probe | Out-Null
+          Copy-Item "$validation/*" artifacts/selection-baseline-probe -Recurse
+          Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.dll artifacts/selection-baseline-probe -Force
+          Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Core.dll artifacts/selection-baseline-probe -Force
+          & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-zoom-probe artifacts/selection/baseline-zoom --expect-obsolete
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & "$validation/LensDocsStudio.Native.Validation.exe" --selection-zoom-probe artifacts/selection/candidate-zoom
+          exit $LASTEXITCODE
       - name: Observe identical mouse operations against the diagnostic baseline
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }

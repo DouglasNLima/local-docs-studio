@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--selection-zoom-probe")
+        {
+            try { NativeSelectionNavigationChecks.RunZoomProbe(Path.GetFullPath(args[1]), args.Contains("--expect-obsolete")); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--selection-navigation")
         {
             try { NativeSelectionNavigationChecks.Run(Path.GetFullPath(args[1])); return 0; }

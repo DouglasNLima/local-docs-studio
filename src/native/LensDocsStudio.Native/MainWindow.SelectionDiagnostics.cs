@@ -16,11 +16,13 @@ public partial class MainWindow
             Directory.CreateDirectory(model.StateDirectory);
             File.AppendAllText(Path.Combine(model.StateDirectory, "selection-events.jsonl"), JsonSerializer.Serialize(new {
                 Operation = operation, At = System.Diagnostics.Stopwatch.GetTimestamp(),
+                Document = model.ActiveDocument?.Id, RenderedDocument = renderedDocumentId, Layout = model.Layout,
                 syncGeneration, pendingSync, applyingSyncOrigin, SyncCurrent, BothPanesVisible,
                 restoringNavigation, bindingViewport, pendingViewportDocument,
-                Start = Editor.SelectionStart, Length = Editor.SelectionLength,
+                Start = Editor.SelectionStart, Length = Editor.SelectionLength, Caret = Editor.CaretOffset,
                 EditorFocus = Editor.IsKeyboardFocusWithin, PreviewFocus = Preview.IsKeyboardFocusWithin,
                 Mouse = System.Windows.Input.Mouse.LeftButton.ToString(),
+                ReadingMode = Preview.ViewingMode.ToString(), Zoom = Preview.Zoom,
                 PreviewStart = Preview.Selection is { } selection && Preview.Document is { } document
                     && selection.Start.IsInSameDocument(document.ContentStart)
                     ? document.ContentStart.GetOffsetToPosition(selection.Start) : (int?)null

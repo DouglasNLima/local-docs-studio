@@ -12,6 +12,47 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeSelectionNavigationChecks
 {
+    // Reflection deliberately supports both the four-argument baseline API and
+    // candidate API, so the identical compiled probe can load either product DLL.
+    public static void RunZoomProbe(string output, bool expectObsoletePublication)
+    {
+        SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+        var app = Application.Current ?? new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        LensDocsStudio.Native.Platform.ThemeService.Apply(app.Resources, "Light");
+        var styles = new ResourceDictionary { Source = new Uri("pack://application:,,,/LensDocsStudio.Native;component/Rendering/DocumentPreview.xaml") };
+        var navigate = typeof(PreviewNavigationService).GetMethods().Single(method => method.Name == "BringIntoViewAsync"
+            && method.GetParameters()[0].ParameterType == typeof(FlowDocumentReader));
+        var observations = new List<object>(); var publishedAny = false;
+        foreach (var mode in new[] { "Continuous", "Pages" })
+        {
+            var run = new Run("planning planning"); var document = new FlowDocument(new Paragraph(run));
+            var viewer = new DocumentPreview { Style = (Style)styles["DocumentPreviewStyle"], Document = document };
+            viewer.ApplyReadingMode(mode);
+            using var host = new HwndSource(new HwndSourceParameters("Hidden exact-source zoom probe") {
+                Width = 850, Height = 550, WindowStyle = unchecked((int)0x80000000) });
+            host.RootVisual = viewer; Layout();
+            if (!Complete(Navigate(0))) throw new IOException("Zoom probe could not establish its original selection.");
+            var pending = Navigate(9); viewer.Zoom = 110; Layout();
+            var published = Complete(pending); publishedAny |= published;
+            observations.Add(new { Mode = mode, ZoomBefore = 100, ZoomAfter = viewer.Zoom, ObsoletePublished = published,
+                RenderedSelection = viewer.Selection?.Text, TextOffset = viewer.Selection is { } selection ? run.ContentStart.GetOffsetToPosition(selection.Start) : (int?)null });
+            Task<bool> Navigate(int offset)
+            {
+                object?[] parameters = [viewer, run.ContentStart.GetPositionAtOffset(offset), run.ContentStart.GetPositionAtOffset(offset + 8), null, null];
+                return (Task<bool>)navigate.Invoke(null, parameters.Take(navigate.GetParameters().Length).ToArray())!;
+            }
+            void Layout() { viewer.Measure(new Size(850, 550)); viewer.Arrange(new Rect(0, 0, 850, 550)); viewer.UpdateLayout(); }
+        }
+        var product = typeof(DocumentPreview).Assembly.Location;
+        Directory.CreateDirectory(output);
+        File.WriteAllText(Path.Combine(output, "zoom-probe.json"), JsonSerializer.Serialize(new {
+            ProductSha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(product))),
+            ProbeSha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(typeof(NativeSelectionNavigationChecks).Assembly.Location))),
+            ExpectObsoletePublication = expectObsoletePublication, ObsoletePublished = publishedAny, Observations = observations
+        }, new JsonSerializerOptions { WriteIndented = true }));
+        if (publishedAny != expectObsoletePublication) throw new IOException("Zoom probe did not produce its expected source-specific result.");
+    }
+
     // Hidden real WPF layout/dispatcher checks. Real mouse and OS appearance remain hosted.
     public static void Run(string output)
     {
