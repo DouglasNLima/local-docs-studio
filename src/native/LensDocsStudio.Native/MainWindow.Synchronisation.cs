@@ -62,6 +62,8 @@ public partial class MainWindow
         Preview.LayoutUpdated += PreviewLayoutUpdated;
         Editor.PreviewMouseWheel += UserScrollInput; Preview.PreviewMouseWheel += UserScrollInput;
         Editor.PreviewMouseDown += UserSelectionInput; Preview.PreviewMouseDown += UserSelectionInput;
+        Editor.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
+        Preview.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
         Closed += (_, _) =>
         {
             CancelSynchronisation(); syncTimer.Tick -= SyncTick;
@@ -71,6 +73,8 @@ public partial class MainWindow
             Preview.RemoveHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(PreviewScrollChanged));
             Editor.PreviewMouseWheel -= UserScrollInput; Preview.PreviewMouseWheel -= UserScrollInput;
             Editor.PreviewMouseDown -= UserSelectionInput; Preview.PreviewMouseDown -= UserSelectionInput;
+            Editor.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
+            Preview.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
         };
     }
@@ -80,6 +84,7 @@ public partial class MainWindow
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
         if (Preview.Selection != observedSelection)
         {
+            TraceSelection("preview-selection-hook");
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
             observedSelection = Preview.Selection;
             if (observedSelection is not null) observedSelection.Changed += PreviewSelectionChanged;
@@ -92,6 +97,7 @@ public partial class MainWindow
     }
     private void InstallSyncPreview(ITextSourceVersion version)
     {
+        TraceSelection("install-map");
         CancelSynchronisation(); renderedVersion = version;
         syncAnchors = rendered is null ? null : new(rendered);
         semanticHighlight?.Show(null);
@@ -154,6 +160,8 @@ public partial class MainWindow
     }
     private void UserSelectionInput(object sender, MouseButtonEventArgs e)
     { TraceSelection("mouse-down " + (ReferenceEquals(sender, Editor) ? "editor" : "preview")); CancelSynchronisation(); }
+    private void SelectionInputCompleted(object sender, MouseButtonEventArgs e)
+        => TraceSelection("mouse-up " + (ReferenceEquals(sender, Editor) ? "editor" : "preview"));
     private void EditorSelectionChanged(object? sender, EventArgs e)
     {
         TraceSelection("editor-selection-changed");

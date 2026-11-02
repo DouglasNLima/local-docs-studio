@@ -6,7 +6,7 @@ Engineering receipt — 2 November 2026. Draft PR [#74](https://github.com/Dougl
 
 **NO-GO while the reported intermittent first mouse-selection failure remains inconclusive.** A separate stale-navigation defect has been reproduced and corrected. It is not yet established as the cause of the user's reported behaviour. Hosted comparison and final-source validation are in progress.
 
-No merge, publication, signing or release is authorised. PR #73 is untouched. Existing SignPath, High Contrast, Continuous 250 ms and Native Stable blockers remain independent.
+No merge, publication, signing or release is authorised. Governance maintenance uses a separate amendment for the twelve changed frozen source/tracking files; the original Goal #62 evidence, Find amendment, licence scope and all unrelated trust/performance digests stay intact. The rights ledger retains existing classifications and introduces no new grant. PR #73 is untouched. Existing SignPath, High Contrast, Continuous 250 ms and Native Stable blockers remain independent.
 
 ## Investigation and before evidence
 
@@ -21,6 +21,8 @@ Hosted diagnostic attempts are retained separately:
 | `b2849f1`, [41437810215](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41437810215) | Preview UIA `SetFocus` rejected before source input | Harness failure; no product reproduction |
 | `ca668ff`, [41438356952](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41438356952) | First ten real mouse selections pass in normal and actual OS High Contrast; distant viewport preparation fails | Harness failure after ten successful operations; no product reproduction |
 | `ccfce7d`, [41439109310](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41439109310) | Same ten selections pass; preparing a distant caret fails | UIA selection does not move AvalonEdit's caret; subsequent Left uses the old caret |
+| `aeb9602`, [41440268944](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41440268944) | Scroll-percentage setup does not expose the target in baseline or candidate | Harness failure before selection; wrapped extent is not a fixed source-length proportion |
+| `84c5b01`, [41441389995](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41441389995) | All 30 double-clicks and one sustained drag pass in both binaries, normal and High Contrast | Keyboard fixture starts from the wrong caret after Left; source selection differs from its expectation, so this is not a mapping failure |
 
 The final harness prepares the source row through the app's existing explicit Find navigation, clicks visible preview text to establish focus and collapse its selection, then performs one completed double-click or drag. The pinned [AvalonEdit TextRangeProvider](https://github.com/icsharpcode/AvalonEdit/blob/862415d51eddc9eac93f462dbc522ffbf929cd52/ICSharpCode.AvalonEdit/Editing/TextRangeProvider.cs) confirms that UIA ScrollIntoView has no implementation and Select changes the selection without moving the caret. Scroll-percentage preparation also proved unreliable for the lazily measured wrapped extent; these setup failures remain recorded, not counted as selection defects. UIA text lookup is confined to test coordinates and expected endpoints. Observation polling never repeats the selection action.
 

@@ -61,14 +61,13 @@ internal static partial class NativeUiChecks
                 }
                 finally { Mouse.Up(MouseButton.Left); }
                 AssertSelection("planning", 2, "drag", dragWatch);
-                Keyboard.Type(VirtualKeyShort.LEFT); var keyWatch = System.Diagnostics.Stopwatch.StartNew();
+                ClickSourceStart(Occurrence(editor, "planning", 2)); var keyWatch = System.Diagnostics.Stopwatch.StartNew();
                 using (Keyboard.Pressing(VirtualKeyShort.SHIFT))
                     for (var character = 0; character < "planning".Length; character++) Keyboard.Type(VirtualKeyShort.RIGHT);
                 AssertSelection("planning", 2, "keyboard", keyWatch);
 
                 PrepareSource(Occurrence(editor, "planning", 1));
-                var crossBox = Occurrence(editor, "planning", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
-                DoubleClick(crossBox); Keyboard.Type(VirtualKeyShort.LEFT);
+                ClickSourceStart(Occurrence(editor, "planning", 1));
                 const string crossSource = "planning **planning** and *planning";
                 using (Keyboard.Pressing(VirtualKeyShort.SHIFT))
                     for (var character = 0; character < crossSource.Length; character++) Keyboard.Type(VirtualKeyShort.RIGHT);
@@ -147,10 +146,18 @@ internal static partial class NativeUiChecks
                 if (ReadEditorText(editor) != source) throw new IOException("Selection operation changed editor contents.");
                 observations.Add(new { Mode = modeName(), Input = input, Word = word, Occurrence = occurrence, SourceOffset = offset,
                     SourceLength = selectedSource.GetText(-1).Length, Rendered = preview.Patterns.Text.Pattern.GetSelection().Single().GetText(-1),
-                    Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true, ActionCount = 1 });
+                    Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true,
+                    ActionCount = input == "rapid-alternation" ? 2 : input == "rapid-settled" ? 0 : 1 });
             }
             string modeName() => Find(window, "PreviewReadingMode").AsComboBox().SelectedItem?.Text ?? "unknown";
             void DoubleClick(System.Drawing.Rectangle rectangle) => Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
+            void ClickSourceStart(FlaUI.Core.ITextRange target)
+            {
+                var rectangle = target.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.IntersectsWith(rect));
+                Mouse.Click(new System.Drawing.Point(rectangle.Left, rectangle.Top + rectangle.Height / 2));
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).Length == 0
+                    && range.CompareEndpoints(TextPatternRangeEndpoint.Start, target, TextPatternRangeEndpoint.Start) == 0), "Keyboard fixture did not start at its exact source boundary.", 2);
+            }
             void PrepareSource(FlaUI.Core.ITextRange target)
             {
                 // Use the app's existing explicit source navigation for setup. The

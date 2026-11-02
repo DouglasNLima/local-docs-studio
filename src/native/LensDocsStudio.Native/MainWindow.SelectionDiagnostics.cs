@@ -22,6 +22,7 @@ public partial class MainWindow
                 EditorFocus = Editor.IsKeyboardFocusWithin, PreviewFocus = Preview.IsKeyboardFocusWithin,
                 Mouse = System.Windows.Input.Mouse.LeftButton.ToString(),
                 PreviewStart = Preview.Selection is { } selection && Preview.Document is { } document
+                    && selection.Start.IsInSameDocument(document.ContentStart)
                     ? document.ContentStart.GetOffsetToPosition(selection.Start) : (int?)null
             }) + Environment.NewLine);
         }
