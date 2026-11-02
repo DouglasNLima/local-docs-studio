@@ -237,7 +237,7 @@ public partial class MainWindow
                     return;
                 }
                 result.RevealSource(start);
-                TraceSelection("map " + result.TextMap.TryPreviewRange(start, length, out _, out _));
+                if (selectionDiagnostics) TraceSelection("map " + result.TextMap.TryPreviewRange(start, length, out _, out _));
                 if (result.TextMap.TryPreviewRange(start, length, out var from, out var to) && Preview.Selection is { } target)
                 {
                     semanticHighlight?.Show(null);

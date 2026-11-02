@@ -4,7 +4,6 @@
 
 Draft PR #74 investigates first-operation WPF selection synchronisation. Exact repeated-table mapping passes; a queued selection surviving zoom is independently reproduced and corrected. The reported intermittent mouse failure remains unconfirmed: **NO-GO**, pending hosted comparison and final-source checks. The 60 ms timer and 250 ms Continuous gate are unchanged. See the [engineering receipt](editor-preview-selection-reliability.md); PR #73 and existing release blockers remain independent.
 
-
 ## Find editor caret stability â€” 1 November 2026
 
 Search refresh is passive during editing; explicit navigation and still-focused query changes own result selection. The native 180 ms debounce and existing release/performance decisions remain unchanged. See the [focused Web/Native correction and validation receipt](../release/find-editor-caret-stability.md); final-source hosted evidence and approval remain recorded on its Draft PR.
@@ -81,7 +80,7 @@ official .NET 10/WPF are unchanged. Stock Continuous timing remains paused and .
 unresolved; no new performance acceptance is claimed.
 
 
-## Fourteen native Mermaid editors ï¿½ Expansion III
+## Fourteen native Mermaid editors — Expansion III
 
 XY Chart, Radar and Sankey add category comparisons, positional profiles and weighted
 flows through the shared source editor, canonical native output and owner Apply

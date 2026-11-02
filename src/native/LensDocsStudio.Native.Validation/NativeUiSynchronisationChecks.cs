@@ -62,8 +62,23 @@ internal static partial class NativeUiChecks
                 finally { Mouse.Up(MouseButton.Left); }
                 AssertSelection("planning", 2, "drag", dragWatch);
                 Keyboard.Type(VirtualKeyShort.LEFT); var keyWatch = System.Diagnostics.Stopwatch.StartNew();
-                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.RIGHT);
-                AssertSelection("planning", 2, "keyboard", keyWatch, allowTrailingSpace: true);
+                using (Keyboard.Pressing(VirtualKeyShort.SHIFT))
+                    for (var character = 0; character < "planning".Length; character++) Keyboard.Type(VirtualKeyShort.RIGHT);
+                AssertSelection("planning", 2, "keyboard", keyWatch);
+
+                PrepareSource(Occurrence(editor, "planning", 1));
+                var crossBox = Occurrence(editor, "planning", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                DoubleClick(crossBox); Keyboard.Type(VirtualKeyShort.LEFT);
+                const string crossSource = "planning **planning** and *planning";
+                using (Keyboard.Pressing(VirtualKeyShort.SHIFT))
+                    for (var character = 0; character < crossSource.Length; character++) Keyboard.Type(VirtualKeyShort.RIGHT);
+                var crossExpected = Occurrence(preview, "planning planning and planning", 1);
+                Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "planning planning and planning"
+                    && range.CompareEndpoints(TextPatternRangeEndpoint.Start, crossExpected, TextPatternRangeEndpoint.Start) == 0
+                    && range.CompareEndpoints(TextPatternRangeEndpoint.End, crossExpected, TextPatternRangeEndpoint.End) == 0), "Cross-inline keyboard selection did not map to its exact table cell.", 2);
+                if (!editor.Properties.HasKeyboardFocus.Value || editor.Patterns.Text.Pattern.GetSelection().Single().GetText(-1) != crossSource)
+                    throw new IOException("Cross-inline keyboard selection lost source endpoints or editor focus.");
+                observations.Add(new { Mode = mode, Input = "cross-inline-keyboard", SourceOffset = source.IndexOf(crossSource, StringComparison.Ordinal), SourceLength = crossSource.Length, Rendered = "planning planning and planning", ActionCount = 1 });
                 var zoom = window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Zoom in")));
                 zoom?.AsButton().Invoke();
                 PrepareSource(Occurrence(editor, "validity", 2));
@@ -114,12 +129,12 @@ internal static partial class NativeUiChecks
             Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Observations = observations, SourceBytesPreserved = true, SelectionActionRetries = 0 });
             return 0;
 
-            void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch, bool allowTrailingSpace = false)
+            void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch)
             {
                 var expected = Occurrence(preview, word, occurrence);
                 bool Matches(FlaUI.Core.ITextRange selected) => selected.CompareEndpoints(TextPatternRangeEndpoint.Start, expected, TextPatternRangeEndpoint.Start) == 0
-                    && (allowTrailingSpace ? selected.GetText(-1).TrimEnd() == word : selected.CompareEndpoints(TextPatternRangeEndpoint.End, expected, TextPatternRangeEndpoint.End) == 0);
-                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => allowTrailingSpace ? selected.GetText(-1).TrimEnd() == word : selected.GetText(-1) == word), "The single mouse/keyboard operation did not select its source word.", 2);
+                    && selected.CompareEndpoints(TextPatternRangeEndpoint.End, expected, TextPatternRangeEndpoint.End) == 0;
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == word), "The single mouse/keyboard operation did not select its source word.", 2);
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(Matches), $"Single {input} failed: {modeName()} {word} occurrence {occurrence}.", 2);
                 var selectedSource = editor.Patterns.Text.Pattern.GetSelection().Single();
                 var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, selectedSource, TextPatternRangeEndpoint.Start);
@@ -138,16 +153,19 @@ internal static partial class NativeUiChecks
             void DoubleClick(System.Drawing.Rectangle rectangle) => Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
             void PrepareSource(FlaUI.Core.ITextRange target)
             {
+                // Use the app's existing explicit source navigation for setup. The
+                // pinned AvalonEdit UIA ScrollIntoView is a no-op; its Select also
+                // leaves the caret behind, and wrapped extents are estimated lazily.
+                var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, target, TextPatternRangeEndpoint.Start);
+                var offset = prefix.GetText(-1).Length; var lineStart = source.LastIndexOf('\n', Math.Max(0, offset - 1)) + 1;
+                var rowId = source.Substring(lineStart + 2, 4);
+                editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+                Find(window, "FindText").AsTextBox().Text = rowId; Keyboard.Type(VirtualKeyShort.RETURN);
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == rowId), "Explicit source-row navigation did not complete.");
+                Keyboard.Type(VirtualKeyShort.ESCAPE);
+                Wait(() => target.GetBoundingRectangles().Any(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.IntersectsWith(rect)), "Source viewport preparation did not expose its target.", 2);
                 FocusPreview();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0), "Preview focus click did not clear the preparatory selection.", 2);
-                // AvalonEdit's UIA Select does not move its caret; ScrollIntoView is
-                // also ineffective for distant wrapped lines. Use its real scroll
-                // pattern solely to prepare geometry, without selecting any text.
-                var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, target, TextPatternRangeEndpoint.Start);
-                var scroll = editor.Patterns.Scroll.Pattern; var viewSize = scroll.VerticalViewSize.Value;
-                var percent = Math.Clamp((100d * prefix.GetText(-1).Length / source.Length - viewSize / 2) / Math.Max(1, 100 - viewSize) * 100, 0, 100);
-                scroll.SetScrollPercent(-1, percent);
-                Wait(() => target.GetBoundingRectangles().Any(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.IntersectsWith(rect)), "Source viewport preparation did not expose its target.", 2);
             }
             void FocusPreview()
             {

@@ -22,7 +22,7 @@ Hosted diagnostic attempts are retained separately:
 | `ca668ff`, [41438356952](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41438356952) | First ten real mouse selections pass in normal and actual OS High Contrast; distant viewport preparation fails | Harness failure after ten successful operations; no product reproduction |
 | `ccfce7d`, [41439109310](https://github.com/DouglasNLima/local-docs-studio/actions/runs/41439109310) | Same ten selections pass; preparing a distant caret fails | UIA selection does not move AvalonEdit's caret; subsequent Left uses the old caret |
 
-The final harness prepares source geometry using the existing scroll pattern, clicks visible preview text to establish focus and collapse its selection, then performs one completed double-click or drag. UIA text lookup is confined to test coordinates and expected endpoints. Observation polling never repeats the selection action.
+The final harness prepares the source row through the app's existing explicit Find navigation, clicks visible preview text to establish focus and collapse its selection, then performs one completed double-click or drag. The pinned [AvalonEdit TextRangeProvider](https://github.com/icsharpcode/AvalonEdit/blob/862415d51eddc9eac93f462dbc522ffbf929cd52/ICSharpCode.AvalonEdit/Editing/TextRangeProvider.cs) confirms that UIA ScrollIntoView has no implementation and Select changes the selection without moving the caret. Scroll-percentage preparation also proved unreliable for the lazily measured wrapped extent; these setup failures remain recorded, not counted as selection defects. UIA text lookup is confined to test coordinates and expected endpoints. Observation polling never repeats the selection action.
 
 An independent hidden WPF reader check reproduces **queued selection surviving a zoom change**: queue `BringIntoViewAsync`, change `Zoom`, pump the real dispatcher, and observe that the obsolete request returns true. The old request checks cancellation, document identity and the destination selection snapshot; it does not check zoom or reading-mode identity. `DocumentPreview` previously queued fitting without cancelling navigation. The before check fails at `Continuous: Zoom invalidates queued selection` after passing newest-occurrence, explicit cancellation and view replacement checks.
 
@@ -42,10 +42,10 @@ For syntax-only selections or unmappable transformed endpoints, collapse the pre
 
 - Local Release build: zero warnings/errors (isolated output used while the earlier corpus process held its binaries).
 - Core: 2,298 passed, zero skipped.
-- Existing native corpus: 202 diagram/export cases, zero failures.
+- Existing native corpus before and after the navigation correction: 202 diagram/export cases each, zero failures.
 - Static web integrity: passed.
 - Browser regressions: 278 Chromium/Edge checks passed.
-- Focused navigation checks after correction: pending final expanded run.
+- Focused navigation checks after correction: 16 passed across Continuous and Pages, including validity rechecks after deferral, zoom/view changes, render replacement and exact repeated occurrences.
 - Hosted normal/actual Windows High Contrast comparison: pending.
 - Continuous performance acceptance: unchanged 250 ms threshold; final hosted result pending and reported independently.
 
