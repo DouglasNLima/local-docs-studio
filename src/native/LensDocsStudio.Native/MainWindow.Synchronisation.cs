@@ -152,9 +152,11 @@ public partial class MainWindow
         CancelSynchronisation();
         if (DesktopState.SyncScroll && BothPanesVisible) QueueSynchronisation(ReferenceEquals(sender, Editor) ? "editor-scroll" : "preview-scroll");
     }
-    private void UserSelectionInput(object sender, MouseButtonEventArgs e) => CancelSynchronisation();
+    private void UserSelectionInput(object sender, MouseButtonEventArgs e)
+    { TraceSelection("mouse-down " + (ReferenceEquals(sender, Editor) ? "editor" : "preview")); CancelSynchronisation(); }
     private void EditorSelectionChanged(object? sender, EventArgs e)
     {
+        TraceSelection("editor-selection-changed");
         if (BothPanesVisible && DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin) QueueFocusedSynchronisation("editor-selection");
     }
     private void EditorCaretChanged(object? sender, EventArgs e)
@@ -184,6 +186,7 @@ public partial class MainWindow
     }
     private void QueueSynchronisation(string origin)
     {
+        TraceSelection("queue " + origin);
         if (restoringNavigation || bindingViewport || pendingViewportDocument is not null || !SyncCurrent) return;
         if (pendingSync?.EndsWith("selection", StringComparison.Ordinal) == true && origin.EndsWith("scroll", StringComparison.Ordinal)) return;
         pendingSync = origin;
@@ -207,6 +210,7 @@ public partial class MainWindow
     }
     private async void SyncTick(object? sender, EventArgs e)
     {
+        TraceSelection("timer");
         syncTimer.Stop(); var origin = pendingSync; pendingSync = null;
         if (restoringNavigation || origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
         var generation = ++syncGeneration; var result = rendered!;
@@ -231,8 +235,9 @@ public partial class MainWindow
                     return;
                 }
                 result.RevealSource(start);
+                TraceSelection("map " + result.TextMap.TryPreviewRange(start, length, out _, out _));
                 if (result.TextMap.TryPreviewRange(start, length, out var from, out var to) && Preview.Selection is { } target)
-                { semanticHighlight?.Show(null); await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!); }
+                { semanticHighlight?.Show(null); var shown = await PreviewNavigationService.BringIntoViewAsync(Preview, from!, to!); TraceSelection("navigation " + shown); }
                 else if (syncAnchors?.AtSource(start) is { } block)
                 {
                     Preview.Selection?.Select(block.ContentStart, block.ContentStart);

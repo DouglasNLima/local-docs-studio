@@ -17,6 +17,13 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--selection-interactions")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Real selection mouse input requires a disposable GitHub-hosted Windows runner."); return 1; }
+            return NativeUiChecks.RunSelectionInteractions(args[1], args[2], args.Contains("--high-contrast"));
+        }
         if (args.FirstOrDefault() is "--arrangement-latency" or "--arrangement-coordinates" or "--arrangement-observe")
         {
             try

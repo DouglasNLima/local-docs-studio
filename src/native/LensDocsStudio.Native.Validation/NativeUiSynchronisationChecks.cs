@@ -9,6 +9,113 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
+    // Real OS input is restricted by Program to disposable hosted Windows runners.
+    public static int RunSelectionInteractions(string executable, string output, bool highContrast) => Task.Run(() =>
+    {
+        output = Path.GetFullPath(output); Directory.CreateDirectory(output);
+        using var clipboard = NativeUiClipboard.Start();
+        using var contrast = highContrast ? new NativeTestHighContrast() : null;
+        using var automation = new FlaUI.UIA3.UIA3Automation();
+        var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
+        File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(
+            AutomaticUpdateChecks: false, Theme: "Light", Desktop: new(ShowSidebar: false, FollowCaret: true, SyncScroll: true, SyncSelection: true))));
+        var source = SelectionTableFixture.Create(); var path = Path.Combine(output, "table.md"); File.WriteAllText(path, source);
+        var saved = File.ReadAllBytes(path); var observations = new List<object>();
+        var info = new System.Diagnostics.ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
+        info.Environment["LENS_NATIVE_SELECTION_DIAGNOSTICS"] = "1";
+        foreach (var argument in new[] { "--state-directory", state, path }) info.ArgumentList.Add(argument);
+        using var app = FlaUI.Core.Application.Launch(info); Window? window = null;
+        try
+        {
+            window = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Selection fixture window missing.");
+            FocusWindow(window); var editor = Find(window, "MarkdownEditor"); var preview = Find(window, "DocumentPreview");
+            _ = editor.FindAllDescendants();
+            Wait(() => ReadEditorText(editor) == source && Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "Selection table did not render.");
+            if (highContrast && !NativeTestHighContrast.IsEnabledNow) throw new IOException("Actual Windows High Contrast is required.");
+            foreach (var mode in new[] { "Continuous", "Pages" })
+            {
+                var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
+                foreach (var row in new[] { 1, 2, 8, 15, 2, 1 })
+                foreach (var word in new[] { "planning", "within", "proposer", "RED", "validity" })
+                {
+                    var occurrence = (row - 1) * (word == "planning" ? 4 : word == "within" ? 3 : word == "validity" ? 3 : 2) + 2;
+                    // Heading capitalisation differs, so literal case-sensitive counts start in row Q-01.
+                    var target = Occurrence(editor, word, occurrence); target.ScrollIntoView(true);
+                    var rectangle = target.GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0 && editor.BoundingRectangle.IntersectsWith(box));
+                    // Start with keyboard focus in the actual preview. No editor Focus/Select
+                    // call precedes this single completed mouse word-selection operation.
+                    preview.Focus();
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    Mouse.DoubleClick(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
+                    AssertSelection(word, occurrence, "double-click", watch);
+                }
+                // A single drag, followed by keyboard selection, at a repeated occurrence.
+                var dragTarget = Occurrence(editor, "planning", 2); dragTarget.ScrollIntoView(true);
+                var box = dragTarget.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                preview.Focus(); var dragWatch = System.Diagnostics.Stopwatch.StartNew();
+                Mouse.MoveTo((int)box.Left, (int)(box.Top + box.Height / 2)); Mouse.Down(MouseButton.Left);
+                try { Mouse.MoveTo((int)box.Right, (int)(box.Top + box.Height / 2)); }
+                finally { Mouse.Up(MouseButton.Left); }
+                AssertSelection("planning", 2, "drag", dragWatch);
+                Keyboard.Type(VirtualKeyShort.LEFT); var keyWatch = System.Diagnostics.Stopwatch.StartNew();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.RIGHT);
+                AssertSelection("planning", 2, "keyboard", keyWatch, allowTrailingSpace: true);
+                var zoom = window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Zoom in")));
+                zoom?.AsButton().Invoke();
+                Occurrence(editor, "validity", 2).ScrollIntoView(true);
+                var zoomBox = Occurrence(editor, "validity", 2).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                preview.Focus(); var zoomWatch = System.Diagnostics.Stopwatch.StartNew();
+                Mouse.DoubleClick(new System.Drawing.Point((int)(zoomBox.Left + zoomBox.Width / 2), (int)(zoomBox.Top + zoomBox.Height / 2)));
+                AssertSelection("validity", 2, "zoom", zoomWatch);
+                Find(window, "PreviewZoomLabel").AsButton().Invoke();
+            }
+            if (ReadEditorText(editor) != source || !saved.SequenceEqual(File.ReadAllBytes(path))) throw new IOException("Selection input changed source contents.");
+            window.CaptureToFile(Path.Combine(output, "selection-table.png"));
+            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Observations = observations, SourceBytesPreserved = true, SelectionActionRetries = 0 });
+            return 0;
+
+            void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch, bool allowTrailingSpace = false)
+            {
+                var expected = Occurrence(preview, word, occurrence);
+                bool Matches(FlaUI.Core.ITextRange selected) => selected.CompareEndpoints(TextPatternRangeEndpoint.Start, expected, TextPatternRangeEndpoint.Start) == 0
+                    && (allowTrailingSpace ? selected.GetText(-1).TrimEnd() == word : selected.CompareEndpoints(TextPatternRangeEndpoint.End, expected, TextPatternRangeEndpoint.End) == 0);
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => allowTrailingSpace ? selected.GetText(-1).TrimEnd() == word : selected.GetText(-1) == word), "The single mouse/keyboard operation did not select its source word.", 2);
+                Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(Matches), $"Single {input} failed: {modeName()} {word} occurrence {occurrence}.", 2);
+                var selectedSource = editor.Patterns.Text.Pattern.GetSelection().Single();
+                var prefix = editor.Patterns.Text.Pattern.DocumentRange.Clone(); prefix.MoveEndpointByRange(TextPatternRangeEndpoint.End, selectedSource, TextPatternRangeEndpoint.Start);
+                var offset = prefix.GetText(-1).Length;
+                var expectedSource = Occurrence(editor, word, occurrence);
+                if (selectedSource.CompareEndpoints(TextPatternRangeEndpoint.Start, expectedSource, TextPatternRangeEndpoint.Start) != 0
+                    || !editor.Properties.HasKeyboardFocus.Value) throw new IOException("Selection occurrence or originating editor focus changed.");
+                var geometry = preview.Patterns.Text.Pattern.GetSelection().SelectMany(range => range.GetBoundingRectangles()).ToArray();
+                if (!geometry.Any(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.IntersectsWith(rect))) throw new IOException("Selected preview occurrence has no visible geometry.");
+                if (ReadEditorText(editor) != source) throw new IOException("Selection operation changed editor contents.");
+                observations.Add(new { Mode = modeName(), Input = input, Word = word, Occurrence = occurrence, SourceOffset = offset,
+                    SourceLength = selectedSource.GetText(-1).Length, Rendered = preview.Patterns.Text.Pattern.GetSelection().Single().GetText(-1),
+                    Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true, ActionCount = 1 });
+            }
+            string modeName() => Find(window, "PreviewReadingMode").AsComboBox().SelectedItem?.Text ?? "unknown";
+        }
+        catch (Exception error)
+        {
+            window?.CaptureToFile(Path.Combine(output, "selection-table-failure.png"));
+            Write(new { Passed = false, Error = error.ToString(), Observations = observations, SelectionActionRetries = 0 });
+            return 1;
+        }
+        finally { if (!app.HasExited) app.Kill(); }
+        void Write(object value) => File.WriteAllText(Path.Combine(output, "selection-interactions.json"), JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }));
+        static FlaUI.Core.ITextRange Occurrence(AutomationElement pane, string word, int occurrence)
+        {
+            var remaining = pane.Patterns.Text.Pattern.DocumentRange.Clone(); FlaUI.Core.ITextRange? match = null;
+            for (var i = 0; i < occurrence; i++)
+            {
+                match = remaining.FindText(word, false, false) ?? throw new IOException($"Missing {word} occurrence {occurrence}.");
+                remaining.MoveEndpointByRange(TextPatternRangeEndpoint.Start, match, TextPatternRangeEndpoint.End);
+            }
+            return match!;
+        }
+    }).GetAwaiter().GetResult();
+
     private static void CheckSynchronisation(Window window, AutomationElement editor, string state, string output, string source)
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);
