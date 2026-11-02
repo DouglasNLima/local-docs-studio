@@ -10,10 +10,11 @@ namespace LensDocsStudio.Native.Validation;
 internal static partial class NativeUiChecks
 {
     // Real OS input is restricted by Program to disposable hosted Windows runners.
-    public static int RunSelectionInteractions(string executable, string output, bool highContrast) => Task.Run(() =>
+    public static int RunSelectionInteractions(string executable, string output, bool highContrast, bool diagnostics = true) => Task.Run(() =>
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         using var clipboard = NativeUiClipboard.Start();
+        var previousClipboard = NativeUiClipboard.GetDataObject(); uint ownedClipboard = 0;
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         using var automation = new FlaUI.UIA3.UIA3Automation();
         var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
@@ -22,7 +23,7 @@ internal static partial class NativeUiChecks
         var source = SelectionTableFixture.Create(); var path = Path.Combine(output, "table.md"); File.WriteAllText(path, source);
         var saved = File.ReadAllBytes(path); var observations = new List<object>();
         var info = new System.Diagnostics.ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
-        info.Environment["LENS_NATIVE_SELECTION_DIAGNOSTICS"] = "1";
+        info.Environment["LENS_NATIVE_SELECTION_DIAGNOSTICS"] = diagnostics ? "1" : "0";
         foreach (var argument in new[] { "--state-directory", state, path }) info.ArgumentList.Add(argument);
         using var app = FlaUI.Core.Application.Launch(info); Window? window = null;
         try
@@ -100,7 +101,8 @@ internal static partial class NativeUiChecks
                 // navigation, then select its new literal after preview regeneration.
                 PrepareSource(Occurrence(editor, "planning", 1));
                 var editBox = Occurrence(editor, "planning", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
-                DoubleClick(editBox); Keyboard.Type("revised");
+                DoubleClick(editBox); NativeUiClipboard.SetText("revised"); ownedClipboard = GetClipboardSequenceNumber();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
                 var original = source; var changedAt = source.IndexOf("planning", StringComparison.Ordinal);
                 source = source.Remove(changedAt, 8).Insert(changedAt, "revised");
                 Wait(() => ReadEditorText(editor) == source && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("revised", StringComparison.Ordinal), "Source edit during pending navigation did not regenerate the preview.");
@@ -113,7 +115,10 @@ internal static partial class NativeUiChecks
 
                 // Syntax-only selections must remove literal highlighting and identify
                 // the source block rather than reuse a previous matching word.
-                PrepareSource(Occurrence(editor, "**", 1));
+                PrepareSource(Occurrence(editor, "planning", 2));
+                var beforeSyntax = Occurrence(editor, "planning", 2).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                var syntaxWatch = System.Diagnostics.Stopwatch.StartNew(); DoubleClick(beforeSyntax);
+                AssertSelection("planning", 2, "before-syntax", syntaxWatch);
                 var syntax = Occurrence(editor, "**", 1).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
                 Mouse.MoveTo((int)syntax.Left, (int)(syntax.Top + syntax.Height / 2)); Mouse.Down(MouseButton.Left);
                 try { Mouse.MoveTo((int)syntax.Right, (int)(syntax.Top + syntax.Height / 2)); }
@@ -122,10 +127,40 @@ internal static partial class NativeUiChecks
                     && preview.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0)
                     && Find(window, "Status").Name == "Selection synchronised as a preview block.", "Syntax-only selection did not use its semantic block fallback.", 2);
                 observations.Add(new { Mode = mode, Input = "syntax-drag", ExactSource = "**", PreviewLiteralCleared = true, SemanticFallback = true, ActionCount = 1 });
+
+                // Preserve the reverse direction using a real preview drag as well.
+                var reverse = Occurrence(preview, "RED", 2);
+                if (!reverse.GetBoundingRectangles().Any(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.Contains(rect)))
+                    reverse.ScrollIntoView(true);
+                System.Drawing.Rectangle reverseBox = default;
+                Wait(() => (reverseBox = reverse.GetBoundingRectangles().FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.Contains(rect))).Width > 0,
+                    "Reverse-selection fixture has no visible preview text.", 2);
+                Mouse.MoveTo(reverseBox.Left, reverseBox.Top + reverseBox.Height / 2); Mouse.Down(MouseButton.Left);
+                try { Mouse.MoveTo(reverseBox.Right, reverseBox.Top + reverseBox.Height / 2); }
+                finally { Mouse.Up(MouseButton.Left); }
+                var reverseFocus = automation.FocusedElement(); var reverseSource = Occurrence(editor, "RED", 2);
+                Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "RED"
+                    && range.CompareEndpoints(TextPatternRangeEndpoint.Start, reverseSource, TextPatternRangeEndpoint.Start) == 0
+                    && range.CompareEndpoints(TextPatternRangeEndpoint.End, reverseSource, TextPatternRangeEndpoint.End) == 0), "Preview drag lost its exact source occurrence.", 2);
+                if (!automation.Compare(reverseFocus, automation.FocusedElement()) || editor.Properties.HasKeyboardFocus.Value)
+                    throw new IOException("Preview-to-editor drag stole its originating preview focus.");
+                observations.Add(new { Mode = mode, Input = "preview-drag", ExactRepeatedOccurrence = true, FocusRetained = true, ActionCount = 1 });
+
+                PrepareSource(Occurrence(editor, "planning", 2));
+                var replacementBox = Occurrence(editor, "planning", 2).GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0);
+                DoubleClick(replacementBox); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                Wait(() => ReadEditorText(editor).Length == 0 && !preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Q-15", StringComparison.Ordinal), "Replacement document did not receive its own preview.");
+                Thread.Sleep(180);
+                if (editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).Length > 0)
+                    || preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).Length > 0)) throw new IOException("Obsolete selection reached the replacement document.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                Wait(() => ReadEditorText(editor) == source && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Q-15", StringComparison.Ordinal), "Original document did not return after cancellation.");
+                observations.Add(new { Mode = mode, Input = "document-replacement", ObsoleteSelectionRejected = true, OriginalSourceRetained = true });
             }
             if (ReadEditorText(editor) != source || !saved.SequenceEqual(File.ReadAllBytes(path))) throw new IOException("Selection input changed source contents.");
             window.CaptureToFile(Path.Combine(output, "selection-table.png"));
-            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Observations = observations, SourceBytesPreserved = true, SelectionActionRetries = 0 });
+            if (!diagnostics && File.Exists(Path.Combine(state, "selection-events.jsonl"))) throw new IOException("Disabled selection diagnostics still wrote an event log.");
+            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Diagnostics = diagnostics, Observations = observations, SourceBytesPreserved = true, SelectionActionRetries = 0 });
             return 0;
 
             void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch)
@@ -184,10 +219,10 @@ internal static partial class NativeUiChecks
         catch (Exception error)
         {
             window?.CaptureToFile(Path.Combine(output, "selection-table-failure.png"));
-            Write(new { Passed = false, Error = error.ToString(), Observations = observations, SelectionActionRetries = 0 });
+            Write(new { Passed = false, Error = error.ToString(), Diagnostics = diagnostics, Observations = observations, SelectionActionRetries = 0 });
             return 1;
         }
-        finally { if (!app.HasExited) app.Kill(); }
+        finally { if (!app.HasExited) app.Kill(); RestoreClipboard(previousClipboard, ownedClipboard); }
         void Write(object value) => File.WriteAllText(Path.Combine(output, "selection-interactions.json"), JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }));
         static FlaUI.Core.ITextRange Occurrence(AutomationElement pane, string word, int occurrence)
         {

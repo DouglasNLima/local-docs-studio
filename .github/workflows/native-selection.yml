@@ -45,6 +45,19 @@ jobs:
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/interactions $appearance
           exit $LASTEXITCODE
+      - name: Observe the baseline with diagnostics disabled
+        if: ${{ !cancelled() }}
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline-no-diagnostics $appearance --no-diagnostics
+          @{ exitCode=$LASTEXITCODE; sourceRevision='ccfce7d8a1c444517e1bc4f4d39992e30e29af1d'; diagnosticOnly=$true } | ConvertTo-Json | Set-Content artifacts/selection/baseline-no-diagnostics-exit.json
+          exit 0
+      - name: Verify the candidate with diagnostics disabled
+        if: ${{ !cancelled() }}
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/no-diagnostics $appearance --no-diagnostics
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -28,11 +28,11 @@
     },
     "src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs": {
       "previous": "64dd397a74eac792bfab7a474b49a8ed948d76444021c35c48b4debe760cc8ca",
-      "current": "77bb7371ed0a54196beb2d85c007322d02d420b329543cf07eaa7cd08d3381c9"
+      "current": "1dc978755b2664ba82a95307a68222f67c57767dc62337fe56d94095a647182f"
     },
     "src/native/LensDocsStudio.Native.Validation/Program.cs": {
       "previous": "00288b43cf8bddcd82f53c4befbb2428f8bb32b3d05eff65dbfec8b6fc295ddf",
-      "current": "3483200b017d1049b3e228c32eddad5c998eb28ce80c59f1e1b0c234a685d235"
+      "current": "996d3a1a12d0fa92bdacd7f505baa8bd71b6ba4cb614e1da4edd959d23e1e7d0"
     },
     "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
       "previous": "76aa1d383f20a096822b7691138e620d5debd9a21e066f8a1209a3dd233606ca",
