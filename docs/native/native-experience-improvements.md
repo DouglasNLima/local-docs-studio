@@ -2,7 +2,7 @@
 
 ## Editor-to-preview selection reliability â€” 2 November 2026
 
-Draft PR #74 corrects independently reproduced obsolete preview navigation and adds real mouse/focus coverage. The reported intermittent first-selection defect remains unconfirmed: **NO-GO**. Baseline and candidate passed 480 single completed word double-clicks across Continuous/Pages, normal/actual OS High Contrast and diagnostics on/off. The 60 ms timer and 250 ms gate are unchanged; performance acceptance remains failed. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). PR #73 and existing release blockers remain independent.
+Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.
 
 ## Original SPC acceptance - 28 October 2026
 
@@ -50,7 +50,7 @@ source and package attribution. Stock Continuous timing is paused; .749 remains
 unresolved. No production signing or public release is authorised.
 
 
-## Fourteen native Mermaid editors — Expansion III
+## Fourteen native Mermaid editors ï¿½ Expansion III
 
 XY Chart, Radar and Sankey add category comparisons, positional profiles and weighted
 flows through the shared source editor, canonical native output and owner Apply

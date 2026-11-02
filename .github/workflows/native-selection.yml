@@ -27,8 +27,7 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-mapping artifacts/selection/mapping
       - name: Verify dispatcher cancellation and exact navigation
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-navigation artifacts/selection/navigation
-      # The visual probe observes an unresolved cold-highlight anomaly; a
-      # successful probe validates the correlation, not first-selection repair.
+      # Verify actual paint before the preview has ever had focus.
       - name: Correlate cold logical selection with actual screen pixels
         if: matrix.appearance == 'normal'
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --selection-visual artifacts/selection/visual-candidate
@@ -47,7 +46,7 @@ jobs:
           Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.dll artifacts/selection-baseline-probe -Force
           Copy-Item artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Core.dll artifacts/selection-baseline-probe -Force
           if ('${{ matrix.appearance }}' -eq 'normal') {
-            & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-visual artifacts/selection/visual-baseline
+            & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-visual artifacts/selection/visual-baseline --expect-cold-invisible
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
           & artifacts/selection-baseline-probe/LensDocsStudio.Native.Validation.exe --selection-zoom-probe artifacts/selection/baseline-zoom --expect-obsolete
@@ -57,7 +56,7 @@ jobs:
       - name: Observe identical mouse operations against the diagnostic baseline
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
-          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline $appearance
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline $appearance --expect-cold-invisible
           @{ exitCode=$LASTEXITCODE; sourceRevision='ccfce7d8a1c444517e1bc4f4d39992e30e29af1d'; diagnosticOnly=$true } | ConvertTo-Json | Set-Content artifacts/selection/baseline-exit.json
           exit 0
       - name: Exercise single completed mouse selections and focus transitions
@@ -69,7 +68,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
-          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline-no-diagnostics $appearance --no-diagnostics
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --selection-interactions artifacts/selection-baseline-source/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/selection/baseline-no-diagnostics $appearance --no-diagnostics --expect-cold-invisible
           @{ exitCode=$LASTEXITCODE; sourceRevision='ccfce7d8a1c444517e1bc4f4d39992e30e29af1d'; diagnosticOnly=$true } | ConvertTo-Json | Set-Content artifacts/selection/baseline-no-diagnostics-exit.json
           exit 0
       - name: Verify the candidate with diagnostics disabled

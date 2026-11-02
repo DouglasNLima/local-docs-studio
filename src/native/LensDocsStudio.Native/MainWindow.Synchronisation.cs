@@ -185,6 +185,7 @@ public partial class MainWindow
     private void PreviewSelectionChanged(object? sender, EventArgs e)
     {
         TraceSelection("preview-selection-changed");
+        if (!Preview.IsKeyboardFocusWithin && Preview.Selection is { } selection) PreviewSelectionVisuals.Refresh(selection);
         if (BothPanesVisible && DesktopState.SyncSelection && Preview.IsKeyboardFocusWithin) QueueFocusedSynchronisation("preview-selection");
     }
     private void PreviewScrollChanged(object sender, ScrollChangedEventArgs e)

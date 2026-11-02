@@ -19,7 +19,7 @@ internal static class NativeSelectionVisualChecks
 {
     // A synthetic isolation probe, not a substitute for natural mouse reproduction.
     // It can load unchanged installed/baseline DLLs through the retained four-argument API.
-    public static void Run(string output)
+    public static void Run(string output, bool expectColdInvisible = false)
     {
         Directory.CreateDirectory(output);
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
@@ -35,6 +35,8 @@ internal static class NativeSelectionVisualChecks
                 new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
             var editor = new TextEditor { Text = source, FontSize = 16 };
             var viewer = new DocumentPreview { Style = (Style)styles["DocumentPreviewStyle"] };
+            var previewFocusVisits = 0;
+            viewer.GotKeyboardFocus += (_, _) => previewFocusVisits++;
             viewer.SetPreview(result, source.Length, mode);
             var panel = new Grid(); panel.ColumnDefinitions.Add(new()); panel.ColumnDefinitions.Add(new());
             panel.Children.Add(editor); panel.Children.Add(viewer); Grid.SetColumn(viewer, 1);
@@ -42,7 +44,8 @@ internal static class NativeSelectionVisualChecks
                 WindowStartupLocation = WindowStartupLocation.CenterScreen, Topmost = true, Content = panel };
             try
             {
-                window.Show(); window.Activate(); editor.Focus(); editor.Select(start, 8); Pump();
+                window.Show(); Pump(); window.Activate(); editor.Focus(); editor.Select(start, 8); Pump();
+                if (!editor.IsKeyboardFocusWithin || previewFocusVisits != 0) throw new IOException("Cold probe did not retain editor focus without a preview visit.");
                 if (!result.TextMap.TryPreviewRange(start, 8, out var from, out var to)) throw new IOException("Visual probe mapping failed.");
                 var navigation = PreviewNavigationService.BringIntoViewAsync(viewer, from!, to!);
                 var deadline = System.Diagnostics.Stopwatch.StartNew();
@@ -62,6 +65,24 @@ internal static class NativeSelectionVisualChecks
                 var coldLogicalStart = result.Document.ContentStart.GetOffsetToPosition(viewer.Selection!.Start);
                 var coldLogicalEnd = result.Document.ContentStart.GetOffsetToPosition(viewer.Selection.End);
                 var coldUiaMatches = textProvider!.GetSelection() is { Length: 1 } coldRanges && coldRanges[0].GetText(9) == "planning";
+                var threadStore = typeof(TextSelection).Assembly.GetType("System.Windows.Documents.TextEditor")?
+                    .GetProperty("_ThreadLocalStore", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)?.GetValue(null);
+                var nativeFocusProperty = threadStore?.GetType().GetProperty("FocusedTextSelection",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                var nativeFocusBefore = nativeFocusProperty?.GetValue(threadStore);
+                // Isolate WPF's own highlight activation from focus and enable state.
+                var activate = typeof(TextSelection).GetInterface("System.Windows.Documents.ITextSelection")?
+                    .GetMethod("UpdateCaretAndHighlight") ?? throw new IOException("The WPF activation probe is unavailable.");
+                activate.Invoke(viewer.Selection, null);
+                var nativeCaret = caretField?.GetValue(viewer.Selection) ?? throw new IOException("The native caret visual was not created.");
+                nativeCaret.GetType().GetMethod("UpdateSelection", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                    .Invoke(nativeCaret, null); Pump();
+                var afterActivation = Capture("activation");
+                var activationFocusPreserved = editor.IsKeyboardFocusWithin && previewFocusVisits == 0;
+                var activationCaretPresent = caretField is null ? (bool?)null : caretField.GetValue(viewer.Selection) is not null;
+                var activationRangePreserved = coldLogicalStart == result.Document.ContentStart.GetOffsetToPosition(viewer.Selection!.Start)
+                    && coldLogicalEnd == result.Document.ContentStart.GetOffsetToPosition(viewer.Selection.End);
+                var nativeFocusPreserved = nativeFocusProperty is null ? (bool?)null : ReferenceEquals(nativeFocusBefore, nativeFocusProperty.GetValue(threadStore));
                 var previewAcceptedFocus = inner.Focus(); editor.Focus(); Pump();
                 var afterFocus = Capture("after-focus");
                 var warmCaretPresent = caretField is null ? (bool?)null : caretField.GetValue(viewer.Selection) is not null;
@@ -88,13 +109,20 @@ internal static class NativeSelectionVisualChecks
                     EditorFocus = editor.IsKeyboardFocusWithin, ReaderInactiveHighlight = viewer.IsInactiveSelectionHighlightEnabled,
                     ViewerInactiveHighlight = inactiveBefore, ColdUiaMatchesLogical = coldUiaMatches, FocusPreservedRange = focusPreservedRange,
                     ColdCaretVisualPresent = coldCaretPresent, WarmCaretVisualPresent = warmCaretPresent,
+                    ActivationCaretVisualPresent = activationCaretPresent, ActivationFocusPreserved = activationFocusPreserved,
+                    ActivationRangePreserved = activationRangePreserved, ActivationChangedPixels = Changed(afterActivation, collapsed),
+                    NativeFocusSelectionPresentBefore = nativeFocusProperty is null ? (bool?)null : nativeFocusBefore is not null,
+                    NativeFocusOwnerPreserved = nativeFocusPreserved,
                     ColdChangedPixels = coldChanged, WarmChangedPixels = warmChanged, RestoredChangedPixels = restoredChanged,
                     ColdHighlightVisible = coldChanged > before.Length / 15, WarmHighlightVisible = warmChanged > before.Length / 15,
                     PreviewAcceptedFocus = previewAcceptedFocus, FocusInitialisationChangedPixels = Changed(before, afterFocus),
                     ScreenStart = new[] { screen.X, screen.Y }, UiaRectangles = ranges?.Select(range => range.GetBoundingRectangles()).ToArray() });
                 File.WriteAllText(Path.Combine(output, "observations.json"), JsonSerializer.Serialize(observations, new JsonSerializerOptions { WriteIndented = true }));
-                if (!exact || !uiaExact || !coldUiaMatches || !focusPreservedRange || !editor.IsKeyboardFocusWithin || warmChanged <= before.Length / 15)
+                if (!exact || !uiaExact || !coldUiaMatches || !focusPreservedRange || !editor.IsKeyboardFocusWithin || warmChanged <= before.Length / 15
+                    || !activationFocusPreserved || !activationRangePreserved || nativeFocusPreserved == false || Changed(afterActivation, collapsed) <= before.Length / 15)
                     throw new IOException("Logical, UIA and painted selection isolation did not correlate.");
+                if ((coldChanged > before.Length / 15) == expectColdInvisible)
+                    throw new IOException("The cold highlight did not match the source-labelled product expectation.");
 
                 bool Inactive() => inner is FlowDocumentScrollViewer scrolling ? scrolling.IsInactiveSelectionHighlightEnabled
                     : ((FlowDocumentPageViewer)inner).IsInactiveSelectionHighlightEnabled;

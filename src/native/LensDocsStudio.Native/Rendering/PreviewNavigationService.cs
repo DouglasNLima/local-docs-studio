@@ -77,6 +77,8 @@ public static class PreviewNavigationService
                             selection.Select(position, selectionEnd);
                         }
                         BringIntoScrollView(scrolling, position, diagnostic);
+                        if (selectionEnd is not null && viewer.Selection is { } selected && !PreviewSelectionVisuals.Refresh(selected))
+                            diagnostic?.Invoke("native selection visual is not ready");
                         shown = true;
                     }, DispatcherPriority.Loaded);
                     return shown && !cancellation.IsCancellationRequested && viewer.Document == document;
@@ -104,6 +106,8 @@ public static class PreviewNavigationService
                     // The exact text position already chose the page. Bringing its parent
                     // paragraph into view would jump back to that paragraph's first page.
                     paged.UpdateLayout();
+                    if (selectionEnd is not null && viewer.Selection is { } selectedRange && !PreviewSelectionVisuals.Refresh(selectedRange))
+                        diagnostic?.Invoke("native selection visual is not ready");
                     selected = true;
                 }, DispatcherPriority.Loaded);
                 return selected && !cancellation.IsCancellationRequested && viewer.Document == document;

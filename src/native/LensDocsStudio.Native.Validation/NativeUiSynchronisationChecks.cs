@@ -10,7 +10,7 @@ namespace LensDocsStudio.Native.Validation;
 internal static partial class NativeUiChecks
 {
     // Real OS input is restricted by Program to disposable hosted Windows runners.
-    public static int RunSelectionInteractions(string executable, string output, bool highContrast, bool diagnostics = true) => Task.Run(() =>
+    public static int RunSelectionInteractions(string executable, string output, bool highContrast, bool diagnostics = true, bool expectColdInvisible = false) => Task.Run(() =>
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         using var clipboard = NativeUiClipboard.Start();
@@ -200,7 +200,13 @@ internal static partial class NativeUiChecks
             {
                 var target = VisibleWord();
                 Select(target, "natural-inherited");
+                Thread.Sleep(150); // Observe native paint after the logical notification.
                 window!.CaptureToFile(Path.Combine(output, mode + "-natural-first.png"));
+                var firstRange = Occurrence(preview, "planning", target.Occurrence);
+                var firstBox = firstRange.GetBoundingRectangles().First(rect => rect.Width > 0 && rect.Height > 0 && preview.BoundingRectangle.Contains(rect));
+                var windowBox = window.BoundingRectangle;
+                var paintRegion = new System.Drawing.Rectangle(firstBox.Left - windowBox.Left, firstBox.Top - windowBox.Top, firstBox.Width, firstBox.Height);
+                using var selectedPaint = window.Capture();
                 Select(target, "natural-repeat");
                 var box = Box(target.Occurrence);
                 Mouse.Click(new System.Drawing.Point(box.Left, box.Top + box.Height / 2));
@@ -208,6 +214,22 @@ internal static partial class NativeUiChecks
                     && preview.Patterns.Text.Pattern.GetSelection().All(range => range.GetText(-1).Length == 0),
                     "Natural single-click caret retained a stale highlight.", 2);
                 observations.Add(new { Mode = mode, Input = "natural-caret", ActionCount = 1, PreviewLiteralCleared = true });
+                Thread.Sleep(150);
+                if (!firstRange.GetBoundingRectangles().Contains(firstBox)) throw new IOException("The cold-paint reference moved; no selection retry was attempted.");
+                using (var plainPaint = window.Capture())
+                {
+                    var changed = 0;
+                    for (var y = paintRegion.Top; y < paintRegion.Bottom; y++)
+                    for (var x = paintRegion.Left; x < paintRegion.Right; x++)
+                    {
+                        var selected = selectedPaint.GetPixel(x, y); var plain = plainPaint.GetPixel(x, y);
+                        if (Math.Abs(selected.R - plain.R) + Math.Abs(selected.G - plain.G) + Math.Abs(selected.B - plain.B) > 6) changed++;
+                    }
+                    var visible = changed > paintRegion.Width * paintRegion.Height / 5;
+                    observations.Add(new { Mode = mode, Input = "natural-first-paint", ChangedPixels = changed, ScreenRectangle = firstBox,
+                        HighlightVisible = visible, ExpectedInvisible = expectColdInvisible, ActionCount = 0 });
+                    if (visible == expectColdInvisible) throw new IOException("Cold source selection has an unexpected painted highlight while editor focus is retained.");
+                }
                 box = Box(target.Occurrence); var watch = System.Diagnostics.Stopwatch.StartNew();
                 Mouse.MoveTo(box.Left, box.Top + box.Height / 2); Mouse.Down(MouseButton.Left);
                 try { Thread.Sleep(120); Mouse.MoveTo(box.Right, box.Top + box.Height / 2); }
