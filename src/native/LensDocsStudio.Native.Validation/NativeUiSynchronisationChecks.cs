@@ -22,6 +22,7 @@ internal static partial class NativeUiChecks
             AutomaticUpdateChecks: false, Theme: "Light", Desktop: new(ShowSidebar: false, FollowCaret: true, SyncScroll: true, SyncSelection: true))));
         var source = SelectionTableFixture.Create(); var path = Path.Combine(output, "table.md"); File.WriteAllText(path, source);
         var saved = File.ReadAllBytes(path); var observations = new List<object>(); var inputTargets = new List<object>();
+        var geometryObservationFailures = 0;
         var info = new System.Diagnostics.ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
         info.Environment["LENS_NATIVE_SELECTION_DIAGNOSTICS"] = diagnostics ? "1" : "0";
         foreach (var argument in new[] { "--state-directory", state, path }) info.ArgumentList.Add(argument);
@@ -167,7 +168,7 @@ internal static partial class NativeUiChecks
             if (ReadEditorText(editor) != source || !saved.SequenceEqual(File.ReadAllBytes(path))) throw new IOException("Selection input changed source contents.");
             window.CaptureToFile(Path.Combine(output, "selection-table.png"));
             if (!diagnostics && File.Exists(Path.Combine(state, "selection-events.jsonl"))) throw new IOException("Disabled selection diagnostics still wrote an event log.");
-            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Diagnostics = diagnostics, Observations = observations, InputTargets = inputTargets, SourceBytesPreserved = true, SelectionActionRetries = 0 });
+            Write(new { Passed = true, ActualHighContrast = NativeTestHighContrast.IsEnabledNow, Diagnostics = diagnostics, Observations = observations, InputTargets = inputTargets, GeometryObservationFailures = geometryObservationFailures, SourceBytesPreserved = true, SelectionActionRetries = 0 });
             return 0;
 
             void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch)
@@ -232,15 +233,29 @@ internal static partial class NativeUiChecks
 
                 (int Occurrence, System.Drawing.Rectangle Rectangle) VisibleWord(int exceptOccurrence = 0)
                 {
-                    var remaining = editor.Patterns.Text.Pattern.DocumentRange.Clone();
-                    for (var occurrence = 1; occurrence <= 60; occurrence++)
+                    (int Occurrence, System.Drawing.Rectangle Rectangle) found = default;
+                    Wait(() =>
                     {
-                        var match = remaining.FindText("planning", false, false) ?? throw new IOException("Natural fixture word is absent.");
-                        remaining.MoveEndpointByRange(TextPatternRangeEndpoint.Start, match, TextPatternRangeEndpoint.End);
-                        var rectangle = match.GetBoundingRectangles().FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
-                        if (rectangle.Width > 0 && occurrence != exceptOccurrence) return (occurrence, rectangle);
-                    }
-                    throw new IOException("Natural sequence has no fully visible source word; no preparation was attempted.");
+                        try
+                        {
+                            var remaining = editor.Patterns.Text.Pattern.DocumentRange.Clone();
+                            for (var occurrence = 1; occurrence <= 60; occurrence++)
+                            {
+                                var match = remaining.FindText("planning", false, false) ?? throw new IOException("Natural fixture word is absent.");
+                                remaining.MoveEndpointByRange(TextPatternRangeEndpoint.Start, match, TextPatternRangeEndpoint.End);
+                                var rectangle = match.GetBoundingRectangles().FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
+                                if (rectangle.Width > 0 && occurrence != exceptOccurrence) { found = (occurrence, rectangle); return true; }
+                            }
+                        }
+                        catch (Exception error) when (error is System.Runtime.InteropServices.COMException || error.GetType() == typeof(Exception))
+                        {
+                            // UIA can reject geometry while AvalonEdit realises a
+                            // wrapped line. Repeat only this read, never the input.
+                            geometryObservationFailures++;
+                        }
+                        return false;
+                    }, "Natural source geometry remained unavailable; no viewport preparation or selection retry was attempted.", 2);
+                    return found;
                 }
                 System.Drawing.Rectangle Box(int occurrence) => Occurrence(editor, "planning", occurrence).GetBoundingRectangles()
                     .FirstOrDefault(rect => rect.Width > 0 && rect.Height > 0 && editor.BoundingRectangle.Contains(rect));
@@ -293,7 +308,7 @@ internal static partial class NativeUiChecks
         catch (Exception error)
         {
             window?.CaptureToFile(Path.Combine(output, "selection-table-failure.png"));
-            Write(new { Passed = false, Error = error.ToString(), Diagnostics = diagnostics, Observations = observations, InputTargets = inputTargets, SelectionActionRetries = 0 });
+            Write(new { Passed = false, Error = error.ToString(), Diagnostics = diagnostics, Observations = observations, InputTargets = inputTargets, GeometryObservationFailures = geometryObservationFailures, SelectionActionRetries = 0 });
             return 1;
         }
         finally { if (!app.HasExited) app.Kill(); RestoreClipboard(previousClipboard, ownedClipboard); }
