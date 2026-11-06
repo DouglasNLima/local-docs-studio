@@ -30,6 +30,7 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--controlled-layout") return LayoutControl.Run(args);
         // No local desktop input, fake hosted flags, environment prewarming or HC polling.
         if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" ||
             Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted" ||
@@ -133,6 +134,7 @@ internal sealed class Probe : IDisposable
     private readonly StreamWriter journal;
     private readonly StageListener stages = new();
     private readonly TransitionTrace? transitions;
+    private bool transitionsStopped;
     private readonly List<object> dispatcherIntervals = [];
     private readonly Dictionary<DispatcherOperation, long> operations = [];
     private readonly CancellationTokenSource stopped = new();
@@ -206,7 +208,7 @@ internal sealed class Probe : IDisposable
     private async Task<double> Measure(string action, string temperature, int iteration, Action input, Func<bool> response, bool requirePixelChange = true, long? origin = null)
     {
         currentAction = action;
-        if (transitions is not null) await Ui(() => transitions.Boundary("input/" + action));
+        if (transitions is not null && !transitionsStopped) await Ui(() => transitions.Boundary("input/" + action));
         windowBounds = Desktop.ClientBounds(windowHandle);
         var before = Desktop.Capture(windowBounds);
         var cpu = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
@@ -230,7 +232,7 @@ internal sealed class Probe : IDisposable
         var ended = Stopwatch.GetTimestamp();
         if (requirePixelChange && after.Sha256 == before.Sha256) throw new IOException($"{action}: semantic change had no observed screen response.");
         if (!await Ui(response)) throw new IOException($"{action}: semantic result did not persist through screen capture.");
-        if (transitions is not null) await Ui(() => transitions.Boundary("usable/" + action));
+        if (transitions is not null && !transitionsStopped) await Ui(() => transitions.Boundary("usable/" + action));
         var process = Process.GetCurrentProcess(); process.Refresh();
         var elapsed = Stopwatch.GetElapsedTime(started, ended).TotalMilliseconds;
         Record(new { kind = "sample", action, temperature, iteration, status = "OBSERVED", elapsedMs = elapsed,
@@ -268,6 +270,7 @@ internal sealed class Probe : IDisposable
         var intervals = await Ui(() => { window.Dispatcher.Hooks.OperationStarted -= OperationStarted; window.Dispatcher.Hooks.OperationCompleted -= OperationCompleted; return dispatcherIntervals.ToArray(); });
         // Freeze product diagnostics before the deliberately blocked observer control.
         // Its imposed delay must never inflate product dispatcher/heartbeat evidence.
+        if (transitions is not null) await Ui(() => { stages.Observed = null; transitions.Dispose(); transitionsStopped = true; });
         await VerifyDelayedResponse();
         Program.Write(output, "completion.json", new { collection = "PASS", acceptance = "PENDING", sampleCount,
             exactSource = "PASS", completeContent = "PASS", historical250ms = "UNCHANGED / NOT EVALUATED BY THIS PROBE",
@@ -520,6 +523,7 @@ internal sealed class Probe : IDisposable
     {
         try
         {
+            if (transitions is not null) await Ui(() => transitions.Boundary("failure/" + currentAction));
             var state = await window.Dispatcher.InvokeAsync(() => new
             {
                 action = currentAction, layout = model.Layout, previewStatus = model.PreviewStatus,

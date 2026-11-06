@@ -45,6 +45,7 @@ foreach ($side in 'baseline','candidate') {
 }
 $protocol = [ordered]@{schema=1;harnessRevision=$harnessRevision;harnessTree=$harnessTree;harnessSha256=$harnessHash;products=$products;
     appearance=$Appearance;order=$Order;processes=$Processes;iterations=$Iterations;fixtures=$selected;
+    transitionTrace=($env:LENS_NATIVE_TRANSITION_TRACE -eq '1');purpose='Correctness investigation; no performance policy activation';
     fixtureIdentities=@($manifest.fixtures | Where-Object id -in $selected);
     image=$env:ImageVersion;processor=(Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors);
     os=[Environment]::OSVersion.ToString();runtimes=(dotnet --list-runtimes);fixtureManifestSha256=(Get-FileHash "$fixtureRoot/manifest.json").Hash;

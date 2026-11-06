@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
@@ -32,6 +34,7 @@ internal sealed class TransitionTrace : IDisposable
     private string action = "startup";
     private int count;
     private bool writing;
+    private bool disposed;
     private static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     internal TransitionTrace(MainWindow window, WorkspaceViewModel model, string output)
@@ -48,7 +51,7 @@ internal sealed class TransitionTrace : IDisposable
         Snapshot("subscribed");
     }
 
-    private T? Field<T>(string name) => (T?)typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(window);
+    private T? Field<T>(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(window) is T value ? value : default;
     private int Id(object? value) { if (value is null) return 0; if (!identities.TryGetValue(value, out var id)) identities[value] = id = identities.Count + 1; return id; }
     internal void Boundary(string name) { action = name; Snapshot(name); }
     internal void Stage(string stage, long request)
@@ -87,9 +90,20 @@ internal sealed class TransitionTrace : IDisposable
             offset = scroll is null ? null : new { scroll.HorizontalOffset, scroll.VerticalOffset, scroll.ExtentWidth, scroll.ExtentHeight, scroll.ViewportWidth, scroll.ViewportHeight },
             scrolling = element is ScrollViewer v ? new { v.HorizontalOffset, v.VerticalOffset, v.ExtentWidth, v.ExtentHeight, v.ViewportWidth, v.ViewportHeight, v.ScrollableHeight } : null };
     }
+    private static object Position(TextPointer position)
+    {
+        var valid = position.HasValidLayout;
+        return new { valid, rectangle = valid ? position.GetCharacterRect(LogicalDirection.Forward).ToString() : null };
+    }
+    private object? TextPattern()
+    {
+        if (UIElementAutomationPeer.CreatePeerForElement(preview)?.GetPattern(PatternInterface.Text) is not ITextProvider provider) return null;
+        return provider.GetVisibleRanges().Select(range => new { characters = range.GetText(128).Length,
+            meaningful = !string.IsNullOrWhiteSpace(range.GetText(128)), rectangles = range.GetBoundingRectangles() }).ToArray();
+    }
     private void Snapshot(string boundary, bool changedOnly = false, long? request = null)
     {
-        if (writing) return;
+        if (writing || disposed) return;
         if (count >= 4000) throw new IOException("Transition trace exceeded its predeclared 4,000-snapshot bound.");
         writing = true;
         try
@@ -101,8 +115,8 @@ internal sealed class TransitionTrace : IDisposable
                 || e.GetType().Name.Contains("Document", StringComparison.Ordinal)).Take(100).Select(Geometry).ToArray();
             var data = new { action, layout = model.Layout, status = model.PreviewStatus,
                 active = active?.Id, renderedOwner = Field<Guid?>("renderedDocumentId"),
-                sourceGeneration = Field<long>("diagnosticSourceGeneration"), acceptedGeneration = Field<long>("diagnosticAcceptedGeneration"),
-                request = Field<int>("diagnosticRequest"), phase = Field<string>("diagnosticPhase"),
+                sourceGeneration = Field<long?>("diagnosticSourceGeneration"), acceptedGeneration = Field<long?>("diagnosticAcceptedGeneration"),
+                request = Field<int?>("diagnosticRequest"), phase = Field<string>("diagnosticPhase"),
                 sourceVersion = Id(active?.EditorDocument.Version), renderedVersion = Id(version),
                 versionMatches = version is not null && active is not null && version.BelongsToSameDocumentAs(active.EditorDocument.Version) && version.CompareAge(active.EditorDocument.Version) == 0,
                 editorOwnerMatches = active?.EditorDocument == editor.Document, sourceLength = active?.EditorDocument.TextLength,
@@ -113,6 +127,9 @@ internal sealed class TransitionTrace : IDisposable
                 syncGeneration = Field<long>("syncGeneration"), previewOffset = active?.PreviewSourceOffset,
                 contentHost = window.FindName("PreviewContentHost") is FrameworkElement host ? Geometry(host) : null,
                 itemStatus = AutomationProperties.GetItemStatus(preview), mode = preview.ViewingMode.ToString(), preview.Zoom,
+                media = result?.Media.Select(m => Geometry(m.Image)).ToArray(),
+                endLiterals = result?.TextMap.Literals.TakeLast(2).Select(l => new { l.Source.Start, l.Source.Length, position = Position(l.Start) }).ToArray(),
+                textPattern = boundary.StartsWith("usable/", StringComparison.Ordinal) || boundary.StartsWith("failure/", StringComparison.Ordinal) ? TextPattern() : null,
                 nodes };
             var payload = JsonSerializer.Serialize(data, Json);
             if (changedOnly && payload == previous) return;
@@ -124,6 +141,8 @@ internal sealed class TransitionTrace : IDisposable
     }
     public void Dispose()
     {
+        if (disposed) return;
+        disposed = true;
         documentProperty.RemoveValueChanged(preview, DocumentChanged);
         preview.LayoutUpdated -= LayoutUpdated; preview.IsVisibleChanged -= VisibilityChanged; preview.SizeChanged -= SizeChanged;
         model.PropertyChanged -= ModelChanged; writer.Dispose();
