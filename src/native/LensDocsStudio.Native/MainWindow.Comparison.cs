@@ -122,7 +122,9 @@ public partial class MainWindow
         comparisonEditor.SetBinding(FontSizeProperty, new System.Windows.Data.Binding(nameof(Editor.FontSize)) { Source = Editor });
         comparisonEditor.SetBinding(FontFamilyProperty, new System.Windows.Data.Binding(nameof(Editor.FontFamily)) { Source = Editor });
         comparisonEditor.TextArea.TextView.LineTransformers.Add(new MarkdownHighlighting { Dark = ThemeService.IsDark(model.Theme), HighContrast = SystemParameters.HighContrast });
-        comparisonPreview.SetResourceReference(StyleProperty, "DocumentPreviewStyle"); comparisonPreview.SetResourceReference(BackgroundProperty, "WindowBrush");
+        // Keep the reader template stable while moving between pane containers.
+        // The style's brushes remain dynamic for theme/High Contrast changes.
+        comparisonPreview.Style = (Style)FindResource("DocumentPreviewStyle"); comparisonPreview.SetResourceReference(BackgroundProperty, "WindowBrush");
         AutomationProperties.SetAutomationId(comparisonEditor, "ComparisonSource"); AutomationProperties.SetName(comparisonEditor, "Secondary source; focus to activate document");
         AutomationProperties.SetAutomationId(comparisonPreview, "ComparisonPreview"); AutomationProperties.SetName(comparisonPreview, "Secondary document preview");
         comparisonEditor.PreviewMouseDown += (_, _) => comparisonEditorPointer = true;
@@ -199,9 +201,7 @@ public partial class MainWindow
         comparisonUpdating = true;
         try
         {
-            if (ContentGrid.Parent is Panel previous) previous.Children.Remove(ContentGrid);
-            foreach (var body in comparisonBodies) body.Children.Clear();
-            comparisonBodies[comparisonActive].Children.Add(ContentGrid);
+            AttachComparisonSurface(ContentGrid, comparisonBodies[comparisonActive]);
             var inactive = 1 - comparisonActive; var slot = comparisonSlots[inactive];
             comparisonEditor.Document = slot.Document.EditorDocument;
             comparisonPreview.Zoom = Preview.Zoom;
@@ -210,7 +210,7 @@ public partial class MainWindow
             var view = comparisonViews.GetValueOrDefault(slot.Document.Id);
             if (view is not null) { var start = Math.Min(view.Start, comparisonEditor.Document.TextLength); comparisonEditor.Select(start, Math.Min(view.Length, comparisonEditor.Document.TextLength - start)); if (view.Caret >= 0) comparisonEditor.CaretOffset = Math.Min(view.Caret, comparisonEditor.Document.TextLength); }
             comparisonEditor.ScrollToVerticalOffset(view?.Vertical ?? slot.Document.VerticalOffset);
-            comparisonBodies[inactive].Children.Add(slot.Mode == "Editor" ? comparisonEditor : comparisonPreview);
+            AttachComparisonSurface(slot.Mode == "Editor" ? comparisonEditor : comparisonPreview, comparisonBodies[inactive]);
             for (var index = 0; index < 2; index++)
             {
                 comparisonDocuments[index].SelectedItem = comparisonSlots[index].Document; comparisonModes[index].SelectedItem = comparisonSlots[index].Mode;
@@ -221,6 +221,12 @@ public partial class MainWindow
             SetLayout(comparisonSlots[comparisonActive].Mode); LayoutComparison(); QueueComparisonPreview();
         }
         finally { comparisonUpdating = false; }
+    }
+    private static void AttachComparisonSurface(FrameworkElement surface, Grid host)
+    {
+        if (ReferenceEquals(surface.Parent, host)) return;
+        if (surface.Parent is Panel previous) previous.Children.Remove(surface);
+        host.Children.Clear(); host.Children.Add(surface);
     }
     private void LayoutComparison()
     {

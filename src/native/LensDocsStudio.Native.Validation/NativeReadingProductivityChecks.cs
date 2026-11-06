@@ -160,6 +160,14 @@ internal static class NativeReadingProductivityChecks
             PumpUntil(() => secondaryPreview.Document is { } readyDocument && new System.Windows.Documents.TextRange(readyDocument.ContentStart, readyDocument.ContentEnd).Text.Contains("Left buffer", StringComparison.Ordinal));
             Check(new System.Windows.Documents.TextRange(secondaryPreview.Document.ContentStart, secondaryPreview.Document.ContentEnd).Text.Contains("Left buffer", StringComparison.Ordinal),
                 "The actual secondary WPF preview renders its own Markdown through the canonical native services");
+            var templateChanges = 0; var previewDocument = secondaryPreview.Document;
+            var templateProperty = System.ComponentModel.DependencyPropertyDescriptor.FromProperty(Control.TemplateProperty, typeof(LensDocsStudio.Native.Rendering.DocumentPreview));
+            EventHandler templateChanged = (_, _) => templateChanges++;
+            templateProperty.AddValueChanged(secondaryPreview, templateChanged);
+            try { Invoke("AttachComparison"); }
+            finally { templateProperty.RemoveValueChanged(secondaryPreview, templateChanged); }
+            Check(templateChanges == 0 && ReferenceEquals(secondaryPreview.Document, previewDocument),
+                "A comparison header refresh retains the live reader template and authoritative preview document");
             Check(UIElementAutomationPeer.CreatePeerForElement(((Button[])Field("comparisonActivate"))[0]).GetPattern(PatternInterface.Invoke) is not null,
                 "Comparison activation exposes a native UI Automation Invoke action");
             Invoke("CloseComparison");

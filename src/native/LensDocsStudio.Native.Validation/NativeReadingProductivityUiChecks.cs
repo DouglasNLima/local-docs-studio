@@ -137,8 +137,12 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error)
         {
-            main?.CaptureToFile(Path.Combine(output, "failure.png"));
-            File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new { status = "FAIL", highContrast, checks, error = error.ToString() }));
+            string? captureError = null;
+            try { if (!app.HasExited) main?.CaptureToFile(Path.Combine(output, "failure.png")); }
+            catch (Exception capture) { captureError = capture.ToString(); }
+            File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new { status = "FAIL", highContrast,
+                source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
+                checks, error = error.ToString(), captureError }));
             Console.Error.WriteLine(error); return 1;
         }
         finally { if (!app.HasExited) app.Kill(); }
