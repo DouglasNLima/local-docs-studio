@@ -1,0 +1,170 @@
+[
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/failure-state.json",
+    "sha256": "7BD08BE3321A9F210DE8CDAE6E3B7FC7825F6EC897533E556D79978987B89950"
+  },
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/failure.json",
+    "sha256": "F68CF1DFDA77F0780BDF05BBF05177E4687A50E9F890E054F3ECE74BC4A09115"
+  },
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/failure.png",
+    "sha256": "680FC9164DB059511F2717DF1CDDD43016DB3490FEE1A6F8441C277BB282F67F"
+  },
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/samples.jsonl",
+    "sha256": "5E87495994BE45DC723DC3DAF483A9BBD58C6E6412C056017011BF3D0816DBF9"
+  },
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/identity.json",
+    "sha256": "21BE8CA9B63B55C78B6EA7D7617D6CAB6AB3D048E374B43D9E3D0FDB815A89C4"
+  },
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/appearance.json",
+    "sha256": "88A7A28C41B41479EDF94DC255D4687EC420CDC3F0677D946608EC877E2BED8C"
+  },
+  {
+    "path": "native-ux-develop-normal-baseline-first/samples/1/mixed/baseline/complete-distant-selection.png",
+    "sha256": "0AE69193A16FE64D01E973B807AA68A6A235A74BC97E2E282015177532E2B7FC"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/failure-state.json",
+    "sha256": "3E7D1DD7BE041ECFCE759E57757ED5292AD6D9FA92A29669BADD6EADE4FCA33F"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/failure.json",
+    "sha256": "F68CF1DFDA77F0780BDF05BBF05177E4687A50E9F890E054F3ECE74BC4A09115"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/failure.png",
+    "sha256": "625E8601DF6E29DA7946439A603EE6B724B512C915E5BDA0104B3935AC5A286D"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/samples.jsonl",
+    "sha256": "38CD1D4E933840399A3F176ABD8D7638ED9D1FDAD1D09BF67BD97D4E2F1D5770"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/identity.json",
+    "sha256": "A82F98D5A37661B4674CB4F930927A638805CDDE891A657466E31A19E2FA8E5E"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/appearance.json",
+    "sha256": "88A7A28C41B41479EDF94DC255D4687EC420CDC3F0677D946608EC877E2BED8C"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/0/mixed/baseline/complete-distant-selection.png",
+    "sha256": "FF73486E936DEEBB0839A6723355B0A2228C9B8B10021AE2462E7E2021375F6D"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/failure-state.json",
+    "sha256": "F78534437B58C6108A6961104E9828D496BF91500387388DA1B074BB315A1071"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/failure.json",
+    "sha256": "F68CF1DFDA77F0780BDF05BBF05177E4687A50E9F890E054F3ECE74BC4A09115"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/failure.png",
+    "sha256": "79A91A838C56F8A7BE78B3EB3B811106597FC4CF8C5B2A61A9FBACF000EA0E6D"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/samples.jsonl",
+    "sha256": "4CBC9DFC1AD3AD8B64275EA63DD1CA896FC1F71478206F1CEF56A04EBAB04B39"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/identity.json",
+    "sha256": "A96942BB4C828494B2FC80682F49404DDFE939F6C076C4E2399A1BF02A99F156"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/appearance.json",
+    "sha256": "88A7A28C41B41479EDF94DC255D4687EC420CDC3F0677D946608EC877E2BED8C"
+  },
+  {
+    "path": "native-ux-develop-normal-candidate-first/samples/1/mixed/candidate/complete-distant-selection.png",
+    "sha256": "2078E0937A45AC2416C83DA2DEFAB1134DE0A1A8DA4C3FEEBF8D659FE09EA050"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/failure-state.json",
+    "sha256": "787E8F5907C080589A148E45C8AFC24B398C78CE3C63B4C2FCE9C78C826E47B0"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/failure.json",
+    "sha256": "F68CF1DFDA77F0780BDF05BBF05177E4687A50E9F890E054F3ECE74BC4A09115"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/failure.png",
+    "sha256": "0F795206452B32B2BB2C2ACE8935127C7F0B13DC95FC14A3E169F788BD2B13B3"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/samples.jsonl",
+    "sha256": "4CBB7AA4DF6FCAC8D3288B3FFC1A1E7496089612429DCFC644080D1642538B5E"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/identity.json",
+    "sha256": "AEA02C7318BD6E035C423341422F614BC8EFDF8583D16173AA79152A317897B0"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/appearance.json",
+    "sha256": "88A7A28C41B41479EDF94DC255D4687EC420CDC3F0677D946608EC877E2BED8C"
+  },
+  {
+    "path": "native-ux-historical-normal-baseline-first/samples/0/mixed/baseline/complete-distant-selection.png",
+    "sha256": "5B541A13727BA12611966B1A8F181C6BC36A6B3CBB72503483F69812CEFA9233"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/failure-state.json",
+    "sha256": "770C2A47D8BA1FCBF5D70838D518D8E23AB5EA2F115616D83F991127F2840CE8"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/failure.json",
+    "sha256": "F68CF1DFDA77F0780BDF05BBF05177E4687A50E9F890E054F3ECE74BC4A09115"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/failure.png",
+    "sha256": "D975D8EA823ED437FC34B345E1C48FF3F7425BCDAD8FEB85ACD35BF625F9548A"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/samples.jsonl",
+    "sha256": "063BECD66609F55E644E01547705D26B76104072C38A14C463D406EEB8F13100"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/identity.json",
+    "sha256": "C636C6A97B4703036F74C50D649DCB23B9366BAC6FCBA0D2868FB026111FDF9A"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/appearance.json",
+    "sha256": "88A7A28C41B41479EDF94DC255D4687EC420CDC3F0677D946608EC877E2BED8C"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/0/mixed/candidate/complete-distant-selection.png",
+    "sha256": "7FC0B89736DC56C840497CA5F04C98025BA89AFBCD73046F8959AC3381AC7326"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/failure-state.json",
+    "sha256": "AD4D054B515651731058530547A10AF3D30281E00D40AA9F3510D1E264AA1CD0"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/failure.json",
+    "sha256": "F68CF1DFDA77F0780BDF05BBF05177E4687A50E9F890E054F3ECE74BC4A09115"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/failure.png",
+    "sha256": "5F416DD4EDE341E5C3E03522F93846C67EE92914DC99A3CD5FBC0CCBBBCE84D0"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/samples.jsonl",
+    "sha256": "201BD84877F5A2F8809373E312A0A16BF5E85C0BFEAC031E16C8B6BD830A953E"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/identity.json",
+    "sha256": "340EC7FC0D6359EBBB0C765705BD399231F3F4AFDACD0C64935D597327520CFF"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/appearance.json",
+    "sha256": "88A7A28C41B41479EDF94DC255D4687EC420CDC3F0677D946608EC877E2BED8C"
+  },
+  {
+    "path": "native-ux-historical-normal-candidate-first/samples/1/mixed/candidate/complete-distant-selection.png",
+    "sha256": "46C4EC479B72D8905679B28BC08EFB0AC016D01EE788F4E6E9BA8E5121CC1D54"
+  }
+]
