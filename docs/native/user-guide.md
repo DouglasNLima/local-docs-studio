@@ -669,3 +669,10 @@ Acceptance replaces the whole slash query in one Undo operation. Cancelling an i
 Native rendering accepts optional trailing semicolons on complete `class`, `classDef` and `style` instructions, comma-separated node targets, and repeated class assignments. Later assignments take precedence for overlapping properties. The original Mermaid remains unchanged. Malformed styling reports an unsupported-syntax message instead of becoming a diagram node. Comma-separated class names in a single assignment are not supported; use separate class statements.
 
 Label text and line breaks inside `<small>`, `<sub>`, `<sup>` and `<mark>` are retained, but their typography is not supported by the pinned native renderer. Preview displays this limitation. These labels remain protected in Visual Edit; read-only inspection and canonical SVG/PNG exports retain the same graph and text. The Web and Native layouts can differ.
+
+
+## Compare two documents
+
+Choose **File → Open beside…** after opening two documents. Select a document and Editor or Preview in each pane's header. **Activate** makes that pane the target for Find, Undo/Redo, paste, Save, Save As and document export. Focusing the secondary source also activates it; the existing editor, its formatting controls and commands follow the active document. Each document retains its own buffer, selection, editing history and Find query. The inactive source is a view of that buffer, not another editable copy.
+
+Scroll is independent by default. Enable **Synchronise scroll** for proportional scrolling between continuous views; paged native readers retain independent page navigation. Adjust the pane widths (Web) or drag/keyboard-operate the divider (Native). Narrow windows stack the panes vertically. Preview navigation resolves links from the owning document. **Close comparison** restores the previous single-document layout without closing or saving either document. Existing external-change checks and recovery still apply. Comparison arrangement is session-only; reopened documents retain the normal recovery contract.

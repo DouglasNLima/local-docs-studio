@@ -19,6 +19,7 @@ export function createRenderingService({
   state,
   dom,
   callbacks,
+  instanceId = 'mdmmd',
 }) {
   const {
     editor,
@@ -54,7 +55,8 @@ export function createRenderingService({
       markedPromise = Promise.all([
         import(MARKED_MODULE_PATH),
         loadKatex().catch(() => null),
-      ]).then(([{ marked, Renderer }, katexRenderer]) => {
+      ]).then(([{ Marked, Renderer }, katexRenderer]) => {
+        const marked = new Marked();
         marked.setOptions({
           gfm: true,
           breaks: false,
@@ -296,6 +298,8 @@ export function createRenderingService({
         const dirtyHtml = selectedMode === 'mermaid'
           ? buildMermaidOnlyHtml(source)
           : await buildMarkdownHtml(source);
+
+        if (renderId !== state.renderId) return { ok: false, cancelled: true, diagramErrors: 0 };
 
         const renderedHtml = sanitizeRenderedHtml(dirtyHtml);
         const modeBanner = buildModeBanner(source, selectedMode);
@@ -544,7 +548,7 @@ export function createRenderingService({
         }
 
         try {
-          const id = `mdmmd-diagram-${renderId}-${index}`;
+          const id = `${instanceId}-diagram-${renderId}-${index}`;
           const validation = await validateMermaidSource(diagramSource);
           if (!validation.ok) {
             renderDiagramError(diagram, validation.error, diagramSource);

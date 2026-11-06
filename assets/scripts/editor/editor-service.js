@@ -101,8 +101,35 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
     let editorHighlight = null;
     let syntaxHighlightFrame = 0;
     let editorResizeObserver = null;
+    // View history belongs to the existing file record, including Save As renames.
+    // Buffers remain in fileCache. Limit retained history to 16 documents / 32 Mi
+    // UTF-16 code units; eviction never changes document content or recovery.
+    const documentSessions = new Map();
 
     function installEditorEnhancements() {
+      editor.addEventListener('lens-document-leaving', () => {
+        const record = state.files.find(item => item.path === state.activePath);
+        if (!record) return;
+        documentSessions.delete(record);
+        documentSessions.set(record, { history: state.editorHistory, start: editor.selectionStart, end: editor.selectionEnd });
+        state.editorHistory = { ...state.editorHistory, undo: [], redo: [], last: null, typing: false };
+        for (const key of documentSessions.keys()) if (!state.files.includes(key)) documentSessions.delete(key);
+        while (documentSessions.size > 16) documentSessions.delete(documentSessions.keys().next().value);
+        let budget = 32 * 1024 * 1024;
+        for (const session of [...documentSessions.values()].reverse()) {
+          for (const list of [session.history.undo, session.history.redo]) {
+            while (list.length && list.reduce((size, snapshot) => size + snapshot.value.length, 0) > budget) list.shift();
+            budget -= list.reduce((size, snapshot) => size + snapshot.value.length, 0);
+          }
+        }
+      });
+      editor.addEventListener('lens-document-loaded', event => {
+        const session = documentSessions.get(event.detail.record);
+        if (session?.history.last?.value !== editor.value) return;
+        state.editorHistory = session.history;
+        state.editorHistory.typing = false;
+        editor.setSelectionRange(session.start, session.end);
+      });
       if (editorShell && editorSyntaxLayer) {
         editorShell.classList.add('syntax-highlight-enabled');
       }

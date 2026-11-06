@@ -606,10 +606,10 @@ export function createUiService({
       applyEditorLayout(state.editorLayout || 'split');
     }
 
-    function setEditorLayout(mode) {
+    function setEditorLayout(mode, { persist = true } = {}) {
       const next = ['editor', 'split', 'preview'].includes(mode) ? mode : 'split';
       state.editorLayout = next;
-      localStorage.setItem(storageKeys.editorLayout, next);
+      if (persist) localStorage.setItem(storageKeys.editorLayout, next);
       applyEditorLayout(next);
     }
 

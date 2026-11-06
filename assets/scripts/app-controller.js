@@ -25,6 +25,7 @@ import { createUiService } from './ui/ui-service.js';
 import { createWindowsSetupService } from './ui/windows-setup-service.js';
 import { collectDocumentHeadings } from './document/table-of-contents.js';
 import { createDocumentStatisticsService } from './document/document-statistics-service.js';
+import { createComparisonService } from './document/comparison-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
@@ -512,6 +513,8 @@ export function createAppController() {
       installDocumentUxHandlers,
       toggleOutline,
       updateDocumentUx,
+      capturePreviewFind,
+      restorePreviewFind,
     } = createDocumentUxService({
       state,
       dom: {
@@ -895,6 +898,8 @@ export function createAppController() {
     installSelectionSyncHandlers();
     installContextMenuHandlers();
     windowsSetupTools.installWindowsSetupHandlers();
+    createComparisonService({ state, editor, preview, workspace, setEditorLayout, selectFile,
+      find: findReplaceTools, capturePreviewFind, restorePreviewFind, onPreviewClick: handlePreviewClick, setStatus });
     installEventHandlers();
     renderLocalLibrary();
     initialiseWelcome();
@@ -3755,6 +3760,16 @@ ${unresolvedRows}
     }
 
     async function handlePreviewClick(event) {
+      const fragmentLink = event.target.closest('a[href^="#"]');
+      if (fragmentLink && !fragmentLink.dataset.docPath && !fragmentLink.dataset.wikilinkTarget) {
+        event.preventDefault();
+        try {
+          const id = decodeURIComponent(fragmentLink.getAttribute('href').slice(1));
+          const target = [...preview.querySelectorAll('[id]')].find(element => element.id === id);
+          if (target) { for (let parent = target.parentElement; parent && parent !== preview; parent = parent.parentElement) if (parent.tagName === 'DETAILS') parent.open = true; target.scrollIntoView({ block: 'start' }); }
+        } catch { /* A malformed fragment cannot identify a section. */ }
+        return;
+      }
       const welcomeAction = event.target.closest('[data-welcome-action]');
       if (welcomeAction) {
         event.stopPropagation();

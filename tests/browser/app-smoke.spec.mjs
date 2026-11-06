@@ -10,6 +10,110 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
+test('comparison keeps independent buffers undo find and modes when the active document changes', async ({ page }) => {
+  await gotoApp(page);
+  await page.locator('#folderInput').setInputFiles(fixturePath('comparison'));
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nOriginal left');
+  await page.locator('#editor').fill('# Left\n\nEdited left');
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-host')).toBeVisible();
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('Right');
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nEdited left');
+  await page.locator('#editor').press('Control+f'); await page.locator('#editorFindInput').fill('Edited');
+  await page.getByLabel('Mode in right pane').selectOption('editor');
+  await page.locator('[data-pane="1"] .comparison-activate').click();
+  await expect(page.locator('#editor')).toHaveValue('# Right\n\nOriginal right');
+  await expect(page.locator('#editorFindPanel')).toBeHidden();
+  await page.locator('#editor').fill('# Right\n\nEdited right');
+  await page.locator('[data-pane="0"] .comparison-activate').click();
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nEdited left');
+  await expect(page.locator('#editorFindInput')).toHaveValue('Edited');
+  await page.locator('#editor').focus(); await page.locator('#editor').press('Control+z');
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nOriginal left');
+  await expect(page.locator('.comparison-passive-editor')).toHaveValue('# Right\n\nEdited right');
+  await page.locator('[data-pane="1"] .comparison-activate').click();
+  await page.locator('#editor').focus(); await page.locator('#editor').press('Control+z');
+  await expect(page.locator('#editor')).toHaveValue('# Right\n\nOriginal right');
+  await page.locator('#editor').press('Control+y');
+  await page.getByLabel('Mode in right pane').selectOption('preview');
+  await page.getByLabel('Mode in left pane').selectOption('preview');
+  await expect(page.locator('#preview h1')).toHaveText('Right');
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('Left');
+  await page.setViewportSize({ width: 700, height: 700 }); await page.emulateMedia({ forcedColors: 'active' });
+  const left = await page.locator('[data-pane="0"]').boundingBox(); const right = await page.locator('[data-pane="1"]').boundingBox();
+  expect(right.y).toBeGreaterThan(left.y); expect(left.width).toBeGreaterThan(250);
+  await page.locator('.comparison-close').click(); await expect(page.locator('.comparison-host')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue('# Right\n\nEdited right');
+});
+
+test('comparison saves only the active file and preserves conflicts and Save As identity', async ({ page }) => {
+  await installMockFileSystemAccess(page); await gotoApp(page);
+  await page.evaluate(() => {
+    for (const name of ['left.md', 'right.md']) window.__mockFs.directoryHandle.files.set(name, window.__mockFs.createFileHandle(name, '# ' + name));
+    window.showSaveFilePicker = async () => (window.__comparisonSavedAs = window.__mockFs.createFileHandle('renamed.md', ''));
+  });
+  await (await openFileMenu(page)).getByRole('button', { name: 'Open folder', exact: true }).click();
+  await expect(page.locator('#editor')).toHaveValue('# left.md');
+  await page.locator('#editor').fill('# Left pending');
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('right.md');
+  expect(await page.evaluate(() => [...window.__mockFs.directoryHandle.files.values()].map(file => file._text))).toEqual(['# left.md', '# right.md']);
+  await page.getByLabel('Mode in right pane').selectOption('editor'); await page.locator('[data-pane="1"] .comparison-activate').click();
+  await page.locator('#editor').fill('# Right saved'); await page.locator('#saveButton').click();
+  await expect.poll(() => page.evaluate(() => window.__mockFs.directoryHandle.files.get('right.md')._text)).toBe('# Right saved');
+  expect(await page.evaluate(() => window.__mockFs.directoryHandle.files.get('left.md')._text)).toBe('# left.md');
+  await page.evaluate(() => { const file = window.__mockFs.directoryHandle.files.get('left.md'); file._text = '# External left'; file._lastModified += 1000; });
+  await page.locator('[data-pane="0"] .comparison-activate').click();
+  await submitAppDialog(page, { button: 'Keep app edits' });
+  await expect(page.locator('#editor')).toHaveValue('# Left pending');
+  await expect(page.locator('#documentPersistenceState')).toHaveText(/conflict/i);
+  await page.locator('#saveAsButton').click();
+  await expect.poll(() => page.evaluate(() => window.__comparisonSavedAs?._text)).toBe('# Left pending');
+  await expect(page.getByLabel('Document in left pane')).toHaveValue(/renamed.md$/);
+  await page.locator('[data-pane="1"] .comparison-activate').click();
+  await expect(page.locator('#editor')).toHaveValue('# Right saved');
+  await page.locator('.comparison-close').click();
+  expect(await page.evaluate(() => window.__mockFs.directoryHandle.files.get('left.md')._text)).toBe('# External left');
+});
+
+test('comparison routes secondary preview links and exports through the correct document', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    { name: 'left.md', text: '# Left\n\nUntouched' },
+    { name: 'right.md', text: '# Right\n\n[Local section](#target)\n\n```mermaid\nflowchart LR\nRightNode[Right only] --> End\n```\n\n## Target\n\n[[third]]' },
+    { name: 'third.md', text: '# Third' },
+  ]);
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-passive-preview .mermaid svg')).toBeVisible();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('.comparison-passive-preview [data-diagram-action="exportSvg"]').click()]);
+  const svg = await readFile(await download.path(), 'utf8'); expect(svg).toContain('Right only');
+  await expect(page.locator('#editor')).toHaveValue(/# Right/);
+  await page.locator('#preview a[href="#target"]').click();
+  await page.locator('#preview [data-wikilink-target="third"]').click();
+  await expect(page.locator('#preview h1')).toHaveText('Third');
+  await expect(page.locator('.comparison-passive-editor')).toHaveValue('# Left\n\nUntouched');
+  await page.locator('.comparison-close').click();
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-host')).toBeVisible();
+});
+
+test('comparison large documents retain independent scroll and an explicit synchronisation option', async ({ page }, testInfo) => {
+  const large = Array.from({ length: 5000 }, (_, index) => `Paragraph ${index}: locally retained source.`).join('\n\n');
+  await loadVirtualWorkspace(page, [{ name: 'left.md', text: '# Left\n\n' + large }, { name: 'right.md', text: '# Right\n\n' + large }]);
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('Right');
+  await page.getByLabel('Mode in right pane').selectOption('editor');
+  await page.locator('#editor').evaluate(editor => { editor.scrollTop = 1200; });
+  await expect.poll(() => page.locator('#editor').evaluate(editor => editor.scrollTop)).toBeGreaterThan(1000);
+  expect(await page.locator('.comparison-passive-editor').evaluate(editor => editor.scrollTop)).toBe(0);
+  await page.locator('.comparison-sync').check();
+  await page.locator('#editor').evaluate(editor => { editor.scrollTop = 3000; });
+  await expect.poll(() => page.locator('.comparison-passive-editor').evaluate(editor => editor.scrollTop)).toBeGreaterThan(1000);
+  await page.locator('.comparison-width').fill('60');
+  expect(await page.locator('.comparison-panes').evaluate(element => element.style.getPropertyValue('--comparison-left'))).toBe('60%');
+  await testInfo.attach('comparison-large-buffers', { body: JSON.stringify({ sourceCharactersPerDocument: large.length, lines: 10001, independentScroll: true }), contentType: 'application/json' });
+  await page.locator('.comparison-close').click(); await expect(page.locator('#editor')).toHaveValue('# Left\n\n' + large);
+});
+
 test('SPC flowchart retains nine nodes eight classes and canonical Web exports without modifying Markdown', async ({ page }, testInfo) => {
   const original = await readFile(path.join(root, 'tests/fixtures/native-flowchart/spc-application-architecture.md'), 'utf8');
   await gotoApp(page); await page.locator('#editor').fill(original);

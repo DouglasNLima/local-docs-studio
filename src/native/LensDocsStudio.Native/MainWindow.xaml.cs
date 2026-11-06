@@ -77,7 +77,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); QueueComparisonPreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -124,7 +124,7 @@ public partial class MainWindow : Window
     private void BindActiveDocument()
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
-        SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
+        CaptureComparisonView(); SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
         mermaidOwnerGeneration++;
         CancelSynchronisation(); CancelPreview(); viewportGeneration++;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
@@ -145,7 +145,7 @@ public partial class MainWindow : Window
         InvalidateFind(FindRefreshCause.ActiveDocument);
         UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
-        RefreshNavigationControls();
+        RefreshNavigationControls(); ComparisonDocumentBound();
     }
     private void UpdateCaretStatus() => CaretStatus.Text = displayedTab is null ? "UTF-8"
         : $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
@@ -290,7 +290,7 @@ public partial class MainWindow : Window
             InstallSyncPreview(sourceVersion);
             Phase("sync-install-end");
             Phase("selection-restore-start");
-            RestorePreviewSelection(previewSelection);
+            RestorePreviewSelection(previewSelection ?? (comparisonSlots is not null ? comparisonViews.GetValueOrDefault(tab.Id)?.PreviewSelection : null));
             Phase("selection-restore-end");
             Phase("outline-start");
             RefreshOutline();
@@ -639,10 +639,13 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
         Editor.TextArea.TextView.Redraw();
+        QueueComparisonPreview();
     }
     private async void ChangeLayout(object sender, RoutedEventArgs e) { SetLayout((string)((FrameworkElement)sender).Tag); await SavePreferences(); }
     private void SetLayout(string layout)
     {
+        if (comparisonSlots is not null)
+        { layout = layout == "Preview" ? "Preview" : "Editor"; comparisonSlots[comparisonActive].Mode = layout; }
         var changed = model.Layout != layout;
         model.Layout = layout;
         EditorColumn.Width = layout == "Preview" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
@@ -673,7 +676,7 @@ public partial class MainWindow : Window
     }
     private async Task SavePreferences()
     {
-        try { await model.UpdatePreferencesAsync(current => current with { Theme = model.Theme, Layout = model.Layout }); }
+        try { await model.UpdatePreferencesAsync(current => current with { Theme = model.Theme, Layout = comparisonSlots is null ? model.Layout : comparisonOriginalLayout }); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { model.Status = "Preferences could not be saved: " + ex.Message; }
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)

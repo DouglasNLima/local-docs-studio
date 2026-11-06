@@ -21,7 +21,7 @@ export function createDocumentStatisticsService({ state, editor, button, reviewB
     const record = state.files.find(item => item.path === state.activePath);
     stateLabel.textContent = record?.readOnly ? 'Read-only'
       : record?.persistenceState === 'saving' ? 'Saving…'
-        : state.externalChangePaths.has(state.activePath) ? 'External change'
+        : state.externalChangePaths.has(state.activePath) ? (state.dirtyPaths.has(state.activePath) ? 'External conflict' : 'External change')
           : record?.persistenceState === 'error' ? 'Save failed'
         : state.dirtyPaths.has(state.activePath) ? 'Unsaved changes'
           : record?.persistenceState === 'saved' ? 'Saved'

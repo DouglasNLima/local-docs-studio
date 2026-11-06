@@ -781,3 +781,6 @@ A linked file is only labelled **Saved** after a completed write. **Unsaved chan
 The document outline supports H1–H6, persistent branch expansion and configurable Copy Table of Contents in Web/PWA and Native. See the [feature guide](docs/tool-guide.md#advanced-outline-and-copy-table-of-contents) for navigation and copy options.
 
 Contextual slash commands reuse the existing formatters and insertion dialogs, with keyboard navigation, composition guards and one-step Undo.
+
+
+Use **File → Open beside…** to compare two workspace documents. Each pane has its own Editor/Preview choice; Activate or focus its source to route editing, Find, Save and exports to that document. Pane widths can be adjusted, scroll is independent until **Synchronise scroll** is selected, and narrow windows stack the panes. Closing comparison keeps both documents and unsaved buffers. This is separate from Editor/Split/Preview for one document.

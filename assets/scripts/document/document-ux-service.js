@@ -282,7 +282,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     clearPreviewSearch({ clearInput: true });
   }
 
-  function applyPreviewSearch(query) {
+  function applyPreviewSearch(query, navigate = true) {
     clearSearchHighlights();
     searchState.matches = [];
     searchState.activeIndex = -1;
@@ -297,7 +297,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     textNodes.forEach((node) => highlightTextNode(node, needle));
     searchState.matches = [...preview.querySelectorAll('mark.preview-search-hit')];
     searchState.activeIndex = searchState.matches.length ? 0 : -1;
-    updateSearchActiveMatch(true);
+    updateSearchActiveMatch(navigate);
   }
 
   function collectSearchableTextNodes() {
@@ -786,6 +786,13 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   return {
+    capturePreviewFind: () => ({ query: previewFindInput.value, open: !previewFindPanel.hidden }),
+    restorePreviewFind: (session = {}) => {
+      previewFindInput.value = session.query || '';
+      previewFindPanel.hidden = !session.open;
+      previewFindToggleButton.setAttribute('aria-pressed', String(!!session.open));
+      applyPreviewSearch(session.open ? session.query : '', false);
+    },
     installDocumentUxHandlers,
     toggleOutline,
     updateDocumentUx,

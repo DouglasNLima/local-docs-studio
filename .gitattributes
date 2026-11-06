@@ -2,3 +2,5 @@
 /assets/vendor/THIRD-PARTY-NOTICES.txt -text
 /docs/open-source/evidence/upstream-notices/*.txt -text
 /docs/open-source/evidence/goal58/mammoth-notices/*.txt -text
+
+/tests/fixtures/native-flowchart/spc-application-architecture.md text eol=lf

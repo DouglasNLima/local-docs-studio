@@ -15,7 +15,7 @@ public partial class DocumentViewModel : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool externalChange;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool isSaving;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool saveFailed;
-    public string PersistenceState => IsSaving ? "Saving…" : ExternalChange ? "External change" : SaveFailed ? "Save failed"
+    public string PersistenceState => IsSaving ? "Saving…" : ExternalChange ? (IsDirty ? "External conflict" : "External change") : SaveFailed ? "Save failed"
         : IsDirty ? "Unsaved changes" : SavedSnapshot is null ? "Unsaved document" : "Saved";
     [ObservableProperty] private bool isPinned;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;

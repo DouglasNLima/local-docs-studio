@@ -904,9 +904,11 @@ export function createFileService({
       return /\.(mmd|mermaid)$/i.test(path) ? 'text/plain' : 'text/markdown';
     }
 
+    let selectionGeneration = 0;
     async function selectFile(path) {
       const record = state.files.find((item) => item.path === path);
       if (!record) return;
+      const generation = ++selectionGeneration;
       rememberScrollPosition?.();
 
       try {
@@ -915,16 +917,19 @@ export function createFileService({
           if (externalDecision === 'cancel') return;
         }
 
-        state.activePath = record.path;
-        state.fileName = record.name;
-
         if (!state.fileCache.has(record.path)) {
           const { file, text } = await readRecordSource(record);
+          if (generation !== selectionGeneration || !state.files.includes(record)) return;
           record.file = file;
           updateRecordFingerprint(record, file);
           state.fileCache.set(record.path, text);
         }
-
+        if (generation !== selectionGeneration || !state.files.includes(record)) return;
+        editor.dispatchEvent(new CustomEvent('lens-document-leaving'));
+        clearTimeout(state.debounceId);
+        state.renderId++;
+        state.activePath = record.path;
+        state.fileName = record.name;
         editor.value = state.fileCache.get(record.path) ?? '';
         editor.scrollTop = 0;
         preview.scrollTop = 0;
@@ -949,10 +954,14 @@ export function createFileService({
           updateActiveFileLabel();
           updateSaveButton();
         }
+        editor.dispatchEvent(new CustomEvent('lens-document-loaded', { detail: { record } }));
         await renderPreview();
+        if (generation !== selectionGeneration) return;
         restoreScrollPosition?.(record.path);
+        editor.dispatchEvent(new CustomEvent('lens-document-ready', { detail: { record } }));
         showNativeWorkspaceChangeStatus(record);
       } catch (error) {
+        if (generation !== selectionGeneration) return;
         setStatus(`Could not open ${record.name}.`, 'danger');
         preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
         updateSaveButton();

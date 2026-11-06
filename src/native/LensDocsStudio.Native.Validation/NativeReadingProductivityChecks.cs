@@ -62,7 +62,7 @@ internal static class NativeReadingProductivityChecks
             var second = model.ActiveDocument!;
             second.IsSaving = true; Check(second.PersistenceState == "Saving…", "Persistence status follows an actual model save operation");
             second.IsSaving = false; second.SaveFailed = true; Check(second.PersistenceState == "Save failed", "Save failure remains explicit");
-            second.ExternalChange = true; Check(second.PersistenceState == "External change", "External conflict takes precedence over ordinary pending changes");
+            second.ExternalChange = true; Check(second.PersistenceState == "External conflict", "External conflict takes precedence over ordinary pending changes");
             model.ActiveDocument = first; editor.Document.Text = ""; AwaitSummary("0 words · 0 chars");
             Check(Convert.ToString(statistics.Content)!.StartsWith("0 min read", StringComparison.Ordinal), "Empty documents preserve zero-minute reading time");
             const string headingsSource = "# Root\n\n## Branch\n\n##### Five\n\n###### Six\n\n## Other";
@@ -115,6 +115,66 @@ internal static class NativeReadingProductivityChecks
             for (var query = 0; query < 100; query++) slashContext = SlashCommandService.Query(longSource, longSource.Length, slashContext)!;
             var cachedQueriesMs = timing.Elapsed.TotalMilliseconds;
             Check(slashContext.Start == longSource.Length - 1, "A large-buffer slash query retains the exact source range with cached prefix validation");
+            editor.Text = "# First\n\nLeft buffer"; first = model.ActiveDocument!;
+            model.NewDocumentCommand.Execute(null); second = model.ActiveDocument!; editor.Text = "# Second\n\nRight buffer";
+            model.ActiveDocument = first;
+            Invoke("StartComparison", first, second);
+            var passiveEditor = (TextEditor)Field("comparisonEditor");
+            Check(ReferenceEquals(passiveEditor.Document, second.EditorDocument) && ReferenceEquals(editor.Document, first.EditorDocument),
+                "Comparison shares the two authoritative AvalonEdit documents without duplicating writable buffers");
+            editor.Document.Insert(editor.Document.TextLength, " edited"); editor.Select(2, 3);
+            var findText = (TextBox)window.FindName("FindText"); findText.Text = "Left";
+            ((FrameworkElement)window.FindName("FindBar")).Visibility = Visibility.Visible;
+            Invoke("ActivateComparison", 1, false);
+            Check(model.ActiveDocument == second && editor.Document == second.EditorDocument && findText.Text == "",
+                "Activating the right pane routes the real editor and clears the other document's Find query");
+            editor.Document.Insert(editor.Document.TextLength, " changed");
+            Invoke("ActivateComparison", 0, false);
+            Check(editor.SelectionStart == 2 && editor.SelectionLength == 3 && findText.Text == "Left",
+                "Returning to the left pane restores its exact selection and Find session");
+            editor.Document.UndoStack.Undo();
+            Check(editor.Text == "# First\n\nLeft buffer" && second.EditorDocument.Text.EndsWith("changed", StringComparison.Ordinal),
+                "Undo in the left pane cannot alter the right document's independent history");
+            Invoke("ActivateComparison", 1, false); editor.Document.UndoStack.Undo();
+            Check(editor.Text == "# Second\n\nRight buffer", "The right document retains its own Undo stack after focus changes");
+            editor.Document.UndoStack.Redo();
+            var modes = (ComboBox[])Field("comparisonModes"); modes[0].SelectedItem = "Preview"; modes[1].SelectedItem = "Preview";
+            var comparisonRender = (Task)Invoke("RenderComparisonAsync")!; PumpUntil(() => comparisonRender.IsCompleted); comparisonRender.GetAwaiter().GetResult();
+            var secondaryPreview = (LensDocsStudio.Native.Rendering.DocumentPreview)Field("comparisonPreview");
+            Check(new System.Windows.Documents.TextRange(secondaryPreview.Document.ContentStart, secondaryPreview.Document.ContentEnd).Text.Contains("Left buffer", StringComparison.Ordinal),
+                "The actual secondary WPF preview renders its own Markdown through the canonical native services");
+            Check(UIElementAutomationPeer.CreatePeerForElement(((Button[])Field("comparisonActivate"))[0]).GetPattern(PatternInterface.Invoke) is not null,
+                "Comparison activation exposes a native UI Automation Invoke action");
+            Invoke("CloseComparison");
+            Check(model.Documents.Contains(first) && model.Documents.Contains(second) && second.EditorDocument.Text.EndsWith("changed", StringComparison.Ordinal),
+                "Closing comparison retains both open documents and all unsaved changes");
+            Invoke("StartComparison", second, first); Invoke("CloseComparison");
+            Check(model.ActiveDocument == second, "Comparison can be reopened and closed without changing its active document");
+
+            var workspace = Path.GetFullPath(Path.Combine(output, "workspace")); Directory.CreateDirectory(workspace);
+            var leftPath = Path.Combine(workspace, "left.md"); var rightPath = Path.Combine(workspace, "right.md");
+            File.WriteAllText(leftPath, "# Disk left"); File.WriteAllText(rightPath, "# Disk right");
+            Complete(model.OpenPathAsync(leftPath, workspace)); var leftFile = model.ActiveDocument!;
+            Complete(model.OpenPathAsync(rightPath, workspace)); var rightFile = model.ActiveDocument!;
+            Invoke("StartComparison", rightFile, leftFile);
+            editor.Document.Insert(editor.Document.TextLength, " edited");
+            Complete(model.SaveTabAsync(rightFile, false));
+            Check(File.ReadAllText(rightPath) == "# Disk right edited" && File.ReadAllText(leftPath) == "# Disk left",
+                "Comparison saves the active real file without writing or replacing the secondary file");
+            Invoke("ActivateComparison", 1, false); editor.Document.Insert(editor.Document.TextLength, " pending");
+            File.WriteAllText(leftPath, "# External replacement");
+            var conflicted = model.SaveTabAsync(leftFile, false); PumpUntil(() => conflicted.IsCompleted);
+            try { conflicted.GetAwaiter().GetResult(); throw new IOException("Expected a document conflict."); }
+            catch (LensDocsStudio.Core.Documents.DocumentConflictException) { }
+            Check(leftFile.ExternalChange && leftFile.IsDirty && File.ReadAllText(leftPath) == "# External replacement"
+                && editor.Text == "# Disk left pending", "External conflicts retain both the changed disk file and the comparison buffer");
+            Complete(model.PersistSessionAsync()); Invoke("CloseComparison");
+            Check(leftFile.EditorDocument.Text == "# Disk left pending" && rightFile.EditorDocument.Text == "# Disk right edited",
+                "Recovery persistence and comparison closure retain each document independently");
+            void Complete(Task task) { PumpUntil(() => task.IsCompleted); task.GetAwaiter().GetResult(); }
+
+            object Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            object? Invoke(string name, params object[] arguments) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, arguments);
             File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new
             {
                 status = "PASS", scope = "COMPILED_WPF_AVALONEDIT_AND_UIA_PEERS; NOT PHYSICAL_GUI_CERTIFICATION",
