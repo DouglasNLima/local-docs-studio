@@ -42,8 +42,14 @@ EventSource marker wakes a background input sender, without first querying the b
 UI dispatcher. This avoids sampling only when the UI is idle. The measurement includes
 any non-preemptible WPF work, verifies the outgoing buffer, and waits for the replacement
 preview. This covers cancellation by document switch, not every export/import operation.
-Export/import cancellation, resource exhaustion, physical accessibility and continuous
-typing during every rendering phase still require independent coverage before approval.
+Typing is also offered from a worker at actual construction and attachment markers,
+after a real edit schedules rendering with editor focus retained. The historic product
+without attachment telemetry explicitly records that cell NOT RUN. No dispatcher
+idle query is made between the marker and the offered keystroke. These isolated
+render-load samples remain separate from idle interaction and do not establish
+continuous-load behaviour. Export/import cancellation, resource exhaustion, physical
+accessibility and sustained typing during every rendering phase still require
+independent coverage before approval.
 
 Idle repeated interaction and interruption during rendering must remain separate
 strata. Closed-loop input after an observed response is not an open-loop typing-storm

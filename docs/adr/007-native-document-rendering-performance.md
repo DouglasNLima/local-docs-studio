@@ -65,6 +65,13 @@ attachment, Run coalescing and batched table construction. The list fixture cont
 4,000 ListItems, 4,000 Paragraphs and 4,000 Runs in one native List. Automatic mode
 may choose Pages, but explicit Continuous stays Continuous.
 
+The versioned WPF formatter also has viewport-specific visual updates and background
+formatting state. Therefore synchronous bottomless formatting does not mean every
+off-screen pixel must be drawn, or prove that first-viewport latency cannot improve.
+Its blocking format section disables dispatcher processing. The actual complete
+layout and navigation obligations, rather than the control's name, determine what
+work a measurement forces. This distinction is another reason to retain three clocks.
+
 Retained original-protocol failures from the final PR #76 receipt:
 
 | Exact comparison | Baseline failures / 66 | Candidate failures / 66 |
@@ -196,5 +203,7 @@ required policy through an explicit owner action, never an agent ruleset edit.
 - [Microsoft WPF threading model](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/threading-model): dispatcher operations run to completion; queued input cannot interrupt one.
 - [Microsoft layout guidance](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/optimizing-performance-layout-and-design) and [text guidance](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/optimizing-performance-text): tree/layout work matters; lighter controls have different functionality.
 - [Versioned WPF FlowDocumentView](https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/documents/FlowDocumentView.cs): supports the architectural interpretation; not a byte match to every serviced runtime.
+- [Versioned WPF FlowDocumentFormatter](https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/documents/FlowDocumentFormatter.cs): blocking bottomless formatting and viewport visual updates are distinct.
 - [Microsoft DwmFlush](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmflush): waits for the caller's queued graphics work, not the entire session; not physical scan-out proof.
 - [Microsoft High Contrast guidance](https://learn.microsoft.com/en-us/windows/compatibility/high-contrast-mode): system-colour pairs and responding to theme changes matter. This guidance does not establish the cause of this failure.
+- [Microsoft WM_SYSCOLORCHANGE](https://learn.microsoft.com/en-us/windows/win32/gdi/wm-syscolorchange) and [WM_THEMECHANGED](https://learn.microsoft.com/en-us/windows/win32/winmsg/wm-themechanged): colour/theme notification and invalidation paths warrant separate chronology; do not simulate messages to make acceptance pass.

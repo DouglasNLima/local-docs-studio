@@ -64,8 +64,9 @@ export function buildReport(root) {
     }
     for (const action of ['typing','caret','selection','find-open','find-navigation','document-switch','outline-open','outline-close','layout-editor','layout-preview','layout-split'])
       if (counts.get(action) !== protocol.iterations) failures.push(`${key}: missing or extra ${action} observations`);
-    for (const action of ['first-usable-preview','complete-readiness','cancel-render-by-switch','observer-delay-control'])
+    for (const action of ['first-usable-preview','complete-readiness','cancel-render-by-switch','observer-delay-control','typing-during-construction'])
       if (counts.get(action) !== 1) failures.push(`${key}: missing or extra ${action} observation`);
+    if (id.capabilities?.attachmentMarker === true && counts.get('typing-during-attachment') !== 1) failures.push(`${key}: missing typing during attachment`);
     const scrollOmissions = records.filter(r => r.kind === 'coverage' && r.action === 'scroll' && r.status === 'NOT APPLICABLE').length;
     if ((counts.get('scroll') ?? 0) + scrollOmissions !== protocol.iterations) failures.push(`${key}: incomplete scrolling coverage`);
     if (id.capabilities?.slash === true) for (const action of ['slash-open','slash-execute']) {

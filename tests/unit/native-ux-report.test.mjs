@@ -55,7 +55,7 @@ function reportFixture(t) {
     const prefix = `samples/0/small/${side}`; mkdirSync(join(root,prefix), {recursive:true});
     write(`${prefix}/identity.json`, {fixture:'small',sha256:hash,productRevision:revision,product:{sha256:hash},core:{sha256:hash},harness:{sha256:hash},highContrast:false,runtime:'test',wpf:{sha256:hash},stopwatchFrequency:1000,capabilities:{slash:false,comparison:false}});
     write(`${prefix}/completion.json`, {collection:'PASS',exactSource:'PASS',completeContent:'PASS',intervalOverflow:false,heartbeatMaximumMs:0,dispatcherIntervals:[]});
-    const actions = ['typing','caret','selection','find-open','find-navigation','document-switch','outline-open','outline-close','layout-editor','layout-preview','layout-split','first-usable-preview','complete-readiness','cancel-render-by-switch','observer-delay-control','scroll'];
+    const actions = ['typing','caret','selection','find-open','find-navigation','document-switch','outline-open','outline-close','layout-editor','layout-preview','layout-split','first-usable-preview','complete-readiness','cancel-render-by-switch','observer-delay-control','scroll','typing-during-construction'];
     const records = actions.map(action => ({kind:'sample',action,status:'OBSERVED',foregroundVerified:true,screenSha256:hash,elapsedMs:25,startTick:1,endTick:26,temperature:'test',facts:action === 'complete-readiness' ? {logicalTextSha256:hash,counts:{Paragraph:12},mappedLiterals:12,media:0}:undefined}));
     records.push({kind:'coverage',action:'slash',status:'NOT RUN'}, {kind:'coverage',action:'comparison-switch',status:'NOT RUN'},
       {kind:'observer-control',status:'PASS',delayMs:200}, {kind:'cancellation',status:'PASS',originalBufferPreserved:true,stalePreviewRejected:true});

@@ -84,7 +84,8 @@ internal static class Program
                 processors = Environment.ProcessorCount, processId = Environment.ProcessId, stopwatchFrequency = Stopwatch.Frequency,
                 sourceBytes = bytes.Length, sourceCharacters = source.Length, lineEnding = fixture.LineEnding,
                 capabilities = new { slash = typeof(MainWindow).GetField("slashCommands", BindingFlags.NonPublic | BindingFlags.Instance) is not null,
-                    comparison = typeof(MainWindow).GetField("comparisonSlots", BindingFlags.NonPublic | BindingFlags.Instance) is not null },
+                    comparison = typeof(MainWindow).GetField("comparisonSlots", BindingFlags.NonPublic | BindingFlags.Instance) is not null,
+                    attachmentMarker = typeof(MainWindow).GetField("diagnosticRequest", BindingFlags.NonPublic | BindingFlags.Instance) is not null },
                 image = Environment.GetEnvironmentVariable("ImageVersion"), run = Environment.GetEnvironmentVariable("GITHUB_RUN_ID"),
                 protocol = "foreground SendInput to semantic state plus captured desktop response; software observation upper bound, not physical scan-out" });
             var probe = new Probe(window, model, source, fixture, path, output, iterations);
@@ -231,6 +232,7 @@ internal sealed class Probe : IDisposable
         await Complete(renderingStart, "cold-render");
         for (var i = 0; i < iterations; i++) await Interactions(i);
         await FeatureInteractions();
+        await RenderingInput();
         await Cancellation();
         await VerifyDelayedResponse();
         if (Program.Hash(File.ReadAllBytes(path)) != fixture.Sha256.ToUpperInvariant()) throw new IOException("Measured interactions changed the fixture file.");
@@ -385,6 +387,28 @@ internal sealed class Probe : IDisposable
         await ClickControl("ActivateComparison0"); await Until(() => model.ActiveDocument == original);
         await ClickControl("CloseComparison"); await Until(() => Field<object>("comparisonSlots") is null);
         await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
+    }
+    private async Task RenderingInput()
+    {
+        foreach (var stage in new[] { "started", "request/attachment-start" })
+        {
+            var action = stage == "started" ? "typing-during-construction" : "typing-during-attachment";
+            if (stage != "started" && typeof(MainWindow).GetField("diagnosticRequest", BindingFlags.NonPublic | BindingFlags.Instance) is null)
+            { Record(new { kind = "coverage", action, status = "NOT RUN", reason = "Exact historical product has no attachment marker" }); continue; }
+            await ClickControl("LayoutSplit");
+            await Until(() => preview.IsVisible && Field<ICSharpCode.AvalonEdit.Document.ITextSourceVersion>("renderedVersion") is { } version &&
+                editor.Document.Version.CompareAge(version) == 0 && preview.IsMeasureValid && preview.IsArrangeValid);
+            await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
+            // A real source edit schedules preview work while the editor keeps focus.
+            // The next input is offered at the renderer marker, without asking the UI
+            // thread whether it is idle. Any non-preemptible layout delay is retained.
+            stages.Arm(stage); Desktop.Text("x"); var stageTick = await stages.Wait(TimeSpan.FromSeconds(ActionSeconds));
+            var sent = Stopwatch.GetTimestamp(); Desktop.Text("y");
+            await Measure(action, "render-load", 0, () => { }, () => editor.Text == "xy" + source && editor.CaretOffset == 2, false, sent);
+            Record(new { kind = "render-load", action, stage, stageTick, inputTick = sent, status = "OBSERVED" });
+            Desktop.Key(0x24, 0x11); Desktop.Key(0x2E); Desktop.Key(0x2E); await Until(() => editor.Text == source);
+            await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
+        }
     }
     private async Task Cancellation()
     {
