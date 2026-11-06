@@ -132,3 +132,9 @@ Read the footer for the active document's estimated reading time, word count and
 Words follow the Review prose rules. Characters count Unicode scalar values in readable text, including punctuation and image descriptions, with whitespace normalised to single spaces. Front matter and code are excluded. A zero-word document has a zero-minute estimate; longer documents retain the 220 words-per-minute ceiling. Files above the 4 Mi source-character analysis limit show an explicit unavailable status. No document content is sent to a service.
 
 The adjacent document state reflects pending changes or linked-file writes. A downloaded copy is not proof that the browser saved it to disk. Edits made during a write remain pending after that older version finishes saving.
+
+## Advanced outline and Copy Table of Contents
+
+The existing outline includes H1–H6, individual branch toggles, Expand All and Collapse All. Expansion is kept per open document during normal edits. Navigation works in Editor, Split and Preview; preview navigation opens enclosing collapsible sections. A filter in the native outline can reveal headings inside collapsed branches.
+
+Use **Copy Table of Contents** in the outline to copy links without editing the document. Choose start/end heading levels, bullets, numbered lists or plain text, optional hierarchy normalisation and a `<details>` wrapper. Normalisation removes gaps in heading levels while keeping their hierarchy. Links use the renderer's actual identifiers, including duplicate-heading suffixes; exported compatible documents keep those targets. Web and native retain their existing anchor conventions. An empty outline produces no entries; an invalid range cannot replace the clipboard. Paste explicitly when you want to insert the copied result with ordinary Undo/Redo.

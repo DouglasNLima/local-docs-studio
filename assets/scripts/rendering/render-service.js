@@ -1,3 +1,4 @@
+import { createDetailsExtension } from '../utils/markdown-details.js';
 import { mermaidStarters, mermaidThemeOptions, normaliseMermaidTheme, storageKeys } from '../state/config.js';
 import { getCodeLanguage, isMermaidLanguage, isSupportedFile } from '../utils/files.js';
 import { clamp, escapeHtml, roundToStep } from '../utils/format.js';
@@ -61,6 +62,7 @@ export function createRenderingService({
         });
         marked.use({
           extensions: [
+            createDetailsExtension(),
             createWikilinkExtension(),
             ...createMathExtensions({
               renderMath: katexRenderer
@@ -328,7 +330,7 @@ export function createRenderingService({
           diagramErrors: diagramResult.errors,
           diagramTotal: diagrams.length,
         };
-        updatePreviewOutline();
+        updatePreviewOutline(source);
         afterPreviewRender?.();
         // A save or other action may complete while preview rendering is awaiting work.
         if (state.statusRevision === renderStatusRevision) setRenderStatus(diagramResult.errors);
@@ -339,7 +341,7 @@ export function createRenderingService({
         preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
         updateDiagramControls(0);
         state.lastRenderResult = { ok: false, diagramErrors: 0, diagramTotal: 0 };
-        updatePreviewOutline();
+        updatePreviewOutline(source);
         afterPreviewRender?.();
         if (state.statusRevision === renderStatusRevision) setStatus('Error while rendering.', 'danger');
         return { ok: false, cancelled: false, diagramErrors: 0 };
@@ -387,29 +389,27 @@ export function createRenderingService({
     }
 
     function assignLineNumbers(tokens, source, lineOffset = 0) {
-      let offset = 0;
-
-      function walk(tokenList) {
-        for (const token of tokenList) {
-          if (token.raw) {
-            const index = source.indexOf(token.raw, offset);
-            if (index !== -1) {
-              const linesBefore = source.slice(0, index).split('\n').length - 1;
-              token.line = linesBefore + lineOffset;
-              offset = index + token.raw.length;
-            }
-          }
-
-          if (token.tokens) {
-            walk(token.tokens);
-          }
-          if (token.items) {
-            walk(token.items);
-          }
+      const starts = [0];
+      for (let index = source.indexOf('\n'); index >= 0; index = source.indexOf('\n', index + 1)) starts.push(index + 1);
+      function lineAt(index) {
+        let low = 0; let high = starts.length;
+        while (low + 1 < high) { const middle = (low + high) >>> 1; if (starts[middle] <= index) low = middle; else high = middle; }
+        return low + lineOffset;
+      }
+      function walk(list, start, end) {
+        let cursor = start;
+        for (const token of list) {
+          if (!token.raw) continue;
+          const index = source.indexOf(token.raw, cursor);
+          if (index < 0 || index + token.raw.length > end) continue;
+          token.line = lineAt(index);
+          const finish = index + token.raw.length;
+          if (token.tokens) walk(token.tokens, index + (token.bodyOffset || 0), finish);
+          if (token.items) walk(token.items, index, finish);
+          cursor = finish;
         }
       }
-
-      walk(tokens);
+      walk(tokens, 0, source.length);
     }
 
     function buildMermaidOnlyHtml(source) {

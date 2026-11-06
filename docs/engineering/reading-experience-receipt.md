@@ -58,3 +58,18 @@ Phase verdicts, added tests, exact final commit/tree, workflow URLs, measurement
 - Browser checkpoint: PASS, 26 tests (13 per Chromium/Edge) in `phase1-web-04.log`, including keyboard Review activation, Undo/Redo, large buffer supersession, Unicode and semantic parity, narrow forced-colours, delayed/failed writes, and existing Find/Review regressions.
 - Development failures retained: a mistaken expected character total in a new test (correct canonical readable string has 40 scalars); an accidental Windows text-encoding conversion during editing (repaired from UTF-8 source before clean reruns). No existing test threshold changed. The first mixed browser run is not final-source acceptance.
 - Save completion now preserves a newer buffer and recovery draft. The status distinguishes the version written to disk from subsequent unsaved edits. No automatic write was added.
+
+### Phase 2 checkpoint and architecture
+
+- Extended the existing Web outline and native ListBox, retaining their source navigation and keyboard contracts. Expansion belongs to the document; active section identity comes from existing renderer targets.
+- Shared Web heading collection now drives the live outline and Docs Site export. Native TOCs use Markdig's existing `DocumentHeading.Anchor`. Existing platform anchor conventions are preserved rather than changing saved links.
+- Copy is separate from insertion. The configurable native dialog and Web controls consume a current-buffer heading snapshot, reject invalid ranges and never write the source. Numbered-list indentation is three spaces per level so a pasted TOC parses as an actual nested list.
+- The Web Markdown details extension is shared by preview and readable statistics. Source locations inside nested tokens now use bounded parent ranges and a precomputed line-offset index; this also corrects navigation into collapsible sections.
+- Checkpoint PASS: 16 focused browser tests (8 each Chromium/Edge), 8 additional existing navigation/selection/Find/Docs Site regressions, 64 focused Core tests, locked Release build with zero warnings/errors, 23 cumulative actual compiled WPF/AvalonEdit/UIA-peer checks. Follow-up verification after numbered indentation correction is recorded separately. Full final-source validation remains pending.
+- Evidence: `phase2-web.log`, `phase2-regression.log`, `phase2-core.log`, `phase2-build-02.log`, `artifacts/reading-experience/phase2-controls/completion.json`. Assembly source stamps at this checkpoint identify the preceding commit plus working-tree changes; they are not final immutable commit evidence.
+
+### Additional acceptance slice — native flowchart fidelity
+
+The user added a fifth workstream to the same Goal and Draft PR. The exact supplied SPC Markdown fixture is retained for raw Mermaider 0.15.1 reproduction, a bounded renderer-input correction, nine-node/nine-edge/eight-class semantics, source preservation, label fidelity, Visual Edit and canonical export regression. No dependency upgrade is planned. This slice is not yet implemented or validated.
+
+- Phase 2 follow-up PASS: 4 Chromium/Edge advanced-outline tests and 42 focused Core tests after the numbered indentation correction, including parsing the copied nested list (phase2-web-final.log, phase2-core-final.log).

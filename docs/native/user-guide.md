@@ -648,3 +648,9 @@ All four use the shared adjustable source pane, independently scrolling inspecto
 ## Reading statistics
 
 The bottom status bar retains operation, preview and caret information and adds reading time, words, readable characters and the document's persistence state. Activate the statistics button to open Document Review. Metrics use the current AvalonEdit buffer after a short editing pause and do not require a preview. Switching tabs cancels obsolete results; a draft is not labelled Saved. Characters are Unicode scalar values in readable prose with normalised whitespace, rather than source bytes or Markdown syntax. The 220 words-per-minute estimate is unchanged, with hours shown for longer documents.
+
+## Advanced outline and Copy Table of Contents
+
+The existing outline includes H1–H6, individual branch toggles, Expand All and Collapse All. Expansion is kept per open document during normal edits. Navigation works in Editor, Split and Preview; preview navigation opens enclosing collapsible sections. A filter in the native outline can reveal headings inside collapsed branches.
+
+Use **Copy Table of Contents** in the outline to copy links without editing the document. Choose start/end heading levels, bullets, numbered lists or plain text, optional hierarchy normalisation and a `<details>` wrapper. Normalisation removes gaps in heading levels while keeping their hierarchy. Links use the renderer's actual identifiers, including duplicate-heading suffixes; exported compatible documents keep those targets. Web and native retain their existing anchor conventions. An empty outline produces no entries; an invalid range cannot replace the clipboard. Paste explicitly when you want to insert the copied result with ordinary Undo/Redo.

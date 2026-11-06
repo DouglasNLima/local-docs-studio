@@ -1,3 +1,4 @@
+import { collectDocumentHeadings, buildTableOfContents } from './table-of-contents.js';
 import { storageKeys } from '../state/config.js';
 import { cssEscape, slugify } from '../utils/format.js';
 import { resolveWikilinkTarget } from '../utils/wikilinks.js';
@@ -16,6 +17,7 @@ const SEARCH_IGNORE_SELECTOR = [
 export function createDocumentUxService({ state, dom, callbacks = {} }) {
   const {
     preview,
+    editor,
     outlineToggleButton,
     outlinePanel,
     outlineLinks,
@@ -34,6 +36,10 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   } = dom;
   const {
     getStatistics,
+    getCurrentHeadings,
+    copyTableOfContents,
+    navigateOutlineLine,
+    setStatus,
     getBacklinks,
     getWorkspaceAudit,
     getGovernanceAudit,
@@ -46,6 +52,15 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     activeIndex: -1,
   };
   let outlineItems = [];
+  const collapsedByDocument = new Map();
+  let outlineSource = null;
+  let outlinePath = null;
+  const previewPane = outlinePanel.parentElement;
+  function collapsedSections() {
+    if (!collapsedByDocument.has(state.activePath)) collapsedByDocument.set(state.activePath, new Set());
+    for (const path of collapsedByDocument.keys()) if (path !== state.activePath && !state.files.some(file => file.path === path)) collapsedByDocument.delete(path);
+    return collapsedByDocument.get(state.activePath);
+  }
   let scrollFrame = 0;
   let outlineClickLockTarget = '';
   let outlineClickLockTimer = 0;
@@ -54,6 +69,14 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   function installDocumentUxHandlers() {
     outlineToggleButton.addEventListener('click', toggleOutline);
     outlineLinks.addEventListener('click', handleOutlineClick);
+    document.getElementById('outlineExpandAll').addEventListener('click', () => { collapsedSections().clear(); renderOutlineTree(); });
+    document.getElementById('outlineCollapseAll').addEventListener('click', () => { outlineItems.forEach(item => collapsedSections().add(item.id)); renderOutlineTree(); });
+    document.getElementById('copyTableOfContents').addEventListener('click', copyOutline);
+    document.addEventListener('lens-layout-changed', placeOutline);
+    editor.addEventListener('keyup', updateActiveOutlineFromEditor);
+    editor.addEventListener('click', updateActiveOutlineFromEditor);
+    editor.addEventListener('select', updateActiveOutlineFromEditor);
+    placeOutline();
     preview.addEventListener('scroll', scheduleActiveOutlineUpdate, { passive: true });
 
     previewFindToggleButton.addEventListener('click', togglePreviewFind);
@@ -77,7 +100,8 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     documentReviewAlerts.addEventListener('click', handleReviewTargetClick);
   }
 
-  function updateDocumentUx() {
+  function updateDocumentUx(renderedSource) {
+    if (typeof renderedSource === 'string') { outlineSource = renderedSource; outlinePath = state.activePath; }
     clearPreviewSearch({ clearInput: false });
     updatePreviewOutline();
     updateDocumentReview();
@@ -93,53 +117,101 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     clearOutlineClickLock();
     outlineToggleButton.setAttribute('aria-pressed', String(state.outlineOpen));
     outlineItems = collectOutlineItems();
-    outlineLinks.innerHTML = '';
+    renderOutlineTree();
+  }
 
-    if (!state.outlineOpen || !outlineItems.length) {
-      outlinePanel.hidden = true;
-      return;
-    }
+  function placeOutline() {
+    if (state.editorLayout === 'editor') editor.closest('.input-pane').insertBefore(outlinePanel, document.getElementById('editorShell'));
+    else previewPane.insertBefore(outlinePanel, document.getElementById('documentReviewPanel'));
+  }
 
-    outlineItems.forEach((item) => {
+  function renderOutlineTree() {
+    const focused = document.activeElement?.dataset.outlineToggle;
+    outlineLinks.replaceChildren();
+    outlinePanel.hidden = !state.outlineOpen;
+    if (!state.outlineOpen) return;
+    if (!outlineItems.length) { outlineLinks.textContent = 'No headings in this document.'; return; }
+    const root = document.createElement('ul');
+    const stack = [{ level: 0, list: root }];
+    const collapsed = collapsedSections();
+    outlineItems.forEach((item, index) => {
+      while (stack.length > 1 && stack.at(-1).level >= item.level) stack.pop();
+      const row = document.createElement('li');
+      const line = document.createElement('div'); line.className = 'outline-row';
+      const children = document.createElement('ul');
+      const branch = outlineItems[index + 1]?.level > item.level;
+      if (branch) {
+        const toggle = document.createElement('button'); toggle.type = 'button';
+        toggle.dataset.outlineToggle = item.id;
+        toggle.setAttribute('aria-label', `Toggle section ${item.text}`);
+        toggle.setAttribute('aria-expanded', String(!collapsed.has(item.id)));
+        toggle.textContent = collapsed.has(item.id) ? '▸' : '▾';
+        children.hidden = collapsed.has(item.id); line.append(toggle);
+      }
       const link = document.createElement('a');
-      link.href = `#${item.id}`;
-      link.dataset.outlineTarget = item.id;
-      link.dataset.outlineLevel = String(item.level);
-      link.className = `outline-level-${item.level}`;
-      link.textContent = item.text;
-      outlineLinks.appendChild(link);
+      link.href = `#${encodeURIComponent(item.id)}`;
+      link.dataset.outlineTarget = item.id; link.dataset.outlineLevel = String(item.level);
+      link.className = `outline-level-${item.level}`; link.textContent = item.text; link.title = item.text;
+      line.append(link); row.append(line);
+      if (branch) row.append(children);
+      stack.at(-1).list.append(row);
+      stack.push({ level: item.level, list: children });
     });
-
-    outlinePanel.hidden = false;
+    outlineLinks.append(root);
+    if (focused) outlineLinks.querySelector(`[data-outline-toggle="${cssEscape(focused)}"]`)?.focus({ preventScroll: true });
     updateActiveOutlineLink();
   }
 
   function collectOutlineItems() {
-    const usedIds = new Set();
-    return [...getContentRoot().querySelectorAll('h1, h2, h3, h4')].map((heading, index) => {
-      const level = Number(heading.tagName.slice(1));
-      const text = heading.textContent.trim() || `Section ${index + 1}`;
-      const base = slugify(text) || `section-${index + 1}`;
-      let id = base;
-      let suffix = 2;
-      while (usedIds.has(id)) {
-        id = `${base}-${suffix}`;
-        suffix += 1;
-      }
-      usedIds.add(id);
-      heading.id = id;
-      return { id, level, text, heading };
-    });
+    const starts = [0];
+    const source = outlineSource || '';
+    for (let index = source.indexOf('\n'); index >= 0; index = source.indexOf('\n', index + 1)) starts.push(index + 1);
+    return collectDocumentHeadings(getContentRoot()).map(item => ({ ...item, start: starts[item.line] }));
+  }
+
+  async function copyOutline() {
+    const button = document.getElementById('copyTableOfContents'); button.disabled = true;
+    try {
+      const items = await getCurrentHeadings();
+      if (!items) { setStatus('The document changed. Copy the table of contents again.', 'warning'); return; }
+      const value = buildTableOfContents(items, {
+        startLevel: Number(document.getElementById('tocStartLevel').value),
+        endLevel: Number(document.getElementById('tocEndLevel').value),
+        style: document.getElementById('tocStyle').value,
+        normalise: document.getElementById('tocNormalise').checked,
+        details: document.getElementById('tocDetails').checked,
+      });
+      if (!value) { setStatus('No headings in the selected levels.', 'info'); return; }
+      await copyTableOfContents(value);
+    } catch (error) { setStatus(error.message || 'The table of contents could not be copied.', 'warning'); }
+    finally { button.disabled = false; }
   }
 
   function handleOutlineClick(event) {
+    const toggle = event.target.closest('[data-outline-toggle]');
+    if (toggle) {
+      const sections = collapsedSections(); const id = toggle.dataset.outlineToggle;
+      if (sections.has(id)) sections.delete(id); else sections.add(id);
+      renderOutlineTree(); return;
+    }
     const link = event.target.closest('[data-outline-target]');
     if (!link) return;
     event.preventDefault();
-    const target = preview.querySelector(`#${cssEscape(link.dataset.outlineTarget)}`);
-    lockActiveOutlineLink(link.dataset.outlineTarget);
-    scrollPreviewTarget(target);
-    setActiveOutlineLink(link.dataset.outlineTarget);
+    const item = outlineItems.find(item => item.id === link.dataset.outlineTarget);
+    if (!item) return;
+    if (outlinePath !== state.activePath || (outlineSource !== null && outlineSource !== editor.value.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, ''))) {
+      setStatus('The outline is updating. Select the heading again shortly.', 'info'); return;
+    }
+    lockActiveOutlineLink(item.id);
+    if (state.editorLayout !== 'preview' && Number.isFinite(item.line)) navigateOutlineLine(item.line + 1);
+    if (state.editorLayout !== 'editor') scrollPreviewTarget(item.heading);
+    setActiveOutlineLink(item.id);
+  }
+
+  function updateActiveOutlineFromEditor() {
+    if (!state.outlineOpen || !outlineItems.length || outlinePath !== state.activePath || outlineSource !== editor.value) return;
+    const active = outlineItems.findLast(item => Number.isFinite(item.start) && item.start <= editor.selectionStart);
+    if (active) setActiveOutlineLink(active.id);
   }
 
   function scheduleActiveOutlineUpdate() {
@@ -153,6 +225,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
 
   function updateActiveOutlineLink() {
     if (!state.outlineOpen || !outlineItems.length) return;
+    if (state.editorLayout === 'editor') { updateActiveOutlineFromEditor(); return; }
     const previewTop = preview.getBoundingClientRect().top;
     const threshold = previewTop + 96;
     let active = outlineItems[0];
@@ -169,6 +242,8 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   function setActiveOutlineLink(id) {
     outlineLinks.querySelectorAll('[data-outline-target]').forEach((link) => {
       link.classList.toggle('active', link.dataset.outlineTarget === id);
+      if (link.dataset.outlineTarget === id) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
     });
   }
 
@@ -362,7 +437,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   function buildDocumentReview() {
     const root = getContentRoot();
     const statistics = getStatistics?.();
-    const headings = [...root.querySelectorAll('h1, h2, h3, h4')];
+    const headings = [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')];
     const h1s = headings.filter((heading) => heading.tagName.toLowerCase() === 'h1');
     const links = [...root.querySelectorAll('a[href]')];
     const externalLinks = links.filter((link) => /^(https?:)?\/\//i.test(link.getAttribute('href') || ''));
@@ -702,7 +777,8 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
 
   function scrollPreviewTarget(target) {
     if (!target) return;
-    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    for (let parent = target.parentElement; parent && parent !== preview; parent = parent.parentElement) if (parent.tagName === 'DETAILS') parent.open = true;
+    target.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
   function getContentRoot() {

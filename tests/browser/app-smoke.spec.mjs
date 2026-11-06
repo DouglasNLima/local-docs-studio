@@ -10,6 +10,68 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
+test('advanced outline retains H1–H6 hierarchy and copies current renderer targets without editing', async ({ page }) => {
+  await gotoApp(page); await mockClipboardWrite(page);
+  const source = '# Root\n\n## Again\n\n### Café **bold**\n\n#### Four\n\n##### Five\n\n###### Six\n\n## Again\n\n```md\n# Excluded\n```\n\n<details>\n<summary>Hidden</summary>\n## Inside\n</details>';
+  await page.locator('#editor').fill(source);
+  await page.locator('#outlineToggleButton').click();
+  await expect(page.locator('#outlineLinks a')).toHaveCount(8);
+  await expect(page.locator('#outlineLinks [data-outline-level="6"]')).toHaveText('Six');
+  await page.locator('#copyTableOfContents').click();
+  await expect(page.locator('#status')).toHaveText('Table of contents copied.');
+  const copied = await page.evaluate(() => window.__copiedText);
+  expect(copied).not.toContain('Excluded');
+  const actualIds = await page.locator('#preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6').evaluateAll(items => items.map(item => item.id));
+  expect([...copied.matchAll(/\]\(#([^)]+)\)/g)].map(match => decodeURIComponent(match[1]))).toEqual(actualIds);
+  expect(new Set(actualIds).size).toBe(8);
+  await page.locator('#outlineCollapseAll').click();
+  await expect(page.locator('#outlineLinks a:visible')).toHaveCount(1);
+  await page.locator('#editor').press('Control+End');
+  await page.locator('#editor').pressSequentially('\n\nBody edit');
+  await expect(page.locator('#preview')).toContainText('Body edit');
+  await expect(page.locator('#outlineLinks a:visible')).toHaveCount(1);
+  await page.locator('#outlineExpandAll').click();
+  await expect(page.locator('#outlineLinks a:visible')).toHaveCount(8);
+  await page.locator('#outlineLinks a').filter({ hasText: /^Inside$/ }).click();
+  await expect(page.locator('#preview details')).toHaveAttribute('open', '');
+  await expect(page.locator('#editor')).toHaveValue(source + '\n\nBody edit');
+});
+
+test('advanced outline navigates the Editor layout and offers filtered numbered plain and wrapped TOCs', async ({ page }) => {
+  await gotoApp(page); await mockClipboardWrite(page);
+  await page.locator('#editor').fill('### A\n\n###### B\n\n## C');
+  await page.locator('#outlineToggleButton').click();
+  await expect(page.locator('#outlineLinks a')).toHaveCount(3);
+  await page.locator('[data-layout-mode="editor"]').click();
+  await expect(page.locator('#outlinePanel')).toBeVisible();
+  await page.locator('#outlineLinks a').filter({ hasText: /^B$/ }).click();
+  await expect(page.locator('#editor')).toBeFocused();
+  expect(await page.locator('#editor').evaluate(editor => editor.selectionStart)).toBe(7);
+  await page.locator('.toc-options summary').click();
+  await page.locator('#tocStyle').selectOption('numbered');
+  await page.locator('#copyTableOfContents').click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('1. [A](#a)\n   1. [B](#b)\n1. [C](#c)');
+  const nestedLabel = await page.evaluate(async () => {
+    const { marked } = await import('/assets/vendor/marked-16.4.2.esm.js');
+    const root = document.createElement('template'); root.innerHTML = marked.parse(window.__copiedText);
+    return root.content.querySelector('li li a')?.textContent;
+  });
+  expect(nestedLabel).toBe('B');
+  await page.locator('#tocStyle').selectOption('plain');
+  await page.locator('#tocStartLevel').selectOption('3');
+  await page.locator('#tocDetails').check();
+  await page.locator('#copyTableOfContents').click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('<details>\n<summary>Table of Contents</summary>\n\nA\n  B\n\n</details>');
+  await page.locator('#tocNormalise').uncheck();
+  await page.locator('#copyTableOfContents').click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toContain('\n    A\n          B\n');
+  await page.locator('#tocEndLevel').selectOption('2');
+  const previous = await page.evaluate(() => window.__copiedText);
+  await page.locator('#copyTableOfContents').click();
+  await expect(page.locator('#status')).toContainText('start no greater than the end');
+  expect(await page.evaluate(() => window.__copiedText)).toBe(previous);
+});
+
 test('document statistics follow the readable unsaved buffer and retain keyboard history', async ({ page }) => {
   await gotoApp(page);
   const editor = page.locator('#editor');

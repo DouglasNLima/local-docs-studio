@@ -22,6 +22,7 @@ import { createDialogService } from './ui/dialog-service.js';
 import { createSupportBundle, redactSupportBundleText } from './ui/support-bundle-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createWindowsSetupService } from './ui/windows-setup-service.js';
+import { collectDocumentHeadings } from './document/table-of-contents.js';
 import { createDocumentStatisticsService } from './document/document-statistics-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
@@ -508,6 +509,7 @@ export function createAppController() {
       state,
       dom: {
         preview,
+        editor,
         outlineToggleButton,
         outlinePanel,
         outlineLinks,
@@ -526,6 +528,16 @@ export function createAppController() {
       },
       callbacks: {
         getStatistics: statisticsTools.getMetrics,
+        setStatus,
+        navigateOutlineLine: line => focusEditorAtLine(line),
+        copyTableOfContents: value => copyToClipboard(value, 'Table of contents copied.', 'Clipboard access blocked. Try copying again.'),
+        getCurrentHeadings: async () => {
+          const source = editor.value; const path = state.activePath;
+          if (resolveMode(source) === 'mermaid') return [];
+          const template = document.createElement('template');
+          template.innerHTML = await buildMarkdownHtml(source);
+          return source === editor.value && path === state.activePath ? collectDocumentHeadings(template.content) : null;
+        },
         getBacklinks,
         getWorkspaceAudit,
         getGovernanceAudit,

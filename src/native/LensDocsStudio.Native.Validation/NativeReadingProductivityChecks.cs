@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using ICSharpCode.AvalonEdit;
 using LensDocsStudio.Core.State;
+using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Workspace;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.ViewModels;
@@ -62,6 +63,38 @@ internal static class NativeReadingProductivityChecks
             second.ExternalChange = true; Check(second.PersistenceState == "External change", "External conflict takes precedence over ordinary pending changes");
             model.ActiveDocument = first; editor.Document.Text = ""; AwaitSummary("0 words · 0 chars");
             Check(Convert.ToString(statistics.Content)!.StartsWith("0 min read", StringComparison.Ordinal), "Empty documents preserve zero-minute reading time");
+            const string headingsSource = "# Root\n\n## Branch\n\n##### Five\n\n###### Six\n\n## Other";
+            editor.Document.Text = headingsSource; model.Layout = "Editor";
+            var prepare = (Task)typeof(MainWindow).GetMethod("UpdatePreviewAsync", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, [false])!;
+            PumpUntil(() => prepare.IsCompleted);
+            prepare.GetAwaiter().GetResult();
+            var outline = (ListBox)window.FindName("Outline");
+            Check(outline.Items.Count == 5, "Actual Editor-layout parsing publishes all heading levels in the existing outline");
+            var toolbar = (ToolBar)window.FindName("OutlineToolbar");
+            toolbar.Items.OfType<Button>().Single(button => AutomationProperties.GetName(button) == "Collapse all heading groups")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Check(outline.Items.Count == 1, "The compiled Collapse All control hides descendants without modifying source");
+            var filter = (TextBox)window.FindName("OutlineFilter");
+            filter.Text = "Six"; Check(outline.Items.Count == 1, "Filtering includes a matching H6 inside a collapsed branch");
+            filter.Text = ""; Check(outline.Items.Count == 1, "Clearing a filter preserves expansion state");
+            toolbar.Items.OfType<Button>().Single(button => AutomationProperties.GetName(button) == "Expand all heading groups")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Check(outline.Items.Count == 5 && editor.Text == headingsSource, "The compiled Expand All control restores the tree without editing");
+            var toc = new TableOfContentsWindow(new MarkdownService().Parse(headingsSource).Headings);
+            try
+            {
+                var generated = (TextBox)toc.FindName("PreviewText");
+                Check(generated.IsReadOnly && generated.Text.Contains("- [Six](#six)", StringComparison.Ordinal), "The compiled TOC window presents real renderer targets in a read-only preview");
+                ((ComboBox)toc.FindName("StartLevel")).SelectedItem = 5;
+                ((CheckBox)toc.FindName("DetailsWrapper")).IsChecked = true;
+                ((ComboBox)toc.FindName("ListStyle")).SelectedIndex = 1;
+                Check(generated.Text.StartsWith("<details>\n<summary>Table of Contents</summary>\n\n1. [Five]", StringComparison.Ordinal)
+                    && !generated.Text.Contains("Root", StringComparison.Ordinal), "Actual TOC controls apply level range, ordered lists and the details wrapper");
+                ((ComboBox)toc.FindName("EndLevel")).SelectedItem = 2;
+                Check(!((Button)toc.FindName("CopyButton")).IsEnabled && generated.Text.Length == 0,
+                    "An invalid range disables Copy without replacing the document");
+            }
+            finally { toc.Close(); }
             File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new
             {
                 status = "PASS", scope = "COMPILED_WPF_AVALONEDIT_AND_UIA_PEERS; NOT PHYSICAL_GUI_CERTIFICATION",
@@ -81,6 +114,17 @@ internal static class NativeReadingProductivityChecks
                     Dispatcher.PushFrame(frame); Thread.Sleep(1);
                 }
                 Check(Convert.ToString(statistics.Content)!.Contains(expected, StringComparison.Ordinal), "Current-buffer metrics: " + expected);
+            }
+            void PumpUntil(Func<bool> ready)
+            {
+                var deadline = Stopwatch.StartNew();
+                while (!ready() && deadline.Elapsed < TimeSpan.FromSeconds(10))
+                {
+                    var frame = new DispatcherFrame();
+                    window.Dispatcher.BeginInvoke(DispatcherPriority.Background, () => frame.Continue = false);
+                    Dispatcher.PushFrame(frame); Thread.Sleep(1);
+                }
+                if (!ready()) throw new IOException("The reading-productivity operation did not complete.");
             }
             void Check(bool value, string message) { if (!value) throw new IOException(message + ": " + statistics.Content); checks.Add(message); }
         }

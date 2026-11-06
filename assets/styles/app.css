@@ -5688,3 +5688,19 @@ label.file-button.primary,
 @media (max-width: 900px) { .document-statistics-secondary { display: none; } }
 @media (max-width: 500px) { .document-persistence-state { max-width: 90px; overflow: hidden; text-overflow: ellipsis; } }
 @media (forced-colors: active) { .document-statistics:focus-visible { outline: 2px solid Highlight; } .document-persistence-state { color: CanvasText; } }
+
+/* Hierarchical outline retains the existing navigation surface in every layout. */
+.outline-panel { grid-template-columns: 1fr; gap: .4rem; }
+.outline-heading { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+.outline-heading button, .toc-options { font-size: 11px; }
+.toc-options > label { display: block; margin: .4rem; }
+.outline-links { display: block; max-height: min(26vh, 18rem); overflow: auto; }
+.outline-links ul { list-style: none; padding-left: 1rem; margin: 0; }
+.outline-links > ul { padding-left: 0; }
+.outline-links ul[hidden] { display: none; }
+.outline-row { display: flex; align-items: center; gap: .2rem; min-height: 28px; }
+.outline-row button { padding: 1px 5px; min-width: 24px; font-size: 12px; }
+.outline-links .outline-row a { margin: 0; border-radius: 4px; max-width: none; min-width: 0; }
+.input-pane:has(> .outline-panel) { grid-template-rows: auto auto auto auto minmax(0, 1fr); }
+.preview-pane:not(:has(> .outline-panel)) { grid-template-rows: auto auto auto auto minmax(0, 1fr); }
+@media (forced-colors: active) { .outline-links a[aria-current] { outline: 2px solid Highlight; } }

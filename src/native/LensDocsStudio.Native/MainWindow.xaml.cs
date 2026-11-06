@@ -352,8 +352,8 @@ public partial class MainWindow : Window
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
         if (updatingOutline) return;
-        if (Outline.SelectedItem is not DocumentHeading heading) return;
-        if (parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
+        if (Outline.SelectedItem is not OutlineEntry heading) return;
+        if (parsedDocumentId != model.ActiveDocument?.Id || parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
         JumpToSource(heading.SourceStart, focusEditor: model.Layout == "Editor");
         if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
         { rendered.RevealSource(heading.SourceStart); _ = PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }

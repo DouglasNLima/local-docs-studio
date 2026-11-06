@@ -616,6 +616,7 @@ export function createUiService({
     function applyEditorLayout(mode) {
       app.classList.remove('layout-editor', 'layout-split', 'layout-preview');
       app.classList.add(`layout-${mode}`);
+      document.dispatchEvent(new Event('lens-layout-changed'));
       layoutModeControl?.querySelectorAll('[data-layout-mode]').forEach((button) => {
         const active = button.dataset.layoutMode === mode;
         button.classList.toggle('active', active);
