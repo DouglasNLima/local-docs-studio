@@ -22,6 +22,8 @@ The controlled workflow runs the identical diagnostic harness against candidate 
 
 The independent recovery workflow runs the unchanged Continuous protocol twice with its existing `BaselineRevision` parameter set to exact develop, and the original High Contrast appearance assertion with identical harness binaries in both execution orders. The historical pinned Continuous workflow still runs independently. Neither fixture bytes nor the 250 ms/4.5:1 acceptance definitions change.
 
+High Contrast also separates hosted runtime from the unchanged packaged Core/WPF 10.0.13 runtime. The latter is copied unmodified from the already pinned NuGet runtime packs into a private runner directory; no host installation, product upgrade, framework patch or package publication occurs. Both the harness and its launched application use that private runtime. This controls one observed difference from the historical failed image, without claiming to recreate that older Windows image.
+
 The user's continuation excludes all signing. The disposable-certificate trust execution is therefore NOT RUN on this feature branch; its test and execution on other branches remain intact. Mock signing-policy checks do not sign artefacts. No trust or production-readiness claim follows from this omission.
 
 ## First controlled checkpoint, 847b8d1
@@ -31,6 +33,8 @@ Original Timeline MiniDumpThreadInfo evidence was analysed with pinned dotnet-du
 The first controlled diagnostic run exposed two defects in the newly added observer. Replacing `phase.json` failed with Windows access denied in baseline arrangement/lifecycle attempts; an append-only journal now avoids replacing an observed file. A real concurrent-reader control verifies 1,001 complete ordered records. Selection lacked intermediate phase events and could finish at the supervisor's no-progress boundary: both products produced 100 passing observations in candidate-first order, but its supervisor still failed. Selection now emits bounded progress records at existing assertion boundaries, and the supervisor rechecks exit before capture. These experiment failures are retained and are not attributed to product regressions.
 
 Unaffected diagnostic observations include candidate arrangement passing in both orders, baseline arrangement passing in candidate-first order, and candidate normal lifecycle passing. Uninstrumented arrangement and selection gates also passed at this checkpoint. None clears the original ADC failures or establishes their cause. Clean repeated diagnostic comparisons and final-source regression results remain required.
+
+Current appearance evidence reports runner image `20261103.298.1`, .NET 10.0.14 and matching WPF/Win32 highlight `#8EE3F0`, text `#263B50`, contrast 7.893273:1. Historical failure used image `20261021.278.1`, .NET 10.0.13 and divergent WPF highlight `#0078D4`, giving 2.542596:1. Source, runtime and image differences must not be collapsed into a causal claim; the original FAIL remains immutable.
 
 ## Interim verdicts
 

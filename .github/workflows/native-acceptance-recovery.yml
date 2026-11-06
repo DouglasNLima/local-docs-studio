@@ -42,6 +42,7 @@ jobs:
       fail-fast: false
       matrix:
         order: [baseline-first, candidate-first]
+        runtime: [hosted, packaged-10.0.13]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,26 +61,54 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows artifacts/appearance-probe -Recurse
           Copy-Item artifacts/appearance-baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/* artifacts/appearance-probe -Recurse -Force
+      - name: Isolate the unchanged packaged runtime for the historical-runtime comparison
+        if: matrix.runtime == 'packaged-10.0.13'
+        run: |
+          dotnet restore src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj -r win-x64 --locked-mode -p:SelfContained=true -p:RuntimeFrameworkVersion=10.0.13
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $packages = (dotnet nuget locals global-packages --list) -replace '^global-packages: ',''
+          $root = 'artifacts/appearance-runtime'
+          New-Item -ItemType Directory "$root/host/fxr/10.0.13" -Force | Out-Null
+          Copy-Item (Get-Command dotnet.exe).Source "$root/dotnet.exe"
+          Copy-Item "$packages/microsoft.netcore.app.runtime.win-x64/10.0.13/runtimes/win-x64/native/hostfxr.dll" "$root/host/fxr/10.0.13/hostfxr.dll"
+          foreach ($framework in 'Microsoft.NETCore.App','Microsoft.WindowsDesktop.App') {
+            $package = Join-Path $packages ($framework.ToLowerInvariant() + '.runtime.win-x64/10.0.13/runtimes/win-x64')
+            $target = "$root/shared/$framework/10.0.13"
+            New-Item -ItemType Directory $target -Force | Out-Null
+            Copy-Item "$package/native/*" $target -Recurse -Force
+            Copy-Item "$package/lib/net10.0/*" $target -Recurse -Force
+          }
+          & "$root/dotnet.exe" --list-runtimes
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Preserve every original High Contrast assertion and pre-assertion colour observation
         run: |
           $candidate = (git rev-parse HEAD).Trim()
           $order = if ('${{ matrix.order }}' -eq 'baseline-first') { @('baseline','candidate') } else { @('candidate','baseline') }
           $root = 'artifacts/develop-appearance'
           New-Item -ItemType Directory $root | Out-Null
+          $runtimeHost = (Get-Command dotnet.exe).Source
+          if ('${{ matrix.runtime }}' -eq 'packaged-10.0.13') {
+            $env:DOTNET_ROOT = [IO.Path]::GetFullPath('artifacts/appearance-runtime')
+            $env:DOTNET_ROOT_X64 = $env:DOTNET_ROOT
+            $env:DOTNET_MULTILEVEL_LOOKUP = '0'
+            $runtimeHost = Join-Path $env:DOTNET_ROOT 'dotnet.exe'
+          }
           $harnessHash = (Get-FileHash src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.dll).Hash
           if ($harnessHash -ne (Get-FileHash artifacts/appearance-probe/LensDocsStudio.Native.Validation.dll).Hash) { throw 'Harness binaries differ.' }
-          @{ baseline='99349d82eb06960eb1f9785cf384db2373aed4fa'; candidate=$candidate; order=$order; harnessSha256=$harnessHash; image=$env:ImageVersion; threshold=4.5 } | ConvertTo-Json | Set-Content "$root/protocol.json"
+          @{ baseline='99349d82eb06960eb1f9785cf384db2373aed4fa'; candidate=$candidate; order=$order; harnessSha256=$harnessHash; image=$env:ImageVersion; threshold=4.5; runtimeCase='${{ matrix.runtime }}'; runtimes=(& $runtimeHost --list-runtimes) } | ConvertTo-Json | Set-Content "$root/protocol.json"
           $failed = $false
           foreach ($side in $order) {
             $directory = if ($side -eq 'baseline') { 'artifacts/appearance-probe' } else { 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows' }
             $revision = if ($side -eq 'baseline') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { $candidate }
-            & "$directory/LensDocsStudio.Native.Validation.exe" --ux-screenshots "$directory/LensDocsStudio.Native.exe" "$root/$side" $revision --high-contrast
+            & $runtimeHost "$directory/LensDocsStudio.Native.Validation.dll" --ux-screenshots "$directory/LensDocsStudio.Native.exe" "$root/$side" $revision --high-contrast
             if ($LASTEXITCODE -ne 0) { $failed = $true }
+            $observation = Get-Content "$root/$side/high-contrast-pre-assertion.json" -Raw | ConvertFrom-Json
+            if ('${{ matrix.runtime }}' -eq 'packaged-10.0.13' -and $observation.runtime -ne '.NET 10.0.13') { throw 'The isolated comparison did not execute the pinned packaged runtime.' }
           }
           if ($failed) { exit 1 }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: develop-high-contrast-${{ matrix.order }}
+          name: develop-high-contrast-${{ matrix.runtime }}-${{ matrix.order }}
           path: artifacts/develop-appearance/
           retention-days: 30
