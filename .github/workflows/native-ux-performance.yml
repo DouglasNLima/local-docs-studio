@@ -1,0 +1,110 @@
+name: Native UX performance evidence (proposed policy)
+on:
+  pull_request:
+    branches: [develop]
+    paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'Actual interaction cycles per fresh process; 1–100, no discarded warm-up'
+        default: '21'
+      processes:
+        description: 'Fresh processes per workload/product; 1–300'
+        default: '3'
+permissions:
+  contents: read
+jobs:
+  observer-smoke:
+    name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: [develop, historical]
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check LF and CRLF journeys before scheduling the comparison matrix
+        shell: pwsh
+        run: |
+          $baseline = if ('${{ matrix.baseline }}' -eq 'develop') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Fixtures 'small,technical' -Processes 1 -Iterations 1
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-observer-${{ matrix.baseline }}-${{ matrix.appearance }}
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+          retention-days: 30
+  contract-controls:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/unit/native-ux-report.test.mjs
+  calibration:
+    needs: [contract-controls, observer-smoke]
+    # Retain a failed observer job and still gather independent cells. Neither
+    # those cells nor the overall workflow can clear an observer failure.
+    if: ${{ !cancelled() && needs.contract-controls.result == 'success' }}
+    name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: [develop, historical]
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Measure exact products with one probe binary and real Windows input
+        shell: pwsh
+        run: |
+          $baseline = if ('${{ matrix.baseline }}' -eq 'develop') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
+          $iterations = if ('${{ inputs.iterations }}') { [int]'${{ inputs.iterations }}' } else { 3 }
+          $processes = if ('${{ inputs.processes }}') { [int]'${{ inputs.processes }}' } else { 2 }
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}' -Iterations $iterations -Processes $processes
+          exit $LASTEXITCODE
+      - name: Publish the source-labelled evidence summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/native-ux/report.md) { Get-Content artifacts/native-ux/report.md | Add-Content $env:GITHUB_STEP_SUMMARY }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-${{ matrix.baseline }}-${{ matrix.appearance }}-${{ matrix.order }}
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+          retention-days: 30

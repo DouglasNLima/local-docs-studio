@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42302867937",
+  "source": "fb19e6fcd71f8d47771eb8ed0d5dc77085b718c2",
+  "tree": "a427e5378471a31c0ab0abf4b376fd01dca7539e",
+  "verdict": "FAIL",
+  "scope": "All four observer controls and ten auditor tests passed. Full matrix: four PASS cohorts, four FAIL cohorts; 219 of 224 processes complete, five mixed-preview failures. No approved acceptance.",
+  "artifacts": [
+    {
+      "id": 13546850486,
+      "name": "native-ux-develop-normal-baseline-first",
+      "sha256": "sha256:807b7868f4bbbf296fa9c8acb66c169e36217b22a0d3a7288118ab722030e5e7",
+      "size": 45893148,
+      "created": "2026-11-06T22:31:28Z",
+      "expires": "2026-12-06T22:31:24Z"
+    },
+    {
+      "id": 13546386614,
+      "name": "native-ux-develop-high-contrast-candidate-first",
+      "sha256": "sha256:e50a4ce8c6e460d8bc80f557f356e84f782789407de526ff8729bab6e372a9f8",
+      "size": 44179971,
+      "created": "2026-11-06T22:32:09Z",
+      "expires": "2026-12-06T22:32:05Z"
+    },
+    {
+      "id": 13546041126,
+      "name": "native-ux-historical-high-contrast-baseline-first",
+      "sha256": "sha256:de5782777308b515741af1ea7f0be9b4405ee305a0f32198ec25dddfc3550b00",
+      "size": 42391179,
+      "created": "2026-11-06T22:29:13Z",
+      "expires": "2026-12-06T22:29:11Z"
+    },
+    {
+      "id": 13545777042,
+      "name": "native-ux-historical-high-contrast-candidate-first",
+      "sha256": "sha256:f10d9cae5de2c3a60ff5e0bad783367efde486a2b7f53b3658ac8e987aff9242",
+      "size": 42691378,
+      "created": "2026-11-06T22:28:00Z",
+      "expires": "2026-12-06T22:27:58Z"
+    },
+    {
+      "id": 13545702529,
+      "name": "native-ux-historical-normal-baseline-first",
+      "sha256": "sha256:a8888b29dd1d8c731098b1a99e0ce17c6851139c5175163a752aa577c0bcd3a7",
+      "size": 43813793,
+      "created": "2026-11-06T22:30:01Z",
+      "expires": "2026-12-06T22:29:58Z"
+    },
+    {
+      "id": 13545680150,
+      "name": "native-ux-observer-historical-normal",
+      "sha256": "sha256:32f521072b03789aca30b76b9e804c2722fd0ed809b59b8fa0dc58041ff5b383",
+      "size": 6127030,
+      "created": "2026-11-06T22:15:19Z",
+      "expires": "2026-12-06T22:15:17Z"
+    },
+    {
+      "id": 13545667168,
+      "name": "native-ux-historical-normal-candidate-first",
+      "sha256": "sha256:0fbb5bd4bcd507c480288bbac6aff44049e97f0ed6a09646c85f4e135e72d4d5",
+      "size": 44142135,
+      "created": "2026-11-06T22:29:26Z",
+      "expires": "2026-12-06T22:29:23Z"
+    },
+    {
+      "id": 13545263198,
+      "name": "native-ux-develop-normal-candidate-first",
+      "sha256": "sha256:c2e056f9604d65ed81477cc02ad5989fabbb97cc376aa1f2e4041d100998e556",
+      "size": 44927004,
+      "created": "2026-11-06T22:30:02Z",
+      "expires": "2026-12-06T22:29:59Z"
+    },
+    {
+      "id": 13545218303,
+      "name": "native-ux-develop-high-contrast-baseline-first",
+      "sha256": "sha256:eabaaa44d280100c98afd75a490ad9bf29c7c491741629930949b9b81f58c3d2",
+      "size": 44162180,
+      "created": "2026-11-06T22:28:26Z",
+      "expires": "2026-12-06T22:28:23Z"
+    },
+    {
+      "id": 13544298754,
+      "name": "native-ux-observer-develop-high-contrast",
+      "sha256": "sha256:5d9374fc39259669372326786f34f36a32aae4f718b445df730e96597307adaa",
+      "size": 6156220,
+      "created": "2026-11-06T22:14:50Z",
+      "expires": "2026-12-06T22:14:49Z"
+    },
+    {
+      "id": 13544253839,
+      "name": "native-ux-observer-develop-normal",
+      "sha256": "sha256:0679cfd19879cfc6821c5d3e4ce543e246f3cb412f6b3790d4eda7da7d861681",
+      "size": 6323417,
+      "created": "2026-11-06T22:14:59Z",
+      "expires": "2026-12-06T22:14:57Z"
+    },
+    {
+      "id": 13543779969,
+      "name": "native-ux-observer-historical-high-contrast",
+      "sha256": "sha256:0fc6779063aff974b03002a9745b22a28f9a736a5fbc659c53d2fba41e469be8",
+      "size": 5961602,
+      "created": "2026-11-06T22:14:58Z",
+      "expires": "2026-12-06T22:14:56Z"
+    }
+  ],
+  "preservedFailureFiles": [
+    {
+      "path": "mixed-preview-candidate-samples.jsonl",
+      "sha256": "43c03f618bb3bc8d3df5a990aade3b66a5c6971e3fee5da5eab55d428f65a54f"
+    },
+    {
+      "path": "mixed-preview-candidate-state.json",
+      "sha256": "24f23ee7030f07a84d190d2b2c051f774c7bcc640b6d21fab6ef23be9fd1a8f8"
+    },
+    {
+      "path": "mixed-preview-candidate.png",
+      "sha256": "b636f61ac8066d70d24a193fd5596f1396c81b15d7ead158d7e48afe53ac7fa7"
+    },
+    {
+      "path": "mixed-preview-develop-samples.jsonl",
+      "sha256": "551186bb0c0517ed09ee21699bc53b634528a9f5b4d94ecc7dc10f84a55cdd49"
+    },
+    {
+      "path": "mixed-preview-develop-state.json",
+      "sha256": "3db56e0a577b5b13f34fca0b5680c66f964c7e54364d2d1a89b1bc94ce4f88c1"
+    },
+    {
+      "path": "mixed-preview-develop.png",
+      "sha256": "852313e91a57f4d28d606f95f8bcde521e248634ff69b2a9ddb3695d7c00a70c"
+    }
+  ]
+}

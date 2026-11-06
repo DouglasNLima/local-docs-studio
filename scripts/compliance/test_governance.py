@@ -11,10 +11,23 @@ from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_
 from rights_ledger import boundary
 from check_foundation import documentation_links
 from licence_scope import (ROOT, SCOPE, validate_licence, validate_scope,
-                           validate_metadata, validate_preserved, apply_find_caret_refresh, apply_selection_sync_refresh)
+                           validate_metadata, validate_preserved, apply_find_caret_refresh, apply_selection_sync_refresh, apply_native_ux_refresh)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
+    def test_ux_amendment_rejects_gate_changes_and_historical_rewriting(self):
+        refresh = json.loads((ROOT / 'docs/open-source/evidence/native-ux-contract/preserved-refresh.json').read_text())
+        previous = {path: entry['previous'] for path, entry in refresh['files'].items()}
+        apply_native_ux_refresh(previous, refresh)
+        altered = copy.deepcopy(refresh)
+        altered['files']['.github/workflows/native-continuous-performance.yml'] = {'previous': '0' * 64, 'current': '1' * 64}
+        with self.assertRaises(ValueError):
+            apply_native_ux_refresh(previous, altered)
+        altered = copy.deepcopy(refresh)
+        altered['files']['.gitattributes']['previous'] = '0' * 64
+        with self.assertRaises(ValueError):
+            apply_native_ux_refresh(previous, altered)
+
     def setUp(self):
         self.payload = json.loads((CONFIG / 'develop-ruleset.json').read_text())
         evidence = json.loads((EVIDENCE / 'check-contexts.json').read_text())
