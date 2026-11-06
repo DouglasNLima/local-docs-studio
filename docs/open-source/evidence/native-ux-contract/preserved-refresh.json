@@ -4,7 +4,7 @@
   "files": {
     ".gitattributes": {
       "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
-      "current": "11477504d893103cb36b3884f58da41a2ecfdee31b2e32770b9a7dc8094bb750"
+      "current": "e3e58fe197ec29f36d5d4fc0f9826b3e241095f2fc5a76acbd786c2b94e4e73c"
     },
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",

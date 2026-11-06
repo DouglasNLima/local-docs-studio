@@ -145,6 +145,26 @@ handling or permission to discard user data. They are deliberately finite and mu
 be reported as FAIL if reached. Product memory/exhaustion/recovery behaviour is
 not certified by killing a disposable probe.
 
+Proposed product failure semantics, subject to the same owner approval:
+
+- Completion must refer to the current document and source version with usable
+  geometry; a busy, stale, empty or failed preview must not announce readiness.
+- A cancellation request must produce observable acknowledgement and a terminal
+  outcome within its approved action budget. It must preserve source, selection,
+  undo history and recovery, and reject subsequent publication from the cancelled
+  request. An editor switch alone cannot certify an acknowledged abort.
+- Exceeding the approved finite completion budget must leave an honest failed or
+  unavailable state with an explicit retry route and an operable editor. Retained
+  old content must be identified as stale; endless loading or automatic retry loops
+  cannot count as completion. No unsaved data may be discarded.
+- The approved hardware/workload envelope must include finite memory and decoded
+  media limits. Oversize inputs and allocation failures need bounded, inspectable
+  failure and cleanup of abandoned visual trees/resources, preserving source and
+  recovery. Process termination by the test supervisor is a FAIL, not that UX.
+- Boundary, oversize, cancellation-during-attachment and recovery-after-failure
+  trials must independently verify these behaviours. They are NOT RUN by this
+  pilot and remain prerequisites for a production acceptance transition.
+
 Record process CPU, managed allocation deltas, natural GC counts, managed/private/
 working-set memory, Stopwatch frequency, binary hashes, revision/tree, runtime/WPF,
 OS/image/processors, fixture hashes, geometry and appearance. Counters include the
