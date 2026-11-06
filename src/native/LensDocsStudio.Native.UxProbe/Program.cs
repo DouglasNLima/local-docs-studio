@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interop;
@@ -244,17 +245,26 @@ internal sealed class Probe : IDisposable
             heartbeatMaximumMs = heartbeatMaximum, dispatcherIntervals = intervals, intervalOverflow,
             scope = "Actual compiled MainWindow hosted by a validation process; not installed application startup or physical-machine certification" });
     }
-    private bool Usable()
+    private bool CurrentPreviewReady()
     {
         var result = Field<PreviewResult>("rendered");
         if (result is null || preview.Document != result.Document || !preview.IsVisible ||
             Field<Guid?>("renderedDocumentId") != model.ActiveDocument?.Id ||
+            Field<ICSharpCode.AvalonEdit.Document.ITextSourceVersion>("renderedVersion") is not { } version || editor.Document.Version.CompareAge(version) != 0 ||
             (window.FindName("PreviewContentHost") is FrameworkElement contentHost && contentHost.Visibility != Visibility.Visible) ||
             AutomationProperties.GetItemStatus(preview).StartsWith("Busy", StringComparison.Ordinal) ||
             !preview.IsMeasureValid || !preview.IsArrangeValid) return false;
-        var offset = editor.Text.IndexOf("ReadableStart", StringComparison.Ordinal);
-        if (!result.TextMap.TryPreviewRange(offset, "ReadableStart".Length, out var first, out var last) || first is null || last is null ||
-            !first.HasValidLayout || new TextRange(first, last).Text != "ReadableStart") return false;
+        if (UIElementAutomationPeer.CreatePeerForElement(preview)?.GetPattern(PatternInterface.Text) is not ITextProvider provider) return false;
+        return provider.GetVisibleRanges().Any(range => !string.IsNullOrWhiteSpace(range.GetText(128)) && range.GetBoundingRectangles().Length >= 4);
+    }
+    private bool Usable() => UsableMarker("ReadableStart");
+    private bool UsableMarker(string marker)
+    {
+        if (!CurrentPreviewReady()) return false;
+        var result = Field<PreviewResult>("rendered")!;
+        var offset = editor.Text.IndexOf(marker, StringComparison.Ordinal);
+        if (!result.TextMap.TryPreviewRange(offset, marker.Length, out var first, out var last) || first is null || last is null ||
+            !first.HasValidLayout || new TextRange(first, last).Text != marker) return false;
         var rect = first.GetCharacterRect(LogicalDirection.Forward);
         return rect.Width >= 0 && rect.Height > 0 && rect.Top >= 0 && rect.Bottom <= preview.ActualHeight &&
             UIElementAutomationPeer.CreatePeerForElement(preview)?.GetPattern(PatternInterface.Text) is not null;
@@ -338,7 +348,7 @@ internal sealed class Probe : IDisposable
         {
             await PointAt(await Ui(() => Control("Layout" + layout)));
             await Measure("layout-" + layout.ToLowerInvariant(), temperature, i, Desktop.Click,
-                () => model.Layout == layout && (layout == "Editor" ? editor.IsVisible : preview.IsVisible && preview.IsMeasureValid && preview.IsArrangeValid));
+                () => model.Layout == layout && (layout == "Editor" ? editor.IsVisible : CurrentPreviewReady()));
         }
     }
     private async Task FeatureInteractions()
@@ -383,7 +393,7 @@ internal sealed class Probe : IDisposable
         await Until(() => Field<object>("comparisonSlots") is not null && Tree(window).OfType<FrameworkElement>().Any(e => e.IsVisible && AutomationProperties.GetAutomationId(e) == "ActivateComparison1"));
         var original = await Ui(() => model.ActiveDocument);
         await PointAt(await Ui(() => Control("ActivateComparison1")));
-        await Measure("comparison-switch", "first-interaction", 0, Desktop.Click, () => model.ActiveDocument != original && editor.Text.Contains("OtherSource", StringComparison.Ordinal));
+        await Measure("comparison-switch", "first-interaction", 0, Desktop.Click, () => model.ActiveDocument != original && editor.Text.Contains("OtherSource", StringComparison.Ordinal) && UsableMarker("OtherSource"));
         await ClickControl("ActivateComparison0"); await Until(() => model.ActiveDocument == original);
         await ClickControl("CloseComparison"); await Until(() => Field<object>("comparisonSlots") is null);
         await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
