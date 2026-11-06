@@ -16,7 +16,8 @@ export function distribution(values, independentProcesses) {
 export function validateSample(sample) {
   if (sample.kind !== 'sample' || sample.status !== 'OBSERVED' || sample.foregroundVerified !== true ||
       typeof sample.screenSha256 !== 'string' || !/^[0-9A-F]{64}$/.test(sample.screenSha256) ||
-      !Number.isFinite(sample.elapsedMs) || sample.elapsedMs < 0 || sample.endTick < sample.startTick)
+      !Number.isFinite(sample.elapsedMs) || sample.elapsedMs < 0 || !Number.isFinite(sample.startTick) ||
+      !Number.isFinite(sample.endTick) || sample.endTick < sample.startTick)
     throw new Error('Invalid action-to-screen evidence');
 }
 export function buildReport(root) {
@@ -30,29 +31,44 @@ export function buildReport(root) {
   const seen = new Set();
   for (const run of runs) {
     const key = `${run.process}/${run.fixture}/${run.side}`;
+    if (!['baseline','candidate'].includes(run.side) || !protocol.fixtures.includes(run.fixture) || !Number.isInteger(run.process) || run.process < 0 || run.process >= protocol.processes)
+      { failures.push(`Unknown process cell: ${key}`); continue; }
     if (seen.has(key)) { failures.push(`Duplicate process cell: ${key}`); continue; } seen.add(key);
     const dir = join(root, 'samples', key);
     if (run.exitCode !== 0 || run.supervisionFailure || !existsSync(join(dir, 'completion.json'))) failures.push(`${key}: failed or incomplete child`);
     if (!existsSync(join(dir, 'identity.json'))) { failures.push(`${key}: missing identity`); continue; }
     const id = read(join(dir, 'identity.json')); identities.push({ key, ...id });
+    if (id.fixture !== run.fixture || id.sha256.toLowerCase() !== protocol.fixtureIdentities.find(f => f.id === run.fixture).sha256)
+      failures.push(`${key}: fixture identity mismatch`);
     if (id.productRevision !== protocol.products[run.side].revision || id.product.sha256 !== protocol.products[run.side].productSha256 ||
         id.core.sha256 !== protocol.products[run.side].coreSha256 || id.harness.sha256 !== protocol.harnessSha256 ||
         id.highContrast !== (protocol.appearance === 'high-contrast')) failures.push(`${key}: artefact identity mismatch`);
     if (existsSync(join(dir, 'appearance.json'))) appearances.push({ key, ...read(join(dir, 'appearance.json')) });
+    const counts = new Map();
     if (existsSync(join(dir, 'samples.jsonl'))) {
       for (const line of readFileSync(join(dir, 'samples.jsonl'), 'utf8').trim().split(/\r?\n/).filter(Boolean)) {
         const sample = JSON.parse(line);
         if (sample.kind !== 'sample') { coverage.push({ key, ...sample }); continue; }
         try { validateSample(sample); } catch (error) { failures.push(`${key}: ${error.message}`); continue; }
+        counts.set(sample.action, (counts.get(sample.action) ?? 0) + 1);
         const group = `${run.side}/${run.fixture}/${sample.action}/${sample.temperature}`;
         if (!groups.has(group)) groups.set(group, { samples: [], processes: new Set() });
         groups.get(group).samples.push(sample.elapsedMs); groups.get(group).processes.add(run.process);
       }
     }
+    for (const action of ['typing','caret','selection','find-open','find-navigation','document-switch','outline-open','outline-close','layout-editor','layout-preview','layout-split'])
+      if (counts.get(action) !== protocol.iterations) failures.push(`${key}: missing or extra ${action} observations`);
+    for (const action of ['first-usable-preview','complete-readiness','cancel-render-by-switch'])
+      if (counts.get(action) !== 1) failures.push(`${key}: missing or extra ${action} observation`);
     if (existsSync(join(dir, 'completion.json'))) {
       const completion = read(join(dir, 'completion.json'));
       if (completion.collection !== 'PASS' || completion.exactSource !== 'PASS' || completion.intervalOverflow) failures.push(`${key}: incomplete correctness or bounded diagnostics`);
     }
+  }
+  for (const fixture of protocol.fixtures) for (let process = 0; process < protocol.processes; process++) {
+    const pair = identities.filter(id => id.key.startsWith(`${process}/${fixture}/`));
+    if (pair.length === 2 && (pair[0].runtime !== pair[1].runtime || pair[0].wpf.sha256 !== pair[1].wpf.sha256))
+      failures.push(`${process}/${fixture}: runtime/WPF identity mismatch between products`);
   }
   const summaries = [...groups].map(([cell, group]) => ({ cell, ...distribution(group.samples, group.processes.size) }));
   const report = { schema: 1, collection: failures.length ? 'FAIL' : 'PASS', nativeUxAcceptance: 'PENDING',

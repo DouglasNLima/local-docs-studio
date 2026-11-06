@@ -45,6 +45,7 @@ $selected = $Fixtures.Split(',')
 if (@($selected | Select-Object -Unique).Count -ne $selected.Count -or @($selected | Where-Object { $_ -notin $manifest.fixtures.id }).Count) { throw 'Unknown or repeated fixture.' }
 $protocol = [ordered]@{schema=1;harnessRevision=$harnessRevision;harnessTree=$harnessTree;harnessSha256=$harnessHash;products=$products;
     appearance=$Appearance;order=$Order;processes=$Processes;iterations=$Iterations;fixtures=$selected;
+    fixtureIdentities=@($manifest.fixtures | Where-Object id -in $selected);
     image=$env:ImageVersion;processor=(Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors);
     os=[Environment]::OSVersion.ToString();runtimes=(dotnet --list-runtimes);fixtureManifestSha256=(Get-FileHash "$fixtureRoot/manifest.json").Hash;
     acceptance='PENDING; proposed policy only';historical='FAIL / LEGACY QUALIFICATION; original required gate remains blocking';

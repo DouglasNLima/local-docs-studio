@@ -134,6 +134,7 @@ internal sealed class Probe : IDisposable
     private double heartbeatMaximum;
     private bool intervalOverflow;
     private long lastActionStart;
+    private Task? heartbeat;
     private const int ActionSeconds = 30;
 
     internal Probe(MainWindow window, WorkspaceViewModel model, string source, Program.Fixture fixture, string path, string output, int iterations)
@@ -210,7 +211,9 @@ internal sealed class Probe : IDisposable
         await Ui(() => { window.Activate(); Desktop.SetForegroundWindow(new WindowInteropHelper(window).Handle); });
         Desktop.OwnsForeground(); windowBounds = await Ui(() => Bounds(window));
         Record(new { kind = "startup", elapsedMs = Stopwatch.GetElapsedTime(startup).TotalMilliseconds, scope = "Show to exact buffer; screen verification follows", status = "OBSERVED" });
-        _ = Heartbeat();
+        Record(new { kind = "environment", dpi = await Ui(() => VisualTreeHelper.GetDpi(window).PixelsPerInchX), width = windowBounds.Width, height = windowBounds.Height,
+            readingMode = await Ui(() => preview.ViewingMode.ToString()), zoom = await Ui(() => preview.Zoom) });
+        heartbeat = Heartbeat();
         await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
         // First render remains the first construction of this document in a fresh process.
         await PointAt(await Ui(() => Control("LayoutSplit")));
@@ -220,11 +223,14 @@ internal sealed class Probe : IDisposable
         for (var i = 0; i < iterations; i++) await Interactions(i);
         await FeatureInteractions();
         await Cancellation();
+        await VerifyDelayedResponse();
         if (Program.Hash(File.ReadAllBytes(path)) != fixture.Sha256.ToUpperInvariant()) throw new IOException("Measured interactions changed the fixture file.");
         if (!await Ui(() => model.Documents.Single(d => d.FilePath == path).EditorDocument.Text == source)) throw new IOException("The original document buffer was not restored exactly.");
+        stopped.Cancel(); if (heartbeat is not null) await heartbeat;
+        var intervals = await Ui(() => { window.Dispatcher.Hooks.OperationStarted -= OperationStarted; window.Dispatcher.Hooks.OperationCompleted -= OperationCompleted; return dispatcherIntervals.ToArray(); });
         Program.Write(output, "completion.json", new { collection = "PASS", acceptance = "PENDING", sampleCount,
             exactSource = "PASS", completeContent = "PASS", historical250ms = "UNCHANGED / NOT EVALUATED BY THIS PROBE",
-            heartbeatMaximumMs = heartbeatMaximum, dispatcherIntervals, intervalOverflow,
+            heartbeatMaximumMs = heartbeatMaximum, dispatcherIntervals = intervals, intervalOverflow,
             scope = "Actual compiled MainWindow hosted by a validation process; not installed application startup or physical-machine certification" });
     }
     private bool Usable()
@@ -288,6 +294,7 @@ internal sealed class Probe : IDisposable
             elapsedMs = Stopwatch.GetElapsedTime(started).TotalMilliseconds, startTick = started, endTick = Stopwatch.GetTimestamp(),
             facts, screenSha256 = frame.Sha256, foregroundVerified = true, observerIncluded = true,
             scope = "Conservative verified upper bound including full-tree audit and real distant Find/selection" });
+        sampleCount++;
         Desktop.Save(frame, Path.Combine(output, "complete-distant-selection.png"));
         Desktop.Key(0x1B); await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
     }
@@ -380,7 +387,28 @@ internal sealed class Probe : IDisposable
             }
         }
         catch (OperationCanceledException) { }
-        catch (Exception error) { Record(new { kind = "observer-error", error = error.Message }); }
+        catch (Exception error) { if (!stopped.IsCancellationRequested) Record(new { kind = "observer-error", error = error.Message }); }
+    }
+    private async Task VerifyDelayedResponse()
+    {
+        // Separate observer control, after all performance samples: no prewarming
+        // or artificial delay is applied to a product measurement.
+        await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
+        using var release = new ManualResetEventSlim();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _ = window.Dispatcher.BeginInvoke(() => { entered.SetResult(); if (!release.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Observer control release failed."); });
+        await entered.Task;
+        try
+        {
+            var delay = await Measure("observer-delay-control", "control", 0, () =>
+            {
+                Desktop.Text("x"); _ = Task.Run(async () => { await Task.Delay(200); release.Set(); });
+            }, () => editor.Text == "x" + source && editor.CaretOffset == 1);
+            if (delay < 180) throw new IOException("The observer omitted the deliberately blocked input interval.");
+            Record(new { kind = "observer-control", status = "PASS", delayMs = delay, imposedDelayMs = 200 });
+        }
+        finally { release.Set(); }
+        Desktop.Key(0x08); await Until(() => editor.Text == source);
     }
     private void OperationStarted(object? sender, DispatcherHookEventArgs e)
     { if (operations.Count < 4096) operations[e.Operation] = Stopwatch.GetTimestamp(); else intervalOverflow = true; }
