@@ -144,6 +144,14 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var panel = new StackPanel { Margin = new Thickness(0, 6, 0, 12) };
                     var actions = new WrapPanel { Orientation = Orientation.Horizontal };
                     var diagramFailure = diagram.Error;
+                    if (diagram.FidelityWarning is { } fidelity)
+                    {
+                        warnings.Add(fidelity);
+                        var note = new TextBlock { Text = fidelity, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 6) };
+                        note.SetResourceReference(TextBlock.ForegroundProperty, "MutedTextBrush");
+                        System.Windows.Automation.AutomationProperties.SetName(note, fidelity);
+                        panel.Children.Add(note);
+                    }
                     PreviewMedia? diagramMedia = null;
                     if (diagram.Success)
                     {

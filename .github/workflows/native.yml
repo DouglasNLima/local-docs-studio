@@ -200,6 +200,12 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --quadrant-compatibility artifacts/native/quadrant-compatibility .
       - name: Prove pinned XY Radar Sankey compatibility through ordinary preview and exports
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --chart-compatibility artifacts/native/chart-compatibility .
+      - name: Verify reading productivity controls and SPC flowchart compatibility
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --reading-productivity artifacts/native/reading-productivity
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --flowchart-compatibility artifacts/native/flowchart-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify chart canonical editor fidelity and atomic owner sessions
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --chart-editor-fidelity artifacts/native/chart-editor-fidelity .
       - name: Prove pinned workflow preview exports and canonical editor correspondence
@@ -311,6 +317,8 @@ jobs:
             artifacts/native/quadrant-compatibility/
             artifacts/native/source-editor-fidelity/
             artifacts/native/chart-compatibility/
+            artifacts/native/reading-productivity/
+            artifacts/native/flowchart-compatibility/
             artifacts/native/chart-editor-fidelity/
             artifacts/native/workflow-compatibility/
             artifacts/native/workflow-editor-fidelity/

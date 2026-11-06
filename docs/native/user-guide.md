@@ -662,3 +662,10 @@ Type `/` at the start of an otherwise empty prose line to search insertion comma
 Commands cover headings 1–6, paragraphs, lists and checklists, quotes, code and Mermaid blocks, tables, links, workspace document links, images and figures, callouts, collapsible sections, rules, ISO date/time and built-in snippets. Web uses the existing insertion dialogs and the built-in Usage snippet; Native uses the existing formatting services and snippet catalogue. Native figure and details commands insert editable starter structures; use the existing figure/details editors to customise them. Workspace links use the existing resolver and completion/picker.
 
 Acceptance replaces the whole slash query in one Undo operation. Cancelling an insertion dialog keeps the query. Existing selection is not consumed by the popup. URLs, inline paths, quoted text, indented/fenced code, front matter, comments and raw code/HTML text containers do not trigger it. It is disabled during IME composition, for read-only or standalone Mermaid documents, and above the 4 Mi source-character limit. Typing a slash deliberately in prose is ambiguous until you choose a command; Escape leaves it literal.
+
+
+## Flowchart styling compatibility
+
+Native rendering accepts optional trailing semicolons on complete `class`, `classDef` and `style` instructions, comma-separated node targets, and repeated class assignments. Later assignments take precedence for overlapping properties. The original Mermaid remains unchanged. Malformed styling reports an unsupported-syntax message instead of becoming a diagram node. Comma-separated class names in a single assignment are not supported; use separate class statements.
+
+Label text and line breaks inside `<small>`, `<sub>`, `<sup>` and `<mark>` are retained, but their typography is not supported by the pinned native renderer. Preview displays this limitation. These labels remain protected in Visual Edit; read-only inspection and canonical SVG/PNG exports retain the same graph and text. The Web and Native layouts can differ.

@@ -10,6 +10,52 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
+test('SPC flowchart retains nine nodes eight classes and canonical Web exports without modifying Markdown', async ({ page }, testInfo) => {
+  const original = await readFile(path.join(root, 'tests/fixtures/native-flowchart/spc-application-architecture.md'), 'utf8');
+  await gotoApp(page); await page.locator('#editor').fill(original);
+  await expect(page.locator('#preview .mermaid svg .node')).toHaveCount(9);
+  await expect(page.locator('#preview .node[id*="-Staff-"] rect').first()).toHaveCSS('fill', 'rgb(12, 74, 127)');
+  const semantics = await page.evaluate(async source => {
+    const { default: mermaid } = await import('/assets/vendor/mermaid-11.15.0.esm.min.js');
+    const diagram = await mermaid.mermaidAPI.getDiagramFromText(source.match(/```mermaid\n([\s\S]*?)\n```/)[1]);
+    const entries = value => value instanceof Map ? [...value.entries()] : Object.entries(value);
+    const groups = diagram.db.getSubGraphs().map(group => ({ id: group.id, nodes: group.nodes }));
+    // Mermaid.js also indexes each subgraph container as a vertex.
+    return { nodes: entries(diagram.db.getVertices()).filter(([id]) => !groups.some(group => group.id === id)).map(([id, value]) => ({ id, classes: value.classes, text: value.text })),
+      classes: entries(diagram.db.getClasses()).map(([name]) => name), edges: diagram.db.getEdges().map(edge => [edge.start, edge.end]),
+      groups };
+  }, original);
+  expect(semantics.nodes.map(node => node.id).sort()).toEqual(['App', 'Automation', 'Bus', 'DV', 'Identity', 'Logic', 'PCF', 'Portal', 'Staff']);
+  expect(semantics.classes.sort()).toEqual(['automation', 'bus', 'data', 'identity', 'interface', 'logic', 'portal', 'users']);
+  expect(semantics.edges).toEqual([['App', 'PCF'], ['App', 'DV'], ['PCF', 'DV'], ['DV', 'Logic'], ['DV', 'Automation'], ['Staff', 'App'], ['Identity', 'App'], ['DV', 'Portal'], ['DV', 'Bus']]);
+  expect(semantics.groups.find(group => group.id === 'SPC').nodes.sort()).toEqual(['App', 'Automation', 'DV', 'Logic', 'PCF']);
+  for (const [id, className] of Object.entries({ Staff: 'users', Identity: 'identity', App: 'interface', PCF: 'interface', DV: 'data', Logic: 'logic', Automation: 'automation', Portal: 'portal', Bus: 'bus' }))
+    expect(semantics.nodes.find(node => node.id === id).classes).toContain(className);
+  for (const format of ['Svg', 'Png']) {
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator(`[data-diagram-action="export${format}"]`).click()]);
+    expect(await download.failure()).toBeNull(); const bytes = await readFile(await download.path());
+    const capture = testInfo.outputPath(`spc-web.${format.toLowerCase()}`); await writeFile(capture, bytes);
+    await testInfo.attach(`spc-web-${format}`, { path: capture });
+    if (format === 'Svg') {
+      const count = await page.evaluate(svg => new DOMParser().parseFromString(svg, 'image/svg+xml').querySelectorAll('.node').length, bytes.toString('utf8'));
+      expect(count).toBe(9); expect(bytes.toString('utf8')).not.toContain('flowchart-class-');
+    } else expect([...bytes.subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+  }
+  await expect(page.locator('#editor')).toHaveValue(original);
+});
+
+test('Web flowchart multiple class assignments retain colours and borders in assignment order', async ({ page }) => {
+  await gotoApp(page);
+  await page.locator('#editor').fill('```mermaid\nflowchart TB\nA[One] --> B[Two]\nclassDef first fill:#123456,stroke:#112233;\nclassDef second fill:#654321,stroke-width:2px;\nclass A second; class A first;\nclass B first; class B second;\n```');
+  await expect(page.locator('#preview .mermaid svg .node')).toHaveCount(2);
+  for (const id of ['A', 'B']) {
+    const shape = page.locator(`#preview .node[id*="-${id}-"] rect`).first();
+    await expect(shape).toHaveCSS('fill', id === 'A' ? 'rgb(18, 52, 86)' : 'rgb(101, 67, 33)');
+    await expect(shape).toHaveCSS('stroke', 'rgb(17, 34, 51)');
+    await expect(shape).toHaveCSS('stroke-width', '2px');
+  }
+});
+
 test('slash commands search at the caret and replace the query in one undo operation', async ({ page }) => {
   await gotoApp(page); const editor = page.locator('#editor');
   await editor.fill(''); await editor.pressSequentially('/heading');
