@@ -90,3 +90,18 @@ test('exact content disagreement and false monotonic duration are rejected', t =
   assert.equal(report.collection,'FAIL'); assert.equal(report.correctnessPairs[0].verdict,'FAIL');
   assert.ok(report.failures.some(f=>f.includes('monotonic timestamps')));
 });
+
+test('lost diagnostic observations and absent complete-content facts cannot pass collection', t => {
+  const {root,write,read}=reportFixture(t);
+  const file=join(root,'samples/0/small/candidate/samples.jsonl');
+  const records=readFileSync(file,'utf8').trim().split('\n').map(line=>JSON.parse(line));
+  records.find(r=>r.action === 'complete-readiness').facts=undefined;
+  records.push({kind:'observer-error',error:'Dispatcher observation deadline exceeded'});
+  writeFileSync(file,records.map(r=>JSON.stringify(r)).join('\n')+'\n');
+  const completion=read('samples/0/small/candidate/completion.json');
+  delete completion.heartbeatMaximumMs; write('samples/0/small/candidate/completion.json',completion);
+  const report=buildReport(root);
+  assert.equal(report.collection,'FAIL');
+  for (const text of ['diagnostic observer failed','missing dispatcher diagnostics','missing complete-content facts'])
+    assert.ok(report.failures.some(f=>f.includes(text)));
+});

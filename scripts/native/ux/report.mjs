@@ -55,7 +55,13 @@ export function buildReport(root) {
         try { validateSample(sample); } catch (error) { failures.push(`${key}: ${error.message}`); continue; }
         if (!Number.isFinite(id.stopwatchFrequency) || Math.abs(sample.elapsedMs - 1000 * (sample.endTick - sample.startTick) / id.stopwatchFrequency) > 1)
           { failures.push(`${key}: elapsed time differs from monotonic timestamps`); continue; }
-        if (sample.action === 'complete-readiness') facts.set(key, sample.facts);
+        if (sample.action === 'complete-readiness') {
+          const f = sample.facts;
+          if (!f || !/^[0-9A-F]{64}$/.test(f.logicalTextSha256) || !f.counts || !Object.keys(f.counts).length ||
+              !Number.isInteger(f.mappedLiterals) || f.mappedLiterals < 1 || !Number.isInteger(f.media) || f.media < 0)
+            failures.push(`${key}: missing complete-content facts`);
+          facts.set(key, f);
+        }
         counts.set(sample.action, (counts.get(sample.action) ?? 0) + 1);
         const group = `${run.side}/${run.fixture}/${sample.action}/${sample.temperature}`;
         if (!groups.has(group)) groups.set(group, { samples: [], processes: new Set() });
@@ -77,10 +83,13 @@ export function buildReport(root) {
       if (counts.get('comparison-switch') !== 1) failures.push(`${key}: missing comparison activation`);
     }
     else if (id.capabilities?.comparison !== false || !records.some(r => r.kind === 'coverage' && r.action === 'comparison-switch' && r.status === 'NOT RUN')) failures.push(`${key}: unaccounted comparison coverage`);
+    if (records.some(r => r.kind === 'observer-error')) failures.push(`${key}: diagnostic observer failed`);
     if (!records.some(r => r.kind === 'observer-control' && r.status === 'PASS' && r.delayMs >= 180)) failures.push(`${key}: delayed-response observer control absent or failed`);
     if (!records.some(r => r.kind === 'cancellation' && r.status === 'PASS' && r.originalBufferPreserved === true && r.stalePreviewRejected === true)) failures.push(`${key}: cancellation correctness absent or failed`);
     if (existsSync(join(dir, 'completion.json'))) {
       const completion = read(join(dir, 'completion.json'));
+      if (!Number.isFinite(completion.heartbeatMaximumMs) || completion.heartbeatMaximumMs < 0 || !Array.isArray(completion.dispatcherIntervals))
+        failures.push(`${key}: missing dispatcher diagnostics`);
       if (completion.collection !== 'PASS' || completion.exactSource !== 'PASS' || completion.completeContent !== 'PASS' || completion.intervalOverflow) failures.push(`${key}: incomplete correctness or bounded diagnostics`);
       diagnostics.push({ key, heartbeatMaximumMs: completion.heartbeatMaximumMs, dispatcherIntervals: completion.dispatcherIntervals,
         samples: records.filter(r => r.kind === 'sample').map(r => ({ action: r.action, temperature: r.temperature,

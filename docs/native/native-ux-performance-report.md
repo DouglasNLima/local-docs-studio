@@ -80,7 +80,7 @@ comparison activation before readable content, and observer-control contaminatio
 Earlier FAIL/CANCELLED/PASS collection outcomes remain in GitHub history. Superseded
 PASS controls are not retroactively treated as qualified product comparisons.
 
-The nine auditor controls reject absent processes/actions, wrong identities, invalid
+The ten auditor controls reject absent processes/actions, wrong identities, invalid
 or inconsistent clocks, unsupported tail claims and content disagreements. A real
 deliberately delayed input control runs after product measurements; collection fails
 if the observer omits that blocked interval. Existing fidelity, export, recovery,
@@ -96,8 +96,8 @@ an observer assumption about the absent live Find counter/F3 route. HC screensho
 show real wheel scrolling while the outer TextEditor offset stays zero; the observer
 was subsequently changed to read the rendered TextView and retain both offsets.
 Those failed observations remain FAIL, and later runs use a separately identified
-harness. The corrected Find route is Enter-to-next; earlier F3 observations are not
-pooled with it. HC palette acceptance is independent of this scroll observation.
+harness. Find routes changed from F3 to Enter and then the common visible Next control;
+these separately identified protocols are never pooled. HC palette acceptance is independent of this scroll observation.
 
 Illustrative **observed maxima in milliseconds**, all with N=2 per entry, on the
 Intel Xeon Platinum 8573C host (2 cores/4 logical processors, image 20261103.298.1,
@@ -122,6 +122,14 @@ typing was substantially slower. The isolated candidate table-cancellation maxim
 of 382.83 ms on the Intel cohort also remains visible; other passing cells cannot
 erase it. These observations demonstrate useful distinctions, not non-regression.
 
+The Intel normal cohort recorded maximum queue-delivery gaps of 873.11 / 920.07 ms
+and inclusive dispatcher operations of 750.72 / 801.22 ms (develop / PR #76).
+Maximum sampled private memory was 393,244,672 / 444,030,976 bytes. The separate AMD
+cohort recorded queue gaps of 1538.98 / 1591.60 ms and inclusive operations of
+1315.64 / 1382.80 ms. These are observer-inclusive diagnostics, not exclusive
+renderer CPU or a certified memory ceiling. Per-action CPU, allocation, GC and
+memory samples are retained in the compact receipt and raw reports.
+
 MainWindow's 300 ms preview scheduling and the secondary comparison's 350 ms timer
 are additional end-to-end costs omitted by the historical direct-viewer benchmark.
 Explicit navigation scheduling is a bounded future experiment; no product timer or
@@ -141,8 +149,9 @@ The historical **2.542596386:1 FAIL remains unresolved** against the unchanged 4
 requirement. Exact develop's packaged .NET 10.0.13 baseline-first run observed WPF
 pressed/text `#FF0078D4 / #FF263B50` while Win32 highlight was `#FF8EE3F0`, before the
 screenshot application launched. Other executions yielded 4.528515:1 or 7.893273:1.
-Fresh probe palette observations have their own process/runtime scope and cannot
-clear that failure.
+All 112 initial-campaign HC process palettes observed 7.893273:1 on .NET/WPF
+10.0.14. These have their own process/runtime scope and cannot clear the original
+packaged-path failure. They are evidence of variation, not proof of resolution.
 
 ThemeService uses WPF system-colour pairs, and the existing disposable-host helper
 broadcasts the actual OS change without persistent registry updates. The evidence

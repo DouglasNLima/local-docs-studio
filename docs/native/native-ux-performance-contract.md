@@ -37,7 +37,7 @@ is outside action clocks; measured actions never use UIA Invoke or model setters
 Missing baseline-only features are NOT RUN, not latency zero or PASS. Documents that
 fit the viewport explicitly mark scrolling NOT APPLICABLE.
 
-Find uses real Enter-to-next in every product. The historical baseline has no live
+Find navigation uses a real click on the visible Next control in every product. The historical baseline has no live
 counter; it still must produce the exact selected text and visible navigation result.
 Scrolling observes the rendered AvalonEdit TextView offset and screen response; the
 outer TextEditor offset is also retained because it can remain zero under the HC
