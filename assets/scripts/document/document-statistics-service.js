@@ -41,7 +41,7 @@ export function createDocumentStatisticsService({ state, editor, button, reviewB
     if (changedDocument) {
       button.textContent = 'Counting…';
       button.title = 'Counting current document statistics. Open Document Review.';
-      button.setAttribute('aria-label', button.title);
+      button.setAttribute('aria-label', 'Counting current document statistics. Open review.');
     }
     button.setAttribute('aria-busy', 'true');
     timer = window.setTimeout(measure, 350);
@@ -68,7 +68,7 @@ export function createDocumentStatisticsService({ state, editor, button, reviewB
         secondary.textContent = ` · ${number.format(words)} words · ${number.format(characters)} chars`;
         button.append(primary, secondary);
         button.title = `${summary}. Open Document Review.`;
-        button.setAttribute('aria-label', `${summary}. Open Document Review`);
+        button.setAttribute('aria-label', `${summary}. Open review`);
         button.removeAttribute('aria-busy');
         worker?.terminate(); worker = null;
         onMetrics?.(metrics);
@@ -80,7 +80,7 @@ export function createDocumentStatisticsService({ state, editor, button, reviewB
   function failed(message) {
     worker?.terminate(); worker = null;
     button.textContent = 'Statistics unavailable'; button.title = message;
-    button.setAttribute('aria-label', `${message} Open Document Review`); button.removeAttribute('aria-busy');
+    button.setAttribute('aria-label', `${message} Open review`); button.removeAttribute('aria-busy');
   }
   return { schedule, getMetrics: () => metrics };
 }

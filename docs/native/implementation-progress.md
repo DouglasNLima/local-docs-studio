@@ -1,5 +1,11 @@
 # Native implementation progress
 
+## Reading experience and productivity — 6 November 2026
+
+One consolidated Draft PR implements readable-buffer statistics, hierarchical H1–H6 outline/Copy TOC, contextual slash commands, two-document comparison, and a separately validated pinned-Mermaider flowchart correction. Web remains buildless/offline and Native remains WPF/AvalonEdit/Markdig/Mermaider 0.15.1. Shared command ownership and canonical buffers preserve persistence, recovery, independent Undo/Redo and conflict checks.
+
+Checkpoint evidence includes Chromium/Edge workflows, Core regressions and 42 cumulative compiled WPF/AvalonEdit/UIA-peer checks. The first complete Core consolidation found two compatibility regressions; both were corrected against unchanged historical tests. The complete corrected Core run passed 2,382 tests; earlier timing failures remain recorded. Final commit-specific results, workflow links, limitations and per-phase verdicts belong to the [consolidated engineering receipt](../engineering/reading-experience-receipt.md) and its Draft PR. Current release readiness is **NOT READY**. Historical Continuous 250 ms and High Contrast failures are unchanged; physical-machine, clean-install and physical screen-reader certification is NOT RUN.
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.

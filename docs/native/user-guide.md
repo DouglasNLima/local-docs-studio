@@ -261,6 +261,12 @@ The preview toolbar exposes **Automatic**, **Pages** and **Continuous** reading 
 
 In the rendered diagram window, **left-click and drag** to pan after a small movement threshold. **Space+drag** and **middle-button drag** remain available. A normal click selects a verified ER or Flowchart entity/relationship; an entity highlights its direct connections. Hover shows transient connection emphasis. The read-only inspection list also supports keyboard selection, including parallel relationships. Click empty canvas or press **Escape** to clear selection. Selection survives pan and zoom and never changes source, history or exported images. Unsupported diagrams retain normal viewing without inspection targets. **Ctrl+mouse wheel** zooms around the pointer. **F** fits the diagram, **Fit width** fills the available width, **Ctrl+0** selects Actual Size, **Home** resets the viewport and arrow keys pan. **Ctrl+C** copies the original drawing, independently of pan or zoom. SVG/PNG exports retain the original drawing.
 
+### Compare two documents
+
+Choose **File → Open beside…** after opening two documents. Select a document and Editor or Preview in each pane's header. **Activate** makes that pane the target for Find, Undo/Redo, paste, Save, Save As and document export. Focusing the secondary source also activates it; the existing editor, its formatting controls and commands follow the active document. Each document retains its own buffer, selection, editing history and Find query. The inactive source is a view of that buffer, not another editable copy.
+
+Scroll is independent by default. Enable **Synchronise scroll** for proportional scrolling between continuous views; paged native readers retain independent page navigation. Adjust the pane widths (Web) or drag/keyboard-operate the divider (Native). Narrow windows stack the panes vertically. Preview navigation resolves links from the owning document. **Close comparison** restores the previous single-document layout without closing or saving either document. Existing external-change checks and recovery still apply. Comparison arrangement is session-only; reopened documents retain the normal recovery contract.
+
 ## Getting started
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.
@@ -306,6 +312,25 @@ Save as retains known wiki targets inside the destination workspace. When linked
 **View → Workspace map** shows the documents read from your open folder, with incoming and outgoing Markdown/wiki links from current saved-file drafts. Search titles or paths, filter documents without incoming links or with review notes, and use **Go to link source** to select the original reference. **Open document** participates in Back/Forward navigation. A changed source must be scanned again before using an old source position.
 
 **Workspace diagram** and **Selected diagram** open native diagrams with zoom and SVG/PNG export. Diagrams show up to 60 documents and 240 distinct connections; the native lists retain the scanned results. **Copy Markdown report** supplies portable diagram source and passive document/link tables. The scan reads up to 1,000 documents, 2 million characters per document, 16 million characters in total and 10,000 links. Unreadable or limited scans are labelled partial, and unconfirmed targets remain unchecked. Close and reopen the map to refresh it. It excludes private application state and never writes workspace documents.
+
+### Reading statistics
+
+The bottom status bar retains operation, preview and caret information and adds reading time, words, readable characters and the document's persistence state. Activate the statistics button to open Document Review. Metrics use the current AvalonEdit buffer after a short editing pause and do not require a preview. Switching tabs cancels obsolete results; a draft is not labelled Saved. Characters are Unicode scalar values in readable prose with normalised whitespace, rather than source bytes or Markdown syntax. The 220 words-per-minute estimate is unchanged, with hours shown for longer documents.
+
+### Advanced outline and Copy Table of Contents
+
+The existing outline includes H1–H6, individual branch toggles, Expand All and Collapse All. Expansion is kept per open document during normal edits. Navigation works in Editor, Split and Preview; preview navigation opens enclosing collapsible sections. A filter in the native outline can reveal headings inside collapsed branches.
+
+Use **Copy Table of Contents** in the outline to copy links without editing the document. Choose start/end heading levels, bullets, numbered lists or plain text, optional hierarchy normalisation and a `<details>` wrapper. Normalisation removes gaps in heading levels while keeping their hierarchy. Links use the renderer's actual identifiers, including duplicate-heading suffixes; exported compatible documents keep those targets. Web and native retain their existing anchor conventions. An empty outline produces no entries; an invalid range cannot replace the clipboard. Paste explicitly when you want to insert the copied result with ordinary Undo/Redo.
+
+### Slash commands
+
+Type `/` at the start of an otherwise empty prose line to search insertion commands. Up to three leading spaces are preserved. Type a command name, use Arrow Up/Down and Enter, or click a result. Escape keeps the literal text. The menu stays near the caret and moves above it when needed; keyboard focus stays in the editor. Unavailable actions explain their prerequisite.
+
+Commands cover headings 1–6, paragraphs, lists and checklists, quotes, code and Mermaid blocks, tables, links, workspace document links, images and figures, callouts, collapsible sections, rules, ISO date/time and built-in snippets. Web uses the existing insertion dialogs and the built-in Usage snippet; Native uses the existing formatting services and snippet catalogue. Native figure and details commands insert editable starter structures; use the existing figure/details editors to customise them. Workspace links use the existing resolver and completion/picker.
+
+Acceptance replaces the whole slash query in one Undo operation. Cancelling an insertion dialog keeps the query. Existing selection is not consumed by the popup. URLs, inline paths, quoted text, indented/fenced code, front matter, comments and raw code/HTML text containers do not trigger it. It is disabled during IME composition, for read-only or standalone Mermaid documents, and above the 4 Mi source-character limit. Typing a slash deliberately in prose is ambiguous until you choose a command; Escape leaves it literal.
+
 
 ## Saving, recovery and external changes
 
@@ -369,6 +394,13 @@ The built-in catalogue includes examples for the supported diagram families. If 
 Maths supports inline dollar delimiters, parenthesised LaTeX delimiters and display formulae. Fractions, roots, scripts, Greek symbols, sums, integrals and common matrix, cases and aligned expressions render offline. Right-click a formula to copy its original LaTeX.
 
 Unsupported or oversized formulae remain readable source. Each formula is limited to 4,096 characters, with at most 256 formulae and 32,768 formula characters per document. HTML, Word, PDF and rich clipboard output use high-resolution formula images; Markdown keeps the editable source.
+
+### Flowchart styling compatibility
+
+Native rendering accepts optional trailing semicolons on complete `class`, `classDef` and `style` instructions, comma-separated node targets, and repeated class assignments. Later assignments take precedence for overlapping properties. The original Mermaid remains unchanged. Malformed styling reports an unsupported-syntax message instead of becoming a diagram node. Comma-separated class names in a single assignment retain protected inspection with a visible warning and default appearance; use separate class statements to apply multiple styles.
+
+Label text and line breaks inside `<small>`, `<sub>`, `<sup>` and `<mark>` are retained, but their typography is not supported by the pinned native renderer. Preview displays this limitation. These labels remain protected in Visual Edit; read-only inspection and canonical SVG/PNG exports retain the same graph and text. The Web and Native layouts can differ.
+
 
 ## Details, callouts and document helpers
 
@@ -644,35 +676,3 @@ Use **Visual Edit** on a document diagram or standalone Mermaid file, or **Inser
 **Venn:** unique safe IDs and proved union references rename atomically. Display labels are separate: make an absent label explicit before preserving its display text during rename, or explicitly elect to rename the default display with the ID. Connected deletion rejects remaining unions unless explicit complete atomic removal is chosen. Size fields are stored metadata and **do not change fixed native circle/overlap geometry**. Unions have no invented hit regions; circle overlap ambiguity uses keyboard selection. Missing/duplicate IDs, comma-containing quoted IDs and unproved escapes remain protected.
 
 All four use the shared adjustable source pane, independently scrolling inspector, complete occurrence list, Locate/original source, private Undo/Redo and guarded owner Apply/Cancel. Invalid pending fields/source remain visible, preserve the last valid draft and disable Apply. Apply is one owner Undo action; Cancel and stale-owner rejection preserve owner data. No browser/WebView, renderer fork, layout replacement, new runtime dependency, file-association default change or experimental Continuous renderer is introduced.
-
-## Reading statistics
-
-The bottom status bar retains operation, preview and caret information and adds reading time, words, readable characters and the document's persistence state. Activate the statistics button to open Document Review. Metrics use the current AvalonEdit buffer after a short editing pause and do not require a preview. Switching tabs cancels obsolete results; a draft is not labelled Saved. Characters are Unicode scalar values in readable prose with normalised whitespace, rather than source bytes or Markdown syntax. The 220 words-per-minute estimate is unchanged, with hours shown for longer documents.
-
-## Advanced outline and Copy Table of Contents
-
-The existing outline includes H1–H6, individual branch toggles, Expand All and Collapse All. Expansion is kept per open document during normal edits. Navigation works in Editor, Split and Preview; preview navigation opens enclosing collapsible sections. A filter in the native outline can reveal headings inside collapsed branches.
-
-Use **Copy Table of Contents** in the outline to copy links without editing the document. Choose start/end heading levels, bullets, numbered lists or plain text, optional hierarchy normalisation and a `<details>` wrapper. Normalisation removes gaps in heading levels while keeping their hierarchy. Links use the renderer's actual identifiers, including duplicate-heading suffixes; exported compatible documents keep those targets. Web and native retain their existing anchor conventions. An empty outline produces no entries; an invalid range cannot replace the clipboard. Paste explicitly when you want to insert the copied result with ordinary Undo/Redo.
-
-## Slash commands
-
-Type `/` at the start of an otherwise empty prose line to search insertion commands. Up to three leading spaces are preserved. Type a command name, use Arrow Up/Down and Enter, or click a result. Escape keeps the literal text. The menu stays near the caret and moves above it when needed; keyboard focus stays in the editor. Unavailable actions explain their prerequisite.
-
-Commands cover headings 1–6, paragraphs, lists and checklists, quotes, code and Mermaid blocks, tables, links, workspace document links, images and figures, callouts, collapsible sections, rules, ISO date/time and built-in snippets. Web uses the existing insertion dialogs and the built-in Usage snippet; Native uses the existing formatting services and snippet catalogue. Native figure and details commands insert editable starter structures; use the existing figure/details editors to customise them. Workspace links use the existing resolver and completion/picker.
-
-Acceptance replaces the whole slash query in one Undo operation. Cancelling an insertion dialog keeps the query. Existing selection is not consumed by the popup. URLs, inline paths, quoted text, indented/fenced code, front matter, comments and raw code/HTML text containers do not trigger it. It is disabled during IME composition, for read-only or standalone Mermaid documents, and above the 4 Mi source-character limit. Typing a slash deliberately in prose is ambiguous until you choose a command; Escape leaves it literal.
-
-
-## Flowchart styling compatibility
-
-Native rendering accepts optional trailing semicolons on complete `class`, `classDef` and `style` instructions, comma-separated node targets, and repeated class assignments. Later assignments take precedence for overlapping properties. The original Mermaid remains unchanged. Malformed styling reports an unsupported-syntax message instead of becoming a diagram node. Comma-separated class names in a single assignment are not supported; use separate class statements.
-
-Label text and line breaks inside `<small>`, `<sub>`, `<sup>` and `<mark>` are retained, but their typography is not supported by the pinned native renderer. Preview displays this limitation. These labels remain protected in Visual Edit; read-only inspection and canonical SVG/PNG exports retain the same graph and text. The Web and Native layouts can differ.
-
-
-## Compare two documents
-
-Choose **File → Open beside…** after opening two documents. Select a document and Editor or Preview in each pane's header. **Activate** makes that pane the target for Find, Undo/Redo, paste, Save, Save As and document export. Focusing the secondary source also activates it; the existing editor, its formatting controls and commands follow the active document. Each document retains its own buffer, selection, editing history and Find query. The inactive source is a view of that buffer, not another editable copy.
-
-Scroll is independent by default. Enable **Synchronise scroll** for proportional scrolling between continuous views; paged native readers retain independent page navigation. Adjust the pane widths (Web) or drag/keyboard-operate the divider (Native). Narrow windows stack the panes vertically. Preview navigation resolves links from the owning document. **Close comparison** restores the previous single-document layout without closing or saving either document. Existing external-change checks and recovery still apply. Comparison arrangement is session-only; reopened documents retain the normal recovery contract.

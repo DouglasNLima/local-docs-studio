@@ -1,10 +1,10 @@
 # Reading experience and productivity — engineering receipt
 
-Status: implementation in progress. This document is an engineering checkpoint, not publication acceptance.
+Status: five implementation slices delivered locally; final commit-specific hosted acceptance pending. This is an engineering receipt, not publication acceptance.
 
 ## Baseline and boundaries
 
-- Goal: `01a1b05e-1f98-7fe2-9aca-a6064536894d`, one consolidated Draft PR targeting `develop`.
+- Goal: [#75](https://github.com/DouglasNLima/local-docs-studio/issues/75), tracking the same active Codex Goal `01a1b05e-1f98-7fe2-9aca-a6064536894d`; one consolidated Draft PR targets `develop`.
 - Initial checkout: `main`, commit `68f1dc955b27a47347a6fccc52a463472b601a1b`, tree `7847c00786aba15bc3d29746a9a983f8b70b9690`. Untracked `.codex-remote-attachments/` retained untouched.
 - Fetched `develop`: `99349d82eb06960eb1f9785cf384db2373aed4fa`, tree `e4d137a12cbdd827583fcb841612890dd88736ec`. Baseline runs in a separate detached worktree so implementation cannot change its test inputs.
 - Feature branch: `feature/reading-experience-productivity`, created from that exact baseline after static validation and a successful native build.
@@ -110,3 +110,37 @@ The user added a fifth workstream to the same Goal and Draft PR. The exact suppl
 - Development failures retained: folder/file picker test setup initially used unsupported Playwright payloads; a conflict label expectation exposed the need to distinguish dirty conflicts; scoped fragment handling initially intercepted wiki links and was corrected to leave document-link routing intact. Initial native compilation found a wrong AvalonEdit scrolling property and missing namespace; subsequent build passed. No existing acceptance threshold was modified.
 
 - Phase 4 final checkpoint PASS: locked Release build, zero warnings/errors (`phase4-build-checkpoint.log`), 42 cumulative compiled WPF/AvalonEdit/UIA-peer checks (`artifacts/reading-experience/phase4-checkpoint/completion.json`), and static integrity (56 modules, 67 shell assets, 218 cache attempts). These remain checkpoint results, pending the final immutable commit and hosted runs.
+
+
+### Consolidation investigation 1
+
+The complete Core run on `7371190` reported FAIL: 2 failed, 2,379 passed (2,381 total). The fixed 22-topic native help contract caught five new top-level sections; they were integrated as subsections of their existing owning topics, preserving the original test and anchor catalogue. The protected unknown-style contract caught rejection of `class D one,two`. This remains protected inspection with an explicit fidelity warning and default appearance (as independently observed in Mermaid.js), while a narrowly recognised renderer-input comment prevents its phantom node. Separately assigned classes still combine in assignment order. The historical tests were not weakened or changed; final reruns follow.
+
+
+### Consolidation investigation 2
+
+The browser matrix exposed loss of the existing `data-details-block` marker in the new shared details renderer and an ambiguous accessible-name match between the established Document review button and the new statistics button. The renderer now retains the supported semantic marker; the statistics control has a distinct **Open review** accessible name while keeping its full metrics and Document Review tooltip. Existing helper/Review regressions remain unchanged.
+
+A second complete Core run reported FAIL: a new directive-prefix regular expression timed out during concurrent work, and the existing complete-detailed ER fixture reached its unchanged six-second rendering deadline. The hot prefix check was replaced with bounded ordinal span comparisons, without widening a timeout. The ER deadline failure remains recorded; isolated baseline/candidate investigation and final-source CI are required before attribution. Continuous 250 ms remains a separate gate.
+
+
+### Technical and security review
+
+- Reviewed current-buffer ownership across debounce, recovery, asynchronous selection and save completion; independent histories and guarded helper-dialog ranges; Marked instance isolation and the shared Mermaid queue; secondary preview cancellation, theme/path/version checks and hidden-pane behaviour; canonical native SVG/PNG ownership; source-only handling of unsupported syntax.
+- Rendering continues through existing HTML/SVG sanitisation and local asset/path validation. No document content is sent to an external service. No new runtime dependency, framework, build step, backend, worker host or copied upstream implementation was added. Source remains authoritative and native Visual Edit still uses protected spans.
+- Review found and corrected stale-read ownership, overlapping accessible names, lost semantic details attributes, a fixed-help-catalogue change, protected compound-class behaviour and a hot regex prefix check. Existing regression tests exposed these issues and are retained. Both source-selection direction and native caret offset now belong to the document view, including activation after a pointer selection.
+- Scoped MIT review grants only enumerated original R1/R2 portions of new implementation/docs. The supplied SPC fixture and other R3–R7 content remain excluded. No dependency version, third-party notice, trust policy, historical rights ledger or performance/High Contrast threshold changed. The repository-designated **current** Goal #62 rights ledger is regenerated as instructed by `scripts/compliance/README.md`; frozen Goal #58/#60 evidence and Goal #62 preserved-file snapshot remain unchanged. A separate exact 40-path amendment binds changed implementation/current-guidance hashes, with negative controls rejecting notice/performance scope changes.
+- Hosted interaction testing is isolated in a new normal/actual-High-Contrast job. Its process guard rejects execution on a development host. It exercises real keyboard slash insertion/Undo, statistics UIA, two-document activation/Find/save, exact SPC Preview disclosure, Preview/Preview and close. Hosted results are pending and are not physical-user certification.
+
+
+### Consolidation checkpoint before the Draft PR
+
+- Initial full Web run: FAIL, 311 passed / 3 failed / 314 total (`consolidation-web-01.log`). The three failures were the details marker in both browsers and the ambiguous Review name in Chromium. The run spans subsequent corrections and is not final-source acceptance. The corrected narrow matrix and exact-head hosted matrix supersede it only for their own source identity.
+- Paired investigation: baseline isolated ER PASS 17 (`baseline-er-isolated.log` in the baseline worktree); candidate ER/flowchart/visual tests PASS 78 (`candidate-er-isolated.log`); baseline complete Core PASS 2,298 (`baseline-core-paired.log`). Candidate full diagnostic run PASS 2,382, zero failed/skipped (`consolidation-core-diagnostic.log`, `core-diagnostic.trx`). Earlier candidate full runs with regex/deadline failures remain FAIL, not overwritten. The existing corpus assertion now includes its renderer error message; its success criterion is unchanged. Timing variability remains INCONCLUSIVE and does not clear Continuous 250 ms.
+- Current native/control checkpoint: locked build, actual compiled controls and canonical SPC checks are rerun after the final interaction changes. Hosted pointer/keyboard/Save As/High Contrast and the original editor-family suites are pending.
+- Governance review: no new dependencies, unchanged Mermaider 0.15.1, R3–R7 exclusions retained, original notice/trust/performance snapshots preserved. The current rights inventory and reviewed original-portion grant are refreshed. Negative controls cover baseline identity, previous hashes, scope omissions, notice/performance injection and malformed/current digest drift.
+- The exact final commit/tree, terminal workflow URLs, final counts and consolidated verdict will be recorded in the single Draft PR body and final generated receipt. This avoids a self-referential Git hash in the versioned file. No PASS from an earlier code version certifies that final identity.
+
+
+- Pre-push correction checkpoint PASS: 20 focused Chromium/Edge tests (`consolidation-browser-fixes.log`); locked native Release build, zero warnings/errors (`consolidation-build-03.log`); 42 actual compiled WPF/AvalonEdit/UIA-peer checks and 13 canonical SPC Light/Dark checks (`consolidation-controls-03` and `consolidation-flowchart-03` completion files). The hosted UI harness is compiled but deliberately NOT RUN on this development host.
+- Pre-push provenance PASS: current inventory 2,553 paths; 2,421 protected files; 1,109 enumerated original-portion grant paths; 68 Web notices and 537 native files retained, with 522 exact upstream matches. All 25 governance negative-control tests passed. No administrative settings were changed. Static integrity PASS: 56 modules, 67 shell assets, 218 cached assets.

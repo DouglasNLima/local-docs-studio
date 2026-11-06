@@ -21,7 +21,7 @@ public partial class MainWindow
     private sealed class ComparisonSlot(DocumentViewModel document, string mode)
     { public DocumentViewModel Document = document; public string Mode = mode; }
     private sealed record ComparisonView(int Start, int Length, double Horizontal, double Vertical, double PreviewTop,
-        string Find, string Replacement, bool FindOpen, bool ReplaceOpen, bool SearchPreview, (int Start, int Length)? PreviewSelection = null);
+        string Find, string Replacement, bool FindOpen, bool ReplaceOpen, bool SearchPreview, (int Start, int Length)? PreviewSelection = null, int Caret = -1);
     private readonly Dictionary<Guid, ComparisonView> comparisonViews = [];
     private ComparisonSlot[]? comparisonSlots;
     private int comparisonActive;
@@ -48,6 +48,7 @@ public partial class MainWindow
     private string? comparisonRequestedContext;
     private long comparisonGeneration;
     private bool comparisonPreviewPointer;
+    private bool comparisonEditorPointer;
     private PreviewResult? comparisonPreviewResult;
 
     private async void OpenBeside(object sender, RoutedEventArgs e)
@@ -100,6 +101,8 @@ public partial class MainWindow
             mode.SelectionChanged += (_, _) => { if (!comparisonUpdating && comparisonSlots is not null && mode.SelectedItem is string selected) { comparisonSlots[captured].Mode = selected; if (captured == comparisonActive) SetLayout(selected); AttachComparison(); } };
             var activate = comparisonActivate[index]; activate.Content = "Activate"; activate.Click += (_, _) => ActivateComparison(captured);
             AutomationProperties.SetName(documents, $"Document in {(index == 0 ? "left" : "right")} pane");
+            AutomationProperties.SetAutomationId(mode, "ComparisonMode" + index);
+            AutomationProperties.SetAutomationId(documents, "ComparisonDocument" + index);
             AutomationProperties.SetName(mode, $"Mode in {(index == 0 ? "left" : "right")} pane");
             AutomationProperties.SetAutomationId(activate, "ActivateComparison" + index);
             header.Children.Add(documents); header.Children.Add(mode); header.Children.Add(activate);
@@ -116,14 +119,27 @@ public partial class MainWindow
             e.Handled = true;
         };
         comparisonEditor.SetResourceReference(BackgroundProperty, "WindowBrush"); comparisonEditor.SetResourceReference(ForegroundProperty, "TextBrush");
+        comparisonEditor.SetBinding(FontSizeProperty, new System.Windows.Data.Binding(nameof(Editor.FontSize)) { Source = Editor });
+        comparisonEditor.SetBinding(FontFamilyProperty, new System.Windows.Data.Binding(nameof(Editor.FontFamily)) { Source = Editor });
         comparisonEditor.TextArea.TextView.LineTransformers.Add(new MarkdownHighlighting { Dark = ThemeService.IsDark(model.Theme), HighContrast = SystemParameters.HighContrast });
         comparisonPreview.SetResourceReference(StyleProperty, "DocumentPreviewStyle"); comparisonPreview.SetResourceReference(BackgroundProperty, "WindowBrush");
         AutomationProperties.SetAutomationId(comparisonEditor, "ComparisonSource"); AutomationProperties.SetName(comparisonEditor, "Secondary source; focus to activate document");
         AutomationProperties.SetAutomationId(comparisonPreview, "ComparisonPreview"); AutomationProperties.SetName(comparisonPreview, "Secondary document preview");
-        comparisonEditor.GotKeyboardFocus += (_, _) => { if (!comparisonUpdating && comparisonSlots is not null) ActivateComparison(1 - comparisonActive); };
+        comparisonEditor.PreviewMouseDown += (_, _) => comparisonEditorPointer = true;
+        comparisonEditor.GotKeyboardFocus += (_, _) => { if (!comparisonEditorPointer && !comparisonUpdating && comparisonSlots is not null) ActivateComparison(1 - comparisonActive); };
+        comparisonEditor.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler((_, _) =>
+        {
+            comparisonEditorPointer = false;
+            if (comparisonSlots is null || comparisonUpdating) return;
+            var document = comparisonSlots[1 - comparisonActive].Document;
+            var view = comparisonViews.GetValueOrDefault(document.Id) ?? new(0, 0, 0, document.VerticalOffset, 0, "", "", false, false, false);
+            comparisonViews[document.Id] = view with { Start = comparisonEditor.SelectionStart, Length = comparisonEditor.SelectionLength,
+                Caret = comparisonEditor.CaretOffset, Vertical = comparisonEditor.VerticalOffset, Horizontal = comparisonEditor.HorizontalOffset };
+            ActivateComparison(1 - comparisonActive);
+        }), true);
         comparisonPreview.PreviewMouseDown += (_, _) => comparisonPreviewPointer = true;
         comparisonPreview.GotKeyboardFocus += (_, _) => { if (!comparisonPreviewPointer && !comparisonUpdating && comparisonSlots is not null) ActivateComparison(1 - comparisonActive); };
-        comparisonPreview.PreviewMouseUp += (_, _) =>
+        comparisonPreview.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler((_, _) =>
         {
             comparisonPreviewPointer = false;
             if (comparisonSlots is null || comparisonUpdating) return;
@@ -133,7 +149,7 @@ public partial class MainWindow
             comparisonViews[document.Id] = view with { PreviewTop = ComparisonScroller(comparisonPreview)?.VerticalOffset ?? 0,
                 PreviewSelection = comparisonPreview.Selection is { IsEmpty: false } selection && comparisonPreviewResult?.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) == true ? (start, length) : null };
             ActivateComparison(1 - comparisonActive);
-        };
+        }), true);
         foreach (var surface in new UIElement[] { Editor, Preview, comparisonEditor, comparisonPreview })
             surface.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler((_, args) => ComparisonScroll(surface, args)));
         comparisonTimer.Tick += async (_, _) => { comparisonTimer.Stop(); await RenderComparisonAsync(); };
@@ -148,13 +164,14 @@ public partial class MainWindow
             ComparisonScroller(Preview)?.VerticalOffset ?? 0, FindText.Text, ReplaceText.Text, FindBar.Visibility == Visibility.Visible,
             ReplaceText.Visibility == Visibility.Visible, searchPreview,
             renderedDocumentId == displayedTab.Id && Preview.Selection is { IsEmpty: false } selection
-                && rendered?.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) == true ? (start, length) : null);
+                && rendered?.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) == true ? (start, length) : null, Editor.CaretOffset);
         foreach (var id in comparisonViews.Keys.Where(id => !model.Documents.Any(document => document.Id == id)).ToArray()) comparisonViews.Remove(id);
     }
     private void RestoreComparisonView(DocumentViewModel document)
     {
         var view = comparisonViews.GetValueOrDefault(document.Id) ?? new(0, 0, 0, document.VerticalOffset, 0, "", "", false, false, false);
         var start = Math.Min(view.Start, Editor.Document.TextLength); Editor.Select(start, Math.Min(view.Length, Editor.Document.TextLength - start));
+        if (view.Caret >= 0) Editor.CaretOffset = Math.Min(view.Caret, Editor.Document.TextLength);
         Editor.ScrollToHorizontalOffset(view.Horizontal); Editor.ScrollToVerticalOffset(view.Vertical);
         FindText.Text = view.Find; ReplaceText.Text = view.Replacement; searchPreview = view.SearchPreview;
         FindBar.Visibility = view.FindOpen ? Visibility.Visible : Visibility.Collapsed;
@@ -187,11 +204,11 @@ public partial class MainWindow
             comparisonBodies[comparisonActive].Children.Add(ContentGrid);
             var inactive = 1 - comparisonActive; var slot = comparisonSlots[inactive];
             comparisonEditor.Document = slot.Document.EditorDocument;
-            comparisonEditor.FontSize = Editor.FontSize;
             comparisonPreview.Zoom = Preview.Zoom;
             foreach (var highlighting in comparisonEditor.TextArea.TextView.LineTransformers.OfType<MarkdownHighlighting>())
             { highlighting.Dark = ThemeService.IsDark(model.Theme); highlighting.HighContrast = SystemParameters.HighContrast; }
             var view = comparisonViews.GetValueOrDefault(slot.Document.Id);
+            if (view is not null) { var start = Math.Min(view.Start, comparisonEditor.Document.TextLength); comparisonEditor.Select(start, Math.Min(view.Length, comparisonEditor.Document.TextLength - start)); if (view.Caret >= 0) comparisonEditor.CaretOffset = Math.Min(view.Caret, comparisonEditor.Document.TextLength); }
             comparisonEditor.ScrollToVerticalOffset(view?.Vertical ?? slot.Document.VerticalOffset);
             comparisonBodies[inactive].Children.Add(slot.Mode == "Editor" ? comparisonEditor : comparisonPreview);
             for (var index = 0; index < 2; index++)
@@ -236,7 +253,7 @@ public partial class MainWindow
         comparisonHost!.Children[0].Visibility = Visibility.Collapsed;
         // Reopening reuses the controls, but restores both pane containers.
         comparisonEditor.Document = new(); comparisonPreview.Document = new(); comparisonPreviewResult = null; comparisonRenderedId = null; comparisonRequestedId = null;
-        SetLayout(comparisonOriginalLayout); Editor.Focus();
+        SetLayout(comparisonOriginalLayout); if (model.Layout == "Preview") Preview.Focus(); else Editor.Focus();
     }
     private void QueueComparisonPreview()
     {

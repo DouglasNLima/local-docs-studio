@@ -60,12 +60,20 @@ public sealed class FlowchartCompatibilityTests(ITestOutputHelper output)
     [InlineData("class A")] [InlineData("class A bad extra;")]
     [InlineData("classDef colour;")] [InlineData("classDef colour nonsense;")]
     [InlineData("style A;")] [InlineData("style A --> B;")]
-    [InlineData("class A red,blue;")]
     public void Malformed_styling_is_reported_instead_of_becoming_a_node(string directive)
     {
         var result = new DiagramService().Render("flowchart TB\nA[Known]\n" + directive);
         Assert.False(result.Success); Assert.Equal(DiagramFailureKind.UnsupportedSyntax, result.FailureKind);
         Assert.NotNull(result.Error);
+    }
+    [Fact]
+    public void Compound_class_names_keep_protected_inspection_without_creating_a_phantom_node()
+    {
+        const string source = "flowchart LR\nA[Known]\nclass A red,blue;\n";
+        var result = new DiagramService().Render(source);
+        Assert.True(result.Success, result.Error); Assert.Single(result.FlowchartSemantics!.Nodes);
+        Assert.False(result.FlowchartSemantics.Nodes.ContainsKey("class")); Assert.Contains("protected source", result.FidelityWarning);
+        Assert.Equal(source, result.Source); Assert.Equal(MermaidCompatibility.Protected, new MermaidSourceParser().Parse(source).Compatibility);
     }
     [Fact]
     public void Multiple_statements_comma_targets_and_multiple_classes_retain_effective_colours_and_borders()
@@ -99,6 +107,15 @@ public sealed class FlowchartCompatibilityTests(ITestOutputHelper output)
         Assert.Equal("#ABCDEF", result.FlowchartSemantics!.ClassDefs["_lens_combined_0"]["fill"]);
         Assert.Equal("_lens_combined_1", result.FlowchartSemantics.ClassAssignments["A"]);
         Assert.Equal(source, result.Source);
+    }
+    [Fact]
+    public void Quoted_style_semicolons_remain_intact_and_quoted_multiline_values_are_not_silently_changed()
+    {
+        const string source = "flowchart TB\nA[Known]\nclassDef c font-family:'One;Two',fill:#FFFFFF;\nclass A c;";
+        Assert.Contains("font-family:'One;Two'", FlowchartCompatibility.Prepare(source));
+        var unsupported = source.Replace("One;Two", "One\nTwo", StringComparison.Ordinal);
+        var result = new DiagramService().Render(unsupported);
+        Assert.False(result.Success); Assert.Equal(DiagramFailureKind.UnsupportedSyntax, result.FailureKind); Assert.Equal(unsupported, result.Source);
     }
     [Fact]
     public void Other_diagram_families_are_not_adapted()

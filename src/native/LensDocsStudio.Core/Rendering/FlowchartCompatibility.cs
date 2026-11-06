@@ -24,7 +24,7 @@ public static partial class FlowchartCompatibility
                 else if (escaped) { escaped = false; continue; }
                 else if (character == '\\') { escaped = true; continue; }
                 else if (quote != '\0') { if (character == quote) quote = '\0'; continue; }
-                else if (character == '"' || character == '\'' && Directive().IsMatch(source[start..index].Trim())) { quote = character; continue; }
+                else if (character == '"' || character == '\'' && IsDirective(source[start..index].Trim())) { quote = character; continue; }
                 else if (character == '%' && index + 1 < source.Length && source[index + 1] == '%' && depth == 0)
                 {
                     // Comments are opaque, including semicolons and directive-looking text.
@@ -33,7 +33,7 @@ public static partial class FlowchartCompatibility
                 else if (character is '[' or '(' or '{') { depth++; continue; }
                 else if (character is ']' or ')' or '}') { depth = Math.Max(0, depth - 1); continue; }
                 if (depth != 0 || character is not ('\n' or ';')) continue;
-                if (character == '\n' && source[start..index].TrimEnd().EndsWith(',') && Directive().IsMatch(source[start..index].Trim())) continue;
+                if (character == '\n' && source[start..index].TrimEnd().EndsWith(',') && IsDirective(source[start..index].Trim())) continue;
             }
             Write(source[start..index], index < source.Length ? source[index] : '\0'); start = index + 1;
         }
@@ -64,11 +64,19 @@ public static partial class FlowchartCompatibility
         void Write(string raw, char delimiter)
         {
             var text = raw.Trim();
-            if (!Directive().IsMatch(text)) { output.Append(raw); if (delimiter != '\0') output.Append(delimiter); return; }
+            if (!IsDirective(text)) { output.Append(raw); if (delimiter != '\0') output.Append(delimiter); return; }
             var assignment = Assignment().Match(text);
             var definition = Definition().Match(text);
             var style = Style().Match(text);
             string canonical;
+            if (CompoundClass().IsMatch(text))
+            {
+                // Mermaid.js treats this as one unresolved compound class name.
+                // Preserve the established protected-inspection contract and its
+                // default appearance, while preventing the pinned phantom node.
+                output.Append("\n%% Protected compound class assignment; original source retained.\n");
+                return;
+            }
             if (assignment.Success)
             {
                 var targets = Targets(assignment.Groups[1].Value); var classes = Targets(assignment.Groups[2].Value).Split(',');
@@ -92,14 +100,40 @@ public static partial class FlowchartCompatibility
         static string Properties(string value)
         {
             if (!PropertyStart().IsMatch(value)) throw new NotSupportedException("Complete the flowchart style properties before rendering.");
+            var quote = '\0'; var escaped = false;
+            foreach (var character in value)
+            {
+                if (escaped) { escaped = false; continue; }
+                if (character == '\\') { escaped = true; continue; }
+                if (quote != '\0')
+                {
+                    if (character is '\r' or '\n') throw new NotSupportedException("Multiline quoted style values remain source-only; no value was rewritten.");
+                    if (character == quote) quote = '\0';
+                }
+                else if (character is '\'' or '"') quote = character;
+            }
             return value.Replace("\r\n", " ", StringComparison.Ordinal).Replace('\n', ' ').TrimEnd();
         }
     }
-    public static string? LabelWarning(string source) => IsFlowchart(source) && UnsupportedTypography().IsMatch(source)
-        ? "Native Mermaid retains label text and line breaks, but small, subscript, superscript and highlight typography is not supported. Original source is unchanged; these labels remain protected in Visual Edit." : null;
+    public static string? LabelWarning(string source)
+    {
+        if (!IsFlowchart(source)) return null;
+        var messages = new List<string>();
+        if (UnsupportedTypography().IsMatch(source)) messages.Add("Native Mermaid retains label text and line breaks, but small, subscript, superscript and highlight typography is not supported. Original source is unchanged; these labels remain protected in Visual Edit.");
+        if (CompoundClassWarning().IsMatch(source)) messages.Add("Comma-separated class names remain protected source. Their unresolved style uses the default appearance; use separate class statements to apply multiple classes. Original source is unchanged.");
+        return messages.Count == 0 ? null : string.Join(" ", messages);
+    }
     [GeneratedRegex(@"^(?:flowchart|graph)\s+(?:TB|TD|BT|LR|RL)(?:\s|;|$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, 50)] private static partial Regex Header();
-    [GeneratedRegex(@"^(?:class|classDef|style)(?:\s|$)", RegexOptions.CultureInvariant, 50)] private static partial Regex Directive();
+    private static bool IsDirective(string source)
+    {
+        var value = source.AsSpan().TrimStart();
+        return Keyword(value, "class") || Keyword(value, "classDef") || Keyword(value, "style");
+        static bool Keyword(ReadOnlySpan<char> value, ReadOnlySpan<char> keyword) => value.StartsWith(keyword, StringComparison.Ordinal)
+            && (value.Length == keyword.Length || char.IsWhiteSpace(value[keyword.Length]));
+    }
     [GeneratedRegex(@"^class\s+([\w-]+(?:\s*,\s*[\w-]+)*)\s+(\w+)$", RegexOptions.CultureInvariant, 50)] private static partial Regex Assignment();
+    [GeneratedRegex(@"^class\s+[\w-]+(?:\s*,\s*[\w-]+)*\s+\w+(?:,\w+)+$", RegexOptions.CultureInvariant, 50)] private static partial Regex CompoundClass();
+    [GeneratedRegex(@"(?:^|[;\n])\s*class\s+[\w-]+(?:\s*,\s*[\w-]+)*\s+\w+(?:,\w+)+(?:[;\r\n]|$)", RegexOptions.CultureInvariant, 50)] private static partial Regex CompoundClassWarning();
     [GeneratedRegex(@"^classDef\s+(\w+)\s+(.+)$", RegexOptions.Singleline | RegexOptions.CultureInvariant, 50)] private static partial Regex Definition();
     [GeneratedRegex(@"^style\s+([\w-]+(?:\s*,\s*[\w-]+)*)\s+(.+)$", RegexOptions.Singleline | RegexOptions.CultureInvariant, 50)] private static partial Regex Style();
     [GeneratedRegex(@"^[a-zA-Z][a-zA-Z-]*\s*:", RegexOptions.CultureInvariant, 50)] private static partial Regex PropertyStart();

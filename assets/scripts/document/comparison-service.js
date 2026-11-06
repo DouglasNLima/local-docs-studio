@@ -58,13 +58,13 @@ export function createComparisonService({ state, editor, preview, workspace, set
   function currentRecord() { return state.files.find(record => record.path === state.activePath); }
   function capture(record = currentRecord()) {
     if (!record) return;
-    sessions.set(record, { start: editor.selectionStart, end: editor.selectionEnd, editorTop: editor.scrollTop,
+    sessions.set(record, { start: editor.selectionStart, end: editor.selectionEnd, direction: editor.selectionDirection, editorTop: editor.scrollTop,
       editorLeft: editor.scrollLeft, previewTop: preview.scrollTop, find: find.captureSession(), previewFind: capturePreviewFind(),
       selection: selectionRange(preview), source: editor.value });
   }
   function restore(record) {
     const session = sessions.get(record) || {};
-    editor.setSelectionRange(session.start || 0, session.end || 0);
+    editor.setSelectionRange(session.start || 0, session.end || 0, session.direction || 'none');
     editor.scrollTop = session.editorTop || 0; editor.scrollLeft = session.editorLeft || 0;
     preview.scrollTop = session.previewTop || 0; find.restoreSession(session.find); restorePreviewFind(session.previewFind);
     if (session.source === editor.value) restoreSelection(preview, session.selection);
@@ -101,7 +101,7 @@ export function createComparisonService({ state, editor, preview, workspace, set
     passiveEditor.setAttribute('aria-label', `${slot.record.name} source; focus to activate this document`);
     passivePreview.setAttribute('aria-label', `${slot.record.name} preview`);
     views[index].body.replaceChildren(slot.mode === 'editor' ? passiveEditor : passivePreview);
-    passiveEditor.setSelectionRange(session.start || 0, session.end || 0);
+    passiveEditor.setSelectionRange(session.start || 0, session.end || 0, session.direction || 'none');
     passiveEditor.scrollTop = session.editorTop || 0; passiveEditor.scrollLeft = session.editorLeft || 0;
     if (slot.mode !== 'preview') { passiveState.renderId++; return; }
     const theme = `${state.theme}|${state.mermaidTheme}`;
@@ -125,6 +125,8 @@ export function createComparisonService({ state, editor, preview, workspace, set
     try {
       await selectFile(target.path);
       if (!slots || generation !== request || currentRecord() !== target) return;
+      if (slots[index].mode === 'editor') sessions.set(target, { ...(sessions.get(target) || {}), start: passiveEditor.selectionStart,
+        end: passiveEditor.selectionEnd, direction: passiveEditor.selectionDirection, editorTop: passiveEditor.scrollTop, editorLeft: passiveEditor.scrollLeft });
       active = index; attach(); restore(target);
       if (focus) (slots[index].mode === 'editor' ? editor : preview).focus({ preventScroll: true });
     } finally { switching = false; host.removeAttribute('aria-busy'); refreshHeaders(); }
@@ -155,7 +157,8 @@ export function createComparisonService({ state, editor, preview, workspace, set
     capture(); request++; slots = null; passiveState.renderId++; paintedRecord = null; paintedSource = null;
     host.before(workspace); host.hidden = true; app.classList.remove('comparing-documents');
     passivePreview.replaceChildren(); passiveEditor.value = ''; setEditorLayout(originalLayout, { persist: false });
-    editor.focus({ preventScroll: true });
+    preview.tabIndex = 0;
+    (originalLayout === 'preview' ? preview : editor).focus({ preventScroll: true });
   }
   editor.addEventListener('lens-document-leaving', () => { if (slots) capture(); });
   editor.addEventListener('lens-document-ready', event => {

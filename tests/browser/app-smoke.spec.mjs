@@ -313,7 +313,7 @@ test('document statistics follow the readable unsaved buffer and retain keyboard
   const editor = page.locator('#editor');
   const statistics = page.locator('#documentStatistics');
   await editor.fill('# Café 😀\n\nHello **world**!');
-  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 3 words · 19 chars. Open Document Review');
+  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 3 words · 19 chars. Open review');
   await editor.press('Control+End');
   await editor.pressSequentially(' Again', { delay: 5 });
   await expect(statistics).toContainText('4 words');
@@ -348,7 +348,7 @@ test('document statistics exclude syntax and code, support Unicode and survive n
   ];
   for (const [source, words, characters] of examples) {
     await editor.fill(source);
-    await expect(statistics).toHaveAttribute('aria-label', `${words ? 1 : 0} min read · ${words} words · ${characters} chars. Open Document Review`);
+    await expect(statistics).toHaveAttribute('aria-label', `${words ? 1 : 0} min read · ${words} words · ${characters} chars. Open review`);
   }
   await page.setViewportSize({ width: 480, height: 720 });
   await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
@@ -367,7 +367,7 @@ test('document statistics discard superseded large buffers and use hours without
   await expect(statistics).toHaveAttribute('aria-label', /1 hr 2 min read · 13,421 words · 67,104 chars/);
   await editor.fill('old '.repeat(50000));
   await editor.fill('# Current');
-  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 1 words · 7 chars. Open Document Review');
+  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 1 words · 7 chars. Open review');
   await editor.press('Control+End');
   await expect(editor).toBeFocused();
   await expect(editor).toHaveValue('# Current');

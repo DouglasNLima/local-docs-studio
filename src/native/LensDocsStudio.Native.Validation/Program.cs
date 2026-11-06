@@ -17,6 +17,13 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--reading-productivity-ui")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Reading-productivity pointer/keyboard and High Contrast acceptance require disposable GitHub-hosted Windows."); return 1; }
+            return NativeUiChecks.RunReadingProductivity(args[1], args[2], args[3], args.Contains("--high-contrast"));
+        }
         if (args.FirstOrDefault() == "--flowchart-compatibility" && args.Length == 3)
         {
             try { NativeFlowchartCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }

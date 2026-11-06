@@ -4,7 +4,7 @@ export function createDetailsExtension() {
   return {
     name: 'lensDetails', level: 'block',
     start: source => source.indexOf('<details'),
-    renderer(token) { return `<details${token.open ? ' open' : ''}><summary>${token.text}</summary>\n${this.parser.parse(token.tokens)}</details>`; },
+    renderer(token) { return `<details${token.lensBlock ? ' data-details-block' : ''}${token.open ? ' open' : ''}><summary>${token.text}</summary>\n${this.parser.parse(token.tokens)}</details>`; },
     tokenizer(source) {
       const opening = source.match(/^ {0,3}<details(?:[ \t]+(?:data-details-block|open)(?:[ \t]*=[ \t]*(?:"[^"<>]*"|'[^'<>]*'))?)*[ \t]*>\r?\n {0,3}<summary>([^<\r\n]{1,4096})<\/summary>[ \t]*\r?\n/i);
       if (!opening) return undefined;
@@ -26,6 +26,7 @@ export function createDetailsExtension() {
           else if (/^ {0,3}<details(?:\s|>)/i.test(trimmed)) { if (++depth > 8) return undefined; }
           else if (/^ {0,3}<\/details>[ \t]*$/i.test(trimmed) && --depth === 0) {
             return { type: 'lensDetails', raw: source.slice(0, offset + line.length), text: opening[1], bodyOffset: opening[0].length, open: /[ \t]open(?:[ \t=>])/.test(opening[0].split('\n')[0]),
+              lensBlock: /\bdata-details-block\b/i.test(opening[0].split('\n')[0]),
               tokens: this.lexer.blockTokens(source.slice(opening[0].length, offset)) };
           }
         }
