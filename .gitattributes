@@ -2,3 +2,5 @@
 /assets/vendor/THIRD-PARTY-NOTICES.txt -text
 /docs/open-source/evidence/upstream-notices/*.txt -text
 /docs/open-source/evidence/goal58/mammoth-notices/*.txt -text
+# UX workload hashes include deliberately mixed LF and CRLF sources.
+/tests/fixtures/native-ux/*.md -text

@@ -1,6 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { distribution, validateSample } from '../../scripts/native/ux/report.mjs';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+test('committed UX fixtures preserve exact UTF-8, line endings and local assets', () => {
+  const root = new URL('../fixtures/native-ux/', import.meta.url);
+  const manifest = JSON.parse(readFileSync(new URL('manifest.json', root), 'utf8'));
+  const hash = b => createHash('sha256').update(b).digest('hex');
+  for (const fixture of manifest.fixtures) {
+    const bytes = readFileSync(new URL(fixture.file, root));
+    assert.equal(hash(bytes), fixture.sha256);
+    const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    assert.equal(text.includes('\r\n'), fixture.lineEnding === 'CRLF');
+  }
+  assert.equal(hash(readFileSync(new URL('pixel.png', root))), manifest.assetSha256);
+});
 
 test('native UX withholds unsupported tails and retains the maximum', () => {
   const result = distribution([10, 20, 900], 3);

@@ -64,16 +64,20 @@ for ($process=0; $process -lt $Processes; $process++) {
             $info.RedirectStandardOutput = $true; $info.RedirectStandardError = $true
             foreach ($argument in @($fixtureRoot,$directory,$fixture,"$Iterations",$Appearance,$products[$side].revision)) { $info.ArgumentList.Add($argument) }
             $child = [Diagnostics.Process]::Start($info)
-            $stdout = $child.StandardOutput.ReadToEndAsync(); $stderr = $child.StandardError.ReadToEndAsync()
+            $stdoutFile = [IO.File]::Create("$parent/$side-stdout.txt")
+            $stderrFile = [IO.File]::Create("$parent/$side-stderr.txt")
+            $stdout = $child.StandardOutput.BaseStream.CopyToAsync($stdoutFile)
+            $stderr = $child.StandardError.BaseStream.CopyToAsync($stderrFile)
             $watch = [Diagnostics.Stopwatch]::StartNew(); $bounded = $null
             while (!$child.WaitForExit(250)) {
                 $child.Refresh()
                 if ($watch.Elapsed.TotalSeconds -gt 240) { $bounded = '240-second child supervision limit' }
                 if ($child.PrivateMemorySize64 -gt 2147483648) { $bounded = '2 GiB child private-memory supervision limit' }
+                if ($stdoutFile.Length + $stderrFile.Length -gt 16777216) { $bounded = '16 MiB child log supervision limit' }
                 if ($bounded) { $child.Kill($true); $child.WaitForExit(); break }
             }
-            $stdout.GetAwaiter().GetResult() | Set-Content "$parent/$side-stdout.txt"
-            $stderr.GetAwaiter().GetResult() | Set-Content "$parent/$side-stderr.txt"
+            try { $stdout.GetAwaiter().GetResult(); $stderr.GetAwaiter().GetResult() }
+            finally { $stdoutFile.Dispose(); $stderrFile.Dispose() }
             $runs.Add(@{process=$process;fixture=$fixture;side=$side;exitCode=$child.ExitCode;supervisionFailure=$bounded})
             $runs | ConvertTo-Json -Depth 5 | Set-Content "$output/processes.json" -Encoding utf8NoBOM
             # Retain every failed observation; continue independent cells, never retry it into PASS.
