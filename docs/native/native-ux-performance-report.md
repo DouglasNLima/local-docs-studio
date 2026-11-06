@@ -35,10 +35,11 @@ timeouts and memory limits are not product SLOs.
 
 | Role | Exact commit | Tree |
 |---|---|---|
-| Historical product | `0237b08390d5d1d946c0b19b81d671ccd54fb951` | Recorded in each protocol.json |
+| Historical product | `0237b08390d5d1d946c0b19b81d671ccd54fb951` | `fa21b42ca71a4665c618a560679e9c835aad65f3` |
 | Develop product | `99349d82eb06960eb1f9785cf384db2373aed4fa` | `e4d137a12cbdd827583fcb841612890dd88736ec` |
 | PR #76 product | `75de42474514af0e7a6e521235a6517f4acad14b` | `6cb88161e24573649321bcb1d9f3418ba128194b` |
 | First full comparison harness | `8e7edf073e5ed81f142132deb3237e15f953158d` | `bc1defbc6e33d76e6d692de4c69951df8364eaa6` |
+| Reviewed comparison harness | `fb19e6fcd71f8d47771eb8ed0d5dc77085b718c2` | `a427e5378471a31c0ab0abf4b376fd01dca7539e` |
 
 Final documentation/provenance commit, tree and terminal CI receipts are recorded
 on PR #78 and Goal #77. A commit cannot contain its own hash; no pre-final hash is
@@ -120,7 +121,13 @@ Do not attribute these differences solely to order or pool them into an SLO. Idl
 warm typing maxima were below 100 ms in each normal cohort, while rendering-load
 typing was substantially slower. The isolated candidate table-cancellation maximum
 of 382.83 ms on the Intel cohort also remains visible; other passing cells cannot
-erase it. These observations demonstrate useful distinctions, not non-regression.
+erase it. First typing also differs from warm typing: the AMD cohort's largest
+first-typing cell maxima were 95.38 ms develop / 411.99 ms PR #76. Its Preview-switch
+maxima reached 956.49 / 938.67 ms. Candidate comparison activation reached 457.80 ms
+there and 486.23 ms on Intel. These are maxima across separately retained workload
+cells, not pooled percentiles. They prevent warm editing from concealing slower
+first-use or navigation behaviour. These observations demonstrate useful distinctions,
+not non-regression.
 
 The Intel normal cohort recorded maximum queue-delivery gaps of 873.11 / 920.07 ms
 and inclusive dispatcher operations of 750.72 / 801.22 ms (develop / PR #76).
@@ -136,12 +143,97 @@ Explicit navigation scheduling is a bounded future experiment; no product timer 
 formatter was changed. Complete-readiness numbers include the full audit and actual
 distant Find/selection, as defined in the protocol.
 
-Final terminal matrix and source-labelled compact evidence follow the completed
-corrected campaign. Reports never turn a pilot collection PASS into UX acceptance.
+The reviewed terminal matrix and retained evidence are below. Reports never turn
+a pilot collection PASS into UX acceptance.
 P95 below 200 observations and P99 below 2,000 are withheld. Repeated input within a
 process is clustered; even published descriptive quantiles do not establish an
 independent P99-threshold claim. No pooling across products, workload, appearance,
 runtime, hardware, action or temperature is authorised.
+
+## Reviewed campaign: terminal FAIL with inspectable product failures
+
+[Run 42302867937](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42302867937)
+uses the reviewed `fb19e6f` harness. All four foreground observer jobs and all ten
+auditor tests pass. The full matrix has four collection PASS jobs and four FAIL
+jobs: **219/224 child processes complete; five fail**. All 112 initial complete-content
+pairs pass logical text, native structure, mapping and media parity. The later
+failures therefore cannot be excused by initial rendering completion.
+
+| Exact baseline / appearance / initial order | CPU family | Completed / 28 | Collection |
+|---|---|---:|---|
+| Develop / HC / baseline-first | EPYC 9V45 | 28 | PASS |
+| Develop / HC / candidate-first | EPYC 7763 | 28 | PASS |
+| Develop / normal / baseline-first | EPYC 7763 | 28 | PASS |
+| Develop / normal / candidate-first | EPYC 9V74 | 26 | FAIL |
+| Historical / HC / baseline-first | EPYC 9V45 | 27 | FAIL |
+| Historical / HC / candidate-first | EPYC 9V74 | 28 | PASS |
+| Historical / normal / baseline-first | EPYC 9V74 | 27 | FAIL |
+| Historical / normal / candidate-first | EPYC 7763 | 27 | FAIL |
+
+All jobs allocate 2 cores / 4 logical processors, image 20261103.298.1 and .NET/WPF
+10.0.14. Different CPU families remain separate strata. The [complete numeric receipt](evidence/native-ux-contract/reviewed-campaign-summary.json)
+retains per-action observations, P50/maximum, withheld tails, source/binary identities,
+CPU/allocation/GC/memory, dispatcher intervals, palettes, missing cells and errors.
+[Artefact identities and expiry](evidence/native-ux-contract/reviewed-campaign-artifacts.json)
+identify the original reports, journals and captures. Original report hashes were
+verified against their integrity sidecars; no failed child was retried into PASS.
+
+On the complete develop/normal/baseline-first EPYC 7763 cohort, each entry below is
+**P50 / maximum ms**, develop followed by PR #76, with **N=2** per cell. P50 uses
+nearest rank (the lower of two observations here), not a stable population estimate.
+
+| Workload | First usable: develop ; PR #76 | Complete: develop ; PR #76 | Attachment typing: develop ; PR #76 |
+|---|---|---|---|
+| small | 564.42 / 610.36 ; 533.56 / 548.27 | 1152.74 / 1170.21 ; 1107.52 / 1119.60 | 89.34 / 97.23 ; 82.63 / 91.75 |
+| technical | 660.50 / 755.02 ; 659.47 / 707.24 | 1329.49 / 1418.68 ; 1261.71 / 1359.15 | 192.62 / 194.61 ; 155.55 / 170.37 |
+| long | 1359.31 / 1421.01 ; 1165.35 / 1373.75 | 2373.56 / 2606.19 ; 2230.31 / 2507.75 | 363.67 / 450.87 ; 343.73 / 352.90 |
+| table | 1483.40 / 1511.87 ; 1278.68 / 1530.74 | 2690.38 / 2784.64 ; 2428.26 / 2755.45 | 348.96 / 375.29 ; 359.86 / 468.32 |
+| nested-list | 2660.94 / 2769.31 ; 2455.34 / 3471.34 | 4611.06 / 4864.28 ; 4042.79 / 5533.16 | 844.74 / 974.06 ; 755.83 / 896.36 |
+| mermaid | 1308.67 / 1356.55 ; 1261.49 / 1294.54 | 1911.28 / 1913.14 ; 1846.49 / 1882.09 | 92.16 / 108.51 ; 90.59 / 106.72 |
+| mixed | 1293.83 / 1293.86 ; 1261.53 / 1309.68 | 1900.11 / 1982.33 ; 1961.34 / 2026.14 | 151.03 / 166.13 ; 186.38 / 196.09 |
+
+### Independent blank-preview correctness failure
+
+All five failed processes time out on **mixed / layout-preview**. The real pointer
+has selected Preview mode; the status reports an updated preview, but the foreground
+capture is blank and usable visible text cannot be established. Two failures use
+exact PR #76, one exact develop and two the historical product. This is an observed
+shared correctness failure, not proof of a PR #76-only regression or a new probe
+failure. The cause (application viewport state, WPF/media reflow or another factor)
+remains INCONCLUSIVE; it must not be dismissed as a timeout or fixed by accepting
+an empty UIA range.
+
+The retained journey is: load the mixed fixture, read Split/Preview and Find the
+distant marker; return to Editor, type/restore source, Find, wheel, switch documents
+and back, toggle Outline, then select Split and Preview. The exact script, source
+and order are in the raw journal. It is intermittent; five failures among 32 mixed
+processes are observed counts, not a pooled failure-rate estimate.
+
+[PR #76 capture](evidence/native-ux-contract/mixed-preview-candidate.png),
+[develop capture](evidence/native-ux-contract/mixed-preview-develop.png),
+[candidate state](evidence/native-ux-contract/mixed-preview-candidate-state.json),
+[develop state](evidence/native-ux-contract/mixed-preview-develop-state.json),
+[candidate input journal](evidence/native-ux-contract/mixed-preview-candidate-samples.jsonl)
+and [develop input journal](evidence/native-ux-contract/mixed-preview-develop-samples.jsonl)
+are preserved in the repository. The initial source/full-content audit passed before
+these later failures. This demonstrates why a complete-layout throughput benchmark
+cannot substitute for ongoing visible interaction correctness.
+
+A focused follow-up can run `Measure-NativeUx.ps1 -Fixtures mixed -Processes 2
+-Iterations 3` on the disposable hosted runner, preserving both exact product inputs.
+Do not reset scroll position, remove media, suppress UIA checks or retry the failed
+action to make it pass. No product fix is attempted here because this shared failure
+has not been demonstrated to be a regression introduced by PR #76.
+
+### Unchanged original benchmark on the reviewed branch
+
+[Run 42302867824](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42302867824)
+remains FAIL at exactly 250 ms. Historical baseline / this branch's unchanged develop
+product fail counts are **40/66 vs 40/66**, then **15/66 vs 17/66**. All 132 paired
+rasters and the independent correctness audits pass. These are not new PR #76
+measurements. The [source-labelled receipt](evidence/native-ux-contract/reviewed-historical-gate.json)
+retains report and archive identities and per-fixture distributions. Normal and
+actual-HC visible Continuous interaction jobs pass separately.
 
 ## High Contrast qualification
 
@@ -173,19 +265,19 @@ also not a required replacement check. No settings were changed.
 | Dimension | Verdict | Basis |
 |---|---|---|
 | PR #76 functional readiness | PASS, scoped | Five completed feature workstreams and their retained exact-source functional receipts; not production certification |
-| Proposed UX responsiveness acceptance | INCONCLUSIVE / PENDING | No approved thresholds/hardware/confidence policy; pilot observations cannot certify tails |
+| Proposed UX responsiveness acceptance | INCONCLUSIVE / PENDING; observed usability FAIL | Numeric policy/tails unqualified; five mixed-preview journeys show a blank viewport |
 | Historical 250 ms benchmark | FAIL / LEGACY QUALIFICATION | Original evidence unchanged; still blocking until explicit approved transition |
 | Performance non-regression | INCONCLUSIVE | No predeclared margin or adequately powered equivalence campaign |
 | High Contrast/accessibility acceptance | FAIL | Historical 2.542596:1 unresolved; causality INCONCLUSIVE |
 | Native production certification | BLOCKED | Trust, installation, physical-machine and screen-reader scopes remain separate; new physical certification NOT RUN |
-| Overall PR #76 integration readiness | BLOCKED / NO-GO | Mandatory performance/accessibility requirements remain unmet |
+| Overall PR #76 integration readiness | BLOCKED / NO-GO | Historical performance, accessibility and newly observed usable-preview correctness remain unmet |
 
 Owner decisions: approve/reject B+C and exact observation boundaries; nominate an
 independent reviewer; select minimum hardware/runtime/display support; approve finite
 budgets and statistical/non-regression margins after calibration; allocate HC root-cause
 work; only then decide whether to retire the original gate's blocking authority.
-Any approved transition needs fresh exact-PR #76 qualification and independent
-correctness/accessibility PASS. It cannot grant retrospective merge eligibility.
+Any approved transition needs fresh exact-PR #76 qualification, resolution of the
+blank mixed-preview journey, and independent correctness/accessibility PASS. It cannot grant retrospective merge eligibility.
 
 Current collection targets explicit Continuous. Pages/Automatic UX performance,
 sustained offered typing loads, export/import cancellation, controlled exhaustion/
@@ -240,3 +332,9 @@ PR #78 product (unchanged develop source), not PR #76. The [retained receipt](ev
 preserves source, scenario, report hashes and artefact identities. It is an additional
 unresolved correctness observation, separate from the 2.542596:1 colour failure;
 no product or existing test was changed to clear it.
+
+
+The same unchanged selection suite subsequently passed at `fb19e6f` in
+[run 42302867839](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42302867839).
+Both outcomes remain evidence. That pass neither identifies the earlier cause nor
+removes the retained failure from an independent correctness review.

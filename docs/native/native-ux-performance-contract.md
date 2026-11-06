@@ -123,7 +123,12 @@ and process-level resampling/confidence intervals before estimating tail effects
 Multiple comparisons need a predeclared family-wise error policy; these per-cell
 numbers alone do not certify the entire product. Non-zero failures need exact
 binomial bounds; do not use the zero-failure shortcut. No formal PASS is emitted by
-the pilot report generator.
+the pilot report generator. The workflow has a 60-minute job bound; requesting 300
+processes does not guarantee that a full workload campaign fits that bound. Formal
+qualification requires reviewed batching/sharding and aggregation on the approved
+hardware envelope. The present reporter does not implement cross-run confidence
+intervals, family-wise testing or equivalence acceptance. Those capabilities and
+resource budgets must be reviewed before a replacement gate can be approved.
 
 Performance non-regression needs paired controlled orders, a predeclared meaningful
 absolute/relative margin, confidence intervals on process-level differences, and

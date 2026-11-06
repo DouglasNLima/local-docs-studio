@@ -1,0 +1,227 @@
+{
+  "schema": 1,
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42302867824",
+  "source": "fb19e6fcd71f8d47771eb8ed0d5dc77085b718c2",
+  "tree": "a427e5378471a31c0ab0abf4b376fd01dca7539e",
+  "scope": "Unchanged original benchmark. The after product is this PR's unchanged develop product source, not PR #76.",
+  "thresholdMilliseconds": 250,
+  "verdict": "FAIL / LEGACY QUALIFICATION; still blocking",
+  "artifacts": [
+    {
+      "id": 13544883658,
+      "name": "continuous-interactions-normal",
+      "sha256": "sha256:97cbc587a67c3abc8eebe9dda633f506b3f27c06e4d688725df6f56702c047ec",
+      "expires": "2026-12-06T22:15:41Z"
+    },
+    {
+      "id": 13544524282,
+      "name": "continuous-performance-1",
+      "sha256": "sha256:4d918c8e144c99e6b911f554afd10d8b293d7e00ac64826f8c4be6bc02619260",
+      "expires": "2026-12-06T22:21:29Z"
+    },
+    {
+      "id": 13543689736,
+      "name": "continuous-interactions-high-contrast",
+      "sha256": "sha256:afec26f262f62cac679dd9c78a84d7d413d296a0cf8336725363c3f2c19c0134",
+      "expires": "2026-12-06T22:18:12Z"
+    },
+    {
+      "id": 13543644636,
+      "name": "continuous-performance-2",
+      "sha256": "sha256:10020ecf7296e6a135d48076f6beeb0b71792e02fbb192b4b7b2631d7fc657d4",
+      "expires": "2026-12-06T22:16:51Z"
+    }
+  ],
+  "replications": [
+    {
+      "name": "continuous-performance-1",
+      "reportSha256": "2a61351c86fb7f04f3ae2baf9c3bcb95a76cab4ee7f1533e252148c88cfd036e",
+      "verdict": "FAIL",
+      "correctness": "PASS",
+      "afterFailures": 40,
+      "countPerProduct": 66,
+      "equalRasterPairs": 66,
+      "products": {
+        "Before": {
+          "source": "0237b08390d5d1d946c0b19b81d671ccd54fb951",
+          "failures": 40,
+          "fixtures": [
+            {
+              "fixture": "details",
+              "n": 11,
+              "p50FirstLayoutInputMs": 157.3491,
+              "maximumFirstLayoutInputMs": 256.3918
+            },
+            {
+              "fixture": "list",
+              "n": 11,
+              "p50FirstLayoutInputMs": 1314.1091000000001,
+              "maximumFirstLayoutInputMs": 1570.5611
+            },
+            {
+              "fixture": "mixed",
+              "n": 11,
+              "p50FirstLayoutInputMs": 543.4870000000001,
+              "maximumFirstLayoutInputMs": 665.7787999999999
+            },
+            {
+              "fixture": "paragraphs",
+              "n": 11,
+              "p50FirstLayoutInputMs": 288.22159999999997,
+              "maximumFirstLayoutInputMs": 372.948
+            },
+            {
+              "fixture": "quote",
+              "n": 11,
+              "p50FirstLayoutInputMs": 166.9906,
+              "maximumFirstLayoutInputMs": 245.08729999999997
+            },
+            {
+              "fixture": "table",
+              "n": 11,
+              "p50FirstLayoutInputMs": 408.4379,
+              "maximumFirstLayoutInputMs": 562.6586
+            }
+          ]
+        },
+        "After": {
+          "source": "fb19e6fcd71f8d47771eb8ed0d5dc77085b718c2",
+          "failures": 40,
+          "fixtures": [
+            {
+              "fixture": "details",
+              "n": 11,
+              "p50FirstLayoutInputMs": 165.461,
+              "maximumFirstLayoutInputMs": 266.8663
+            },
+            {
+              "fixture": "list",
+              "n": 11,
+              "p50FirstLayoutInputMs": 1338.0066,
+              "maximumFirstLayoutInputMs": 1552.1068
+            },
+            {
+              "fixture": "mixed",
+              "n": 11,
+              "p50FirstLayoutInputMs": 479.91389999999996,
+              "maximumFirstLayoutInputMs": 592.7862
+            },
+            {
+              "fixture": "paragraphs",
+              "n": 11,
+              "p50FirstLayoutInputMs": 278.3514,
+              "maximumFirstLayoutInputMs": 382.80550000000005
+            },
+            {
+              "fixture": "quote",
+              "n": 11,
+              "p50FirstLayoutInputMs": 139.506,
+              "maximumFirstLayoutInputMs": 255.3623
+            },
+            {
+              "fixture": "table",
+              "n": 11,
+              "p50FirstLayoutInputMs": 340.02060000000006,
+              "maximumFirstLayoutInputMs": 482.33020000000005
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "continuous-performance-2",
+      "reportSha256": "c5a6ed5b8ab258837ed088d2be765aeda76e308921861875e4e186dd6155fbb0",
+      "verdict": "FAIL",
+      "correctness": "PASS",
+      "afterFailures": 17,
+      "countPerProduct": 66,
+      "equalRasterPairs": 66,
+      "products": {
+        "Before": {
+          "source": "0237b08390d5d1d946c0b19b81d671ccd54fb951",
+          "failures": 15,
+          "fixtures": [
+            {
+              "fixture": "details",
+              "n": 11,
+              "p50FirstLayoutInputMs": 64.8349,
+              "maximumFirstLayoutInputMs": 121.7404
+            },
+            {
+              "fixture": "list",
+              "n": 11,
+              "p50FirstLayoutInputMs": 424.4494,
+              "maximumFirstLayoutInputMs": 511.8621
+            },
+            {
+              "fixture": "mixed",
+              "n": 11,
+              "p50FirstLayoutInputMs": 234.66449999999998,
+              "maximumFirstLayoutInputMs": 313.0355
+            },
+            {
+              "fixture": "paragraphs",
+              "n": 11,
+              "p50FirstLayoutInputMs": 145.73239999999998,
+              "maximumFirstLayoutInputMs": 199.77669999999998
+            },
+            {
+              "fixture": "quote",
+              "n": 11,
+              "p50FirstLayoutInputMs": 55.61,
+              "maximumFirstLayoutInputMs": 112.0427
+            },
+            {
+              "fixture": "table",
+              "n": 11,
+              "p50FirstLayoutInputMs": 161.0173,
+              "maximumFirstLayoutInputMs": 280.6692
+            }
+          ]
+        },
+        "After": {
+          "source": "fb19e6fcd71f8d47771eb8ed0d5dc77085b718c2",
+          "failures": 17,
+          "fixtures": [
+            {
+              "fixture": "details",
+              "n": 11,
+              "p50FirstLayoutInputMs": 80.412,
+              "maximumFirstLayoutInputMs": 173.3759
+            },
+            {
+              "fixture": "list",
+              "n": 11,
+              "p50FirstLayoutInputMs": 450.4587,
+              "maximumFirstLayoutInputMs": 694.3475999999999
+            },
+            {
+              "fixture": "mixed",
+              "n": 11,
+              "p50FirstLayoutInputMs": 253.68990000000002,
+              "maximumFirstLayoutInputMs": 540.5142
+            },
+            {
+              "fixture": "paragraphs",
+              "n": 11,
+              "p50FirstLayoutInputMs": 142.0043,
+              "maximumFirstLayoutInputMs": 197.25070000000002
+            },
+            {
+              "fixture": "quote",
+              "n": 11,
+              "p50FirstLayoutInputMs": 62.3615,
+              "maximumFirstLayoutInputMs": 104.28729999999999
+            },
+            {
+              "fixture": "table",
+              "n": 11,
+              "p50FirstLayoutInputMs": 181.44389999999999,
+              "maximumFirstLayoutInputMs": 248.6527
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

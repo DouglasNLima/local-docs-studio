@@ -1,10 +1,10 @@
 {
   "baseCommit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
-  "purpose": "Goal #77: preserve new fixture bytes, exclude actual signing on the authorised branch, and update five current tracking notes. Historical evidence and acceptance files unchanged.",
+  "purpose": "Goal #77: preserve new fixture and captured evidence bytes, exclude actual signing on the authorised branch, and update five current tracking notes. Historical evidence and acceptance files unchanged.",
   "files": {
     ".gitattributes": {
       "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
-      "current": "b7ee204e7b4e73e959221b0193caa71c6c8da0c6d9d1312f6940577199247144"
+      "current": "11477504d893103cb36b3884f58da41a2ecfdee31b2e32770b9a7dc8094bb750"
     },
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",

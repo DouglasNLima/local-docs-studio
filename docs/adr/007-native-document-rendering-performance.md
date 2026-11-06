@@ -114,6 +114,20 @@ Local .NET 10.0.12/144-DPI and hosted .NET 10.0.14/96-DPI observations must not 
 pooled. The original 4.14 MB timeout and unresolved local class/dense-ER deadlines
 remain historical failures; passing hosted runs do not explain them.
 
+## Independent foreground evidence from this Goal
+
+The reviewed campaign at `fb19e6fcd71f8d47771eb8ed0d5dc77085b718c2`, tree
+`a427e5378471a31c0ab0abf4b376fd01dca7539e`, has four passing observer jobs and
+219/224 complete child processes. Five mixed-document Preview transitions show a
+blank viewport despite an updated status; exact PR #76, develop and historical
+products are all affected. All 112 initial logical-content/structure pairs passed
+before the later interaction failures. This is additional evidence for independent
+journey correctness, not justification to loosen a deadline. The [engineering receipt](../native/native-ux-performance-report.md)
+preserves cohort identities, raw numeric observations, screenshots and terminal
+results. Numeric SLO approval and non-regression remain INCONCLUSIVE. Mandatory
+usable-preview correctness is FAIL on the observed journeys. No policy transition
+can waive that finding, the original 250 ms FAIL, or the separate HC failure.
+
 ## User consequences
 
 A synchronous layout blocks keyboard and pointer dispatch even when parsing is
