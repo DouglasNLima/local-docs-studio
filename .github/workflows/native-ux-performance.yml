@@ -38,7 +38,7 @@ jobs:
         shell: pwsh
         run: |
           $baseline = if ('${{ matrix.baseline }}' -eq 'develop') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
-          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Fixtures small,technical -Processes 1 -Iterations 1
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Fixtures 'small,technical' -Processes 1 -Iterations 1
           exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()

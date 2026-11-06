@@ -13,6 +13,10 @@ if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_ENVIRONMENT -ne 'github-hoste
     throw 'Real foreground input and OS appearance changes require a disposable hosted Windows runner.'
 }
 if ($BaselineRevision -notmatch '^[0-9a-f]{40}$' -or $CandidateRevision -notmatch '^[0-9a-f]{40}$') { throw 'Exact source SHAs are required.' }
+$fixtureRoot = [IO.Path]::GetFullPath('tests/fixtures/native-ux')
+$manifest = Get-Content "$fixtureRoot/manifest.json" -Raw | ConvertFrom-Json
+$selected = $Fixtures.Split(',')
+if (@($selected | Select-Object -Unique).Count -ne $selected.Count -or @($selected | Where-Object { $_ -notin $manifest.fixtures.id }).Count) { throw 'Unknown or repeated fixture.' }
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 if (Test-Path -LiteralPath $output) { throw 'Use a fresh evidence directory; retained runs are never overwritten.' }
 New-Item -ItemType Directory -Path $output | Out-Null
@@ -39,10 +43,6 @@ foreach ($side in 'baseline','candidate') {
     $products[$side] = @{revision=$revision;tree=(git -C $checkout rev-parse 'HEAD^{tree}').Trim();binary=$binary;
         productSha256=(Get-FileHash "$binary/LensDocsStudio.Native.dll").Hash;coreSha256=(Get-FileHash "$binary/LensDocsStudio.Core.dll").Hash}
 }
-$fixtureRoot = [IO.Path]::GetFullPath('tests/fixtures/native-ux')
-$manifest = Get-Content "$fixtureRoot/manifest.json" -Raw | ConvertFrom-Json
-$selected = $Fixtures.Split(',')
-if (@($selected | Select-Object -Unique).Count -ne $selected.Count -or @($selected | Where-Object { $_ -notin $manifest.fixtures.id }).Count) { throw 'Unknown or repeated fixture.' }
 $protocol = [ordered]@{schema=1;harnessRevision=$harnessRevision;harnessTree=$harnessTree;harnessSha256=$harnessHash;products=$products;
     appearance=$Appearance;order=$Order;processes=$Processes;iterations=$Iterations;fixtures=$selected;
     fixtureIdentities=@($manifest.fixtures | Where-Object id -in $selected);
