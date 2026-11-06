@@ -2,7 +2,7 @@ name: Native UX performance evidence (proposed policy)
 on:
   pull_request:
     branches: [develop]
-    paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
+    paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
   workflow_dispatch:
     inputs:
       iterations:
@@ -15,9 +15,14 @@ permissions:
   contents: read
 jobs:
   observer-smoke:
-    name: Foreground observer controls
+    name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
     runs-on: windows-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: [develop, historical]
+        appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,11 +35,15 @@ jobs:
         with:
           node-version: '22'
       - name: Check LF and CRLF journeys before scheduling the comparison matrix
-        run: pwsh -NoProfile -File scripts/native/Measure-NativeUx.ps1 -Fixtures small,technical -Processes 1 -Iterations 1
+        shell: pwsh
+        run: |
+          $baseline = if ('${{ matrix.baseline }}' -eq 'develop') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Fixtures small,technical -Processes 1 -Iterations 1
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: native-ux-observer-smoke
+          name: native-ux-observer-${{ matrix.baseline }}-${{ matrix.appearance }}
           path: |
             artifacts/native-ux/protocol.json
             artifacts/native-ux/processes.json

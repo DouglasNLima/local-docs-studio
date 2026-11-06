@@ -170,6 +170,8 @@ internal sealed class Probe : IDisposable
                 foreach (var child in Tree(VisualTreeHelper.GetChild(root, i))) yield return child;
     }
     private FrameworkElement Control(string id) => Tree(window).OfType<FrameworkElement>().First(e => e.IsVisible && AutomationProperties.GetAutomationId(e) == id);
+    private bool FindQueryReady(string query, int matches) => ((TextBox)window.FindName("FindText")).Text == query &&
+        (window.FindName("FindCounter") is not TextBlock counter || counter.Text.Contains($"of {matches}", StringComparison.Ordinal));
     private static Rect Bounds(FrameworkElement element)
     {
         var start = element.PointToScreen(new Point(0, 0)); var end = element.PointToScreen(new Point(element.ActualWidth, element.ActualHeight));
@@ -310,7 +312,7 @@ internal sealed class Probe : IDisposable
         await ClickControl("LayoutPreview"); await Until(() => model.Layout == "Preview");
         await PointAt(preview); Desktop.Click(); await Until(() => preview.IsKeyboardFocusWithin);
         Desktop.Key(0x46, 0x11); await Until(() => ((FrameworkElement)window.FindName("FindText")).IsVisible);
-        Desktop.Text("ReadableEnd"); await Until(() => ((TextBlock)window.FindName("FindCounter")).Text.Contains("of 1", StringComparison.Ordinal));
+        Desktop.Text("ReadableEnd"); await Until(() => FindQueryReady("ReadableEnd", 1));
         Desktop.Key(0x0D);
         await Until(() => preview.Selection.Text == "ReadableEnd" && preview.Selection.Start.HasValidLayout &&
             preview.Selection.Start.GetCharacterRect(LogicalDirection.Forward).Top >= 0 &&
@@ -334,12 +336,22 @@ internal sealed class Probe : IDisposable
         await Measure("selection", temperature, i, () => Desktop.Key(0x27, 0x10), () => editor.SelectionStart == 2 && editor.SelectionLength == 1);
         Desktop.Key(0x24, 0x11); Desktop.Key(0x2E); await Until(() => editor.Text == source); // Restore with real input; no buffer replacement.
         await Measure("find-open", temperature, i, () => Desktop.Key(0x46, 0x11), () => ((FrameworkElement)window.FindName("FindText")).IsVisible);
-        Desktop.Key(0x41, 0x11); Desktop.Text("NeedleOne"); await Until(() => ((TextBlock)window.FindName("FindCounter")).Text.Contains("of 2", StringComparison.Ordinal));
+        Desktop.Key(0x41, 0x11); Desktop.Text("NeedleOne"); await Until(() => FindQueryReady("NeedleOne", 2));
         var caret = await Ui(() => editor.CaretOffset);
-        await Measure("find-navigation", temperature, i, () => Desktop.Key(0x72), () => editor.SelectedText == "NeedleOne" && editor.CaretOffset != caret);
-        Desktop.Key(0x1B); await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.VerticalOffset < 1);
+        // Enter-to-next is the real Find command shared by all three pinned products.
+        // The historical baseline predates F3 and the live counter; the required
+        // exact selection and navigation endpoint remains the same.
+        await Measure("find-navigation", temperature, i, () => Desktop.Key(0x0D), () => editor.SelectedText == "NeedleOne" && editor.CaretOffset != caret);
+        Desktop.Key(0x1B); await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11);
+        await Until(() => editor.TextArea.TextView.VisualLinesValid && editor.TextArea.TextView.ScrollOffset.Y < 1);
         if (await Ui(() => editor.ExtentHeight > editor.ViewportHeight))
-            await Measure("scroll", temperature, i, () => Desktop.Wheel(-120), () => editor.VerticalOffset > 1);
+        {
+            // The HC template can leave TextEditor.VerticalOffset at zero while
+            // the rendered TextView has moved. Observe the actual visible text view.
+            await Measure("scroll", temperature, i, () => Desktop.Wheel(-120), () => editor.TextArea.TextView.VisualLinesValid && editor.TextArea.TextView.ScrollOffset.Y > 1);
+            Record(await Ui(() => new { kind = "scroll-position", iteration = i, textViewOffset = editor.TextArea.TextView.ScrollOffset.Y,
+                editorWrapperOffset = editor.VerticalOffset, firstVisibleLine = editor.TextArea.TextView.VisualLines.First().FirstDocumentLine.LineNumber }));
+        }
         else Record(new { kind = "coverage", action = "scroll", status = "NOT APPLICABLE", reason = "Document fits the editor viewport" });
         var active = await Ui(() => model.ActiveDocument);
         await Measure("document-switch", temperature, i, () => Desktop.Key(0x09, 0x11), () => model.ActiveDocument != active && editor.Text.Contains("OtherSource", StringComparison.Ordinal));
@@ -486,10 +498,12 @@ internal sealed class Probe : IDisposable
                 action = currentAction, layout = model.Layout, previewStatus = model.PreviewStatus,
                 activeFile = model.ActiveDocument?.FilePath, editor.CaretOffset, editor.SelectionStart, editor.SelectionLength,
                 editor.VerticalOffset, editor.ExtentHeight, editor.ViewportHeight,
+                textViewOffset = editor.TextArea.TextView.ScrollOffset.Y, visibleLinesValid = editor.TextArea.TextView.VisualLinesValid,
+                firstVisibleLine = editor.TextArea.TextView.VisualLinesValid ? editor.TextArea.TextView.VisualLines.FirstOrDefault()?.FirstDocumentLine.LineNumber : null,
                 bufferSha256 = Program.Hash(Encoding.UTF8.GetBytes(editor.Text)), tail = editor.Text[^Math.Min(80, editor.Text.Length)..],
                 focusedType = System.Windows.Input.Keyboard.FocusedElement?.GetType().FullName,
                 previewText = preview.Selection?.Text, previewVisible = preview.IsVisible,
-                findCounter = ((TextBlock)window.FindName("FindCounter")).Text, window.Left, window.Top, window.ActualWidth, window.ActualHeight
+                findCounter = (window.FindName("FindCounter") as TextBlock)?.Text, window.Left, window.Top, window.ActualWidth, window.ActualHeight
             }, DispatcherPriority.Input).Task.WaitAsync(TimeSpan.FromSeconds(2));
             Program.Write(output, "failure-state.json", state);
             Desktop.Save(Desktop.Capture(Desktop.ClientBounds(windowHandle)), Path.Combine(output, "failure.png"));

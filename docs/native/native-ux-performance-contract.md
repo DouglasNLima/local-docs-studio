@@ -37,6 +37,12 @@ is outside action clocks; measured actions never use UIA Invoke or model setters
 Missing baseline-only features are NOT RUN, not latency zero or PASS. Documents that
 fit the viewport explicitly mark scrolling NOT APPLICABLE.
 
+Find uses real Enter-to-next in every product. The historical baseline has no live
+counter; it still must produce the exact selected text and visible navigation result.
+Scrolling observes the rendered AvalonEdit TextView offset and screen response; the
+outer TextEditor offset is also retained because it can remain zero under the HC
+template while visible text has moved. A state counter alone is not screen evidence.
+
 Cancellation changes documents during real render construction. An existing renderer
 EventSource marker wakes a background input sender, without first querying the busy
 UI dispatcher. This avoids sampling only when the UI is idle. The measurement includes
@@ -122,7 +128,8 @@ must approve the margin before qualification; until then report INCONCLUSIVE.
 ## Resource and diagnostic bounds
 
 Each action has a 30-second observation deadline. The supervisor bounds each child
-to 240 seconds and 2 GiB private bytes. It retains partial JSONL and terminal exit,
+to 240 seconds and observes private bytes every 250 ms, terminating on an observed
+2 GiB exceedance. This is a polling supervisor, not a hard allocation cap. It retains partial JSONL and terminal exit,
 then continues independent cells. These are test safety bounds, not product failure
 handling or permission to discard user data. They are deliberately finite and must
 be reported as FAIL if reached. Product memory/exhaustion/recovery behaviour is

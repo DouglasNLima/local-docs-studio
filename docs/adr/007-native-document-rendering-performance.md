@@ -44,8 +44,8 @@ a measurement of typing or usable foreground presentation. It cannot alone certi
 all of those experiences. It also embodies the stock FlowDocument presentation
 architecture; an alternative renderer cannot honestly pass it under another name.
 
-The combination of complete arbitrary content, stock bottomless WPF layout, identical
-visual/selection/UIA semantics, cold runtimes, all hardware and a single 250 ms
+The combination of complete stress-fixture content, stock bottomless WPF layout, identical
+visual/selection/UIA semantics, cold runtimes, unspecified minimum hardware and a single 250 ms
 maximum has not been established as feasible. Individual responsiveness and fidelity
 requirements remain valuable. No requirement is removed because it is difficult.
 
@@ -64,6 +64,13 @@ is synchronous and bottomless. Existing optimisation already includes parent-fir
 attachment, Run coalescing and batched table construction. The list fixture contains
 4,000 ListItems, 4,000 Paragraphs and 4,000 Runs in one native List. Automatic mode
 may choose Pages, but explicit Continuous stays Continuous.
+
+MainWindow also queues preview updates through a 300 ms dispatcher timer; the PR #76
+secondary comparison preview has a 350 ms timer. The direct-viewer benchmark bypasses
+this scheduling. End-to-end foreground latency therefore includes work that the
+historical benchmark never measured. Investigating explicit-navigation scheduling is
+a bounded follow-up option, distinct from a formatter rewrite; no product timer is
+changed here and no measured gain is claimed without a controlled experiment.
 
 The versioned WPF formatter also has viewport-specific visual updates and background
 formatting state. Therefore synchronous bottomless formatting does not mean every
