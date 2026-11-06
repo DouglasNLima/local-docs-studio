@@ -77,12 +77,19 @@ internal static partial class NativeUiChecks
                 "The exact SPC typography limitation was not visible in the real secondary preview.");
             Check(File.ReadAllBytes(left).SequenceEqual(originalLeft), "Opening the exact SPC beside another document does not write its Markdown");
             main.CaptureToFile(Path.Combine(output, "editor-preview-spc.png"));
-            Find(main, "ComparisonMode1").AsComboBox().Select("Editor"); Find(main, "ActivateComparison1").AsButton().Invoke();
+            var secondaryMode = Find(main, "ComparisonMode1").AsComboBox(); secondaryMode.Select("Editor"); secondaryMode.Collapse();
+            Find(main, "ActivateComparison1").AsButton().Invoke();
             Wait(() => ReadEditorText(editor) == spc, "The left activation did not bind its authoritative source.");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(VirtualKeyShort.RETURN);
             var leftBeforeTyping = spc + "\n";
             Wait(() => ReadEditorText(editor) == leftBeforeTyping, "The left document did not receive the new paragraph.");
-            Keyboard.Type("Left pending"); var leftBuffer = leftBeforeTyping + "Left pending";
+            var leftBeforeFinalKey = leftBeforeTyping + "Left pendin";
+            Keyboard.Type("Left pendin");
+            Wait(() => ReadEditorText(editor) == leftBeforeFinalKey, "The left typing prefix did not finish.");
+            // Delimit the final ordinary keystroke through real caret input;
+            // comparison must retain AvalonEdit's own undo grouping.
+            Keyboard.Type(VirtualKeyShort.LEFT); Keyboard.Type(VirtualKeyShort.RIGHT); Keyboard.Type("g");
+            var leftBuffer = leftBeforeFinalKey + "g";
             Wait(() => ReadEditorText(editor) == leftBuffer, "The left typing operation did not finish before switching documents.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F); Find(main, "FindText").AsTextBox().Text = "Left pending";
             Wait(() => Find(main, "FindCounter").Name == "1 of 1", "Find did not use the active left buffer.");
@@ -111,13 +118,17 @@ internal static partial class NativeUiChecks
             Find(main, "ActivateComparison1").AsButton().Invoke();
             Wait(() => Find(main, "FindText").AsTextBox().Text == "Left pending" && ReadEditorText(editor) == leftBuffer, "Left Find/source state was not restored.");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-            Wait(() => ReadEditorText(editor) == leftBeforeTyping, "Left Undo affected the wrong document or lost its own history.");
+            Wait(() => ReadEditorText(editor) == leftBeforeFinalKey, "Left Undo affected the wrong document or lost its own history.");
             Check(File.ReadAllText(right) == rightBuffer, "Left Undo cannot change the right document or its saved file");
-            Find(main, "ComparisonMode0").AsComboBox().Select("Preview"); Find(main, "ComparisonMode1").AsComboBox().Select("Preview");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => ReadEditorText(editor) == leftBuffer, "Left Redo did not restore its own final keystroke.");
+            Check(File.ReadAllText(right) == rightBuffer, "Left Redo retains the right document's saved source");
+            var primaryMode = Find(main, "ComparisonMode0").AsComboBox(); primaryMode.Select("Preview"); primaryMode.Collapse();
+            secondaryMode.Select("Preview"); secondaryMode.Collapse();
             Wait(() => !Find(main, "DocumentPreview").IsOffscreen && !Find(main, "ComparisonPreview").IsOffscreen, "Preview/Preview did not expose both readers.");
             main.CaptureToFile(Path.Combine(output, "preview-preview.png"));
             Find(main, "CloseComparison").AsButton().Invoke();
-            Check(ReadEditorText(editor) == leftBeforeTyping && File.ReadAllText(right) == rightBuffer, "Closing comparison retains the active source and the other saved document");
+            Check(ReadEditorText(editor) == leftBuffer && File.ReadAllText(right) == rightBuffer, "Closing comparison retains the active source and the other saved document");
             File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new { status = "PASS", highContrast,
                 source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 scope = "GITHUB_HOSTED_WINDOWS_POINTER_KEYBOARD_UIA; NOT PHYSICAL_MACHINE_CERTIFICATION", checks }, new JsonSerializerOptions { WriteIndented = true }));
