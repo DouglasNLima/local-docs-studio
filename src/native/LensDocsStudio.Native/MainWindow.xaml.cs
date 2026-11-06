@@ -124,6 +124,7 @@ public partial class MainWindow : Window
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
         mermaidOwnerGeneration++;
         CancelSynchronisation(); CancelPreview(); viewportGeneration++;
+        previewLayoutAnchor = null;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
         // The shared reader may still display the outgoing document while rendering.
         // Its visible position must never be captured for the incoming tab.
@@ -641,6 +642,8 @@ public partial class MainWindow : Window
     private void SetLayout(string layout)
     {
         var changed = model.Layout != layout;
+        var completedPreviewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        if (changed) CapturePreviewLayoutAnchor();
         model.Layout = layout;
         EditorColumn.Width = layout == "Preview" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         PreviewColumn.Width = layout == "Editor" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
@@ -661,9 +664,12 @@ public partial class MainWindow : Window
                 // Native layout can reuse an unchanged completed preview. Hidden source
                 // edits still invalidate it through the normal preview scheduling path.
                 if (layout == "Editor")
-                { previewBeforeEditorStatus = model.PreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
-                else if (previewBeforeEditorStatus is { } status)
-                { model.PreviewStatus = status; previewBeforeEditorStatus = null; }
+                { previewBeforeEditorStatus = completedPreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
+                else
+                {
+                    model.PreviewStatus = completedPreviewStatus; previewBeforeEditorStatus = null;
+                    _ = RestorePreviewLayoutAsync(completedPreviewStatus);
+                }
             }
             else { previewBeforeEditorStatus = null; QueuePreview(); }
         }
