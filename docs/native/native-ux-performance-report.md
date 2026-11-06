@@ -223,3 +223,20 @@ and records hover/capture/geometry on failure. Independent matrix jobs continue
 when the auditor controls pass even if an observer job fails; that observer failure
 still fails the workflow and prevents qualification. This is evidence collection,
 not a retry or acceptance waiver.
+
+
+Review also tightened cancellation's replacement check to the same current-document,
+visible UIA and source-mapped readable geometry used by usable-preview observations.
+A switch offered at construction start does not prove every short-document render
+was still unfinished when Windows delivered input. Abort acknowledgement/chronology
+remains INCONCLUSIVE; the observed switch, preserved buffer and current replacement
+are the measured scope. No broader cancellation PASS is claimed.
+
+An unchanged existing selection workflow at `79c983c` also failed independently:
+[run 42301217980](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42301217980),
+normal PASS / High Contrast FAIL. Pages/natural-preview-wheel could not find visible
+selection geometry, with diagnostics enabled and disabled. This workflow tested the
+PR #78 product (unchanged develop source), not PR #76. The [retained receipt](evidence/native-ux-contract/selection-observation.json)
+preserves source, scenario, report hashes and artefact identities. It is an additional
+unresolved correctness observation, separate from the 2.542596:1 colour failure;
+no product or existing test was changed to clear it.

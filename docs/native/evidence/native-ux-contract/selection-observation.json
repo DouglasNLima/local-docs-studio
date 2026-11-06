@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42301217980",
+  "source": "79c983c4c8edd45abd64a773c406dceb7c1b8d35",
+  "productScope": "PR #78 product/validation sources are byte-identical to exact develop 99349d82eb06960eb1f9785cf384db2373aed4fa. This is not a measurement of PR #76.",
+  "normal": "PASS",
+  "highContrast": "FAIL",
+  "scope": "Retained independent existing selection-workflow failure; not the historical colour-ratio defect and not evidence of a new UX-probe regression.",
+  "failure": "Selected preview occurrence has no visible geometry.",
+  "scenario": "Pages / natural-preview-wheel, following 57 retained observations; failure with diagnostics enabled and disabled.",
+  "diagnosticBaseline": "ccfce7d8a1c444517e1bc4f4d39992e30e29af1d",
+  "diagnosticBaselineResults": "PASS in both runs; diagnostic expectations differ and are not release acceptance.",
+  "artifacts": [
+    {
+      "id": 13544512407,
+      "name": "native-selection-normal",
+      "sha256": "sha256:0c556ef357e6850b3c8fbb30dfa5f24a6ef49b27edb2380ef66d9040fcafe5e2",
+      "expires": "2026-12-06T22:05:35Z"
+    },
+    {
+      "id": 13543349104,
+      "name": "native-selection-high-contrast",
+      "sha256": "sha256:1161cae9c6d602e007fcf34f06ee33ef6f2bb4c1365430d0187825aae114612b",
+      "expires": "2026-12-06T22:04:13Z"
+    }
+  ],
+  "reports": [
+    {
+      "path": "baseline/selection-interactions.json",
+      "sha256": "9dc99ff0d4fc2a3c114215c902667ebbb1392888a34b867ef2e9a48fa9274271",
+      "passed": true
+    },
+    {
+      "path": "baseline-no-diagnostics/selection-interactions.json",
+      "sha256": "bd9a6c5322483bd13096f9b6469a7eece0461803d64995640efd1c43e917fec5",
+      "passed": true
+    },
+    {
+      "path": "interactions/selection-interactions.json",
+      "sha256": "814552e6e97d02fdec9b454e4b646bc94d70858b26c418fb52dfb0a731657f50",
+      "passed": false
+    },
+    {
+      "path": "no-diagnostics/selection-interactions.json",
+      "sha256": "1c2cded83a48ef35f6f6a467cc0636f973a23ad68bad8eec56949efe12e2a96e",
+      "passed": false
+    }
+  ]
+}

@@ -47,7 +47,12 @@ Cancellation changes documents during real render construction. An existing rend
 EventSource marker wakes a background input sender, without first querying the busy
 UI dispatcher. This avoids sampling only when the UI is idle. The measurement includes
 any non-preemptible WPF work, verifies the outgoing buffer, and waits for the replacement
-preview. This covers cancellation by document switch, not every export/import operation.
+preview, including its current document/version identity, UIA and readable source-mapped
+geometry. The construction-start trigger does not prove that a short document was
+still unfinished when Windows delivered the switch. Those observations qualify
+switch responsiveness and replacement correctness, not an acknowledged abort in
+every trial. Per-request abort chronology and every export/import operation remain
+separate required qualification work.
 Typing is also offered from a worker at actual construction and attachment markers,
 after a real edit schedules rendering with editor focus retained. The historic product
 without attachment telemetry explicitly records that cell NOT RUN. No dispatcher

@@ -466,10 +466,11 @@ internal sealed class Probe : IDisposable
         // No Dispatcher request between the render marker and input: avoids coordinated omission.
         var sent = Stopwatch.GetTimestamp(); Desktop.Key(0x09, 0x11);
         await Measure("cancel-render-by-switch", "warm", 0, () => { }, () => model.ActiveDocument != active && editor.Text.Contains("OtherSource", StringComparison.Ordinal), false, sent);
-        await Until(() => model.ActiveDocument != active && (Field<PreviewResult>("rendered")?.ReadText().Contains("OtherSource", StringComparison.Ordinal) ?? false));
+        await Until(() => model.ActiveDocument != active && UsableMarker("OtherSource"));
         Record(new { kind = "cancellation", status = "PASS", triggeredAtStageTick = stage, inputTick = sent,
             originalBufferPreserved = await Ui(() => active!.EditorDocument.Text == source),
-            stalePreviewRejected = true, scope = "Document-switch cancellation of real preview construction; export cancellation remains separate" });
+            stalePreviewRejected = true, replacementReadyMs = Stopwatch.GetElapsedTime(sent).TotalMilliseconds,
+            scope = "Observed current, readable replacement after a switch offered at construction start; not proof of an unfinished-operation abort in every short-document trial" });
         Desktop.Key(0x09, 0x11); await Until(() => model.ActiveDocument == active);
         await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
     }
