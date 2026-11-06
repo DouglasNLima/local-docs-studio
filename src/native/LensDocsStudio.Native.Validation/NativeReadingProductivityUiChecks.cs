@@ -17,6 +17,7 @@ internal static partial class NativeUiChecks
     public static int RunReadingProductivity(string executable, string output, string root, bool highContrast) => Task.Run(() =>
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
+        using var clipboardApartment = NativeUiClipboard.Start();
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         var checks = new List<string>(); var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
