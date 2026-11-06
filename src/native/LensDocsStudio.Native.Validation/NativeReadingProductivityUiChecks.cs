@@ -47,8 +47,11 @@ internal static partial class NativeUiChecks
                 var tocWindow = toc ?? throw new IOException("The TOC window is unavailable.");
                 var generated = (tocWindow.FindFirstDescendant(cf => cf.ByName("Generated table of contents")) ?? throw new IOException("The generated TOC preview is unavailable.")).AsTextBox();
                 Wait(() => generated.Text.Trim() == "- [Right](#right)", "The TOC did not retain the actual rendered heading anchor.");
-                (tocWindow.FindFirstDescendant(cf => cf.ByName("Table of contents style")) ?? throw new IOException("The TOC style is unavailable.")).AsComboBox().Select("Numbered list");
-                (tocWindow.FindFirstDescendant(cf => cf.ByName("Collapsible wrapper")) ?? throw new IOException("The TOC wrapper is unavailable.")).AsCheckBox().Click();
+                var listStyle = (tocWindow.FindFirstDescendant(cf => cf.ByName("Table of contents style")) ?? throw new IOException("The TOC style is unavailable.")).AsComboBox();
+                listStyle.Select("Numbered list"); listStyle.Collapse();
+                var wrapper = tocWindow.FindFirstDescendant(cf => cf.ByName("Collapsible wrapper")) ?? throw new IOException("The TOC wrapper is unavailable.");
+                wrapper.Patterns.Toggle.Pattern.Toggle();
+                Wait(() => wrapper.AsCheckBox().IsChecked == true, "The TOC wrapper toggle did not become checked.");
                 Wait(() => generated.Text.Contains("<details>", StringComparison.Ordinal) && generated.Text.Contains("1. [Right](#right)", StringComparison.Ordinal),
                     "The actual TOC options did not generate a numbered collapsible index.");
                 (tocWindow.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Copy Table of Contents"))) ?? throw new IOException("The TOC copy button is unavailable.")).AsButton().Invoke();
