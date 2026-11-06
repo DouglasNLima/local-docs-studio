@@ -17,7 +17,7 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        if (args.FirstOrDefault() == "--reading-productivity-ui")
+        if (args.FirstOrDefault() == "--reading-productivity-ui" && args.Length == 5 && args[4] is "--normal" or "--high-contrast")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
                 || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")

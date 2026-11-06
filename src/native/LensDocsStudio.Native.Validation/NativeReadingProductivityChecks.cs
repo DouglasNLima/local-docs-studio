@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using ICSharpCode.AvalonEdit;
 using LensDocsStudio.Core.State;
@@ -98,6 +99,20 @@ internal static class NativeReadingProductivityChecks
             }
             finally { toc.Close(); }
             var slash = (EditorSlashCommandService)typeof(MainWindow).GetField("slashCommands", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            editor.Text = "";
+            var composition = new TextComposition(InputManager.Current, editor.TextArea, "/", TextCompositionAutoComplete.On);
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, composition) { RoutedEvent = TextCompositionManager.PreviewTextInputStartEvent });
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, composition) { RoutedEvent = TextCompositionManager.TextInputEvent });
+            Check(editor.Text == "/" && slash.IsOpen, "Automatically completed WPF text input opens slash commands through AvalonEdit events");
+            var ongoing = new TextComposition(InputManager.Current, editor.TextArea, "", TextCompositionAutoComplete.Off);
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, ongoing) { RoutedEvent = TextCompositionManager.PreviewTextInputStartEvent });
+            Check(!slash.IsOpen, "An ongoing WPF composition closes slash commands before text is committed");
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, ongoing) { RoutedEvent = TextCompositionManager.PreviewTextInputEvent });
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, ongoing) { RoutedEvent = TextCompositionManager.TextInputEvent });
+            editor.Text = "";
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, composition) { RoutedEvent = TextCompositionManager.PreviewTextInputStartEvent });
+            editor.TextArea.RaiseEvent(new TextCompositionEventArgs(Keyboard.PrimaryDevice, composition) { RoutedEvent = TextCompositionManager.TextInputEvent });
+            Check(editor.Text == "/" && slash.IsOpen, "A cancelled composition does not suppress the next ordinary slash keystroke");
             editor.Text = "/heading"; editor.CaretOffset = editor.Text.Length;
             slash.Refresh();
             Check(slash.CommandList.Items.Count == 6, "The real AvalonEdit slash controller filters all six heading commands");
@@ -139,8 +154,10 @@ internal static class NativeReadingProductivityChecks
             Check(editor.Text == "# Second\n\nRight buffer", "The right document retains its own Undo stack after focus changes");
             editor.Document.UndoStack.Redo();
             var modes = (ComboBox[])Field("comparisonModes"); modes[0].SelectedItem = "Preview"; modes[1].SelectedItem = "Preview";
-            var comparisonRender = (Task)Invoke("RenderComparisonAsync")!; PumpUntil(() => comparisonRender.IsCompleted); comparisonRender.GetAwaiter().GetResult();
             var secondaryPreview = (LensDocsStudio.Native.Rendering.DocumentPreview)Field("comparisonPreview");
+            // Observe the scheduled preview itself; an extra direct render races
+            // the genuine debounce and may finish as a cancelled obsolete request.
+            PumpUntil(() => secondaryPreview.Document is { } readyDocument && new System.Windows.Documents.TextRange(readyDocument.ContentStart, readyDocument.ContentEnd).Text.Contains("Left buffer", StringComparison.Ordinal));
             Check(new System.Windows.Documents.TextRange(secondaryPreview.Document.ContentStart, secondaryPreview.Document.ContentEnd).Text.Contains("Left buffer", StringComparison.Ordinal),
                 "The actual secondary WPF preview renders its own Markdown through the canonical native services");
             Check(UIElementAutomationPeer.CreatePeerForElement(((Button[])Field("comparisonActivate"))[0]).GetPattern(PatternInterface.Invoke) is not null,

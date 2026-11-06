@@ -34,7 +34,7 @@ internal static partial class NativeUiChecks
             FocusWindow(main); var editor = Find(main, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == "# Right\n\nRight source", "The right document did not load.");
             Wait(() => Find(main, "DocumentStatistics").Name.Contains("3 words", StringComparison.Ordinal), "Current-buffer reading statistics were not announced.");
-            Check(!highContrast || System.Windows.SystemParameters.HighContrast, "Requested operating-system High Contrast is active");
+            Check(System.Windows.SystemParameters.HighContrast == highContrast, "The requested operating-system appearance is active");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("/heading 2");
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByAutomationId("SlashCommands").And(cf.ByProcessId(app.ProcessId))) is not null, "The actual slash popup did not open.");
             Keyboard.Type(VirtualKeyShort.RETURN);

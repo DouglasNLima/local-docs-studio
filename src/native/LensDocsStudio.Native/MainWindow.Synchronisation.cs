@@ -288,14 +288,17 @@ public partial class MainWindow
                     var position = view.GetPositionFloor(new Point(0, view.VerticalOffset + view.ActualHeight / 3));
                     if (position is null) return;
                     offset = Editor.Document.GetOffset(position.Value.Line, position.Value.Column);
-                    // Prefer a section heading already visible above the scroll point. Its following
-                    // paragraph can start on the next printed page; keep that section identifiable.
-                    // Long paragraphs/code without a visible heading still use their exact source point.
-                    if (view.GetPositionFloor(new Point(0, view.VerticalOffset)) is { } first)
+                    // Use a representative visible heading when a viewport contains several
+                    // sections. A physical one-third point can fall in the previous paragraph
+                    // after a small height change and select the preceding printed page.
+                    // Long paragraphs/code without visible headings retain their exact point.
+                    if (view.GetPositionFloor(new Point(0, view.VerticalOffset)) is { } first
+                        && view.GetPositionFloor(new Point(0, view.VerticalOffset + view.ActualHeight)) is { } last)
                     {
                         var visibleStart = Editor.Document.GetOffset(first.Line, first.Column);
-                        var heading = parsed?.Headings.LastOrDefault(candidate => candidate.SourceStart >= visibleStart && candidate.SourceStart <= offset);
-                        if (heading is not null) offset = heading.SourceStart;
+                        var visibleEnd = Editor.Document.GetOffset(last.Line, last.Column);
+                        var headings = parsed?.Headings.Where(candidate => candidate.SourceStart >= visibleStart && candidate.SourceStart <= visibleEnd).ToArray();
+                        if (headings is { Length: > 0 }) offset = headings[headings.Length / 3].SourceStart;
                     }
                 }
                 result.RevealSource(offset);

@@ -8,7 +8,7 @@
     },
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
-      "current": "aa3079fbd17cf8bdcd1ead2ee45a5722d5c15356515956c46ec9f8fb674878db"
+      "current": "c9f1ea8a97d577ffc95aab06294083f64ef7d537ebeeae9385f94780961f1f64"
     },
     "assets/scripts/app-controller.js": {
       "previous": "346bd413a4faaa696d339e84fcb4a322840c71495d490cd0a6ac890a049dd0d1",
@@ -124,7 +124,7 @@
     },
     "src/native/LensDocsStudio.Native.Validation/Program.cs": {
       "previous": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
-      "current": "6b99376d89c48001d84a64876e8cf7ee18f443534ca93ee1116e80bfd136ae2a"
+      "current": "0acb66fa540ebbbef22f64688a21d85a7e9e55c5f3ea864ea093b1ff693a227b"
     },
     "src/native/LensDocsStudio.Native/DocumentReviewWindow.xaml.cs": {
       "previous": "4f3c558461ae6e3751b8139bbb5ade0d541a404c1b566d2bef31f51d4e7807a9",
@@ -161,6 +161,10 @@
     "tests/browser/app-smoke.spec.mjs": {
       "previous": "abee2b5033359030900829977f5181cc7b47728b8ab5fd397f2582250b09595e",
       "current": "a3bb83de885bc7f52e45200c26fb425d4d9318bdd3ceb574ad64c6b8d8c33e22"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
+      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
+      "current": "8f8ad0f646427bcea4ce55b80b02b32508cb5189d312fdad917f0a98f0ccf02f"
     }
   }
 }

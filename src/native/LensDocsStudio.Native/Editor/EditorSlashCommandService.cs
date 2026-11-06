@@ -22,6 +22,7 @@ public sealed class EditorSlashCommandService : IDisposable
     private readonly ListBox list = new() { MinWidth = 270, MaxWidth = 420, MaxHeight = 280, Focusable = false };
     private SlashContext? context;
     private bool composing;
+    private TextComposition? completedComposition;
     private bool dismissed;
     public bool IsOpen => popup.IsOpen;
     public ListBox CommandList => list;
@@ -47,6 +48,7 @@ public sealed class EditorSlashCommandService : IDisposable
         editor.PreviewKeyUp += KeyReleased;
         TextCompositionManager.AddPreviewTextInputStartHandler(editor, CompositionStarted);
         TextCompositionManager.AddPreviewTextInputUpdateHandler(editor, CompositionStarted);
+        TextCompositionManager.AddPreviewTextInputHandler(editor, CompositionCompleted);
         list.PreviewMouseLeftButtonDown += ChooseWithMouse;
     }
     public void Refresh()
@@ -94,11 +96,23 @@ public sealed class EditorSlashCommandService : IDisposable
     }
     private void TextEntered(object? sender, TextCompositionEventArgs e)
     {
-        if (composing) { composing = false; dismissed = true; Close(); return; }
+        if (composing || ReferenceEquals(e.TextComposition, completedComposition))
+        { composing = false; completedComposition = null; dismissed = true; Close(); return; }
         if (e.Text == "/") dismissed = false;
         Refresh();
     }
-    private void CompositionStarted(object sender, TextCompositionEventArgs e) { composing = true; Close(); }
+    private void CompositionStarted(object sender, TextCompositionEventArgs e)
+    {
+        // Ordinary WM_CHAR input also raises Start, but completes automatically.
+        // Only an ongoing IME/dead-key composition suppresses slash activation.
+        if (e.TextComposition.AutoComplete == TextCompositionAutoComplete.On) return;
+        composing = true; Close();
+    }
+    private void CompositionCompleted(object sender, TextCompositionEventArgs e)
+    {
+        if (!composing) return;
+        composing = false; completedComposition = e.TextComposition; dismissed = true; Close();
+    }
     private void KeyReleased(object sender, KeyEventArgs e) { if (IsOpen && e.Key is Key.Back or Key.Delete) Refresh(); }
     private void ChooseWithMouse(object sender, MouseButtonEventArgs e)
     {
@@ -109,7 +123,7 @@ public sealed class EditorSlashCommandService : IDisposable
     private void EditorMouseDown(object sender, MouseButtonEventArgs e) { dismissed = true; Close(); }
     private void Scrolled(object? sender, EventArgs e) { if (IsOpen) { popup.HorizontalOffset += .01; popup.HorizontalOffset -= .01; } }
     private void LostFocus(object sender, KeyboardFocusChangedEventArgs e) => Close();
-    private void DocumentChanged(object? sender, EventArgs e) { dismissed = false; Close(); }
+    private void DocumentChanged(object? sender, EventArgs e) { dismissed = false; composing = false; completedComposition = null; Close(); }
     public void Close() { popup.IsOpen = false; context = null; }
     public void Dispose()
     {
@@ -118,6 +132,7 @@ public sealed class EditorSlashCommandService : IDisposable
         editor.PreviewKeyUp -= KeyReleased;
         TextCompositionManager.RemovePreviewTextInputStartHandler(editor, CompositionStarted);
         TextCompositionManager.RemovePreviewTextInputUpdateHandler(editor, CompositionStarted);
+        TextCompositionManager.RemovePreviewTextInputHandler(editor, CompositionCompleted);
         list.PreviewMouseLeftButtonDown -= ChooseWithMouse;
     }
 }
