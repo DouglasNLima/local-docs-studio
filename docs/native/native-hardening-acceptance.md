@@ -14,7 +14,15 @@ Local read-only COM reproduction: TransactionTimeout and ConnectionTimeout rejec
 
 The correction floors the provider limit inside the original shared deadline, rejecting remaining budgets below 50 ms before UIA. Native process/HWND observation precedes provider configuration. The launch budget remains 25 seconds, the provider cap remains 3 seconds, Resize remains a single action and no input is retried. Actual UIA boundary controls accompany this correction; hosted application readiness remains required.
 
-## Current verdicts
+## Bounded controlled diagnostics
+
+The opt-in `LENS_NATIVE_ACCEPTANCE_TRACE` harness records at most 2,048 phase events of 4,096 characters, including exact harness/product assembly revisions. It records command delivery, ownership and lifecycle phases without authored text. An external hosted-Windows supervisor retains partial evidence, bounded output and managed stacks/Mini dumps after 60 seconds without progress (eight minutes total). This is a separate diagnostic experiment, not an extension or replacement of the original acceptance deadlines. Uninstrumented suites remain required.
+
+The controlled workflow runs the identical diagnostic harness against candidate and exact develop product assemblies, in both baseline-first and candidate-first order. Arrangement and normal lifecycle use real shown WPF; Packet and selection use actual Windows High Contrast; Timeline uses portable launch for comparison, with installed launch remaining a separate mandatory regression. Passing diagnostics cannot erase a failed original observation.
+
+The user's continuation excludes all signing. The disposable-certificate trust execution is therefore NOT RUN on this feature branch; its test and execution on other branches remain intact. Mock signing-policy checks do not sign artefacts. No trust or production-readiness claim follows from this omission.
+
+## Interim verdicts
 
 - Functional readiness: previous five-slice evidence retained; final hardening regression pending.
 - Candidate regression acceptance: INCONCLUSIVE pending controlled P0/P1 runs.

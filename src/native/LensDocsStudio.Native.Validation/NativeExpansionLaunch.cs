@@ -27,6 +27,7 @@ internal static class NativeExpansionLaunch
         try
         {
             process = Process.GetProcessById(app.ProcessId);
+            NativeAcceptanceDiagnostics.Mark("launch/process", new { app.ProcessId, ordinal, requireHighContrast });
             NativeLaunchReadiness.ResizeOnce(timer, budget, Observe, () =>
             {
                 var pattern = Provider(() => main!.Patterns.Transform.Pattern);
@@ -73,8 +74,11 @@ internal static class NativeExpansionLaunch
             automation.TransactionTimeout = limit; automation.ConnectionTimeout = limit;
         }
         T Provider<T>(Func<T> read) { LimitProviderCall(); return read(); }
-        void Record(string phase, NativeLaunchWindow? window, Exception? error) => observations.Add(new
-        { Phase = phase, ElapsedMilliseconds = timer.Elapsed.TotalMilliseconds, Window = window, Error = error?.ToString(), ResizeActionCount = resizeCount });
+        void Record(string phase, NativeLaunchWindow? window, Exception? error)
+        {
+            observations.Add(new { Phase = phase, ElapsedMilliseconds = timer.Elapsed.TotalMilliseconds, Window = window, Error = error?.ToString(), ResizeActionCount = resizeCount });
+            NativeAcceptanceDiagnostics.Mark("launch/" + phase, new { TargetProcess = app.ProcessId, Window = window, ErrorType = error?.GetType().Name, ResizeActionCount = resizeCount });
+        }
         NativeLaunchWindow Observe()
         {
             // Native ownership is observable even when no UIA provider exists.

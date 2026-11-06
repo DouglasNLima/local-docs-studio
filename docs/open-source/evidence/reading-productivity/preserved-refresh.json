@@ -8,7 +8,7 @@
     },
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
-      "current": "c9f1ea8a97d577ffc95aab06294083f64ef7d537ebeeae9385f94780961f1f64"
+      "current": "c9395c23cf2b106a279ba6aee43a9c9e82e96724ed40816328d779e03662672f"
     },
     "assets/scripts/app-controller.js": {
       "previous": "346bd413a4faaa696d339e84fcb4a322840c71495d490cd0a6ac890a049dd0d1",
@@ -122,6 +122,26 @@
       "previous": "33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738",
       "current": "7c99911849b28f54be0b0615b4c91374a0b791d86e897a40fa177e6d0cad888c"
     },
+    "src/native/LensDocsStudio.Native.Validation/NativeArrangementLatencyChecks.cs": {
+      "previous": "8ee6774e806f92eaf065d6d72d9ddd31e47a7e0ea604228b392066817eb6ccab",
+      "current": "0b8fe3d063bf3984bba0ee953246f1247242e571ee6ac4d78334c468a184d625"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs": {
+      "previous": "1080069ca8310995402706e1042c714037e445919fc4720fe82ae8c7761ffe63",
+      "current": "5173fc68dfc1cd6a008b2a15e7cacd6d6bec309e0540530de77e5420227febf5"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadiness.cs": {
+      "previous": "047fb5496b80324374294373e09f45dab0ba80a804bda5e51dee295deddf74b6",
+      "current": "7a88afabdb6d896545004aabde2fce76312a0eb04f34dba169693031b1e26917"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadinessChecks.cs": {
+      "previous": "b07be4aaaf75433bd05f04fe59302befc02df7e1b1c47c048423076ea49d0b64",
+      "current": "e06065ef08ffd77f994ee54bd38325cba99dc894e32bfee1df0e896a59e87021"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeSuiteLifecycleChecks.cs": {
+      "previous": "4ac3bb2b4b54b04f7fd8796eaa3f23b58aa9ce7da28a374558da183ba67ba718",
+      "current": "2e4fc18f56ae3b8136a17f3ce30150106941fe7e7ef4d250b6947659914031e1"
+    },
     "src/native/LensDocsStudio.Native.Validation/Program.cs": {
       "previous": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
       "current": "0acb66fa540ebbbef22f64688a21d85a7e9e55c5f3ea864ea093b1ff693a227b"
@@ -133,6 +153,10 @@
     "src/native/LensDocsStudio.Native/MainWindow.Desktop.cs": {
       "previous": "31a29022ed66677121fb2ced6f7fb8bb6b98a964227e0008c8ba1f8a70eb3f6f",
       "current": "7544ed2ec03e9c2f0fbc5695ed5cd97178d308d23ff2c9b396a1ea6a3e526cc4"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
+      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
+      "current": "8f8ad0f646427bcea4ce55b80b02b32508cb5189d312fdad917f0a98f0ccf02f"
     },
     "src/native/LensDocsStudio.Native/MainWindow.WorkspaceChrome.cs": {
       "previous": "b80ada80d49aa569100a3ef1e67da1a2e49b81d994f997da2959575b9b58f748",
@@ -161,22 +185,6 @@
     "tests/browser/app-smoke.spec.mjs": {
       "previous": "abee2b5033359030900829977f5181cc7b47728b8ab5fd397f2582250b09595e",
       "current": "a3bb83de885bc7f52e45200c26fb425d4d9318bdd3ceb574ad64c6b8d8c33e22"
-    },
-    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
-      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
-      "current": "8f8ad0f646427bcea4ce55b80b02b32508cb5189d312fdad917f0a98f0ccf02f"
-    },
-    "src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs": {
-      "previous": "1080069ca8310995402706e1042c714037e445919fc4720fe82ae8c7761ffe63",
-      "current": "f610541af016c91f43ba17dd1dd2d6b323939338e0f80853a60c6c6b216f2d21"
-    },
-    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadiness.cs": {
-      "previous": "047fb5496b80324374294373e09f45dab0ba80a804bda5e51dee295deddf74b6",
-      "current": "7a88afabdb6d896545004aabde2fce76312a0eb04f34dba169693031b1e26917"
-    },
-    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadinessChecks.cs": {
-      "previous": "b07be4aaaf75433bd05f04fe59302befc02df7e1b1c47c048423076ea49d0b64",
-      "current": "e06065ef08ffd77f994ee54bd38325cba99dc894e32bfee1df0e896a59e87021"
     }
   }
 }

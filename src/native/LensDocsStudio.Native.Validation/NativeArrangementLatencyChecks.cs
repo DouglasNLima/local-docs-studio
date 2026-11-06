@@ -313,6 +313,7 @@ internal static class NativeArrangementLatencyChecks
         var window = observation.Window; var before = Ui(() => observation.Session.Current.State);
         var probes = new ConcurrentQueue<double>();
         using var pulse = new Timer(_ => { var start = Now(); window.Dispatcher.BeginInvoke(DispatcherPriority.Input, () => probes.Enqueue(Now() - start)); }, null, 0, 16);
+        NativeAcceptanceDiagnostics.Mark("arrangement/cancel-search-input");
         var cancelledSearchStart = Now(); Click("ArrangementCandidates");
         WaitWorker(() => Ui(() => Field(window, "candidateSearch") is not null) || Completed(cancelledSearchStart), "Candidate generation did not start.");
         var cancellationRequested = Ui(() => Field(window, "candidateSearch") is not null);
@@ -326,8 +327,11 @@ internal static class NativeArrangementLatencyChecks
             CancellationRequested = cancellationRequested, CandidateChoicesCount = cancellationChoices, Milliseconds = cancellation });
         if (cancellationOutcome == "Failure or unclassified UI outcome") throw new IOException("The automatic cancellation attempt reported a failure or unclassified UI outcome: " + cancellationStatus);
         if (!Ui(() => observation.Session.Current.State.SameAs(before))) throw new IOException("Cancelled automatic search changed the accepted layout.");
+        NativeAcceptanceDiagnostics.Mark("arrangement/search-input", new { cancellationOutcome, cancellationChoices, Phases = observation.Phases.Count });
         var searchStart = Now(); Click("ArrangementCandidates");
+        NativeAcceptanceDiagnostics.Mark("arrangement/search-wait", Ui(() => new { observation.Ready, SearchActive = Field(window, "candidateSearch") is not null, Foreground = GetForegroundWindow().ToInt64() }));
         WaitWorker(() => Completed(searchStart) && Ui(() => observation.Ready), "Candidate generation did not finish.");
+        NativeAcceptanceDiagnostics.Mark("arrangement/search-finished");
         var searchMs = Now() - searchStart;
         var count = Ui(() => ((ComboBox)window.FindName("CandidateChoices")).Items.Count);
         var searchStatus = Ui(() => ((TextBlock)window.FindName("Status")).Text);
@@ -369,6 +373,7 @@ internal static class NativeArrangementLatencyChecks
                 var control = Descendants(window).OfType<FrameworkElement>().Single(e => System.Windows.Automation.AutomationProperties.GetAutomationId(e) == automationId);
                 return Round(control.PointToScreen(new(control.ActualWidth / 2, control.ActualHeight / 2)));
             });
+            NativeAcceptanceDiagnostics.Mark("arrangement/command-input", new { automationId, point, Foreground = GetForegroundWindow().ToInt64(), Down = observation.LastButtonDown, Up = observation.LastButtonUp });
             Move(point); Button(true); Button(false);
         }
     }
@@ -480,6 +485,11 @@ internal static class NativeArrangementLatencyChecks
                 }
             };
             ActivitySource.AddActivityListener(listener); CompositionTarget.Rendering += Frame;
+            Window.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((_, e) =>
+            {
+                if (NativeAcceptanceDiagnostics.Enabled && e.OriginalSource is FrameworkElement element)
+                    NativeAcceptanceDiagnostics.Mark("arrangement/button-click", new { Id = System.Windows.Automation.AutomationProperties.GetAutomationId(element), element.IsEnabled, Ready });
+            }), true);
             Window.AddHandler(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler((_, e) =>
             {
                 lastInput = Now(); lastInputKind = "Down"; Interlocked.Increment(ref inputSequence);

@@ -33,7 +33,10 @@
     "scripts/compliance/observe_governance.py",
     "scripts/native/Copy-NativeLicence.ps1",
     "scripts/native/Test-NativeLicence.ps1",
-    "docs/native/native-hardening-acceptance.md"
+    "docs/native/native-hardening-acceptance.md",
+    ".github/workflows/native-hardening.yml",
+    "scripts/native/Invoke-NativeAcceptanceDiagnostic.ps1",
+    "src/native/LensDocsStudio.Native.Validation/NativeAcceptanceDiagnostics.cs"
   ],
   "spdxPaths": [
     "scripts/compliance/licence_scope.py",
@@ -48,6 +51,7 @@
     ".github/workflows/native-continuous-diagnosis.yml",
     ".github/workflows/native-continuous-performance.yml",
     ".github/workflows/native-expansion-vi-compatibility.yml",
+    ".github/workflows/native-hardening.yml",
     ".github/workflows/native-interactions.yml",
     ".github/workflows/native-mermaid-creation.yml",
     ".github/workflows/native-source-editors.yml",
@@ -340,6 +344,7 @@
     "scripts/native/Get-NativeDevelopmentHostDisplayEvidence.ps1",
     "scripts/native/Get-NativeDisplayEvidence.ps1",
     "scripts/native/Invoke-ContinuousPreviewInteractions.ps1",
+    "scripts/native/Invoke-NativeAcceptanceDiagnostic.ps1",
     "scripts/native/Invoke-NativePortableHostSmoke.ps1",
     "scripts/native/NativeAssociationExclusion.ps1",
     "scripts/native/NativeAuthoringStatePreservation.ps1",
@@ -704,6 +709,7 @@
     "src/native/LensDocsStudio.Native.Validation/MermaidCreationSessionChecks.cs",
     "src/native/LensDocsStudio.Native.Validation/MermaidCreationUiChecks.cs",
     "src/native/LensDocsStudio.Native.Validation/MermaidPhaseRecorder.cs",
+    "src/native/LensDocsStudio.Native.Validation/NativeAcceptanceDiagnostics.cs",
     "src/native/LensDocsStudio.Native.Validation/NativeAcceptanceWorkflowChecks.cs",
     "src/native/LensDocsStudio.Native.Validation/NativeAnchorChecks.cs",
     "src/native/LensDocsStudio.Native.Validation/NativeArrangementChecks.cs",
