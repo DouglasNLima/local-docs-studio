@@ -181,3 +181,8 @@ The `df42add` hosted journey reached Preview/Preview and exposed a real process 
 Final review found a missing path/workspace component in the completed secondary-preview cache key, despite the queue already invalidating that context. A new actual WPF/file test first rendered a one-pixel image, relocated the unchanged Markdown model to another real folder containing a two-pixel image under the same relative reference, and failed waiting for the new image (`ci-relative-cache-reproduction.log`, line 210). The completed cache now includes effective source path and workspace; old preview callbacks also reject changed path ownership. The same test must pass with the exact new pixels, unchanged source version/text and unchanged source files. No automatic source write or asset transfer is introduced.
 
 The preceding `b7b776d` hosted reading journey passed all ten explicit checks plus its intermediate exact-state waits in both normal and actual High Contrast, including native TOC clipboard/options, slash Undo/Redo, SPC source preservation, Find/Save/Save As, independent history, Preview/Preview and closure. This confirms the reader-template correction for that source identity; the final asset-cache candidate still requires its own complete CI evidence.
+
+
+### Native hardening continuation
+
+Goal #75 / Draft PR #76 continue from `adc68a98d0570bc39858591d252da90a644553d2`, tree `00aac08a1c06821612bbb27b256057bf94a43217`. Five functional slices remain intact. See [hardening and acceptance](../native/native-hardening-acceptance.md) for P0/P1 investigation, unchanged independent gates and separate verdicts. Original failures and receipts remain retained.

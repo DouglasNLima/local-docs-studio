@@ -69,9 +69,7 @@ internal static class NativeExpansionLaunch
         string HashFile() { using var file = File.OpenRead(fixture); return Convert.ToHexStringLower(SHA256.HashData(file)); }
         void LimitProviderCall()
         {
-            var remaining = budget - timer.Elapsed;
-            if (remaining <= TimeSpan.Zero) throw new InvalidOperationException("The original launch budget has expired.");
-            var limit = remaining < TimeSpan.FromSeconds(3) ? remaining : TimeSpan.FromSeconds(3);
+            var limit = NativeLaunchReadiness.ProviderTimeout(budget - timer.Elapsed);
             automation.TransactionTimeout = limit; automation.ConnectionTimeout = limit;
         }
         T Provider<T>(Func<T> read) { LimitProviderCall(); return read(); }
@@ -79,7 +77,9 @@ internal static class NativeExpansionLaunch
         { Phase = phase, ElapsedMilliseconds = timer.Elapsed.TotalMilliseconds, Window = window, Error = error?.ToString(), ResizeActionCount = resizeCount });
         NativeLaunchWindow Observe()
         {
-            LimitProviderCall(); process!.Refresh();
+            // Native ownership is observable even when no UIA provider exists.
+            // A provider configuration failure must not hide an absent HWND.
+            process!.Refresh();
             var exited = process.HasExited;
             if (!exited) handle = process.MainWindowHandle;
             var exists = !exited && handle != 0 && IsWindow(handle);

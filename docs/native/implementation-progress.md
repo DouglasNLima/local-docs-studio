@@ -275,3 +275,6 @@ The original brief's completion clause allows explicit evidence-backed residual 
 [Historical progress through the application baseline](history/implementation-progress-through-7008751.md) preserves all prior milestones and failures. The [continuation handoff](continuation-handoff.md) describes how to resume only outstanding acceptance work when its required resources become available. Do not recreate the native project or repeat completed implementation.
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+
+Native hardening continuation from `adc68a9`: [investigation and acceptance](native-hardening-acceptance.md). Scope is P0/P1 remediation and independent unchanged-gate acceptance. Five functional workstreams remain intact; integration remains NO-GO pending final-source evidence.

@@ -60,7 +60,7 @@
     },
     "docs/native/architecture-decisions.md": {
       "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
-      "current": "7b611792affbec23c54ac68f5e8903ca587cb544d59d3147563e44a85d7eb534"
+      "current": "e585151bc5b2d66746dd1f0d9276d18f998d5eb1b5807fb43ae9ed46d00f2d3f"
     },
     "docs/native/functional-parity-matrix.md": {
       "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
@@ -68,7 +68,7 @@
     },
     "docs/native/implementation-progress.md": {
       "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
-      "current": "12f81ac7a62854ed4d7edc791dec3d5e675785c1a273857f7ca3ba83557d10dd"
+      "current": "32cce21bc92ad440a886f472e925f000060ccc0a6be022ef8ef0266ae6220a34"
     },
     "docs/native/user-guide.md": {
       "previous": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327",
@@ -76,7 +76,7 @@
     },
     "docs/native/validation-report.md": {
       "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
-      "current": "1ed1cae14fe57cf442d10b30afc5bbb5e754acb4cceaa6cf456c7a2c6bb80ca6"
+      "current": "20fcb215f256c393bde77756eb8147d8f930eab0c4d67188249d87bbcc50ee66"
     },
     "docs/tool-guide.md": {
       "previous": "70945830852bf75c68f35284fe56416a1422fdfa5af731c26e27ac2039833d04",
@@ -165,6 +165,18 @@
     "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
       "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
       "current": "8f8ad0f646427bcea4ce55b80b02b32508cb5189d312fdad917f0a98f0ccf02f"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs": {
+      "previous": "1080069ca8310995402706e1042c714037e445919fc4720fe82ae8c7761ffe63",
+      "current": "f610541af016c91f43ba17dd1dd2d6b323939338e0f80853a60c6c6b216f2d21"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadiness.cs": {
+      "previous": "047fb5496b80324374294373e09f45dab0ba80a804bda5e51dee295deddf74b6",
+      "current": "7a88afabdb6d896545004aabde2fce76312a0eb04f34dba169693031b1e26917"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadinessChecks.cs": {
+      "previous": "b07be4aaaf75433bd05f04fe59302befc02df7e1b1c47c048423076ea49d0b64",
+      "current": "e06065ef08ffd77f994ee54bd38325cba99dc894e32bfee1df0e896a59e87021"
     }
   }
 }

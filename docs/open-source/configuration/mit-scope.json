@@ -32,7 +32,8 @@
     "scripts/compliance/licence_scope.py",
     "scripts/compliance/observe_governance.py",
     "scripts/native/Copy-NativeLicence.ps1",
-    "scripts/native/Test-NativeLicence.ps1"
+    "scripts/native/Test-NativeLicence.ps1",
+    "docs/native/native-hardening-acceptance.md"
   ],
   "spdxPaths": [
     "scripts/compliance/licence_scope.py",

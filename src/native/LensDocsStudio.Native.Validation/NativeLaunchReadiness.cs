@@ -21,6 +21,16 @@ internal sealed record NativeLaunchWindow(int ExpectedPid, long ProcessHandle, b
 
 internal static class NativeLaunchReadiness
 {
+    internal static TimeSpan ProviderTimeout(TimeSpan remaining)
+    {
+        // Windows UIA rejects values below 50 ms. Never round up beyond the
+        // shared launch deadline merely to obtain an accepted provider value.
+        var milliseconds = Math.Floor(Math.Min(remaining.TotalMilliseconds, 3000));
+        if (milliseconds < 50)
+            throw new TimeoutException("The remaining original launch budget cannot accommodate UIA's minimum 50 ms timeout.");
+        return TimeSpan.FromMilliseconds(milliseconds);
+    }
+
     // The injected functions are read-only observations, apart from the single action below.
     // Deterministic controls exercise this same orchestration; they are not installed UI evidence.
     public static void ResizeOnce<T>(Stopwatch timer, TimeSpan budget, Func<NativeLaunchWindow> observe,
