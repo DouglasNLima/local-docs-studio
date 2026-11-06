@@ -192,6 +192,8 @@ jobs:
       - name: Validate pluggable signing policy
         run: pwsh -NoProfile -File scripts/native/Test-NativeSigning.ps1
       - name: Validate Windows signature trust with a disposable certificate
+        # Goal #77 explicitly excludes all signing, including test certificates.
+        if: github.head_ref != 'feature/native-ux-performance-contract' && github.ref != 'refs/heads/feature/native-ux-performance-contract'
         timeout-minutes: 3
         run: pwsh -NoProfile -File scripts/native/Test-NativeAuthenticode.ps1
       - name: Validate native diagram corpus
