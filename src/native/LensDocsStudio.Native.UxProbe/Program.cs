@@ -186,10 +186,14 @@ internal sealed class Probe : IDisposable
         Desktop.Move(await Ui(() => { var b = Rect.Intersect(Bounds(element), Desktop.ClientBounds(windowHandle));
             if (b.IsEmpty) throw new IOException("Input target has no visible client geometry.");
             return new Point(b.X + b.Width / 2, b.Y + b.Height / 2); }));
+        // SetCursorPos returning does not establish that WPF has processed the
+        // native pointer move. Require the actual target's mouse-over state.
+        await Until(() => element.IsMouseOver);
     }
     private async Task FocusEditor()
     {
-        await PointAt(editor); Desktop.Click(); await Until(() => editor.IsKeyboardFocusWithin);
+        currentAction = "setup-focus-editor";
+        await PointAt(editor.TextArea.TextView); Desktop.Click(); await Until(() => editor.IsKeyboardFocusWithin);
     }
     private async Task ClickControl(string id) { await PointAt(await Ui(() => Control(id))); Desktop.Click(); }
     private void Record(object record) => journal.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
@@ -338,7 +342,8 @@ internal sealed class Probe : IDisposable
             scope = "Conservative verified upper bound including full-tree audit and real distant Find/selection" });
         sampleCount++;
         Desktop.Save(frame, Path.Combine(output, "complete-distant-selection.png"));
-        Desktop.Key(0x1B); await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
+        Desktop.Key(0x1B); await Until(() => !((FrameworkElement)window.FindName("FindBar")).IsVisible);
+        await ClickControl("LayoutEditor"); await Until(() => model.Layout == "Editor");
     }
     private async Task Interactions(int i)
     {
@@ -515,6 +520,10 @@ internal sealed class Probe : IDisposable
                 firstVisibleLine = editor.TextArea.TextView.VisualLinesValid ? editor.TextArea.TextView.VisualLines.FirstOrDefault()?.FirstDocumentLine.LineNumber : null,
                 bufferSha256 = Program.Hash(Encoding.UTF8.GetBytes(editor.Text)), tail = editor.Text[^Math.Min(80, editor.Text.Length)..],
                 focusedType = System.Windows.Input.Keyboard.FocusedElement?.GetType().FullName,
+                hoveredType = System.Windows.Input.Mouse.DirectlyOver?.GetType().FullName,
+                capturedType = System.Windows.Input.Mouse.Captured?.GetType().FullName,
+                editorBounds = Bounds(editor).ToString(), textViewBounds = Bounds(editor.TextArea.TextView).ToString(),
+                pointer = System.Windows.Input.Mouse.GetPosition(window).ToString(),
                 previewText = preview.Selection?.Text, previewVisible = preview.IsVisible,
                 findCounter = (window.FindName("FindCounter") as TextBlock)?.Text,
                 findText = (window.FindName("FindText") as TextBox)?.Text, searchPreview = Field<bool>("searchPreview"),

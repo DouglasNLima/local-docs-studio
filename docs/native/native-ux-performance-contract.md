@@ -175,6 +175,9 @@ builds one probe DLL, overlays exact product binaries into separate directories 
 verifies product/harness hashes. Actual source revision is checked again in-process.
 Reports are JSON, accessible Markdown tables, PNG captures and raw JSONL; timestamps
 and missing cells remain inspectable. A successful workflow is collection PASS only.
+Observer jobs run first. Their failures remain workflow failures; independent full
+matrix cells still run to preserve useful evidence rather than omit whole strata.
+No full matrix result can clear a failed observer control.
 
 The original workflow name and 250 ms threshold remain unchanged. This branch changes
 only the actual signing step's branch guard in the Native regression workflow, because

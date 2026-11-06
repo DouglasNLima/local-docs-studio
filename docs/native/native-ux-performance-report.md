@@ -213,3 +213,13 @@ and verifies real-click focus before a typing trial. Find navigation uses the
 shared visible Next control for every product. The failed historical Enter case
 remains retained, separate keyboard evidence; a pointer result cannot certify it.
 No product code, correctness endpoint, timeout or acceptance threshold changes.
+
+
+A subsequent independent observer campaign at `79c983c` retained one HC candidate
+focus-setup failure after Preview-to-Editor transition (the other three observer
+jobs passed). It is not a timing sample and is not discarded. Pointer setup now
+requires actual WPF mouse-over after the native move, targets the editor TextView,
+and records hover/capture/geometry on failure. Independent matrix jobs continue
+when the auditor controls pass even if an observer job fails; that observer failure
+still fails the workflow and prevents qualification. This is evidence collection,
+not a retry or acceptance waiver.
