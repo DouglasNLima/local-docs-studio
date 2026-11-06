@@ -11,9 +11,12 @@ public partial class DocumentViewModel : ObservableObject
     public TextDocument EditorDocument { get; }
     public DocumentSnapshot? SavedSnapshot { get; private set; }
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(IsEmptyDraft))] [NotifyPropertyChangedFor(nameof(Location))] private string? filePath;
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool isDirty;
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool externalChange;
-    [ObservableProperty] private bool isSaving;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool isDirty;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool externalChange;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool isSaving;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(PersistenceState))] private bool saveFailed;
+    public string PersistenceState => IsSaving ? "Saving…" : ExternalChange ? "External change" : SaveFailed ? "Save failed"
+        : IsDirty ? "Unsaved changes" : SavedSnapshot is null ? "Unsaved document" : "Saved";
     [ObservableProperty] private bool isPinned;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;
     public string? RecoveryKey { get; set; }
@@ -44,6 +47,8 @@ public partial class DocumentViewModel : ObservableObject
     public void MarkSaved(DocumentSnapshot snapshot)
     {
         SavedSnapshot = snapshot;
+        SaveFailed = false;
+        OnPropertyChanged(nameof(PersistenceState));
         FilePath = snapshot.Path;
         IsDirty = EditorDocument.Text != snapshot.Text;
         ExternalChange = false;

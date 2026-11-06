@@ -5680,3 +5680,11 @@ label.file-button.primary,
     grid-template-columns: 2.2rem repeat(var(--table-editor-columns), minmax(7rem, 1fr));
   }
 }
+
+/* Readable-buffer statistics retain the operational status and Focus Mode exit. */
+.document-statistics { flex: 0 1 auto; min-width: 0; font-size: 11px; padding: 3px 6px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.document-persistence-state { font-size: 11px; white-space: nowrap; color: var(--muted-strong); }
+.statusbar .status { min-width: 0; flex: 1 1 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 900px) { .document-statistics-secondary { display: none; } }
+@media (max-width: 500px) { .document-persistence-state { max-width: 90px; overflow: hidden; text-overflow: ellipsis; } }
+@media (forced-colors: active) { .document-statistics:focus-visible { outline: 2px solid Highlight; } .document-persistence-state { color: CanvasText; } }

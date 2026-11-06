@@ -60,6 +60,7 @@ public partial class MainWindow : Window
         DocumentTabs.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(TabStripViewportChanged));
         InitialiseSynchronisation();
         InitialiseFind();
+        InitialiseStatistics();
         InitialisePreviewZoom();
         InitialisePreviewLoading();
         InitialiseArtifactContext();

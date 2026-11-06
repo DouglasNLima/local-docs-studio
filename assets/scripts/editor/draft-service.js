@@ -170,7 +170,8 @@ export function createDraftService({ state, dom, callbacks }) {
   async function afterSaveActiveFile(record, content, oldPath = '') {
     state.savedContentCache.set(record.path, content);
     state.deletionOverridePaths.delete(record.path);
-    await deleteDraft(record.path);
+    // A completed write may be older than the current editor buffer.
+    await saveDraftForPath(record.path);
     if (oldPath && oldPath !== record.path) {
       state.savedContentCache.delete(oldPath);
       state.deletionOverridePaths.delete(oldPath);

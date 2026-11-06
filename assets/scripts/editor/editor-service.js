@@ -125,6 +125,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
     }
 
     function updateEditorChrome() {
+      editor.dispatchEvent(new Event('lens-buffer-changed'));
       updateEditorScrollbarMetrics();
       updateLineNumbers();
       syncLineNumbers();

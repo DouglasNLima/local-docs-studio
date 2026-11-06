@@ -313,6 +313,7 @@ export function createUiService({
     }
 
     function updateSaveButton() {
+      document.dispatchEvent(new Event('lens-document-state'));
       const record = state.files.find((item) => item.path === state.activePath);
       const canSaveConvertedCopy = Boolean(record?.converted && !record?.handle);
       const disabled = !record || Boolean(record?.readOnly);

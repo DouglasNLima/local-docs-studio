@@ -10,6 +10,103 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
+test('document statistics follow the readable unsaved buffer and retain keyboard history', async ({ page }) => {
+  await gotoApp(page);
+  const editor = page.locator('#editor');
+  const statistics = page.locator('#documentStatistics');
+  await editor.fill('# Café 😀\n\nHello **world**!');
+  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 3 words · 19 chars. Open Document Review');
+  await editor.press('Control+End');
+  await editor.pressSequentially(' Again', { delay: 5 });
+  await expect(statistics).toContainText('4 words');
+  await expect(editor).toBeFocused();
+  const caret = await editor.evaluate(el => [el.selectionStart, el.selectionEnd, el.scrollTop]);
+  await statistics.focus();
+  await statistics.press('Enter');
+  await expect(page.locator('#documentReviewPanel')).toBeVisible();
+  await expect(page.locator('#documentReviewSummary')).toContainText('4 words');
+  await expect(page.locator('#documentReviewMetrics')).toContainText('Characters: 25');
+  expect(await editor.evaluate(el => [el.selectionStart, el.selectionEnd, el.scrollTop])).toEqual(caret);
+  await editor.focus();
+  await editor.press('Control+z');
+  await expect(statistics).toContainText('3 words');
+  await editor.press('Control+y');
+  await expect(statistics).toContainText('4 words');
+});
+
+test('document statistics exclude syntax and code, support Unicode and survive narrow High Contrast', async ({ page }) => {
+  await gotoApp(page);
+  const editor = page.locator('#editor');
+  const statistics = page.locator('#documentStatistics');
+  const examples = [
+    ['', 0, 0],
+    ["# Title\n\none**two** three &amp; four-five Café's 中文", 6, 40],
+    ['---\ntitle: Hidden\n---\n# Visible\n\n`hidden code`\n\n```mermaid\nA --> B\n```', 1, 7],
+    ['| A | B |\n|---|---|\n| One | Two |', 4, 11],
+    ['![Alt text](private.png) [Read me](https://example.invalid)', 4, 16],
+    ['<details>\n<summary>More</summary>\n## Hidden title\n</details>', 3, 17],
+    ['<figure data-image-figure>\n<img src="private.png" alt="Alt text">\n<figcaption>Caption</figcaption>\n</figure>', 3, 16],
+    ['# 𝒜𝒷 𐐀 Ⅳ ²', 4, 8],
+  ];
+  for (const [source, words, characters] of examples) {
+    await editor.fill(source);
+    await expect(statistics).toHaveAttribute('aria-label', `${words ? 1 : 0} min read · ${words} words · ${characters} chars. Open Document Review`);
+  }
+  await page.setViewportSize({ width: 480, height: 720 });
+  await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+  await expect(statistics).toBeVisible();
+  await expect(statistics).toHaveAttribute('title', /4 words · 8 chars/);
+  await expect(page.locator('#status')).toBeVisible();
+  const bounds = await statistics.boundingBox();
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(480);
+});
+
+test('document statistics discard superseded large buffers and use hours without changing the estimate', async ({ page }) => {
+  await gotoApp(page);
+  const editor = page.locator('#editor');
+  const statistics = page.locator('#documentStatistics');
+  await editor.fill('word '.repeat(13421));
+  await expect(statistics).toHaveAttribute('aria-label', /1 hr 2 min read · 13,421 words · 67,104 chars/);
+  await editor.fill('old '.repeat(50000));
+  await editor.fill('# Current');
+  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 1 words · 7 chars. Open Document Review');
+  await editor.press('Control+End');
+  await expect(editor).toBeFocused();
+  await expect(editor).toHaveValue('# Current');
+});
+
+test('document statistics persistence state confirms writes and retains edits made while saving', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await openFileMenu(page);
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file', exact: true }).click();
+  await expect(page.locator('#editor')).toHaveValue('# Opened\n');
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Unchanged');
+  await page.evaluate(() => {
+    const handle = window.__mockFs.fileHandle;
+    const original = handle.createWritable.bind(handle);
+    handle.createWritable = async () => {
+      const writer = await original();
+      const close = writer.close.bind(writer);
+      writer.close = async () => { await new Promise(resolve => { window.__finishStatisticsSave = resolve; }); await close(); };
+      return writer;
+    };
+  });
+  await page.locator('#editor').fill('# Saved version');
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Saving…');
+  await expect.poll(() => page.evaluate(() => typeof window.__finishStatisticsSave)).toBe('function');
+  await page.locator('#editor').fill('# Newer draft');
+  await page.evaluate(() => window.__finishStatisticsSave());
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Unsaved changes');
+  await expect(page.locator('#editor')).toHaveValue('# Newer draft');
+  expect(await page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Saved version');
+  await page.evaluate(() => { window.__mockFs.fileHandle.createWritable = async () => { throw new Error('Synthetic write failure'); }; });
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Save failed');
+  await expect(page.locator('#editor')).toHaveValue('# Newer draft');
+});
+
 function fixturePath(name) {
   return path.join(root, 'tests', 'fixtures', name);
 }

@@ -124,3 +124,11 @@ Use **Help > Windows shell diagnostics > Create support bundle** when you need a
 Optional artefact bundle metadata is session-only and untrusted unless you explicitly export an artefact review pack. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings. Reader filters stay inside the reader panel and are not stored.
 
 Future compatible producers should follow `docs/integration/lens-artifact-bundle-producer-guide.md`. Release candidates should follow `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`.
+
+## Reading statistics
+
+Read the footer for the active document's estimated reading time, word count and readable character count. It updates shortly after editing, pasting and Undo/Redo, using the current buffer. The statistics button opens Document Review without changing your selection. On a narrow window, focus or hover over the button for all metrics.
+
+Words follow the Review prose rules. Characters count Unicode scalar values in readable text, including punctuation and image descriptions, with whitespace normalised to single spaces. Front matter and code are excluded. A zero-word document has a zero-minute estimate; longer documents retain the 220 words-per-minute ceiling. Files above the 4 Mi source-character analysis limit show an explicit unavailable status. No document content is sent to a service.
+
+The adjacent document state reflects pending changes or linked-file writes. A downloaded copy is not proof that the browser saved it to disk. Edits made during a write remain pending after that older version finishes saving.

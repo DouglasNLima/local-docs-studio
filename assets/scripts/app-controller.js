@@ -22,6 +22,7 @@ import { createDialogService } from './ui/dialog-service.js';
 import { createSupportBundle, redactSupportBundleText } from './ui/support-bundle-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createWindowsSetupService } from './ui/windows-setup-service.js';
+import { createDocumentStatisticsService } from './document/document-statistics-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
@@ -493,6 +494,12 @@ export function createAppController() {
       },
     });
     openInsertHelper = insertHelperTools.openInsertHelper;
+    const statisticsTools = createDocumentStatisticsService({
+      state, editor, button: document.getElementById('documentStatistics'),
+      stateLabel: document.getElementById('documentPersistenceState'),
+      reviewButton: documentReviewToggleButton,
+      onMetrics: () => document.dispatchEvent(new Event('lens-statistics-updated')),
+    });
     const {
       installDocumentUxHandlers,
       toggleOutline,
@@ -518,6 +525,7 @@ export function createAppController() {
         documentReviewAlerts,
       },
       callbacks: {
+        getStatistics: statisticsTools.getMetrics,
         getBacklinks,
         getWorkspaceAudit,
         getGovernanceAudit,
@@ -871,6 +879,7 @@ export function createAppController() {
     installEventHandlers();
     renderLocalLibrary();
     initialiseWelcome();
+    statisticsTools.schedule();
     localStorage.removeItem(storageKeys.typewriterMode);
     initRecentHandles();
     registerServiceWorker();

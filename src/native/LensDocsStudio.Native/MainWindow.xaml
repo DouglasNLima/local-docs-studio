@@ -257,6 +257,11 @@
    <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
     <Grid>
      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+     <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,3,0,0">
+      <Button x:Name="DocumentStatisticsButton" Content="Counting…" Click="ReviewDocument" HorizontalAlignment="Left" Padding="3,1" AutomationProperties.AutomationId="DocumentStatistics" AutomationProperties.Name="Open Document Review"/>
+      <TextBlock Text="{Binding ActiveDocument.PersistenceState}" FontSize="11" Margin="10,0,0,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DocumentPersistenceState"/>
+     </StackPanel>
      <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/>
      <StackPanel Grid.Column="1" Orientation="Horizontal" AutomationProperties.AutomationId="ExportCompletionActions">
       <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding CompletedExport}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>

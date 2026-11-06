@@ -771,3 +771,9 @@ python -m http.server 4173
 ```
 
 Then open `http://127.0.0.1:4173/`.
+
+### Reading statistics
+
+The footer shows reading time, words and readable characters for the current buffer, including unsaved edits. Select the statistics (or focus the button and press Enter) to open Document Review. Counts exclude front matter, inline code and code/Mermaid blocks; image descriptions and supported captions count. Characters are Unicode scalar values with normalised whitespace. Long reading times use hours and minutes at the existing 220 words per minute. The native edition calculates these independently of preview rendering too.
+
+A linked file is only labelled **Saved** after a completed write. **Unsaved changes**, **Saving…**, **Save failed** and **External change** remain separate from preview/operation messages. Browser downloads cannot confirm persistence. See the [engineering receipt](docs/engineering/reading-experience-receipt.md) for scope and validation limits.

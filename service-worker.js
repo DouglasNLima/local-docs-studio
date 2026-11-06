@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v73';
+const CACHE_NAME = 'lens-docs-studio-v74';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -13,6 +13,8 @@ const LOCAL_ASSETS = [
   './assets/scripts/app-controller.js',
   './assets/scripts/dom.js',
   './assets/scripts/document/document-ux-service.js',
+  './assets/scripts/document/document-statistics-service.js',
+  './assets/scripts/document/document-statistics-worker.js',
   './assets/scripts/document/markdown-governance-service.js',
   './assets/scripts/document/selection-sync-service.js',
   './assets/scripts/document/scroll-sync-service.js',

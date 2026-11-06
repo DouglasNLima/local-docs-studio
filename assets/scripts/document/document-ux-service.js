@@ -33,6 +33,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     documentReviewAlerts,
   } = dom;
   const {
+    getStatistics,
     getBacklinks,
     getWorkspaceAudit,
     getGovernanceAudit,
@@ -71,6 +72,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     previewFindNextButton.addEventListener('click', () => goToSearchMatch(1));
     previewFindClearButton.addEventListener('click', closePreviewFind);
 
+    document.addEventListener('lens-statistics-updated', () => { if (state.documentReviewOpen) updateDocumentReview(); });
     documentReviewToggleButton.addEventListener('click', toggleDocumentReview);
     documentReviewAlerts.addEventListener('click', handleReviewTargetClick);
   }
@@ -359,8 +361,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
 
   function buildDocumentReview() {
     const root = getContentRoot();
-    const text = getReviewText(root);
-    const words = text.match(/[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*/gu) ?? [];
+    const statistics = getStatistics?.();
     const headings = [...root.querySelectorAll('h1, h2, h3, h4')];
     const h1s = headings.filter((heading) => heading.tagName.toLowerCase() === 'h1');
     const links = [...root.querySelectorAll('a[href]')];
@@ -374,7 +375,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       + [...root.querySelectorAll('pre code')].filter((code) => !code.closest('.code-block')).length;
     const diagrams = root.querySelectorAll('.diagram-frame').length || state.lastRenderResult.diagramTotal || 0;
     const diagramErrors = root.querySelectorAll('.mermaid-error, .diagram-error').length || state.lastRenderResult.diagramErrors || 0;
-    const wordCount = words.length;
+    const wordCount = statistics?.words ?? 0;
     const readingMinutes = wordCount ? Math.max(1, Math.ceil(wordCount / 220)) : 0;
     const alerts = [];
 
@@ -457,6 +458,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       readingMinutes,
       alerts,
       metrics: [
+        { label: 'Characters', value: statistics?.characters ?? 'Counting…' },
         { label: 'Headings', value: headings.length },
         { label: 'Links', value: links.length },
         { label: 'Broken links', value: unresolvedWikilinks.length + brokenRelativeLinks.length },
