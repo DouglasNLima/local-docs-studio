@@ -1,0 +1,85 @@
+name: Native independent acceptance recovery
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [develop]
+    paths: ['.github/workflows/native-acceptance-recovery.yml']
+permissions:
+  contents: read
+jobs:
+  develop-performance:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'feature/reading-experience-productivity'
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Unchanged 250 ms protocol against exact develop, independent of historical pinned gate
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousPreviewPerformance.ps1 -BaselineRevision 99349d82eb06960eb1f9785cf384db2373aed4fa -OutputDirectory artifacts/develop-performance -Replication ${{ matrix.replication }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: develop-performance-${{ matrix.replication }}
+          path: |
+            artifacts/develop-performance/protocol.json
+            artifacts/develop-performance/comparison.json
+            artifacts/develop-performance/samples/
+          retention-days: 30
+  develop-high-contrast:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'feature/reading-experience-productivity'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build identical original appearance gate against exact products
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/appearance-baseline 99349d82eb06960eb1f9785cf384db2373aed4fa
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/appearance-baseline/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows artifacts/appearance-probe -Recurse
+          Copy-Item artifacts/appearance-baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/* artifacts/appearance-probe -Recurse -Force
+      - name: Preserve every original High Contrast assertion and pre-assertion colour observation
+        run: |
+          $candidate = (git rev-parse HEAD).Trim()
+          $order = if ('${{ matrix.order }}' -eq 'baseline-first') { @('baseline','candidate') } else { @('candidate','baseline') }
+          $root = 'artifacts/develop-appearance'
+          New-Item -ItemType Directory $root | Out-Null
+          $harnessHash = (Get-FileHash src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.dll).Hash
+          if ($harnessHash -ne (Get-FileHash artifacts/appearance-probe/LensDocsStudio.Native.Validation.dll).Hash) { throw 'Harness binaries differ.' }
+          @{ baseline='99349d82eb06960eb1f9785cf384db2373aed4fa'; candidate=$candidate; order=$order; harnessSha256=$harnessHash; image=$env:ImageVersion; threshold=4.5 } | ConvertTo-Json | Set-Content "$root/protocol.json"
+          $failed = $false
+          foreach ($side in $order) {
+            $directory = if ($side -eq 'baseline') { 'artifacts/appearance-probe' } else { 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows' }
+            $revision = if ($side -eq 'baseline') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { $candidate }
+            & "$directory/LensDocsStudio.Native.Validation.exe" --ux-screenshots "$directory/LensDocsStudio.Native.exe" "$root/$side" $revision --high-contrast
+            if ($LASTEXITCODE -ne 0) { $failed = $true }
+          }
+          if ($failed) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: develop-high-contrast-${{ matrix.order }}
+          path: artifacts/develop-appearance/
+          retention-days: 30

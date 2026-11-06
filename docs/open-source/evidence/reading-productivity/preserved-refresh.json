@@ -142,9 +142,13 @@
       "previous": "4ac3bb2b4b54b04f7fd8796eaa3f23b58aa9ce7da28a374558da183ba67ba718",
       "current": "2e4fc18f56ae3b8136a17f3ce30150106941fe7e7ef4d250b6947659914031e1"
     },
+    "src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs": {
+      "previous": "a3cc8ac2c2e47d49f72f4bddd37a5f98ace9d183f736ffe8ea4a94245c07aa3f",
+      "current": "0e7b8355957735fb9477ffe7d0f5add978db746ddd37e11067126001557762b8"
+    },
     "src/native/LensDocsStudio.Native.Validation/Program.cs": {
       "previous": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
-      "current": "0acb66fa540ebbbef22f64688a21d85a7e9e55c5f3ea864ea093b1ff693a227b"
+      "current": "ca42bfef4f7bc3a64622ee42f9f4624fb566cc102f173118d4ae2846e69d2473"
     },
     "src/native/LensDocsStudio.Native/DocumentReviewWindow.xaml.cs": {
       "previous": "4f3c558461ae6e3751b8139bbb5ade0d541a404c1b566d2bef31f51d4e7807a9",

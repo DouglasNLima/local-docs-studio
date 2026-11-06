@@ -143,6 +143,7 @@ def apply_reading_productivity_refresh(preserved, refresh):
         'src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs',
         'src/native/LensDocsStudio.Native.Validation/NativeArrangementLatencyChecks.cs',
         'src/native/LensDocsStudio.Native.Validation/NativeSuiteLifecycleChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs',
         'src/native/LensDocsStudio.Native.Validation/NativeLaunchReadiness.cs',
         'src/native/LensDocsStudio.Native.Validation/NativeLaunchReadinessChecks.cs',
         'src/native/LensDocsStudio.Native/DocumentReviewWindow.xaml.cs',

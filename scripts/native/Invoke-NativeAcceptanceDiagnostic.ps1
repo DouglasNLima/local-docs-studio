@@ -59,16 +59,24 @@ try {
     @{ status='RUNNING'; pid=$child.Id; arguments=$ValidationArguments; diagnosticOnly=$true } |
         ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'supervisor-start.json')
     while (-not $child.WaitForExit(200)) {
-        $phasePath = Join-Path $output 'trace/phase.json'
+        $phasePath = Join-Path $output 'trace/phases.jsonl'
         if (Test-Path -LiteralPath $phasePath) {
             $stream = [IO.FileStream]::new($phasePath,[IO.FileMode]::Open,[IO.FileAccess]::Read,([IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete))
+            # Read only a bounded tail of the append-only journal. Do not rename
+            # a file while the observer holds a Windows handle to it.
+            $null = $stream.Seek([Math]::Max(0,$stream.Length - 16384),[IO.SeekOrigin]::Begin)
             $reader = [IO.StreamReader]::new($stream)
-            try { $phase = $reader.ReadToEnd() } finally { $reader.Dispose() }
-            if ($phase -ne $lastPhase) { $lastPhase = $phase; $lastProgress.Restart() }
+            try { $tail = $reader.ReadToEnd() } finally { $reader.Dispose() }
+            $lines = $tail.Split([char]10)
+            if ($lines.Length -ge 2) {
+                $phase = $lines[$lines.Length - 2].TrimEnd([char]13)
+                if ($phase -ne $lastPhase) { $lastPhase = $phase; $lastProgress.Restart() }
+            }
         }
         # This is a diagnostic-only fail-closed guard, never an enlarged product
         # acceptance deadline. The unchanged suites also run without this wrapper.
         if ($lastProgress.Elapsed.TotalSeconds -ge 60 -or $watch.Elapsed.TotalMinutes -ge 8) {
+            if ($child.HasExited) { break }
             $blocked = $true
             @{ status='FAIL'; reason='Diagnostic process stopped making bounded progress'; pid=$child.Id;
                 elapsedMs=$watch.Elapsed.TotalMilliseconds; lastProgressMs=$lastProgress.Elapsed.TotalMilliseconds; lastPhase=$lastPhase } |

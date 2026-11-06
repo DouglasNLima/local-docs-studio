@@ -20,7 +20,17 @@ The opt-in `LENS_NATIVE_ACCEPTANCE_TRACE` harness records at most 2,048 phase ev
 
 The controlled workflow runs the identical diagnostic harness against candidate and exact develop product assemblies, in both baseline-first and candidate-first order. Arrangement and normal lifecycle use real shown WPF; Packet and selection use actual Windows High Contrast; Timeline uses portable launch for comparison, with installed launch remaining a separate mandatory regression. Passing diagnostics cannot erase a failed original observation.
 
+The independent recovery workflow runs the unchanged Continuous protocol twice with its existing `BaselineRevision` parameter set to exact develop, and the original High Contrast appearance assertion with identical harness binaries in both execution orders. The historical pinned Continuous workflow still runs independently. Neither fixture bytes nor the 250 ms/4.5:1 acceptance definitions change.
+
 The user's continuation excludes all signing. The disposable-certificate trust execution is therefore NOT RUN on this feature branch; its test and execution on other branches remain intact. Mock signing-policy checks do not sign artefacts. No trust or production-readiness claim follows from this omission.
+
+## First controlled checkpoint, 847b8d1
+
+Original Timeline MiniDumpThreadInfo evidence was analysed with pinned dotnet-dump 10.0.750501. At capture, the main thread is in WPF Dispatcher.GetMessage/Application.RunDispatcher, with no synchronous renderer stack. The retained desktop image shows the Timeline document and canonical preview after failure. Last native observation at 24,900.85 ms still has HWND zero; provider configuration fails at 26,660.50 ms, while the outer acceptance receipt records 39,084.11 ms. This proves neither a permanent startup deadlock nor readiness inside the original deadline. The provider correction does not establish the cause of late/unobserved ownership.
+
+The first controlled diagnostic run exposed two defects in the newly added observer. Replacing `phase.json` failed with Windows access denied in baseline arrangement/lifecycle attempts; an append-only journal now avoids replacing an observed file. A real concurrent-reader control verifies 1,001 complete ordered records. Selection lacked intermediate phase events and could finish at the supervisor's no-progress boundary: both products produced 100 passing observations in candidate-first order, but its supervisor still failed. Selection now emits bounded progress records at existing assertion boundaries, and the supervisor rechecks exit before capture. These experiment failures are retained and are not attributed to product regressions.
+
+Unaffected diagnostic observations include candidate arrangement passing in both orders, baseline arrangement passing in candidate-first order, and candidate normal lifecycle passing. Uninstrumented arrangement and selection gates also passed at this checkpoint. None clears the original ADC failures or establishes their cause. Clean repeated diagnostic comparisons and final-source regression results remain required.
 
 ## Interim verdicts
 

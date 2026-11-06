@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--acceptance-diagnostics" && args.Length == 2)
+        {
+            try { NativeAcceptanceDiagnostics.CheckJournal(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--reading-productivity-ui" && args.Length == 5 && args[4] is "--normal" or "--high-contrast")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"

@@ -36,7 +36,8 @@
     "docs/native/native-hardening-acceptance.md",
     ".github/workflows/native-hardening.yml",
     "scripts/native/Invoke-NativeAcceptanceDiagnostic.ps1",
-    "src/native/LensDocsStudio.Native.Validation/NativeAcceptanceDiagnostics.cs"
+    "src/native/LensDocsStudio.Native.Validation/NativeAcceptanceDiagnostics.cs",
+    ".github/workflows/native-acceptance-recovery.yml"
   ],
   "spdxPaths": [
     "scripts/compliance/licence_scope.py",
@@ -47,6 +48,7 @@
   "paths": [
     ".gitattributes",
     ".github/CODEOWNERS",
+    ".github/workflows/native-acceptance-recovery.yml",
     ".github/workflows/native-consolidation.yml",
     ".github/workflows/native-continuous-diagnosis.yml",
     ".github/workflows/native-continuous-performance.yml",
