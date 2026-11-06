@@ -184,3 +184,23 @@ recovery, representative user-owned documents, physical display timing and scree
 certification are NOT RUN by this probe. These are explicit limits on policy approval,
 not removed correctness requirements. The harness's finite supervision bounds do not
 certify the product's resource-exhaustion behaviour.
+
+### Retained initial campaign and observer corrections
+
+The [compact first-campaign receipt](evidence/native-ux-contract/initial-campaign-summary.json)
+and [uploaded artefact identities](evidence/native-ux-contract/initial-campaign-artifacts.json)
+retain all eight cohorts from run 42295050128. Original report hashes were verified
+against their integrity sidecars. Of 224 processes, 84 completed and 140 failed:
+56 historical counter null references, 83 scroll observer timeouts, and one
+`layout-preview` timeout. That last timeout remains an unresolved observation;
+it is not silently attributed to scrolling or discarded.
+
+The subsequent four observer checks at `5fa9782` passed develop/normal but failed
+historical/normal, historical/HC and develop/HC. The TextView scrolling endpoint
+now succeeds in HC. Captured failures show input arriving without editor focus
+after a layout transition, plus historical Enter-to-next not establishing the
+required selection. The revised probe waits for normal arranged input geometry
+and verifies real-click focus before a typing trial. Find navigation uses the
+shared visible Next control for every product. The failed historical Enter case
+remains retained, separate keyboard evidence; a pointer result cannot certify it.
+No product code, correctness endpoint, timeout or acceptance threshold changes.

@@ -177,7 +177,20 @@ internal sealed class Probe : IDisposable
         var start = element.PointToScreen(new Point(0, 0)); var end = element.PointToScreen(new Point(element.ActualWidth, element.ActualHeight));
         return new Rect(start, end);
     }
-    private async Task PointAt(FrameworkElement element) => Desktop.Move(await Ui(() => { var b = Bounds(element); return new Point(b.X + b.Width / 2, b.Y + b.Height / 2); }));
+    private async Task PointAt(FrameworkElement element)
+    {
+        // A model layout flag can precede arranged input geometry. Set up the
+        // next action against the settled visible control, without forcing layout.
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task.WaitAsync(TimeSpan.FromSeconds(ActionSeconds));
+        await Until(() => element.IsVisible && element.IsMeasureValid && element.IsArrangeValid && element.ActualWidth > 0 && element.ActualHeight > 0);
+        Desktop.Move(await Ui(() => { var b = Rect.Intersect(Bounds(element), Desktop.ClientBounds(windowHandle));
+            if (b.IsEmpty) throw new IOException("Input target has no visible client geometry.");
+            return new Point(b.X + b.Width / 2, b.Y + b.Height / 2); }));
+    }
+    private async Task FocusEditor()
+    {
+        await PointAt(editor); Desktop.Click(); await Until(() => editor.IsKeyboardFocusWithin);
+    }
     private async Task ClickControl(string id) { await PointAt(await Ui(() => Control(id))); Desktop.Click(); }
     private void Record(object record) => journal.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
     private async Task<double> Measure(string action, string temperature, int iteration, Action input, Func<bool> response, bool requirePixelChange = true, long? origin = null)
@@ -227,7 +240,7 @@ internal sealed class Probe : IDisposable
         Record(new { kind = "environment", dpi = await Ui(() => VisualTreeHelper.GetDpi(window).PixelsPerInchX), width = windowBounds.Width, height = windowBounds.Height,
             readingMode = await Ui(() => preview.ViewingMode.ToString()), zoom = await Ui(() => preview.Zoom) });
         heartbeat = Heartbeat();
-        await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
+        await FocusEditor(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
         // First render remains the first construction of this document in a fresh process.
         await PointAt(await Ui(() => Control("LayoutSplit")));
         await Measure("first-usable-preview", "cold-render", 0, Desktop.Click, Usable);
@@ -330,7 +343,7 @@ internal sealed class Probe : IDisposable
     private async Task Interactions(int i)
     {
         var temperature = i == 0 ? "first-interaction" : "warm";
-        await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
+        await FocusEditor(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
         await Measure("typing", temperature, i, () => Desktop.Text("x"), () => editor.Text == "x" + source && editor.CaretOffset == 1);
         await Measure("caret", temperature, i, () => Desktop.Key(0x27), () => editor.CaretOffset == 2 && editor.SelectionLength == 0);
         await Measure("selection", temperature, i, () => Desktop.Key(0x27, 0x10), () => editor.SelectionStart == 2 && editor.SelectionLength == 1);
@@ -338,11 +351,11 @@ internal sealed class Probe : IDisposable
         await Measure("find-open", temperature, i, () => Desktop.Key(0x46, 0x11), () => ((FrameworkElement)window.FindName("FindText")).IsVisible);
         Desktop.Key(0x41, 0x11); Desktop.Text("NeedleOne"); await Until(() => FindQueryReady("NeedleOne", 2));
         var caret = await Ui(() => editor.CaretOffset);
-        // Enter-to-next is the real Find command shared by all three pinned products.
-        // The historical baseline predates F3 and the live counter; the required
-        // exact selection and navigation endpoint remains the same.
-        await Measure("find-navigation", temperature, i, () => Desktop.Key(0x0D), () => editor.SelectedText == "NeedleOne" && editor.CaretOffset != caret);
-        Desktop.Key(0x1B); await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11);
+        // Use the shared visible Next control across all exact products. The
+        // historical Enter observation remains a failed, separate keyboard case.
+        await PointAt(await Ui(() => Control("FindNext")));
+        await Measure("find-navigation", temperature, i, Desktop.Click, () => editor.SelectedText == "NeedleOne" && editor.CaretOffset != caret);
+        Desktop.Key(0x1B); await FocusEditor(); Desktop.Key(0x24, 0x11);
         await Until(() => editor.TextArea.TextView.VisualLinesValid && editor.TextArea.TextView.ScrollOffset.Y < 1);
         if (await Ui(() => editor.ExtentHeight > editor.ViewportHeight))
         {
@@ -372,7 +385,7 @@ internal sealed class Probe : IDisposable
         if (slash is null) Record(new { kind = "coverage", action = "slash", status = "NOT RUN", reason = "Feature absent in this exact product" });
         else
         {
-            await PointAt(editor); Desktop.Click(); Desktop.Key(0x23, 0x11);
+            await FocusEditor(); Desktop.Key(0x23, 0x11);
             Desktop.Key(0x0D); await Until(() => editor.CaretOffset == editor.Text.Length);
             var before = await Ui(() => editor.Text);
             var commands = await Ui(() => (ListBox)slash.GetType().GetProperty("CommandList")!.GetValue(slash)!);
@@ -425,7 +438,7 @@ internal sealed class Probe : IDisposable
             await ClickControl("LayoutSplit");
             await Until(() => preview.IsVisible && Field<ICSharpCode.AvalonEdit.Document.ITextSourceVersion>("renderedVersion") is { } version &&
                 editor.Document.Version.CompareAge(version) == 0 && preview.IsMeasureValid && preview.IsArrangeValid);
-            await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
+            await FocusEditor(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
             // A real source edit schedules preview work while the editor keeps focus.
             // The next input is offered at the renderer marker, without asking the UI
             // thread whether it is idle. Any non-preemptible layout delay is retained.
@@ -440,7 +453,7 @@ internal sealed class Probe : IDisposable
     private async Task Cancellation()
     {
         // Invalidate via real input, then interrupt the next actual construction from a worker.
-        await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); Desktop.Text("x"); await Until(() => editor.Text == "x" + source);
+        await FocusEditor(); Desktop.Key(0x24, 0x11); Desktop.Text("x"); await Until(() => editor.Text == "x" + source);
         Desktop.Key(0x08); await Until(() => editor.Text == source);
         var active = await Ui(() => model.ActiveDocument);
         stages.Arm("started"); await ClickControl("LayoutSplit");
@@ -472,7 +485,7 @@ internal sealed class Probe : IDisposable
     {
         // Separate observer control, after all performance samples: no prewarming
         // or artificial delay is applied to a product measurement.
-        await PointAt(editor); Desktop.Click(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
+        await FocusEditor(); Desktop.Key(0x24, 0x11); await Until(() => editor.CaretOffset == 0);
         using var release = new ManualResetEventSlim();
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         _ = window.Dispatcher.BeginInvoke(() => { entered.SetResult(); if (!release.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Observer control release failed."); });
@@ -503,7 +516,9 @@ internal sealed class Probe : IDisposable
                 bufferSha256 = Program.Hash(Encoding.UTF8.GetBytes(editor.Text)), tail = editor.Text[^Math.Min(80, editor.Text.Length)..],
                 focusedType = System.Windows.Input.Keyboard.FocusedElement?.GetType().FullName,
                 previewText = preview.Selection?.Text, previewVisible = preview.IsVisible,
-                findCounter = (window.FindName("FindCounter") as TextBlock)?.Text, window.Left, window.Top, window.ActualWidth, window.ActualHeight
+                findCounter = (window.FindName("FindCounter") as TextBlock)?.Text,
+                findText = (window.FindName("FindText") as TextBox)?.Text, searchPreview = Field<bool>("searchPreview"),
+                status = model.Status, modifiers = System.Windows.Input.Keyboard.Modifiers.ToString(), window.Left, window.Top, window.ActualWidth, window.ActualHeight
             }, DispatcherPriority.Input).Task.WaitAsync(TimeSpan.FromSeconds(2));
             Program.Write(output, "failure-state.json", state);
             Desktop.Save(Desktop.Capture(Desktop.ClientBounds(windowHandle)), Path.Combine(output, "failure.png"));

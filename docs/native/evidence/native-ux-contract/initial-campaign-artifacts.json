@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42295050128",
+  "source": "8e7edf073e5ed81f142132deb3237e15f953158d",
+  "tree": "bc1defbc6e33d76e6d692de4c69951df8364eaa6",
+  "verdict": "FAIL",
+  "scope": "Observer-development campaign. Two exact-develop normal cohorts pass collection; historical Find and HC scroll observer incompatibilities remain failures. No UX or policy acceptance.",
+  "artifacts": [
+    {
+      "id": 13542763090,
+      "name": "native-ux-develop-high-contrast-candidate-first",
+      "sha256": "sha256:833331a7a01b48fa007df0b1fce852e0d3b1602c8c0de34d3f6a2c1f72433063",
+      "size": 19977880,
+      "created": "2026-11-06T21:41:51Z",
+      "expires": "2026-12-06T21:41:49Z"
+    },
+    {
+      "id": 13542298363,
+      "name": "native-ux-develop-normal-candidate-first",
+      "sha256": "sha256:d907de29cbb286ce50d0498028db51393b081cb116fe5eac435e043850fd0ae8",
+      "size": 45921244,
+      "created": "2026-11-06T21:31:56Z",
+      "expires": "2026-12-06T21:31:53Z"
+    },
+    {
+      "id": 13542252989,
+      "name": "native-ux-historical-normal-candidate-first",
+      "sha256": "sha256:5fc0cb9b9aefc27045371879cc0276c6b5f372dfd816ad8c12f80d03d763de84",
+      "size": 25682804,
+      "created": "2026-11-06T21:29:43Z",
+      "expires": "2026-12-06T21:29:40Z"
+    },
+    {
+      "id": 13542082869,
+      "name": "native-ux-historical-normal-baseline-first",
+      "sha256": "sha256:d11be3d7e024f90b50650afe826cb6f099bb930a18b7963ad8d305b7ab1fab96",
+      "size": 26277718,
+      "created": "2026-11-06T21:27:52Z",
+      "expires": "2026-12-06T21:27:50Z"
+    },
+    {
+      "id": 13542024752,
+      "name": "native-ux-develop-high-contrast-baseline-first",
+      "sha256": "sha256:47be98a86fc7171afc441674f92fd54d1ffc698f8849bbaecf9f7aaa69734387",
+      "size": 19082998,
+      "created": "2026-11-06T21:37:24Z",
+      "expires": "2026-12-06T21:37:22Z"
+    },
+    {
+      "id": 13541978484,
+      "name": "native-ux-develop-normal-baseline-first",
+      "sha256": "sha256:d60e827fabbe90e0b653cb0b06d337f5d9d04935631f98aec5baef787aa7f20f",
+      "size": 45892103,
+      "created": "2026-11-06T21:30:33Z",
+      "expires": "2026-12-06T21:30:30Z"
+    },
+    {
+      "id": 13541968660,
+      "name": "native-ux-historical-high-contrast-baseline-first",
+      "sha256": "sha256:5dca52403d2ab8438158001ced2d2c65becb02a335b06019850ebdd38ca2dc44",
+      "size": 11199287,
+      "created": "2026-11-06T21:32:19Z",
+      "expires": "2026-12-06T21:32:17Z"
+    },
+    {
+      "id": 13541784253,
+      "name": "native-ux-historical-high-contrast-candidate-first",
+      "sha256": "sha256:8906161f18720b3df7c59a99a1390b326af3427508b26d2bc0f38d3d58596b00",
+      "size": 11187751,
+      "created": "2026-11-06T21:33:29Z",
+      "expires": "2026-12-06T21:33:26Z"
+    },
+    {
+      "id": 13541431763,
+      "name": "native-ux-observer-smoke",
+      "sha256": "sha256:d3ed285a4ba04eb0b5f8dbf415a4e6886c167b14024ecb9c0389b55eda0dc5f0",
+      "size": 6324720,
+      "created": "2026-11-06T21:17:18Z",
+      "expires": "2026-12-06T21:17:17Z"
+    }
+  ]
+}
