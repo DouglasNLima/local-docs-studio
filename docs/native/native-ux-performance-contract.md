@@ -168,3 +168,13 @@ only the actual signing step's branch guard in the Native regression workflow, b
 Goal #77 explicitly forbids signing even a disposable test certificate. Mock signing
 policy checks remain allowed and do not sign anything. No required-check/ruleset,
 deployment, release, tag or merge action is authorised.
+
+Read-only settings audit on 6 November 2026 found active develop ruleset `26127883`
+with 30 required status contexts, strict status checks and review-thread resolution.
+The standalone Continuous workflow and the new UX workflow are not named required
+contexts in that ruleset; the historical 250 ms requirement remains a mandatory
+engineering acceptance policy and NO-GO condition. Do not confuse that policy with
+GitHub enforcement. The legacy branch-protection endpoint returns 404 because this
+repository uses rulesets; that does not mean develop lacks protection. No settings
+were changed. Any future transition must explicitly reconcile policy and enforced
+check names through owner review, not silently rely on a green collection job.

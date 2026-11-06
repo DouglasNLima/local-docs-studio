@@ -342,7 +342,15 @@ internal sealed class Probe : IDisposable
             Desktop.Key(0x59, 0x11); await Until(() => editor.Text == before + "## ");
             // Select the exact inserted suffix through real keyboard selection and restore it.
             var added = await Ui(() => editor.Text.Length - source.Length);
-            for (var n = 0; n < added; n++) Desktop.Key(0x25, 0x10);
+            Desktop.Key(0x23, 0x11); await Until(() => editor.CaretOffset == editor.Text.Length && editor.SelectionLength == 0);
+            // One caret movement crosses CRLF atomically; UTF-16 length is not a key count.
+            for (var n = 0; n < added && await Ui(() => editor.SelectionStart > source.Length); n++)
+            {
+                var previous = await Ui(() => editor.SelectionStart);
+                Desktop.Key(0x25, 0x10); await Until(() => editor.SelectionStart < previous);
+            }
+            if (!await Ui(() => editor.SelectionStart == source.Length && editor.SelectionLength == added))
+                throw new IOException("Keyboard restoration did not select exactly the added suffix.");
             Desktop.Key(0x08); await Until(() => editor.Text == source);
         }
         if (typeof(MainWindow).GetField("comparisonSlots", BindingFlags.NonPublic | BindingFlags.Instance) is null)
