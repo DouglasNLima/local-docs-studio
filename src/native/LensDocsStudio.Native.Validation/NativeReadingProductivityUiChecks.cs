@@ -35,6 +35,29 @@ internal static partial class NativeUiChecks
             Wait(() => ReadEditorText(editor) == "# Right\n\nRight source", "The right document did not load.");
             Wait(() => Find(main, "DocumentStatistics").Name.Contains("3 words", StringComparison.Ordinal), "Current-buffer reading statistics were not announced.");
             Check(System.Windows.SystemParameters.HighContrast == highContrast, "The requested operating-system appearance is active");
+            var clipboard = NativeUiClipboard.GetDataObject(); uint ownedClipboard = 0;
+            try
+            {
+                (main.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Copy Table of Contents")))
+                    ?? throw new IOException("The outline Copy Table of Contents command is unavailable.")).AsButton().Invoke();
+                Window? toc = null;
+                Wait(() => (toc = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Window)).And(cf.ByName("Copy Table of Contents")))?.AsWindow()) is not null,
+                    "The outline TOC dialogue did not open.");
+                var tocWindow = toc ?? throw new IOException("The TOC window is unavailable.");
+                var generated = (tocWindow.FindFirstDescendant(cf => cf.ByName("Generated table of contents")) ?? throw new IOException("The generated TOC preview is unavailable.")).AsTextBox();
+                Wait(() => generated.Text.Trim() == "- [Right](#right)", "The TOC did not retain the actual rendered heading anchor.");
+                (tocWindow.FindFirstDescendant(cf => cf.ByName("Table of contents style")) ?? throw new IOException("The TOC style is unavailable.")).AsComboBox().Select("Numbered list");
+                (tocWindow.FindFirstDescendant(cf => cf.ByName("Collapsible wrapper")) ?? throw new IOException("The TOC wrapper is unavailable.")).AsCheckBox().Click();
+                Wait(() => generated.Text.Contains("<details>", StringComparison.Ordinal) && generated.Text.Contains("1. [Right](#right)", StringComparison.Ordinal),
+                    "The actual TOC options did not generate a numbered collapsible index.");
+                (tocWindow.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Copy Table of Contents"))) ?? throw new IOException("The TOC copy button is unavailable.")).AsButton().Invoke();
+                Wait(() => NativeUiClipboard.GetText() == generated.Text, "Copy TOC did not put the exact generated index on the clipboard.");
+                ownedClipboard = GetClipboardSequenceNumber(); FocusWindow(tocWindow); Keyboard.Type(VirtualKeyShort.ESCAPE);
+                FocusWindow(main);
+                Check(ReadEditorText(editor) == "# Right\n\nRight source", "Actual outline TOC options and clipboard copying preserve the source document");
+            }
+            finally { RestoreClipboard(clipboard, ownedClipboard); }
+
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("/heading 2");
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByAutomationId("SlashCommands").And(cf.ByProcessId(app.ProcessId))) is not null, "The actual slash popup did not open.");
             Keyboard.Type(VirtualKeyShort.RETURN);
@@ -52,8 +75,11 @@ internal static partial class NativeUiChecks
             main.CaptureToFile(Path.Combine(output, "editor-preview-spc.png"));
             Find(main, "ComparisonMode1").AsComboBox().Select("Editor"); Find(main, "ActivateComparison1").AsButton().Invoke();
             Wait(() => ReadEditorText(editor) == spc, "The left activation did not bind its authoritative source.");
-            editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("Left pending");
-            var leftBuffer = ReadEditorText(editor);
+            editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(VirtualKeyShort.RETURN);
+            var leftBeforeTyping = spc + "\n";
+            Wait(() => ReadEditorText(editor) == leftBeforeTyping, "The left document did not receive the new paragraph.");
+            Keyboard.Type("Left pending"); var leftBuffer = leftBeforeTyping + "Left pending";
+            Wait(() => ReadEditorText(editor) == leftBuffer, "The left typing operation did not finish before switching documents.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F); Find(main, "FindText").AsTextBox().Text = "Left pending";
             Wait(() => Find(main, "FindCounter").Name == "1 of 1", "Find did not use the active left buffer.");
             Find(main, "ActivateComparison0").AsButton().Invoke();
@@ -81,13 +107,13 @@ internal static partial class NativeUiChecks
             Find(main, "ActivateComparison1").AsButton().Invoke();
             Wait(() => Find(main, "FindText").AsTextBox().Text == "Left pending" && ReadEditorText(editor) == leftBuffer, "Left Find/source state was not restored.");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-            Wait(() => ReadEditorText(editor) == spc, "Left Undo affected the wrong document or lost its own history.");
+            Wait(() => ReadEditorText(editor) == leftBeforeTyping, "Left Undo affected the wrong document or lost its own history.");
             Check(File.ReadAllText(right) == rightBuffer, "Left Undo cannot change the right document or its saved file");
             Find(main, "ComparisonMode0").AsComboBox().Select("Preview"); Find(main, "ComparisonMode1").AsComboBox().Select("Preview");
             Wait(() => !Find(main, "DocumentPreview").IsOffscreen && !Find(main, "ComparisonPreview").IsOffscreen, "Preview/Preview did not expose both readers.");
             main.CaptureToFile(Path.Combine(output, "preview-preview.png"));
             Find(main, "CloseComparison").AsButton().Invoke();
-            Check(ReadEditorText(editor) == spc && File.ReadAllText(right) == rightBuffer, "Closing comparison retains the active source and the other saved document");
+            Check(ReadEditorText(editor) == leftBeforeTyping && File.ReadAllText(right) == rightBuffer, "Closing comparison retains the active source and the other saved document");
             File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new { status = "PASS", highContrast,
                 source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 scope = "GITHUB_HOSTED_WINDOWS_POINTER_KEYBOARD_UIA; NOT PHYSICAL_MACHINE_CERTIFICATION", checks }, new JsonSerializerOptions { WriteIndented = true }));
