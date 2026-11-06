@@ -75,7 +75,9 @@ internal static class Program
             var other = Path.Combine(output, "other.md"); File.WriteAllText(other, "# Other document\n\nOtherSource\n", new UTF8Encoding(false));
             var dialogs = new DesktopDialogs();
             var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), dialogs);
-            var window = new MainWindow(model, dialogs, [other, path]) { Width = 1280, Height = 800, Left = 0, Top = 0 };
+            var area = SystemParameters.WorkArea;
+            var window = new MainWindow(model, dialogs, [other, path]) { Width = Math.Min(1280, area.Width), Height = Math.Min(800, area.Height),
+                WindowStartupLocation = WindowStartupLocation.Manual, Left = area.Left, Top = area.Top };
             Write(output, "identity.json", new { schema = 1, productRevision = args[5], fixture = fixture.Id, fixture.Sha256, highContrast, iterations,
                 harness = Identity(typeof(Program).Assembly), product = Identity(product), core = Identity(typeof(SessionStore).Assembly), wpf = Identity(typeof(Window).Assembly),
                 runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, os = Environment.OSVersion.VersionString,
@@ -89,7 +91,7 @@ internal static class Program
             {
                 var code = 0;
                 try { await probe.Run(started); }
-                catch (Exception error) { code = 1; Write(output, "failure.json", new { verdict = "FAIL", error = error.ToString() }); Console.Error.WriteLine(error); }
+                catch (Exception error) { code = 1; Write(output, "failure.json", new { verdict = "FAIL", error = error.ToString() }); await probe.FailureSnapshot(); Console.Error.WriteLine(error); }
                 finally
                 {
                     probe.Dispose();
@@ -130,11 +132,13 @@ internal sealed class Probe : IDisposable
     private readonly Dictionary<DispatcherOperation, long> operations = [];
     private readonly CancellationTokenSource stopped = new();
     private Rect windowBounds;
+    private IntPtr windowHandle;
     private int sampleCount, pngCount;
     private double heartbeatMaximum;
     private bool intervalOverflow;
     private long lastActionStart;
     private Task? heartbeat;
+    private string currentAction = "startup";
     private const int ActionSeconds = 30;
 
     internal Probe(MainWindow window, WorkspaceViewModel model, string source, Program.Fixture fixture, string path, string output, int iterations)
@@ -172,6 +176,8 @@ internal sealed class Probe : IDisposable
     private void Record(object record) => journal.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
     private async Task<double> Measure(string action, string temperature, int iteration, Action input, Func<bool> response, bool requirePixelChange = true, long? origin = null)
     {
+        currentAction = action;
+        windowBounds = Desktop.ClientBounds(windowHandle);
         var before = Desktop.Capture(windowBounds);
         var cpu = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
         var allocated = GC.GetTotalAllocatedBytes(false); var gc = Enumerable.Range(0, 3).Select(GC.CollectionCount).ToArray();
@@ -186,6 +192,7 @@ internal sealed class Probe : IDisposable
             await Until(response); semantic = Stopwatch.GetTimestamp();
             // Let the normal WPF render queue run. No UpdateLayout, synthetic event or hidden HWND.
             await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task.WaitAsync(TimeSpan.FromSeconds(ActionSeconds));
+            windowBounds = Desktop.ClientBounds(windowHandle);
             after = Desktop.Capture(windowBounds);
             if (!requirePixelChange || after.Sha256 != before.Sha256) break;
             await Task.Delay(8);
@@ -197,7 +204,7 @@ internal sealed class Probe : IDisposable
         var elapsed = Stopwatch.GetElapsedTime(started, ended).TotalMilliseconds;
         Record(new { kind = "sample", action, temperature, iteration, status = "OBSERVED", elapsedMs = elapsed,
             startTick = started, semanticTick = semantic, endTick = ended, semanticMs = Stopwatch.GetElapsedTime(started, semantic).TotalMilliseconds,
-            screenSha256 = after.Sha256, changedPixels = after.Sha256 != before.Sha256, foregroundVerified = true,
+            screenSha256 = after.Sha256, screenWidth = after.Width, screenHeight = after.Height, changedPixels = after.Sha256 != before.Sha256, foregroundVerified = true,
             cpuMs = process.TotalProcessorTime.TotalMilliseconds - cpu, allocations = GC.GetTotalAllocatedBytes(false) - allocated,
             gc = Enumerable.Range(0, 3).Select(i => GC.CollectionCount(i) - gc[i]).ToArray(), privateBytes = process.PrivateMemorySize64,
             workingSet = process.WorkingSet64, managedBytes = GC.GetTotalMemory(false), observerIncluded = true });
@@ -207,9 +214,9 @@ internal sealed class Probe : IDisposable
     }
     internal async Task Run(long startup)
     {
-        await Until(() => window.IsLoaded && model.ActiveDocument?.EditorDocument.Text == source && editor.IsVisible);
+        await Until(() => window.IsLoaded && !model.IsBusy && model.ActiveDocument?.EditorDocument.Text == source && editor.IsVisible);
         await Ui(() => { window.Activate(); Desktop.SetForegroundWindow(new WindowInteropHelper(window).Handle); });
-        Desktop.OwnsForeground(); windowBounds = await Ui(() => Bounds(window));
+        Desktop.OwnsForeground(); windowHandle = await Ui(() => new WindowInteropHelper(window).Handle); windowBounds = Desktop.ClientBounds(windowHandle);
         Record(new { kind = "startup", elapsedMs = Stopwatch.GetElapsedTime(startup).TotalMilliseconds, scope = "Show to exact buffer; screen verification follows", status = "OBSERVED" });
         Record(new { kind = "environment", dpi = await Ui(() => VisualTreeHelper.GetDpi(window).PixelsPerInchX), width = windowBounds.Width, height = windowBounds.Height,
             readingMode = await Ui(() => preview.ViewingMode.ToString()), zoom = await Ui(() => preview.Zoom) });
@@ -250,6 +257,7 @@ internal sealed class Probe : IDisposable
     }
     private async Task Complete(long started, string temperature)
     {
+        currentAction = "complete-readiness";
         var facts = await Ui(() =>
         {
             var result = Field<PreviewResult>("rendered") ?? throw new IOException("No rendered document.");
@@ -289,6 +297,7 @@ internal sealed class Probe : IDisposable
         await Until(() => preview.Selection.Text == "ReadableEnd" && preview.Selection.Start.HasValidLayout &&
             preview.Selection.Start.GetCharacterRect(LogicalDirection.Forward).Top >= 0 &&
             preview.Selection.Start.GetCharacterRect(LogicalDirection.Forward).Bottom <= preview.ActualHeight);
+        windowBounds = Desktop.ClientBounds(windowHandle);
         var frame = Desktop.Capture(windowBounds);
         Record(new { kind = "sample", action = "complete-readiness", temperature, iteration = 0, status = "OBSERVED",
             elapsedMs = Stopwatch.GetElapsedTime(started).TotalMilliseconds, startTick = started, endTick = Stopwatch.GetTimestamp(),
@@ -417,6 +426,25 @@ internal sealed class Probe : IDisposable
         }
         finally { release.Set(); }
         Desktop.Key(0x08); await Until(() => editor.Text == source);
+    }
+    internal async Task FailureSnapshot()
+    {
+        try
+        {
+            var state = await window.Dispatcher.InvokeAsync(() => new
+            {
+                action = currentAction, layout = model.Layout, previewStatus = model.PreviewStatus,
+                activeFile = model.ActiveDocument?.FilePath, editor.CaretOffset, editor.SelectionStart, editor.SelectionLength,
+                editor.VerticalOffset, editor.ExtentHeight, editor.ViewportHeight,
+                bufferSha256 = Program.Hash(Encoding.UTF8.GetBytes(editor.Text)), tail = editor.Text[^Math.Min(80, editor.Text.Length)..],
+                focusedType = System.Windows.Input.Keyboard.FocusedElement?.GetType().FullName,
+                previewText = preview.Selection?.Text, previewVisible = preview.IsVisible,
+                findCounter = ((TextBlock)window.FindName("FindCounter")).Text, window.Left, window.Top, window.ActualWidth, window.ActualHeight
+            }, DispatcherPriority.Input).Task.WaitAsync(TimeSpan.FromSeconds(2));
+            Program.Write(output, "failure-state.json", state);
+            Desktop.Save(Desktop.Capture(Desktop.ClientBounds(windowHandle)), Path.Combine(output, "failure.png"));
+        }
+        catch (Exception error) { Program.Write(output, "failure-capture.json", new { error = error.Message }); }
     }
     private void OperationStarted(object? sender, DispatcherHookEventArgs e)
     { if (operations.Count < 4096) operations[e.Operation] = Stopwatch.GetTimestamp(); else intervalOverflow = true; }

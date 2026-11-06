@@ -12,6 +12,12 @@ namespace LensDocsStudio.Native.UxProbe;
 // Only the disposable hosted runner guard in Program permits this input adapter.
 internal static class Desktop
 {
+    [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
+    [StructLayout(LayoutKind.Sequential)] private struct NativePoint { public int X, Y; }
+    [DllImport("user32.dll")] private static extern bool GetClientRect(IntPtr window, out NativeRect rectangle);
+    [DllImport("user32.dll")] private static extern bool ClientToScreen(IntPtr window, ref NativePoint point);
+    [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")] private static extern bool IsIconic(IntPtr window);
     [StructLayout(LayoutKind.Sequential)] private struct Input { public uint Type; public InputUnion Value; }
     [StructLayout(LayoutKind.Explicit)] private struct InputUnion
     {
@@ -40,6 +46,14 @@ internal static class Desktop
     {
         GetWindowThreadProcessId(GetForegroundWindow(), out var process);
         if (process != Environment.ProcessId) throw new IOException("Foreground ownership lost; no input sent or sample accepted.");
+    }
+    internal static Rect ClientBounds(IntPtr window)
+    {
+        if (!IsWindowVisible(window) || IsIconic(window) || !GetClientRect(window, out var rect))
+            throw new IOException("A hidden or minimised HWND cannot supply usable screen evidence.");
+        var origin = new NativePoint();
+        if (!ClientToScreen(window, ref origin)) throw new Win32Exception(Marshal.GetLastWin32Error());
+        return new Rect(origin.X, origin.Y, rect.Right - rect.Left, rect.Bottom - rect.Top);
     }
     private static void Send(params Input[] input)
     {

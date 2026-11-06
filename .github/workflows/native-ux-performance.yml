@@ -14,6 +14,33 @@ on:
 permissions:
   contents: read
 jobs:
+  observer-smoke:
+    name: Foreground observer controls
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check LF and CRLF journeys before scheduling the comparison matrix
+        run: pwsh -NoProfile -File scripts/native/Measure-NativeUx.ps1 -Fixtures small,technical -Processes 1 -Iterations 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-observer-smoke
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+          retention-days: 30
   contract-controls:
     runs-on: windows-latest
     steps:
@@ -25,6 +52,7 @@ jobs:
           node-version: '22'
       - run: node --test tests/unit/native-ux-report.test.mjs
   calibration:
+    needs: [contract-controls, observer-smoke]
     name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
     runs-on: windows-latest
     timeout-minutes: 60
