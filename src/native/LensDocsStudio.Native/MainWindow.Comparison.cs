@@ -42,7 +42,7 @@ public partial class MainWindow
     private CancellationTokenSource? comparisonCancellation;
     private Guid? comparisonRenderedId;
     private ITextSourceVersion? comparisonRenderedVersion;
-    private string? comparisonRenderedAppearance;
+    private string? comparisonRenderedContext;
     private Guid? comparisonRequestedId;
     private ITextSourceVersion? comparisonRequestedVersion;
     private string? comparisonRequestedContext;

@@ -18,16 +18,19 @@ public partial class MainWindow
         var slot = comparisonSlots[1 - comparisonActive]; var document = slot.Document;
         var version = document.EditorDocument.Version; var source = document.EditorDocument.Text;
         var appearance = model.Theme + "|" + CurrentDiagramTheme + "|" + SystemParameters.HighContrast;
-        if (comparisonRenderedId == document.Id && comparisonRenderedVersion?.CompareAge(version) == 0 && comparisonRenderedAppearance == appearance) return;
+        var path = document.EffectivePath; var workspace = document.EffectiveWorkspace;
+        var context = appearance + "|" + path + "|" + workspace;
+        if (comparisonRenderedId == document.Id && comparisonRenderedVersion?.CompareAge(version) == 0 && comparisonRenderedContext == context) return;
         comparisonCancellation?.Cancel(); comparisonCancellation?.Dispose(); comparisonCancellation = new();
         var cancellation = comparisonCancellation.Token; var generation = comparisonGeneration;
-        var dark = ThemeService.IsDark(model.Theme); var theme = CurrentDiagramTheme; var path = document.EffectivePath; var workspace = document.EffectiveWorkspace;
+        var dark = ThemeService.IsDark(model.Theme); var theme = CurrentDiagramTheme;
         var standalone = Path.GetExtension(path ?? document.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         bool Current() => !closing && !cancellation.IsCancellationRequested && generation == comparisonGeneration && comparisonSlots?[1 - comparisonActive] == slot
             && slot.Mode == "Preview" && model.Documents.Contains(document) && document.EditorDocument.Version.CompareAge(version) == 0
             && appearance == model.Theme + "|" + CurrentDiagramTheme + "|" + SystemParameters.HighContrast
             && document.EffectivePath == path && document.EffectiveWorkspace == workspace && ThemeService.IsCurrentHighContrast(SystemParameters.HighContrast);
-        bool Owner() => model.Documents.Contains(document) && document.EditorDocument.Version.CompareAge(version) == 0;
+        bool Owner() => model.Documents.Contains(document) && document.EditorDocument.Version.CompareAge(version) == 0
+            && document.EffectivePath == path && document.EffectiveWorkspace == workspace;
         void ActivateOwner() { if (comparisonSlots is not null && Owner()) { var index = Array.FindIndex(comparisonSlots, item => item.Document == document); if (index >= 0) ActivateComparison(index, false); } }
         var acquired = false;
         try
@@ -51,7 +54,7 @@ public partial class MainWindow
             if (!Current()) return;
             comparisonPreview.SetPreview(result, source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             comparisonPreviewResult = result;
-            comparisonRenderedId = document.Id; comparisonRenderedVersion = version; comparisonRenderedAppearance = appearance;
+            comparisonRenderedId = document.Id; comparisonRenderedVersion = version; comparisonRenderedContext = context;
             var top = comparisonViews.GetValueOrDefault(document.Id)?.PreviewTop ?? 0;
             await Dispatcher.InvokeAsync(() => { if (Current()) ComparisonScroller(comparisonPreview)?.ScrollToVerticalOffset(top); }, DispatcherPriority.Loaded, cancellation);
         }

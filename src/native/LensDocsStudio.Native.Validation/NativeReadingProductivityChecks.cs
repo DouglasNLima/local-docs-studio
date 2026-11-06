@@ -196,6 +196,31 @@ internal static class NativeReadingProductivityChecks
             Complete(model.PersistSessionAsync()); Invoke("CloseComparison");
             Check(leftFile.EditorDocument.Text == "# Disk left pending" && rightFile.EditorDocument.Text == "# Disk right edited",
                 "Recovery persistence and comparison closure retain each document independently");
+            var assetOld = Path.Combine(workspace, "asset-old"); var assetNew = Path.Combine(workspace, "asset-new");
+            Directory.CreateDirectory(assetOld); Directory.CreateDirectory(assetNew);
+            const string assetSource = "![Local pixel](pixel.png)";
+            var oldAssetDocument = Path.Combine(assetOld, "image.md"); var newAssetDocument = Path.Combine(assetNew, "image.md");
+            File.WriteAllText(oldAssetDocument, assetSource); File.WriteAllText(newAssetDocument, assetSource);
+            WritePixels(Path.Combine(assetOld, "pixel.png"), 1); WritePixels(Path.Combine(assetNew, "pixel.png"), 2);
+            Complete(model.OpenPathAsync(oldAssetDocument, assetOld)); var imageDocument = model.ActiveDocument!;
+            model.ActiveDocument = rightFile; Invoke("StartComparison", rightFile, imageDocument);
+            PumpUntil(() => SecondaryImageWidth() == 1);
+            var imageVersion = imageDocument.EditorDocument.Version;
+            imageDocument.FilePath = newAssetDocument; imageDocument.WorkspaceRoot = assetNew;
+            Invoke("QueueComparisonPreview"); PumpUntil(() => SecondaryImageWidth() == 2);
+            Check(imageDocument.EditorDocument.Version.CompareAge(imageVersion) == 0 && imageDocument.EditorDocument.Text == assetSource
+                && File.ReadAllText(oldAssetDocument) == assetSource && File.ReadAllText(newAssetDocument) == assetSource,
+                "Relocating an unchanged comparison document resolves its relative image in the new workspace without rewriting source");
+            Invoke("CloseComparison");
+            int SecondaryImageWidth() => (Field("comparisonPreviewResult") as LensDocsStudio.Native.Rendering.PreviewResult)?.Media
+                .Select(media => media.Image.Source).OfType<System.Windows.Media.Imaging.BitmapSource>().FirstOrDefault()?.PixelWidth ?? 0;
+            static void WritePixels(string path, int width)
+            {
+                var bitmap = System.Windows.Media.Imaging.BitmapSource.Create(width, 1, 96, 96, System.Windows.Media.PixelFormats.Bgra32,
+                    null, Enumerable.Repeat((byte)255, width * 4).ToArray(), width * 4);
+                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                using var stream = File.Create(path); encoder.Save(stream);
+            }
             void Complete(Task task) { PumpUntil(() => task.IsCompleted); task.GetAwaiter().GetResult(); }
 
             object Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
