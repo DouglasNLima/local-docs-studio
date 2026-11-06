@@ -1,6 +1,15 @@
 # Reading experience and productivity — engineering receipt
 
-Status: five implementation slices delivered locally; final commit-specific hosted acceptance pending. This is an engineering receipt, not publication acceptance.
+Current continuation: the five functional slices and native hardening have their
+commit-specific terminal receipts in [Draft PR #76](https://github.com/DouglasNLima/local-docs-studio/pull/76).
+The [WPF first-layout investigation](../native/wpf-first-layout-recovery.md) records
+controlled profiles, a rejected appearance-changing alternative and the proposed
+redesign boundary. No safe 250 ms fix has been demonstrated; independent performance
+remains FAIL and historical High Contrast remains unresolved. Overall: NO-GO.
+
+The checkpoint text below retains its original source-specific evidence; an older
+PASS or pending entry is not the final-head verdict. This is an engineering receipt,
+not publication acceptance.
 
 ## Baseline and boundaries
 

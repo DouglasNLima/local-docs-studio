@@ -1,7 +1,8 @@
 param(
     [string]$BaselineRevision = '99349d82eb06960eb1f9785cf384db2373aed4fa',
     [string]$OutputDirectory = 'artifacts/first-layout-attribution',
-    [ValidateSet('baseline-first','candidate-first')][string]$Order = 'baseline-first'
+    [ValidateSet('baseline-first','candidate-first')][string]$Order = 'baseline-first',
+    [ValidateSet('untraced-first','sampled-first')][string]$ObservationOrder = 'untraced-first'
 )
 $ErrorActionPreference = 'Stop'
 $output = [IO.Path]::GetFullPath($OutputDirectory)
@@ -51,14 +52,15 @@ $analyser = [IO.Path]::GetFullPath('scripts/native/diagnostics/FirstLayoutTrace/
 dotnet $analyser --self-test
 if ($LASTEXITCODE -ne 0) { throw 'Attribution controls failed.' }
 $sides = if ($Order -eq 'baseline-first') { @('baseline','candidate') } else { @('candidate','baseline') }
+$kinds = if ($ObservationOrder -eq 'untraced-first') { @('untraced','sampled') } else { @('sampled','untraced') }
 [ordered]@{
-    Status='DIAGNOSTIC_ONLY'; Candidate=$candidate; Baseline=$BaselineRevision; Order=$sides
+    Status='DIAGNOSTIC_ONLY'; Candidate=$candidate; Baseline=$BaselineRevision; Order=$sides; ObservationOrder=$kinds
     CandidateTree=(git rev-parse 'HEAD^{tree}').Trim(); HarnessSha256=$harnessHash
     TraceToolVersion='10.0.750501'; TraceLibrarySha256=(Get-FileHash $traceAssembly[0].FullName).Hash
     ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; Runtime=(dotnet --list-runtimes)
     Processor=(Get-CimInstance Win32_Processor | Select-Object Name,NumberOfCores,NumberOfLogicalProcessors)
     Products=@{ baseline=(Get-FileHash "$baseline/LensDocsStudio.Native.dll").Hash; candidate=(Get-FileHash "$harness/LensDocsStudio.Native.dll").Hash }
-    Policy='Both products: fresh untraced process, then fresh sampled process, two complete constructions of all six unchanged fixtures per process. No prewarm, forced GC, appearance manipulation, input retries or runtime patch. All samples retained. Not the independent 66-sample acceptance protocol.'
+    Policy='Both products: separate fresh untraced and sampled processes, two complete constructions of all six unchanged fixtures per process. Prescribed observation order is retained, including profiling before any untraced preview on that runner. No prewarm, forced GC, appearance manipulation, input retries or runtime patch. All samples retained. Not the independent 66-sample acceptance protocol.'
     Bounds='120 seconds per child; 32 MiB EventPipe buffer; 256 MiB retained trace limit; analyser cardinality/event limits. These are diagnostic resource bounds, not acceptance deadlines.'
 } | ConvertTo-Json -Depth 8 | Set-Content "$output/protocol.json"
 $failures = [Collections.Generic.List[string]]::new()
@@ -81,7 +83,7 @@ function Invoke-Bounded([string]$file, [string[]]$arguments, [string]$directory)
     if ($expired -or $process.ExitCode -ne 0) { throw 'Diagnostic child failed; retain its partial output.' }
 }
 try {
-    foreach ($kind in 'untraced','sampled') {
+    foreach ($kind in $kinds) {
         foreach ($side in $sides) {
             $directory = Join-Path $output "$kind/$side"
             New-Item -ItemType Directory -Path $directory -Force | Out-Null
