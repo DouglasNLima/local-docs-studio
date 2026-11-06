@@ -364,10 +364,13 @@ internal sealed class Probe : IDisposable
         }
         if (typeof(MainWindow).GetField("comparisonSlots", BindingFlags.NonPublic | BindingFlags.Instance) is null)
         { Record(new { kind = "coverage", action = "comparison-switch", status = "NOT RUN", reason = "Feature absent in this exact product" }); return; }
-        await ClickControl("FileMenu");
-        // Menu children have a separate popup visual; find the actual MenuItem in the logical menu tree.
-        var menu = await Ui(() => ((Menu)window.FindName("ApplicationMenu")).Items.OfType<MenuItem>().SelectMany(m => m.Items.OfType<MenuItem>()).Single(m => AutomationProperties.GetAutomationId(m) == "OpenBeside"));
-        await PointAt(menu); Desktop.Click(); await Until(() => Tree(window).Any(e => AutomationProperties.GetAutomationId(e) == "ActivateComparison1"));
+        currentAction = "comparison-open";
+        // Use the displayed access keys. Popup coordinates can be stale until their
+        // separate HWND has arranged; reading a MenuItem is not proof of click delivery.
+        Desktop.Key(0x46, 0x12);
+        await Until(() => ((Menu)window.FindName("ApplicationMenu")).Items.OfType<MenuItem>().First().IsSubmenuOpen);
+        Desktop.Key(0x42);
+        await Until(() => Field<object>("comparisonSlots") is not null && Tree(window).OfType<FrameworkElement>().Any(e => e.IsVisible && AutomationProperties.GetAutomationId(e) == "ActivateComparison1"));
         var original = await Ui(() => model.ActiveDocument);
         await PointAt(await Ui(() => Control("ActivateComparison1")));
         await Measure("comparison-switch", "first-interaction", 0, Desktop.Click, () => model.ActiveDocument != original && editor.Text.Contains("OtherSource", StringComparison.Ordinal));
