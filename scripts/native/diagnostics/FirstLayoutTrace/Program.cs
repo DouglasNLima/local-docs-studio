@@ -100,7 +100,7 @@ sealed class Attribution
         // Assign each sample once. Inclusive call-tree counts remain separate.
         if (names.Any(n => n.StartsWith("MS.Internal.Documents.FlowDocumentView.MeasureOverride(", StringComparison.Ordinal))) return "WPF document measure";
         if (names.Any(n => n.StartsWith("MS.Internal.Documents.FlowDocumentView.ArrangeOverride(", StringComparison.Ordinal))) return "WPF document arrange";
-        if (names.Any(n => n.StartsWith("System.Windows.Controls.FlowDocumentScrollViewer.OnDocumentChanged(", StringComparison.Ordinal))) return "Viewer document attachment";
+        if (names.Any(n => n.StartsWith("System.Windows.Controls.FlowDocumentScrollViewer.DocumentChanged(", StringComparison.Ordinal))) return "Viewer document attachment";
         return "Other or unresolved";
     }
 
@@ -140,7 +140,7 @@ static class Checks
         var p = a.Phases.Single();
         Require(p.Samples == 2 && p.Inclusive["leaf"] == 1 && p.Categories.Values.Sum() == 2, "Thread, boundary and recursive-frame accounting");
         Require(p.UnresolvedSamples == 1 && p.TruncatedStacks == 1, "Uncertainty accounting");
-        Require(Attribution.Category(["System.Windows.Controls.FlowDocumentScrollViewer.OnDocumentChanged(x)"]) == "Viewer document attachment", "Attachment attribution");
+        Require(Attribution.Category(["System.Windows.Controls.FlowDocumentScrollViewer.DocumentChanged(x)", "System.Windows.Controls.FlowDocumentScrollViewer.AttachTextEditor()"]) == "Viewer document attachment", "Observed WPF attachment callback attribution");
         Reject(() => new Attribution().Complete());
         Reject(() => new Attribution().Marker("harness/first-layout-end", 10, 7));
         Reject(() => { var b = new Attribution(); b.Marker("harness/first-layout-start", 10, 7); b.Complete(); });

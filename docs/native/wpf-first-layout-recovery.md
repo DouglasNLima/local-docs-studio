@@ -284,6 +284,34 @@ against the original gate before committing to a larger architecture.
 
 ## Validation and verdicts
 
+The subsequent sampled-first run at `7a7c78d` exposed a diagnostic naming error:
+the stock callback is `FlowDocumentScrollViewer.DocumentChanged`, whereas the
+initial classifier expected `OnDocumentChanged`. Its samples were conservatively
+counted as `Other or unresolved`, never discarded. The classifier and its control
+now use the observed callback name. Earlier raw traces, timings and category
+reports remain immutable; new analysis and final-source runs retain their own
+identity. The sampled cold baseline includes `AttachTextEditor` and
+`DocumentPageTextView` construction, but does not reproduce or explain the earlier
+1,035.53 ms untraced candidate attachment.
+Reanalysis of that retained cold baseline trace assigns its 837 samples as 132
+attachment, 374 document Measure, 311 document Arrange and 20 other/unresolved.
+Only classification changes; the original trace hash and latency stay unchanged.
+
+Local full Core at `7a7c78d` retained 2,379 passes and three deadline failures:
+one class relationship reverse/reconnection case at the original three-second
+limit and the `complete-detailed` / `complete-relationships` ER fixtures at the
+original six-second limit. Product/test source is unchanged by this continuation.
+Prescribed focused fresh-process comparisons use the identical Core test harness
+with exact-develop/candidate assemblies in both orders. Their outcomes and hosted
+full-Core results remain independent; later passes cannot erase these failures
+or establish a scheduling cause without causal evidence.
+Those four focused observations retain 54 cases each: baseline-first 52 PASS / 2
+FAIL, candidate 53 PASS / 1 FAIL, candidate-first 53 PASS / 1 FAIL, and baseline
+53 PASS / 1 FAIL. All five failures are the unchanged dense-ER deadline; class
+relationship controls pass in these observations. This demonstrates that the ER
+deadline can also fail in exact develop under these local conditions. It neither
+explains the earlier class failure nor proves general non-regression.
+
 Initial local Release build: PASS, zero warnings/errors. Analyser controls and
 analysis of the real six-fixture trace: PASS. The first analyser compilation
 required an explicit reference to the tool's FastSerialization assembly; that
