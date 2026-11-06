@@ -235,11 +235,13 @@ internal sealed class Probe : IDisposable
         await FeatureInteractions();
         await RenderingInput();
         await Cancellation();
-        await VerifyDelayedResponse();
         if (Program.Hash(File.ReadAllBytes(path)) != fixture.Sha256.ToUpperInvariant()) throw new IOException("Measured interactions changed the fixture file.");
         if (!await Ui(() => model.Documents.Single(d => d.FilePath == path).EditorDocument.Text == source)) throw new IOException("The original document buffer was not restored exactly.");
         stopped.Cancel(); if (heartbeat is not null) await heartbeat;
         var intervals = await Ui(() => { window.Dispatcher.Hooks.OperationStarted -= OperationStarted; window.Dispatcher.Hooks.OperationCompleted -= OperationCompleted; return dispatcherIntervals.ToArray(); });
+        // Freeze product diagnostics before the deliberately blocked observer control.
+        // Its imposed delay must never inflate product dispatcher/heartbeat evidence.
+        await VerifyDelayedResponse();
         Program.Write(output, "completion.json", new { collection = "PASS", acceptance = "PENDING", sampleCount,
             exactSource = "PASS", completeContent = "PASS", historical250ms = "UNCHANGED / NOT EVALUATED BY THIS PROBE",
             heartbeatMaximumMs = heartbeatMaximum, dispatcherIntervals = intervals, intervalOverflow,
@@ -342,7 +344,8 @@ internal sealed class Probe : IDisposable
         var active = await Ui(() => model.ActiveDocument);
         await Measure("document-switch", temperature, i, () => Desktop.Key(0x09, 0x11), () => model.ActiveDocument != active && editor.Text.Contains("OtherSource", StringComparison.Ordinal));
         Desktop.Key(0x09, 0x11); await Until(() => model.ActiveDocument == active && editor.Text == source);
-        await Measure("outline-open", temperature, i, () => Desktop.Key(0x4F, 0x11, 0x12), () => ((FrameworkElement)window.FindName("OutlinePanel")).IsVisible);
+        await Measure("outline-open", temperature, i, () => Desktop.Key(0x4F, 0x11, 0x12), () => ((FrameworkElement)window.FindName("OutlinePanel")).IsVisible &&
+            Tree((DependencyObject)window.FindName("Outline")).OfType<TextBlock>().Any(text => text.IsVisible && text.Text.Contains("ReadableStart", StringComparison.Ordinal)));
         await Measure("outline-close", temperature, i, () => Desktop.Key(0x4F, 0x11, 0x12), () => !((FrameworkElement)window.FindName("OutlinePanel")).IsVisible);
         foreach (var layout in new[] { "Split", "Preview", "Editor" })
         {
@@ -360,7 +363,9 @@ internal sealed class Probe : IDisposable
             await PointAt(editor); Desktop.Click(); Desktop.Key(0x23, 0x11);
             Desktop.Key(0x0D); await Until(() => editor.CaretOffset == editor.Text.Length);
             var before = await Ui(() => editor.Text);
-            await Measure("slash-open", "first-interaction", 0, () => Desktop.Text("/"), () => (bool)slash.GetType().GetProperty("IsOpen")!.GetValue(slash)!);
+            var commands = await Ui(() => (ListBox)slash.GetType().GetProperty("CommandList")!.GetValue(slash)!);
+            await Measure("slash-open", "first-interaction", 0, () => Desktop.Text("/"), () => (bool)slash.GetType().GetProperty("IsOpen")!.GetValue(slash)! &&
+                commands.IsVisible && commands.IsArrangeValid && commands.ActualHeight > 20 && commands.SelectedIndex >= 0 && PresentationSource.FromVisual(commands) is not null);
             Desktop.Text("heading 2"); await Until(() => editor.Text.EndsWith("/heading 2", StringComparison.Ordinal));
             await Measure("slash-execute", "first-interaction", 0, () => Desktop.Key(0x0D), () => editor.Text == before + "## ");
             Desktop.Key(0x5A, 0x11); await Until(() => editor.Text == before + "/heading 2");
