@@ -83,6 +83,8 @@ internal static class Program
                 runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, os = Environment.OSVersion.VersionString,
                 processors = Environment.ProcessorCount, processId = Environment.ProcessId, stopwatchFrequency = Stopwatch.Frequency,
                 sourceBytes = bytes.Length, sourceCharacters = source.Length, lineEnding = fixture.LineEnding,
+                capabilities = new { slash = typeof(MainWindow).GetField("slashCommands", BindingFlags.NonPublic | BindingFlags.Instance) is not null,
+                    comparison = typeof(MainWindow).GetField("comparisonSlots", BindingFlags.NonPublic | BindingFlags.Instance) is not null },
                 image = Environment.GetEnvironmentVariable("ImageVersion"), run = Environment.GetEnvironmentVariable("GITHUB_RUN_ID"),
                 protocol = "foreground SendInput to semantic state plus captured desktop response; software observation upper bound, not physical scan-out" });
             var probe = new Probe(window, model, source, fixture, path, output, iterations);
@@ -292,8 +294,10 @@ internal sealed class Probe : IDisposable
         });
         // The distant operation is actual keyboard Find, not a programmatic selection proxy.
         await ClickControl("LayoutPreview"); await Until(() => model.Layout == "Preview");
+        await PointAt(preview); Desktop.Click(); await Until(() => preview.IsKeyboardFocusWithin);
         Desktop.Key(0x46, 0x11); await Until(() => ((FrameworkElement)window.FindName("FindText")).IsVisible);
-        Desktop.Text("ReadableEnd"); Desktop.Key(0x0D);
+        Desktop.Text("ReadableEnd"); await Until(() => ((TextBlock)window.FindName("FindCounter")).Text.Contains("of 1", StringComparison.Ordinal));
+        Desktop.Key(0x0D);
         await Until(() => preview.Selection.Text == "ReadableEnd" && preview.Selection.Start.HasValidLayout &&
             preview.Selection.Start.GetCharacterRect(LogicalDirection.Forward).Top >= 0 &&
             preview.Selection.Start.GetCharacterRect(LogicalDirection.Forward).Bottom <= preview.ActualHeight);
@@ -370,6 +374,10 @@ internal sealed class Probe : IDisposable
         Desktop.Key(0x46, 0x12);
         await Until(() => ((Menu)window.FindName("ApplicationMenu")).Items.OfType<MenuItem>().First().IsSubmenuOpen);
         Desktop.Key(0x42);
+        // B is also used by Import Markdown bundle: Windows selects the first
+        // matching item and requires Enter to invoke it.
+        await Until(() => System.Windows.Input.Keyboard.FocusedElement is MenuItem item && AutomationProperties.GetAutomationId(item) == "OpenBeside");
+        Desktop.Key(0x0D);
         await Until(() => Field<object>("comparisonSlots") is not null && Tree(window).OfType<FrameworkElement>().Any(e => e.IsVisible && AutomationProperties.GetAutomationId(e) == "ActivateComparison1"));
         var original = await Ui(() => model.ActiveDocument);
         await PointAt(await Ui(() => Control("ActivateComparison1")));

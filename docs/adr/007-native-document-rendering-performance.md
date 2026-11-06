@@ -135,6 +135,15 @@ CI collection PASS is distinct from UX acceptance. Missing or invalid observatio
 are never zero latency. Source/visual/accessibility failures cannot be offset by
 better speed. Comparisons remain within hardware/runtime/appearance/workload strata.
 
+Human-factors guidance supports separate interaction classes, not a universal layout
+deadline. Microsoft's Windows responsiveness guidance distinguishes fast menu feedback
+(100–200 ms), interactive results (300–500 ms), navigation and longer work. Nielsen's
+direct-manipulation guidance uses approximately 100 ms for an immediate feeling and
+one second for uninterrupted navigation. These are design guidance, not percentile
+acceptance studies for this editor, minimum-hardware evidence, or justification for
+allowing every action 250 ms. The proposed targets still require representative user
+tasks, physical display validation and independent baseline calibration.
+
 ## High Contrast remains independent
 
 The final packaged .NET 10.0.13 baseline-first comparison reproduces **2.542596386:1**
@@ -182,6 +191,8 @@ required policy through an explicit owner action, never an agent ruleset edit.
 
 ## Primary references consulted
 
+- [Microsoft Windows responsiveness classes](https://learn.microsoft.com/en-us/windows/apps/develop/performance/responsive): scenario-specific goals and visible interaction boundaries.
+- [Jakob Nielsen, Response Times: The 3 Important Limits](https://www.nngroup.com/articles/response-times-3-important-limits/): direct-manipulation and navigation guidance; not a Lens Docs Studio percentile study.
 - [Microsoft WPF threading model](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/threading-model): dispatcher operations run to completion; queued input cannot interrupt one.
 - [Microsoft layout guidance](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/optimizing-performance-layout-and-design) and [text guidance](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/optimizing-performance-text): tree/layout work matters; lighter controls have different functionality.
 - [Versioned WPF FlowDocumentView](https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/documents/FlowDocumentView.cs): supports the architectural interpretation; not a byte match to every serviced runtime.

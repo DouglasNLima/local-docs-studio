@@ -107,8 +107,12 @@ def apply_selection_sync_refresh(preserved, refresh):
 
 def apply_native_ux_refresh(preserved, refresh):
     # Goal #77 changes only new-fixture byte handling and its no-signing branch
-    # guard. Original performance/HC fixtures, workflows and trust remain frozen.
-    allowed = {'.gitattributes', '.github/workflows/native.yml'}
+    # guard, plus current tracking notes. Historical snapshots and original
+    # performance/HC fixtures, workflows and trust remain frozen.
+    allowed = {'.gitattributes', '.github/workflows/native.yml',
+        'docs/native/architecture-decisions.md', 'docs/native/engineering-handover.md',
+        'docs/native/functional-parity-matrix.md', 'docs/native/implementation-progress.md',
+        'docs/native/validation-report.md'}
     require(refresh['baseCommit'] == '99349d82eb06960eb1f9785cf384db2373aed4fa',
             'UX amendment must identify exact develop')
     require(set(refresh['files']) == allowed, 'UX amendment exceeds its reviewed scope')

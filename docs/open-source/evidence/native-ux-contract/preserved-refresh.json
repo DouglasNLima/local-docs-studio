@@ -1,6 +1,6 @@
 {
   "baseCommit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
-  "purpose": "Goal #77: preserve new fixture line endings and exclude actual signing on the authorised branch only. Historical acceptance files unchanged.",
+  "purpose": "Goal #77: preserve new fixture bytes, exclude actual signing on the authorised branch, and update five current tracking notes. Historical evidence and acceptance files unchanged.",
   "files": {
     ".gitattributes": {
       "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
@@ -9,6 +9,26 @@
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
       "current": "235a91816ef3cf146ba8054c81a6e5a67fa215328337d4c547e8d1bdda6586ce"
+    },
+    "docs/native/architecture-decisions.md": {
+      "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
+      "current": "1c39f4a156249aaebd7d966f2c05ba86f0cc714b00bc0ccd96b25802016971eb"
+    },
+    "docs/native/engineering-handover.md": {
+      "previous": "354bde30f72714e924f619116cb75225a6554f6a3f68ab5efa5f1ea961ca7293",
+      "current": "9ea062a4c60caa0dbdabe26d8def73146bb5974fd02aafbe0276436a0016231f"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
+      "current": "3626692c2a71b82c7db762b903ff009559124c946123820bb262037edad257d6"
+    },
+    "docs/native/implementation-progress.md": {
+      "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
+      "current": "330bad17446196e9fccc500b76e51754cd97210ca6f61073cfa7dfbc1b2ec9a5"
+    },
+    "docs/native/validation-report.md": {
+      "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
+      "current": "f69db4415d48b27f18e14221175221eab9f2920b78aab872439028389706b50e"
     }
   }
 }
