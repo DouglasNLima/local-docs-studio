@@ -5704,3 +5704,19 @@ label.file-button.primary,
 .input-pane:has(> .outline-panel) { grid-template-rows: auto auto auto auto minmax(0, 1fr); }
 .preview-pane:not(:has(> .outline-panel)) { grid-template-rows: auto auto auto auto minmax(0, 1fr); }
 @media (forced-colors: active) { .outline-links a[aria-current] { outline: 2px solid Highlight; } }
+
+.slash-commands {
+  position: fixed; z-index: 220; width: min(340px, calc(100vw - 16px));
+  overflow-y: auto; padding: 6px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 28px #0003;
+}
+.slash-commands [role="option"] { padding: 7px 10px; border: 1px solid transparent; border-radius: 4px; cursor: pointer; }
+.slash-commands [aria-selected="true"] { background: var(--surface-soft); border-color: #FF883E; }
+.slash-commands [aria-disabled="true"] { color: var(--muted); cursor: default; }
+.slash-caret-mirror { position: fixed; visibility: hidden; pointer-events: none; left: -9999px; top: 0; box-sizing: border-box; }
+@media (forced-colors: active) {
+  .slash-commands { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  .slash-commands [aria-selected="true"] { background: Highlight; color: HighlightText; border-color: Highlight; }
+  .slash-commands [aria-disabled="true"] { color: GrayText; }
+}
+.slash-announcement { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

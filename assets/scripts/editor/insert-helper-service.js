@@ -120,16 +120,18 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
     insertHelperFields?.addEventListener('click', handleHelperClick);
   }
 
-  function openInsertHelper(type) {
+  function openInsertHelper(type, replacementRange = null) {
     if (!helperTypes.has(type)) return;
     helperState = {
       ...helperState,
       type,
       selectedEmoji: emojis[0],
       selectedStatus: statusKinds[1],
-      selectionStart: editor.selectionStart,
-      selectionEnd: editor.selectionEnd,
-      selectionText: editor.value.slice(editor.selectionStart, editor.selectionEnd).trim(),
+      selectionStart: replacementRange?.start ?? editor.selectionStart,
+      selectionEnd: replacementRange?.end ?? editor.selectionEnd,
+      selectionText: replacementRange ? '' : editor.value.slice(editor.selectionStart, editor.selectionEnd).trim(),
+      source: editor.value,
+      replacementRange,
     };
     renderHelper();
     insertHelperDialog?.showModal();
@@ -174,6 +176,7 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
   }
 
   function applyInsertHelper(event) {
+    if (editor.readOnly || editor.value !== helperState.source) { setStatus('The document changed; open the insertion helper again.', 'warning'); closeInsertHelper(event); return; }
     event?.preventDefault?.();
     const config = getHelperConfig(helperState.type);
     const insertion = config.build();
@@ -191,7 +194,7 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
     const trailingBreak = block && end < editor.value.length && editor.value[end] !== '\n' ? '\n\n' : '';
     const replacement = `${leadingBreak}${text}${trailingBreak}`;
     const insertedStart = start + leadingBreak.length;
-    replaceEditorRange(start, end, replacement, insertedStart, insertedStart + text.length);
+    replaceEditorRange(start, end, replacement, insertedStart, insertedStart + text.length, helperState.replacementRange);
   }
 
   function getHelperConfig(type) {

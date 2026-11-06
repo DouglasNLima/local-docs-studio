@@ -10,6 +10,92 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
+test('slash commands search at the caret and replace the query in one undo operation', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  await editor.fill(''); await editor.pressSequentially('/heading');
+  await expect(page.locator('#slashCommands')).toBeVisible();
+  await expect(page.locator('#slashCommands [role="option"]')).toHaveCount(6);
+  await editor.press('ArrowUp');
+  await expect(page.locator('#slashCommands [aria-selected="true"]')).toHaveText('Heading 6');
+  await expect(editor).toHaveAttribute('aria-activedescendant', 'slash-command-5');
+  await editor.press('Enter'); await expect(editor).toHaveValue('###### ');
+  await expect(editor).toBeFocused(); await expect(page.locator('#slashCommands')).toBeHidden();
+  await editor.press('Control+z'); await expect(editor).toHaveValue('/heading');
+  await editor.press('Control+y'); await expect(editor).toHaveValue('###### ');
+  await editor.fill(''); await editor.pressSequentially('/check'); await editor.press('Enter');
+  await expect(editor).toHaveValue('- [ ] ');
+});
+
+test('slash helper cancellation retains source and accepted tables use the existing dialog', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  await editor.fill(''); await editor.pressSequentially('/callout'); await editor.press('Enter');
+  await expect(page.locator('#insertHelperDialog')).toBeVisible();
+  await page.locator('#insertHelperCancelButton').click(); await expect(editor).toHaveValue('/callout');
+  await editor.fill(''); await editor.pressSequentially('/table');
+  await page.locator('#slashCommands [role="option"]').click();
+  await expect(page.locator('#tableEditorDialog')).toBeVisible();
+  await page.locator('#tableEditorApplyButton').click();
+  await expect(editor).not.toHaveValue(/\/table/); await expect(editor).toHaveValue(/\|/);
+  await editor.press('Control+z'); await expect(editor).toHaveValue('/table');
+});
+
+test('slash commands leave URLs code IME literal text and read-only buffers alone', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  for (const prefix of ['https:/', 'C:/folder', 'Existing ', '```md\n', '~~~\n', ':::mermaid\n', '    ', '<!--\n', '<pre>\n', '<script>\n', '---\ntitle: Test\n']) {
+    await editor.fill(prefix); await editor.press('Control+End'); await editor.pressSequentially('/');
+    await expect(page.locator('#slashCommands')).toBeHidden();
+  }
+  await editor.fill(''); await editor.pressSequentially('/'); await editor.press('Escape');
+  await expect(editor).toHaveValue('/'); await editor.pressSequentially('literal'); await expect(page.locator('#slashCommands')).toBeHidden();
+  await editor.fill(''); await editor.dispatchEvent('compositionstart'); await editor.pressSequentially('/');
+  await expect(page.locator('#slashCommands')).toBeHidden(); await editor.dispatchEvent('compositionend');
+  await editor.evaluate(element => { element.readOnly = true; }); await editor.dispatchEvent('input', { inputType: 'insertText', data: '/' });
+  await expect(page.locator('#slashCommands')).toBeHidden();
+});
+
+test('slash commands retain Find and fit a narrow forced-colours viewport', async ({ page }) => {
+  await gotoApp(page); await page.setViewportSize({ width: 700, height: 600 }); await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+  const editor = page.locator('#editor'); await editor.fill('Find this\n\n'); await editor.press('Control+f');
+  await editor.focus(); await editor.press('Control+End'); await editor.pressSequentially('/code');
+  await expect(page.locator('#slashCommands')).toBeVisible();
+  const bounds = await page.locator('#slashCommands').boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0); expect(bounds.x + bounds.width).toBeLessThanOrEqual(700);
+  expect(bounds.y + bounds.height).toBeLessThanOrEqual(600);
+  await editor.press('Escape'); await expect(editor).toHaveValue('Find this\n\n/code');
+  await editor.press('Control+f'); await expect(page.locator('#slashCommands')).toBeHidden();
+});
+
+test('slash insertion families reuse formatters and preserve surrounding text and indentation', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  for (const [query, marker] of [['paragraph', ''], ['bullet', '- '], ['numbered', '1. '], ['quote', '> '], ['code', '```'], ['mermaid', '```mermaid'], ['link', '[link text]'], ['image', '![alt text]'], ['horizontal', '---'], ['date', 'T']]) {
+    await editor.fill('Before\n\n'); await editor.press('Control+End'); await editor.pressSequentially('/' + query);
+    // Image figure is a separate command; the first image result is the existing inline image formatter.
+    await editor.press('Enter'); const value = await editor.inputValue();
+    expect(value.startsWith('Before\n\n')).toBeTruthy(); expect(value).not.toContain('/' + query); expect(value).toContain(marker);
+    await editor.press('Control+z'); await expect(editor).toHaveValue('Before\n\n/' + query);
+  }
+  await editor.fill('Before\n\n  '); await editor.press('Control+End'); await editor.pressSequentially('/code'); await editor.press('Enter');
+  await expect(editor).toHaveValue('Before\n\n  ```\n  code\n  ```');
+  await editor.fill(''); await editor.pressSequentially('/heading 6'); await editor.press('Backspace');
+  await expect(page.locator('#slashCommands [role="option"]')).toHaveCount(6);
+});
+
+test('slash context validation caches a large prose prefix and invalidates earlier fence edits', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const result = await page.evaluate(async () => {
+    const { slashContext } = await import('/assets/scripts/editor/slash-command-service.js');
+    const source = 'Ordinary prose.\n'.repeat(65536) + '\n/';
+    let start = performance.now(); let context = slashContext(source, source.length); const initialQueryMs = performance.now() - start;
+    start = performance.now(); for (let index = 0; index < 100; index++) context = slashContext(source, source.length, context);
+    const cached100QueriesMs = performance.now() - start;
+    const changed = '```md\n' + source;
+    return { sourceCharacters: source.length, start: context.start, initialQueryMs, cached100QueriesMs,
+      rejectedEarlierFence: slashContext(changed, changed.length, context) === null };
+  });
+  expect(result.start).toBe(result.sourceCharacters - 1); expect(result.rejectedEarlierFence).toBeTruthy();
+  await testInfo.attach('slash-context-performance', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
+});
+
 test('advanced outline retains H1–H6 hierarchy and copies current renderer targets without editing', async ({ page }) => {
   await gotoApp(page); await mockClipboardWrite(page);
   const source = '# Root\n\n## Again\n\n### Café **bold**\n\n#### Four\n\n##### Five\n\n###### Six\n\n## Again\n\n```md\n# Excluded\n```\n\n<details>\n<summary>Hidden</summary>\n## Inside\n</details>';

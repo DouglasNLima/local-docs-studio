@@ -65,6 +65,8 @@ public partial class MainWindow : Window
         InitialisePreviewLoading();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
+        slashCommands = new(Editor, SlashCommandsPermitted, SlashCommandUnavailable, ExecuteSlashCommand, completion.Close);
+        Closed += (_, _) => slashCommands.Dispose();
         Closed += (_, _) => completion.Dispose();
         WindowStateService.FitInitialWindow(this);
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
@@ -676,6 +678,7 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (slashCommands.HandleKey(e)) return;
         if (Editor.IsKeyboardFocusWithin) ObserveEditorFindKey(sender, e);
         // Native command surfaces consume Escape before Find and viewing modes.
         if (e.Key == Key.Escape && CommandSurfaceOpen) return;

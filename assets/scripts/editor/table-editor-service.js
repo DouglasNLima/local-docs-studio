@@ -47,11 +47,13 @@ export function createTableEditorService({ editor, dom, callbacks }) {
     tableEditorMoveColumnRightButton?.addEventListener('click', () => moveColumn(1));
   }
 
-  function openTableEditor() {
-    const range = findMarkdownTableAt(editor.value, editor.selectionStart);
+  function openTableEditor(replacementRange = null) {
+    const range = replacementRange ? { start: replacementRange.start, end: replacementRange.end } : findMarkdownTableAt(editor.value, editor.selectionStart);
     tableState = {
       rows: normaliseTableRows(range?.rows || createDefaultTable()),
       range,
+      source: editor.value,
+      replacementRange,
       activeRow: 0,
       activeColumn: 0,
     };
@@ -194,10 +196,11 @@ export function createTableEditorService({ editor, dom, callbacks }) {
   }
 
   function applyTable(event) {
+    if (editor.readOnly || editor.value !== tableState.source) { setStatus('The document changed; open the table editor again.', 'warning'); closeTableEditor(event); return; }
     event?.preventDefault?.();
     const markdown = formatMarkdownTable(tableState.rows);
     if (tableState.range) {
-      replaceEditorRange(tableState.range.start, tableState.range.end, markdown, tableState.range.start, tableState.range.start + markdown.length);
+      replaceEditorRange(tableState.range.start, tableState.range.end, markdown, tableState.range.start, tableState.range.start + markdown.length, tableState.replacementRange);
       setStatus('Table updated.', 'ok');
     } else {
       const selectionStart = editor.selectionStart;

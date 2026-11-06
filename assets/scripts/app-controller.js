@@ -2,6 +2,7 @@ import { createContentRegistries } from './registries/content.js';
 import { getDomElements } from './dom.js';
 import { APP_BUILD, APP_VERSION, createInitialState, storageKeys } from './state/config.js';
 import { createEditorService } from './editor/editor-service.js';
+import { createSlashCommandService } from './editor/slash-command-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
 import { createInsertHelperService } from './editor/insert-helper-service.js';
@@ -301,12 +302,18 @@ export function createAppController() {
       },
       callbacks: {
         commandHandlers: {
-          table: () => openTableEditor(),
+          table: (range) => openTableEditor(range),
           progressBar: () => openProgressBarEditor(),
-          insertHelper: (type) => openInsertHelper(type),
+          insertHelper: (type, range) => openInsertHelper(type, range),
+          snippet: () => insertGeneratorSnippet('project.usage'),
         },
         getAutocompleteFiles: () => state.files,
       },
+    });
+    const slashTools = createSlashCommandService({ editor, state, execute: executeMarkdownCommand,
+      closeOther: hideMermaidAutocomplete,
+      available: command => command === 'documentLink' && !state.files.some(file => file.path !== state.activePath)
+        ? 'Open another workspace document first' : command === 'snippet' && !state.activePath ? 'Open or create a document first' : '',
     });
     const {
       renderFileList,
@@ -1142,6 +1149,7 @@ export function createAppController() {
       });
 
       editor.addEventListener('keydown', (event) => {
+        if (slashTools.keydown(event)) return;
         if (handleMermaidAutocompleteKeydown(event)) return;
 
         const isShortcut = event.ctrlKey || event.metaKey;

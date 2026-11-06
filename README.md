@@ -779,3 +779,5 @@ The footer shows reading time, words and readable characters for the current buf
 A linked file is only labelled **Saved** after a completed write. **Unsaved changes**, **Saving…**, **Save failed** and **External change** remain separate from preview/operation messages. Browser downloads cannot confirm persistence. See the [engineering receipt](docs/engineering/reading-experience-receipt.md) for scope and validation limits.
 
 The document outline supports H1–H6, persistent branch expansion and configurable Copy Table of Contents in Web/PWA and Native. See the [feature guide](docs/tool-guide.md#advanced-outline-and-copy-table-of-contents) for navigation and copy options.
+
+Contextual slash commands reuse the existing formatters and insertion dialogs, with keyboard navigation, composition guards and one-step Undo.

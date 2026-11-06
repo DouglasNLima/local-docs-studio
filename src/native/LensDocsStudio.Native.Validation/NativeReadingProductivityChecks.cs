@@ -11,6 +11,8 @@ using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Workspace;
 using LensDocsStudio.Native.Platform;
+using LensDocsStudio.Native.Editor;
+using LensDocsStudio.Core.Editing;
 using LensDocsStudio.Native.ViewModels;
 
 namespace LensDocsStudio.Native.Validation;
@@ -95,11 +97,29 @@ internal static class NativeReadingProductivityChecks
                     "An invalid range disables Copy without replacing the document");
             }
             finally { toc.Close(); }
+            var slash = (EditorSlashCommandService)typeof(MainWindow).GetField("slashCommands", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            editor.Text = "/heading"; editor.CaretOffset = editor.Text.Length;
+            slash.Refresh();
+            Check(slash.CommandList.Items.Count == 6, "The real AvalonEdit slash controller filters all six heading commands");
+            Check(UIElementAutomationPeer.CreatePeerForElement(slash.CommandList).GetPattern(PatternInterface.Selection) is not null,
+                "The native slash list exposes the UI Automation Selection pattern");
+            slash.CommandList.SelectedIndex = 5; slash.Accept();
+            Check(editor.Text == "###### " && !slash.IsOpen, "Accepting the actual native slash selection inserts H6 and closes the popup");
+            editor.Document.UndoStack.Undo(); Check(editor.Text == "/heading", "A native slash insertion is one AvalonEdit undo operation");
+            editor.Document.UndoStack.Redo(); Check(editor.Text == "###### ", "Native slash redo restores the single insertion");
+            editor.Text = "```md\n/"; editor.CaretOffset = editor.Text.Length; slash.Refresh();
+            Check(!slash.IsOpen, "Native slash commands cannot open inside a fenced code block");
+            var longSource = string.Concat(Enumerable.Repeat("Ordinary prose.\n", 65_536)) + "\n/";
+            var timing = Stopwatch.StartNew(); var slashContext = SlashCommandService.Query(longSource, longSource.Length)!;
+            var initialQueryMs = timing.Elapsed.TotalMilliseconds; timing.Restart();
+            for (var query = 0; query < 100; query++) slashContext = SlashCommandService.Query(longSource, longSource.Length, slashContext)!;
+            var cachedQueriesMs = timing.Elapsed.TotalMilliseconds;
+            Check(slashContext.Start == longSource.Length - 1, "A large-buffer slash query retains the exact source range with cached prefix validation");
             File.WriteAllText(Path.Combine(output, "completion.json"), JsonSerializer.Serialize(new
             {
                 status = "PASS", scope = "COMPILED_WPF_AVALONEDIT_AND_UIA_PEERS; NOT PHYSICAL_GUI_CERTIFICATION",
                 source = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
-                elapsedMs = watch.Elapsed.TotalMilliseconds, checks
+                elapsedMs = watch.Elapsed.TotalMilliseconds, slashPerformance = new { sourceCharacters = longSource.Length, initialQueryMs, cached100QueriesMs = cachedQueriesMs }, checks
             }, new JsonSerializerOptions { WriteIndented = true }));
 
             void AwaitSummary(string expected)

@@ -3,6 +3,7 @@ import { isPositionInsideDevOpsMermaidBlock } from '../utils/devops-markdown.js'
 const HIGHLIGHT_MODULE_PATH = '../../vendor/highlight-11.11.1.esm.js';
 
 export function createEditorService({ editor, state, dom = {}, callbacks = {} }) {
+    let commandSelection = null;
     const { editorShell, editorLineNumbers, editorSyntaxLayer, mermaidAutocomplete } = dom;
     const {
       commandHandlers = {},
@@ -542,8 +543,13 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       executeMarkdownCommand(button.dataset.command);
     }
 
-    function executeMarkdownCommand(command) {
+    function executeMarkdownCommand(command, replacementRange = null) {
+      commandSelection = replacementRange;
       const commands = {
+        paragraph: () => { const selection = getEditorSelection(); replaceEditorRange(selection.start, selection.end, '', selection.start, selection.start); },
+        dateTime: () => { const selection = getEditorSelection(); const value = new Date().toISOString(); replaceEditorRange(selection.start, selection.end, value, selection.start + value.length, selection.start + value.length); },
+        documentLink: () => { const selection = getEditorSelection(); replaceEditorRange(selection.start, selection.end, '[[]]', selection.start + 2, selection.start + 2); },
+        snippet: () => commandHandlers.snippet?.(),
         bold: () => toggleInlineWrap('**', '**', 'bold text'),
         italic: () => toggleInlineWrap('*', '*', 'italic text'),
         strikethrough: () => toggleInlineWrap('~~', '~~', 'struck text'),
@@ -553,15 +559,15 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
           return text.trim() ? `# ${text}` : '# ';
         }),
         bulletList: () => transformSelectedLines((line) => {
-          if (!line.trim()) return line;
+          if (!line.trim() && !commandSelection) return line;
           return /^(\s*)[-*+]\s+/.test(line) ? line : line.replace(/^(\s*)/, '$1- ');
         }),
         numberedList: () => transformSelectedLines((line, index) => {
-          if (!line.trim()) return line;
+          if (!line.trim() && !commandSelection) return line;
           return /^(\s*)\d+\.\s+/.test(line) ? line : line.replace(/^(\s*)/, `$1${index + 1}. `);
         }),
         quote: () => transformSelectedLines((line) => {
-          if (!line.trim()) return line;
+          if (!line.trim() && !commandSelection) return line;
           return /^(\s*)>\s?/.test(line) ? line : line.replace(/^(\s*)/, '$1> ');
         }),
         taskList: () => transformTaskList(false),
@@ -573,7 +579,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         horizontalRule: insertHorizontalRule,
         table: () => {
           if (commandHandlers.table) {
-            commandHandlers.table();
+            commandHandlers.table(commandSelection);
             return;
           }
           insertTable();
@@ -582,15 +588,18 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
           commandHandlers.progressBar?.();
         },
         emoji: () => commandHandlers.insertHelper?.('emoji'),
-        callout: () => commandHandlers.insertHelper?.('callout'),
+        callout: () => commandHandlers.insertHelper?.('callout', commandSelection),
         statusBadge: () => commandHandlers.insertHelper?.('statusBadge'),
-        detailsBlock: () => commandHandlers.insertHelper?.('detailsBlock'),
-        imageFigure: () => commandHandlers.insertHelper?.('imageFigure'),
+        detailsBlock: () => commandHandlers.insertHelper?.('detailsBlock', commandSelection),
+        imageFigure: () => commandHandlers.insertHelper?.('imageFigure', commandSelection),
         keyboardShortcut: () => commandHandlers.insertHelper?.('keyboardShortcut'),
         anchor: () => commandHandlers.insertHelper?.('anchor'),
       };
 
-      commands[command]?.();
+      try {
+        if (/^heading:[1-6]$/.test(command)) transformSelectedLines(line => line.replace(/^( {0,3})(?:#{1,6}\s+)?/, `$1${'#'.repeat(Number(command.at(-1)))} `));
+        else commands[command]?.();
+      } finally { commandSelection = null; }
     }
 
     function toggleInlineWrap(prefix, suffix, placeholder) {
@@ -670,19 +679,20 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       const start = value.lastIndexOf('\n', Math.max(selection.start - 1, 0)) + 1;
       const endIndex = value.indexOf('\n', selection.end);
       const end = endIndex === -1 ? value.length : endIndex;
-      const original = value.slice(start, end);
+      const original = commandSelection
+        ? value.slice(start, selection.start) + value.slice(selection.end, end) : value.slice(start, end);
       const transformed = original
         .split('\n')
         .map((line, index) => transform(line, index))
         .join('\n');
 
-      replaceEditorRange(start, end, transformed, start, start + transformed.length);
+      replaceEditorRange(start, end, transformed, commandSelection ? start + transformed.length : start, start + transformed.length);
     }
 
     function transformTaskList(checked) {
       const marker = checked ? 'x' : ' ';
       transformSelectedLines((line) => {
-        if (!line.trim()) return line;
+        if (!line.trim() && !commandSelection) return line;
 
         const taskMatch = line.match(/^(\s*)(?:[-*+]|\d+\.)\s+\[[ xX]\]\s*(.*)$/);
         if (taskMatch) {
@@ -699,6 +709,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
     }
 
     function getEditorSelection() {
+      if (commandSelection) return commandSelection;
       return {
         start: editor.selectionStart,
         end: editor.selectionEnd,
@@ -706,8 +717,19 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       };
     }
 
-    function replaceEditorRange(start, end, replacement, selectionStart, selectionEnd) {
+    function replaceEditorRange(start, end, replacement, selectionStart, selectionEnd, insertionContext = commandSelection) {
       const value = editor.value;
+      if (insertionContext && start === insertionContext.start) {
+        const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+        const indentation = value.slice(lineStart, start);
+        if (/^ {1,3}$/.test(indentation)) {
+          const removed = replacement.length - replacement.replace(/^\n+/, '').length;
+          const adjust = text => text.slice(Math.min(removed, text.length)).replaceAll('\n', `\n${indentation}`);
+          const nextStart = start + adjust(replacement.slice(0, selectionStart - start)).length;
+          const nextEnd = start + adjust(replacement.slice(0, selectionEnd - start)).length;
+          replacement = adjust(replacement); selectionStart = nextStart; selectionEnd = nextEnd;
+        }
+      }
       editor.value = `${value.slice(0, start)}${replacement}${value.slice(end)}`;
       editor.focus();
       editor.setSelectionRange(selectionStart, selectionEnd);
