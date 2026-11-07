@@ -54,7 +54,7 @@ internal static class ComparisonControl
         var closing = typeof(MainWindow).GetMethod("WindowClosing", BindingFlags.Instance | BindingFlags.NonPublic)!;
         window.Closing -= (CancelEventHandler)closing.CreateDelegate(typeof(CancelEventHandler), window);
         var preview = (DocumentPreview)window.FindName("Preview"); var editor = (TextEditor)window.FindName("Editor");
-        var code = 1; var facts = new List<object>();
+        var code = 1; var facts = new List<object>(); CompletionTrace? completionTrace = null;
         using var trace = new TransitionTrace(window, model, output);
         object? Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(window);
         object? Call(string name, params object[] values) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, values);
@@ -118,6 +118,7 @@ internal static class ComparisonControl
                 await Until(() => EndVisible(false, first) && EndVisible(true, second));
                 facts.Add(Snapshot("comparison-deep-primary", false, first));
                 facts.Add(Snapshot("comparison-deep-secondary", true, second));
+                if (args.Contains("--completion-trace")) completionTrace = new(window, model);
                 if (scenario == "cancelnav")
                 {
                     // The old reader's queued native navigation must be cancelled
@@ -276,7 +277,7 @@ internal static class ComparisonControl
                     try { facts.Add(Snapshot("failure-primary", false, owner)); } catch (Exception) { }
                 Program.Write(output, "failure.json", new { error = error.ToString(), facts }); Console.Error.WriteLine(error);
             }
-            finally { app.Shutdown(code); }
+            finally { if (completionTrace is not null) { completionTrace.Save(output); completionTrace.Dispose(); } app.Shutdown(code); }
         });
         app.Run(); return code;
     }

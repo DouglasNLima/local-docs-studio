@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Threading;
+using System.Runtime.CompilerServices;
 
 namespace LensDocsStudio.Native.Rendering;
 
@@ -28,12 +29,14 @@ internal sealed partial record PreviewViewportAnchor(FlowDocument Document, Text
     {
         if (viewer.ViewingMode != FlowDocumentReaderViewingMode.Scroll) return RestorePageAsync(viewer, current, cancellation);
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        TraceRestoration("started", viewer, completion.Task);
         var zoom = viewer.Zoom;
         double? requestedOffset = null;
         var checking = false;
         CancellationTokenRegistration registration = default;
         void Finish(bool restored)
         {
+            if (!completion.Task.IsCompleted) TraceRestoration(restored ? "restored" : "rejected", viewer, completion.Task);
             viewer.LayoutUpdated -= Layout;
             viewer.Unloaded -= Unloaded;
             registration.Dispose();
@@ -84,5 +87,11 @@ internal sealed partial record PreviewViewportAnchor(FlowDocument Document, Text
         // ordinary render pass before deciding where the source position now lies.
         viewer.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, Check);
         return completion.Task;
+    }
+
+    private static void TraceRestoration(string phase, DocumentPreview reader, Task operation)
+    {
+        if (PreviewRestorationEvents.Log.IsEnabled())
+            PreviewRestorationEvents.Log.Restoration(phase, RuntimeHelpers.GetHashCode(reader), RuntimeHelpers.GetHashCode(operation));
     }
 }

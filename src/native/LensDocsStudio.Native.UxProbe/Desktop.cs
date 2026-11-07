@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -87,22 +88,27 @@ internal static class Desktop
     internal static void LeftUp() => Send(new Input { Value = new() { Mouse = new() { Flags = 4 } } });
     internal static void Wheel(int delta) => Send(new Input { Value = new() { Mouse = new() { Flags = 0x800, Data = unchecked((uint)delta) } } });
 
-    internal sealed record Frame(string Sha256, int Width, int Height, int DistinctColours, BitmapSource Bitmap);
+    internal sealed record Frame(string Sha256, int Width, int Height, int DistinctColours, BitmapSource Bitmap,
+        long Started, long DwmReturned, long PixelsStarted, long PixelsFinished);
     internal static Frame Capture(Rect bounds)
     {
+        var started = Stopwatch.GetTimestamp();
         OwnsForeground();
         if (bounds.IsEmpty || bounds.Width < 2 || bounds.Height < 2 || bounds.Width > 3840 || bounds.Height > 2160)
             throw new IOException("Invalid or unbounded visible capture rectangle.");
         var result = DwmFlush();
+        var dwmReturned = Stopwatch.GetTimestamp();
         if (result < 0) Marshal.ThrowExceptionForHR(result);
         int width = (int)bounds.Width, height = (int)bounds.Height;
         var screen = GetDC(IntPtr.Zero); var target = CreateCompatibleDC(screen);
         var bitmap = CreateCompatibleBitmap(screen, width, height); var previous = SelectObject(target, bitmap);
         try
         {
+            var pixelsStarted = Stopwatch.GetTimestamp();
             if (screen == IntPtr.Zero || target == IntPtr.Zero || bitmap == IntPtr.Zero ||
                 !BitBlt(target, 0, 0, width, height, screen, (int)bounds.X, (int)bounds.Y, 0x40CC0020))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Visible desktop capture failed.");
+            var pixelsFinished = Stopwatch.GetTimestamp();
             var image = new FormatConvertedBitmap(Imaging.CreateBitmapSourceFromHBitmap(bitmap, IntPtr.Zero, Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions()), PixelFormats.Bgra32, null, 0);
             image.Freeze();
@@ -110,7 +116,7 @@ internal static class Desktop
             var colours = new HashSet<int>();
             for (var i = 0; i < pixels.Length && colours.Count < 32; i += 4) colours.Add(BitConverter.ToInt32(pixels, i));
             if (colours.Count < 2) throw new IOException("A blank capture cannot establish a visible response.");
-            return new(Convert.ToHexString(SHA256.HashData(pixels)), width, height, colours.Count, image);
+            return new(Convert.ToHexString(SHA256.HashData(pixels)), width, height, colours.Count, image, started, dwmReturned, pixelsStarted, pixelsFinished);
         }
         finally { SelectObject(target, previous); DeleteObject(bitmap); DeleteDC(target); ReleaseDC(IntPtr.Zero, screen); }
     }

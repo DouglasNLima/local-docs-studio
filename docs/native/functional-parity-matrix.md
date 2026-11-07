@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. Its diagnostics do not change presentation behaviour or acceptance thresholds; exact final verdicts remain in Goal #75 and Draft PR #76.
+
 ## PR #80 preview correction integrated into PR #76 — 7 November 2026
 
 The three reviewed source-position commits and focused comparison ownership, closure, Find-bar, divider, edited-source, cancelled-replacement and interrupted-Find completion corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.

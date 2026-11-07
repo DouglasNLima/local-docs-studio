@@ -83,7 +83,8 @@ internal static class Program
                 wpfHighlight = SystemColors.HighlightColor.ToString(), wpfText = SystemColors.HighlightTextColor.ToString(),
                 verdict = highContrast ? (ratio >= 4.5 && foreground == SystemColors.HighlightTextColor ? "PASS" : "FAIL") : "NOT RUN",
                 scope = "FIRST PROBE HOST PALETTE; distinct from the unchanged historical pre-assertion test" });
-            var comparisonJourney = Environment.GetEnvironmentVariable("LENS_NATIVE_COMPARISON_JOURNEY") == "1";
+            var completionJourney = Environment.GetEnvironmentVariable("LENS_NATIVE_COMPLETION_JOURNEY") == "1";
+            var comparisonJourney = completionJourney || Environment.GetEnvironmentVariable("LENS_NATIVE_COMPARISON_JOURNEY") == "1";
             var readingMode = comparisonJourney ? Environment.GetEnvironmentVariable("LENS_NATIVE_COMPARISON_MODE") ?? "Continuous" : "Continuous";
             var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
             File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(Theme: "System", Layout: "Editor", AutomaticUpdateChecks: false,
@@ -113,7 +114,7 @@ internal static class Program
             _ = Task.Run(async () =>
             {
                 var code = 0;
-                try { if (comparisonJourney) await probe.RunComparison(started); else await probe.Run(started); }
+                try { if (completionJourney) await probe.RunCompletion(started); else if (comparisonJourney) await probe.RunComparison(started); else await probe.Run(started); }
                 catch (Exception error) { code = 1; Write(output, "failure.json", new { verdict = "FAIL", error = error.ToString() }); await probe.FailureSnapshot(); Console.Error.WriteLine(error); }
                 finally
                 {
@@ -584,7 +585,10 @@ internal sealed class StageListener : EventListener
     private string? expected;
     private TaskCompletionSource<long>? completion;
     protected override void OnEventSourceCreated(EventSource source)
-    { if (source.Name == "LensDocsStudio-Native-PreviewConstruction") EnableEvents(source, EventLevel.Verbose); }
+    {
+        if (Environment.GetEnvironmentVariable("LENS_NATIVE_COMPLETION_JOURNEY") == "1") return;
+        if (source.Name == "LensDocsStudio-Native-PreviewConstruction") EnableEvents(source, EventLevel.Verbose);
+    }
     internal void Arm(string stage) { expected = stage; completion = new(TaskCreationOptions.RunContinuationsAsynchronously); }
     protected override void OnEventWritten(EventWrittenEventArgs e)
     {

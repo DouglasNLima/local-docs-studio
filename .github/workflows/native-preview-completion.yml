@@ -1,0 +1,45 @@
+name: Native preview completion evidence
+on:
+  push:
+    branches: [feature/reading-experience-productivity]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  completion:
+    name: Completion (${{ matrix.mode }}, ${{ matrix.appearance }})
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [Continuous, Automatic, Pages]
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source completion observer and product
+        shell: pwsh
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.UxProbe -c Release -p:RestoreLockedMode=true "-p:SourceRevisionId=$((git rev-parse HEAD).Trim())"
+          exit $LASTEXITCODE
+      - name: Verify timing and presentation negative controls
+        run: node --test tests/unit/native-completion-audit.test.mjs
+      - name: Bounded real foreground and controlled completion experiments
+        run: scripts/native/Test-PreviewCompletion.ps1 -Mode '${{ matrix.mode }}' -Appearance '${{ matrix.appearance }}'
+      - name: Independently read retained status and page-counter pixels
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: scripts/native/Read-CompletionPixels.ps1 -EvidenceDirectory artifacts/preview-completion
+      - name: Preserve independent qualified verdicts
+        if: ${{ !cancelled() }}
+        run: node scripts/native/completion-audit.mjs artifacts/preview-completion
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: completion-${{ matrix.mode }}-${{ matrix.appearance }}
+          path: artifacts/preview-completion/

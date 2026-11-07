@@ -10,6 +10,7 @@ internal sealed partial record PreviewViewportAnchor
     private Task<bool> RestorePageAsync(DocumentPreview viewer, Func<bool> current, CancellationToken cancellation)
     {
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        TraceRestoration("started", viewer, completion.Task);
         var paginator = (DynamicDocumentPaginator)((IDocumentPaginatorSource)Document).DocumentPaginator;
         var request = new object(); var mode = viewer.ViewingMode; var zoom = viewer.Zoom;
         var started = false; var applied = false; var checking = false; var ready = false;
@@ -18,6 +19,7 @@ internal sealed partial record PreviewViewportAnchor
         void Finish(bool restored)
         {
             if (completion.Task.IsCompleted) return;
+            TraceRestoration(restored ? "restored" : "rejected", viewer, completion.Task);
             viewer.LayoutUpdated -= Layout; viewer.Unloaded -= Unloaded;
             paginator.GetPageNumberCompleted -= PageNumber;
             registration.Dispose();
