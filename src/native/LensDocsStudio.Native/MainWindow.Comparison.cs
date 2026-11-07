@@ -21,7 +21,8 @@ public partial class MainWindow
     private sealed class ComparisonSlot(DocumentViewModel document, string mode)
     { public DocumentViewModel Document = document; public string Mode = mode; }
     private sealed record ComparisonView(int Start, int Length, double Horizontal, double Vertical, double PreviewTop,
-        string Find, string Replacement, bool FindOpen, bool ReplaceOpen, bool SearchPreview, (int Start, int Length)? PreviewSelection = null, int Caret = -1);
+        string Find, string Replacement, bool FindOpen, bool ReplaceOpen, bool SearchPreview, (int Start, int Length)? PreviewSelection = null, int Caret = -1,
+        (int Source, double Fraction)? PreviewAnchor = null, ITextSourceVersion? PreviewVersion = null);
     private readonly Dictionary<Guid, ComparisonView> comparisonViews = [];
     private ComparisonSlot[]? comparisonSlots;
     private int comparisonActive;
@@ -162,12 +163,35 @@ public partial class MainWindow
     private void CaptureComparisonView()
     {
         if (comparisonSlots is null || displayedTab is null) return;
+        var previous = comparisonViews.GetValueOrDefault(displayedTab.Id);
         comparisonViews[displayedTab.Id] = new(Editor.SelectionStart, Editor.SelectionLength, Editor.HorizontalOffset, Editor.VerticalOffset,
             ComparisonScroller(Preview)?.VerticalOffset ?? 0, FindText.Text, ReplaceText.Text, FindBar.Visibility == Visibility.Visible,
             ReplaceText.Visibility == Visibility.Visible, searchPreview,
             renderedDocumentId == displayedTab.Id && Preview.Selection is { IsEmpty: false } selection
-                && rendered?.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) == true ? (start, length) : null, Editor.CaretOffset);
+                && rendered?.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) == true ? (start, length) : null,
+            Editor.CaretOffset, previous?.PreviewAnchor, previous?.PreviewVersion);
+        CaptureComparisonReadingPosition(displayedTab, Preview, rendered, renderedDocumentId, renderedVersion);
+        var secondary = comparisonSlots[1 - comparisonActive].Document;
+        CaptureComparisonReadingPosition(secondary, comparisonPreview, comparisonPreviewResult, comparisonRenderedId, comparisonRenderedVersion);
         foreach (var id in comparisonViews.Keys.Where(id => !model.Documents.Any(document => document.Id == id)).ToArray()) comparisonViews.Remove(id);
+    }
+    private void CaptureComparisonReadingPosition(DocumentViewModel document, DocumentPreview reader, PreviewResult? result,
+        Guid? owner, ITextSourceVersion? version)
+    {
+        if (owner != document.Id || result is null || reader.Document != result.Document || !reader.IsVisible
+            || version is null || !version.BelongsToSameDocumentAs(document.EditorDocument.Version)
+            || version.CompareAge(document.EditorDocument.Version) != 0 || !reader.IsMeasureValid || !reader.IsArrangeValid
+            || AutomationProperties.GetItemStatus(reader).StartsWith("Busy", StringComparison.Ordinal)
+            || result.TextMap.VisibleSource(reader.ActualHeight) is not { } source) return;
+        var anchor = PreviewViewportAnchor.Capture(reader, result);
+        // The secondary reader belongs to its document too. Save its source position
+        // before activation replaces the shared reader and its immutable source map.
+        document.PreviewSourceOffset = source;
+        var view = comparisonViews.GetValueOrDefault(document.Id) ?? new(0, 0, 0, document.VerticalOffset, 0, "", "", false, false, false);
+        comparisonViews[document.Id] = view with { PreviewTop = ComparisonScroller(reader)?.VerticalOffset ?? 0,
+            PreviewAnchor = (source, anchor?.VerticalFraction ?? 0), PreviewVersion = version,
+            PreviewSelection = reader.Selection is { IsEmpty: false } selection
+                && result.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) ? (start, length) : null };
     }
     private void RestoreComparisonView(DocumentViewModel document)
     {
@@ -252,6 +276,11 @@ public partial class MainWindow
     private void CloseComparison()
     {
         if (comparisonSlots is null) return;
+        // Closing Preview/Preview changes the reader's viewport even when its
+        // layout name stays Preview. Capture before detaching the pane.
+        var completedPreviewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        CapturePreviewLayoutAnchor();
+        CancelSynchronisation();
         CaptureComparisonView(); comparisonSlots = null; comparisonGeneration++; comparisonCancellation?.Cancel(); comparisonTimer.Stop();
         foreach (var body in comparisonBodies) body.Children.Clear();
         comparisonGrid.Children.Clear(); comparisonGrid.RowDefinitions.Clear(); comparisonGrid.ColumnDefinitions.Clear();
@@ -260,6 +289,8 @@ public partial class MainWindow
         // Reopening reuses the controls, but restores both pane containers.
         comparisonEditor.Document = new(); comparisonPreview.Document = new(); comparisonPreviewResult = null; comparisonRenderedId = null; comparisonRequestedId = null;
         SetLayout(comparisonOriginalLayout); if (model.Layout == "Preview") Preview.Focus(); else Editor.Focus();
+        if (model.Layout != "Editor" && previewLayoutCancellation is null && SyncCurrent)
+            _ = RestorePreviewLayoutAsync(completedPreviewStatus);
     }
     private void QueueComparisonPreview()
     {

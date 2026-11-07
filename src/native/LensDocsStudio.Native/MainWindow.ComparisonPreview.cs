@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Threading;
 using LensDocsStudio.Core.Workspace;
@@ -35,6 +37,7 @@ public partial class MainWindow
         var acquired = false;
         try
         {
+            AutomationProperties.SetItemStatus(comparisonPreview, "Busy; comparison preview is being updated");
             if (comparisonRenderedId != document.Id) comparisonPreview.Document = new FlowDocument(new Paragraph(new Run("Loading comparison preview…")));
             // Share the existing native work gate so two large documents cannot
             // start unbounded parallel parse/layout/media construction.
@@ -55,13 +58,31 @@ public partial class MainWindow
             comparisonPreview.SetPreview(result, source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             comparisonPreviewResult = result;
             comparisonRenderedId = document.Id; comparisonRenderedVersion = version; comparisonRenderedContext = context;
-            var top = comparisonViews.GetValueOrDefault(document.Id)?.PreviewTop ?? 0;
-            await Dispatcher.InvokeAsync(() => { if (Current()) ComparisonScroller(comparisonPreview)?.ScrollToVerticalOffset(top); }, DispatcherPriority.Loaded, cancellation);
+            var view = comparisonViews.GetValueOrDefault(document.Id);
+            var restored = true;
+            if (view?.PreviewAnchor is { } anchor && view.PreviewVersion is { } savedVersion
+                && savedVersion.BelongsToSameDocumentAs(version) && savedVersion.CompareAge(version) == 0
+                && result.TextMap.TryPreviewRange(anchor.Source, 0, out var position, out _) && position is not null)
+            {
+                if (comparisonPreview.ViewingMode == FlowDocumentReaderViewingMode.Scroll)
+                    restored = await new PreviewViewportAnchor(result.Document, position, anchor.Fraction)
+                        .RestoreAsync(comparisonPreview, Current, cancellation);
+                else restored = await PreviewNavigationService.BringIntoViewAsync(comparisonPreview, position);
+            }
+            else await Dispatcher.InvokeAsync(() => { if (Current()) ComparisonScroller(comparisonPreview)?.ScrollToVerticalOffset(view?.PreviewTop ?? 0); }, DispatcherPriority.Loaded, cancellation);
+            if (Current())
+            {
+                if (view?.PreviewSelection is { } selection && view.PreviewVersion is { } selectionVersion
+                    && selectionVersion.BelongsToSameDocumentAs(version) && selectionVersion.CompareAge(version) == 0
+                    && result.TextMap.TryPreviewRange(selection.Start, selection.Length, out var from, out var to))
+                    comparisonPreview.Selection?.Select(from!, to!);
+                AutomationProperties.SetItemStatus(comparisonPreview, restored ? "Ready" : "Comparison preview position could not be restored");
+            }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException)
         {
-            if (Current()) { comparisonRenderedId = null; comparisonRequestedId = null; comparisonPreview.Document = new FlowDocument(new Paragraph(new Run("Comparison preview could not be updated: " + error.Message))); }
+            if (Current()) { comparisonRenderedId = null; comparisonRequestedId = null; comparisonPreview.Document = new FlowDocument(new Paragraph(new Run("Comparison preview could not be updated: " + error.Message))); AutomationProperties.SetItemStatus(comparisonPreview, "Preview unavailable"); }
         }
         finally { if (acquired) previewGate.Release(); }
     }
