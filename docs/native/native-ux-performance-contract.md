@@ -1,9 +1,11 @@
 # Native UX performance contract — proposed calibration protocol
 
-**PENDING owner approval; not an active replacement gate.**
+**Design/methods approved; operational policy transition pending; not an active replacement gate.**
 The 7 November [decision package](native-acceptance-decision-package.md) separates
 integration Contract A from release Contract B and supplies the pending owner
-decisions. B+C has in-principle support only. This existing calibration protocol
+decisions. The [owner decision](https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6714211040)
+approves D01–D13 at design level for `bc092512`; numeric limits/margins, support
+certification and operational activation remain pending. This existing calibration protocol
 and its historical observations remain intact; the proposed statistical extension
 and visible-completion boundary require review and implementation, not silent activation.
 
@@ -151,7 +153,7 @@ handling or permission to discard user data. They are deliberately finite and mu
 be reported as FAIL if reached. Product memory/exhaustion/recovery behaviour is
 not certified by killing a disposable probe.
 
-Proposed product failure semantics, subject to the same owner approval:
+Design-approved failure semantics; numeric budgets and operational activation pending:
 
 - Completion must refer to the current document and source version with usable
   geometry; a busy, stale, empty or failed preview must not announce readiness.

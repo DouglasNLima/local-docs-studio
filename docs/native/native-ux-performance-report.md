@@ -4,7 +4,10 @@
 [Native Acceptance Decision Package](native-acceptance-decision-package.md),
 [risk register](native-acceptance-risk-register.md) and
 [PR #76 source review index](pr76-review-index.md) for the current recommendation.
-The owner supports B+C in principle; ADR 007 remains Proposed. The report below
+The owner has [approved D01–D13 at design level](https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6714211040)
+for `bc092512`; ADR 007's operational policy/transition remains pending. The
+[bounded qualification plan](native-acceptance-qualification-plan.md) prepares R01/R02
+and calibration without activating limits. The report below
 retains its original source-labelled campaign, including its older #76 input and
 all failed results. It does not requalify current #76 `7b1334b0`. General repository
 integration policy, the stricter current campaign hold and release acceptance are

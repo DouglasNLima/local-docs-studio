@@ -1,16 +1,20 @@
 # Native acceptance risk register
 
-7 November 2026 · Goal #77 · **Proposed dispositions; no failure closed**
+7 November 2026 · Goal #77 · **Design-level criteria approved; no failure closed**
 
 Decision authority is [ADR 007 D10/D13](../adr/007-native-document-rendering-performance.md#decision-matrix--7-november-continuation).
 Contract A and Contract B are in the [decision package](native-acceptance-decision-package.md).
+The [owner decision](https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6714211040)
+approves the criteria without waiving or closing any risk. The
+[qualification plan](native-acceptance-qualification-plan.md) prepares only R01/R02
+and calibration; R03–R06 retain the controls and escalation boundaries below.
 Unless noted otherwise, facts below come from the [exact 7b1334b0 terminal receipt](https://github.com/DouglasNLima/local-docs-studio/pull/76#issuecomment-6713058791)
 and [targeted investigation](https://github.com/DouglasNLima/local-docs-studio/blob/7b1334b09a02ad2fbfd4a0234798e6c387d3e634/docs/native/targeted-regression-closure.md).
 All owner assignments below are roles to nominate, not accepted assignments or waivers.
 
 | ID | Classification / present decision | Existing controls | Smallest next evidence / explicit closure decision |
 |---|---|---|---|
-| R01 Visible completion | **Observed visual FAIL; original attribution INCONCLUSIVE.** Semantic Ready and current text do not clear stale required labels or earlier stale source pixels. Blocks current A and B. | Owner/version/generation, source mapping, geometry/UIA, fixed full frames/crops, passive WPF batch traces; no forced layout or capture-until-pass. | Qualification owner + technical reviewer approve the software-visible boundary below, validate observer negative controls and inspect one bounded affected journey. No historical FAIL conversion. |
+| R01 Visible completion | **Observed visual FAIL; original attribution INCONCLUSIVE.** Semantic Ready and current text do not clear stale required labels or earlier stale source pixels. Blocks current A and B. | Owner/version/generation, source mapping, geometry/UIA, fixed full frames/crops, passive WPF batch traces; no forced layout or capture-until-pass. | Qualification owner + technical reviewer validate the observer against the design-approved boundary below, check negative controls and inspect one bounded affected journey. No historical FAIL conversion. |
 | R02 High Contrast | **Historical 2.542596:1 FAIL retained against 4.5:1; overall INCONCLUSIVE.** Final candidate passes do not explain earlier candidate failures. Blocks current A and B. | Actual OS/WPF HC checks, initial Win32/WPF/pressed-colour logs, both product orders, unchanged ratio assertion. | Accessibility/runtime owner executes the fixed discriminating protocol below; identify application vs propagation scope without excusing a failed supported control. |
 | R03 TreeView shutdown | **Intermittent original functional failure; cause INCONCLUSIVE.** Original upgrade saved-close missed 20-second predicate; reinstall unaccepted in that lifecycle. No demonstrated reflow causality. | Payload/source/state hashes; ordinary installed authoring; eight later diagnostic lifecycles / 24 saved closures pass, immediate UIA during exit unavailable. | Review original input/owner/save evidence; keep open with explicit owner disposition. Escalate on a single recurrence in a normal affected qualification or report, with a new discriminating hypothesis, not repeated closure sweeps. |
 | R04 Startup | **Incomplete original startup; cause INCONCLUSIVE.** Five early records, no owner/binding/render/resize before 240-second termination; not demonstrated resize regression. | 32 later fresh-process controls pass; passive startup/dispatcher/process markers, trace-off controls and unchanged supervision. | Retain missing chronology and explicit owner disposition. One recurrence before binding triggers targeted process/dispatcher evidence; do not rerun a resize matrix to attribute pre-binding failure. |
@@ -54,7 +58,7 @@ concerns queued work; it cannot make an unsubmitted WPF update appear. The
 and [threading model](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/threading-model)
 support distinguishing UI work and presentation, not inventing a compositor promise.
 
-**Recommended boundary, requiring approval and observer qualification:** keep model
+**Design-approved boundary; observer qualification and numeric budgets pending:** keep model
 Ready as an application state and measure visible completion separately from the
 offered action. A qualifying software frame must show the expected current source,
 selection and required labels with consistent before/after ownership and layout;
@@ -96,9 +100,13 @@ Recommended fixed protocol, **not executed here**: one approved disposable Windo
 image, exact develop `99349d82` and candidate `7b1334b0`, packaged .NET 10.0.13 and
 recorded hosted .NET 10.0.14 as separate controls, both product orders, one fresh
 pair per cell (eight product launches total), plus one minimal stock-WPF process
-per runtime. Launch with real OS HC already active, matching the original cold
-pre-assertion; record initial OS/WPF state and all colour pairs before first app
-interaction. Observe real theme notifications and one HC→normal→HC transition,
+per runtime. Preserve the original pre-assertion process separately: source inspection
+shows that it enables HC inside the validation process before creating theme resources,
+and may fail before launching the application. HC-already-active application launch
+is a distinct diagnostic control, not the same startup order. The qualification plan
+specifies both process identities and does not broaden the four-cell product matrix.
+Record initial OS/WPF state and all colour pairs before first app interaction.
+Observe real theme notifications and one HC→normal→HC transition,
 actual pressed control colours/pixels, keyboard
 focus and selection. Correlate the preflight PID with the product PID; do not treat
 their colour caches as one process. Preserve every cold-start result even if later
