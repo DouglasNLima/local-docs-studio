@@ -653,7 +653,8 @@ public partial class MainWindow : Window
         EditorSplitter.Visibility = layout == "Split" ? Visibility.Visible : Visibility.Collapsed;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
         PreviewPane.Visibility = Preview.Visibility;
-        CancelSynchronisation();
+        // Re-selecting the same layout does not supersede its pending presentation.
+        if (changed || previewLayoutCancellation is null) CancelSynchronisation();
         ApplyPanels();
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
