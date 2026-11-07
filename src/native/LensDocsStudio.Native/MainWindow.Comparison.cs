@@ -289,8 +289,11 @@ public partial class MainWindow
         // Reopening reuses the controls, but restores both pane containers.
         comparisonEditor.Document = new(); comparisonPreview.Document = new(); comparisonPreviewResult = null; comparisonRenderedId = null; comparisonRequestedId = null;
         SetLayout(comparisonOriginalLayout); if (model.Layout == "Preview") Preview.Focus(); else Editor.Focus();
-        if (model.Layout != "Editor" && previewLayoutCancellation is null && SyncCurrent)
-            _ = RestorePreviewLayoutAsync(completedPreviewStatus);
+        if (model.Layout != "Editor" && SyncCurrent)
+        {
+            CancelPreviewLayout();
+            _ = RestorePreviewLayoutAsync(completedPreviewStatus, afterReattachment: true);
+        }
     }
     private void QueueComparisonPreview()
     {

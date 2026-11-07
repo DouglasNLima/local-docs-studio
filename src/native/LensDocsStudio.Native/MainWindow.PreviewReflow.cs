@@ -1,4 +1,5 @@
 using System.Windows.Automation;
+using System.Windows.Threading;
 using LensDocsStudio.Native.Rendering;
 
 namespace LensDocsStudio.Native;
@@ -31,7 +32,7 @@ public partial class MainWindow
         AutomationProperties.SetItemStatus(Preview, "Preview layout changed");
     }
 
-    private async Task RestorePreviewLayoutAsync(string status)
+    private async Task RestorePreviewLayoutAsync(string status, bool afterReattachment = false)
     {
         if (previewLayoutAnchor is not { } anchor || !SyncCurrent || anchor.Document != Preview.Document) return;
         var result = rendered; var owner = model.ActiveDocument; var generation = syncGeneration;
@@ -43,6 +44,12 @@ public partial class MainWindow
             && model.ActiveDocument == owner && rendered == result && SyncCurrent && model.Layout != "Editor";
         try
         {
+            // Reparenting comparison queues an Unloaded/Loaded pair even when
+            // the same reader remains attached to this window. Let that lifecycle
+            // finish before subscribing to unloading as a cancellation boundary.
+            if (afterReattachment)
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Loaded, cancellation.Token);
+            if (!Current()) return;
             var restored = await anchor.RestoreAsync(Preview, Current, cancellation.Token);
             if (Current())
             {
@@ -51,6 +58,7 @@ public partial class MainWindow
                 PublishPreviewDiagnostic(restored ? "layout-presented" : "layout-unavailable");
             }
         }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { }
         finally
         {
             if (previewLayoutCancellation == cancellation)
