@@ -118,6 +118,25 @@ internal static class ComparisonControl
                 await Until(() => EndVisible(false, first) && EndVisible(true, second));
                 facts.Add(Snapshot("comparison-deep-primary", false, first));
                 facts.Add(Snapshot("comparison-deep-secondary", true, second));
+                if (scenario == "placeholder")
+                {
+                    // Hold the existing worker gate at the same replacement boundary
+                    // seen in the foreground failure; no timed input or layout forcing.
+                    var gate = (SemaphoreSlim)Field("previewGate")!;
+                    await gate.WaitAsync();
+                    try
+                    {
+                        Call("ActivateComparison", 1, false);
+                        await Until(() => Reader(true).Document != Result(true).Document
+                            && AutomationProperties.GetItemStatus(Reader(true)).StartsWith("Busy", StringComparison.Ordinal));
+                        trace.Boundary("cancel-loading-replacement");
+                        Call("ActivateComparison", 0, false);
+                    }
+                    finally { gate.Release(); }
+                    await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                    facts.Add(Snapshot("replacement-cancelled-primary", false, first));
+                    facts.Add(Snapshot("replacement-cancelled-secondary", true, second));
+                }
                 if (scenario == "edit")
                 {
                     Call("CloseComparison"); await Until(() => EndVisible(false, first));

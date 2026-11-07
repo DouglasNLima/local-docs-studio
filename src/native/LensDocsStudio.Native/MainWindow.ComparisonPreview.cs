@@ -22,7 +22,10 @@ public partial class MainWindow
         var appearance = model.Theme + "|" + CurrentDiagramTheme + "|" + SystemParameters.HighContrast;
         var path = document.EffectivePath; var workspace = document.EffectiveWorkspace;
         var context = appearance + "|" + path + "|" + workspace;
-        if (comparisonRenderedId == document.Id && comparisonRenderedVersion?.CompareAge(version) == 0 && comparisonRenderedContext == context) return;
+        // A cancelled replacement can leave the loading document attached while
+        // the last accepted owner/version still describe the previous preview.
+        if (comparisonRenderedId == document.Id && comparisonRenderedVersion?.CompareAge(version) == 0 && comparisonRenderedContext == context
+            && comparisonPreviewResult is { } accepted && comparisonPreview.Document == accepted.Document) return;
         comparisonCancellation?.Cancel(); comparisonCancellation?.Dispose(); comparisonCancellation = new();
         var cancellation = comparisonCancellation.Token; var generation = comparisonGeneration;
         var dark = ThemeService.IsDark(model.Theme); var theme = CurrentDiagramTheme;
