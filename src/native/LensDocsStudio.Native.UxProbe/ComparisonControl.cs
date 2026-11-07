@@ -118,6 +118,27 @@ internal static class ComparisonControl
                 await Until(() => EndVisible(false, first) && EndVisible(true, second));
                 facts.Add(Snapshot("comparison-deep-primary", false, first));
                 facts.Add(Snapshot("comparison-deep-secondary", true, second));
+                if (scenario == "edit")
+                {
+                    Call("CloseComparison"); await Until(() => EndVisible(false, first));
+                    Call("SetLayout", "Split"); await Until(() => EndVisible(false, first));
+                    Call("SaveViewport");
+                    var prefix = "# Inserted preface\n\n" + string.Concat(Enumerable.Repeat("Inserted source before the reading position.\n\n", 80));
+                    editor.Document.Insert(0, prefix);
+                    await (Task)Call("UpdatePreviewAsync", false)!;
+                    await Until(() => EndVisible(false, first));
+                    if (editor.Text != prefix + source || !first.IsDirty)
+                        throw new IOException("The unsaved source edit was lost.");
+                    facts.Add(Snapshot("edited-source", false, first));
+                    editor.Undo(); await (Task)Call("UpdatePreviewAsync", false)!;
+                    await Until(() => editor.Text == source && EndVisible(false, first));
+                    facts.Add(Snapshot("undone-source", false, first));
+                    editor.Redo(); await (Task)Call("UpdatePreviewAsync", false)!;
+                    await Until(() => editor.Text == prefix + source && EndVisible(false, first));
+                    facts.Add(Snapshot("redone-source", false, first));
+                    editor.Undo(); await (Task)Call("UpdatePreviewAsync", false)!;
+                    await Until(() => editor.Text == source && EndVisible(false, first));
+                }
                 if (scenario is "findchrome" or "pendingfind" or "pendingfindclose")
                 {
                     Call("ShowFind", false);
@@ -146,7 +167,7 @@ internal static class ComparisonControl
                     var secondEnd = End(true, secondSource); Reader(true).Selection.Select(secondEnd, secondEnd.GetPositionAtOffset(11));
                     editor.Select(4, 5);
                 }
-                if (scenario is "switch" or "selection" or "findchrome" or "pendingfind")
+                if (scenario is "switch" or "switchresize" or "selection" or "findchrome" or "pendingfind")
                 {
                     Call("ActivateComparison", 1, false);
                     await Until(() => EndVisible(false, second) && EndVisible(true, first));
@@ -159,7 +180,7 @@ internal static class ComparisonControl
                         throw new IOException("Pane activation lost independent preview/editor selection.");
                     facts.Add(Snapshot("returned-primary", false, first));
                 }
-                if (scenario == "resize")
+                if (scenario is "resize" or "switchresize")
                 {
                     var splitter = (GridSplitter)Field("comparisonSplitter")!;
                     var before = preview.RenderSize;

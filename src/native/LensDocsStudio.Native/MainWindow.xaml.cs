@@ -117,8 +117,12 @@ public partial class MainWindow : Window
         if (displayedTab is null || bindingViewport) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
+        // An accepted view remains usable while an edit is rendering. Translate
+        // its source through the version change; only intermediate reflow views
+        // must be prevented from replacing the intended reading position.
         if (pendingViewportDocument != displayedTab.Id && renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
-            && Preview.IsMeasureValid && Preview.IsArrangeValid && AutomationProperties.GetItemStatus(Preview) == "Ready"
+            && Preview.IsMeasureValid && Preview.IsArrangeValid
+            && AutomationProperties.GetItemStatus(Preview) is ("Ready" or "Busy; preview is being updated")
             && VisiblePreviewSource() is { } source)
             displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
         TraceViewport("viewport-saved");

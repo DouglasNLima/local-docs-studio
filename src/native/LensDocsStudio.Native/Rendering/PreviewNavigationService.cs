@@ -30,6 +30,14 @@ public static class PreviewNavigationService
         return !rectangle.IsEmpty && rectangle.Bottom > 0 && rectangle.Top < viewer.ActualHeight ? position : null;
     }
 
+    internal static void RetainVisibleTarget(FlowDocumentReader viewer, TextPointer position)
+    {
+        if (viewer.Document is null || !position.IsInSameDocument(viewer.Document.ContentStart) || !position.HasValidLayout) return;
+        var rectangle = position.GetCharacterRect(LogicalDirection.Forward);
+        if (!rectangle.IsEmpty && rectangle.Bottom > 0 && rectangle.Top < viewer.ActualHeight)
+            States.GetOrCreateValue(viewer).LastPosition = position;
+    }
+
     // Keep the existing compiled entry point for paired validation of older products.
     public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
         => BringIntoViewAsync(viewer, position, selectionEnd, diagnostic, null);

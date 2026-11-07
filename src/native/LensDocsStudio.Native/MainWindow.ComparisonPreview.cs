@@ -68,6 +68,9 @@ public partial class MainWindow
                     restored = await new PreviewViewportAnchor(result.Document, position, anchor.Fraction)
                         .RestoreAsync(comparisonPreview, Current, cancellation);
                 else restored = await PreviewNavigationService.BringIntoViewAsync(comparisonPreview, position);
+                // A reconstructed secondary reader must retain the same literal
+                // target for its next capture, rather than fall back to a nearby heading.
+                if (restored && Current()) PreviewNavigationService.RetainVisibleTarget(comparisonPreview, position);
             }
             else await Dispatcher.InvokeAsync(() => { if (Current()) ComparisonScroller(comparisonPreview)?.ScrollToVerticalOffset(view?.PreviewTop ?? 0); }, DispatcherPriority.Loaded, cancellation);
             if (Current())
