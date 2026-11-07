@@ -1,0 +1,345 @@
+{
+  "source": "3f11997a292df052e96cc81464f23127227106ae",
+  "tree": "d3c9635b2f807cda50479e1a8d5e8d7d1cf4a61d",
+  "verdict": "NO-GO; checkpoint failures retained, not replaced by later repeats",
+  "workflows": [
+    {
+      "databaseId": 42360020706,
+      "name": "Publish Lens Docs Studio",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360020706",
+      "jsonSha256": "feabcb627b551a80b390e4291f2eaddd2d811f3e213bb731170a5409b737585a",
+      "logSha256": "4e698dd4ae0ec42cebf51d7e2a11c687a15cd92707e9ee31133f7b444f0df022"
+    },
+    {
+      "databaseId": 42360020725,
+      "name": "Native preview reflow integration acceptance",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360020725",
+      "jsonSha256": "7487237bc13b4d1a15f4e14ebe0b79c6db5e1aba61f129b1af321dd89cff173d",
+      "logSha256": "23fae894ca9b2ede8d3f46c540d068f66b59e8e5f0de21041205d48bd9bfad34"
+    },
+    {
+      "databaseId": 42360025486,
+      "name": "Validate native workspace and Mermaid interactions",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025486",
+      "jsonSha256": "bc192e31384ac1cf9887d4a5f8d11b5f75b41f9a3201982e32cfc8f79d3a0e95",
+      "logSha256": "01cfaf1c5f6ef2876ea6ab9217e4b3ca96d14ac548577414d3213c2c0b877feb"
+    },
+    {
+      "databaseId": 42360025495,
+      "name": "Validate native Windows edition",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025495",
+      "jsonSha256": "cfcafdc3eb2e1a227ab79173b525a5497075047c37fa90ff09a6a6b12cbb8909",
+      "logSha256": "17daa8b587bfec6ef79303418f3be8ce46ba0e23fa48279551f17f0eba76df77"
+    },
+    {
+      "databaseId": 42360025512,
+      "name": "Native hardening controlled diagnostics",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025512",
+      "jsonSha256": "85debcf4399dd03e36aad7c4a9f7be6729cc8fee0468fd740bed74fdb2d826ce",
+      "logSha256": "be0f3d09113c0f28bc945ba95c1db03737e16803609e00a8f62d9086d1614d39"
+    },
+    {
+      "databaseId": 42360025513,
+      "name": "Native Continuous 250 ms acceptance",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025513",
+      "jsonSha256": "cee7c9a052b93af4de9597f04db6c5a5a44a2a09e2b289e9a3cde76faeeeaddf",
+      "logSha256": "fe879ec1bdb61e776f3cb7211c848c12bc86be02f440e5634943d63234fe7ef7"
+    },
+    {
+      "databaseId": 42360025515,
+      "name": "Validate native desktop UX",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025515",
+      "jsonSha256": "8243b491ec2d271eef10b5da72dbb23f8ff9821bed2d2fab71db136b5b01049c",
+      "logSha256": "c4dfa1d8708b9dd7b4c0e9fe0f25f924b81acdd15423225b55bd4b9abe20bac4"
+    },
+    {
+      "databaseId": 42360025516,
+      "name": "Native independent acceptance recovery",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025516",
+      "jsonSha256": "dea102e76422765056eab378c3ce6c853d1ebc20d69c448f0d326df541e6dc7f",
+      "logSha256": "fb474109cee759b61cc2d57f40293debb4f949d138bd0e2e2cdf076fce8c4cc6"
+    },
+    {
+      "databaseId": 42360025534,
+      "name": "Validate native Mermaid creation hub",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025534",
+      "jsonSha256": "8418e8a67e5f9d357290130c1d8209dda77f116ab3c7d0e2c2885ad56d6663a4",
+      "logSha256": "8fc8edc68663a7ff2d92aeb21e2d18bc971cbe4ce04cb102be527fafe5f2ae0f"
+    },
+    {
+      "databaseId": 42360025536,
+      "name": "Native editor selection reliability",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025536",
+      "jsonSha256": "48177f3da329ee3990255d1c44180db01e4483d7368d4b4a4aa19b5bcbb068be",
+      "logSha256": "e859db8d6845a7d1fe08ff433680681fd1e84b3c78dd66fed7e8a7aab561dc16"
+    },
+    {
+      "databaseId": 42360025544,
+      "name": "Native first-layout attribution",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025544",
+      "jsonSha256": "ca6cbcaee3d9729e2cb1a78596b721a134414a8c5134e6c987ca0f0f4e974e40",
+      "logSha256": "ea06a86779674721441d3ce6077f030210be393c85318f14ca7028d6dfd6a2e0"
+    },
+    {
+      "databaseId": 42360025555,
+      "name": "Publish Lens Docs Studio",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025555",
+      "jsonSha256": "56f062cc3ef097dac3395124e883d4279c817113b0b847b4111216f1011ac563",
+      "logSha256": "9fbcf186befd3cdf096f2e4e3f17abd4611782e82c66c2026da02c9baa9ec340"
+    },
+    {
+      "databaseId": 42360025566,
+      "name": "Validate OSS provenance",
+      "headSha": "3f11997a292df052e96cc81464f23127227106ae",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42360025566",
+      "jsonSha256": "d5fa5cafc5d3bffefc502d48704f9886afb608cf8e533d4347599da4a88a0aa6",
+      "logSha256": "437a5cc9b8fdaca3caea980540747f88d52cb004d160e5590c334c3a01aa8359"
+    }
+  ],
+  "artefacts": [
+    {
+      "id": 13570190281,
+      "name": "comparison-Automatic-normal-baseline-first",
+      "digest": "sha256:06fa7c54084b02f8dbdf123ddf9d391b46f1b2ff6368a762742edccb20bf095e",
+      "size_in_bytes": 5657879
+    },
+    {
+      "id": 13570145582,
+      "name": "comparison-Continuous-high-contrast-candidate-first",
+      "digest": "sha256:90ee41c5788b8aabd95ca43a240451628ffc2944a111b3f3c06b4f7c6197e21b",
+      "size_in_bytes": 5621035
+    },
+    {
+      "id": 13570136723,
+      "name": "comparison-Automatic-normal-candidate-first",
+      "digest": "sha256:27de81b6fa7df9478f95f4b765d68fdb5254dc4b90e7004855cc142e2cb622e8",
+      "size_in_bytes": 5632139
+    },
+    {
+      "id": 13569931240,
+      "name": "comparison-Pages-normal-baseline-first",
+      "digest": "sha256:f75cf21fdd99b450148a6636d4007d6cf2929db42a4531cc50b601bd2f76d1a4",
+      "size_in_bytes": 3777352
+    },
+    {
+      "id": 13569815391,
+      "name": "original-mixed-normal-candidate-first-trace-1",
+      "digest": "sha256:1d14f845a254c2aafbd73a8a82eb374afbe43dc714143250b2ac3e0381514a05",
+      "size_in_bytes": 10019089
+    },
+    {
+      "id": 13569796876,
+      "name": "comparison-Pages-high-contrast-baseline-first",
+      "digest": "sha256:fe87a6e45e1acd2ac85dc49f2ebb2c339ee2f63dbd1657c2239cefa79a49cb40",
+      "size_in_bytes": 3669842
+    },
+    {
+      "id": 13569791193,
+      "name": "comparison-Pages-high-contrast-candidate-first",
+      "digest": "sha256:e608f1c5cc611370fd060e815046c7f6e0025a618e19b7d587e7b9e3bbab7431",
+      "size_in_bytes": 4124869
+    },
+    {
+      "id": 13569675752,
+      "name": "comparison-Continuous-high-contrast-baseline-first",
+      "digest": "sha256:c9542d5b7e7708a9a6a44f02b7c282ab7cd497eaa4d7cd14a1bec6675af297a3",
+      "size_in_bytes": 5637384
+    },
+    {
+      "id": 13569512132,
+      "name": "original-mixed-high-contrast-candidate-first-trace-0",
+      "digest": "sha256:cd10469012f577806fb703b52b17d012a84bbdd8fa0eb45ad9d739169a42639f",
+      "size_in_bytes": 10850904
+    },
+    {
+      "id": 13569442689,
+      "name": "original-mixed-high-contrast-baseline-first-trace-0",
+      "digest": "sha256:6e19526cf22d465f6689e6e6ce2ae3b1dc3da207d4b0ceecd60a66bb5ac1d64b",
+      "size_in_bytes": 11431922
+    },
+    {
+      "id": 13569437785,
+      "name": "original-mixed-normal-candidate-first-trace-0",
+      "digest": "sha256:f92e2c840b08757b2e998c46dc024864c38f8ca2c0b12dd3cb73287fa7e92a74",
+      "size_in_bytes": 11772279
+    },
+    {
+      "id": 13569302641,
+      "name": "comparison-Continuous-normal-baseline-first",
+      "digest": "sha256:888e66d870b2fe4f4e5a59da640008cbe622350cf1b0d9e76082e7f1536042f2",
+      "size_in_bytes": 5801536
+    },
+    {
+      "id": 13569299081,
+      "name": "comparison-Pages-normal-candidate-first",
+      "digest": "sha256:8eb222fdafd1981b7915f6081ec3d8d368bb13651517e768042b02fb2b967256",
+      "size_in_bytes": 4144642
+    },
+    {
+      "id": 13569287104,
+      "name": "original-mixed-high-contrast-candidate-first-trace-1",
+      "digest": "sha256:16b59fe1024c77d45a0e87dfc05246f51b7b221cdc5d29ab72f2f20abcf616bd",
+      "size_in_bytes": 12407593
+    },
+    {
+      "id": 13569283577,
+      "name": "comparison-Continuous-normal-candidate-first",
+      "digest": "sha256:4ca342ec1a331e4ffa604c62bcbf6752d9e9de9f84e44db3d8898879a6d63a7d",
+      "size_in_bytes": 5805723
+    },
+    {
+      "id": 13569272675,
+      "name": "comparison-Automatic-high-contrast-baseline-first",
+      "digest": "sha256:48178f8008baaf8e35a5baba2a601f2b99138c8280ea92a43e9c40f7cc526fe0",
+      "size_in_bytes": 5467285
+    },
+    {
+      "id": 13569249285,
+      "name": "comparison-Automatic-high-contrast-candidate-first",
+      "digest": "sha256:b5e26f61836016004cb9eb76865c27a215eebc80f9bb5844742734362fad6473",
+      "size_in_bytes": 5467634
+    },
+    {
+      "id": 13569039533,
+      "name": "original-mixed-normal-baseline-first-trace-1",
+      "digest": "sha256:a1911b002339686109b82fdbeb9ea993b6655c11854aa1459772d11b4fc6be9f",
+      "size_in_bytes": 11366073
+    },
+    {
+      "id": 13568929759,
+      "name": "original-mixed-high-contrast-baseline-first-trace-1",
+      "digest": "sha256:9e94d5ff7e40c54f42c54c830cff198c01ec1c889c9e65b983e099eebc8a9e51",
+      "size_in_bytes": 12393171
+    },
+    {
+      "id": 13568894818,
+      "name": "original-mixed-normal-baseline-first-trace-0",
+      "digest": "sha256:90754ac1bc6f6b1c5107c5c96133286ad65258e7369ef4383ebe0de7d4cff62b",
+      "size_in_bytes": 11186599
+    }
+  ],
+  "files": [
+    {
+      "path": "original-mixed-high-contrast-candidate-first-trace-0/samples/0/mixed/baseline/failure.json",
+      "sha256": "271ae602c8a4abcd51004520275eba3e1d5f5101f45fe22780105c88f1e580e7"
+    },
+    {
+      "path": "original-mixed-high-contrast-candidate-first-trace-0/samples/0/mixed/baseline/failure-state.json",
+      "sha256": "3ca39b8cea9f50df2640f3339ab6f435c78d044e2da2710f807faab644b8a423"
+    },
+    {
+      "path": "original-mixed-high-contrast-candidate-first-trace-0/samples/0/mixed/baseline/failure.png",
+      "sha256": "1d64fdecf94c742512c77d77e2c5b783f306f8dc3d404f0d1017f8b2efea369a"
+    },
+    {
+      "path": "original-mixed-high-contrast-candidate-first-trace-0/samples/0/mixed/baseline/samples.jsonl",
+      "sha256": "8e2ad003f0768811fda54bfba99507164779701f38f15cab1f447534d0ba7fb9"
+    },
+    {
+      "path": "original-mixed-normal-candidate-first-trace-1/samples/0/mixed/baseline/failure.json",
+      "sha256": "271ae602c8a4abcd51004520275eba3e1d5f5101f45fe22780105c88f1e580e7"
+    },
+    {
+      "path": "original-mixed-normal-candidate-first-trace-1/samples/0/mixed/baseline/failure-state.json",
+      "sha256": "98d38c3ee22835a619d3d4fe4c05bd2df20b62406b18e59473df8ee7dc936d52"
+    },
+    {
+      "path": "original-mixed-normal-candidate-first-trace-1/samples/0/mixed/baseline/failure.png",
+      "sha256": "a0e0a40af0172f405607de2a9e7fa09b7f39ae690f754d08622b0ddda0e610a6"
+    },
+    {
+      "path": "original-mixed-normal-candidate-first-trace-1/samples/0/mixed/baseline/samples.jsonl",
+      "sha256": "c6703fb6747d61df0e50492e3f7ffa8277c7aab278eab476b544b9a4a622db47"
+    },
+    {
+      "path": "original-mixed-normal-candidate-first-trace-1/samples/0/mixed/baseline/transitions.jsonl",
+      "sha256": "d48c5c1db2c5a9d89b865228400a54d90d75173bffccdd7bbfc23a316c45bb56"
+    },
+    {
+      "path": "comparison-Automatic-normal-baseline-first/foreground/1/resize/candidate/failure.json",
+      "sha256": "1f729fe86db846d788e7221528bd3dbf933c5707723df3e8e812f01df3c65b1c"
+    },
+    {
+      "path": "comparison-Automatic-normal-baseline-first/foreground/1/resize/candidate/failure-state.json",
+      "sha256": "95b70426aebf6593a5d3e0d848a786c90e21a16f994132e08eaab43b4b8d33d2"
+    },
+    {
+      "path": "comparison-Automatic-normal-baseline-first/foreground/1/resize/candidate/failure.png",
+      "sha256": "f2a8f91b3018dbbef89b87a428aa4d07426de52aff92d198695e0c4f01520e1d"
+    },
+    {
+      "path": "comparison-Automatic-normal-baseline-first/foreground/1/resize/candidate/samples.jsonl",
+      "sha256": "c97a692bb3671274eb391de58cd4e66fdb18718835baf7f3fc30306a22d8222a"
+    },
+    {
+      "path": "comparison-Automatic-normal-baseline-first/foreground/1/resize/candidate/transitions.jsonl",
+      "sha256": "c28cb76a467f97efb2f6410f4805fed55e60bb36fa18fcf01380233b9d0c5f91"
+    },
+    {
+      "path": "comparison-Pages-normal-candidate-first/foreground/1/close/candidate/failure.json",
+      "sha256": "06668d2be2f92881b418be51b5a2d5f2d2582b630d56b69443d0c20c51d99381"
+    },
+    {
+      "path": "comparison-Pages-normal-candidate-first/foreground/1/close/candidate/failure-state.json",
+      "sha256": "6ab9e17f53d8a239fec08e6571dc438231230b825aae07dab8b8f75c7430de20"
+    },
+    {
+      "path": "comparison-Pages-normal-candidate-first/foreground/1/close/candidate/failure.png",
+      "sha256": "7ae41e7805876910f3e173031b4e82b0191f178469719adfe16dad47ff0de024"
+    },
+    {
+      "path": "comparison-Pages-normal-candidate-first/foreground/1/close/candidate/samples.jsonl",
+      "sha256": "052b6c1dbe35d38365a0fe010a6db30a1c8e343391be961ad5192613e34aa320"
+    },
+    {
+      "path": "comparison-Pages-normal-candidate-first/foreground/1/close/candidate/transitions.jsonl",
+      "sha256": "cea1b91560ee4815c2a569fc3845695d817c88e0825703ce37ba5df1f63b7bc2"
+    },
+    {
+      "path": "packaged-high-contrast/candidate/high-contrast-pre-assertion.json",
+      "sha256": "b8ae12294f4f274c344df0a4f4c298047ab89feb6b5b9b9e150f3a37cffdebd8"
+    },
+    {
+      "path": "packaged-high-contrast/candidate/failure.json",
+      "sha256": "e6bed73a974dbd6b44b479054048e205cbc8a2ac17b5d73fe2bdb812b0be72a2"
+    }
+  ]
+}

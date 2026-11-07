@@ -4,7 +4,7 @@
   "files": {
     "src/native/LensDocsStudio.Native/MainWindow.Find.cs": {
       "previous": "9e8bcd8b2fbbcdf7d073a61f98b500e54c2c58dd6341e9dc506fab5fa6e7ac7e",
-      "current": "373d669137bf0f6b026a53db7e0f954d1d772fd5c35acc89ce5a43066e50f7bb"
+      "current": "69e8ffdc7d3211bd0a22fb38468bb2f8c21299eb12926c7dbfe4572a95a4b7c7"
     },
     "src/native/LensDocsStudio.Native/MainWindow.Zoom.cs": {
       "previous": "56ed43dbeecd78f474d941e686df74092e66bcc4063a6a8099d7fa4c6c306fd5",
@@ -12,7 +12,7 @@
     },
     "src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs": {
       "previous": "3bf9d9a067c433463da1d8a8939e229161d5148d5bc9d643f195486a55d19678",
-      "current": "50d540006485a29a6ba00509906d6658b29eab8c1b51b0c1ad4d4d92c7f9b8eb"
+      "current": "c55690556a9f83af7348c41eb8b2799ebc199283d9a11b918a9ff53a1310bb69"
     }
   }
 }

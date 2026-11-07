@@ -2,7 +2,7 @@
 
 ## PR #80 preview correction integrated into PR #76 — 7 November 2026
 
-The three reviewed source-position commits and focused comparison ownership/closure corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
+The three reviewed source-position commits and focused comparison ownership, closure, Find-bar and divider reflow corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
 
 
 ## Editor-to-preview selection reliability — 2 November 2026
