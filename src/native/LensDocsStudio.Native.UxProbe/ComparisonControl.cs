@@ -73,7 +73,7 @@ internal static class ComparisonControl
                 || Field(secondary ? "comparisonRenderedId" : "renderedDocumentId") is not Guid id || id != owner.Id
                 || Field(secondary ? "comparisonRenderedVersion" : "renderedVersion") is not ITextSourceVersion version
                 || !version.BelongsToSameDocumentAs(owner.EditorDocument.Version) || version.CompareAge(owner.EditorDocument.Version) != 0
-                || AutomationProperties.GetItemStatus(reader) != "Ready") return false;
+                || !Program.ComparisonStatusReady(reader, secondary)) return false;
             return UIElementAutomationPeer.CreatePeerForElement(reader)?.GetPattern(PatternInterface.Text) is ITextProvider provider
                 && provider.GetVisibleRanges().Any(range => !string.IsNullOrWhiteSpace(range.GetText(128)) && range.GetBoundingRectangles().Length >= 4);
         }
@@ -170,6 +170,27 @@ internal static class ComparisonControl
                     editor.Undo(); await (Task)Call("UpdatePreviewAsync", false)!;
                     await Until(() => editor.Text == source && EndVisible(false, first));
                 }
+                if (scenario == "findquery")
+                {
+                    typeof(MainWindow).GetField("previewFocused", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(window, true);
+                    Call("ShowFind", false);
+                    var interrupted = Field("previewLayoutCancellation") is not null;
+                    ((TextBox)window.FindName("FindText")).Text = "ReadableEnd";
+                    await (Task)Call("NavigateFindAsync", 1)!;
+                    facts.Add(new { stage = "find-query-interrupted-reflow", interrupted });
+                    await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                    if (preview.Selection.Text != "ReadableEnd") throw new IOException("Find did not select its current preview match.");
+                    facts.Add(Snapshot("find-query-presented", false, first));
+                    var obsolete = (Task)Call("NavigateFindAsync", 1)!;
+                    Call("ActivateComparison", 1, false);
+                    await obsolete;
+                    await Until(() => EndVisible(false, second) && EndVisible(true, first));
+                    facts.Add(Snapshot("find-query-owner-changed", false, second));
+                    Call("ActivateComparison", 0, false);
+                    await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                    Call("HideFind");
+                    await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                }
                 if (scenario is "findchrome" or "pendingfind" or "pendingfindclose")
                 {
                     Call("ShowFind", false);
@@ -242,7 +263,7 @@ internal static class ComparisonControl
                 if (preview.Document != attached || model.ActiveDocument != first || editor.Text != source || second.EditorDocument.Text != secondSource
                     || File.ReadAllText(firstPath) != source || File.ReadAllText(secondPath) != secondSource)
                     throw new IOException("Comparison closure changed source or current document ownership.");
-                Program.Write(output, "control.json", new { verdict = "PASS", scenario, mode, zoom, compact, facts,
+                Program.Write(output, "control.json", new { verdict = "PASS", scenario, mode, zoom, compact, facts, secondaryCompletionStatus = Program.SecondaryCompletionStatusAvailable,
                     fixtureSha256 = Program.Hash(File.ReadAllBytes(Path.Combine(fixtures, "mixed.md"))),
                     product = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
                     highContrast = SystemParameters.HighContrast, osHighContrast = NativeTestHighContrast.IsEnabledNow,

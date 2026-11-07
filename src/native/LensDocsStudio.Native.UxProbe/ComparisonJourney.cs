@@ -26,7 +26,7 @@ internal sealed partial class Probe
         if (result is null || result.Document != reader.Document || !reader.IsVisible || !reader.IsMeasureValid || !reader.IsArrangeValid
             || Field<Guid?>(secondary ? "comparisonRenderedId" : "renderedDocumentId") != owner.Id || version is null
             || !version.BelongsToSameDocumentAs(owner.EditorDocument.Version) || version.CompareAge(owner.EditorDocument.Version) != 0
-            || AutomationProperties.GetItemStatus(reader) != "Ready") return false;
+            || !Program.ComparisonStatusReady(reader, secondary)) return false;
         if (UIElementAutomationPeer.CreatePeerForElement(reader)?.GetPattern(PatternInterface.Text) is not ITextProvider provider
             || !provider.GetVisibleRanges().Any(r => !string.IsNullOrWhiteSpace(r.GetText(128)) && r.GetBoundingRectangles().Length >= 4)) return false;
         if (marker is null) return result.TextMap.VisibleSource(reader.ActualHeight) is not null;
@@ -183,7 +183,7 @@ internal sealed partial class Probe
         if (!await Ui(() => first.EditorDocument.Text == source && second.EditorDocument.Text == otherSource && model.Documents.Contains(first) && model.Documents.Contains(second))
             || Program.Hash(File.ReadAllBytes(path)) != fixture.Sha256.ToUpperInvariant() || File.ReadAllText(second.FilePath!) != otherSource)
             throw new IOException("Comparison altered fixture files, source buffers or document ownership.");
-        Program.Write(output, "comparison-completion.json", new { verdict = "PASS", scenario, mode, sampleCount,
+        Program.Write(output, "comparison-completion.json", new { verdict = "PASS", scenario, mode, sampleCount, secondaryCompletionStatus = Program.SecondaryCompletionStatusAvailable,
             elapsedMs = Stopwatch.GetElapsedTime(startup).TotalMilliseconds, fixture.Sha256, sourceIntegrity = "PASS",
             scope = "Foreground Windows input, desktop captures, source mapping and UIA; bounded evidence, not proof of eliminating every intermittent failure" });
     }

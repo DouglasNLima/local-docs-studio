@@ -102,7 +102,7 @@ public partial class MainWindow
     {
         TraceSelection("install-map");
         CancelSynchronisation(); renderedVersion = version;
-        previewLayoutAnchor = null;
+        previewLayoutAnchor = null; interruptedPreviewLayoutStatus = null;
         syncAnchors = rendered is null ? null : new(rendered);
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)

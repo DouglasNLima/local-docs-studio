@@ -9,6 +9,7 @@ public partial class MainWindow
     private PreviewViewportAnchor? previewLayoutAnchor;
     private CancellationTokenSource? previewLayoutCancellation;
     private string? previewLayoutStatus;
+    private string? interruptedPreviewLayoutStatus;
 
     private void CapturePreviewLayoutAnchor()
     {
@@ -30,6 +31,7 @@ public partial class MainWindow
         if (previewLayoutCancellation is not { } cancellation) return;
         previewLayoutCancellation = null;
         cancellation.Cancel();
+        interruptedPreviewLayoutStatus = previewLayoutStatus;
         previewLayoutStatus = null;
         // Cancellation is not a successful presentation. A replacement render or
         // layout owns its subsequent status; fresh input must never be overridden.
@@ -42,6 +44,7 @@ public partial class MainWindow
         if (previewLayoutAnchor is not { } anchor || !SyncCurrent || anchor.Document != Preview.Document) return;
         var result = rendered; var owner = model.ActiveDocument; var generation = syncGeneration;
         using var cancellation = new CancellationTokenSource();
+        interruptedPreviewLayoutStatus = null;
         previewLayoutCancellation = cancellation; previewLayoutStatus = status;
         model.PreviewStatus = "Updating preview layout…";
         AutomationProperties.SetItemStatus(Preview, "Busy; preview layout is being updated");

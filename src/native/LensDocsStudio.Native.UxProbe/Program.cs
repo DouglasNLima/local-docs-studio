@@ -27,6 +27,19 @@ namespace LensDocsStudio.Native.UxProbe;
 internal static class Program
 {
     private static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true, PropertyNameCaseInsensitive = true };
+    internal static readonly bool SecondaryCompletionStatusAvailable = typeof(MainWindow)
+        .GetMethod("CaptureComparisonReadingPosition", BindingFlags.NonPublic | BindingFlags.Instance) is not null;
+    internal static readonly bool LegacySecondaryStatus = !SecondaryCompletionStatusAvailable
+        && typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            .EndsWith("+75de42474514af0e7a6e521235a6517f4acad14b", StringComparison.Ordinal) == true;
+    internal static bool ComparisonStatusReady(DocumentPreview reader, bool secondary)
+    {
+        var status = AutomationProperties.GetItemStatus(reader);
+        // The exact pre-integration product never published a secondary status.
+        // Its empty value is an absent capability, not a failed reflow. The current
+        // product must still publish Ready; all source, UIA and geometry checks apply.
+        return status == "Ready" || secondary && LegacySecondaryStatus && status.Length == 0;
+    }
     [STAThread]
     private static int Main(string[] args)
     {
@@ -90,6 +103,8 @@ internal static class Program
                 sourceBytes = bytes.Length, sourceCharacters = source.Length, lineEnding = fixture.LineEnding,
                 capabilities = new { slash = typeof(MainWindow).GetField("slashCommands", BindingFlags.NonPublic | BindingFlags.Instance) is not null,
                     comparison = typeof(MainWindow).GetField("comparisonSlots", BindingFlags.NonPublic | BindingFlags.Instance) is not null,
+                    secondaryCompletionStatus = SecondaryCompletionStatusAvailable,
+                    legacySecondaryStatus = LegacySecondaryStatus,
                     attachmentMarker = typeof(MainWindow).GetField("diagnosticRequest", BindingFlags.NonPublic | BindingFlags.Instance) is not null },
                 image = Environment.GetEnvironmentVariable("ImageVersion"), run = Environment.GetEnvironmentVariable("GITHUB_RUN_ID"),
                 protocol = "foreground SendInput to semantic state plus captured desktop response; software observation upper bound, not physical scan-out" });
