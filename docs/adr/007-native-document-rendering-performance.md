@@ -1,8 +1,16 @@
 # ADR — Native Document Rendering Performance & Responsiveness Contract
 
-Status: **Proposed**. Owner: repository maintainer DouglasNLima. Decision authority:
-explicit written owner approval on [Goal #77](https://github.com/DouglasNLima/local-docs-studio/issues/77)
-and its Draft PR. No approval has been given. Date: 6 November 2026.
+Status: **Proposed — formal approval pending**. Owner: repository maintainer
+DouglasNLima. Created 6 November 2026; decision-readiness continuation 7 November 2026.
+The owner [supports B+C in principle](https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6713735024).
+That agreement does not accept this ADR, numeric limits, support envelope,
+statistical rules, gate migration, integration or release. Formal approval must
+name the exact ADR commit and individual decisions below on Goal #77 / Draft PR #78.
+
+Current entry point: [Native Acceptance Decision Package](../native/native-acceptance-decision-package.md),
+with independent integration/release contracts, [risk register](../native/native-acceptance-risk-register.md)
+and [PR #76 review index](../native/pr76-review-index.md). Earlier measurements below
+retain their original identities; they are not measurements of current PR #76.
 
 Related: [Goal #75](https://github.com/DouglasNLima/local-docs-studio/issues/75),
 [Draft PR #76](https://github.com/DouglasNLima/local-docs-studio/pull/76),
@@ -12,8 +20,11 @@ Related: [Goal #75](https://github.com/DouglasNLima/local-docs-studio/issues/75)
 
 Adopt **B + C**: independently qualify foreground interaction, first usable preview
 and complete readiness, with empirically calibrated complexity and hardware strata.
-Keep **A** as the unchanged required gate until an owner approves the policy and
-its independently validated implementation. Do not implement **D**, ship a WPF fork,
+Keep **A** unchanged, including its present release and campaign acceptance authority,
+until an owner approves a separately validated transition. Repository governance
+already excludes Continuous 250 ms from ordinary integration protection; this ADR
+must not extend that gate to every feature PR or remove the current #75–#77 NO-GO.
+The decision package reconciles those scopes explicitly. Do not implement **D**, ship a WPF fork,
 or make release planning depend on **E**. This decision is not a waiver for PR #76.
 
 Maintaining the 250 ms benchmark is inexpensive and useful for engineering. Requiring
@@ -51,8 +62,8 @@ requirements remain valuable. No requirement is removed because it is difficult.
 
 ## Architecture and exact evidence
 
-Verified before work: `develop` is `99349d82eb06960eb1f9785cf384db2373aed4fa`, tree
-`e4d137a12cbdd827583fcb841612890dd88736ec`; PR #76 remains Draft at
+Verified for the original 6 November investigation: `develop` was `99349d82eb06960eb1f9785cf384db2373aed4fa`, tree
+`e4d137a12cbdd827583fcb841612890dd88736ec`; PR #76 was Draft at
 `75de42474514af0e7a6e521235a6517f4acad14b`, tree
 `6cb88161e24573649321bcb1d9f3418ba128194b`. Original comparison baseline:
 `0237b08390d5d1d946c0b19b81d671ccd54fb951`. These are fixed inputs, not moving refs.
@@ -79,7 +90,7 @@ Its blocking format section disables dispatcher processing. The actual complete
 layout and navigation obligations, rather than the control's name, determine what
 work a measurement forces. This distinction is another reason to retain three clocks.
 
-Retained original-protocol failures from the final PR #76 receipt:
+Retained original-protocol failures from the `75de4247` PR #76 receipt:
 
 | Exact comparison | Baseline failures / 66 | Candidate failures / 66 |
 |---|---:|---:|
@@ -208,14 +219,29 @@ coverage, or performance improves by changing semantics. Revert only new policy
 authority; retain all raw observations and failed histories. Restore the previous
 required policy through an explicit owner action, never an agent ruleset edit.
 
-## Owner decisions pending
+## Decision matrix — 7 November continuation
 
-- Approve or reject B+C and the proposed observation boundaries; identify reviewer.
-- Select minimum supported hardware, display/DPI and runtime support policy.
-- Approve numeric limits and confidence/variance tolerances after calibration and
-  human evaluation; determine supported large-document envelope and failure UX.
-- Decide whether evidence is sufficient to retire the old gate's blocking role.
-- Resolve independent HC ownership and release/physical-certification requirements.
+Every row is **PENDING formal owner decision**. B+C alone has directional agreement.
+“Ready” means the recommendation can be approved as a design/protocol choice now;
+it is not an acceptance PASS. “Evidence needed” identifies a separate later approval.
+The [package](../native/native-acceptance-decision-package.md) gives contracts A/B,
+statistical details, migration steps and an owner response form.
+
+| ID / item | Recommended option | Evidence and trade-off | Explicit owner decision / readiness |
+|---|---|---|---|
+| D01 Architecture | B+C; retain native semantics and existing renderer. Separate three clocks, finite complexity budgets. No D/E dependency. | Original hidden-viewer gate and foreground journeys observe different work; WPF layout remains synchronous. More measurement governance, no evidence for a parity-preserving rewrite. | Accept/reject the exact ADR architecture and nominate technical reviewer. **Ready**; in-principle agreement is already recorded. |
+| D02 Interaction responsiveness | Measure offered real input to correct visible response, idle and render-load separately; cancellation includes acknowledgement and rejection of late ownership. | Probe has actual input/capture controls; delayed Continuous/Automatic interruption is not a pending cancellation PASS. Proposed 100 ms P95 / 250 ms P99 remain hypotheses. | Approve boundaries now; approve per-action limits only after independent hardware/task calibration. **Evidence needed for numbers and load coverage**. |
+| D03 First usable preview | Current source/version, readable mapped viewport, valid geometry, usable UIA and captured foreground pixels; never a spinner or stale content. | Original mixed-preview defect escaped logical-content tests. Hidden HWND first layout is only a proxy. Captures add overhead. | Approve observable boundary; retain 500 ms common-preview only as a hypothesis. **Ready for definition; evidence needed for budget**. |
+| D04 Complete readiness | Finite end-to-end budget for each approved complexity class; all required readers/media, distant navigation/selection and truthful status. Honour separate software-visible and physical scopes. | 128 foreground / 388 controls pass functionally, but required-label frames still fail. Full audit timing is a conservative upper bound. | Approve boundary and honest failure/retry/source-preservation semantics; reject unlimited completion. **Evidence needed for finite budgets and resource handling**. |
+| D05 Document complexity | Freeze the seven exact-byte workloads as calibration anchors, add a small consented real corpus plus boundary/oversize cases; classify by structural counts, graph and decoded media size. | Existing catalogue spans prose, technical, long, table, nested lists, Mermaid and mixed content; it is not a representative user corpus. Byte-only classes conceal costly structures. | Approve catalogue method; explicitly select maximum counts/nesting/media and supported modes before acceptance. **Evidence needed for support caps**. |
+| D06 Minimum hardware | Nominate a physical entry-level Windows x64 reference: proposed 4 physical CPU cores, 8 GiB RAM, SSD, integrated GPU, 1920×1080/60 Hz; one 16 GiB typical control. Record exact models, drivers, power/thermal state and storage. | Hosted CPUs and the development workstation are not a measured minimum. This is a proposed test procurement profile, not a proven minimum or a budget derived from PR #76. A higher floor reduces reach. | Accept/replace the proposed reference machines and appoint an operator. **Ready to choose; physical performance evidence needed before claiming support**. |
+| D07 OS / .NET | Preserve the repository's Windows 10/11 x64 qualification obligations; choose explicit serviced OS editions/builds and exact self-contained .NET 10/WPF package revision. Validate the shipped runtime; keep hosted runtime controls separate. | Existing release checklist still has Windows 10/11 clean-machine gaps. Packaged 10.0.13 and hosted 10.0.14 evidence cannot be pooled. Narrowing to Windows 11 or changing runtime needs its own explicit support decision. | Select actual OS builds/runtime and any deliberately reduced support scope, with rationale. **Evidence needed for certification; no automatic version upgrade**. |
+| D08 Display / DPI | Integration retains hosted real-input/actual-HC evidence with exact geometry; release adds physical 100/125/150/200% and mixed-DPI monitor movement, resize and focus checks. Keep application zoom 50–200% distinct from OS scaling. | Hosted 96-DPI and local 144-DPI evidence are different strata; UIA geometry cannot certify physical display behaviour. Physical work is smaller but manual. | Approve integration/release split and physical display matrix/operator. **Ready for plan; physical evidence needed**. |
+| D09 Statistical confidence | Separate bounded integration correctness evidence from release tail claims. Predeclare independent units, strata, trial counts and family-wise 95% confidence; use exact exceedance bounds and process/block-aware comparisons. | Pilot cells with two processes cannot establish P99 or equivalence. Within-process repetitions and shared runners are correlated. Cost is explicit; no campaign-wide claim from per-cell minima. | Approve method; freeze claim family, sampling/power and resource plan before qualification. **Ready for method; implementation/evidence needed**. |
+| D10 Correctness / accessibility | Non-compensable gates under both contracts: source, ownership, selection, navigation, truthful completion, keyboard/UIA and unchanged 4.5:1 HC assertion. Physical reader certification additionally belongs to release. | Current pixel FAIL / attribution gaps and historical 2.542596:1 FAIL remain open. Baseline defects cannot prove candidate safety. | Approve proposed risk closure criteria and assign owners; do not waive observed failures. **Ready for criteria; closure evidence needed**. |
+| D11 Performance regression tolerance | Require both absolute and relative upper-confidence bounds on matched candidate–baseline degradation, plus absolute SLO compliance where activated. Approve action/class margins from human tolerability and baseline variability before candidate qualification. | Similar counts/lower medians do not prove non-regression. Zero margin may be statistically impractical; arbitrary percentages would excuse harm. No defensible numeric margin is established here. | Approve the dual-bound method; supply calibrated absolute/relative margins and precision plan later. **Evidence needed for numeric approval**. |
+| D12 Historical benchmark | Keep original scripts, six fixtures, 250 ms assertions, raw FAILs and reproducible benchmark permanently. Propose replacing its release/campaign blocking role only after independently qualified B+C checks. | Existing ordinary integration governance already excludes it; current campaign expressly retains it. Two scopes must be recorded, not silently conflated. | Approve migration design now; separately approve activation, exact check contexts and fresh PR #76 decision later. **Ready for design; activation not ready**. |
+| D13 Acceptance separation | Adopt Contract A for safe feature integration and Contract B for distribution. Retain all currently required integration jobs, installed preview checks and unresolved campaign blockers. | Governance already separates release/trust work. Full production signing/physical certification would otherwise stall unrelated development; installer changes still need affected safety tests at integration. | Approve/reject contracts and explicitly reconcile #76 campaign-specific requirements. **Ready for policy decision; #76 remains NO-GO**. |
 
 ## Primary references consulted
 

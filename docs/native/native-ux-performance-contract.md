@@ -1,6 +1,12 @@
 # Native UX performance contract — proposed calibration protocol
 
 **PENDING owner approval; not an active replacement gate.**
+The 7 November [decision package](native-acceptance-decision-package.md) separates
+integration Contract A from release Contract B and supplies the pending owner
+decisions. B+C has in-principle support only. This existing calibration protocol
+and its historical observations remain intact; the proposed statistical extension
+and visible-completion boundary require review and implementation, not silent activation.
+
 [ADR](../adr/007-native-document-rendering-performance.md),
 [Goal #77](https://github.com/DouglasNLima/local-docs-studio/issues/77),
 [PR #76](https://github.com/DouglasNLima/local-docs-studio/pull/76).

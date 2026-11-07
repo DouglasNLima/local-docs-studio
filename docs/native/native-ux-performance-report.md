@@ -1,5 +1,15 @@
 # Native performance contract — engineering assessment
 
+**7 November decision-readiness continuation:** use the
+[Native Acceptance Decision Package](native-acceptance-decision-package.md),
+[risk register](native-acceptance-risk-register.md) and
+[PR #76 source review index](pr76-review-index.md) for the current recommendation.
+The owner supports B+C in principle; ADR 007 remains Proposed. The report below
+retains its original source-labelled campaign, including its older #76 input and
+all failed results. It does not requalify current #76 `7b1334b0`. General repository
+integration policy, the stricter current campaign hold and release acceptance are
+explicitly reconciled in the package; no existing gate changes here.
+
 Status: **Proposed policy; integration remains NO-GO**. This is the engineering
 receipt for [Goal #77](https://github.com/DouglasNLima/local-docs-studio/issues/77)
 and [Draft PR #78](https://github.com/DouglasNLima/local-docs-studio/pull/78), targeting
