@@ -1,3 +1,4 @@
+import { collectDocumentHeadings } from '../document/table-of-contents.js';
 import { base64ToUint8Array, textToBase64 } from '../utils/binary.js';
 import { downloadBlob } from '../utils/browser.js';
 import { isSupportedFile } from '../utils/files.js';
@@ -1222,24 +1223,9 @@ export function createExportService({
     }
 
     function decorateDocsSiteHeadings(container) {
-      const used = new Set();
-      return [...container.querySelectorAll('h1, h2, h3, h4')].map((heading, index) => {
-        const text = heading.textContent.trim() || `Section ${index + 1}`;
-        const base = slugify(heading.id || text) || `section-${index + 1}`;
-        let id = base;
-        let suffix = 2;
-        while (used.has(id)) {
-          id = `${base}-${suffix}`;
-          suffix += 1;
-        }
-        used.add(id);
-        heading.id = id;
+      return collectDocumentHeadings(container).map(({ heading, id, text, level }) => {
         heading.tabIndex = -1;
-        return {
-          id,
-          text,
-          level: Number(heading.tagName.slice(1)),
-        };
+        return { id, text, level };
       });
     }
 

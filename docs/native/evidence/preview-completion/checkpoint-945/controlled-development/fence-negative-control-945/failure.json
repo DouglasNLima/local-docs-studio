@@ -1,0 +1,165 @@
+{
+  "error": "System.InvalidOperationException: A UIA-only mutation incorrectly requires another visual commit.\r\n   at LensDocsStudio.Native.UxProbe.ComparisonControl.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CRun\u003Eb__12\u003Ed.MoveNext() in C:\\Code\\MarkdownReader-reading-productivity\\src\\native\\LensDocsStudio.Native.UxProbe\\ComparisonControl.cs:line 267",
+  "facts": [
+    {
+      "stage": "comparison-deep-primary",
+      "secondary": false,
+      "owner": "de6f1be1-6c50-43ff-8cae-94787f4b2aae",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 949 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,76.57999999999993,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    },
+    {
+      "stage": "comparison-deep-secondary",
+      "secondary": true,
+      "owner": "6bb4dec7-605f-438e-be38-480a016db362",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 949 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 167.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,116.57999999999993,0,19.950000000000003",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    },
+    {
+      "stage": "find-query-interrupted-reflow",
+      "interrupted": true
+    },
+    {
+      "stage": "find-query-presented",
+      "secondary": false,
+      "owner": "de6f1be1-6c50-43ff-8cae-94787f4b2aae",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 949 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 103.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,52.57999999999993,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    },
+    {
+      "stage": "find-query-owner-changed",
+      "secondary": false,
+      "owner": "6bb4dec7-605f-438e-be38-480a016db362",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 159 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,76.57999999999993,0,19.950000000000003",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    },
+    {
+      "stage": "completion-commit-control",
+      "started": 5308424312163,
+      "committed": 5308424438585,
+      "nonVisualFenceCompleted": false
+    },
+    {
+      "stage": "failure-primary",
+      "secondary": false,
+      "owner": "de6f1be1-6c50-43ff-8cae-94787f4b2aae",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 112 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,76.57999999999993,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    }
+  ]
+}

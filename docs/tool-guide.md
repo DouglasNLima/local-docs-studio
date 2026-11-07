@@ -124,3 +124,32 @@ Use **Help > Windows shell diagnostics > Create support bundle** when you need a
 Optional artefact bundle metadata is session-only and untrusted unless you explicitly export an artefact review pack. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings. Reader filters stay inside the reader panel and are not stored.
 
 Future compatible producers should follow `docs/integration/lens-artifact-bundle-producer-guide.md`. Release candidates should follow `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`.
+
+## Reading statistics
+
+Read the footer for the active document's estimated reading time, word count and readable character count. It updates shortly after editing, pasting and Undo/Redo, using the current buffer. The statistics button opens Document Review without changing your selection. On a narrow window, focus or hover over the button for all metrics.
+
+Words follow the Review prose rules. Characters count Unicode scalar values in readable text, including punctuation and image descriptions, with whitespace normalised to single spaces. Front matter and code are excluded. A zero-word document has a zero-minute estimate; longer documents retain the 220 words-per-minute ceiling. Files above the 4 Mi source-character analysis limit show an explicit unavailable status. No document content is sent to a service.
+
+The adjacent document state reflects pending changes or linked-file writes. A downloaded copy is not proof that the browser saved it to disk. Edits made during a write remain pending after that older version finishes saving.
+
+## Advanced outline and Copy Table of Contents
+
+The existing outline includes H1–H6, individual branch toggles, Expand All and Collapse All. Expansion is kept per open document during normal edits. Navigation works in Editor, Split and Preview; preview navigation opens enclosing collapsible sections. A filter in the native outline can reveal headings inside collapsed branches.
+
+Use **Copy Table of Contents** in the outline to copy links without editing the document. Choose start/end heading levels, bullets, numbered lists or plain text, optional hierarchy normalisation and a `<details>` wrapper. Normalisation removes gaps in heading levels while keeping their hierarchy. Links use the renderer's actual identifiers, including duplicate-heading suffixes; exported compatible documents keep those targets. Web and native retain their existing anchor conventions. An empty outline produces no entries; an invalid range cannot replace the clipboard. Paste explicitly when you want to insert the copied result with ordinary Undo/Redo.
+
+## Slash commands
+
+Type `/` at the start of an otherwise empty prose line to search insertion commands. Up to three leading spaces are preserved. Type a command name, use Arrow Up/Down and Enter, or click a result. Escape keeps the literal text. The menu stays near the caret and moves above it when needed; keyboard focus stays in the editor. Unavailable actions explain their prerequisite.
+
+Commands cover headings 1–6, paragraphs, lists and checklists, quotes, code and Mermaid blocks, tables, links, workspace document links, images and figures, callouts, collapsible sections, rules, ISO date/time and built-in snippets. Web uses the existing insertion dialogs and the built-in Usage snippet; Native uses the existing formatting services and snippet catalogue. Native figure and details commands insert editable starter structures; use the existing figure/details editors to customise them. Workspace links use the existing resolver and completion/picker.
+
+Acceptance replaces the whole slash query in one Undo operation. Cancelling an insertion dialog keeps the query. Existing selection is not consumed by the popup. URLs, inline paths, quoted text, indented/fenced code, front matter, comments and raw code/HTML text containers do not trigger it. It is disabled during IME composition, for read-only or standalone Mermaid documents, and above the 4 Mi source-character limit. Typing a slash deliberately in prose is ambiguous until you choose a command; Escape leaves it literal.
+
+
+## Compare two documents
+
+Choose **File → Open beside…** after opening two documents. Select a document and Editor or Preview in each pane's header. **Activate** makes that pane the target for Find, Undo/Redo, paste, Save, Save As and document export. Focusing the secondary source also activates it; the existing editor, its formatting controls and commands follow the active document. Each document retains its own buffer, selection, editing history and Find query. The inactive source is a view of that buffer, not another editable copy.
+
+Scroll is independent by default. Enable **Synchronise scroll** for proportional scrolling between continuous views; paged native readers retain independent page navigation. Adjust the pane widths (Web) or drag/keyboard-operate the divider (Native). Narrow windows stack the panes vertically. Preview navigation resolves links from the owning document. **Close comparison** restores the previous single-document layout without closing or saving either document. Existing external-change checks and recovery still apply. Comparison arrangement is session-only; reopened documents retain the normal recovery contract.

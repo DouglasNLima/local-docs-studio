@@ -1,0 +1,30 @@
+{
+  "scope": "Original failed controlled observations; no foreground or screenshot acceptance. Original PR #78 failures remain pinned in PR #80.",
+  "fixture": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "files": [
+    {
+      "path": "control-three-commits-exact-fixture/failure.json",
+      "sha256": "431efff7b93309fd9eb25c0d7ec3a45929c00cc63cfee73b042db5d4854293a1"
+    },
+    {
+      "path": "control-three-commits-exact-fixture/transitions.jsonl",
+      "sha256": "9955238064032404c26210eb650a9cb4ae68b08f8bc6d0c12640bd4a06f7798e"
+    },
+    {
+      "path": "control-closure-only-switch/failure.json",
+      "sha256": "3fc0a3615ffd92bfa82ab02134daf9708dacf489e2ccaf3bcf9b8d89bcd6e00b"
+    },
+    {
+      "path": "control-closure-only-switch/transitions.jsonl",
+      "sha256": "05ef62118bf8af325ef1482a6e9e5b66de7aec29541e14149f4c7c2029ce1f48"
+    },
+    {
+      "path": "zoom-150-switch/failure.json",
+      "sha256": "3873dd13083b4f60dfec6f39395355fc6f7a58230927f185310b078591baca79"
+    },
+    {
+      "path": "zoom-150-switch/transitions.jsonl",
+      "sha256": "e379422f4dc6b1e009c80d39861efe2dd7d3a45d49936794f13e653b39536913"
+    }
+  ]
+}

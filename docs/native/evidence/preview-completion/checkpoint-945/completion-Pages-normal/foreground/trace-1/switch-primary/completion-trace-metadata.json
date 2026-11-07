@@ -1,0 +1,54 @@
+{
+  "recordOverflow": false,
+  "byteOverflow": false,
+  "written": 179,
+  "bytes": 150484,
+  "unchangedEvents": {
+    "render-started": 14,
+    "media/CommittingBatch": 14,
+    "media/RenderComplete": 14,
+    "render-completed": 14,
+    "render-posted": 13
+  },
+  "verdict": {
+    "pendingInterruption": "PASS",
+    "qualifiedDeliveries": 1,
+    "cancellationsVerified": true,
+    "staleReady": 0,
+    "offeredOperation": 1430465,
+    "deliveries": [
+      {
+        "tick": 2207020076,
+        "operation": 1430465,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      }
+    ],
+    "operations": [
+      {
+        "id": 1430465,
+        "reader": "primary",
+        "start": 2206708102,
+        "end": 2207413440,
+        "cancelled": 2207028199,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      {
+        "id": 55724344,
+        "reader": "secondary",
+        "start": 2206713139,
+        "end": 2207414398,
+        "cancelled": 2207403970,
+        "outcome": "rejected",
+        "generation": 3
+      }
+    ]
+  },
+  "scope": "All subscribed mutations and input events; first render boundary per mutation epoch, with unchanged render events counted separately"
+}

@@ -1,0 +1,3158 @@
+{
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+  "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "cohorts": [
+    {
+      "name": "treeview-closure-baseline-first-trace-0",
+      "protocol": {
+        "originalArtifact": 13582703336,
+        "trace": "0",
+        "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+        "baselinePackageNumber": "1050",
+        "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+        "exitDeadlineSeconds": 20,
+        "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+        "candidatePackageNumber": "1052",
+        "scope": "Identical observer; separately verified installed product identities. Full install/upgrade/reinstall; no retries.",
+        "originalRun": 42391694305,
+        "order": "baseline-first"
+      },
+      "processes": [
+        {
+          "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+          "side": "baseline",
+          "failure": "Independent package verification failed before TreeView installer execution.",
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\0883ca38b60d44a69092a95abc0bff3f"
+          ]
+        },
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "side": "candidate",
+          "failure": null,
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\8c593265ee7c49b2a2ff39c5510b3835"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "treeview-closure-baseline-first-trace-1",
+      "protocol": {
+        "order": "baseline-first",
+        "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+        "candidatePackageNumber": "1052",
+        "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+        "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+        "originalArtifact": 13582703336,
+        "originalRun": 42391694305,
+        "trace": "1",
+        "scope": "Identical observer; separately verified installed product identities. Full install/upgrade/reinstall; no retries.",
+        "baselinePackageNumber": "1050",
+        "exitDeadlineSeconds": 20
+      },
+      "processes": [
+        {
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\9a7f0659871b405fb2143b45e6607f1a"
+          ],
+          "failure": "Independent package verification failed before TreeView installer execution.",
+          "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+          "side": "baseline"
+        },
+        {
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\85b49ecf19414dfe9cd6d0f2c194f61f"
+          ],
+          "failure": null,
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "side": "candidate"
+        }
+      ]
+    },
+    {
+      "name": "treeview-closure-candidate-first-trace-0",
+      "protocol": {
+        "trace": "0",
+        "exitDeadlineSeconds": 20,
+        "order": "candidate-first",
+        "candidatePackageNumber": "1052",
+        "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+        "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+        "originalRun": 42391694305,
+        "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+        "scope": "Identical observer; separately verified installed product identities. Full install/upgrade/reinstall; no retries.",
+        "originalArtifact": 13582703336,
+        "baselinePackageNumber": "1050"
+      },
+      "processes": [
+        {
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\89b2004682024c719c44d724e9160264"
+          ],
+          "side": "candidate",
+          "failure": null,
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+        },
+        {
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\f9f8cd1c226b4e20a78d87b36fcfee6b"
+          ],
+          "side": "baseline",
+          "failure": "Independent package verification failed before TreeView installer execution.",
+          "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+        }
+      ]
+    },
+    {
+      "name": "treeview-closure-candidate-first-trace-1",
+      "protocol": {
+        "originalRun": 42391694305,
+        "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+        "exitDeadlineSeconds": 20,
+        "baselinePackageNumber": "1050",
+        "trace": "1",
+        "order": "candidate-first",
+        "originalArtifact": 13582703336,
+        "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+        "candidatePackageNumber": "1052",
+        "scope": "Identical observer; separately verified installed product identities. Full install/upgrade/reinstall; no retries.",
+        "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+      },
+      "processes": [
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\cee558f780344827b55d53dde542423b"
+          ],
+          "side": "candidate",
+          "failure": null
+        },
+        {
+          "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+          "directories": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\35ffa6b6ba854a0d8bc76301aac07545"
+          ],
+          "side": "baseline",
+          "failure": "Independent package verification failed before TreeView installer execution."
+        }
+      ]
+    }
+  ],
+  "qualifiedLifecycles": 4,
+  "savedClosures": 12,
+  "instrumentedClosures": 6,
+  "preservedFilesVerified": 546,
+  "lifecycles": [
+    {
+      "path": "treeview-closure-baseline-first-trace-0/treeview-install-smoke/8c593265ee7c49b2a2ff39c5510b3835/treeview-installer-results.json",
+      "status": "PASS",
+      "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+      "versions": [
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "phase": "install",
+          "binary": "0.1.0-preview.1052",
+          "version": "0.1.0-preview.1052",
+          "registered": "0.1.0-preview.1052"
+        },
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "phase": "upgrade",
+          "binary": "0.1.1-preview.1052",
+          "version": "0.1.1-preview.1052",
+          "registered": "0.1.1-preview.1052"
+        },
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "phase": "reinstall",
+          "binary": "0.1.1-preview.1052",
+          "version": "0.1.1-preview.1052",
+          "registered": "0.1.1-preview.1052"
+        }
+      ],
+      "checks": [
+        "install: optional association tasks explicitly disabled and registrations absent",
+        "install: all 540 installed payload files match independently verified portable bytes",
+        "install: 0 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "install: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "install: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "upgrade: optional association tasks explicitly disabled and registrations absent",
+        "upgrade: all 540 installed payload files match independently verified portable bytes",
+        "upgrade: 45 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "upgrade: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "upgrade: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "before-reinstall: native installation and shortcuts removed",
+        "before-reinstall: 90 previous authored/source/state/evidence files retain exact SHA-256 after uninstall",
+        "reinstall: optional association tasks explicitly disabled and registrations absent",
+        "reinstall: all 540 installed payload files match independently verified portable bytes",
+        "reinstall: 90 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "reinstall: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "reinstall: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "final-uninstall: native installation and shortcuts removed",
+        "final-uninstall: 135 previous authored/source/state/evidence files retain exact SHA-256 after uninstall"
+      ],
+      "preservedFilesVerified": 135,
+      "phases": [
+        {
+          "phase": "install",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.0-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "83344a599aac752e68f6abcc46394cf59049bd56c47869955a8255c04739dbcb",
+            "portableSha256": "fac4e04119f608ad7067bef30edad2498ec760b341aa2a677404b71e5c23a988"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "upgrade",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "reinstall",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/treeview-installer-results.json",
+      "status": "PASS",
+      "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+      "versions": [
+        {
+          "phase": "install",
+          "registered": "0.1.0-preview.1052",
+          "binary": "0.1.0-preview.1052",
+          "version": "0.1.0-preview.1052",
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+        },
+        {
+          "phase": "upgrade",
+          "registered": "0.1.1-preview.1052",
+          "binary": "0.1.1-preview.1052",
+          "version": "0.1.1-preview.1052",
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+        },
+        {
+          "phase": "reinstall",
+          "registered": "0.1.1-preview.1052",
+          "binary": "0.1.1-preview.1052",
+          "version": "0.1.1-preview.1052",
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+        }
+      ],
+      "checks": [
+        "install: optional association tasks explicitly disabled and registrations absent",
+        "install: all 540 installed payload files match independently verified portable bytes",
+        "install: 0 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "install: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "install: 46 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "upgrade: optional association tasks explicitly disabled and registrations absent",
+        "upgrade: all 540 installed payload files match independently verified portable bytes",
+        "upgrade: 46 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "upgrade: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "upgrade: 46 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "before-reinstall: native installation and shortcuts removed",
+        "before-reinstall: 92 previous authored/source/state/evidence files retain exact SHA-256 after uninstall",
+        "reinstall: optional association tasks explicitly disabled and registrations absent",
+        "reinstall: all 540 installed payload files match independently verified portable bytes",
+        "reinstall: 92 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "reinstall: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "reinstall: 46 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "final-uninstall: native installation and shortcuts removed",
+        "final-uninstall: 138 previous authored/source/state/evidence files retain exact SHA-256 after uninstall"
+      ],
+      "preservedFilesVerified": 138,
+      "phases": [
+        {
+          "phase": "install",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.0-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "83344a599aac752e68f6abcc46394cf59049bd56c47869955a8255c04739dbcb",
+            "portableSha256": "fac4e04119f608ad7067bef30edad2498ec760b341aa2a677404b71e5c23a988"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "upgrade",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "reinstall",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-candidate-first-trace-0/treeview-install-smoke/89b2004682024c719c44d724e9160264/treeview-installer-results.json",
+      "status": "PASS",
+      "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+      "versions": [
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "registered": "0.1.0-preview.1052",
+          "binary": "0.1.0-preview.1052",
+          "phase": "install",
+          "version": "0.1.0-preview.1052"
+        },
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "registered": "0.1.1-preview.1052",
+          "binary": "0.1.1-preview.1052",
+          "phase": "upgrade",
+          "version": "0.1.1-preview.1052"
+        },
+        {
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "registered": "0.1.1-preview.1052",
+          "binary": "0.1.1-preview.1052",
+          "phase": "reinstall",
+          "version": "0.1.1-preview.1052"
+        }
+      ],
+      "checks": [
+        "install: optional association tasks explicitly disabled and registrations absent",
+        "install: all 540 installed payload files match independently verified portable bytes",
+        "install: 0 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "install: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "install: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "upgrade: optional association tasks explicitly disabled and registrations absent",
+        "upgrade: all 540 installed payload files match independently verified portable bytes",
+        "upgrade: 45 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "upgrade: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "upgrade: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "before-reinstall: native installation and shortcuts removed",
+        "before-reinstall: 90 previous authored/source/state/evidence files retain exact SHA-256 after uninstall",
+        "reinstall: optional association tasks explicitly disabled and registrations absent",
+        "reinstall: all 540 installed payload files match independently verified portable bytes",
+        "reinstall: 90 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "reinstall: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "reinstall: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "final-uninstall: native installation and shortcuts removed",
+        "final-uninstall: 135 previous authored/source/state/evidence files retain exact SHA-256 after uninstall"
+      ],
+      "preservedFilesVerified": 135,
+      "phases": [
+        {
+          "phase": "install",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.0-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "83344a599aac752e68f6abcc46394cf59049bd56c47869955a8255c04739dbcb",
+            "portableSha256": "fac4e04119f608ad7067bef30edad2498ec760b341aa2a677404b71e5c23a988"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "upgrade",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "reinstall",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/treeview-installer-results.json",
+      "status": "PASS",
+      "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+      "versions": [
+        {
+          "phase": "install",
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "registered": "0.1.0-preview.1052",
+          "binary": "0.1.0-preview.1052",
+          "version": "0.1.0-preview.1052"
+        },
+        {
+          "phase": "upgrade",
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "registered": "0.1.1-preview.1052",
+          "binary": "0.1.1-preview.1052",
+          "version": "0.1.1-preview.1052"
+        },
+        {
+          "phase": "reinstall",
+          "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+          "registered": "0.1.1-preview.1052",
+          "binary": "0.1.1-preview.1052",
+          "version": "0.1.1-preview.1052"
+        }
+      ],
+      "checks": [
+        "install: optional association tasks explicitly disabled and registrations absent",
+        "install: all 540 installed payload files match independently verified portable bytes",
+        "install: 0 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "install: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "install: 46 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "upgrade: optional association tasks explicitly disabled and registrations absent",
+        "upgrade: all 540 installed payload files match independently verified portable bytes",
+        "upgrade: 46 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "upgrade: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "upgrade: 46 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "before-reinstall: native installation and shortcuts removed",
+        "before-reinstall: 92 previous authored/source/state/evidence files retain exact SHA-256 after uninstall",
+        "reinstall: optional association tasks explicitly disabled and registrations absent",
+        "reinstall: all 540 installed payload files match independently verified portable bytes",
+        "reinstall: 92 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+        "reinstall: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+        "reinstall: 46 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+        "final-uninstall: native installation and shortcuts removed",
+        "final-uninstall: 138 previous authored/source/state/evidence files retain exact SHA-256 after uninstall"
+      ],
+      "preservedFilesVerified": 138,
+      "phases": [
+        {
+          "phase": "install",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.0-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "83344a599aac752e68f6abcc46394cf59049bd56c47869955a8255c04739dbcb",
+            "portableSha256": "fac4e04119f608ad7067bef30edad2498ec760b341aa2a677404b71e5c23a988"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "upgrade",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        },
+        {
+          "phase": "reinstall",
+          "authoring": {
+            "Status": "PASS",
+            "Family": "TreeView",
+            "SourceRevision": "0.1.0-preview.1+331f7a85385449e779a12a6c045365de2931e4a2",
+            "Checks": [
+              "Independent native UIA connections agree on exact source occurrence selection",
+              "Actual native geometry has an unambiguous pointer interior",
+              "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+              "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+              "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+              "Private source, inspector and history preserve owner and disk before Apply",
+              "Apply/Cancel and inspector remain reachable at 880x600",
+              "Apply/Cancel and inspector remain reachable at 1280x800",
+              "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+              "Restart/reopen retains exact authored source and numeric lexemes",
+              "Cancel preserves authored saved bytes",
+              "Stale owner rejection preserves both exact sources",
+              "Standalone Mermaid uses the ordinary native authoring route",
+              "Insert opens the exact bounded native family starter",
+              "Insert produces portable Mermaid source",
+              "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+              "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+              "Protected source can be directly inspected after rejected operations"
+            ],
+            "Observations": [
+              {
+                "Operation": "Canonical pointer",
+                "Bounds": "25,33.5,14,10",
+                "Scale": 1,
+                "ScreenX": 507.7,
+                "ScreenY": 182
+              }
+            ],
+            "Error": null
+          },
+          "packageVerification": {
+            "status": "PASS",
+            "version": "0.1.1-preview.1052",
+            "sourceRevision": "331f7a85385449e779a12a6c045365de2931e4a2",
+            "sourceTree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+            "ciRunId": "42405138271",
+            "installerSha256": "c0c274ff0cd096f942152d536790004a13ebbdadd37af4a7206ba2792acfaab2",
+            "portableSha256": "855752ee11a0f4023040ccb647aebfab3f7acedcbc79d0f621da9efee39136bc"
+          },
+          "payloadFiles": 540
+        }
+      ]
+    }
+  ],
+  "traces": [
+    {
+      "path": "treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/install/saved-closure.jsonl",
+      "phases": [
+        "close-request",
+        "uia-close-target",
+        "native-sample",
+        "close-returned",
+        "uia-observation-error",
+        "process-exited"
+      ],
+      "processExited": true,
+      "elapsedMs": 221.0966,
+      "events": [
+        {
+          "tick": 2823547401,
+          "phase": "close-request",
+          "processId": 8876,
+          "frequency": 10000000,
+          "value": null
+        },
+        {
+          "tick": 2823604775,
+          "phase": "uia-close-target",
+          "processId": 8876,
+          "frequency": 10000000,
+          "value": {
+            "handle": 327790,
+            "pid": 8876,
+            "FrameworkType": 2,
+            "IsEnabled": true,
+            "titleBar": true,
+            "closeButton": true,
+            "closeEnabled": true,
+            "closeOffscreen": false,
+            "windowPattern": true
+          }
+        },
+        {
+          "tick": 2823782513,
+          "phase": "native-sample",
+          "processId": 8876,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 1.4294,
+            "state": {
+              "started": 2823722274,
+              "finished": 2823779677,
+              "processId": 8876,
+              "exited": false,
+              "SessionId": 2,
+              "PrivateMemorySize64": 116314112,
+              "HandleCount": 654,
+              "cpuMs": 11109.375,
+              "mainHandle": 327790,
+              "windows": [
+                {
+                  "handle": 327790,
+                  "thread": 6764,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;3c5672b7-edb0-4ce7-9481-8c4ab86292ac]",
+                  "owner": 0,
+                  "visible": true,
+                  "enabled": true,
+                  "foreground": true,
+                  "responding": true
+                },
+                {
+                  "handle": 262306,
+                  "thread": 6764,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;3ca2e83e-7b86-494c-9aed-bb57ccd71ee4]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 196968,
+                  "thread": 8288,
+                  "kind": ".NET-BroadcastEventWindow.3b95145.0",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 262538,
+                  "thread": 6764,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;6250283a-35e9-4b7d-9d6c-486e428a64e8]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 328080,
+                  "thread": 6764,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;53b3b511-0840-41cb-a5a3-ad50c2bd064c]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 328068,
+                  "thread": 6764,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;b855105a-a771-4b1c-9bb6-7672da2d483b]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 262494,
+                  "thread": 6764,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 262304,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 131626,
+                  "thread": 6764,
+                  "kind": "MSCTFIME UI",
+                  "owner": 524678,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 524678,
+                  "thread": 6764,
+                  "kind": "IME",
+                  "owner": 327790,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 262304,
+                  "thread": 6764,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 458864,
+                  "thread": 8288,
+                  "kind": "IME",
+                  "owner": 196968,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                }
+              ],
+              "threads": [
+                {
+                  "Id": 6764,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 4484.375
+                },
+                {
+                  "Id": 8312,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4216,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8068,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8588,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 6412,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7324,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8048,
+                  "state": "Wait",
+                  "wait": "ExecutionDelay",
+                  "cpuMs": 2046.875
+                },
+                {
+                  "Id": 6896,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 125
+                },
+                {
+                  "Id": 2652,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 1416,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1452,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8656,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 78.125
+                },
+                {
+                  "Id": 7528,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 593.75
+                },
+                {
+                  "Id": 8288,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1968,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 5340,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 140.625
+                },
+                {
+                  "Id": 4540,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 171.875
+                },
+                {
+                  "Id": 3376,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 203.125
+                },
+                {
+                  "Id": 5052,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 125
+                },
+                {
+                  "Id": 2064,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 46.875
+                },
+                {
+                  "Id": 1960,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 140.625
+                },
+                {
+                  "Id": 3640,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 156.25
+                },
+                {
+                  "Id": 8908,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 6200,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7384,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 2187.5
+                },
+                {
+                  "Id": 3424,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 2804,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                }
+              ],
+              "scope": "Native thread state and WM_NULL responsiveness; not a managed dispatcher stack"
+            }
+          }
+        },
+        {
+          "tick": 2824866064,
+          "phase": "close-returned",
+          "processId": 8876,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 116.4618
+          }
+        },
+        {
+          "tick": 2825489007,
+          "phase": "uia-observation-error",
+          "processId": 8876,
+          "frequency": 10000000,
+          "value": {
+            "error": "FlaUI.Core.Exceptions.PropertyNotSupportedException"
+          }
+        },
+        {
+          "tick": 2825910257,
+          "phase": "process-exited",
+          "processId": 8876,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 221.0966
+          }
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/reinstall/saved-closure.jsonl",
+      "phases": [
+        "close-request",
+        "uia-close-target",
+        "native-sample",
+        "close-returned",
+        "uia-observation-error",
+        "process-exited"
+      ],
+      "processExited": true,
+      "elapsedMs": 126.1754,
+      "events": [
+        {
+          "tick": 3479417205,
+          "phase": "close-request",
+          "processId": 1836,
+          "frequency": 10000000,
+          "value": null
+        },
+        {
+          "tick": 3479472435,
+          "phase": "uia-close-target",
+          "processId": 1836,
+          "frequency": 10000000,
+          "value": {
+            "handle": 786978,
+            "pid": 1836,
+            "FrameworkType": 2,
+            "IsEnabled": true,
+            "titleBar": true,
+            "closeButton": true,
+            "closeEnabled": true,
+            "closeOffscreen": false,
+            "windowPattern": true
+          }
+        },
+        {
+          "tick": 3479650762,
+          "phase": "native-sample",
+          "processId": 1836,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 1.5092,
+            "state": {
+              "started": 3479591666,
+              "finished": 3479648064,
+              "processId": 1836,
+              "exited": false,
+              "SessionId": 2,
+              "PrivateMemorySize64": 114130944,
+              "HandleCount": 657,
+              "cpuMs": 10843.75,
+              "mainHandle": 786978,
+              "windows": [
+                {
+                  "handle": 786978,
+                  "thread": 2944,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;f96c6b06-598b-41f8-96ca-1ca6880d6f68]",
+                  "owner": 0,
+                  "visible": true,
+                  "enabled": true,
+                  "foreground": true,
+                  "responding": true
+                },
+                {
+                  "handle": 524850,
+                  "thread": 2944,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;d0e7622b-bbb4-43fe-ab71-0686f859d6d6]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 2097690,
+                  "thread": 1232,
+                  "kind": ".NET-BroadcastEventWindow.3b95145.0",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1114510,
+                  "thread": 2944,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;32a1092e-f0d8-4c60-89dd-3b80df8ad2d9]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1311108,
+                  "thread": 2944,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;5db96665-9098-49ca-9474-8012d49ac143]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1180042,
+                  "thread": 2944,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;28230abb-e12d-48d5-8eba-65386dd1ea5a]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1048742,
+                  "thread": 2944,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 721450,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 524844,
+                  "thread": 2944,
+                  "kind": "MSCTFIME UI",
+                  "owner": 1245570,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1245570,
+                  "thread": 2944,
+                  "kind": "IME",
+                  "owner": 786978,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 721450,
+                  "thread": 2944,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 721220,
+                  "thread": 1232,
+                  "kind": "IME",
+                  "owner": 2097690,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                }
+              ],
+              "threads": [
+                {
+                  "Id": 2944,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 4375
+                },
+                {
+                  "Id": 6140,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 9192,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8220,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 3080,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8812,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 832,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 2928,
+                  "state": "Wait",
+                  "wait": "ExecutionDelay",
+                  "cpuMs": 1921.875
+                },
+                {
+                  "Id": 2896,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 46.875
+                },
+                {
+                  "Id": 7344,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 9000,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 78.125
+                },
+                {
+                  "Id": 1768,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1752,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 156.25
+                },
+                {
+                  "Id": 6824,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 531.25
+                },
+                {
+                  "Id": 1232,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1348,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1948,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 218.75
+                },
+                {
+                  "Id": 3196,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 904,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 281.25
+                },
+                {
+                  "Id": 5560,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 203.125
+                },
+                {
+                  "Id": 4592,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8788,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 250
+                },
+                {
+                  "Id": 8272,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 3124,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 2046.875
+                },
+                {
+                  "Id": 1184,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 78.125
+                },
+                {
+                  "Id": 3400,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1812,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                }
+              ],
+              "scope": "Native thread state and WM_NULL responsiveness; not a managed dispatcher stack"
+            }
+          }
+        },
+        {
+          "tick": 3479744277,
+          "phase": "close-returned",
+          "processId": 1836,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 17.5389
+          }
+        },
+        {
+          "tick": 3480367166,
+          "phase": "uia-observation-error",
+          "processId": 1836,
+          "frequency": 10000000,
+          "value": {
+            "error": "System.InvalidOperationException"
+          }
+        },
+        {
+          "tick": 3480829798,
+          "phase": "process-exited",
+          "processId": 1836,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 126.1754
+          }
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/upgrade/saved-closure.jsonl",
+      "phases": [
+        "close-request",
+        "uia-close-target",
+        "native-sample",
+        "close-returned",
+        "uia-observation-error",
+        "process-exited"
+      ],
+      "processExited": true,
+      "elapsedMs": 133.0686,
+      "events": [
+        {
+          "tick": 3150455069,
+          "phase": "close-request",
+          "processId": 1776,
+          "frequency": 10000000,
+          "value": null
+        },
+        {
+          "tick": 3150511756,
+          "phase": "uia-close-target",
+          "processId": 1776,
+          "frequency": 10000000,
+          "value": {
+            "handle": 655720,
+            "pid": 1776,
+            "FrameworkType": 2,
+            "IsEnabled": true,
+            "titleBar": true,
+            "closeButton": true,
+            "closeEnabled": true,
+            "closeOffscreen": false,
+            "windowPattern": true
+          }
+        },
+        {
+          "tick": 3150691112,
+          "phase": "native-sample",
+          "processId": 1776,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 1.4522,
+            "state": {
+              "started": 3150630234,
+              "finished": 3150688556,
+              "processId": 1776,
+              "exited": false,
+              "SessionId": 2,
+              "PrivateMemorySize64": 115216384,
+              "HandleCount": 656,
+              "cpuMs": 11109.375,
+              "mainHandle": 655720,
+              "windows": [
+                {
+                  "handle": 655720,
+                  "thread": 3272,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;c478d8c3-c5fa-4d8e-b49f-b27877975292]",
+                  "owner": 0,
+                  "visible": true,
+                  "enabled": true,
+                  "foreground": true,
+                  "responding": true
+                },
+                {
+                  "handle": 721290,
+                  "thread": 3272,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;e4ff61ae-fcd4-45d2-b8f1-d717d5ab9ce2]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 917616,
+                  "thread": 6004,
+                  "kind": ".NET-BroadcastEventWindow.3b95145.0",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 786542,
+                  "thread": 3272,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;f68ff220-8c54-4ffe-ab54-0ebf30e1fe0b]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 786820,
+                  "thread": 3272,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;c0438b6a-63be-4e88-b845-c8d680088ad3]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 393590,
+                  "thread": 3272,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;101293b5-f2be-4c7a-aa64-2c3baa5ddf33]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 393776,
+                  "thread": 3272,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 524832,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 590364,
+                  "thread": 3272,
+                  "kind": "MSCTFIME UI",
+                  "owner": 524686,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 524686,
+                  "thread": 3272,
+                  "kind": "IME",
+                  "owner": 655720,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 524832,
+                  "thread": 3272,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 721058,
+                  "thread": 6004,
+                  "kind": "IME",
+                  "owner": 917616,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                }
+              ],
+              "threads": [
+                {
+                  "Id": 3272,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 4468.75
+                },
+                {
+                  "Id": 1640,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7544,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 8668,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8700,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4348,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1672,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1712,
+                  "state": "Wait",
+                  "wait": "ExecutionDelay",
+                  "cpuMs": 1750
+                },
+                {
+                  "Id": 1812,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 62.5
+                },
+                {
+                  "Id": 1992,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1636,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 6692,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1020,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 171.875
+                },
+                {
+                  "Id": 6580,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 515.625
+                },
+                {
+                  "Id": 6004,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4340,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8960,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 6240,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 203.125
+                },
+                {
+                  "Id": 2784,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 203.125
+                },
+                {
+                  "Id": 8276,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 62.5
+                },
+                {
+                  "Id": 2264,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 218.75
+                },
+                {
+                  "Id": 2484,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 2296.875
+                },
+                {
+                  "Id": 2580,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7208,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 250
+                },
+                {
+                  "Id": 1964,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 125
+                },
+                {
+                  "Id": 6964,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 8588,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 156.25
+                },
+                {
+                  "Id": 620,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                }
+              ],
+              "scope": "Native thread state and WM_NULL responsiveness; not a managed dispatcher stack"
+            }
+          }
+        },
+        {
+          "tick": 3150916036,
+          "phase": "close-returned",
+          "processId": 1776,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 30.7253
+          }
+        },
+        {
+          "tick": 3151537520,
+          "phase": "uia-observation-error",
+          "processId": 1776,
+          "frequency": 10000000,
+          "value": {
+            "error": "FlaUI.Core.Exceptions.PropertyNotSupportedException"
+          }
+        },
+        {
+          "tick": 3151937870,
+          "phase": "process-exited",
+          "processId": 1776,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 133.0686
+          }
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/install/saved-closure.jsonl",
+      "phases": [
+        "close-request",
+        "uia-close-target",
+        "native-sample",
+        "close-returned",
+        "uia-observation-error",
+        "process-exited"
+      ],
+      "processExited": true,
+      "elapsedMs": 148.8277,
+      "events": [
+        {
+          "tick": 4410809389,
+          "phase": "close-request",
+          "processId": 7728,
+          "frequency": 10000000,
+          "value": null
+        },
+        {
+          "tick": 4410869252,
+          "phase": "uia-close-target",
+          "processId": 7728,
+          "frequency": 10000000,
+          "value": {
+            "handle": 196982,
+            "pid": 7728,
+            "FrameworkType": 2,
+            "IsEnabled": true,
+            "titleBar": true,
+            "closeButton": true,
+            "closeEnabled": true,
+            "closeOffscreen": false,
+            "windowPattern": true
+          }
+        },
+        {
+          "tick": 4411049786,
+          "phase": "native-sample",
+          "processId": 7728,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 1.7724,
+            "state": {
+              "started": 4410985057,
+              "finished": 4411047528,
+              "processId": 7728,
+              "exited": false,
+              "SessionId": 2,
+              "PrivateMemorySize64": 175579136,
+              "HandleCount": 673,
+              "cpuMs": 12921.875,
+              "mainHandle": 196982,
+              "windows": [
+                {
+                  "handle": 196982,
+                  "thread": 2284,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;aecccb28-3a5e-456c-8a1d-654d63f247d2]",
+                  "owner": 0,
+                  "visible": true,
+                  "enabled": true,
+                  "foreground": true,
+                  "responding": true
+                },
+                {
+                  "handle": 327790,
+                  "thread": 2284,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;31944bf8-858f-49e2-80fd-ee221eb3616b]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 328072,
+                  "thread": 7576,
+                  "kind": ".NET-BroadcastEventWindow.3b95145.0",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 393606,
+                  "thread": 2284,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;b7d55f21-5f14-4c3f-889c-0cdfe01efa80]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 262532,
+                  "thread": 2284,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;a91f4628-adbd-4094-9476-d6d046f87682]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 589936,
+                  "thread": 2284,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;26269e92-acb1-4b50-8de2-8190f9cd7189]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 327870,
+                  "thread": 2284,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 196774,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 131612,
+                  "thread": 2284,
+                  "kind": "MSCTFIME UI",
+                  "owner": 328180,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 328180,
+                  "thread": 2284,
+                  "kind": "IME",
+                  "owner": 196982,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 196774,
+                  "thread": 2284,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 197006,
+                  "thread": 7576,
+                  "kind": "IME",
+                  "owner": 328072,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                }
+              ],
+              "threads": [
+                {
+                  "Id": 2284,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 5187.5
+                },
+                {
+                  "Id": 1228,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 9016,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8880,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4908,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8344,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 5832,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7656,
+                  "state": "Wait",
+                  "wait": "ExecutionDelay",
+                  "cpuMs": 2828.125
+                },
+                {
+                  "Id": 5664,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 203.125
+                },
+                {
+                  "Id": 6408,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8296,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 6904,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 9200,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 156.25
+                },
+                {
+                  "Id": 4308,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 468.75
+                },
+                {
+                  "Id": 7576,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1916,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7620,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 218.75
+                },
+                {
+                  "Id": 3004,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 4656,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 187.5
+                },
+                {
+                  "Id": 2068,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 31.25
+                },
+                {
+                  "Id": 8588,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 46.875
+                },
+                {
+                  "Id": 704,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 187.5
+                },
+                {
+                  "Id": 8032,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 2484.375
+                },
+                {
+                  "Id": 7732,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8616,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 171.875
+                },
+                {
+                  "Id": 3568,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 171.875
+                },
+                {
+                  "Id": 996,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 46.875
+                }
+              ],
+              "scope": "Native thread state and WM_NULL responsiveness; not a managed dispatcher stack"
+            }
+          }
+        },
+        {
+          "tick": 4411285117,
+          "phase": "close-returned",
+          "processId": 7728,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 32.6349
+          }
+        },
+        {
+          "tick": 4412299195,
+          "phase": "uia-observation-error",
+          "processId": 7728,
+          "frequency": 10000000,
+          "value": {
+            "error": "System.Runtime.InteropServices.COMException"
+          }
+        },
+        {
+          "tick": 4412445776,
+          "phase": "process-exited",
+          "processId": 7728,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 148.8277
+          }
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/reinstall/saved-closure.jsonl",
+      "phases": [
+        "close-request",
+        "uia-close-target",
+        "native-sample",
+        "close-returned",
+        "uia-observation-error",
+        "process-exited"
+      ],
+      "processExited": true,
+      "elapsedMs": 125.0971,
+      "events": [
+        {
+          "tick": 5146179879,
+          "phase": "close-request",
+          "processId": 7996,
+          "frequency": 10000000,
+          "value": null
+        },
+        {
+          "tick": 5146234601,
+          "phase": "uia-close-target",
+          "processId": 7996,
+          "frequency": 10000000,
+          "value": {
+            "handle": 1245724,
+            "pid": 7996,
+            "FrameworkType": 2,
+            "IsEnabled": true,
+            "titleBar": true,
+            "closeButton": true,
+            "closeEnabled": true,
+            "closeOffscreen": false,
+            "windowPattern": true
+          }
+        },
+        {
+          "tick": 5146411529,
+          "phase": "native-sample",
+          "processId": 7996,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 1.6555,
+            "state": {
+              "started": 5146349941,
+              "finished": 5146409143,
+              "processId": 7996,
+              "exited": false,
+              "SessionId": 2,
+              "PrivateMemorySize64": 182349824,
+              "HandleCount": 663,
+              "cpuMs": 13296.875,
+              "mainHandle": 1245724,
+              "windows": [
+                {
+                  "handle": 1245724,
+                  "thread": 8564,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;059beb76-eb67-46f1-ab33-898be932e100]",
+                  "owner": 0,
+                  "visible": true,
+                  "enabled": true,
+                  "foreground": true,
+                  "responding": true
+                },
+                {
+                  "handle": 721442,
+                  "thread": 8564,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;16387085-07ad-4007-863c-68b5c766c3b9]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1245582,
+                  "thread": 6376,
+                  "kind": ".NET-BroadcastEventWindow.3b95145.0",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 917880,
+                  "thread": 8564,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;b6b4f766-519b-43e3-9380-b0f73d09169b]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1180022,
+                  "thread": 8564,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;06f724a1-6c8a-459b-be9e-e7c6e3d6ca9e]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1245374,
+                  "thread": 8564,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;74ac0e17-70e8-4d8b-b8d2-3c0d2c40571f]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 197158,
+                  "thread": 8564,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 917896,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 786964,
+                  "thread": 8564,
+                  "kind": "MSCTFIME UI",
+                  "owner": 1245588,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1245588,
+                  "thread": 8564,
+                  "kind": "IME",
+                  "owner": 1245724,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 917896,
+                  "thread": 8564,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1311250,
+                  "thread": 6376,
+                  "kind": "IME",
+                  "owner": 1245582,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                }
+              ],
+              "threads": [
+                {
+                  "Id": 8564,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 5437.5
+                },
+                {
+                  "Id": 7852,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 6964,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 6836,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8108,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4124,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 5744,
+                  "state": "Wait",
+                  "wait": "ExecutionDelay",
+                  "cpuMs": 2765.625
+                },
+                {
+                  "Id": 8080,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 46.875
+                },
+                {
+                  "Id": 7644,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 5200,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 218.75
+                },
+                {
+                  "Id": 2592,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4884,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 109.375
+                },
+                {
+                  "Id": 2032,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 3400,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 484.375
+                },
+                {
+                  "Id": 6376,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 15.625
+                },
+                {
+                  "Id": 2904,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 680,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 218.75
+                },
+                {
+                  "Id": 4652,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 7352,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 1784,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 8844,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 2406.25
+                },
+                {
+                  "Id": 1852,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7828,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 109.375
+                },
+                {
+                  "Id": 6364,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7344,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 109.375
+                },
+                {
+                  "Id": 3748,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 203.125
+                },
+                {
+                  "Id": 1160,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 15.625
+                }
+              ],
+              "scope": "Native thread state and WM_NULL responsiveness; not a managed dispatcher stack"
+            }
+          }
+        },
+        {
+          "tick": 5146510320,
+          "phase": "close-returned",
+          "processId": 7996,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 18.5446
+          }
+        },
+        {
+          "tick": 5147262924,
+          "phase": "uia-observation-error",
+          "processId": 7996,
+          "frequency": 10000000,
+          "value": {
+            "error": "System.Runtime.InteropServices.COMException"
+          }
+        },
+        {
+          "tick": 5147574984,
+          "phase": "process-exited",
+          "processId": 7996,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 125.0971
+          }
+        }
+      ]
+    },
+    {
+      "path": "treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/upgrade/saved-closure.jsonl",
+      "phases": [
+        "close-request",
+        "uia-close-target",
+        "native-sample",
+        "close-returned",
+        "uia-observation-error",
+        "process-exited"
+      ],
+      "processExited": true,
+      "elapsedMs": 133.17,
+      "events": [
+        {
+          "tick": 4772523160,
+          "phase": "close-request",
+          "processId": 1308,
+          "frequency": 10000000,
+          "value": null
+        },
+        {
+          "tick": 4772577452,
+          "phase": "uia-close-target",
+          "processId": 1308,
+          "frequency": 10000000,
+          "value": {
+            "handle": 721300,
+            "pid": 1308,
+            "FrameworkType": 2,
+            "IsEnabled": true,
+            "titleBar": true,
+            "closeButton": true,
+            "closeEnabled": true,
+            "closeOffscreen": false,
+            "windowPattern": true
+          }
+        },
+        {
+          "tick": 4772759891,
+          "phase": "native-sample",
+          "processId": 1308,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 1.6139,
+            "state": {
+              "started": 4772691754,
+              "finished": 4772757497,
+              "processId": 1308,
+              "exited": false,
+              "SessionId": 2,
+              "PrivateMemorySize64": 175984640,
+              "HandleCount": 673,
+              "cpuMs": 12531.25,
+              "mainHandle": 721300,
+              "windows": [
+                {
+                  "handle": 721300,
+                  "thread": 5876,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;f2e40828-fec5-49cd-904f-e05be8a3ebbc]",
+                  "owner": 0,
+                  "visible": true,
+                  "enabled": true,
+                  "foreground": true,
+                  "responding": true
+                },
+                {
+                  "handle": 655748,
+                  "thread": 5876,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;bde86d66-747b-44d4-91fc-cf0f82a8e630]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 983306,
+                  "thread": 8556,
+                  "kind": ".NET-BroadcastEventWindow.3b95145.0",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 786622,
+                  "thread": 5876,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;d178ca85-97d6-440d-bf81-50914241f81f]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 721062,
+                  "thread": 5876,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;41780110-27ac-40ff-a14d-03130e086509]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": true,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 590202,
+                  "thread": 5876,
+                  "kind": "HwndWrapper[LensDocsStudio.Native;;ae6b272f-c8ed-47da-a5ac-825c2c2e1ebc]",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 131618,
+                  "thread": 5876,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 328222,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 655890,
+                  "thread": 5876,
+                  "kind": "MSCTFIME UI",
+                  "owner": 1048688,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 1048688,
+                  "thread": 5876,
+                  "kind": "IME",
+                  "owner": 721300,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 328222,
+                  "thread": 5876,
+                  "kind": "CiceroUIWndFrame",
+                  "owner": 0,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                },
+                {
+                  "handle": 655734,
+                  "thread": 8556,
+                  "kind": "IME",
+                  "owner": 983306,
+                  "visible": false,
+                  "enabled": false,
+                  "foreground": false,
+                  "responding": true
+                }
+              ],
+              "threads": [
+                {
+                  "Id": 5876,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 4843.75
+                },
+                {
+                  "Id": 7328,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 6264,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 2752,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 3768,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 7360,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 6976,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 1724,
+                  "state": "Wait",
+                  "wait": "ExecutionDelay",
+                  "cpuMs": 2421.875
+                },
+                {
+                  "Id": 3724,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 62.5
+                },
+                {
+                  "Id": 7092,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4456,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 171.875
+                },
+                {
+                  "Id": 7528,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 2768,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 31.25
+                },
+                {
+                  "Id": 4372,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 593.75
+                },
+                {
+                  "Id": 8556,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 8888,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 5272,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 218.75
+                },
+                {
+                  "Id": 3600,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 234.375
+                },
+                {
+                  "Id": 3540,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 171.875
+                },
+                {
+                  "Id": 9028,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 187.5
+                },
+                {
+                  "Id": 5716,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 2703.125
+                },
+                {
+                  "Id": 6360,
+                  "state": "Wait",
+                  "wait": "UserRequest",
+                  "cpuMs": 0
+                },
+                {
+                  "Id": 4688,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 78.125
+                },
+                {
+                  "Id": 1740,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 125
+                },
+                {
+                  "Id": 7128,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 187.5
+                },
+                {
+                  "Id": 8900,
+                  "state": "Wait",
+                  "wait": "EventPairLow",
+                  "cpuMs": 109.375
+                }
+              ],
+              "scope": "Native thread state and WM_NULL responsiveness; not a managed dispatcher stack"
+            }
+          }
+        },
+        {
+          "tick": 4772972379,
+          "phase": "close-returned",
+          "processId": 1308,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 30.5046
+          }
+        },
+        {
+          "tick": 4773598313,
+          "phase": "uia-observation-error",
+          "processId": 1308,
+          "frequency": 10000000,
+          "value": {
+            "error": "FlaUI.Core.Exceptions.PropertyNotSupportedException"
+          }
+        },
+        {
+          "tick": 4773998107,
+          "phase": "process-exited",
+          "processId": 1308,
+          "frequency": 10000000,
+          "value": {
+            "elapsedMs": 133.17
+          }
+        }
+      ]
+    }
+  ],
+  "preparationFailures": [
+    {
+      "cohort": "treeview-closure-baseline-first-trace-0",
+      "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+      "side": "baseline",
+      "failure": "Independent package verification failed before TreeView installer execution.",
+      "directories": [
+        "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\0883ca38b60d44a69092a95abc0bff3f"
+      ]
+    },
+    {
+      "cohort": "treeview-closure-baseline-first-trace-1",
+      "directories": [
+        "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\9a7f0659871b405fb2143b45e6607f1a"
+      ],
+      "failure": "Independent package verification failed before TreeView installer execution.",
+      "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+      "side": "baseline"
+    },
+    {
+      "cohort": "treeview-closure-candidate-first-trace-0",
+      "directories": [
+        "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\f9f8cd1c226b4e20a78d87b36fcfee6b"
+      ],
+      "side": "baseline",
+      "failure": "Independent package verification failed before TreeView installer execution.",
+      "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+    },
+    {
+      "cohort": "treeview-closure-candidate-first-trace-1",
+      "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+      "directories": [
+        "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\35ffa6b6ba854a0d8bc76301aac07545"
+      ],
+      "side": "baseline",
+      "failure": "Independent package verification failed before TreeView installer execution."
+    }
+  ],
+  "verdict": "INCONCLUSIVE: passing bounded repetitions do not establish the original shutdown cause or prove a fix. Any reproduced failure requires separate causal review."
+}

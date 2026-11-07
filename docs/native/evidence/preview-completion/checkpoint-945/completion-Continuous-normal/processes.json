@@ -1,0 +1,166 @@
+[
+  {
+    "label": "foreground/trace-1/close-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "close",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-1/close-secondary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "close",
+      "LENS_NATIVE_COMPLETION_READER": "secondary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-1/switch-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "switch",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 1
+  },
+  {
+    "label": "foreground/trace-1/switch-secondary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "switch",
+      "LENS_NATIVE_COMPLETION_READER": "secondary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 1
+  },
+  {
+    "label": "foreground/trace-1/find-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "find",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-1/find-secondary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "find",
+      "LENS_NATIVE_COMPLETION_READER": "secondary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-1/pixels-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "1"
+    },
+    "exitCode": 1
+  },
+  {
+    "label": "foreground/trace-0/close-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "close",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "0"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-0/switch-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "switch",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "0"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-0/find-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "find",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "0"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "foreground/trace-0/pixels-primary",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_TRACE": "0"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "controls/pendingfind",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "controls/pendingfindclose",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "controls/cancelnav",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1"
+    },
+    "exitCode": 0
+  },
+  {
+    "label": "controls/findquery",
+    "supervisionFailure": null,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1"
+    },
+    "exitCode": 0
+  }
+]

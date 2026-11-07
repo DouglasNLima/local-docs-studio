@@ -1,0 +1,76 @@
+{
+  "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "workflow": 42391694305,
+  "job": 128470374636,
+  "verdict": "FAIL",
+  "cause": "INCONCLUSIVE; retained upgrade authoring closure failure outside this continuation's two presentation questions.",
+  "checks": [
+    "install: optional association tasks explicitly disabled and registrations absent",
+    "install: all 540 installed payload files match independently verified portable bytes",
+    "install: 0 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+    "install: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "install: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+    "upgrade: optional association tasks explicitly disabled and registrations absent",
+    "upgrade: all 540 installed payload files match independently verified portable bytes",
+    "upgrade: 45 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+    "cleanup: native installation and shortcuts removed",
+    "cleanup: 45 previous authored/source/state/evidence files retain exact SHA-256 after uninstall"
+  ],
+  "versions": [
+    {
+      "binary": "0.1.0-preview.1050",
+      "version": "0.1.0-preview.1050",
+      "phase": "install",
+      "registered": "0.1.0-preview.1050",
+      "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+    },
+    {
+      "binary": "0.1.1-preview.1050",
+      "version": "0.1.1-preview.1050",
+      "phase": "upgrade",
+      "registered": "0.1.1-preview.1050",
+      "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+    }
+  ],
+  "upgradeAuthoring": {
+    "Status": "FAIL",
+    "Family": "TreeView",
+    "SourceRevision": "0.1.0-preview.1+358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "Checks": [
+      "Independent native UIA connections agree on exact source occurrence selection",
+      "Actual native geometry has an unambiguous pointer interior",
+      "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+      "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+      "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+      "Private source, inspector and history preserve owner and disk before Apply",
+      "Apply/Cancel and inspector remain reachable at 880x600",
+      "Apply/Cancel and inspector remain reachable at 1280x800",
+      "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte"
+    ],
+    "Observations": [
+      {
+        "Operation": "Canonical pointer",
+        "Bounds": "25,33.5,14,10",
+        "Scale": 1,
+        "ScreenX": 507.7,
+        "ScreenY": 182
+      }
+    ],
+    "Error": "System.InvalidOperationException: Saved application did not close.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func`1 condition, String failure, Int32 seconds) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1807\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass28_0.<RunExpansionViEditor>b__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeExpansionViEditorUiChecks.cs:line 83"
+  },
+  "files": [
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/treeview-installer-results.json",
+      "sha256": "7684c0260c229bfab7f660a206e6f31ed7a0cde51c7682d3a05ff03cc8770867"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/install/authoring-ui.json",
+      "sha256": "08b83ac083740ba6d7a0d16ef65463a75a467be550ae93129bb0c568a8413fae"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/authoring-ui.json",
+      "sha256": "10e6849832692bf282e3d078048ed15594247c8c3be8b04ee71902da8f645866"
+    }
+  ],
+  "preservation": "Original archive, source identity, UI reports, screenshots and terminal job results retained. No retry or unrelated product change."
+}

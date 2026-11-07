@@ -313,6 +313,7 @@ export function createUiService({
     }
 
     function updateSaveButton() {
+      document.dispatchEvent(new Event('lens-document-state'));
       const record = state.files.find((item) => item.path === state.activePath);
       const canSaveConvertedCopy = Boolean(record?.converted && !record?.handle);
       const disabled = !record || Boolean(record?.readOnly);
@@ -605,16 +606,17 @@ export function createUiService({
       applyEditorLayout(state.editorLayout || 'split');
     }
 
-    function setEditorLayout(mode) {
+    function setEditorLayout(mode, { persist = true } = {}) {
       const next = ['editor', 'split', 'preview'].includes(mode) ? mode : 'split';
       state.editorLayout = next;
-      localStorage.setItem(storageKeys.editorLayout, next);
+      if (persist) localStorage.setItem(storageKeys.editorLayout, next);
       applyEditorLayout(next);
     }
 
     function applyEditorLayout(mode) {
       app.classList.remove('layout-editor', 'layout-split', 'layout-preview');
       app.classList.add(`layout-${mode}`);
+      document.dispatchEvent(new Event('lens-layout-changed'));
       layoutModeControl?.querySelectorAll('[data-layout-mode]').forEach((button) => {
         const active = button.dataset.layoutMode === mode;
         button.classList.toggle('active', active);

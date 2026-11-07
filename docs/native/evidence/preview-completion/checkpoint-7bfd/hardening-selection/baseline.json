@@ -1,0 +1,3040 @@
+{
+  "Passed": false,
+  "Error": "System.IO.IOException: Selected preview occurrence has no visible geometry.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass138_2.\u003CRunSelectionInteractions\u003Eg__AssertSelection|4(String word, Int32 occurrence, String input, Stopwatch watch) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiSynchronisationChecks.cs:line 192\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass138_2.\u003CRunSelectionInteractions\u003Eg__Select|51(ValueTuple\u00602 item, String input, \u003C\u003Ec__DisplayClass138_6\u0026) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiSynchronisationChecks.cs:line 292\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass138_2.\u003CRunSelectionInteractions\u003Eg__NaturalSelections|6(String mode) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiSynchronisationChecks.cs:line 246\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass138_0.\u003CRunSelectionInteractions\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiSynchronisationChecks.cs:line 45",
+  "Diagnostics": false,
+  "Observations": [
+    {
+      "Mode": "Continuous",
+      "Input": "natural-inherited",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 192.1497,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 512,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-repeat",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 163.9297,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 512,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-caret",
+      "ActionCount": 1,
+      "PreviewLiteralCleared": true
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-first-paint",
+      "ChangedPixels": 580,
+      "ScreenRectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 482,
+          "Y": 365
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 29,
+          "Height": 20
+        },
+        "X": 482,
+        "Y": 365,
+        "Width": 29,
+        "Height": 20,
+        "Left": 482,
+        "Top": 365,
+        "Right": 511,
+        "Bottom": 385,
+        "IsEmpty": false
+      },
+      "HighlightVisible": true,
+      "ExpectedInvisible": false,
+      "ActionCount": 0
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-drag",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 479.5157,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 512,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-preview-focus",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 236.0319,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 512,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-editor-wheel",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 129.8949,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 512,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-preview-wheel",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 137.9457,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 512,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-rapid",
+      "Word": "planning",
+      "Occurrence": 2,
+      "SourceOffset": 133,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 153.9798,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 2
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "planning",
+      "Occurrence": 58,
+      "SourceOffset": 3017,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 191.7071,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "within",
+      "Occurrence": 44,
+      "SourceOffset": 3055,
+      "SourceLength": 6,
+      "Rendered": "within",
+      "Milliseconds": 192.6901,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 36,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 365,
+          "Width": 36,
+          "Height": 20,
+          "Left": 536,
+          "Top": 365,
+          "Right": 572,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 9,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 388,
+          "Width": 9,
+          "Height": 20,
+          "Left": 536,
+          "Top": 388,
+          "Right": 545,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "proposer",
+      "Occurrence": 30,
+      "SourceOffset": 3129,
+      "SourceLength": 8,
+      "Rendered": "proposer",
+      "Milliseconds": 173.5918,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 365,
+          "Width": 30,
+          "Height": 20,
+          "Left": 590,
+          "Top": 365,
+          "Right": 620,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 388,
+          "Width": 27,
+          "Height": 20,
+          "Left": 590,
+          "Top": 388,
+          "Right": 617,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "RED",
+      "Occurrence": 30,
+      "SourceOffset": 3150,
+      "SourceLength": 3,
+      "Rendered": "RED",
+      "Milliseconds": 168.9285,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 644,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 644,
+          "Y": 365,
+          "Width": 27,
+          "Height": 20,
+          "Left": 644,
+          "Top": 365,
+          "Right": 671,
+          "Bottom": 385,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "validity",
+      "Occurrence": 44,
+      "SourceOffset": 3167,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 150.6162,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 33,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 365,
+          "Width": 33,
+          "Height": 20,
+          "Left": 698,
+          "Top": 365,
+          "Right": 731,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 18,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 388,
+          "Width": 18,
+          "Height": 20,
+          "Left": 698,
+          "Top": 388,
+          "Right": 716,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "planning",
+      "Occurrence": 2,
+      "SourceOffset": 133,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 158.6859,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "within",
+      "Occurrence": 2,
+      "SourceOffset": 171,
+      "SourceLength": 6,
+      "Rendered": "within",
+      "Milliseconds": 129.1684,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 36,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 365,
+          "Width": 36,
+          "Height": 20,
+          "Left": 536,
+          "Top": 365,
+          "Right": 572,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 9,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 388,
+          "Width": 9,
+          "Height": 20,
+          "Left": 536,
+          "Top": 388,
+          "Right": 545,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "proposer",
+      "Occurrence": 2,
+      "SourceOffset": 245,
+      "SourceLength": 8,
+      "Rendered": "proposer",
+      "Milliseconds": 299.5925,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 365,
+          "Width": 30,
+          "Height": 20,
+          "Left": 590,
+          "Top": 365,
+          "Right": 620,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 388,
+          "Width": 27,
+          "Height": 20,
+          "Left": 590,
+          "Top": 388,
+          "Right": 617,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "RED",
+      "Occurrence": 2,
+      "SourceOffset": 266,
+      "SourceLength": 3,
+      "Rendered": "RED",
+      "Milliseconds": 145.0083,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 644,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 644,
+          "Y": 365,
+          "Width": 27,
+          "Height": 20,
+          "Left": 644,
+          "Top": 365,
+          "Right": 671,
+          "Bottom": 385,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "validity",
+      "Occurrence": 2,
+      "SourceOffset": 283,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 124.0263,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 33,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 365,
+          "Width": 33,
+          "Height": 20,
+          "Left": 698,
+          "Top": 365,
+          "Right": 731,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 18,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 388,
+          "Width": 18,
+          "Height": 20,
+          "Left": 698,
+          "Top": 388,
+          "Right": 716,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "planning",
+      "Occurrence": 30,
+      "SourceOffset": 1575,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 160.1084,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "within",
+      "Occurrence": 23,
+      "SourceOffset": 1613,
+      "SourceLength": 6,
+      "Rendered": "within",
+      "Milliseconds": 156.0452,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 36,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 365,
+          "Width": 36,
+          "Height": 20,
+          "Left": 536,
+          "Top": 365,
+          "Right": 572,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 9,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 388,
+          "Width": 9,
+          "Height": 20,
+          "Left": 536,
+          "Top": 388,
+          "Right": 545,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "proposer",
+      "Occurrence": 16,
+      "SourceOffset": 1687,
+      "SourceLength": 8,
+      "Rendered": "proposer",
+      "Milliseconds": 131.0709,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 365,
+          "Width": 30,
+          "Height": 20,
+          "Left": 590,
+          "Top": 365,
+          "Right": 620,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 388,
+          "Width": 27,
+          "Height": 20,
+          "Left": 590,
+          "Top": 388,
+          "Right": 617,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "RED",
+      "Occurrence": 16,
+      "SourceOffset": 1708,
+      "SourceLength": 3,
+      "Rendered": "RED",
+      "Milliseconds": 139.5555,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 644,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 644,
+          "Y": 365,
+          "Width": 27,
+          "Height": 20,
+          "Left": 644,
+          "Top": 365,
+          "Right": 671,
+          "Bottom": 385,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "validity",
+      "Occurrence": 23,
+      "SourceOffset": 1725,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 135.8259,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 33,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 365,
+          "Width": 33,
+          "Height": 20,
+          "Left": 698,
+          "Top": 365,
+          "Right": 731,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 18,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 388,
+          "Width": 18,
+          "Height": 20,
+          "Left": 698,
+          "Top": 388,
+          "Right": 716,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "planning",
+      "Occurrence": 6,
+      "SourceOffset": 339,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 146.5294,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "within",
+      "Occurrence": 5,
+      "SourceOffset": 377,
+      "SourceLength": 6,
+      "Rendered": "within",
+      "Milliseconds": 148.8436,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 36,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 365,
+          "Width": 36,
+          "Height": 20,
+          "Left": 536,
+          "Top": 365,
+          "Right": 572,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 9,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 388,
+          "Width": 9,
+          "Height": 20,
+          "Left": 536,
+          "Top": 388,
+          "Right": 545,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "proposer",
+      "Occurrence": 4,
+      "SourceOffset": 451,
+      "SourceLength": 8,
+      "Rendered": "proposer",
+      "Milliseconds": 160.1702,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 365,
+          "Width": 30,
+          "Height": 20,
+          "Left": 590,
+          "Top": 365,
+          "Right": 620,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 388,
+          "Width": 27,
+          "Height": 20,
+          "Left": 590,
+          "Top": 388,
+          "Right": 617,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "RED",
+      "Occurrence": 4,
+      "SourceOffset": 472,
+      "SourceLength": 3,
+      "Rendered": "RED",
+      "Milliseconds": 134.4906,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 644,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 644,
+          "Y": 365,
+          "Width": 27,
+          "Height": 20,
+          "Left": 644,
+          "Top": 365,
+          "Right": 671,
+          "Bottom": 385,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "validity",
+      "Occurrence": 5,
+      "SourceOffset": 489,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 152.1281,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 33,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 365,
+          "Width": 33,
+          "Height": 20,
+          "Left": 698,
+          "Top": 365,
+          "Right": 731,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 18,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 388,
+          "Width": 18,
+          "Height": 20,
+          "Left": 698,
+          "Top": 388,
+          "Right": 716,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "planning",
+      "Occurrence": 58,
+      "SourceOffset": 3017,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 195.5704,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "within",
+      "Occurrence": 44,
+      "SourceOffset": 3055,
+      "SourceLength": 6,
+      "Rendered": "within",
+      "Milliseconds": 169.5748,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 36,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 365,
+          "Width": 36,
+          "Height": 20,
+          "Left": 536,
+          "Top": 365,
+          "Right": 572,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 9,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 388,
+          "Width": 9,
+          "Height": 20,
+          "Left": 536,
+          "Top": 388,
+          "Right": 545,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "proposer",
+      "Occurrence": 30,
+      "SourceOffset": 3129,
+      "SourceLength": 8,
+      "Rendered": "proposer",
+      "Milliseconds": 160.1991,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 365,
+          "Width": 30,
+          "Height": 20,
+          "Left": 590,
+          "Top": 365,
+          "Right": 620,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 388,
+          "Width": 27,
+          "Height": 20,
+          "Left": 590,
+          "Top": 388,
+          "Right": 617,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "RED",
+      "Occurrence": 30,
+      "SourceOffset": 3150,
+      "SourceLength": 3,
+      "Rendered": "RED",
+      "Milliseconds": 139.4254,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 644,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 644,
+          "Y": 365,
+          "Width": 27,
+          "Height": 20,
+          "Left": 644,
+          "Top": 365,
+          "Right": 671,
+          "Bottom": 385,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "validity",
+      "Occurrence": 44,
+      "SourceOffset": 3167,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 158.205,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 33,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 365,
+          "Width": 33,
+          "Height": 20,
+          "Left": 698,
+          "Top": 365,
+          "Right": 731,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 18,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 388,
+          "Width": 18,
+          "Height": 20,
+          "Left": 698,
+          "Top": 388,
+          "Right": 716,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "planning",
+      "Occurrence": 2,
+      "SourceOffset": 133,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 130.7876,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "within",
+      "Occurrence": 2,
+      "SourceOffset": 171,
+      "SourceLength": 6,
+      "Rendered": "within",
+      "Milliseconds": 153.2386,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 36,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 365,
+          "Width": 36,
+          "Height": 20,
+          "Left": 536,
+          "Top": 365,
+          "Right": 572,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 536,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 9,
+            "Height": 20
+          },
+          "X": 536,
+          "Y": 388,
+          "Width": 9,
+          "Height": 20,
+          "Left": 536,
+          "Top": 388,
+          "Right": 545,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "proposer",
+      "Occurrence": 2,
+      "SourceOffset": 245,
+      "SourceLength": 8,
+      "Rendered": "proposer",
+      "Milliseconds": 146.2445,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 365,
+          "Width": 30,
+          "Height": 20,
+          "Left": 590,
+          "Top": 365,
+          "Right": 620,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 590,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 590,
+          "Y": 388,
+          "Width": 27,
+          "Height": 20,
+          "Left": 590,
+          "Top": 388,
+          "Right": 617,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "RED",
+      "Occurrence": 2,
+      "SourceOffset": 266,
+      "SourceLength": 3,
+      "Rendered": "RED",
+      "Milliseconds": 141.0288,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 644,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 20
+          },
+          "X": 644,
+          "Y": 365,
+          "Width": 27,
+          "Height": 20,
+          "Left": 644,
+          "Top": 365,
+          "Right": 671,
+          "Bottom": 385,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "double-click",
+      "Word": "validity",
+      "Occurrence": 2,
+      "SourceOffset": 283,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 148.439,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 33,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 365,
+          "Width": 33,
+          "Height": 20,
+          "Left": 698,
+          "Top": 365,
+          "Right": 731,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 698,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 18,
+            "Height": 20
+          },
+          "X": 698,
+          "Y": 388,
+          "Width": 18,
+          "Height": 20,
+          "Left": 698,
+          "Top": 388,
+          "Right": 716,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "drag",
+      "Word": "planning",
+      "Occurrence": 2,
+      "SourceOffset": 133,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 1199.6705,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "keyboard",
+      "Word": "planning",
+      "Occurrence": 2,
+      "SourceOffset": 133,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 243.1591,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "cross-inline-keyboard",
+      "SourceOffset": 122,
+      "SourceLength": 35,
+      "Rendered": "planning planning and planning",
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "zoom",
+      "Word": "validity",
+      "Occurrence": 2,
+      "SourceOffset": 283,
+      "SourceLength": 8,
+      "Rendered": "validity",
+      "Milliseconds": 135.337,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 697,
+            "Y": 342
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 27,
+            "Height": 22
+          },
+          "X": 697,
+          "Y": 342,
+          "Width": 27,
+          "Height": 22,
+          "Left": 697,
+          "Top": 342,
+          "Right": 724,
+          "Bottom": 364,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 697,
+            "Y": 368
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 21
+          },
+          "X": 697,
+          "Y": 368,
+          "Width": 30,
+          "Height": 21,
+          "Left": 697,
+          "Top": 368,
+          "Right": 727,
+          "Bottom": 389,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "rapid-alternation",
+      "Word": "planning",
+      "Occurrence": 3,
+      "SourceOffset": 149,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 150.1777,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 511,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 2
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "rapid-settled",
+      "Word": "planning",
+      "Occurrence": 3,
+      "SourceOffset": 149,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 448.2478,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 511,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 511,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 0
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "regenerated-preview",
+      "Word": "revised",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 7,
+      "Rendered": "revised",
+      "Milliseconds": 144.3566,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 17,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 17,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 499,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "before-syntax",
+      "Word": "planning",
+      "Occurrence": 2,
+      "SourceOffset": 133,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 142.6968,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 365
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 31,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 365,
+          "Width": 31,
+          "Height": 20,
+          "Left": 482,
+          "Top": 365,
+          "Right": 513,
+          "Bottom": 385,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 388
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 32,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 388,
+          "Width": 32,
+          "Height": 20,
+          "Left": 482,
+          "Top": 388,
+          "Right": 514,
+          "Bottom": 408,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "syntax-drag",
+      "ExactSource": "**",
+      "PreviewLiteralCleared": true,
+      "SemanticFallback": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "preview-drag",
+      "ExactRepeatedOccurrence": true,
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "document-replacement",
+      "ObsoleteSelectionRejected": true,
+      "OriginalSourceRetained": true
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-inherited",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 140.7237,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 383
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 383,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 383,
+          "Right": 511,
+          "Bottom": 403,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 406
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 406,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 406,
+          "Right": 512,
+          "Bottom": 426,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-repeat",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 144.9503,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 383
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 383,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 383,
+          "Right": 511,
+          "Bottom": 403,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 406
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 406,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 406,
+          "Right": 512,
+          "Bottom": 426,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-caret",
+      "ActionCount": 1,
+      "PreviewLiteralCleared": true
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-first-paint",
+      "ChangedPixels": 580,
+      "ScreenRectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 482,
+          "Y": 383
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 29,
+          "Height": 20
+        },
+        "X": 482,
+        "Y": 383,
+        "Width": 29,
+        "Height": 20,
+        "Left": 482,
+        "Top": 383,
+        "Right": 511,
+        "Bottom": 403,
+        "IsEmpty": false
+      },
+      "HighlightVisible": true,
+      "ExpectedInvisible": false,
+      "ActionCount": 0
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-drag",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 472.3746,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 383
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 383,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 383,
+          "Right": 511,
+          "Bottom": 403,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 406
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 406,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 406,
+          "Right": 512,
+          "Bottom": 426,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-preview-focus",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 221.5825,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 383
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 383,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 383,
+          "Right": 511,
+          "Bottom": 403,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 406
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 406,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 406,
+          "Right": 512,
+          "Bottom": 426,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-editor-wheel",
+      "Word": "planning",
+      "Occurrence": 1,
+      "SourceOffset": 122,
+      "SourceLength": 8,
+      "Rendered": "planning",
+      "Milliseconds": 125.992,
+      "Geometry": [
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 383
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 29,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 383,
+          "Width": 29,
+          "Height": 20,
+          "Left": 482,
+          "Top": 383,
+          "Right": 511,
+          "Bottom": 403,
+          "IsEmpty": false
+        },
+        {
+          "Location": {
+            "IsEmpty": false,
+            "X": 482,
+            "Y": 406
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 30,
+            "Height": 20
+          },
+          "X": 482,
+          "Y": 406,
+          "Width": 30,
+          "Height": 20,
+          "Left": 482,
+          "Top": 406,
+          "Right": 512,
+          "Bottom": 426,
+          "IsEmpty": false
+        }
+      ],
+      "FocusRetained": true,
+      "ActionCount": 1
+    }
+  ],
+  "InputTargets": [
+    {
+      "Mode": "Continuous",
+      "Input": "natural-inherited",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-repeat",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-preview-focus",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-editor-wheel",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 270
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 270,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 270,
+        "Right": 183,
+        "Bottom": 286,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-preview-wheel",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Continuous",
+      "Input": "natural-rapid",
+      "First": {
+        "Occurrence": 1,
+        "Rectangle": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 117,
+            "Y": 319
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 66,
+            "Height": 16
+          },
+          "X": 117,
+          "Y": 319,
+          "Width": 66,
+          "Height": 16,
+          "Left": 117,
+          "Top": 319,
+          "Right": 183,
+          "Bottom": 335,
+          "IsEmpty": false
+        }
+      },
+      "Last": {
+        "Occurrence": 2,
+        "Rectangle": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 207,
+            "Y": 319
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 66,
+            "Height": 16
+          },
+          "X": 207,
+          "Y": 319,
+          "Width": 66,
+          "Height": 16,
+          "Left": 207,
+          "Top": 319,
+          "Right": 273,
+          "Bottom": 335,
+          "IsEmpty": false
+        }
+      }
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-inherited",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-repeat",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-preview-focus",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-editor-wheel",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 270
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 270,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 270,
+        "Right": 183,
+        "Bottom": 286,
+        "IsEmpty": false
+      }
+    },
+    {
+      "Mode": "Pages",
+      "Input": "natural-preview-wheel",
+      "Occurrence": 1,
+      "Rectangle": {
+        "Location": {
+          "IsEmpty": false,
+          "X": 117,
+          "Y": 319
+        },
+        "Size": {
+          "IsEmpty": false,
+          "Width": 66,
+          "Height": 16
+        },
+        "X": 117,
+        "Y": 319,
+        "Width": 66,
+        "Height": 16,
+        "Left": 117,
+        "Top": 319,
+        "Right": 183,
+        "Bottom": 335,
+        "IsEmpty": false
+      }
+    }
+  ],
+  "GeometryObservationFailures": 0,
+  "SelectionActionRetries": 0
+}

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <!-- Reuse the library in pinned dotnet-trace 10.0.750501, outside the product. -->
+  <ItemGroup>
+    <Reference Include="Microsoft.Diagnostics.Tracing.TraceEvent">
+      <HintPath>$(TraceEventAssembly)</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.Diagnostics.FastSerialization">
+      <HintPath>$([System.IO.Path]::GetDirectoryName('$(TraceEventAssembly)'))/Microsoft.Diagnostics.FastSerialization.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="RequireDiagnosticTool" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(TraceEventAssembly)')" Text="Supply TraceEventAssembly from pinned dotnet-trace 10.0.750501." />
+  </Target>
+</Project>

@@ -1,0 +1,225 @@
+{
+  "scope": "Timing only; later collection failures remain failed",
+  "counts": {
+    "Scroll/INCONCLUSIVE": 24,
+    "Pages/PASS": 12
+  },
+  "rows": [
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "close-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "close-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "find-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "find-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "switch-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "switch-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "close-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "close-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "find-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "find-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "switch-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "switch-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "close-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "close-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "find-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "find-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "switch-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "switch-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "close-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "close-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "find-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "find-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "switch-primary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "switch-secondary",
+      "timing": "INCONCLUSIVE",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "close-primary",
+      "timing": "PASS",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "close-secondary",
+      "timing": "PASS",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "find-primary",
+      "timing": "PASS",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "find-secondary",
+      "timing": "PASS",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "switch-primary",
+      "timing": "PASS",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "switch-secondary",
+      "timing": "PASS",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "close-primary",
+      "timing": "PASS",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "close-secondary",
+      "timing": "PASS",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "find-primary",
+      "timing": "PASS",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "find-secondary",
+      "timing": "PASS",
+      "completeFunctionalSummary": true
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "switch-primary",
+      "timing": "PASS",
+      "completeFunctionalSummary": false
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "switch-secondary",
+      "timing": "PASS",
+      "completeFunctionalSummary": false
+    }
+  ]
+}

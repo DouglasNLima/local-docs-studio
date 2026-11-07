@@ -1,0 +1,17 @@
+[
+  {
+    "longpaths": "false",
+    "exitCode": 128,
+    "path": "C:\\Code\\MarkdownReader-reading-productivity\\artifacts\\native-regression-closure-investigation\\long-path-control\\nested-worktree-acceptance-false\\baseline-source",
+    "errorMentionsFilenameTooLong": true
+  },
+  {
+    "longpaths": "true",
+    "exitCode": 0,
+    "path": "C:\\Code\\MarkdownReader-reading-productivity\\artifacts\\native-regression-closure-investigation\\long-path-control\\nested-worktree-acceptance-true\\baseline-source",
+    "errorMentionsFilenameTooLong": false,
+    "head": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "tree": "81a5921ddc41780ae7aa644a9c2fb37aaef6e70b",
+    "status": ""
+  }
+]

@@ -1,0 +1,1222 @@
+{
+  "collection": "FAIL",
+  "pendingInterruption": "INCONCLUSIVE",
+  "presentation": "FAIL",
+  "pending": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\close-primary\\presentation-completion.json",
+      "scenario": "close",
+      "reader": "primary",
+      "verdict": "PASS"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\close-secondary\\presentation-completion.json",
+      "scenario": "close",
+      "reader": "secondary",
+      "verdict": "PASS"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\find-secondary\\presentation-completion.json",
+      "scenario": "find",
+      "reader": "secondary",
+      "verdict": "PASS"
+    }
+  ],
+  "semantic": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\find-primary\\completion-captures.json",
+      "action": "interrupted-find",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "returned-primary",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\switch-primary\\completion-captures.json",
+      "action": "interrupted-switch",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\switch-secondary\\completion-captures.json",
+      "action": "interrupted-switch",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    }
+  ],
+  "deferred": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "after",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 1,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 1,
+      "boundary": "after",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 2,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "after",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 1,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 1,
+      "boundary": "after",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    }
+  ],
+  "pixelReview": [
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-0\\close-primary\\completion-000-interrupted-close-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-0\\close-primary\\completion-001-interrupted-close-frame-1-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-0\\close-primary\\completion-002-interrupted-close-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\find-primary\\completion-000-interrupted-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-0\\find-primary\\completion-000-interrupted-find-frame-0-secondary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\find-primary\\completion-001-interrupted-find-frame-1-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 1,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-0\\find-primary\\completion-001-interrupted-find-frame-1-secondary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\find-primary\\completion-002-interrupted-find-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-0\\find-primary\\completion-002-interrupted-find-frame-2-secondary-page.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 525 ms",
+      "sha256": "7F8176EE2D04A8247C88E92FD8D44D418DAED7B0E9F73CD11C1F793FC5DBB990",
+      "observed": "Preview updated in 525 msl",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-000-primary-find-frame-0-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-000-primary-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 525 ms",
+      "sha256": "7F8176EE2D04A8247C88E92FD8D44D418DAED7B0E9F73CD11C1F793FC5DBB990",
+      "observed": "Preview updated in 525 msl",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-001-primary-find-frame-1-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-001-primary-find-frame-1-primary-page.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 525 ms",
+      "sha256": "7F8176EE2D04A8247C88E92FD8D44D418DAED7B0E9F73CD11C1F793FC5DBB990",
+      "observed": "Preview updated in 525 msl",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-002-primary-find-frame-2-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-002-primary-find-frame-2-primary-page.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 525 ms",
+      "sha256": "7F8176EE2D04A8247C88E92FD8D44D418DAED7B0E9F73CD11C1F793FC5DBB990",
+      "observed": "Preview updated in 525 msl",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-003-primary-find-all-readers-frame-0-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-003-primary-find-all-readers-frame-0-primary-page.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 525 ms",
+      "sha256": "7F8176EE2D04A8247C88E92FD8D44D418DAED7B0E9F73CD11C1F793FC5DBB990",
+      "observed": "Preview updated in 525 msl",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-004-primary-find-all-readers-frame-1-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-004-primary-find-all-readers-frame-1-primary-page.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 525 ms",
+      "sha256": "7F8176EE2D04A8247C88E92FD8D44D418DAED7B0E9F73CD11C1F793FC5DBB990",
+      "observed": "Preview updated in 525 msl",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-005-primary-find-all-readers-frame-2-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-005-primary-find-all-readers-frame-2-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 93 ms",
+      "sha256": "4995C55CCA81E2A29C7A88524585814F95D475D86A00F2CD5FBBE6EA8EF32AA5",
+      "observed": "Preview updated in ms",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-006-secondary-find-frame-0-status.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-006-secondary-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 1 of 1",
+      "sha256": "42C03E361072969FE08F666A8C48A39193E83138E5259B4D8F9503944508FBC4",
+      "observed": "Page 1 af 1",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-006-secondary-find-frame-0-secondary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 93 ms",
+      "sha256": "4995C55CCA81E2A29C7A88524585814F95D475D86A00F2CD5FBBE6EA8EF32AA5",
+      "observed": "Preview updated in ms",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-007-secondary-find-frame-1-status.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-007-secondary-find-frame-1-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 1,
+      "expected": "Page 1 of 1",
+      "sha256": "42C03E361072969FE08F666A8C48A39193E83138E5259B4D8F9503944508FBC4",
+      "observed": "Page 1 af 1",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-007-secondary-find-frame-1-secondary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 93 ms",
+      "sha256": "4995C55CCA81E2A29C7A88524585814F95D475D86A00F2CD5FBBE6EA8EF32AA5",
+      "observed": "Preview updated in ms",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-008-secondary-find-frame-2-status.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-008-secondary-find-frame-2-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 1 of 179",
+      "sha256": "59DEDE65E00BEC87FD638F3E3CAB980731674C2C1696F850A62C288AE9E99654",
+      "observed": "Page 1 of 89",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-008-secondary-find-frame-2-secondary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 93 ms",
+      "sha256": "4995C55CCA81E2A29C7A88524585814F95D475D86A00F2CD5FBBE6EA8EF32AA5",
+      "observed": "Preview updated in ms",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-009-secondary-find-all-readers-frame-0-status.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-009-secondary-find-all-readers-frame-0-primary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-009-secondary-find-all-readers-frame-0-secondary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 93 ms",
+      "sha256": "4995C55CCA81E2A29C7A88524585814F95D475D86A00F2CD5FBBE6EA8EF32AA5",
+      "observed": "Preview updated in ms",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-010-secondary-find-all-readers-frame-1-status.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-010-secondary-find-all-readers-frame-1-primary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 1,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-010-secondary-find-all-readers-frame-1-secondary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 93 ms",
+      "sha256": "4995C55CCA81E2A29C7A88524585814F95D475D86A00F2CD5FBBE6EA8EF32AA5",
+      "observed": "Preview updated in ms",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-011-secondary-find-all-readers-frame-2-status.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-011-secondary-find-all-readers-frame-2-primary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-011-secondary-find-all-readers-frame-2-secondary-page.png"
+    },
+    {
+      "action": "returned-primary",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-012-returned-primary-frame-0-primary-page.png"
+    },
+    {
+      "action": "returned-primary",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-013-returned-primary-frame-1-primary-page.png"
+    },
+    {
+      "action": "returned-primary",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-014-returned-primary-frame-2-primary-page.png"
+    },
+    {
+      "action": "rapid-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-015-rapid-switch-frame-0-primary-page.png"
+    },
+    {
+      "action": "rapid-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-016-rapid-switch-frame-1-primary-page.png"
+    },
+    {
+      "action": "rapid-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-017-rapid-switch-frame-2-primary-page.png"
+    },
+    {
+      "action": "closed-comparison",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 37 of 37",
+      "sha256": "BB6F1F69CFF277BCE324068E2798C25E2CC25C39DB8F9FEA443B9D065CD2A0C8",
+      "observed": "Page 37 af 37",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-018-closed-comparison-frame-0-primary-page.png"
+    },
+    {
+      "action": "closed-comparison",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 37 of 37",
+      "sha256": "BB6F1F69CFF277BCE324068E2798C25E2CC25C39DB8F9FEA443B9D065CD2A0C8",
+      "observed": "Page 37 af 37",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-019-closed-comparison-frame-1-primary-page.png"
+    },
+    {
+      "action": "closed-comparison",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 37 of 37",
+      "sha256": "BB6F1F69CFF277BCE324068E2798C25E2CC25C39DB8F9FEA443B9D065CD2A0C8",
+      "observed": "Page 37 af 37",
+      "match": false,
+      "file": "foreground\\trace-0\\pixels-primary\\completion-020-closed-comparison-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\switch-primary\\completion-000-interrupted-switch-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 155 of 155",
+      "sha256": "538727FDDC5B5E9697A3826DA3DED1CDF00A5C76B6906583F5BDAE68830F326B",
+      "observed": "Page 155 of 1551",
+      "match": false,
+      "file": "foreground\\trace-0\\switch-primary\\completion-000-interrupted-switch-frame-0-secondary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\switch-primary\\completion-001-interrupted-switch-frame-1-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 1,
+      "expected": "Page 155 of 155",
+      "sha256": "538727FDDC5B5E9697A3826DA3DED1CDF00A5C76B6906583F5BDAE68830F326B",
+      "observed": "Page 155 of 1551",
+      "match": false,
+      "file": "foreground\\trace-0\\switch-primary\\completion-001-interrupted-switch-frame-1-secondary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-0\\switch-primary\\completion-002-interrupted-switch-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 155 of 155",
+      "sha256": "538727FDDC5B5E9697A3826DA3DED1CDF00A5C76B6906583F5BDAE68830F326B",
+      "observed": "Page 155 of 1551",
+      "match": false,
+      "file": "foreground\\trace-0\\switch-primary\\completion-002-interrupted-switch-frame-2-secondary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-1\\close-primary\\completion-000-interrupted-close-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-1\\close-primary\\completion-001-interrupted-close-frame-1-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-1\\close-primary\\completion-002-interrupted-close-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-1\\close-secondary\\completion-000-interrupted-close-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-1\\close-secondary\\completion-001-interrupted-close-frame-1-primary-page.png"
+    },
+    {
+      "action": "interrupted-close",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 43 of 43",
+      "sha256": "71ADEA03A01909939AB04BC9043C646AA93CEFB5A7B890CD657138ECB477FCB4",
+      "observed": "Page 43 af 43",
+      "match": false,
+      "file": "foreground\\trace-1\\close-secondary\\completion-002-interrupted-close-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\find-primary\\completion-000-interrupted-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-1\\find-primary\\completion-000-interrupted-find-frame-0-secondary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\find-secondary\\completion-000-interrupted-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-1\\find-secondary\\completion-000-interrupted-find-frame-0-secondary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\find-secondary\\completion-001-interrupted-find-frame-1-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 1,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-1\\find-secondary\\completion-001-interrupted-find-frame-1-secondary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\find-secondary\\completion-002-interrupted-find-frame-2-primary-page.png"
+    },
+    {
+      "action": "interrupted-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 183 of 183",
+      "sha256": "D176E9DD5F0C3DD567156F4A1C66B27E164533CF345EF0F0954230E33A4ADA94",
+      "observed": "Page 183 of 1831",
+      "match": false,
+      "file": "foreground\\trace-1\\find-secondary\\completion-002-interrupted-find-frame-2-secondary-page.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 520 ms",
+      "sha256": "33DAD82419C84672FD5BACBC8ED8F2F842F4AF2CED2EFE1773B7A35AA371CDD5",
+      "observed": "Preview updated in 520 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-000-primary-find-frame-0-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-000-primary-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 520 ms",
+      "sha256": "33DAD82419C84672FD5BACBC8ED8F2F842F4AF2CED2EFE1773B7A35AA371CDD5",
+      "observed": "Preview updated in 520 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-001-primary-find-frame-1-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-001-primary-find-frame-1-primary-page.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 520 ms",
+      "sha256": "33DAD82419C84672FD5BACBC8ED8F2F842F4AF2CED2EFE1773B7A35AA371CDD5",
+      "observed": "Preview updated in 520 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-002-primary-find-frame-2-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-002-primary-find-frame-2-primary-page.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 520 ms",
+      "sha256": "33DAD82419C84672FD5BACBC8ED8F2F842F4AF2CED2EFE1773B7A35AA371CDD5",
+      "observed": "Preview updated in 520 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-003-primary-find-all-readers-frame-0-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-003-primary-find-all-readers-frame-0-primary-page.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 520 ms",
+      "sha256": "33DAD82419C84672FD5BACBC8ED8F2F842F4AF2CED2EFE1773B7A35AA371CDD5",
+      "observed": "Preview updated in 520 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-004-primary-find-all-readers-frame-1-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-004-primary-find-all-readers-frame-1-primary-page.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 520 ms",
+      "sha256": "33DAD82419C84672FD5BACBC8ED8F2F842F4AF2CED2EFE1773B7A35AA371CDD5",
+      "observed": "Preview updated in 520 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-005-primary-find-all-readers-frame-2-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-005-primary-find-all-readers-frame-2-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 48 ms",
+      "sha256": "43389EB93909BE0D6A8F82D50D53F88E411EC3469B603191DEC656642AB32789",
+      "observed": "Preview layout changed",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-006-secondary-find-frame-0-status.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "D91921307D42C161C670BBAB3C4E625F7E29F1E391AF65B09F177AAEEA795238",
+      "observed": "Page 2 of 259",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-006-secondary-find-frame-0-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 1 of 1",
+      "sha256": "42C03E361072969FE08F666A8C48A39193E83138E5259B4D8F9503944508FBC4",
+      "observed": "Page 1 af 1",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-006-secondary-find-frame-0-secondary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-007-secondary-find-frame-1-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-008-secondary-find-frame-2-primary-page.png"
+    },
+    {
+      "action": "secondary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-008-secondary-find-frame-2-secondary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-009-secondary-find-all-readers-frame-0-primary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-009-secondary-find-all-readers-frame-0-secondary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 1,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-010-secondary-find-all-readers-frame-1-primary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 1,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-010-secondary-find-all-readers-frame-1-secondary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 2,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-011-secondary-find-all-readers-frame-2-primary-page.png"
+    },
+    {
+      "action": "secondary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 2,
+      "expected": "Page 182 of 182",
+      "sha256": "380E2D58FD6504128AFD22C695C5B7191BB445221091BA4A090F6744B0A7B890",
+      "observed": "Page 182 of 1821",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-011-secondary-find-all-readers-frame-2-secondary-page.png"
+    },
+    {
+      "action": "returned-primary",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 257 of 257",
+      "sha256": "73C926FB91318F96D5C8FB868F2B714D6A89AA313229953ABF7A1868602DCC08",
+      "observed": "257 of 257",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-012-returned-primary-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\switch-primary\\completion-000-interrupted-switch-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 155 of 155",
+      "sha256": "538727FDDC5B5E9697A3826DA3DED1CDF00A5C76B6906583F5BDAE68830F326B",
+      "observed": "Page 155 of 1551",
+      "match": false,
+      "file": "foreground\\trace-1\\switch-primary\\completion-000-interrupted-switch-frame-0-secondary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 91 ms",
+      "sha256": "B5F0879EEF6E88A207143C9C9A1ABB14B0409CD3E3BC8C8D53AD5685FCF422B2",
+      "observed": "Preview updated in 21 ms",
+      "match": false,
+      "file": "foreground\\trace-1\\switch-secondary\\completion-000-interrupted-switch-frame-0-status.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "primary-page",
+      "frameIndex": 0,
+      "expected": "Page 259 of 259",
+      "sha256": "41BBF05E0AD9319E09990599FA9101C8A9737348C7A930E9BC755A4317EAD039",
+      "observed": "Page 259 of 259 |",
+      "match": false,
+      "file": "foreground\\trace-1\\switch-secondary\\completion-000-interrupted-switch-frame-0-primary-page.png"
+    },
+    {
+      "action": "interrupted-switch",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "secondary-page",
+      "frameIndex": 0,
+      "expected": "Page 155 of 155",
+      "sha256": "538727FDDC5B5E9697A3826DA3DED1CDF00A5C76B6906583F5BDAE68830F326B",
+      "observed": "Page 155 of 1551",
+      "match": false,
+      "file": "foreground\\trace-1\\switch-secondary\\completion-000-interrupted-switch-frame-0-secondary-page.png"
+    }
+  ],
+  "fullFrames": 55,
+  "pixelReadings": 153,
+  "verdict": "NO-GO",
+  "scope": "Finite observation, not universal intermittent-failure elimination; OCR mismatches require independent review and are never silently accepted."
+}

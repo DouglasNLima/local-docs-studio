@@ -1,0 +1,84 @@
+name: Native preview reflow integration acceptance
+on:
+  push:
+    branches: [feature/reading-experience-productivity]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mixed:
+    name: Original mixed (${{ matrix.appearance }}, ${{ matrix.order }}, trace=${{ matrix.trace }})
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+        trace: ['0', '1']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate inherited observer controls
+        run: node --test tests/unit/native-ux-report.test.mjs
+      - name: Original journey with unchanged fixture and observation deadline
+        shell: pwsh
+        env:
+          LENS_NATIVE_TRANSITION_TRACE: '${{ matrix.trace }}'
+        run: |
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision 75de42474514af0e7a6e521235a6517f4acad14b -CandidateRevision (git rev-parse HEAD).Trim() -Fixtures mixed -Processes 4 -Iterations 3 -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}'
+          exit $LASTEXITCODE
+      - name: Original causal controls, modes, zoom, selection and supersession
+        if: ${{ !cancelled() }}
+        run: scripts/native/Test-PreviewLayoutRetention.ps1 -EvidenceDirectory artifacts/native-ux
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-mixed-${{ matrix.appearance }}-${{ matrix.order }}-trace-${{ matrix.trace }}
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+            artifacts/native-ux/controls/
+  comparison:
+    name: Comparison (${{ matrix.mode }}, ${{ matrix.appearance }}, ${{ matrix.order }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [Continuous, Automatic, Pages]
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Freeze exact products and identical observer
+        shell: pwsh
+        run: scripts/native/Measure-NativeUx.ps1 -BaselineRevision 75de42474514af0e7a6e521235a6517f4acad14b -CandidateRevision (git rev-parse HEAD).Trim() -Fixtures mixed -Processes 2 -Iterations 1 -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}' -OutputDirectory artifacts/comparison-reflow -PrepareOnly
+      - name: Independent foreground comparison and controlled reflow acceptance
+        run: scripts/native/Test-ComparisonPreviewRetention.ps1 -EvidenceDirectory artifacts/comparison-reflow -Mode '${{ matrix.mode }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: comparison-${{ matrix.mode }}-${{ matrix.appearance }}-${{ matrix.order }}
+          path: |
+            artifacts/comparison-reflow/protocol.json
+            artifacts/comparison-reflow/comparison-results.json
+            artifacts/comparison-reflow/foreground/
+            artifacts/comparison-reflow/controls/

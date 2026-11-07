@@ -180,7 +180,14 @@ public partial class MainWindow
                 visible.Add(heading);
                 if (CollapsedOutlineSections.Contains(heading.Anchor)) closedLevel = heading.Level;
             }
-            Outline.ItemsSource = visible;
+            var all = parsed?.Headings ?? [];
+            var branches = new HashSet<string>(StringComparer.Ordinal);
+            for (var index = 0; index + 1 < all.Count; index++)
+                if (all[index + 1].Level > all[index].Level) branches.Add(all[index].Anchor);
+            Outline.ItemsSource = visible.Select(heading => new OutlineEntry(heading, branches.Contains(heading.Anchor),
+                !CollapsedOutlineSections.Contains(heading.Anchor))).ToArray();
+            foreach (var id in collapsedOutlineSections.Keys.Where(id => !model.Documents.Any(document => document.Id == id)).ToArray())
+                collapsedOutlineSections.Remove(id);
             HighlightCurrentHeading();
         }
         finally { updatingOutline = false; }
@@ -188,7 +195,7 @@ public partial class MainWindow
     private void HighlightCurrentHeading()
     {
         if (parsed is null || parsedVersion is null || parsedDocumentId != model.ActiveDocument?.Id || Editor.Document.Version.CompareAge(parsedVersion) != 0 || !OutlinePanel.IsVisible) return;
-        var heading = Outline.Items.OfType<DocumentHeading>().LastOrDefault(item => item.SourceStart <= Editor.CaretOffset);
+        var heading = Outline.Items.OfType<OutlineEntry>().LastOrDefault(item => item.SourceStart <= Editor.CaretOffset);
         var wasUpdating = updatingOutline; updatingOutline = true;
         try { Outline.SelectedItem = heading; }
         finally { updatingOutline = wasUpdating; }
@@ -203,7 +210,7 @@ public partial class MainWindow
     }
     private void OutlineKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key is not (Key.Left or Key.Right) || Outline.SelectedItem is not DocumentHeading heading) return;
+        if (e.Key is not (Key.Left or Key.Right) || Outline.SelectedItem is not OutlineEntry heading) return;
         if (e.Key == Key.Left) CollapsedOutlineSections.Add(heading.Anchor); else CollapsedOutlineSections.Remove(heading.Anchor);
         e.Handled = true; RefreshOutline();
         // Replacing the filtered item collection removes its focused container.
@@ -212,8 +219,8 @@ public partial class MainWindow
         var document = model.ActiveDocument;
         Dispatcher.BeginInvoke(() =>
         {
-            if (model.ActiveDocument == document && Outline.IsKeyboardFocusWithin && ReferenceEquals(Outline.SelectedItem, heading)
-                && Outline.ItemContainerGenerator.ContainerFromItem(heading) is ListBoxItem { IsVisible: true } row) row.Focus();
+            if (model.ActiveDocument == document && Outline.IsKeyboardFocusWithin && Outline.SelectedItem is OutlineEntry selected && selected.Anchor == heading.Anchor
+                && Outline.ItemContainerGenerator.ContainerFromItem(Outline.SelectedItem) is ListBoxItem { IsVisible: true } row) row.Focus();
         }, System.Windows.Threading.DispatcherPriority.Loaded);
     }
 }

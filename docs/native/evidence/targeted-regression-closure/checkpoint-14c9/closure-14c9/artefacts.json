@@ -1,0 +1,116 @@
+[
+  {
+    "id": 13585944888,
+    "name": "treeview-closure-baseline-first-trace-1",
+    "size_in_bytes": 13364820,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13585944888",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13585944888/zip",
+    "expired": false,
+    "created_at": "2026-11-07T18:58:24Z",
+    "expires_at": "2026-11-21T18:58:22Z",
+    "updated_at": "2026-11-07T18:58:24Z",
+    "digest": "sha256:1fad0c8e4c8e28b50f21047c5fec8e613445a0d420fe88b1ea9685458357c822",
+    "workflow_run": {
+      "id": 42400249221,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "14c9b056974f43810e2ad7d45376dd516d4ebd71"
+    }
+  },
+  {
+    "id": 13585629703,
+    "name": "treeview-closure-baseline-first-trace-0",
+    "size_in_bytes": 13594009,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13585629703",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13585629703/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:00:29Z",
+    "expires_at": "2026-11-21T19:00:27Z",
+    "updated_at": "2026-11-07T19:00:29Z",
+    "digest": "sha256:d2db8e0853346a5e07fb566615c1fb3323e19230bb411767d6a62c482fd2850e",
+    "workflow_run": {
+      "id": 42400249221,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "14c9b056974f43810e2ad7d45376dd516d4ebd71"
+    }
+  },
+  {
+    "id": 13584953278,
+    "name": "regression-closure-high-contrast-baseline-first",
+    "size_in_bytes": 299,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584953278",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584953278/zip",
+    "expired": false,
+    "created_at": "2026-11-07T18:15:20Z",
+    "expires_at": "2026-11-21T18:15:19Z",
+    "updated_at": "2026-11-07T18:15:20Z",
+    "digest": "sha256:59034a6958dc78885aca61c61d63c30c73c82f97aa66ad5387bab7a73fbc0010",
+    "workflow_run": {
+      "id": 42400249221,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "14c9b056974f43810e2ad7d45376dd516d4ebd71"
+    }
+  },
+  {
+    "id": 13584934153,
+    "name": "regression-closure-normal-baseline-first",
+    "size_in_bytes": 299,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584934153",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584934153/zip",
+    "expired": false,
+    "created_at": "2026-11-07T18:20:54Z",
+    "expires_at": "2026-11-21T18:20:53Z",
+    "updated_at": "2026-11-07T18:20:54Z",
+    "digest": "sha256:7e9e8bbd348dd2457caed1edc343b03a261df7b15eb5c707829cdad5ac5e85a5",
+    "workflow_run": {
+      "id": 42400249221,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "14c9b056974f43810e2ad7d45376dd516d4ebd71"
+    }
+  },
+  {
+    "id": 13584704031,
+    "name": "regression-closure-normal-candidate-first",
+    "size_in_bytes": 299,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584704031",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584704031/zip",
+    "expired": false,
+    "created_at": "2026-11-07T18:25:44Z",
+    "expires_at": "2026-11-21T18:25:44Z",
+    "updated_at": "2026-11-07T18:25:44Z",
+    "digest": "sha256:1158e8a3ba7bbb7c525e7caf0fc3b6e346b455fe8b6af726c5b957ccc90d2b07",
+    "workflow_run": {
+      "id": 42400249221,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "14c9b056974f43810e2ad7d45376dd516d4ebd71"
+    }
+  },
+  {
+    "id": 13584649386,
+    "name": "regression-closure-high-contrast-candidate-first",
+    "size_in_bytes": 299,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584649386",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13584649386/zip",
+    "expired": false,
+    "created_at": "2026-11-07T18:28:03Z",
+    "expires_at": "2026-11-21T18:28:03Z",
+    "updated_at": "2026-11-07T18:28:03Z",
+    "digest": "sha256:a9d0bd258188031f17ac74e76631b09f617c6346660cb738eead980e1f0841f5",
+    "workflow_run": {
+      "id": 42400249221,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "14c9b056974f43810e2ad7d45376dd516d4ebd71"
+    }
+  }
+]

@@ -1,5 +1,14 @@
 # Native architecture decisions
 
+The [targeted regression closure](targeted-regression-closure.md) continues from exact `358d2a6f4b8028461fb535f2f71a9b7c71636760`. Its bounded campaign investigates installed TreeView closure, a pre-binding comparison startup timeout and retained stale Pages pixels. Diagnostic-only changes preserve every original failure, deadline, source/state assertion and acceptance gate. No product correction is justified yet; unresolved causes remain INCONCLUSIVE and overall acceptance remains NO-GO.
+
+The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. Both diagnostic checkpoints and their failures are preserved. A controlled negative case justifies separating UIA-only publication from actual bound-text changes in the passive render-commit observer. Product presentation behaviour, fixed pixel assertions and acceptance thresholds remain unchanged; exact final-source verdicts and all terminal workflows remain in Goal #75 and Draft PR #76.
+
+## PR #80 preview correction integrated into PR #76 — 7 November 2026
+
+The three reviewed source-position commits and focused comparison ownership, closure, Find-bar, divider, edited-source, cancelled-replacement and interrupted-Find completion corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
+
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.
@@ -337,3 +346,15 @@ The disposable-certificate CI fixture now also combines the production update tr
 The validation clipboard adapter retries only read operations that fail with CLIPBRD_E_CANT_OPEN (0x800401D0), for at most five attempts with 50 ms between attempts on the MTA caller. Each read still runs on the owning pumping STA; writes and UI actions are not replayed. The last error propagates, and other COM failures are not retried. This addresses the observed read failure after a copy command in 5120f18's reinstalled app. The identity/duration of the clipboard holder was not captured. See [Windows OpenClipboard](https://learn.microsoft.com/en-nz/windows/win32/api/winuser/nf-winuser-openclipboard). Local tests simulate failures without accessing the Windows clipboard; actual delivery remains a CI check.
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+
+## Reading productivity and comparison ownership — 6 November 2026
+
+Readable metrics consume the current buffer through a debounced background parser, independent of Preview. Unicode scalar character counts share an explicit readable-text contract; word estimation remains 220 words per minute. Outline entries retain renderer anchor identities and per-document expansion. Slash menus pass a guarded source range to existing insertion services, creating one coherent edit.
+
+Comparison has two document/mode slots with separate view/Find snapshots. The active command surface follows the selected document. Secondary AvalonEdit binds the same `TextDocument` as its document model; secondary Web source is a view of `fileCache`. There is no second authoritative buffer or persistence implementation. Secondary previews have separate generation/version/appearance ownership, use the existing canonical services and serial work budgets, and never write source. Opening/closing comparison only changes presentation. The native outline is temporarily hidden to leave usable comparison space, then restored with the previous layout.
+
+Pinned Mermaider 0.15.1 receives a bounded lexical adaptation of complete flowchart styling directives. Authoritative source and visual-edit spans remain byte-preserved. Unsupported compound class names retain protected inspection/default appearance with a visible warning. Native SVG group styling corrects only verified omitted dash/title-colour properties. Unsupported HTML typography is disclosed. No dependency, external service or upstream code copy was introduced. See the [receipt](../engineering/reading-experience-receipt.md) for limits, failure evidence and final acceptance.
+
+
+Native hardening continuation from `adc68a9`: [investigation and acceptance](native-hardening-acceptance.md). Scope is P0/P1 remediation and independent unchanged-gate acceptance. Five functional workstreams remain intact; integration remains NO-GO pending final-source evidence.

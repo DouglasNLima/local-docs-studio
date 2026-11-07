@@ -1,0 +1,123 @@
+{
+  "originalSource": "06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d",
+  "identity": {
+    "schema": 1,
+    "productRevision": "06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d",
+    "fixture": "mixed",
+    "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+    "highContrast": true,
+    "iterations": 1,
+    "harness": {
+      "sha256": "1032E72E16F16EEF5B8E5F58BE0722E63C7600B8F770D0FE4261BF97CA71FBE6",
+      "name": "LensDocsStudio.Native.UxProbe",
+      "version": "0.1.0-preview.1+06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d",
+      "fileVersion": "0.1.0.0"
+    },
+    "product": {
+      "sha256": "495545B461C56026B65A261D0D77E4D468BD40EA8F78A73D7454F7373ABBCC95",
+      "name": "LensDocsStudio.Native",
+      "version": "0.1.0-preview.1+06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d",
+      "fileVersion": "0.1.0.0"
+    },
+    "core": {
+      "sha256": "29C403DD0CDD329070233EB3986EF43EB086ED9E7302AC549EB58FB4974EF32B",
+      "name": "LensDocsStudio.Core",
+      "version": "0.1.0-preview.1+06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d",
+      "fileVersion": "0.1.0.0"
+    },
+    "wpf": {
+      "sha256": "15EC7AC7EAECDEABF3BFB378711F2C45BCD8A59D77BCD8254B9E90B776385189",
+      "name": "PresentationFramework",
+      "version": "10.0.14-servicing.26522.126+0427b9abbead3fa64c6655eb4290c537397131fa",
+      "fileVersion": "10.0.1426.52326"
+    },
+    "runtime": ".NET 10.0.14",
+    "os": "Microsoft Windows NT 10.0.26100.0",
+    "processors": 4,
+    "processId": 2136,
+    "stopwatchFrequency": 10000000,
+    "sourceBytes": 4475,
+    "sourceCharacters": 4471,
+    "lineEnding": "LF",
+    "capabilities": {
+      "slash": true,
+      "comparison": true,
+      "secondaryCompletionStatus": true,
+      "legacySecondaryStatus": false,
+      "attachmentMarker": true
+    },
+    "image": "20261103.298.1",
+    "run": "42371416877",
+    "protocol": "foreground SendInput to semantic state plus captured desktop response; software observation upper bound, not physical scan-out"
+  },
+  "imageSha256": "d1eef27f67cea75c414e0dc3eaa50b7895c3fb500f6c2e03fedfaeabf3e60ee0",
+  "boundaries": [
+    {
+      "tick": 5562323349,
+      "boundary": "layout",
+      "action": "input/comparison-find-end",
+      "status": "Preview layout changed",
+      "itemStatus": "Preview layout changed",
+      "active": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "renderedOwner": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "versionMatches": true,
+      "attached": 53,
+      "rendered": 53
+    },
+    {
+      "tick": 5562364895,
+      "boundary": "model/PreviewStatus",
+      "action": "input/comparison-find-end",
+      "status": "Preview updated in 82 ms",
+      "itemStatus": "Preview layout changed",
+      "active": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "renderedOwner": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "versionMatches": true,
+      "attached": 53,
+      "rendered": 53
+    },
+    {
+      "tick": 5562371248,
+      "boundary": "stage/shell/find-presented",
+      "action": "input/comparison-find-end",
+      "status": "Preview updated in 82 ms",
+      "itemStatus": "Ready",
+      "active": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "renderedOwner": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "versionMatches": true,
+      "attached": 53,
+      "rendered": 53
+    },
+    {
+      "tick": 5562405864,
+      "boundary": "layout",
+      "action": "input/comparison-find-end",
+      "status": "Preview updated in 82 ms",
+      "itemStatus": "Ready",
+      "active": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "renderedOwner": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "versionMatches": true,
+      "attached": 53,
+      "rendered": 53
+    },
+    {
+      "tick": 5562896764,
+      "boundary": "usable/comparison-find-end",
+      "action": "usable/comparison-find-end",
+      "status": "Preview updated in 82 ms",
+      "itemStatus": "Ready",
+      "active": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "renderedOwner": "c5b52ab4-8138-4e5b-8535-5f70af15abfa",
+      "versionMatches": true,
+      "attached": 53,
+      "rendered": 53
+    }
+  ],
+  "missingOriginalMeasurements": [
+    "bound WPF status text",
+    "outer and inner page metadata",
+    "label UIA names",
+    "render-channel commit",
+    "actual BitBlt interval"
+  ]
+}

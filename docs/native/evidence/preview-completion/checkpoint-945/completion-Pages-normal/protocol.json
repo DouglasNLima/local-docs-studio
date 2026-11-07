@@ -1,0 +1,62 @@
+{
+  "source": "945c106bd75141b74b3c1a3cf832f5c1b88fa592",
+  "tree": "7df926cf05aa3394fff8140b30d2072e44955663",
+  "startingHead": "06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d",
+  "mode": "Pages",
+  "appearance": "normal",
+  "binaries": [
+    {
+      "sha256": "6FE6F8A1A0BD8247016313F7A9F0FA03F426D76D14FC07C684206A654FC600AC",
+      "file": "LensDocsStudio.Native.UxProbe.dll"
+    },
+    {
+      "sha256": "39D2BD118F486566E95401EE2F172960291750E6F154840103EAFE90F5EC9ACE",
+      "file": "LensDocsStudio.Native.dll"
+    },
+    {
+      "sha256": "E07FBD4F4596395BD4740FC262217941E35E79375206441350943005B8AEC485",
+      "file": "LensDocsStudio.Core.dll"
+    }
+  ],
+  "fixtureSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+  "manifestSha256": "F3B0C4B16F64ADDAD2545B0C7E0128544220F7867CED5370AB2FE3FF0A0E4095",
+  "foregroundProcesses": 11,
+  "controlledProcesses": 4,
+  "fixedFramesPerBoundary": 3,
+  "pixelJourneyBoundaries": 7,
+  "observationSeconds": 30,
+  "childSeconds": 240,
+  "privateBytes": 2147483648,
+  "logBytes": 16777216,
+  "qualification": "An actual unfinished anchor task at WPF delivery, the same uncancelled layout token, subsequent cancellation and rejection; a late arrival is INCONCLUSIVE.",
+  "pixelProtocol": "Every boundary retains exactly three frames. First after semantic readiness and Background; second after observed natural WPF commit in traced runs; third at the next DWM capture. Active-reader Find and all-reader readiness are separate boundaries; both are retained. No pixel-dependent retries.",
+  "uninstrumented": "No completion EventSource, property, input or compositor subscriptions. Functional and pixel evidence only; no pending-interruption qualification.",
+  "noProductDelay": true,
+  "image": "20261103.298.1",
+  "runtimes": [
+    "Microsoft.AspNetCore.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 8.0.33 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 9.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.NETCore.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 8.0.33 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 9.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.WindowsDesktop.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 8.0.33 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 9.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]"
+  ]
+}

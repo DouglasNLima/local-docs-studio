@@ -1,0 +1,105 @@
+{
+  "verdict": "PASS",
+  "scenario": "close",
+  "mode": "Continuous",
+  "zoom": 100,
+  "compact": true,
+  "facts": [
+    {
+      "stage": "comparison-deep-primary",
+      "secondary": false,
+      "owner": "ae1d582f-dffd-42c7-9057-9c893d90c49c",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 560 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,76.57999999999993,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    },
+    {
+      "stage": "comparison-deep-secondary",
+      "secondary": true,
+      "owner": "572ab0bd-df62-4fd3-a007-75ba845e30fb",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 560 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 167.57833333333332,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,116.57999999999993,0,19.950000000000003",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    },
+    {
+      "stage": "closed-comparison",
+      "secondary": false,
+      "owner": "ae1d582f-dffd-42c7-9057-9c893d90c49c",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 560 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 404.15666666666664,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,353.15999999999985,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 718.3333333333334
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    }
+  ],
+  "secondaryCompletionStatus": true,
+  "fixtureSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+  "product": "0.1.0-preview.1\u002Bdb8e6f95eb22a89652e515f038ff13d96e63202a",
+  "highContrast": false,
+  "osHighContrast": false,
+  "scope": "Controlled off-screen natural WPF geometry; no foreground input or physical display acceptance"
+}

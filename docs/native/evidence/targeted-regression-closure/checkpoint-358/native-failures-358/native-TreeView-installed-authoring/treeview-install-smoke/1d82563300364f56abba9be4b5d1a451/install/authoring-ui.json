@@ -1,0 +1,35 @@
+{
+  "Status": "PASS",
+  "Family": "TreeView",
+  "SourceRevision": "0.1.0-preview.1\u002B358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "Checks": [
+    "Independent native UIA connections agree on exact source occurrence selection",
+    "Actual native geometry has an unambiguous pointer interior",
+    "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+    "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+    "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+    "Private source, inspector and history preserve owner and disk before Apply",
+    "Apply/Cancel and inspector remain reachable at 880x600",
+    "Apply/Cancel and inspector remain reachable at 1280x800",
+    "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte",
+    "Restart/reopen retains exact authored source and numeric lexemes",
+    "Cancel preserves authored saved bytes",
+    "Stale owner rejection preserves both exact sources",
+    "Standalone Mermaid uses the ordinary native authoring route",
+    "Insert opens the exact bounded native family starter",
+    "Insert produces portable Mermaid source",
+    "Keyboard navigation and direct Locate preserve complete source with independent scrolling",
+    "Protected skipped/fallback/box-prefix/duplicate source remains byte-exact",
+    "Protected source can be directly inspected after rejected operations"
+  ],
+  "Observations": [
+    {
+      "Operation": "Canonical pointer",
+      "Bounds": "25,33.5,14,10",
+      "Scale": 1,
+      "ScreenX": 507.7,
+      "ScreenY": 182
+    }
+  ],
+  "Error": null
+}

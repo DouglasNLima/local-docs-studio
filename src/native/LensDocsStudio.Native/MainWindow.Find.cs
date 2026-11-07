@@ -1,5 +1,7 @@
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using LensDocsStudio.Core.Parsing;
@@ -51,18 +53,38 @@ public partial class MainWindow
     private void OpenReplace(object sender, RoutedEventArgs e) => ShowFind(true);
     private void ShowFind(bool replace)
     {
+        var changed = FindBar.Visibility != Visibility.Visible;
+        var previewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        if (changed)
+        {
+            if (comparisonSlots is not null) BeginComparisonReflow();
+            else { CapturePreviewLayoutAnchor(); CancelSynchronisation(); }
+        }
         searchPreview = previewFocused && !replace;
         FindContext.Text = searchPreview ? "Find in preview" : "Find in editor";
         FindContext.ToolTip = searchPreview ? "Rendered text and formula source. Mermaid diagram labels are not searchable." : "Case-insensitive literal source text";
         ReplaceText.Visibility = ReplaceButton.Visibility = replace ? Visibility.Visible : Visibility.Collapsed;
         FindBar.Visibility = Visibility.Visible; FindText.Focus(); FindText.SelectAll();
         InvalidateFind(FindRefreshCause.Query);
+        if (changed && Preview.IsVisible && SyncCurrent)
+        {
+            if (comparisonSlots is not null) FinishComparisonReflow();
+            else _ = RestorePreviewLayoutAsync(previewStatus);
+        }
     }
     private void CloseFind(object sender, RoutedEventArgs e) => HideFind();
     private void HideFind()
     {
+        var previewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        if (comparisonSlots is not null) BeginComparisonReflow();
+        else { CapturePreviewLayoutAnchor(); CancelSynchronisation(); }
         FindBar.Visibility = Visibility.Collapsed; InvalidateFind(FindRefreshCause.Closed);
         if (searchPreview) Preview.Focus(); else Editor.Focus();
+        if (Preview.IsVisible && SyncCurrent)
+        {
+            if (comparisonSlots is not null) FinishComparisonReflow();
+            else _ = RestorePreviewLayoutAsync(previewStatus);
+        }
     }
     private void FindQueryChanged(object sender, TextChangedEventArgs e) => InvalidateFind(FindRefreshCause.Query);
     private void ObserveEditorFindKey(object sender, KeyEventArgs e)
@@ -75,6 +97,7 @@ public partial class MainWindow
     }
     private void CancelFindNavigation()
     {
+        CancelPreviewLayout();
         findInteraction++;
         if (Preview is not null) PreviewNavigationService.CancelPending(Preview);
         if (Editor is not null) EditorNavigationService.CancelPending(Editor);
@@ -150,18 +173,39 @@ public partial class MainWindow
             : count == 0 ? "No matches found." : searchPreview ? "Rendered text and formula source; diagram labels are excluded." : "Matches in editor source";
         if (findMatches?.Complete == false) model.Status = (string)FindCounter.ToolTip;
     }
-    private Task RevealFindAsync()
+    private async Task RevealFindAsync()
     {
-        if (findMatches is null || findCurrent < 0) return Task.CompletedTask;
+        if (findMatches is null || findCurrent < 0) return;
         var offset = findMatches.Offsets[findCurrent];
         if (searchPreview && previewFindIndex is { } index)
         {
             var range = index.Range(offset, findMatches.Length);
             if (range.Formula) model.Status = "Matching formula source; its LaTeX is available from the context menu.";
-            return PreviewNavigationService.BringIntoViewAsync(Preview, range.Start, range.End);
+            var request = new FindRequest(findGeneration, findInteraction, FindRefreshCause.Navigation);
+            var owner = model.ActiveDocument; var result = rendered; var generation = syncGeneration;
+            bool Current() => IsCurrentFindNavigation(request) && searchPreview && previewFindIndex == index
+                && owner == model.ActiveDocument && result == rendered && generation == syncGeneration
+                && SyncCurrent && result?.Document == Preview.Document && Preview.IsVisible;
+            if (await PreviewNavigationService.BringIntoViewAsync(Preview, range.Start, range.End, null, Current)
+                && Current() && previewLayoutCancellation is null && model.PreviewStatus == "Preview layout changed"
+                && Preview.IsMeasureValid && Preview.IsArrangeValid && range.Start.HasValidLayout
+                && result!.TextMap.VisibleSource(Preview.ActualHeight) is not null)
+            {
+                var rectangle = range.Start.GetCharacterRect(LogicalDirection.Forward);
+                if (!rectangle.IsEmpty && rectangle.Height > 0 && rectangle.Top >= 0 && rectangle.Bottom <= Preview.ActualHeight)
+                {
+                    // Fresh Find input supersedes the old anchor. Only its current,
+                    // visibly completed navigation may finish the interrupted status.
+                    model.PreviewStatus = interruptedPreviewLayoutStatus ?? "Preview position updated";
+                    interruptedPreviewLayoutStatus = null;
+                    AutomationProperties.SetItemStatus(Preview, "Ready");
+                    PublishPreviewDiagnostic("find-presented");
+                }
+            }
+            return;
         }
         Editor.Select(offset, findMatches.Length);
-        return EditorNavigationService.BringIntoViewAsync(Editor, offset);
+        await EditorNavigationService.BringIntoViewAsync(Editor, offset);
     }
     private async Task NavigateFindAsync(int direction)
     {

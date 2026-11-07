@@ -1,0 +1,78 @@
+[
+  {
+    "id": 13587657172,
+    "name": "first-layout-baseline-first-sampled-first",
+    "size_in_bytes": 5738675,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587657172",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587657172/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:26:45Z",
+    "expires_at": "2026-12-07T19:26:44Z",
+    "updated_at": "2026-11-07T19:26:45Z",
+    "digest": "sha256:8bd20c55fb9e04da95aed6b5bfed27af316b7f4d1cbb536440d01cf079b77e87",
+    "workflow_run": {
+      "id": 42405138291,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587392467,
+    "name": "first-layout-candidate-first-sampled-first",
+    "size_in_bytes": 5251396,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587392467",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587392467/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:21:50Z",
+    "expires_at": "2026-12-07T19:21:48Z",
+    "updated_at": "2026-11-07T19:21:50Z",
+    "digest": "sha256:eec1ab25074fa5073884a9596e3aa4ea0bdc66f3e4b783a35e223620dbbbc14f",
+    "workflow_run": {
+      "id": 42405138291,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587077981,
+    "name": "first-layout-candidate-first-untraced-first",
+    "size_in_bytes": 5493167,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587077981",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587077981/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:20:37Z",
+    "expires_at": "2026-12-07T19:20:36Z",
+    "updated_at": "2026-11-07T19:20:37Z",
+    "digest": "sha256:5acdd83f58e66d5cd772341c0c1d0a3b42dc39ca95870c73dd1f494024bbf5ec",
+    "workflow_run": {
+      "id": 42405138291,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587072928,
+    "name": "first-layout-baseline-first-untraced-first",
+    "size_in_bytes": 5167751,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587072928",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587072928/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:29:21Z",
+    "expires_at": "2026-12-07T19:29:19Z",
+    "updated_at": "2026-11-07T19:29:21Z",
+    "digest": "sha256:fa5d2f87c4349c143791da07a50f154aeba4f069f4be3709d2dd9e2ec30bc632",
+    "workflow_run": {
+      "id": 42405138291,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  }
+]

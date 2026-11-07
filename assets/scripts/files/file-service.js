@@ -904,9 +904,11 @@ export function createFileService({
       return /\.(mmd|mermaid)$/i.test(path) ? 'text/plain' : 'text/markdown';
     }
 
+    let selectionGeneration = 0;
     async function selectFile(path) {
       const record = state.files.find((item) => item.path === path);
       if (!record) return;
+      const generation = ++selectionGeneration;
       rememberScrollPosition?.();
 
       try {
@@ -915,16 +917,19 @@ export function createFileService({
           if (externalDecision === 'cancel') return;
         }
 
-        state.activePath = record.path;
-        state.fileName = record.name;
-
         if (!state.fileCache.has(record.path)) {
           const { file, text } = await readRecordSource(record);
+          if (generation !== selectionGeneration || !state.files.includes(record)) return;
           record.file = file;
           updateRecordFingerprint(record, file);
           state.fileCache.set(record.path, text);
         }
-
+        if (generation !== selectionGeneration || !state.files.includes(record)) return;
+        editor.dispatchEvent(new CustomEvent('lens-document-leaving'));
+        clearTimeout(state.debounceId);
+        state.renderId++;
+        state.activePath = record.path;
+        state.fileName = record.name;
         editor.value = state.fileCache.get(record.path) ?? '';
         editor.scrollTop = 0;
         preview.scrollTop = 0;
@@ -949,10 +954,14 @@ export function createFileService({
           updateActiveFileLabel();
           updateSaveButton();
         }
+        editor.dispatchEvent(new CustomEvent('lens-document-loaded', { detail: { record } }));
         await renderPreview();
+        if (generation !== selectionGeneration) return;
         restoreScrollPosition?.(record.path);
+        editor.dispatchEvent(new CustomEvent('lens-document-ready', { detail: { record } }));
         showNativeWorkspaceChangeStatus(record);
       } catch (error) {
+        if (generation !== selectionGeneration) return;
         setStatus(`Could not open ${record.name}.`, 'danger');
         preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
         updateSaveButton();
@@ -1145,7 +1154,22 @@ export function createFileService({
       return { ...openFolderDiagnostics };
     }
 
+    async function trackDocumentWrite(record, write) {
+      const previous = record.persistenceState;
+      record.persistenceState = 'saving'; updateSaveButton();
+      try { return await write(); }
+      catch (error) { record.persistenceState = error?.name === 'AbortError' ? previous : 'error'; throw error; }
+      finally {
+        if (record.persistenceState === 'saving') record.persistenceState = previous;
+        updateSaveButton();
+      }
+    }
+
     async function saveRecordToNativeHandle(record, content) {
+      return trackDocumentWrite(record, () => saveRecordToNativeHandleOperation(record, content));
+    }
+
+    async function saveRecordToNativeHandleOperation(record, content) {
       setStatus(`Saving ${record.name} through Windows...`, 'busy');
       const result = await nativeBridgeClient.saveFile({
         nativeHandleId: record.nativeHandleId,
@@ -1153,6 +1177,7 @@ export function createFileService({
       });
 
       if (!result.ok) {
+        record.persistenceState = 'error';
         setStatus(result.message || 'Windows save failed safely.', 'danger');
         updateSaveButton();
         return;
@@ -1160,6 +1185,7 @@ export function createFileService({
 
       const payload = result.response?.payload || {};
       if (!payload.saved) {
+        record.persistenceState = 'error';
         setStatus('Windows save did not complete.', 'warning');
         updateSaveButton();
         return;
@@ -1171,6 +1197,10 @@ export function createFileService({
     }
 
     async function saveRecordToNativeWorkspaceHandle(record, content) {
+      return trackDocumentWrite(record, () => saveRecordToNativeWorkspaceHandleOperation(record, content));
+    }
+
+    async function saveRecordToNativeWorkspaceHandleOperation(record, content) {
       setStatus(`Saving ${record.name} through Windows workspace...`, 'busy');
       const result = await nativeBridgeClient.saveWorkspaceFile({
         nativeHandleId: record.nativeHandleId,
@@ -1178,6 +1208,7 @@ export function createFileService({
       });
 
       if (!result.ok) {
+        record.persistenceState = 'error';
         setStatus(result.message || 'Windows workspace save failed safely.', 'danger');
         updateSaveButton();
         return;
@@ -1185,6 +1216,7 @@ export function createFileService({
 
       const payload = result.response?.payload || {};
       if (!payload.saved) {
+        record.persistenceState = 'error';
         setStatus('Windows workspace save did not complete.', 'warning');
         updateSaveButton();
         return;
@@ -1196,6 +1228,10 @@ export function createFileService({
     }
 
     async function saveRecordToNativeHandleAs(record, content) {
+      return trackDocumentWrite(record, () => saveRecordToNativeHandleAsOperation(record, content));
+    }
+
+    async function saveRecordToNativeHandleAsOperation(record, content) {
       setStatus(`Saving ${record.name} through Windows...`, 'busy');
       const oldPath = record.path;
       const result = await nativeBridgeClient.saveFileAs({
@@ -1227,6 +1263,8 @@ export function createFileService({
     function updateRecordAfterNativeSave(record, payload, content, options = {}) {
       const oldPath = options.oldPath || record.path;
       const nextName = payload.displayName || payload.name || record.name;
+      const stillActive = state.activePath === oldPath;
+      const currentText = stillActive ? editor.value : state.fileCache.get(oldPath) ?? content;
       if (options.replaceHandle) {
         record.name = nextName;
         record.path = getUniqueRecordPath(normalisePath(nextName || record.path || record.name), record);
@@ -1235,20 +1273,22 @@ export function createFileService({
         state.files.sort(compareRecords);
       }
 
+      record.persistenceState = 'saved';
       record.file = new File([content], record.name, { type: getMimeTypeForPath(record.name) });
       record.converted = false;
       record.needsSave = false;
       updateRecordFingerprint(record, record.file);
-      state.fileName = record.name;
-      state.activePath = record.path;
+      if (stillActive) { state.fileName = record.name; state.activePath = record.path; }
       if (oldPath && oldPath !== record.path) {
         state.fileCache.delete(oldPath);
         state.dirtyPaths.delete(oldPath);
         state.externalChangePaths?.delete(oldPath);
         state.externalChangeDetails?.delete(oldPath);
       }
-      state.fileCache.set(record.path, content);
-      state.dirtyPaths.delete(record.path);
+      state.fileCache.set(record.path, currentText);
+      state.savedContentCache?.set(record.path, content);
+      if (currentText === content) state.dirtyPaths.delete(record.path);
+      else state.dirtyPaths.add(record.path);
       state.externalChangePaths?.delete(record.path);
       state.externalChangeDetails?.delete(record.path);
       renderFileList();
@@ -1300,6 +1340,10 @@ export function createFileService({
     }
 
     async function saveRecordToHandle(record, handle, content, options = {}) {
+      return trackDocumentWrite(record, () => saveRecordToHandleOperation(record, handle, content, options));
+    }
+
+    async function saveRecordToHandleOperation(record, handle, content, options = {}) {
       const oldPath = options.oldPath || record.path;
       setStatus(`Saving ${record.name}...`);
       const writable = await handle.createWritable();
@@ -1307,6 +1351,8 @@ export function createFileService({
       await writable.close();
 
       const file = await handle.getFile();
+      const stillActive = state.activePath === oldPath;
+      const currentText = stillActive ? editor.value : state.fileCache.get(oldPath) ?? content;
       if (options.replaceHandle) {
         record.handle = handle;
         record.name = handle.name || record.name;
@@ -1314,20 +1360,22 @@ export function createFileService({
         state.files.sort(compareRecords);
       }
 
+      record.persistenceState = 'saved';
       record.file = file;
       record.converted = false;
       record.needsSave = false;
       updateRecordFingerprint(record, file);
-      state.fileName = record.name;
-      state.activePath = record.path;
+      if (stillActive) { state.fileName = record.name; state.activePath = record.path; }
       if (oldPath && oldPath !== record.path) {
         state.fileCache.delete(oldPath);
         state.dirtyPaths.delete(oldPath);
         state.externalChangePaths?.delete(oldPath);
         state.externalChangeDetails?.delete(oldPath);
       }
-      state.fileCache.set(record.path, content);
-      state.dirtyPaths.delete(record.path);
+      state.fileCache.set(record.path, currentText);
+      state.savedContentCache?.set(record.path, content);
+      if (currentText === content) state.dirtyPaths.delete(record.path);
+      else state.dirtyPaths.add(record.path);
       state.externalChangePaths?.delete(record.path);
       state.externalChangeDetails?.delete(record.path);
       renderFileList();
@@ -1798,6 +1846,7 @@ export function createFileService({
 
     async function reloadRecordFromFile(record, file, options = {}) {
       const text = await file.text();
+      record.persistenceState = 'saved';
       record.file = file;
       record.converted = false;
       record.needsSave = false;

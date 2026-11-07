@@ -18,6 +18,7 @@ internal static class NativeSuiteLifecycleChecks
 {
     public static void Run(string output, bool highContrast)
     {
+        NativeAcceptanceDiagnostics.Mark("suite/starting");
         Directory.CreateDirectory(output); using var recorder = new MermaidPhaseRecorder(); using var contrast = highContrast ? new NativeTestHighContrast() : null;
         var application = Application.Current ?? new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         ThemeService.Apply(application.Resources, "Light");
@@ -26,7 +27,7 @@ internal static class NativeSuiteLifecycleChecks
         var hostButton = new Button { Content = "Disposable lifecycle owner" };
         var host = new Window { Title = "Mermaid suite lifecycle fixture", Width = 1024, Height = 768, Content = hostButton };
         var windows = new List<WeakReference>(); var observations = new List<object>(); var service = new DiagramService();
-        host.Show();
+        NativeAcceptanceDiagnostics.Mark("suite/show-owner"); host.Show();
         try
         {
             foreach (var family in new[] { "Flowchart", "Sequence", "State", "ER", "Class" })
@@ -35,13 +36,16 @@ internal static class NativeSuiteLifecycleChecks
                 windows.Add(OpenClose(family, -1, host, hostButton, service, observations));
                 Drain();
                 // Diagnostic collection measures retained windows. Never called by production code.
-                GC.Collect(); GC.WaitForPendingFinalizers(); Drain(); GC.Collect(); Drain();
+                NativeAcceptanceDiagnostics.Mark("suite/collect"); GC.Collect();
+                NativeAcceptanceDiagnostics.Mark("suite/finalisers"); GC.WaitForPendingFinalizers();
+                Drain(); GC.Collect(); Drain();
                 var retained = windows.Count(item => item.IsAlive);
                 observations.Add(new { Family = family, Operation = "Controlled diagnostic collection after six smaller and one larger open/close cycle", RetainedWindows = retained, RetainedIdentities = windows.Select((item, index) => item.IsAlive ? "family index " + (index / 7) + ", case " + (index % 7) : null).Where(item => item is not null).ToArray(), ManagedBytes = GC.GetTotalMemory(false), WorkingSet = Environment.WorkingSet });
                 if (retained != 0) throw new IOException(family + ": a closed editor remains retained after dispatcher drain and diagnostic collection.");
             }
             windows.AddRange(ConcurrentWindows(host, hostButton, service, observations));
-            Drain(); GC.Collect(); GC.WaitForPendingFinalizers(); Drain(); GC.Collect(); Drain();
+            Drain(); NativeAcceptanceDiagnostics.Mark("suite/concurrent-collect"); GC.Collect();
+            NativeAcceptanceDiagnostics.Mark("suite/concurrent-finalisers"); GC.WaitForPendingFinalizers(); Drain(); GC.Collect(); Drain();
             if (windows.Any(item => item.IsAlive)) throw new IOException("Concurrent editor windows remained retained after their cleanup completed.");
             File.WriteAllText(Path.Combine(output, "suite-lifecycle.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrast = highContrast,
                 Dpi = new { X = VisualTreeHelper.GetDpi(host).PixelsPerInchX, Y = VisualTreeHelper.GetDpi(host).PixelsPerInchY },
@@ -64,7 +68,7 @@ internal static class NativeSuiteLifecycleChecks
             }
             throw;
         }
-        finally { host.Close(); recorder.Write(Path.Combine(output, "suite-lifecycle-phases.json")); SynchronizationContext.SetSynchronizationContext(previous); }
+        finally { NativeAcceptanceDiagnostics.Mark("suite/close-owner"); host.Close(); recorder.Write(Path.Combine(output, "suite-lifecycle-phases.json")); SynchronizationContext.SetSynchronizationContext(previous); }
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static WeakReference OpenClose(string family, int cycle, Window owner, Button ownerFocus, DiagramService service, List<object> observations)
@@ -75,11 +79,14 @@ internal static class NativeSuiteLifecycleChecks
         var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew(); var lastBeat = Stopwatch.GetTimestamp(); var maximumGap = 0d;
         var heartbeat = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
         heartbeat.Tick += Beat; heartbeat.Start();
+        NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/construct");
         Window window = Create(family, source, service);
-        window.Owner = owner; var weak = new WeakReference(window); window.Show();
+        window.Owner = owner; var weak = new WeakReference(window);
+        NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/show"); window.Show();
         bool Ready() => IsReady(window);
         try
         {
+            NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/presentation");
             PumpUntil(Ready, "The native suite lifecycle did not reach an editable presentation."); Drain();
             var firstUsefulMs = timer.Elapsed.TotalMilliseconds; firstPresentationPhase?.Dispose();
             var list = (ListBox)window.FindName(family == "Sequence" ? "Participants" : "Elements");
@@ -116,18 +123,22 @@ internal static class NativeSuiteLifecycleChecks
             if (cycle == 2)
             {
                 var gate = (SemaphoreSlim)typeof(NativeSvgService).GetField("canonicalConversion", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+                NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/acquire-conversion-gate");
                 gate.Wait();
                 try
                 {
+                    NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/theme-with-held-gate");
                     ApplyTheme("Dark");
+                    NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/wait-queued-conversion");
                     PumpUntil(() => (int)typeof(NativeSvgService).GetField("canonicalWaiting", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)! > 0, "The close-during-conversion fixture never reached the occupied conversion queue.");
-                    window.Close();
+                    NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/close-with-held-gate"); window.Close();
                 }
                 finally { gate.Release(); }
             }
             else window.Close();
             if (window.IsVisible) throw new IOException(family + ": unchanged private editor refused closure.");
             var cleanup = (TaskCompletionSource)window.GetType().GetField("closedCleanup", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            NativeAcceptanceDiagnostics.Mark($"suite/{family}/{cycle}/cleanup");
             var cleanupTimer = Stopwatch.StartNew(); PumpUntil(() => cleanup.Task.IsCompleted, "Native editor cleanup did not finish."); cleanup.Task.GetAwaiter().GetResult(); var cleanupMs = cleanupTimer.Elapsed.TotalMilliseconds;
             owner.Activate(); ownerFocus.Focus(); Drain();
             observations.Add(new { Family = family, Cycle = cycle, Scenario = cycle < 0 ? "Larger" : "Smaller", FirstUsefulPresentationIncludingNativeDispatcherMs = firstUsefulMs,
@@ -264,6 +275,7 @@ internal static class NativeSuiteLifecycleChecks
     }
     private static void Drain()
     {
+        NativeAcceptanceDiagnostics.Mark("suite/drain-application-idle");
         var frame = new DispatcherFrame();
         Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, () => frame.Continue = false);
         Dispatcher.PushFrame(frame);

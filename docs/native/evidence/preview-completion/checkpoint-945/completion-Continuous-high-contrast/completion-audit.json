@@ -1,0 +1,60 @@
+{
+  "collection": "FAIL",
+  "pendingInterruption": "INCONCLUSIVE",
+  "presentation": "FAIL",
+  "pending": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\close-primary\\presentation-completion.json",
+      "scenario": "close",
+      "reader": "primary",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\close-secondary\\presentation-completion.json",
+      "scenario": "close",
+      "reader": "secondary",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\find-primary\\presentation-completion.json",
+      "scenario": "find",
+      "reader": "primary",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\find-secondary\\presentation-completion.json",
+      "scenario": "find",
+      "reader": "secondary",
+      "verdict": "INCONCLUSIVE"
+    }
+  ],
+  "semantic": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "returned-primary",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\switch-primary\\completion-captures.json",
+      "action": "interrupted-switch",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\switch-secondary\\completion-captures.json",
+      "action": "interrupted-switch",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    }
+  ],
+  "deferred": [],
+  "pixelReview": [],
+  "fullFrames": 57,
+  "pixelReadings": 57,
+  "verdict": "NO-GO",
+  "scope": "Finite observation, not universal intermittent-failure elimination; OCR mismatches require independent review and are never silently accepted."
+}

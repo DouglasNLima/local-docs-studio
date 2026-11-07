@@ -1,0 +1,69 @@
+{
+  "functional": "PASS",
+  "scenario": "find",
+  "target": "primary",
+  "mode": "Pages",
+  "instrumented": true,
+  "verdict": {
+    "pendingInterruption": "PASS",
+    "qualifiedDeliveries": 1,
+    "cancellationsVerified": true,
+    "staleReady": 0,
+    "offeredOperation": 62937012,
+    "deliveries": [
+      {
+        "tick": 3604848340,
+        "operation": 62937012,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      }
+    ],
+    "operations": [
+      {
+        "id": 62937012,
+        "reader": "primary",
+        "start": 3604770713,
+        "end": 3604899268,
+        "cancelled": 3604857157,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      {
+        "id": 28355904,
+        "reader": "secondary",
+        "start": 3604773878,
+        "end": 3604899725,
+        "cancelled": 3604859126,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      {
+        "id": 45240270,
+        "reader": "primary",
+        "start": 3604897950,
+        "end": 3606067072,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 37
+      },
+      {
+        "id": 4647771,
+        "reader": "secondary",
+        "start": 3604898526,
+        "end": 3606032734,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      }
+    ]
+  },
+  "sourceIntegrity": "PASS",
+  "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "elapsedMs": 5504.6493,
+  "pixelAcceptance": "PENDING independent pixel correlation; no frame is discarded"
+}

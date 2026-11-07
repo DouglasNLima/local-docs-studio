@@ -1,0 +1,50 @@
+{
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "path": "native-TreeView-installed-authoring/treeview-install-smoke/4689473ef8cf498eb59fd60cd4d0874a/treeview-installer-results.json",
+  "status": "PASS",
+  "versions": [
+    {
+      "version": "0.1.0-preview.1052",
+      "phase": "install",
+      "registered": "0.1.0-preview.1052",
+      "binary": "0.1.0-preview.1052",
+      "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+    },
+    {
+      "version": "0.1.1-preview.1052",
+      "phase": "upgrade",
+      "registered": "0.1.1-preview.1052",
+      "binary": "0.1.1-preview.1052",
+      "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+    },
+    {
+      "version": "0.1.1-preview.1052",
+      "phase": "reinstall",
+      "registered": "0.1.1-preview.1052",
+      "binary": "0.1.1-preview.1052",
+      "source": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  ],
+  "checks": [
+    "install: optional association tasks explicitly disabled and registrations absent",
+    "install: all 540 installed payload files match independently verified portable bytes",
+    "install: 0 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+    "install: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "install: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+    "upgrade: optional association tasks explicitly disabled and registrations absent",
+    "upgrade: all 540 installed payload files match independently verified portable bytes",
+    "upgrade: 45 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+    "upgrade: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "upgrade: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+    "before-reinstall: native installation and shortcuts removed",
+    "before-reinstall: 90 previous authored/source/state/evidence files retain exact SHA-256 after uninstall",
+    "reinstall: optional association tasks explicitly disabled and registrations absent",
+    "reinstall: all 540 installed payload files match independently verified portable bytes",
+    "reinstall: 90 previous authored/source/state/evidence files retain exact SHA-256 after installation",
+    "reinstall: real installed TreeView authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "reinstall: 45 authored/source/state/evidence files recorded for upgrade/reinstall/uninstall preservation",
+    "final-uninstall: native installation and shortcuts removed",
+    "final-uninstall: 135 previous authored/source/state/evidence files retain exact SHA-256 after uninstall"
+  ],
+  "preservedFilesVerified": 135
+}

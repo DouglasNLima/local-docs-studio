@@ -1,0 +1,13 @@
+{
+  "trace": "0",
+  "exitDeadlineSeconds": 20,
+  "order": "candidate-first",
+  "candidatePackageNumber": "1052",
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "originalRun": 42391694305,
+  "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+  "scope": "Identical observer; separately verified installed product identities. Full install/upgrade/reinstall; no retries.",
+  "originalArtifact": 13582703336,
+  "baselinePackageNumber": "1050"
+}

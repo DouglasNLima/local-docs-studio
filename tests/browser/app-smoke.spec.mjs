@@ -10,6 +10,401 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
+test('comparison keeps independent buffers undo find and modes when the active document changes', async ({ page }) => {
+  await gotoApp(page);
+  await page.locator('#folderInput').setInputFiles(fixturePath('comparison'));
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nOriginal left');
+  await page.locator('#editor').fill('# Left\n\nEdited left');
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-host')).toBeVisible();
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('Right');
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nEdited left');
+  await page.locator('#editor').press('Control+f'); await page.locator('#editorFindInput').fill('Edited');
+  await page.getByLabel('Mode in right pane').selectOption('editor');
+  await page.locator('[data-pane="1"] .comparison-activate').click();
+  await expect(page.locator('#editor')).toHaveValue('# Right\n\nOriginal right');
+  await expect(page.locator('#editorFindPanel')).toBeHidden();
+  await page.locator('#editor').fill('# Right\n\nEdited right');
+  await page.locator('[data-pane="0"] .comparison-activate').click();
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nEdited left');
+  await expect(page.locator('#editorFindInput')).toHaveValue('Edited');
+  await page.locator('#editor').focus(); await page.locator('#editor').press('Control+z');
+  await expect(page.locator('#editor')).toHaveValue('# Left\n\nOriginal left');
+  await expect(page.locator('.comparison-passive-editor')).toHaveValue('# Right\n\nEdited right');
+  await page.locator('[data-pane="1"] .comparison-activate').click();
+  await page.locator('#editor').focus(); await page.locator('#editor').press('Control+z');
+  await expect(page.locator('#editor')).toHaveValue('# Right\n\nOriginal right');
+  await page.locator('#editor').press('Control+y');
+  await page.getByLabel('Mode in right pane').selectOption('preview');
+  await page.getByLabel('Mode in left pane').selectOption('preview');
+  await expect(page.locator('#preview h1')).toHaveText('Right');
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('Left');
+  await page.setViewportSize({ width: 700, height: 700 }); await page.emulateMedia({ forcedColors: 'active' });
+  const left = await page.locator('[data-pane="0"]').boundingBox(); const right = await page.locator('[data-pane="1"]').boundingBox();
+  expect(right.y).toBeGreaterThan(left.y); expect(left.width).toBeGreaterThan(250);
+  await page.locator('.comparison-close').click(); await expect(page.locator('.comparison-host')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue('# Right\n\nEdited right');
+});
+
+test('comparison saves only the active file and preserves conflicts and Save As identity', async ({ page }) => {
+  await installMockFileSystemAccess(page); await gotoApp(page);
+  await page.evaluate(() => {
+    for (const name of ['left.md', 'right.md']) window.__mockFs.directoryHandle.files.set(name, window.__mockFs.createFileHandle(name, '# ' + name));
+    window.showSaveFilePicker = async () => (window.__comparisonSavedAs = window.__mockFs.createFileHandle('renamed.md', ''));
+  });
+  await (await openFileMenu(page)).getByRole('button', { name: 'Open folder', exact: true }).click();
+  await expect(page.locator('#editor')).toHaveValue('# left.md');
+  await page.locator('#editor').fill('# Left pending');
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('right.md');
+  expect(await page.evaluate(() => [...window.__mockFs.directoryHandle.files.values()].map(file => file._text))).toEqual(['# left.md', '# right.md']);
+  await page.getByLabel('Mode in right pane').selectOption('editor'); await page.locator('[data-pane="1"] .comparison-activate').click();
+  await page.locator('#editor').fill('# Right saved'); await page.locator('#saveButton').click();
+  await expect.poll(() => page.evaluate(() => window.__mockFs.directoryHandle.files.get('right.md')._text)).toBe('# Right saved');
+  expect(await page.evaluate(() => window.__mockFs.directoryHandle.files.get('left.md')._text)).toBe('# left.md');
+  await page.evaluate(() => { const file = window.__mockFs.directoryHandle.files.get('left.md'); file._text = '# External left'; file._lastModified += 1000; });
+  await page.locator('[data-pane="0"] .comparison-activate').click();
+  await submitAppDialog(page, { button: 'Keep app edits' });
+  await expect(page.locator('#editor')).toHaveValue('# Left pending');
+  await expect(page.locator('#documentPersistenceState')).toHaveText(/conflict/i);
+  await page.locator('#saveAsButton').click();
+  await expect.poll(() => page.evaluate(() => window.__comparisonSavedAs?._text)).toBe('# Left pending');
+  await expect(page.getByLabel('Document in left pane')).toHaveValue(/renamed.md$/);
+  await page.locator('[data-pane="1"] .comparison-activate').click();
+  await expect(page.locator('#editor')).toHaveValue('# Right saved');
+  await page.locator('.comparison-close').click();
+  expect(await page.evaluate(() => window.__mockFs.directoryHandle.files.get('left.md')._text)).toBe('# External left');
+});
+
+test('comparison routes secondary preview links and exports through the correct document', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    { name: 'left.md', text: '# Left\n\nUntouched' },
+    { name: 'right.md', text: '# Right\n\n[Local section](#target)\n\n```mermaid\nflowchart LR\nRightNode[Right only] --> End\n```\n\n## Target\n\n[[third]]' },
+    { name: 'third.md', text: '# Third' },
+  ]);
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-passive-preview .mermaid svg')).toBeVisible();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('.comparison-passive-preview [data-diagram-action="exportSvg"]').click()]);
+  const svg = await readFile(await download.path(), 'utf8'); expect(svg).toContain('Right only');
+  await expect(page.locator('#editor')).toHaveValue(/# Right/);
+  await page.locator('#preview a[href="#target"]').click();
+  await page.locator('#preview [data-wikilink-target="third"]').click();
+  await expect(page.locator('#preview h1')).toHaveText('Third');
+  await expect(page.locator('.comparison-passive-editor')).toHaveValue('# Left\n\nUntouched');
+  await page.locator('.comparison-close').click();
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-host')).toBeVisible();
+});
+
+test('comparison large documents retain independent scroll and an explicit synchronisation option', async ({ page }, testInfo) => {
+  const large = Array.from({ length: 5000 }, (_, index) => `Paragraph ${index}: locally retained source.`).join('\n\n');
+  await loadVirtualWorkspace(page, [{ name: 'left.md', text: '# Left\n\n' + large }, { name: 'right.md', text: '# Right\n\n' + large }]);
+  await page.locator('#openBesideButton').evaluate(button => button.click());
+  await expect(page.locator('.comparison-passive-preview h1')).toHaveText('Right');
+  await page.getByLabel('Mode in right pane').selectOption('editor');
+  await page.locator('#editor').evaluate(editor => { editor.scrollTop = 1200; });
+  await expect.poll(() => page.locator('#editor').evaluate(editor => editor.scrollTop)).toBeGreaterThan(1000);
+  expect(await page.locator('.comparison-passive-editor').evaluate(editor => editor.scrollTop)).toBe(0);
+  await page.locator('.comparison-sync').check();
+  await page.locator('#editor').evaluate(editor => { editor.scrollTop = 3000; });
+  await expect.poll(() => page.locator('.comparison-passive-editor').evaluate(editor => editor.scrollTop)).toBeGreaterThan(1000);
+  await page.locator('.comparison-width').fill('60');
+  expect(await page.locator('.comparison-panes').evaluate(element => element.style.getPropertyValue('--comparison-left'))).toBe('60%');
+  await testInfo.attach('comparison-large-buffers', { body: JSON.stringify({ sourceCharactersPerDocument: large.length, lines: 10001, independentScroll: true }), contentType: 'application/json' });
+  await page.locator('.comparison-close').click(); await expect(page.locator('#editor')).toHaveValue('# Left\n\n' + large);
+});
+
+test('SPC flowchart retains nine nodes eight classes and canonical Web exports without modifying Markdown', async ({ page }, testInfo) => {
+  const original = await readFile(path.join(root, 'tests/fixtures/native-flowchart/spc-application-architecture.md'), 'utf8');
+  await gotoApp(page); await page.locator('#editor').fill(original);
+  await expect(page.locator('#preview .mermaid svg .node')).toHaveCount(9);
+  await expect(page.locator('#preview .node[id*="-Staff-"] rect').first()).toHaveCSS('fill', 'rgb(12, 74, 127)');
+  const semantics = await page.evaluate(async source => {
+    const { default: mermaid } = await import('/assets/vendor/mermaid-11.15.0.esm.min.js');
+    const diagram = await mermaid.mermaidAPI.getDiagramFromText(source.match(/```mermaid\n([\s\S]*?)\n```/)[1]);
+    const entries = value => value instanceof Map ? [...value.entries()] : Object.entries(value);
+    const groups = diagram.db.getSubGraphs().map(group => ({ id: group.id, nodes: group.nodes }));
+    // Mermaid.js also indexes each subgraph container as a vertex.
+    return { nodes: entries(diagram.db.getVertices()).filter(([id]) => !groups.some(group => group.id === id)).map(([id, value]) => ({ id, classes: value.classes, text: value.text })),
+      classes: entries(diagram.db.getClasses()).map(([name]) => name), edges: diagram.db.getEdges().map(edge => [edge.start, edge.end]),
+      groups };
+  }, original);
+  expect(semantics.nodes.map(node => node.id).sort()).toEqual(['App', 'Automation', 'Bus', 'DV', 'Identity', 'Logic', 'PCF', 'Portal', 'Staff']);
+  expect(semantics.classes.sort()).toEqual(['automation', 'bus', 'data', 'identity', 'interface', 'logic', 'portal', 'users']);
+  expect(semantics.edges).toEqual([['App', 'PCF'], ['App', 'DV'], ['PCF', 'DV'], ['DV', 'Logic'], ['DV', 'Automation'], ['Staff', 'App'], ['Identity', 'App'], ['DV', 'Portal'], ['DV', 'Bus']]);
+  expect(semantics.groups.find(group => group.id === 'SPC').nodes.sort()).toEqual(['App', 'Automation', 'DV', 'Logic', 'PCF']);
+  for (const [id, className] of Object.entries({ Staff: 'users', Identity: 'identity', App: 'interface', PCF: 'interface', DV: 'data', Logic: 'logic', Automation: 'automation', Portal: 'portal', Bus: 'bus' }))
+    expect(semantics.nodes.find(node => node.id === id).classes).toContain(className);
+  for (const format of ['Svg', 'Png']) {
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator(`[data-diagram-action="export${format}"]`).click()]);
+    expect(await download.failure()).toBeNull(); const bytes = await readFile(await download.path());
+    const capture = testInfo.outputPath(`spc-web.${format.toLowerCase()}`); await writeFile(capture, bytes);
+    await testInfo.attach(`spc-web-${format}`, { path: capture });
+    if (format === 'Svg') {
+      const count = await page.evaluate(svg => new DOMParser().parseFromString(svg, 'image/svg+xml').querySelectorAll('.node').length, bytes.toString('utf8'));
+      expect(count).toBe(9); expect(bytes.toString('utf8')).not.toContain('flowchart-class-');
+    } else expect([...bytes.subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+  }
+  await expect(page.locator('#editor')).toHaveValue(original);
+});
+
+test('Web flowchart multiple class assignments retain colours and borders in assignment order', async ({ page }) => {
+  await gotoApp(page);
+  await page.locator('#editor').fill('```mermaid\nflowchart TB\nA[One] --> B[Two]\nclassDef first fill:#123456,stroke:#112233;\nclassDef second fill:#654321,stroke-width:2px;\nclass A second; class A first;\nclass B first; class B second;\n```');
+  await expect(page.locator('#preview .mermaid svg .node')).toHaveCount(2);
+  for (const id of ['A', 'B']) {
+    const shape = page.locator(`#preview .node[id*="-${id}-"] rect`).first();
+    await expect(shape).toHaveCSS('fill', id === 'A' ? 'rgb(18, 52, 86)' : 'rgb(101, 67, 33)');
+    await expect(shape).toHaveCSS('stroke', 'rgb(17, 34, 51)');
+    await expect(shape).toHaveCSS('stroke-width', '2px');
+  }
+});
+
+test('slash commands search at the caret and replace the query in one undo operation', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  await editor.fill(''); await editor.pressSequentially('/heading');
+  await expect(page.locator('#slashCommands')).toBeVisible();
+  await expect(page.locator('#slashCommands [role="option"]')).toHaveCount(6);
+  await editor.press('ArrowUp');
+  await expect(page.locator('#slashCommands [aria-selected="true"]')).toHaveText('Heading 6');
+  await expect(editor).toHaveAttribute('aria-activedescendant', 'slash-command-5');
+  await editor.press('Enter'); await expect(editor).toHaveValue('###### ');
+  await expect(editor).toBeFocused(); await expect(page.locator('#slashCommands')).toBeHidden();
+  await editor.press('Control+z'); await expect(editor).toHaveValue('/heading');
+  await editor.press('Control+y'); await expect(editor).toHaveValue('###### ');
+  await editor.fill(''); await editor.pressSequentially('/check'); await editor.press('Enter');
+  await expect(editor).toHaveValue('- [ ] ');
+});
+
+test('slash helper cancellation retains source and accepted tables use the existing dialog', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  await editor.fill(''); await editor.pressSequentially('/callout'); await editor.press('Enter');
+  await expect(page.locator('#insertHelperDialog')).toBeVisible();
+  await page.locator('#insertHelperCancelButton').click(); await expect(editor).toHaveValue('/callout');
+  await editor.fill(''); await editor.pressSequentially('/table');
+  await page.locator('#slashCommands [role="option"]').click();
+  await expect(page.locator('#tableEditorDialog')).toBeVisible();
+  await page.locator('#tableEditorApplyButton').click();
+  await expect(editor).not.toHaveValue(/\/table/); await expect(editor).toHaveValue(/\|/);
+  await editor.press('Control+z'); await expect(editor).toHaveValue('/table');
+});
+
+test('slash commands leave URLs code IME literal text and read-only buffers alone', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  for (const prefix of ['https:/', 'C:/folder', 'Existing ', '```md\n', '~~~\n', ':::mermaid\n', '    ', '<!--\n', '<pre>\n', '<script>\n', '---\ntitle: Test\n']) {
+    await editor.fill(prefix); await editor.press('Control+End'); await editor.pressSequentially('/');
+    await expect(page.locator('#slashCommands')).toBeHidden();
+  }
+  await editor.fill(''); await editor.pressSequentially('/'); await editor.press('Escape');
+  await expect(editor).toHaveValue('/'); await editor.pressSequentially('literal'); await expect(page.locator('#slashCommands')).toBeHidden();
+  await editor.fill(''); await editor.dispatchEvent('compositionstart'); await editor.pressSequentially('/');
+  await expect(page.locator('#slashCommands')).toBeHidden(); await editor.dispatchEvent('compositionend');
+  await editor.evaluate(element => { element.readOnly = true; }); await editor.dispatchEvent('input', { inputType: 'insertText', data: '/' });
+  await expect(page.locator('#slashCommands')).toBeHidden();
+});
+
+test('slash commands retain Find and fit a narrow forced-colours viewport', async ({ page }) => {
+  await gotoApp(page); await page.setViewportSize({ width: 700, height: 600 }); await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+  const editor = page.locator('#editor'); await editor.fill('Find this\n\n'); await editor.press('Control+f');
+  await editor.focus(); await editor.press('Control+End'); await editor.pressSequentially('/code');
+  await expect(page.locator('#slashCommands')).toBeVisible();
+  const bounds = await page.locator('#slashCommands').boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0); expect(bounds.x + bounds.width).toBeLessThanOrEqual(700);
+  expect(bounds.y + bounds.height).toBeLessThanOrEqual(600);
+  await editor.press('Escape'); await expect(editor).toHaveValue('Find this\n\n/code');
+  await editor.press('Control+f'); await expect(page.locator('#slashCommands')).toBeHidden();
+});
+
+test('slash insertion families reuse formatters and preserve surrounding text and indentation', async ({ page }) => {
+  await gotoApp(page); const editor = page.locator('#editor');
+  for (const [query, marker] of [['paragraph', ''], ['bullet', '- '], ['numbered', '1. '], ['quote', '> '], ['code', '```'], ['mermaid', '```mermaid'], ['link', '[link text]'], ['image', '![alt text]'], ['horizontal', '---'], ['date', 'T']]) {
+    await editor.fill('Before\n\n'); await editor.press('Control+End'); await editor.pressSequentially('/' + query);
+    // Image figure is a separate command; the first image result is the existing inline image formatter.
+    await editor.press('Enter'); const value = await editor.inputValue();
+    expect(value.startsWith('Before\n\n')).toBeTruthy(); expect(value).not.toContain('/' + query); expect(value).toContain(marker);
+    await editor.press('Control+z'); await expect(editor).toHaveValue('Before\n\n/' + query);
+  }
+  await editor.fill('Before\n\n  '); await editor.press('Control+End'); await editor.pressSequentially('/code'); await editor.press('Enter');
+  await expect(editor).toHaveValue('Before\n\n  ```\n  code\n  ```');
+  await editor.fill(''); await editor.pressSequentially('/heading 6'); await editor.press('Backspace');
+  await expect(page.locator('#slashCommands [role="option"]')).toHaveCount(6);
+});
+
+test('slash context validation caches a large prose prefix and invalidates earlier fence edits', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const result = await page.evaluate(async () => {
+    const { slashContext } = await import('/assets/scripts/editor/slash-command-service.js');
+    const source = 'Ordinary prose.\n'.repeat(65536) + '\n/';
+    let start = performance.now(); let context = slashContext(source, source.length); const initialQueryMs = performance.now() - start;
+    start = performance.now(); for (let index = 0; index < 100; index++) context = slashContext(source, source.length, context);
+    const cached100QueriesMs = performance.now() - start;
+    const changed = '```md\n' + source;
+    return { sourceCharacters: source.length, start: context.start, initialQueryMs, cached100QueriesMs,
+      rejectedEarlierFence: slashContext(changed, changed.length, context) === null };
+  });
+  expect(result.start).toBe(result.sourceCharacters - 1); expect(result.rejectedEarlierFence).toBeTruthy();
+  await testInfo.attach('slash-context-performance', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
+});
+
+test('advanced outline retains H1–H6 hierarchy and copies current renderer targets without editing', async ({ page }) => {
+  await gotoApp(page); await mockClipboardWrite(page);
+  const source = '# Root\n\n## Again\n\n### Café **bold**\n\n#### Four\n\n##### Five\n\n###### Six\n\n## Again\n\n```md\n# Excluded\n```\n\n<details>\n<summary>Hidden</summary>\n## Inside\n</details>';
+  await page.locator('#editor').fill(source);
+  await page.locator('#outlineToggleButton').click();
+  await expect(page.locator('#outlineLinks a')).toHaveCount(8);
+  await expect(page.locator('#outlineLinks [data-outline-level="6"]')).toHaveText('Six');
+  await page.locator('#copyTableOfContents').click();
+  await expect(page.locator('#status')).toHaveText('Table of contents copied.');
+  const copied = await page.evaluate(() => window.__copiedText);
+  expect(copied).not.toContain('Excluded');
+  const actualIds = await page.locator('#preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6').evaluateAll(items => items.map(item => item.id));
+  expect([...copied.matchAll(/\]\(#([^)]+)\)/g)].map(match => decodeURIComponent(match[1]))).toEqual(actualIds);
+  expect(new Set(actualIds).size).toBe(8);
+  await page.locator('#outlineCollapseAll').click();
+  await expect(page.locator('#outlineLinks a:visible')).toHaveCount(1);
+  await page.locator('#editor').press('Control+End');
+  await page.locator('#editor').pressSequentially('\n\nBody edit');
+  await expect(page.locator('#preview')).toContainText('Body edit');
+  await expect(page.locator('#outlineLinks a:visible')).toHaveCount(1);
+  await page.locator('#outlineExpandAll').click();
+  await expect(page.locator('#outlineLinks a:visible')).toHaveCount(8);
+  await page.locator('#outlineLinks a').filter({ hasText: /^Inside$/ }).click();
+  await expect(page.locator('#preview details')).toHaveAttribute('open', '');
+  await expect(page.locator('#editor')).toHaveValue(source + '\n\nBody edit');
+});
+
+test('advanced outline navigates the Editor layout and offers filtered numbered plain and wrapped TOCs', async ({ page }) => {
+  await gotoApp(page); await mockClipboardWrite(page);
+  await page.locator('#editor').fill('### A\n\n###### B\n\n## C');
+  await page.locator('#outlineToggleButton').click();
+  await expect(page.locator('#outlineLinks a')).toHaveCount(3);
+  await page.locator('[data-layout-mode="editor"]').click();
+  await expect(page.locator('#outlinePanel')).toBeVisible();
+  await page.locator('#outlineLinks a').filter({ hasText: /^B$/ }).click();
+  await expect(page.locator('#editor')).toBeFocused();
+  expect(await page.locator('#editor').evaluate(editor => editor.selectionStart)).toBe(7);
+  await page.locator('.toc-options summary').click();
+  await page.locator('#tocStyle').selectOption('numbered');
+  await page.locator('#copyTableOfContents').click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('1. [A](#a)\n   1. [B](#b)\n1. [C](#c)');
+  const nestedLabel = await page.evaluate(async () => {
+    const { marked } = await import('/assets/vendor/marked-16.4.2.esm.js');
+    const root = document.createElement('template'); root.innerHTML = marked.parse(window.__copiedText);
+    return root.content.querySelector('li li a')?.textContent;
+  });
+  expect(nestedLabel).toBe('B');
+  await page.locator('#tocStyle').selectOption('plain');
+  await page.locator('#tocStartLevel').selectOption('3');
+  await page.locator('#tocDetails').check();
+  await page.locator('#copyTableOfContents').click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('<details>\n<summary>Table of Contents</summary>\n\nA\n  B\n\n</details>');
+  await page.locator('#tocNormalise').uncheck();
+  await page.locator('#copyTableOfContents').click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toContain('\n    A\n          B\n');
+  await page.locator('#tocEndLevel').selectOption('2');
+  const previous = await page.evaluate(() => window.__copiedText);
+  await page.locator('#copyTableOfContents').click();
+  await expect(page.locator('#status')).toContainText('start no greater than the end');
+  expect(await page.evaluate(() => window.__copiedText)).toBe(previous);
+});
+
+test('document statistics follow the readable unsaved buffer and retain keyboard history', async ({ page }) => {
+  await gotoApp(page);
+  const editor = page.locator('#editor');
+  const statistics = page.locator('#documentStatistics');
+  await editor.fill('# Café 😀\n\nHello **world**!');
+  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 3 words · 19 chars. Open review');
+  await editor.press('Control+End');
+  await editor.pressSequentially(' Again', { delay: 5 });
+  await expect(statistics).toContainText('4 words');
+  await expect(editor).toBeFocused();
+  const caret = await editor.evaluate(el => [el.selectionStart, el.selectionEnd, el.scrollTop]);
+  await statistics.focus();
+  await statistics.press('Enter');
+  await expect(page.locator('#documentReviewPanel')).toBeVisible();
+  await expect(page.locator('#documentReviewSummary')).toContainText('4 words');
+  await expect(page.locator('#documentReviewMetrics')).toContainText('Characters: 25');
+  expect(await editor.evaluate(el => [el.selectionStart, el.selectionEnd, el.scrollTop])).toEqual(caret);
+  await editor.focus();
+  await editor.press('Control+z');
+  await expect(statistics).toContainText('3 words');
+  await editor.press('Control+y');
+  await expect(statistics).toContainText('4 words');
+});
+
+test('document statistics exclude syntax and code, support Unicode and survive narrow High Contrast', async ({ page }) => {
+  await gotoApp(page);
+  const editor = page.locator('#editor');
+  const statistics = page.locator('#documentStatistics');
+  const examples = [
+    ['', 0, 0],
+    ["# Title\n\none**two** three &amp; four-five Café's 中文", 6, 40],
+    ['---\ntitle: Hidden\n---\n# Visible\n\n`hidden code`\n\n```mermaid\nA --> B\n```', 1, 7],
+    ['| A | B |\n|---|---|\n| One | Two |', 4, 11],
+    ['![Alt text](private.png) [Read me](https://example.invalid)', 4, 16],
+    ['<details>\n<summary>More</summary>\n## Hidden title\n</details>', 3, 17],
+    ['<figure data-image-figure>\n<img src="private.png" alt="Alt text">\n<figcaption>Caption</figcaption>\n</figure>', 3, 16],
+    ['# 𝒜𝒷 𐐀 Ⅳ ²', 4, 8],
+  ];
+  for (const [source, words, characters] of examples) {
+    await editor.fill(source);
+    await expect(statistics).toHaveAttribute('aria-label', `${words ? 1 : 0} min read · ${words} words · ${characters} chars. Open review`);
+  }
+  await page.setViewportSize({ width: 480, height: 720 });
+  await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+  await expect(statistics).toBeVisible();
+  await expect(statistics).toHaveAttribute('title', /4 words · 8 chars/);
+  await expect(page.locator('#status')).toBeVisible();
+  const bounds = await statistics.boundingBox();
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(480);
+});
+
+test('document statistics discard superseded large buffers and use hours without changing the estimate', async ({ page }) => {
+  await gotoApp(page);
+  const editor = page.locator('#editor');
+  const statistics = page.locator('#documentStatistics');
+  await editor.fill('word '.repeat(13421));
+  await expect(statistics).toHaveAttribute('aria-label', /1 hr 2 min read · 13,421 words · 67,104 chars/);
+  await editor.fill('old '.repeat(50000));
+  await editor.fill('# Current');
+  await expect(statistics).toHaveAttribute('aria-label', '1 min read · 1 words · 7 chars. Open review');
+  await editor.press('Control+End');
+  await expect(editor).toBeFocused();
+  await expect(editor).toHaveValue('# Current');
+});
+
+test('document statistics persistence state confirms writes and retains edits made while saving', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await openFileMenu(page);
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file', exact: true }).click();
+  await expect(page.locator('#editor')).toHaveValue('# Opened\n');
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Unchanged');
+  await page.evaluate(() => {
+    const handle = window.__mockFs.fileHandle;
+    const original = handle.createWritable.bind(handle);
+    handle.createWritable = async () => {
+      const writer = await original();
+      const close = writer.close.bind(writer);
+      writer.close = async () => { await new Promise(resolve => { window.__finishStatisticsSave = resolve; }); await close(); };
+      return writer;
+    };
+  });
+  await page.locator('#editor').fill('# Saved version');
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Saving…');
+  await expect.poll(() => page.evaluate(() => typeof window.__finishStatisticsSave)).toBe('function');
+  await page.locator('#editor').fill('# Newer draft');
+  await page.evaluate(() => window.__finishStatisticsSave());
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Unsaved changes');
+  await expect(page.locator('#editor')).toHaveValue('# Newer draft');
+  expect(await page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Saved version');
+  await page.evaluate(() => { window.__mockFs.fileHandle.createWritable = async () => { throw new Error('Synthetic write failure'); }; });
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#documentPersistenceState')).toHaveText('Save failed');
+  await expect(page.locator('#editor')).toHaveValue('# Newer draft');
+});
+
 function fixturePath(name) {
   return path.join(root, 'tests', 'fixtures', name);
 }

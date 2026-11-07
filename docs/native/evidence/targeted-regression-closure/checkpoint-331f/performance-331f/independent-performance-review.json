@@ -1,0 +1,32 @@
+[
+  {
+    "cohort": "continuous-performance-1",
+    "PerformanceAcceptance": "FAIL",
+    "ThresholdMilliseconds": 250,
+    "Correctness": "PASS",
+    "CandidateSampleCount": 66,
+    "FailedSamples": 39,
+    "baselineRevision": [
+      "0237b08390d5d1d946c0b19b81d671ccd54fb951"
+    ],
+    "candidateRevision": [
+      "331f7a85385449e779a12a6c045365de2931e4a2"
+    ],
+    "baselineFailedSamples": 40
+  },
+  {
+    "cohort": "continuous-performance-2",
+    "PerformanceAcceptance": "FAIL",
+    "ThresholdMilliseconds": 250,
+    "Correctness": "PASS",
+    "CandidateSampleCount": 66,
+    "FailedSamples": 32,
+    "baselineRevision": [
+      "0237b08390d5d1d946c0b19b81d671ccd54fb951"
+    ],
+    "candidateRevision": [
+      "331f7a85385449e779a12a6c045365de2931e4a2"
+    ],
+    "baselineFailedSamples": 34
+  }
+]

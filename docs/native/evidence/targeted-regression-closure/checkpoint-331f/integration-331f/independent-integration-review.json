@@ -1,0 +1,4323 @@
+{
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+  "cohortCount": 20,
+  "identities": [
+    {
+      "side": "baseline",
+      "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+      "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+    },
+    {
+      "side": "candidate",
+      "revision": "331f7a85385449e779a12a6c045365de2931e4a2",
+      "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400"
+    }
+  ],
+  "counts": [
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Automatic",
+      "status": "FAIL",
+      "count": 76
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Automatic",
+      "status": "PASS",
+      "count": 24
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Continuous",
+      "status": "FAIL",
+      "count": 76
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Continuous",
+      "status": "PASS",
+      "count": 24
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Pages",
+      "status": "FAIL",
+      "count": 68
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Pages",
+      "status": "PASS",
+      "count": 32
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "candidate",
+      "mode": "Automatic",
+      "status": "PASS",
+      "count": 100
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "candidate",
+      "mode": "Continuous",
+      "status": "PASS",
+      "count": 132
+    },
+    {
+      "family": "comparison",
+      "kind": "controls",
+      "side": "candidate",
+      "mode": "Pages",
+      "status": "PASS",
+      "count": 100
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "baseline",
+      "mode": "Automatic",
+      "status": "FAIL",
+      "count": 8
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "baseline",
+      "mode": "Automatic",
+      "status": "PASS",
+      "count": 24
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "baseline",
+      "mode": "Continuous",
+      "status": "FAIL",
+      "count": 8
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "baseline",
+      "mode": "Continuous",
+      "status": "PASS",
+      "count": 24
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "baseline",
+      "mode": "Pages",
+      "status": "FAIL",
+      "count": 32
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "candidate",
+      "mode": "Automatic",
+      "status": "PASS",
+      "count": 32
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "candidate",
+      "mode": "Continuous",
+      "status": "PASS",
+      "count": 32
+    },
+    {
+      "family": "comparison",
+      "kind": "foreground",
+      "side": "candidate",
+      "mode": "Pages",
+      "status": "PASS",
+      "count": 32
+    },
+    {
+      "family": "original",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Automatic",
+      "status": "EXPECTED NEGATIVE: EMPTY VIEWPORT",
+      "count": 8
+    },
+    {
+      "family": "original",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Continuous",
+      "status": "EXPECTED NEGATIVE: EMPTY VIEWPORT",
+      "count": 8
+    },
+    {
+      "family": "original",
+      "kind": "controls",
+      "side": "baseline",
+      "mode": "Pages",
+      "status": "FAIL",
+      "count": 8
+    },
+    {
+      "family": "original",
+      "kind": "controls",
+      "side": "candidate",
+      "mode": "Automatic",
+      "status": "PASS",
+      "count": 8
+    },
+    {
+      "family": "original",
+      "kind": "controls",
+      "side": "candidate",
+      "mode": "Continuous",
+      "status": "PASS",
+      "count": 40
+    },
+    {
+      "family": "original",
+      "kind": "controls",
+      "side": "candidate",
+      "mode": "Pages",
+      "status": "PASS",
+      "count": 8
+    },
+    {
+      "family": "original",
+      "kind": "foreground",
+      "side": "baseline",
+      "mode": "journey",
+      "status": "PASS",
+      "count": 32
+    },
+    {
+      "family": "original",
+      "kind": "foreground",
+      "side": "candidate",
+      "mode": "journey",
+      "status": "PASS",
+      "count": 32
+    }
+  ],
+  "verified": {
+    "foreground_identity_source_appearance": 208,
+    "controlled_verdicts": 484,
+    "negative_baseline_empty_viewports": 16
+  },
+  "failures": [
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "foreground/0/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "foreground/1/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\switch-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/switch-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\resize-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/resize-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/resize-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/switchresize-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/switchresize-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/zoom-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/zoom-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\selection-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/selection-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/selection-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/findchrome-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/findchrome-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/pendingfind-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/pendingfind-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/placeholder-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/placeholder-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/cancelnav-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/cancelnav-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/findquery-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-baseline-first",
+      "directory": "comparison-Automatic-high-contrast-baseline-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "mode": "Automatic",
+        "label": "controls/findquery-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/0/resize/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/1/resize/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\switch-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switch-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\resize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/resize-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/resize-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switchresize-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switchresize-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/zoom-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/zoom-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\selection-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/selection-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/selection-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findchrome-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findchrome-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/pendingfind-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/pendingfind-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/placeholder-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/placeholder-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/cancelnav-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/cancelnav-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findquery-100/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-high-contrast-candidate-first",
+      "directory": "comparison-Automatic-high-contrast-candidate-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "mode": "Automatic",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findquery-compact/baseline",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "foreground/0/resize/baseline",
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        },
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "foreground/1/resize/baseline",
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        },
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\switch-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/switch-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\resize-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/resize-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/resize-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/switchresize-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/switchresize-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/zoom-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/zoom-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\selection-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/selection-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/selection-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/findchrome-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/findchrome-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/pendingfind-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/pendingfind-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/placeholder-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/placeholder-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/cancelnav-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/cancelnav-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/findquery-100/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-baseline-first",
+      "directory": "comparison-Automatic-normal-baseline-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "side": "baseline",
+        "label": "controls/findquery-compact/baseline",
+        "supervisionFailure": null,
+        "environment": {},
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "label": "foreground/0/resize/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Automatic",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "label": "foreground/1/resize/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\switch-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/switch-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\resize-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/resize-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/resize-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/switchresize-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/switchresize-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/zoom-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/zoom-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\selection-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/selection-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/selection-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/findchrome-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/findchrome-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/pendingfind-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/pendingfind-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/placeholder-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/placeholder-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/cancelnav-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/cancelnav-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/findquery-100/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Automatic-normal-candidate-first",
+      "directory": "comparison-Automatic-normal-candidate-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Automatic",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "environment": {},
+        "label": "controls/findquery-compact/baseline",
+        "side": "baseline",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "foreground/0/resize/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "foreground/1/resize/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\switch-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/switch-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\resize-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/resize-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/resize-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/switchresize-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/switchresize-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/zoom-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/zoom-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\selection-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/selection-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/selection-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/findchrome-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/findchrome-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/pendingfind-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/pendingfind-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/placeholder-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/placeholder-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/cancelnav-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/cancelnav-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/findquery-100/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-baseline-first",
+      "directory": "comparison-Continuous-high-contrast-baseline-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "supervisionFailure": null,
+        "environment": {},
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "exitCode": 1,
+        "mode": "Continuous",
+        "label": "controls/findquery-compact/baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/0/resize/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_TRANSITION_TRACE": "0"
+        },
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/1/resize/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_TRANSITION_TRACE": "1"
+        },
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\switch-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/switch-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\resize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/resize-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/resize-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/switchresize-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/switchresize-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/zoom-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/zoom-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\selection-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/selection-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/selection-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findchrome-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findchrome-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/pendingfind-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/pendingfind-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/placeholder-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/placeholder-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/cancelnav-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/cancelnav-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findquery-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-high-contrast-candidate-first",
+      "directory": "comparison-Continuous-high-contrast-candidate-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findquery-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "environment": {},
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/0/resize/baseline",
+        "side": "baseline",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous"
+        },
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/1/resize/baseline",
+        "side": "baseline",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous"
+        },
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\switch-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/switch-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\resize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/resize-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/resize-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/switchresize-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/switchresize-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/zoom-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/zoom-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\selection-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/selection-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/selection-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findchrome-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findchrome-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/pendingfind-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/pendingfind-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/placeholder-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/placeholder-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/cancelnav-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/cancelnav-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findquery-100/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-baseline-first",
+      "directory": "comparison-Continuous-normal-baseline-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findquery-compact/baseline",
+        "side": "baseline",
+        "environment": {},
+        "mode": "Continuous",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/0/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/1/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Continuous",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\switch-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switch-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\resize-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/resize-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/resize-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switchresize-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switchresize-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\zoom-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/zoom-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\zoom-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/zoom-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\selection-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/selection-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/selection-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findchrome-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findchrome-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/pendingfind-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/pendingfind-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/placeholder-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/placeholder-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/cancelnav-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/cancelnav-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findquery-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Continuous-normal-candidate-first",
+      "directory": "comparison-Continuous-normal-candidate-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "mode": "Continuous",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findquery-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "supervisionFailure": null,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\0\\close\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/0/close/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\0\\ownership\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/0/ownership/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/0/resize/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\0\\pending\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/0/pending/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\1\\close\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/1/close/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\1\\ownership\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/1/ownership/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/1/resize/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\foreground\\1\\pending\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "foreground/1/pending/baseline",
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending"
+        },
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\switch-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/switch-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\resize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/resize-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/resize-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/switchresize-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/switchresize-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\selection-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/selection-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/selection-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findchrome-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findchrome-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/pendingfind-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/pendingfind-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/placeholder-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/placeholder-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/cancelnav-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/cancelnav-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findquery-100/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-baseline-first",
+      "directory": "comparison-Pages-high-contrast-baseline-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "supervisionFailure": null,
+        "label": "controls/findquery-compact/baseline",
+        "mode": "Pages",
+        "environment": {},
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\0\\close\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/0/close/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\0\\ownership\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/0/ownership/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/0/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\0\\pending\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/0/pending/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\1\\close\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/1/close/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\1\\ownership\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/1/ownership/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/1/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\foreground\\1\\pending\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "foreground/1/pending/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1"
+        },
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\switch-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switch-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\resize-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/resize-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/resize-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switchresize-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/switchresize-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\selection-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/selection-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/selection-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findchrome-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findchrome-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/pendingfind-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/pendingfind-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/placeholder-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/placeholder-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/cancelnav-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/cancelnav-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findquery-100/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-high-contrast-candidate-first",
+      "directory": "comparison-Pages-high-contrast-candidate-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "label": "controls/findquery-compact/baseline",
+        "environment": {},
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\0\\close\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/0/close/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\0\\ownership\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/0/ownership/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/0/resize/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\0\\pending\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/0/pending/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\1\\close\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/1/close/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\1\\ownership\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/1/ownership/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/1/resize/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\foreground\\1\\pending\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "foreground/1/pending/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending"
+        }
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\switch-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/switch-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\resize-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/resize-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/resize-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/switchresize-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/switchresize-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\selection-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/selection-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/selection-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/findchrome-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/findchrome-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/pendingfind-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/pendingfind-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/placeholder-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/placeholder-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/cancelnav-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/cancelnav-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/findquery-100/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-baseline-first",
+      "directory": "comparison-Pages-normal-baseline-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "label": "controls/findquery-compact/baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "supervisionFailure": null,
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages",
+        "environment": {}
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\0\\close\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/0/close/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\0\\ownership\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/0/ownership/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\0\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/0/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\0\\pending\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/0/pending/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\1\\close\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/1/close/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "close"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\1\\ownership\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/1/ownership/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "ownership"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\1\\resize\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/1/resize/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "resize"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\foreground\\1\\pending\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "foreground/1/pending/baseline",
+        "environment": {
+          "LENS_NATIVE_COMPARISON_JOURNEY": "1",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_TRANSITION_TRACE": "1",
+          "LENS_NATIVE_COMPARISON_SCENARIO": "pending"
+        },
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\switch-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/switch-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\resize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/resize-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\resize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/resize-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\switchresize-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/switchresize-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\switchresize-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/switchresize-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\selection-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/selection-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\selection-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/selection-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\findchrome-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findchrome-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\findchrome-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findchrome-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\pendingfind-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/pendingfind-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\pendingfind-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/pendingfind-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\placeholder-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/placeholder-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\placeholder-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/placeholder-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\cancelnav-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/cancelnav-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\cancelnav-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/cancelnav-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\findquery-100\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findquery-100/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "comparison-Pages-normal-candidate-first",
+      "directory": "comparison-Pages-normal-candidate-first\\controls\\findquery-compact\\baseline",
+      "record": {
+        "exitCode": 1,
+        "label": "controls/findquery-compact/baseline",
+        "environment": {},
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "supervisionFailure": null,
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline"
+      }
+    },
+    {
+      "cohort": "original-mixed-high-contrast-baseline-first-trace-0",
+      "directory": "original-mixed-high-contrast-baseline-first-trace-0\\controls\\baseline-Pages",
+      "record": {
+        "expectation": "Retain visible source, selection, caret and documents",
+        "zoom": 100,
+        "side": "baseline",
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "original-mixed-high-contrast-baseline-first-trace-1",
+      "directory": "original-mixed-high-contrast-baseline-first-trace-1\\controls\\baseline-Pages",
+      "record": {
+        "mode": "Pages",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "expectation": "Retain visible source, selection, caret and documents",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "exitCode": 1,
+        "side": "baseline",
+        "zoom": 100
+      }
+    },
+    {
+      "cohort": "original-mixed-high-contrast-candidate-first-trace-0",
+      "directory": "original-mixed-high-contrast-candidate-first-trace-0\\controls\\baseline-Pages",
+      "record": {
+        "expectation": "Retain visible source, selection, caret and documents",
+        "side": "baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "mode": "Pages",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "zoom": 100,
+        "exitCode": 1
+      }
+    },
+    {
+      "cohort": "original-mixed-high-contrast-candidate-first-trace-1",
+      "directory": "original-mixed-high-contrast-candidate-first-trace-1\\controls\\baseline-Pages",
+      "record": {
+        "expectation": "Retain visible source, selection, caret and documents",
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "zoom": 100,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "side": "baseline",
+        "mode": "Pages"
+      }
+    },
+    {
+      "cohort": "original-mixed-normal-baseline-first-trace-0",
+      "directory": "original-mixed-normal-baseline-first-trace-0\\controls\\baseline-Pages",
+      "record": {
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "zoom": 100,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "expectation": "Retain visible source, selection, caret and documents",
+        "side": "baseline",
+        "exitCode": 1,
+        "mode": "Pages"
+      }
+    },
+    {
+      "cohort": "original-mixed-normal-baseline-first-trace-1",
+      "directory": "original-mixed-normal-baseline-first-trace-1\\controls\\baseline-Pages",
+      "record": {
+        "side": "baseline",
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "mode": "Pages",
+        "zoom": 100,
+        "expectation": "Retain visible source, selection, caret and documents",
+        "exitCode": 1,
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b"
+      }
+    },
+    {
+      "cohort": "original-mixed-normal-candidate-first-trace-0",
+      "directory": "original-mixed-normal-candidate-first-trace-0\\controls\\baseline-Pages",
+      "record": {
+        "exitCode": 1,
+        "mode": "Pages",
+        "expectation": "Retain visible source, selection, caret and documents",
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "zoom": 100,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b"
+      }
+    },
+    {
+      "cohort": "original-mixed-normal-candidate-first-trace-1",
+      "directory": "original-mixed-normal-candidate-first-trace-1\\controls\\baseline-Pages",
+      "record": {
+        "expectation": "Retain visible source, selection, caret and documents",
+        "zoom": 100,
+        "exitCode": 1,
+        "tree": "6cb88161e24573649321bcb1d9f3418ba128194b",
+        "side": "baseline",
+        "revision": "75de42474514af0e7a6e521235a6517f4acad14b",
+        "mode": "Pages"
+      }
+    }
+  ],
+  "scope": "Independent identity, fixture, source-preservation, appearance and recorded functional verdict audit. Original report acceptance and historical negative-baseline failures remain unchanged. Passing functional observations do not certify all pixel timing or eliminate intermittent failures."
+}

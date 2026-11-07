@@ -358,6 +358,20 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
   }
 
   return {
+    captureSession: () => ({ query: editorFindInput.value, open: !editorFindPanel.hidden,
+      replaceQuery: findReplaceFindInput.value, replacement: findReplaceReplaceInput.value,
+      regex: findReplaceRegexToggle.checked, caseSensitive: findReplaceCaseToggle.checked }),
+    restoreSession: (session = {}) => {
+      findReplaceDialog.close();
+      editorFindInput.value = session.query || '';
+      editorFindPanel.hidden = !session.open;
+      editorFindToggleButton.setAttribute('aria-pressed', String(!!session.open));
+      findReplaceFindInput.value = session.replaceQuery || '';
+      findReplaceReplaceInput.value = session.replacement || '';
+      findReplaceRegexToggle.checked = !!session.regex;
+      findReplaceCaseToggle.checked = !!session.caseSensitive;
+      refreshEditorFind();
+    },
     installFindReplaceHandlers,
     openFindReplace,
     openEditorFind,

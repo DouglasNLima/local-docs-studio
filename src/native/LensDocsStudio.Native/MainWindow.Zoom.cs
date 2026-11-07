@@ -25,5 +25,13 @@ public partial class MainWindow
         };
         Closed += (_, _) => { property.RemoveValueChanged(Preview, Changed); zoomPreferenceTimer.Stop(); };
     }
-    private void ResetPreviewZoom(object sender, RoutedEventArgs e) => Preview.Zoom = 100;
+    private void SetPreviewZoom(double zoom)
+    {
+        if (Preview.Zoom == zoom) return;
+        var status = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        CapturePreviewLayoutAnchor(); CancelSynchronisation();
+        Preview.Zoom = zoom;
+        if (model.Layout != "Editor" && SyncCurrent) _ = RestorePreviewLayoutAsync(status);
+    }
+    private void ResetPreviewZoom(object sender, RoutedEventArgs e) => SetPreviewZoom(100);
 }

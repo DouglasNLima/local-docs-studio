@@ -1,0 +1,3950 @@
+[
+  {
+    "action": "primary-find",
+    "frameIndex": 0,
+    "file": "completion-000-primary-find-frame-0.png",
+    "sha256": "51E70B1ECC352EB14D53A772187E47AF5BF93E920C6871269B3DED6CC3D0420E",
+    "started": 2424023432,
+    "dwmReturned": 2424179650,
+    "pixelsStarted": 2424181710,
+    "pixelsFinished": 2424529271,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2423967024,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2423976823,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2423992927
+      },
+      "secondary": {
+        "started": 2423994343,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2424005111
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2424006005
+    },
+    "after": {
+      "tick": 2424680549,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2424680764,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2424694263
+      },
+      "secondary": {
+        "started": 2424694281,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2424701830
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2424701843
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 404 ms",
+        "x": 617,
+        "y": 616,
+        "width": 149,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 2 of 184",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary"
+    ],
+    "observationStarted": 2421784826,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "primary-find",
+    "frameIndex": 1,
+    "file": "completion-001-primary-find-frame-1.png",
+    "sha256": "51E70B1ECC352EB14D53A772187E47AF5BF93E920C6871269B3DED6CC3D0420E",
+    "started": 2425010355,
+    "dwmReturned": 2425295993,
+    "pixelsStarted": 2425297306,
+    "pixelsFinished": 2425489869,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2424989627,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2424989734,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2425000698
+      },
+      "secondary": {
+        "started": 2425000713,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2425008667
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2425008680
+    },
+    "after": {
+      "tick": 2425513591,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2425513747,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2425526876
+      },
+      "secondary": {
+        "started": 2425526892,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2425535054
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2425535071
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 404 ms",
+        "x": 617,
+        "y": 616,
+        "width": 149,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 2 of 184",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary"
+    ],
+    "observationStarted": 2421784826,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "primary-find",
+    "frameIndex": 2,
+    "file": "completion-002-primary-find-frame-2.png",
+    "sha256": "51E70B1ECC352EB14D53A772187E47AF5BF93E920C6871269B3DED6CC3D0420E",
+    "started": 2425641048,
+    "dwmReturned": 2425935398,
+    "pixelsStarted": 2425936772,
+    "pixelsFinished": 2426289989,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2425624167,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2425624230,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2425632432
+      },
+      "secondary": {
+        "started": 2425632445,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2425639627
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2425639637
+    },
+    "after": {
+      "tick": 2426323907,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2426324057,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2426336845
+      },
+      "secondary": {
+        "started": 2426336863,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2426344567
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2426344586
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 404 ms",
+        "x": 617,
+        "y": 616,
+        "width": 149,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 2 of 184",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary"
+    ],
+    "observationStarted": 2421784826,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "primary-find-all-readers",
+    "frameIndex": 0,
+    "file": "completion-003-primary-find-all-readers-frame-0.png",
+    "sha256": "51E70B1ECC352EB14D53A772187E47AF5BF93E920C6871269B3DED6CC3D0420E",
+    "started": 2426549965,
+    "dwmReturned": 2426575204,
+    "pixelsStarted": 2426576452,
+    "pixelsFinished": 2426767669,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2426532888,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2426533000,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2426541784
+      },
+      "secondary": {
+        "started": 2426541792,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2426548624
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2426548632
+    },
+    "after": {
+      "tick": 2426791031,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2426791175,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2426834215
+      },
+      "secondary": {
+        "started": 2426835298,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2426845636
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2426846522
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 404 ms",
+        "x": 617,
+        "y": 616,
+        "width": 149,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 2 of 184",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2421784826,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "primary-find-all-readers",
+    "frameIndex": 1,
+    "file": "completion-004-primary-find-all-readers-frame-1.png",
+    "sha256": "51E70B1ECC352EB14D53A772187E47AF5BF93E920C6871269B3DED6CC3D0420E",
+    "started": 2427164064,
+    "dwmReturned": 2427214944,
+    "pixelsStarted": 2427216242,
+    "pixelsFinished": 2427408848,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2426936624,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2426936715,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2426947078
+      },
+      "secondary": {
+        "started": 2426947087,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2426954455
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2426954464
+    },
+    "after": {
+      "tick": 2427432091,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2427432346,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2427445315
+      },
+      "secondary": {
+        "started": 2427445330,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2427453052
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2427453070
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 404 ms",
+        "x": 617,
+        "y": 616,
+        "width": 149,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 2 of 184",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2421784826,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "primary-find-all-readers",
+    "frameIndex": 2,
+    "file": "completion-005-primary-find-all-readers-frame-2.png",
+    "sha256": "51E70B1ECC352EB14D53A772187E47AF5BF93E920C6871269B3DED6CC3D0420E",
+    "started": 2427562166,
+    "dwmReturned": 2427695799,
+    "pixelsStarted": 2427696653,
+    "pixelsFinished": 2427902425,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2427543996,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2427544083,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2427553423
+      },
+      "secondary": {
+        "started": 2427553435,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2427560533
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2427560545
+    },
+    "after": {
+      "tick": 2427926466,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 404 ms",
+      "statusText": "Preview updated in 404 ms",
+      "statusUia": "Preview updated in 404 ms",
+      "primary": {
+        "started": 2427926618,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              372,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2427939550
+      },
+      "secondary": {
+        "started": 2427939564,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 2,
+        "pageCount": 184,
+        "nativePage": 2,
+        "nativeCount": 184,
+        "pageText": "Page 2 of 184",
+        "pageUia": "Page 2 of 184",
+        "source": 18,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              511,
+              83,
+              20
+            ]
+          }
+        ],
+        "finished": 2427947629
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2427947642
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 404 ms",
+        "x": 617,
+        "y": 616,
+        "width": 149,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 2 of 184",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2421784826,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "secondary-find",
+    "frameIndex": 0,
+    "file": "completion-006-secondary-find-frame-0.png",
+    "sha256": "7E0DCB1D9194098FF69BF3C200D425B6BF873567E4F3EB1F24D3DF65F6DEE5D6",
+    "started": 2437627415,
+    "dwmReturned": 2437731109,
+    "pixelsStarted": 2437732242,
+    "pixelsFinished": 2438074249,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2437602488,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2437602538,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2437615234
+      },
+      "secondary": {
+        "started": 2437615708,
+        "itemStatus": "Busy; comparison preview is being updated",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              261,
+              322,
+              218,
+              18
+            ]
+          }
+        ],
+        "finished": 2437625306
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2437626127
+    },
+    "after": {
+      "tick": 2438192488,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2438192574,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2438204408
+      },
+      "secondary": {
+        "started": 2438204422,
+        "itemStatus": "Busy; comparison preview is being updated",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 0,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 0",
+        "pageUia": "Page 1 of 0",
+        "source": 2,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              190,
+              39
+            ]
+          }
+        ],
+        "finished": 2438221984
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2438222006
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 51 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 259 of 259",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 1 of 1",
+        "x": 589,
+        "y": 390,
+        "width": 65,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary"
+    ],
+    "observationStarted": 2435687150,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "secondary-find",
+    "frameIndex": 1,
+    "file": "completion-007-secondary-find-frame-1.png",
+    "sha256": "21FED9D98B911B148DC5C758C287F42D9C5A80D02E7D200307B03EBCB2882479",
+    "started": 2438582298,
+    "dwmReturned": 2438695253,
+    "pixelsStarted": 2438696786,
+    "pixelsFinished": 2438893462,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2438368148,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2438368215,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2438383965
+      },
+      "secondary": {
+        "started": 2438383983,
+        "itemStatus": "Busy; comparison preview is being updated",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": 2,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              190,
+              39
+            ]
+          }
+        ],
+        "finished": 2438395935
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2438395950
+    },
+    "after": {
+      "tick": 2438961550,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2438961627,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2438973715
+      },
+      "secondary": {
+        "started": 2438973726,
+        "itemStatus": "Busy; comparison preview is being updated",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 179,
+        "nativePage": 1,
+        "nativeCount": 179,
+        "pageText": "Page 1 of 179",
+        "pageUia": "Page 1 of 179",
+        "source": 2,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              190,
+              39
+            ]
+          }
+        ],
+        "finished": 2438988198
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2438988213
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 51 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 259 of 259",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 1 of 1",
+        "x": 589,
+        "y": 390,
+        "width": 65,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary"
+    ],
+    "observationStarted": 2435687150,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "secondary-find",
+    "frameIndex": 2,
+    "file": "completion-008-secondary-find-frame-2.png",
+    "sha256": "BFFF1BB1E406D74E854980BC70298A1DD957BD59A13595CA60D36183E6BA5DDF",
+    "started": 2439183648,
+    "dwmReturned": 2439330581,
+    "pixelsStarted": 2439332152,
+    "pixelsFinished": 2439667015,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2439147971,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2439148106,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2439166900
+      },
+      "secondary": {
+        "started": 2439167427,
+        "itemStatus": "Busy; comparison preview is being updated",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 179,
+        "nativePage": 1,
+        "nativeCount": 179,
+        "pageText": "Page 1 of 179",
+        "pageUia": "Page 1 of 179",
+        "source": 2,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              190,
+              39
+            ]
+          }
+        ],
+        "finished": 2439180718
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2439181506
+    },
+    "after": {
+      "tick": 2439691165,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2439691331,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2439708499
+      },
+      "secondary": {
+        "started": 2439708520,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2439773223
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2439774691
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 51 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 259 of 259",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 1 of 179",
+        "x": 582,
+        "y": 390,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary"
+    ],
+    "observationStarted": 2435687150,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "secondary-find-all-readers",
+    "frameIndex": 0,
+    "file": "completion-009-secondary-find-all-readers-frame-0.png",
+    "sha256": "F685B442A0E1327F8D1823527F7A263957AEB7DCF73D12BF13E6F3E2C627CE63",
+    "started": 2439915232,
+    "dwmReturned": 2440132193,
+    "pixelsStarted": 2440133541,
+    "pixelsFinished": 2440327303,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2439890419,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2439890510,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2439902956
+      },
+      "secondary": {
+        "started": 2439902966,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2439912793
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2439912801
+    },
+    "after": {
+      "tick": 2440351537,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2440351698,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2440368669
+      },
+      "secondary": {
+        "started": 2440368686,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2440379794
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2440379812
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 51 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 259 of 259",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 182 of 182",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2435687150,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "secondary-find-all-readers",
+    "frameIndex": 1,
+    "file": "completion-010-secondary-find-all-readers-frame-1.png",
+    "sha256": "F685B442A0E1327F8D1823527F7A263957AEB7DCF73D12BF13E6F3E2C627CE63",
+    "started": 2440502229,
+    "dwmReturned": 2440770258,
+    "pixelsStarted": 2440771813,
+    "pixelsFinished": 2440967140,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2440475255,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2440475335,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2440488139
+      },
+      "secondary": {
+        "started": 2440488150,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2440500692
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2440500708
+    },
+    "after": {
+      "tick": 2440991086,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2440991241,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2441007351
+      },
+      "secondary": {
+        "started": 2441007371,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2441018958
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2441018975
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 51 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 259 of 259",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 182 of 182",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2435687150,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "secondary-find-all-readers",
+    "frameIndex": 2,
+    "file": "completion-011-secondary-find-all-readers-frame-2.png",
+    "sha256": "F685B442A0E1327F8D1823527F7A263957AEB7DCF73D12BF13E6F3E2C627CE63",
+    "started": 2441343763,
+    "dwmReturned": 2441413930,
+    "pixelsStarted": 2441415445,
+    "pixelsFinished": 2441609860,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2441234598,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2441234734,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2441250450
+      },
+      "secondary": {
+        "started": 2441250466,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2441261071
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2441261088
+    },
+    "after": {
+      "tick": 2441636723,
+      "active": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+      "previewStatus": "Preview updated in 51 ms",
+      "statusText": "Preview updated in 51 ms",
+      "statusUia": "Preview updated in 51 ms",
+      "primary": {
+        "started": 2441636870,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 259,
+        "pageCount": 259,
+        "nativePage": 259,
+        "nativeCount": 259,
+        "pageText": "Page 259 of 259",
+        "pageUia": "Page 259 of 259",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              551,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2441652253
+      },
+      "secondary": {
+        "started": 2441652276,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 182,
+        "pageCount": 182,
+        "nativePage": 182,
+        "nativeCount": 182,
+        "pageText": "Page 182 of 182",
+        "pageUia": "Page 182 of 182",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              332,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2441663337
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2441663359
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 51 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 259 of 259",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 182 of 182",
+        "x": 576,
+        "y": 390,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2435687150,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "returned-primary",
+    "frameIndex": 0,
+    "file": "completion-012-returned-primary-frame-0.png",
+    "sha256": "2C3C8663AC470387D0373E5C0011F1AF2CBF98DCF365067E0BA145072051FBDD",
+    "started": 2450402152,
+    "dwmReturned": 2450581131,
+    "pixelsStarted": 2450582047,
+    "pixelsFinished": 2450922573,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2450367957,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 52 ms",
+      "statusText": "Preview updated in 52 ms",
+      "statusUia": "Preview updated in 52 ms",
+      "primary": {
+        "started": 2450368026,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2450383829
+      },
+      "secondary": {
+        "started": 2450383840,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2450400953
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2450400967
+    },
+    "after": {
+      "tick": 2450945740,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 52 ms",
+      "statusText": "Preview updated in 52 ms",
+      "statusUia": "Preview updated in 52 ms",
+      "primary": {
+        "started": 2450945902,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2450964559
+      },
+      "secondary": {
+        "started": 2450964608,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2450981695
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2450981726
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 52 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 366,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 181 of 181",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2450362783,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "returned-primary",
+    "frameIndex": 1,
+    "file": "completion-013-returned-primary-frame-1.png",
+    "sha256": "2C3C8663AC470387D0373E5C0011F1AF2CBF98DCF365067E0BA145072051FBDD",
+    "started": 2451103349,
+    "dwmReturned": 2451370840,
+    "pixelsStarted": 2451371869,
+    "pixelsFinished": 2451700157,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2451072490,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 52 ms",
+      "statusText": "Preview updated in 52 ms",
+      "statusUia": "Preview updated in 52 ms",
+      "primary": {
+        "started": 2451072557,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2451086265
+      },
+      "secondary": {
+        "started": 2451086280,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2451101950
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2451101965
+    },
+    "after": {
+      "tick": 2451723085,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 52 ms",
+      "statusText": "Preview updated in 52 ms",
+      "statusUia": "Preview updated in 52 ms",
+      "primary": {
+        "started": 2451723215,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2451741445
+      },
+      "secondary": {
+        "started": 2451741472,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2451758389
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2451758407
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 52 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 366,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 181 of 181",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2450362783,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "returned-primary",
+    "frameIndex": 2,
+    "file": "completion-014-returned-primary-frame-2.png",
+    "sha256": "2C3C8663AC470387D0373E5C0011F1AF2CBF98DCF365067E0BA145072051FBDD",
+    "started": 2451882707,
+    "dwmReturned": 2452296146,
+    "pixelsStarted": 2452297536,
+    "pixelsFinished": 2452505884,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2451849474,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 52 ms",
+      "statusText": "Preview updated in 52 ms",
+      "statusUia": "Preview updated in 52 ms",
+      "primary": {
+        "started": 2451849545,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2451864140
+      },
+      "secondary": {
+        "started": 2451864153,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2451880625
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2451880638
+    },
+    "after": {
+      "tick": 2452528661,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 52 ms",
+      "statusText": "Preview updated in 52 ms",
+      "statusUia": "Preview updated in 52 ms",
+      "primary": {
+        "started": 2452528813,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2452548192
+      },
+      "secondary": {
+        "started": 2452548212,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2452565242
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2452565258
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 52 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 366,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 181 of 181",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2450362783,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "rapid-switch",
+    "frameIndex": 0,
+    "file": "completion-015-rapid-switch-frame-0.png",
+    "sha256": "099D7A5D393820005883024044B90C648855AC1B4560474BCE56ACC6D378E106",
+    "started": 2459247352,
+    "dwmReturned": 2459521359,
+    "pixelsStarted": 2459522414,
+    "pixelsFinished": 2459734655,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2459211491,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2459211557,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2459227187
+      },
+      "secondary": {
+        "started": 2459227195,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2459245093
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2459245972
+    },
+    "after": {
+      "tick": 2459758493,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2459758647,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2459778091
+      },
+      "secondary": {
+        "started": 2459778108,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2459795257
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2459795276
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 82 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 366,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 181 of 181",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2459207752,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "rapid-switch",
+    "frameIndex": 1,
+    "file": "completion-016-rapid-switch-frame-1.png",
+    "sha256": "099D7A5D393820005883024044B90C648855AC1B4560474BCE56ACC6D378E106",
+    "started": 2459927311,
+    "dwmReturned": 2460152100,
+    "pixelsStarted": 2460153474,
+    "pixelsFinished": 2460343308,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2459892967,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2459893062,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2459908014
+      },
+      "secondary": {
+        "started": 2459908027,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2459925503
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2459925518
+    },
+    "after": {
+      "tick": 2460367265,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2460367418,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2460398796
+      },
+      "secondary": {
+        "started": 2460399464,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2460418461
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2460419357
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 82 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 366,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 181 of 181",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2459207752,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "rapid-switch",
+    "frameIndex": 2,
+    "file": "completion-017-rapid-switch-frame-2.png",
+    "sha256": "099D7A5D393820005883024044B90C648855AC1B4560474BCE56ACC6D378E106",
+    "started": 2460551466,
+    "dwmReturned": 2460800343,
+    "pixelsStarted": 2460801810,
+    "pixelsFinished": 2461128425,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2460517777,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2460517850,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2460532902
+      },
+      "secondary": {
+        "started": 2460532913,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2460550033
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2460550049
+    },
+    "after": {
+      "tick": 2461152402,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2461152563,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 257,
+        "pageCount": 257,
+        "nativePage": 257,
+        "nativeCount": 257,
+        "pageText": "Page 257 of 257",
+        "pageUia": "Page 257 of 257",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              324,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2461172131
+      },
+      "secondary": {
+        "started": 2461172150,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "expectedOwner": "be5f7a09-cf2a-4ee0-87e6-6d9e89be8984",
+        "mode": "Page",
+        "pageNumber": 181,
+        "pageCount": 181,
+        "nativePage": 181,
+        "nativeCount": 181,
+        "pageText": "Page 181 of 181",
+        "pageUia": "Page 181 of 181",
+        "source": 4490,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              487,
+              150,
+              32,
+              271,
+              527,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2461189586
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2461189600
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 82 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 257 of 257",
+        "x": 576,
+        "y": 366,
+        "width": 91,
+        "height": 22
+      },
+      {
+        "name": "secondary-page",
+        "expected": "Page 181 of 181",
+        "x": 576,
+        "y": 570,
+        "width": 91,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2459207752,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "closed-comparison",
+    "frameIndex": 0,
+    "file": "completion-018-closed-comparison-frame-0.png",
+    "sha256": "7131352E9579A65C9173D993DB278DF9C8098129C8A3DF5C2CCE579156D9DB13",
+    "started": 2462700941,
+    "dwmReturned": 2462827422,
+    "pixelsStarted": 2462828798,
+    "pixelsFinished": 2463018080,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2462681407,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2462681509,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 37,
+        "pageCount": 37,
+        "nativePage": 37,
+        "nativeCount": 37,
+        "pageText": "Page 37 of 37",
+        "pageUia": "Page 37 of 37",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              252,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2462696121
+      },
+      "secondary": {
+        "started": 2462697373,
+        "itemStatus": "Ready",
+        "isVisible": false,
+        "isMeasureValid": false,
+        "isArrangeValid": false,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": null,
+        "expectedOwner": null,
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": null,
+        "finished": 2462698837
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2462699585
+    },
+    "after": {
+      "tick": 2463042572,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2463042723,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 37,
+        "pageCount": 37,
+        "nativePage": 37,
+        "nativeCount": 37,
+        "pageText": "Page 37 of 37",
+        "pageUia": "Page 37 of 37",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              252,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2463061793
+      },
+      "secondary": {
+        "started": 2463061808,
+        "itemStatus": "Ready",
+        "isVisible": false,
+        "isMeasureValid": false,
+        "isArrangeValid": false,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": null,
+        "expectedOwner": null,
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": null,
+        "finished": 2463062062
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2463062077
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 82 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 37 of 37",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2462680080,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "closed-comparison",
+    "frameIndex": 1,
+    "file": "completion-019-closed-comparison-frame-1.png",
+    "sha256": "7131352E9579A65C9173D993DB278DF9C8098129C8A3DF5C2CCE579156D9DB13",
+    "started": 2463166253,
+    "dwmReturned": 2463455425,
+    "pixelsStarted": 2463456685,
+    "pixelsFinished": 2463652848,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2463149697,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2463149756,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 37,
+        "pageCount": 37,
+        "nativePage": 37,
+        "nativeCount": 37,
+        "pageText": "Page 37 of 37",
+        "pageUia": "Page 37 of 37",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              252,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2463164564
+      },
+      "secondary": {
+        "started": 2463164577,
+        "itemStatus": "Ready",
+        "isVisible": false,
+        "isMeasureValid": false,
+        "isArrangeValid": false,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": null,
+        "expectedOwner": null,
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": null,
+        "finished": 2463164785
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2463164795
+    },
+    "after": {
+      "tick": 2463676868,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2463677021,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 37,
+        "pageCount": 37,
+        "nativePage": 37,
+        "nativeCount": 37,
+        "pageText": "Page 37 of 37",
+        "pageUia": "Page 37 of 37",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              252,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2463697228
+      },
+      "secondary": {
+        "started": 2463697248,
+        "itemStatus": "Ready",
+        "isVisible": false,
+        "isMeasureValid": false,
+        "isArrangeValid": false,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": null,
+        "expectedOwner": null,
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": null,
+        "finished": 2463697513
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2463697528
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 82 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 37 of 37",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2462680080,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  },
+  {
+    "action": "closed-comparison",
+    "frameIndex": 2,
+    "file": "completion-020-closed-comparison-frame-2.png",
+    "sha256": "7131352E9579A65C9173D993DB278DF9C8098129C8A3DF5C2CCE579156D9DB13",
+    "started": 2463802371,
+    "dwmReturned": 2464084305,
+    "pixelsStarted": 2464085665,
+    "pixelsFinished": 2464425544,
+    "compositionBefore": null,
+    "compositionAfter": null,
+    "committed": null,
+    "before": {
+      "tick": 2463785560,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2463785657,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 37,
+        "pageCount": 37,
+        "nativePage": 37,
+        "nativeCount": 37,
+        "pageText": "Page 37 of 37",
+        "pageUia": "Page 37 of 37",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              252,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2463800812
+      },
+      "secondary": {
+        "started": 2463800826,
+        "itemStatus": "Ready",
+        "isVisible": false,
+        "isMeasureValid": false,
+        "isArrangeValid": false,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": null,
+        "expectedOwner": null,
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": null,
+        "finished": 2463801031
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2463801041
+    },
+    "after": {
+      "tick": 2464449625,
+      "active": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+      "previewStatus": "Preview updated in 82 ms",
+      "statusText": "Preview updated in 82 ms",
+      "statusUia": "Preview updated in 82 ms",
+      "primary": {
+        "started": 2464449797,
+        "itemStatus": "Ready",
+        "isVisible": true,
+        "isMeasureValid": true,
+        "isArrangeValid": true,
+        "attachedMatches": true,
+        "currentOwner": true,
+        "owner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "expectedOwner": "fda69de9-b7e2-4f94-9844-f9c5c1b6b3c6",
+        "mode": "Page",
+        "pageNumber": 37,
+        "pageCount": 37,
+        "nativePage": 37,
+        "nativeCount": 37,
+        "pageText": "Page 37 of 37",
+        "pageUia": "Page 37 of 37",
+        "source": 4459,
+        "textPattern": [
+          {
+            "meaningful": true,
+            "rectangles": [
+              271,
+              252,
+              86,
+              20
+            ]
+          }
+        ],
+        "finished": 2464468857
+      },
+      "secondary": {
+        "started": 2464468875,
+        "itemStatus": "Ready",
+        "isVisible": false,
+        "isMeasureValid": false,
+        "isArrangeValid": false,
+        "attachedMatches": false,
+        "currentOwner": false,
+        "owner": null,
+        "expectedOwner": null,
+        "mode": "Page",
+        "pageNumber": 1,
+        "pageCount": 1,
+        "nativePage": 1,
+        "nativeCount": 1,
+        "pageText": "Page 1 of 1",
+        "pageUia": "Page 1 of 1",
+        "source": null,
+        "textPattern": null,
+        "finished": 2464469134
+      },
+      "primaryPending": false,
+      "secondaryPending": false,
+      "finished": 2464469146
+    },
+    "regions": [
+      {
+        "name": "status",
+        "expected": "Preview updated in 82 ms",
+        "x": 624,
+        "y": 616,
+        "width": 142,
+        "height": 22
+      },
+      {
+        "name": "primary-page",
+        "expected": "Page 37 of 37",
+        "x": 582,
+        "y": 570,
+        "width": 79,
+        "height": 22
+      }
+    ],
+    "completedReaders": [
+      "primary",
+      "secondary"
+    ],
+    "observationStarted": 2462680080,
+    "observationDeadlineSeconds": 30,
+    "scope": "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out"
+  }
+]

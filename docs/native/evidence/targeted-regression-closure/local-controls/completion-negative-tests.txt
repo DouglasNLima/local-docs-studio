@@ -1,0 +1,13 @@
+✔ qualification needs native delivery inside the actual unfinished operation (3.6062ms)
+✔ accepted interruption must cancel its own task and cannot publish stale Ready (0.3245ms)
+✔ keyboard qualification needs the native key-down before WPF consumes it (0.2206ms)
+✔ semantic Ready does not conceal stale page counters, UIA, ownership or missing text (2.223ms)
+✔ an unfinished independent pane is not completion evidence and Ready still requires full checks (0.8309ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 181.6139

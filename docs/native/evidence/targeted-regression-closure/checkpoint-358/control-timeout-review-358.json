@@ -1,0 +1,126 @@
+{
+  "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "outcome": {
+    "label": "controls/resize-compact/candidate",
+    "tree": "81a5921ddc41780ae7aa644a9c2fb37aaef6e70b",
+    "supervisionFailure": "240-second child supervision limit",
+    "environment": {},
+    "side": "candidate",
+    "revision": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "mode": "Continuous",
+    "exitCode": -1
+  },
+  "traceRecords": 5,
+  "trace": [
+    {
+      "tick": 10276553346,
+      "boundary": "subscribed",
+      "state": {
+        "action": "startup",
+        "active": null,
+        "renderedOwner": null,
+        "sourceGeneration": 0,
+        "acceptedGeneration": -1,
+        "phase": "idle",
+        "status": "Preview pending",
+        "itemStatus": ""
+      }
+    },
+    {
+      "tick": 10276804532,
+      "boundary": "visibility",
+      "state": {
+        "action": "startup",
+        "active": null,
+        "renderedOwner": null,
+        "sourceGeneration": 0,
+        "acceptedGeneration": -1,
+        "phase": "idle",
+        "status": "Preview pending",
+        "itemStatus": ""
+      }
+    },
+    {
+      "tick": 10277532754,
+      "boundary": "size",
+      "state": {
+        "action": "startup",
+        "active": null,
+        "renderedOwner": null,
+        "sourceGeneration": 0,
+        "acceptedGeneration": -1,
+        "phase": "idle",
+        "status": "Preview pending",
+        "itemStatus": ""
+      }
+    },
+    {
+      "tick": 10277550409,
+      "boundary": "layout",
+      "state": {
+        "action": "startup",
+        "active": null,
+        "renderedOwner": null,
+        "sourceGeneration": 0,
+        "acceptedGeneration": -1,
+        "phase": "idle",
+        "status": "Preview pending",
+        "itemStatus": ""
+      }
+    },
+    {
+      "tick": 10278075205,
+      "boundary": "layout",
+      "state": {
+        "action": "startup",
+        "active": null,
+        "renderedOwner": null,
+        "sourceGeneration": 0,
+        "acceptedGeneration": -1,
+        "phase": "idle",
+        "status": "Preview pending",
+        "itemStatus": ""
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/mixed.md",
+      "bytes": 4475,
+      "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/pixel.png",
+      "bytes": 68,
+      "sha256": "a38a4ff7320a3d8764ac959b264f15e335360d7c1e23a0627dee7f366c95c58f"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/second.md",
+      "bytes": 4494,
+      "sha256": "677ff86a06124b4c498fdcd97697f8f0b858c35e8f1c8dca890d7ba7a73076ce"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/state/preferences.json",
+      "bytes": 318,
+      "sha256": "26e88b67c03d2b533b1bd7ca737a5c9f894dc26ae639fa2ce509e7819fbde70c"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/transitions.jsonl",
+      "bytes": 27252,
+      "sha256": "d98b8b38800e88876ee7440024bc3cea4048da39ed3c83d06687fa56020b9648"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate-stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate-stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "observed": "Only startup subscription/visibility/size/layout is recorded; no active document, render request, comparison or resize action is recorded. Both process output streams are empty. No completed control or exception report was written.",
+  "verdict": "FAIL: supervised control did not complete. Exact cause INCONCLUSIVE; this trace does not establish a compact-resize product defect or an observer defect.",
+  "preservation": "Original archive, five startup records, empty output streams and process outcome retained. No rerun, timeout extension or relabelling as PASS."
+}

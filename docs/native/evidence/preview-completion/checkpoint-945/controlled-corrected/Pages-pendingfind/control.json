@@ -1,0 +1,231 @@
+{
+  "verdict": "PASS",
+  "scenario": "pendingfind",
+  "mode": "Pages",
+  "zoom": 100,
+  "compact": true,
+  "facts": [
+    {
+      "stage": "comparison-deep-primary",
+      "secondary": false,
+      "owner": "2e29249a-921d-4558-9d44-4c0e61c23f14",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 3105 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,28,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 10.618333333333311,
+          "actualHeight": 10.618333333333311
+        },
+        {
+          "actualWidth": 3.4602156334231804,
+          "actualHeight": 1
+        }
+      ]
+    },
+    {
+      "stage": "comparison-deep-secondary",
+      "secondary": true,
+      "owner": "377c3ea3-8847-47b7-bfe5-6d5b39959cd8",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 3105 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 167.57833333333332,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,67.92333333333333,0,19.950000000000003",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 50.61833333333331,
+          "actualHeight": 50.61833333333331
+        },
+        {
+          "actualWidth": 64.59645884995498,
+          "actualHeight": 18.668333333333308
+        }
+      ]
+    },
+    {
+      "stage": "find-open",
+      "secondary": false,
+      "owner": "2e29249a-921d-4558-9d44-4c0e61c23f14",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 3105 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 103.57833333333332,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,28,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 1,
+          "actualHeight": 1
+        },
+        {
+          "actualWidth": 3.4602156334231804,
+          "actualHeight": 1
+        }
+      ]
+    },
+    {
+      "stage": "switched-primary",
+      "secondary": false,
+      "owner": "377c3ea3-8847-47b7-bfe5-6d5b39959cd8",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 203 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,28,0,19.950000000000003",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 10.618333333333311,
+          "actualHeight": 10.618333333333311
+        },
+        {
+          "actualWidth": 3.4602156334231804,
+          "actualHeight": 1
+        }
+      ]
+    },
+    {
+      "stage": "switched-secondary",
+      "secondary": true,
+      "owner": "2e29249a-921d-4558-9d44-4c0e61c23f14",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 203 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 167.57833333333332,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,67.92333333333333,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 50.61833333333331,
+          "actualHeight": 50.61833333333331
+        },
+        {
+          "actualWidth": 64.59645884995498,
+          "actualHeight": 18.668333333333308
+        }
+      ]
+    },
+    {
+      "stage": "returned-primary",
+      "secondary": false,
+      "owner": "2e29249a-921d-4558-9d44-4c0e61c23f14",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 219 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 127.57833333333332,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,28,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 10.618333333333311,
+          "actualHeight": 10.618333333333311
+        },
+        {
+          "actualWidth": 3.4602156334231804,
+          "actualHeight": 1
+        }
+      ]
+    },
+    {
+      "stage": "completion-commit-control",
+      "started": 5324025190891,
+      "committed": 5324024934073,
+      "nonVisualFenceCompleted": true
+    },
+    {
+      "stage": "closed-comparison",
+      "secondary": false,
+      "owner": "2e29249a-921d-4558-9d44-4c0e61c23f14",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 219 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 404.15666666666664,
+      "mode": "Page",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,28,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 287.19666666666666,
+          "actualHeight": 287.19666666666666
+        },
+        {
+          "actualWidth": 718.3333333333334,
+          "actualHeight": 207.5978521092018
+        }
+      ]
+    }
+  ],
+  "secondaryCompletionStatus": true,
+  "fixtureSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+  "product": "0.1.0-preview.1\u002B945c106bd75141b74b3c1a3cf832f5c1b88fa592",
+  "highContrast": false,
+  "osHighContrast": false,
+  "scope": "Controlled off-screen natural WPF geometry; no foreground input or physical display acceptance"
+}

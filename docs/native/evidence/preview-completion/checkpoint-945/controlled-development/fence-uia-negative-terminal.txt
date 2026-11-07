@@ -1,0 +1,2 @@
+System.InvalidOperationException: A UIA-only mutation incorrectly requires another visual commit.
+   at LensDocsStudio.Native.UxProbe.ComparisonControl.<>c__DisplayClass0_0.<<Run>b__12>d.MoveNext() in C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Native.UxProbe\ComparisonControl.cs:line 266

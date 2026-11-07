@@ -1,0 +1,96 @@
+{
+  "recordOverflow": false,
+  "byteOverflow": false,
+  "written": 854,
+  "bytes": 603327,
+  "unchangedEvents": {
+    "render-posted": 100,
+    "render-started": 143,
+    "media/CommittingBatch": 79,
+    "media/RenderComplete": 71,
+    "render-completed": 139
+  },
+  "verdict": {
+    "pendingInterruption": "INCONCLUSIVE",
+    "qualifiedDeliveries": 0,
+    "cancellationsVerified": false,
+    "staleReady": 0,
+    "offeredOperation": null,
+    "deliveries": [],
+    "operations": [
+      {
+        "id": 36537487,
+        "reader": "primary",
+        "start": 2352740418,
+        "end": 2352896082,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 12
+      },
+      {
+        "id": 10659760,
+        "reader": "secondary",
+        "start": 2352751923,
+        "end": 2355288758,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 1
+      },
+      {
+        "id": 39396540,
+        "reader": "primary",
+        "start": 2359485047,
+        "end": 2360482921,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 15
+      },
+      {
+        "id": 50874815,
+        "reader": "secondary",
+        "start": 2359485753,
+        "end": 2360465120,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 1
+      },
+      {
+        "id": 17807781,
+        "reader": "primary",
+        "start": 2367016496,
+        "end": 2367324831,
+        "cancelled": 2367320246,
+        "outcome": "rejected",
+        "generation": 22
+      },
+      {
+        "id": 8352897,
+        "reader": "primary",
+        "start": 2372989912,
+        "end": 2374669882,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 25
+      },
+      {
+        "id": 30595629,
+        "reader": "secondary",
+        "start": 2372991175,
+        "end": 2374281248,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 2
+      },
+      {
+        "id": 21346716,
+        "reader": "primary",
+        "start": 2393402087,
+        "end": 2394000832,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 46
+      }
+    ]
+  },
+  "scope": "All subscribed mutations and input events; first render boundary per mutation epoch, with unchanged render events counted separately"
+}

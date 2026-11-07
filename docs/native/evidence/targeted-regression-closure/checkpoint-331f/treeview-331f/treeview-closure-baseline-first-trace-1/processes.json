@@ -1,0 +1,18 @@
+[
+  {
+    "directories": [
+      "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\9a7f0659871b405fb2143b45e6607f1a"
+    ],
+    "failure": "Independent package verification failed before TreeView installer execution.",
+    "source": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "side": "baseline"
+  },
+  {
+    "directories": [
+      "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\treeview-install-smoke\\85b49ecf19414dfe9cd6d0f2c194f61f"
+    ],
+    "failure": null,
+    "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+    "side": "candidate"
+  }
+]

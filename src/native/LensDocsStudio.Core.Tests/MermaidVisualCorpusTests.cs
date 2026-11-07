@@ -23,7 +23,8 @@ public sealed class MermaidVisualCorpusTests
         var changed = await draft.ExecuteAsync(new UpdateMermaidNode(selected.Id, "Changed label", selected.Shape, selected.Id));
         Assert.True(changed.Success, changed.Error);
         Assert.Equal(source[..label.Start] + "\"Changed label\"" + source[label.End..], draft.Source);
-        Assert.True(new DiagramService().Render(draft.Source).Success);
+        var rendering = new DiagramService().Render(draft.Source);
+        Assert.True(rendering.Success, rendering.Error);
         draft.Undo(); Assert.Equal(source, draft.Source);
     }
 

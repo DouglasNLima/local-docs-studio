@@ -1,0 +1,127 @@
+{
+  "head": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "tree": "81a5921ddc41780ae7aa644a9c2fb37aaef6e70b",
+  "scope": "Selected original failures and complete terminal workflow manifest. Full archives and logs retained in the originating campaign. Passing repeats cannot erase these observations.",
+  "files": [
+    {
+      "path": "final-report-358.md",
+      "bytes": 32425,
+      "sha256": "7744391f59f5a2428bd78e680f088f3fd15fc1a7d21b7900352414f4f4911876"
+    },
+    {
+      "path": "final-delivery-358.json",
+      "bytes": 627526,
+      "sha256": "eb57db31fedb2bd47e978d4cbb2cedb89877a3ccde900c1a4f042a16f2b44a3c"
+    },
+    {
+      "path": "native-failure-review-358.json",
+      "bytes": 4385,
+      "sha256": "97c7403d8cb6a5fc15f8fa2517818a5412187835ccfa7dff49a73d0dbb94c964"
+    },
+    {
+      "path": "control-timeout-review-358.json",
+      "bytes": 4553,
+      "sha256": "7c28aec30602498aec5de87b73e612328fa754a2cc3f155b1afe00822a0c8311"
+    },
+    {
+      "path": "hosted-358/pixel-frame-correlation.json",
+      "bytes": 21068,
+      "sha256": "03d487991bd9552fcdf31db20910a976c2316cd2cbd8d6f61c5d06a4e72ee5e1"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/mixed.md",
+      "bytes": 4475,
+      "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/pixel.png",
+      "bytes": 68,
+      "sha256": "a38a4ff7320a3d8764ac959b264f15e335360d7c1e23a0627dee7f366c95c58f"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/second.md",
+      "bytes": 4494,
+      "sha256": "677ff86a06124b4c498fdcd97697f8f0b858c35e8f1c8dca890d7ba7a73076ce"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/transitions.jsonl",
+      "bytes": 27252,
+      "sha256": "d98b8b38800e88876ee7440024bc3cea4048da39ed3c83d06687fa56020b9648"
+    },
+    {
+      "path": "integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/state/preferences.json",
+      "bytes": 318,
+      "sha256": "26e88b67c03d2b533b1bd7ca737a5c9f894dc26ae639fa2ce509e7819fbde70c"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/install/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "08b83ac083740ba6d7a0d16ef65463a75a467be550ae93129bb0c568a8413fae"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/authoring-ui.json",
+      "bytes": 1673,
+      "sha256": "10e6849832692bf282e3d078048ed15594247c8c3be8b04ee71902da8f645866"
+    },
+    {
+      "path": "hosted-358/completion-Pages-normal/foreground/trace-0/pixels-primary/identity.json",
+      "bytes": 1878,
+      "sha256": "88da102b4cb1a296e5812c41cdf00403de15b5ef1970be2268b553417cfbcc90"
+    },
+    {
+      "path": "hosted-358/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-captures.json",
+      "bytes": 110802,
+      "sha256": "3082e2d96c8622ee1d030a94129a1f1c422b4b5b53fc77f99d9b438919185f49"
+    },
+    {
+      "path": "hosted-358/completion-Pages-normal/foreground/trace-0/pixels-primary/appearance.json",
+      "bytes": 434,
+      "sha256": "88a7a28c41b41479edf94dc255d4687ec420cdc3f0677d946608ec877e2bed8c"
+    },
+    {
+      "path": "hosted-358/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-000-primary-find-frame-0.png",
+      "bytes": 55644,
+      "sha256": "f1c831406066c8296119f6fa92289e8f3d108cf43d9ffbd33b605651e389835a"
+    },
+    {
+      "path": "hosted-358/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-001-primary-find-frame-1.png",
+      "bytes": 52368,
+      "sha256": "c9e7d299e33836a510571394f1fc8930ae69d9bc60edbf2fb6c70cc5332b700f"
+    },
+    {
+      "path": "hosted-358/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-002-primary-find-frame-2.png",
+      "bytes": 52368,
+      "sha256": "c9e7d299e33836a510571394f1fc8930ae69d9bc60edbf2fb6c70cc5332b700f"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/treeview-installer-results.json",
+      "bytes": 11801,
+      "sha256": "7684c0260c229bfab7f660a206e6f31ed7a0cde51c7682d3a05ff03cc8770867"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/0.1.0-preview.1050-verification.json",
+      "bytes": 106877,
+      "sha256": "9c6e7893d03d29c3f422a51c92b4e6dc0c6e878358d73b0f9b308e088f5ec782"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/0.1.1-preview.1050-verification.json",
+      "bytes": 106877,
+      "sha256": "fa77c3348e0b106e3d9adae0beeee37d1c56dd05982640a5d6634711fd797d78"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/failure.png",
+      "bytes": 123755,
+      "sha256": "ece73338ed3dcd90216943319466675e93faf7734b6435817c9afc781b4eb1d1"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/failure-controls.txt",
+      "bytes": 461,
+      "sha256": "9ac60dc934137e8dab7e1bd2b8c503b410dd8043db173528c8668543f6cd1f4f"
+    },
+    {
+      "path": "native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/launch-1.json",
+      "bytes": 39781,
+      "sha256": "d04231da121158936753d063c90bb519c404d30bf25785fa0f89300894ea55ed"
+    }
+  ]
+}

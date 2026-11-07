@@ -1,0 +1,41 @@
+name: Native targeted regression closure
+on:
+  push:
+    branches: [feature/reading-experience-productivity]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression-closure:
+    name: Regression closure (${{ matrix.appearance }}, ${{ matrix.order }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Bounded startup and Pages observations on exact baseline and candidate
+        run: scripts/native/Test-NativeRegressionClosure.ps1 -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}'
+      - name: Independently read every fixed Pages label capture
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: scripts/native/Read-CompletionPixels.ps1 -EvidenceDirectory artifacts/native-regression-closure/pixels
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-closure-${{ matrix.appearance }}-${{ matrix.order }}
+          path: |
+            artifacts/native-regression-closure/closure-protocol.json
+            artifacts/native-regression-closure/protocol.json
+            artifacts/native-regression-closure/processes.json
+            artifacts/native-regression-closure/startup/
+            artifacts/native-regression-closure/pixels/
+          retention-days: 14

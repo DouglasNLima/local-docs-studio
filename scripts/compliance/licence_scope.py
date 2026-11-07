@@ -105,6 +105,103 @@ def apply_selection_sync_refresh(preserved, refresh):
     return result
 
 
+def apply_reading_productivity_refresh(preserved, refresh):
+    # Reviewed implementation/current-guidance paths only. No historical evidence,
+    # upstream notice, trust decision or performance/High Contrast gate is eligible.
+    allowed = {
+        '.gitattributes',
+        '.github/workflows/native.yml',
+        'assets/scripts/app-controller.js',
+        'assets/scripts/document/document-ux-service.js',
+        'assets/scripts/editor/draft-service.js',
+        'assets/scripts/editor/editor-service.js',
+        'assets/scripts/editor/find-replace-service.js',
+        'assets/scripts/editor/insert-helper-service.js',
+        'assets/scripts/editor/table-editor-service.js',
+        'assets/scripts/exports/export-service.js',
+        'assets/scripts/files/file-service.js',
+        'assets/scripts/rendering/render-service.js',
+        'assets/scripts/ui/ui-service.js',
+        'assets/styles/app.css',
+        'docs/native/architecture-decisions.md',
+        'docs/native/functional-parity-matrix.md',
+        'docs/native/implementation-progress.md',
+        'docs/native/user-guide.md',
+        'docs/native/validation-report.md',
+        'docs/tool-guide.md',
+        'index.html',
+        'src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj',
+        'src/native/LensDocsStudio.Core.Tests/MermaidVisualCorpusTests.cs',
+        'src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs',
+        'src/native/LensDocsStudio.Core/Editing/MarkdownEditService.cs',
+        'src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs',
+        'src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs',
+        'src/native/LensDocsStudio.Core/Rendering/DiagramService.cs',
+        'src/native/LensDocsStudio.Core/Review/DocumentReviewService.cs',
+        'src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs',
+        'src/native/LensDocsStudio.Native.Validation/Program.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeArrangementLatencyChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeSuiteLifecycleChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeLaunchReadiness.cs',
+        'src/native/LensDocsStudio.Native.Validation/NativeLaunchReadinessChecks.cs',
+        'src/native/LensDocsStudio.Native/DocumentReviewWindow.xaml.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.Desktop.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.WorkspaceChrome.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.xaml',
+        'src/native/LensDocsStudio.Native/MainWindow.xaml.cs',
+        'src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs',
+        'src/native/LensDocsStudio.Native/ViewModels/DocumentViewModel.cs',
+        'src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.cs',
+        'tests/browser/app-smoke.spec.mjs',
+    }
+    require(refresh['baseCommit'] == '99349d82eb06960eb1f9785cf384db2373aed4fa',
+            'Reading amendment must identify the inspected develop baseline')
+    require(set(refresh['files']) == allowed, 'Reading amendment must retain its exact reviewed path scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'Reading amendment changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'Reading amendment requires an exact canonical source digest: ' + path)
+        result[path] = entry['current']
+    return result
+
+
+def apply_preview_reflow_refresh(preserved, refresh):
+    allowed = {
+        'src/native/LensDocsStudio.Native/MainWindow.Find.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.Zoom.cs',
+        'src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs',
+    }
+    require(refresh['baseCommit'] == '75de42474514af0e7a6e521235a6517f4acad14b',
+            'Preview integration must identify the exact original PR #76 source')
+    require(set(refresh['files']) == allowed, 'Preview integration must retain its exact reviewed source scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'Preview integration changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'Preview integration requires an exact canonical source digest: ' + path)
+        result[path] = entry['current']
+    return result
+
+
+def apply_regression_closure_refresh(preserved, refresh):
+    path = 'src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs'
+    require(refresh['baseCommit'] == '358d2a6f4b8028461fb535f2f71a9b7c71636760',
+            'Closure diagnostics must identify the exact retained failure source')
+    require(set(refresh['files']) == {path}, 'Closure diagnostics must retain their single harness path scope')
+    entry = refresh['files'][path]
+    require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+            'Closure diagnostics changed historical evidence: ' + path)
+    require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+            'Closure diagnostics require an exact canonical source digest')
+    return {**preserved, path: entry['current']}
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -148,6 +245,12 @@ def main():
     preserved = apply_find_caret_refresh(preserved, refresh)
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
+    reading_refresh = json.loads((ROOT / 'docs/open-source/evidence/reading-productivity/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_reading_productivity_refresh(preserved, reading_refresh)
+    reflow_refresh = json.loads((ROOT / 'docs/open-source/evidence/preview-reflow-integration/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_preview_reflow_refresh(preserved, reflow_refresh)
+    closure_refresh = json.loads((ROOT / 'docs/open-source/evidence/targeted-regression-closure/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_regression_closure_refresh(preserved, closure_refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

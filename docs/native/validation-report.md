@@ -1,5 +1,20 @@
 # Native validation report
 
+The [targeted regression closure](targeted-regression-closure.md) continues from exact `358d2a6f4b8028461fb535f2f71a9b7c71636760`. Its bounded campaign investigates installed TreeView closure, a pre-binding comparison startup timeout and retained stale Pages pixels. Diagnostic-only changes preserve every original failure, deadline, source/state assertion and acceptance gate. No product correction is justified yet; unresolved causes remain INCONCLUSIVE and overall acceptance remains NO-GO.
+
+The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. Both diagnostic checkpoints and their failures are preserved. A controlled negative case justifies separating UIA-only publication from actual bound-text changes in the passive render-commit observer. Product presentation behaviour, fixed pixel assertions and acceptance thresholds remain unchanged; exact final-source verdicts and all terminal workflows remain in Goal #75 and Draft PR #76.
+
+## PR #80 preview correction integrated into PR #76 — 7 November 2026
+
+The three reviewed source-position commits and focused comparison ownership, closure, Find-bar, divider, edited-source, cancelled-replacement and interrupted-Find completion corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
+
+
+## Reading experience and productivity — 6 November 2026
+
+One consolidated Draft PR implements readable-buffer statistics, hierarchical H1–H6 outline/Copy TOC, contextual slash commands, two-document comparison, and a separately validated pinned-Mermaider flowchart correction. Web remains buildless/offline and Native remains WPF/AvalonEdit/Markdig/Mermaider 0.15.1. Shared command ownership and canonical buffers preserve persistence, recovery, independent Undo/Redo and conflict checks.
+
+Checkpoint evidence includes Chromium/Edge workflows, Core regressions and 42 cumulative compiled WPF/AvalonEdit/UIA-peer checks. The first complete Core consolidation found two compatibility regressions; both were corrected against unchanged historical tests. The complete corrected Core run passed 2,382 tests; earlier timing failures remain recorded. Final commit-specific results, workflow links, limitations and per-phase verdicts belong to the [consolidated engineering receipt](../engineering/reading-experience-receipt.md) and its Draft PR. Current release readiness is **NOT READY**. Historical Continuous 250 ms and High Contrast failures are unchanged; physical-machine, clean-install and physical screen-reader certification is NOT RUN.
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.
@@ -570,3 +585,6 @@ Broader Word/template rendering, PDF complex-script shaping/BiDi/joined or colou
 No downloaded installer, foreground native application, clipboard, Office instance or certificate-store test ran locally in this batch. No merge, release or tag changed. Earlier baseline, failures, corrections, run IDs and artefact paths remain in [history through 0c20f64](history/validation-report-through-0c20f64.md) and [earlier validation history](history/validation-report-through-9fddfd9.md).
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+
+Native hardening continuation from `adc68a9`: [investigation and acceptance](native-hardening-acceptance.md). Scope is P0/P1 remediation and independent unchanged-gate acceptance. Five functional workstreams remain intact; integration remains NO-GO pending final-source evidence.

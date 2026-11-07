@@ -1,0 +1,95 @@
+{
+  "error": "System.TimeoutException: Comparison semantic response was not observed within 30 seconds.\r\n   at LensDocsStudio.Native.UxProbe.ComparisonControl.\u003CRun\u003Eg__Until|0_10(Func\u00601 predicate) in C:\\Code\\MarkdownReader-reading-productivity\\src\\native\\LensDocsStudio.Native.UxProbe\\ComparisonControl.cs:line 90\r\n   at LensDocsStudio.Native.UxProbe.ComparisonControl.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CRun\u003Eb__12\u003Ed.MoveNext() in C:\\Code\\MarkdownReader-reading-productivity\\src\\native\\LensDocsStudio.Native.UxProbe\\ComparisonControl.cs:line 240",
+  "facts": [
+    {
+      "stage": "comparison-deep-primary",
+      "secondary": false,
+      "owner": "9af5d157-d20e-45b7-b8a8-b817b86dd62e",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 658 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 553.1566666666666,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,502.15999999999804,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 536.6666666666666,
+          "actualHeight": 536.6666666666666
+        },
+        {
+          "actualWidth": 536.6666666666666,
+          "actualHeight": 155.0963071442296
+        }
+      ]
+    },
+    {
+      "stage": "comparison-deep-secondary",
+      "secondary": true,
+      "owner": "dbe86cf2-f7d1-4464-bff0-db1cb9c4bd2e",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 658 ms",
+      "itemStatus": "",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 593.1566666666666,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": true,
+      "endVisible": true,
+      "end": "28,542.159999999998,0,19.950000000000003",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 536.6666666666666,
+          "actualHeight": 536.6666666666666
+        },
+        {
+          "actualWidth": 536.6666666666666,
+          "actualHeight": 155.0963071442296
+        }
+      ]
+    },
+    {
+      "stage": "failure-primary",
+      "secondary": false,
+      "owner": "9af5d157-d20e-45b7-b8a8-b817b86dd62e",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 658 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 1190.3333333333333,
+      "actualHeight": 625.1566666666666,
+      "mode": "Scroll",
+      "zoom": 100,
+      "visible": false,
+      "endVisible": false,
+      "end": "28,858.2166666666653,0,19.950000000000003",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720
+        },
+        {
+          "actualWidth": 1134.3333333333333,
+          "actualHeight": 327.82157342348654
+        }
+      ]
+    }
+  ]
+}

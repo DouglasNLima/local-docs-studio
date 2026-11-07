@@ -1,0 +1,61 @@
+{
+  "scope": "Local pre-commit diagnostics; no foreground/High Contrast/installed certification; production sources unchanged from 358d2a6. No retry of the Core failure.",
+  "core": {
+    "passed": 2381,
+    "failed": 1,
+    "total": 2382,
+    "failure": "ComplexErRenderingTests complete-detailed exceeded existing six-second resource deadline"
+  },
+  "completionNegativeTests": 5,
+  "governanceTests": 27,
+  "tracedStartup": "PASS",
+  "uninstrumentedStartup": "PASS",
+  "disabledTraceAbsent": true,
+  "files": [
+    {
+      "path": "completion-negative-tests.txt",
+      "bytes": 604,
+      "sha256": "051ccc7dac277da47bd62274d828d53cb45d631bbcecfb8f586151b6ab235891"
+    },
+    {
+      "path": "composition-control.json",
+      "bytes": 438,
+      "sha256": "3eddc2ad050823d1656419215dfa6dbc6fcfdd1dd4f166357216a70d49726360"
+    },
+    {
+      "path": "core-tests.txt",
+      "bytes": 1972,
+      "sha256": "6ee9b64b94a4b2113f6ab4adab266de948d9c0149cb9bbc51c0274aa5eca9b83"
+    },
+    {
+      "path": "governance-tests.txt",
+      "bytes": 132,
+      "sha256": "300f98b353b2c26f0419d9da4e2769dcf874d31002f9a159a4ad1ebe0b107013"
+    },
+    {
+      "path": "web-static.txt",
+      "bytes": 333,
+      "sha256": "e3554009f10de5b5df0bfca75ff5f980ae554e9277afc871b3d2471f696f95e8"
+    },
+    {
+      "path": "local-startup/control.json",
+      "bytes": 5242,
+      "sha256": "4d2f5c0d01439fd04cf80662ae4650cb8b8cbd680de61bf1e741a963641e4555"
+    },
+    {
+      "path": "local-startup/startup.jsonl",
+      "bytes": 16563,
+      "sha256": "4681ec7b4547861848ec380998938dba177a2c6aff11de491cf96f2fd00ebdb0"
+    },
+    {
+      "path": "local-startup-uninstrumented/control.json",
+      "bytes": 5237,
+      "sha256": "0f02ce5102af3a493a289231ad35d4f673c39c5950934f999fe081e5f5018f65"
+    },
+    {
+      "path": "tests/core.trx",
+      "bytes": 3715680,
+      "sha256": "3602da899c86d15d67c4ee146dcabbbce8280e725d559c8457d80f22b89c605c"
+    }
+  ]
+}
