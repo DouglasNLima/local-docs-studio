@@ -1,5 +1,10 @@
 # Native architecture decisions
 
+## PR #80 preview correction integrated into PR #76 — 7 November 2026
+
+The three reviewed source-position commits and focused comparison ownership/closure corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
+
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.

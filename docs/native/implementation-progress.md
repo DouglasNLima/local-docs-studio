@@ -1,5 +1,10 @@
 # Native implementation progress
 
+## PR #80 preview correction integrated into PR #76 — 7 November 2026
+
+The three reviewed source-position commits and focused comparison ownership/closure corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
+
+
 ## Reading experience and productivity — 6 November 2026
 
 One consolidated Draft PR implements readable-buffer statistics, hierarchical H1–H6 outline/Copy TOC, contextual slash commands, two-document comparison, and a separately validated pinned-Mermaider flowchart correction. Web remains buildless/offline and Native remains WPF/AvalonEdit/Markdig/Mermaider 0.15.1. Shared command ownership and canonical buffers preserve persistence, recovery, independent Undo/Redo and conflict checks.

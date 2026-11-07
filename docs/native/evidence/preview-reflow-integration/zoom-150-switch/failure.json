@@ -1,0 +1,185 @@
+{
+  "error": "System.TimeoutException: Comparison semantic response was not observed within 30 seconds.\r\n   at LensDocsStudio.Native.UxProbe.ComparisonControl.\u003CRun\u003Eg__Until|0_10(Func\u00601 predicate) in C:\\Code\\MarkdownReader-reading-productivity\\src\\native\\LensDocsStudio.Native.UxProbe\\ComparisonControl.cs:line 89\r\n   at LensDocsStudio.Native.UxProbe.ComparisonControl.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CRun\u003Eb__12\u003Ed.MoveNext() in C:\\Code\\MarkdownReader-reading-productivity\\src\\native\\LensDocsStudio.Native.UxProbe\\ComparisonControl.cs:line 148",
+  "facts": [
+    {
+      "stage": "comparison-deep-primary",
+      "secondary": false,
+      "owner": "976e2e56-317b-4e28-8fde-737632c7458d",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 3225 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 553.1566666666666,
+      "mode": "Scroll",
+      "zoom": 150,
+      "visible": true,
+      "endVisible": true,
+      "end": "42,476.6600000000017,0,29.925000000000004",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 339.11
+        },
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 98.0025628242479
+        }
+      ]
+    },
+    {
+      "stage": "comparison-deep-secondary",
+      "secondary": true,
+      "owner": "13575e32-1625-4ce2-b370-953f70257050",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 3225 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 593.1566666666666,
+      "mode": "Scroll",
+      "zoom": 150,
+      "visible": true,
+      "endVisible": true,
+      "end": "42,516.6600000000008,0,29.925000000000004",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 339.11
+        },
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 98.0025628242479
+        }
+      ]
+    },
+    {
+      "stage": "switched-primary",
+      "secondary": false,
+      "owner": "13575e32-1625-4ce2-b370-953f70257050",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 527 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 553.1566666666666,
+      "mode": "Scroll",
+      "zoom": 150,
+      "visible": true,
+      "endVisible": true,
+      "end": "42,476.6600000000017,0,29.925000000000004",
+      "sourceSha256": "677FF86A06124B4C498FDCD97697F8F0B858C35E8F1C8DCA890D7BA7A73076CE",
+      "media": [
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 339.11
+        },
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 98.0025628242479
+        }
+      ]
+    },
+    {
+      "stage": "switched-secondary",
+      "secondary": true,
+      "owner": "976e2e56-317b-4e28-8fde-737632c7458d",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 527 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 593.1566666666666,
+      "mode": "Scroll",
+      "zoom": 150,
+      "visible": true,
+      "endVisible": true,
+      "end": "42,516.6600000000008,0,29.925000000000004",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 339.11
+        },
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 98.0025628242479
+        }
+      ]
+    },
+    {
+      "stage": "returned-primary",
+      "secondary": false,
+      "owner": "976e2e56-317b-4e28-8fde-737632c7458d",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 468 ms",
+      "itemStatus": "Ready",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 592.6666666666666,
+      "actualHeight": 553.1566666666666,
+      "mode": "Scroll",
+      "zoom": 150,
+      "visible": true,
+      "endVisible": true,
+      "end": "42,476.6600000000017,0,29.925000000000004",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 339.11
+        },
+        {
+          "actualWidth": 339.11,
+          "actualHeight": 98.0025628242479
+        }
+      ]
+    },
+    {
+      "stage": "failure-primary",
+      "secondary": false,
+      "owner": "976e2e56-317b-4e28-8fde-737632c7458d",
+      "layout": "Preview",
+      "previewStatus": "Preview layout could not be restored. Retry preview.",
+      "itemStatus": "Preview unavailable",
+      "sameAttached": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "actualWidth": 1190.3333333333333,
+      "actualHeight": 625.1566666666666,
+      "mode": "Scroll",
+      "zoom": 150,
+      "visible": false,
+      "endVisible": false,
+      "end": "42,1172.795000000002,0,29.925000000000004",
+      "sourceSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720
+        },
+        {
+          "actualWidth": 737.5566666666666,
+          "actualHeight": 213.15338256448607
+        }
+      ]
+    }
+  ]
+}
