@@ -2,3 +2,7 @@
 /assets/vendor/THIRD-PARTY-NOTICES.txt -text
 /docs/open-source/evidence/upstream-notices/*.txt -text
 /docs/open-source/evidence/goal58/mammoth-notices/*.txt -text
+# Reuse PR #78 workloads and retained failure files byte-for-byte.
+/tests/fixtures/native-ux/*.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/docs/native/evidence/blank-preview/original/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/docs/native/evidence/blank-preview/causal/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

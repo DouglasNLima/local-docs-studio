@@ -105,6 +105,30 @@ def apply_selection_sync_refresh(preserved, refresh):
     return result
 
 
+def apply_preview_reflow_refresh(preserved, refresh):
+    # Preserve historical evidence. This correction changes only source, tracking
+    # notes, exact-byte attributes and the explicitly excluded signing test step.
+    allowed = {
+        '.gitattributes', '.github/workflows/native.yml',
+        'docs/native/architecture-decisions.md', 'docs/native/functional-parity-matrix.md',
+        'docs/native/implementation-progress.md', 'docs/native/native-experience-improvements.md',
+        'docs/native/validation-report.md',
+        'src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.xaml.cs',
+    }
+    require(refresh['baseCommit'] == '99349d82eb06960eb1f9785cf384db2373aed4fa',
+            'Preview amendment must identify the inspected develop baseline')
+    require(set(refresh['files']) == allowed, 'Preview amendment must retain its exact reviewed path scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'Preview amendment changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'Preview amendment requires an exact canonical source digest: ' + path)
+        result[path] = entry['current']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -148,6 +172,8 @@ def main():
     preserved = apply_find_caret_refresh(preserved, refresh)
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
+    preview_refresh = json.loads((ROOT / 'docs/open-source/evidence/preview-reflow/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_preview_reflow_refresh(preserved, preview_refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

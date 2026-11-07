@@ -1,0 +1,61 @@
+name: Native blank preview correctness investigation
+on:
+  push:
+    branches: [fix/native-blank-preview-lifecycle]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  comparison:
+    name: Preview (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }}, trace=${{ matrix.trace }})
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: [develop, pr76, historical]
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+        trace: ['0', '1']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate inherited observer controls
+        run: node --test tests/unit/native-ux-report.test.mjs
+      - name: Run the unchanged foreground journey on exact baseline and candidate
+        shell: pwsh
+        env:
+          LENS_NATIVE_TRANSITION_TRACE: '${{ matrix.trace }}'
+        run: |
+          $baseline = switch ('${{ matrix.baseline }}') {
+            develop { '99349d82eb06960eb1f9785cf384db2373aed4fa' }
+            pr76 { '75de42474514af0e7a6e521235a6517f4acad14b' }
+            historical { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
+          }
+          $candidate = (git rev-parse HEAD).Trim()
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -CandidateRevision $candidate -Fixtures mixed -Processes 4 -Iterations 3 -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}'
+          exit $LASTEXITCODE
+      - name: Test causal geometry, supported modes, selection and supersession independently
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          & scripts/native/Test-PreviewLayoutRetention.ps1 -EvidenceDirectory artifacts/native-ux
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blank-preview-${{ matrix.baseline }}-${{ matrix.appearance }}-${{ matrix.order }}-trace-${{ matrix.trace }}
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+            artifacts/native-ux/controls/
+          retention-days: 30
