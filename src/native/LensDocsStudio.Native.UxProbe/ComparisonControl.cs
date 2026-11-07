@@ -73,7 +73,7 @@ internal static class ComparisonControl
                 || Field(secondary ? "comparisonRenderedId" : "renderedDocumentId") is not Guid id || id != owner.Id
                 || Field(secondary ? "comparisonRenderedVersion" : "renderedVersion") is not ITextSourceVersion version
                 || !version.BelongsToSameDocumentAs(owner.EditorDocument.Version) || version.CompareAge(owner.EditorDocument.Version) != 0
-                || AutomationProperties.GetItemStatus(reader).StartsWith("Busy", StringComparison.Ordinal)) return false;
+                || AutomationProperties.GetItemStatus(reader) != "Ready") return false;
             return UIElementAutomationPeer.CreatePeerForElement(reader)?.GetPattern(PatternInterface.Text) is ITextProvider provider
                 && provider.GetVisibleRanges().Any(range => !string.IsNullOrWhiteSpace(range.GetText(128)) && range.GetBoundingRectangles().Length >= 4);
         }

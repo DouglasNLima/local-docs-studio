@@ -26,7 +26,7 @@ internal sealed partial class Probe
         if (result is null || result.Document != reader.Document || !reader.IsVisible || !reader.IsMeasureValid || !reader.IsArrangeValid
             || Field<Guid?>(secondary ? "comparisonRenderedId" : "renderedDocumentId") != owner.Id || version is null
             || !version.BelongsToSameDocumentAs(owner.EditorDocument.Version) || version.CompareAge(owner.EditorDocument.Version) != 0
-            || AutomationProperties.GetItemStatus(reader).StartsWith("Busy", StringComparison.Ordinal)) return false;
+            || AutomationProperties.GetItemStatus(reader) != "Ready") return false;
         if (UIElementAutomationPeer.CreatePeerForElement(reader)?.GetPattern(PatternInterface.Text) is not ITextProvider provider
             || !provider.GetVisibleRanges().Any(r => !string.IsNullOrWhiteSpace(r.GetText(128)) && r.GetBoundingRectangles().Length >= 4)) return false;
         if (marker is null) return result.TextMap.VisibleSource(reader.ActualHeight) is not null;
