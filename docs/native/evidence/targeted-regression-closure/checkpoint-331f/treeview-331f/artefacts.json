@@ -1,0 +1,97 @@
+[
+  {
+    "id": 13589325039,
+    "name": "native-TreeView-installed-authoring",
+    "size_in_bytes": 6689366,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13589325039",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13589325039/zip",
+    "expired": false,
+    "created_at": "2026-11-07T20:08:33Z",
+    "expires_at": "2026-11-21T20:08:31Z",
+    "updated_at": "2026-11-07T20:08:33Z",
+    "digest": "sha256:a9a00d579d5837fadbedb4246b320104bc529cbabd4fd0563479254aa776b70a",
+    "workflow_run": {
+      "id": 42405138271,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13588996040,
+    "name": "treeview-closure-baseline-first-trace-1",
+    "size_in_bytes": 6682694,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588996040",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588996040/zip",
+    "expired": false,
+    "created_at": "2026-11-07T20:08:27Z",
+    "expires_at": "2026-11-21T20:08:25Z",
+    "updated_at": "2026-11-07T20:08:27Z",
+    "digest": "sha256:599075d47e59a1aca5ee5babcad9c7c0bb2ec296a7e6cf75bce8dbf8df888824",
+    "workflow_run": {
+      "id": 42405138271,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13588424597,
+    "name": "treeview-closure-candidate-first-trace-1",
+    "size_in_bytes": 6708135,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588424597",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588424597/zip",
+    "expired": false,
+    "created_at": "2026-11-07T20:08:34Z",
+    "expires_at": "2026-11-21T20:08:32Z",
+    "updated_at": "2026-11-07T20:08:34Z",
+    "digest": "sha256:8ed20c7c54501d779867dd659dc2c73c770ea0d48e6c1668069dc6485738a745",
+    "workflow_run": {
+      "id": 42405138271,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13588329727,
+    "name": "treeview-closure-baseline-first-trace-0",
+    "size_in_bytes": 6693855,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588329727",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588329727/zip",
+    "expired": false,
+    "created_at": "2026-11-07T20:09:06Z",
+    "expires_at": "2026-11-21T20:09:05Z",
+    "updated_at": "2026-11-07T20:09:06Z",
+    "digest": "sha256:60aff873670406c7af19ecc463d2ac9e7f6d0bcd75c31ec1eafacaca730e4a02",
+    "workflow_run": {
+      "id": 42405138271,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13588264710,
+    "name": "treeview-closure-candidate-first-trace-0",
+    "size_in_bytes": 6676248,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588264710",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13588264710/zip",
+    "expired": false,
+    "created_at": "2026-11-07T20:08:48Z",
+    "expires_at": "2026-11-21T20:08:46Z",
+    "updated_at": "2026-11-07T20:08:48Z",
+    "digest": "sha256:2aefe26f311211d41b16d960342f568acf9debe515d5c812f7c06a1ea798ea61",
+    "workflow_run": {
+      "id": 42405138271,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  }
+]

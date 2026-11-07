@@ -1,0 +1,198 @@
+[
+  {
+    "started": 2204576945,
+    "exitCode": 0,
+    "elapsedMs": 4837.0284,
+    "side": "candidate",
+    "supervisionFailure": null,
+    "label": "startup/trace-1/repeat-0/candidate",
+    "created": 2204642112,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "1",
+      "LENS_NATIVE_TRANSITION_TRACE": "1"
+    },
+    "finished": 2253074844,
+    "product": "331f7a85385449e779a12a6c045365de2931e4a2"
+  },
+  {
+    "started": 2253145364,
+    "exitCode": 0,
+    "elapsedMs": 2428.4865,
+    "side": "baseline",
+    "supervisionFailure": null,
+    "label": "startup/trace-1/repeat-0/baseline",
+    "created": 2253198408,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "1",
+      "LENS_NATIVE_TRANSITION_TRACE": "1"
+    },
+    "finished": 2277488260,
+    "product": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+  },
+  {
+    "started": 2277509948,
+    "exitCode": 0,
+    "elapsedMs": 2469.6339,
+    "side": "candidate",
+    "supervisionFailure": null,
+    "label": "startup/trace-1/repeat-1/candidate",
+    "created": 2277538657,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "1",
+      "LENS_NATIVE_TRANSITION_TRACE": "1"
+    },
+    "finished": 2302237850,
+    "product": "331f7a85385449e779a12a6c045365de2931e4a2"
+  },
+  {
+    "started": 2302263453,
+    "exitCode": 0,
+    "elapsedMs": 2337.2047,
+    "side": "baseline",
+    "supervisionFailure": null,
+    "label": "startup/trace-1/repeat-1/baseline",
+    "created": 2302285019,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "1",
+      "LENS_NATIVE_TRANSITION_TRACE": "1"
+    },
+    "finished": 2325661789,
+    "product": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+  },
+  {
+    "started": 2325682639,
+    "exitCode": 0,
+    "elapsedMs": 7084.2713,
+    "side": "candidate",
+    "supervisionFailure": null,
+    "label": "pixels/trace-1/candidate",
+    "created": 2325719202,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_TRACE": "1",
+      "LENS_NATIVE_COMPOSITION_TRACE": "1",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+      "LENS_NATIVE_COMPARISON_MODE": "Pages"
+    },
+    "finished": 2396564844,
+    "product": "331f7a85385449e779a12a6c045365de2931e4a2"
+  },
+  {
+    "started": 2396590747,
+    "exitCode": 0,
+    "elapsedMs": 6928.5116,
+    "side": "baseline",
+    "supervisionFailure": null,
+    "label": "pixels/trace-1/baseline",
+    "created": 2396610858,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_TRACE": "1",
+      "LENS_NATIVE_COMPOSITION_TRACE": "1",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+      "LENS_NATIVE_COMPARISON_MODE": "Pages"
+    },
+    "finished": 2465900024,
+    "product": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+  },
+  {
+    "started": 2465921336,
+    "exitCode": 0,
+    "elapsedMs": 2243.012,
+    "side": "candidate",
+    "supervisionFailure": null,
+    "label": "startup/trace-0/repeat-0/candidate",
+    "created": 2465938501,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "0",
+      "LENS_NATIVE_TRANSITION_TRACE": "0"
+    },
+    "finished": 2488371477,
+    "product": "331f7a85385449e779a12a6c045365de2931e4a2"
+  },
+  {
+    "started": 2488393177,
+    "exitCode": 0,
+    "elapsedMs": 2305.2311,
+    "side": "baseline",
+    "supervisionFailure": null,
+    "label": "startup/trace-0/repeat-0/baseline",
+    "created": 2488410275,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "0",
+      "LENS_NATIVE_TRANSITION_TRACE": "0"
+    },
+    "finished": 2511467084,
+    "product": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+  },
+  {
+    "started": 2511491820,
+    "exitCode": 0,
+    "elapsedMs": 2529.2812,
+    "side": "candidate",
+    "supervisionFailure": null,
+    "label": "startup/trace-0/repeat-1/candidate",
+    "created": 2511508756,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "0",
+      "LENS_NATIVE_TRANSITION_TRACE": "0"
+    },
+    "finished": 2536804368,
+    "product": "331f7a85385449e779a12a6c045365de2931e4a2"
+  },
+  {
+    "started": 2536825706,
+    "exitCode": 0,
+    "elapsedMs": 2525.5252,
+    "side": "baseline",
+    "supervisionFailure": null,
+    "label": "startup/trace-0/repeat-1/baseline",
+    "created": 2536842773,
+    "environment": {
+      "LENS_NATIVE_STARTUP_TRACE": "0",
+      "LENS_NATIVE_TRANSITION_TRACE": "0"
+    },
+    "finished": 2562102290,
+    "product": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+  },
+  {
+    "started": 2562127774,
+    "exitCode": 0,
+    "elapsedMs": 6979.2617,
+    "side": "candidate",
+    "supervisionFailure": null,
+    "label": "pixels/trace-0/candidate",
+    "created": 2562144664,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_TRACE": "0",
+      "LENS_NATIVE_COMPOSITION_TRACE": "0",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+      "LENS_NATIVE_COMPARISON_MODE": "Pages"
+    },
+    "finished": 2631940503,
+    "product": "331f7a85385449e779a12a6c045365de2931e4a2"
+  },
+  {
+    "started": 2631965794,
+    "exitCode": 0,
+    "elapsedMs": 6811.6992,
+    "side": "baseline",
+    "supervisionFailure": null,
+    "label": "pixels/trace-0/baseline",
+    "created": 2631985673,
+    "environment": {
+      "LENS_NATIVE_COMPLETION_TRACE": "0",
+      "LENS_NATIVE_COMPOSITION_TRACE": "0",
+      "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+      "LENS_NATIVE_COMPLETION_READER": "primary",
+      "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+      "LENS_NATIVE_COMPARISON_MODE": "Pages"
+    },
+    "finished": 2700107730,
+    "product": "358d2a6f4b8028461fb535f2f71a9b7c71636760"
+  }
+]

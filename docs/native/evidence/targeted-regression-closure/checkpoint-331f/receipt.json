@@ -1,0 +1,1093 @@
+{
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+  "scope": "Selected unchanged captures and complete derived review. Raw archives and original full terminal logs remain retained separately. Offline OCR does not replace the failed hosted step. Original 358 TreeView evidence is explicitly labelled.",
+  "files": [
+    {
+      "path": "ocr-preparation-control.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/ocr-preparation-control.json",
+      "bytes": 2170,
+      "sha256": "d2839ec287e4b92e63abdf33f26cbc412e387fbe67e908d8b50aef219c7e0a01"
+    },
+    {
+      "path": "checkout-depth-control.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/checkout-depth-control.json",
+      "bytes": 7914,
+      "sha256": "23279d2fb2398a62ea1789567e0d00b21393fe4aebc1ef7051b4a9e50079c36f"
+    },
+    {
+      "path": "high-contrast-review-331f.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/high-contrast-review-331f.json",
+      "bytes": 37331,
+      "sha256": "c2175370bfc40320137e3a233878fcb35d2c4008044278159b0ba1972d7b4c82"
+    },
+    {
+      "path": "terminal-receipt-331f.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/terminal-receipt-331f.json",
+      "bytes": 545174,
+      "sha256": "332bb90f3dd06c2e445236f817fc2a68c1010f1b8d1a0ab7e011e57c905cc7c7"
+    },
+    {
+      "path": "closure-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/artefacts.json",
+      "bytes": 3367,
+      "sha256": "2952824d54194de2879be63fc47048127718a30e4ba231657a5a08f50d60c871"
+    },
+    {
+      "path": "hosted-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/artefacts.json",
+      "bytes": 4962,
+      "sha256": "3061841a0316519ed44cd4455e67d7c0e386d65d41c147428ea64797d3f241d6"
+    },
+    {
+      "path": "recovery-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/recovery-331f/artefacts.json",
+      "bytes": 5017,
+      "sha256": "36371d5c028974345b49aa6d73db90d054e411c1200c25fcd28fb664b6b21723"
+    },
+    {
+      "path": "attribution-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/attribution-331f/artefacts.json",
+      "bytes": 3359,
+      "sha256": "bd6ae3a650be33b003bf376d77ed983fc05cf6720db30bc31287e1d2ef39e256"
+    },
+    {
+      "path": "integration-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/integration-331f/artefacts.json",
+      "bytes": 16875,
+      "sha256": "20116e169c53df848ed08212824c97485a4d5cab5712ba988ae0787e95da6e95"
+    },
+    {
+      "path": "performance-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/performance-331f/artefacts.json",
+      "bytes": 3304,
+      "sha256": "3d1e1536b11d3033a456b64af84038ce169d6590980c31a7bd0d970b3754b493"
+    },
+    {
+      "path": "treeview-331f/artefacts.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/artefacts.json",
+      "bytes": 4181,
+      "sha256": "8e9b35149ac7a5fa3b93b2a5fbed944586c96432ce90fd03f6af0677cc9255c1"
+    },
+    {
+      "path": "closure-331f/pixel-review/blind-transcription.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/pixel-review/blind-transcription.json",
+      "bytes": 634,
+      "sha256": "63ee9f27959424e91fd9f20a0f6c569db13adae27ff8f2909fea497b09854a23"
+    },
+    {
+      "path": "closure-331f/pixel-review/independent-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/pixel-review/independent-review.json",
+      "bytes": 232524,
+      "sha256": "95df253531131ffb82cdfb8a97c0781a7a9f94d34b9c5da6ec72b1131bd09332"
+    },
+    {
+      "path": "closure-331f/pixel-frame-correlation.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/pixel-frame-correlation.json",
+      "bytes": 935419,
+      "sha256": "a72b7500fe4a19d8ae77e9ebcb806e2ccc598313b8b60a0f6e26805b9b8f0146"
+    },
+    {
+      "path": "captures/closure-331f-01/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/identity.json",
+      "bytes": 1877,
+      "sha256": "dba987e28cc610952d7ec3af74f88ffc7ba15eadfa5efbf383e43be8e769f67f"
+    },
+    {
+      "path": "captures/closure-331f-01/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/appearance.json",
+      "bytes": 426,
+      "sha256": "1e977584bf6e9d6c61aa6acaf33cc3b7c89b09665e2ec6b6d4bd4887ed676e6a"
+    },
+    {
+      "path": "captures/closure-331f-01/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/presentation-completion.json",
+      "bytes": 447,
+      "sha256": "64a146168da973b56559918235da502091dad3e115c13bf2c63ab6e923bbb3fd"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-captures.json",
+      "bytes": 112370,
+      "sha256": "9abc0cbe94743b3f13bf17a9a474c95d4325b60363389cfbee39e1d954bd2726"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-006-secondary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-006-secondary-find-frame-0.png",
+      "bytes": 50563,
+      "sha256": "70a24aa7eb92641ac455f31f23490b719b593b5a6e22e1d608551d5ab5e661a3"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-006-secondary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-006-secondary-find-frame-0-status.png",
+      "bytes": 1444,
+      "sha256": "1d997dc32e355e1b7be538305d9c56db62c672a7186a5904a5240924da42284a"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-006-secondary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-006-secondary-find-frame-0-primary-page.png",
+      "bytes": 1216,
+      "sha256": "a3ee314d1793ea255543278181ba710e74b540dc3a09895f29b051496c991520"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-006-secondary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-006-secondary-find-frame-0-secondary-page.png",
+      "bytes": 785,
+      "sha256": "8af2fb22995ee92b6c4d6b29d7632689142518dfb9b1e68891ce258d192f3b88"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-007-secondary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-007-secondary-find-frame-1.png",
+      "bytes": 53663,
+      "sha256": "5a22012cf1fdad20d4afe684d512be11d29608df2c4f80c904d09ff7bb07548c"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-007-secondary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-007-secondary-find-frame-1-status.png",
+      "bytes": 1574,
+      "sha256": "b52dea9bb95454d27fd55fc0b6ab45244b643887d8f1f5a05f2a22fc681f39d3"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-007-secondary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-007-secondary-find-frame-1-primary-page.png",
+      "bytes": 1461,
+      "sha256": "2e71ca09de2193c3524f30cac2481305b16992c9366f29c4fb77fa3dbe91df1e"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-007-secondary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-007-secondary-find-frame-1-secondary-page.png",
+      "bytes": 936,
+      "sha256": "0eed0708c71339023cd572c037c969459e232efc8acfb4d4dad0c65f556b62f2"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-008-secondary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-008-secondary-find-frame-2.png",
+      "bytes": 53735,
+      "sha256": "11ef912dc2ca041bbf6feb53c5d756bd72b9e702d1efe690251d24dea27172fa"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-008-secondary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-008-secondary-find-frame-2-status.png",
+      "bytes": 1574,
+      "sha256": "b52dea9bb95454d27fd55fc0b6ab45244b643887d8f1f5a05f2a22fc681f39d3"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-008-secondary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-008-secondary-find-frame-2-primary-page.png",
+      "bytes": 1461,
+      "sha256": "2e71ca09de2193c3524f30cac2481305b16992c9366f29c4fb77fa3dbe91df1e"
+    },
+    {
+      "path": "captures/closure-331f-01/completion-008-secondary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/trace-0/candidate/completion-008-secondary-find-frame-2-secondary-page.png",
+      "bytes": 1104,
+      "sha256": "c150d1993253e72e532d4afe16a614ce074dab08cc8b155555c221342766dbc3"
+    },
+    {
+      "path": "captures/closure-331f-02/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/identity.json",
+      "bytes": 1877,
+      "sha256": "28fd8393c2c60c5dc0331e3132ebe712d3e692477d1380de9f8925d499a343af"
+    },
+    {
+      "path": "captures/closure-331f-02/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/appearance.json",
+      "bytes": 426,
+      "sha256": "1e977584bf6e9d6c61aa6acaf33cc3b7c89b09665e2ec6b6d4bd4887ed676e6a"
+    },
+    {
+      "path": "captures/closure-331f-02/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/presentation-completion.json",
+      "bytes": 2336,
+      "sha256": "7c205d10eee7e8016f8b16b573d11664f1b45c71c3c391d08ad201f92f77f5e5"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-captures.json",
+      "bytes": 137356,
+      "sha256": "2b653a0b268e01880857389560856b6081aadc07b401dcb0460fe82d7f7a7cef"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-006-secondary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0.png",
+      "bytes": 51259,
+      "sha256": "9306df59b70e3f0c1cd50146e2b1b0b577406988de4a2c1ce18525617e67e48a"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-006-secondary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0-status.png",
+      "bytes": 1444,
+      "sha256": "1d997dc32e355e1b7be538305d9c56db62c672a7186a5904a5240924da42284a"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-006-secondary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0-primary-page.png",
+      "bytes": 1207,
+      "sha256": "696cebe8eb1d2f10628dcbc78770f17a096d898d39f34d486fb6353bbd055fda"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-006-secondary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0-secondary-page.png",
+      "bytes": 785,
+      "sha256": "8af2fb22995ee92b6c4d6b29d7632689142518dfb9b1e68891ce258d192f3b88"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-007-secondary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1.png",
+      "bytes": 51902,
+      "sha256": "e197a4b10ff7ed5934e352b65c7270237369bb384a258ffe521999c564340d47"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-007-secondary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1-status.png",
+      "bytes": 1474,
+      "sha256": "e03ec53926cc3c8dc703815709d4115b729d38a02c1f3703fc3c0e06f0fb66a7"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-007-secondary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1-primary-page.png",
+      "bytes": 1461,
+      "sha256": "2e71ca09de2193c3524f30cac2481305b16992c9366f29c4fb77fa3dbe91df1e"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-007-secondary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1-secondary-page.png",
+      "bytes": 785,
+      "sha256": "8af2fb22995ee92b6c4d6b29d7632689142518dfb9b1e68891ce258d192f3b88"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-008-secondary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2.png",
+      "bytes": 54294,
+      "sha256": "d20701c449dfd76f2f3f279dc7d890223155f4823ee67f1adbd9e8491dfdfb41"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-008-secondary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2-status.png",
+      "bytes": 1474,
+      "sha256": "e03ec53926cc3c8dc703815709d4115b729d38a02c1f3703fc3c0e06f0fb66a7"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-008-secondary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2-primary-page.png",
+      "bytes": 1461,
+      "sha256": "2e71ca09de2193c3524f30cac2481305b16992c9366f29c4fb77fa3dbe91df1e"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-008-secondary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2-secondary-page.png",
+      "bytes": 1044,
+      "sha256": "e41ba13d6531b260c1f89989e66e892950acaaf2d0b8720ed84522d493e61029"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-trace.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-trace.jsonl",
+      "bytes": 838479,
+      "sha256": "98820473645383483f68b945d1709f2848b968244ca24e8653f93afc561cce3a"
+    },
+    {
+      "path": "captures/closure-331f-02/completion-trace-metadata.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-1/candidate/completion-trace-metadata.json",
+      "bytes": 2415,
+      "sha256": "15bf9bd6d1df6c9d599243fccc18c26d9fc859e713cf0c1b5df554e84a2405e1"
+    },
+    {
+      "path": "captures/closure-331f-03/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/identity.json",
+      "bytes": 1877,
+      "sha256": "00085f8242938f1eb9f0e67856a53fed2b64236650790ed5915fd5861eaae333"
+    },
+    {
+      "path": "captures/closure-331f-03/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/appearance.json",
+      "bytes": 426,
+      "sha256": "1e977584bf6e9d6c61aa6acaf33cc3b7c89b09665e2ec6b6d4bd4887ed676e6a"
+    },
+    {
+      "path": "captures/closure-331f-03/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/presentation-completion.json",
+      "bytes": 447,
+      "sha256": "e0d2069f2eff3fb369b886b89fd740199e50abae89753a7218af86e687b8763b"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-captures.json",
+      "bytes": 112366,
+      "sha256": "bc94e963d96a0e8b02de468a9a1bcaefa0e666a758a8a225f653bc77628b15e4"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-000-primary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-000-primary-find-frame-0.png",
+      "bytes": 53183,
+      "sha256": "287c86f94a5abb2685ec73a06d5ea3c569f0683f8f4e1dcb51eee5e0d7a40c9f"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-000-primary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-000-primary-find-frame-0-status.png",
+      "bytes": 1654,
+      "sha256": "1894d17f74a0fa768267c2730e7ab94e252e6dbdd2751a0b00cd67039ed55599"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-000-primary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-000-primary-find-frame-0-primary-page.png",
+      "bytes": 1120,
+      "sha256": "11b1db2ba9b8c3df76667aff56e506909e3e4dcf12a66d90407b4ec3a47603fe"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-000-primary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-000-primary-find-frame-0-secondary-page.png",
+      "bytes": 1121,
+      "sha256": "803b5c37e9c7ad5e1ef462d0f24887e6903818cf62adf45fc49221bf202a29f8"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-001-primary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-001-primary-find-frame-1.png",
+      "bytes": 50014,
+      "sha256": "443244475cf03311ccad137d1ed02277f9b6733672ec88d33a14bad2dca956be"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-001-primary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-001-primary-find-frame-1-status.png",
+      "bytes": 1654,
+      "sha256": "1894d17f74a0fa768267c2730e7ab94e252e6dbdd2751a0b00cd67039ed55599"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-001-primary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-001-primary-find-frame-1-primary-page.png",
+      "bytes": 1299,
+      "sha256": "7e371423f21b999416f6c1520f35282da239365222a7435ef28beadea7e11b58"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-001-primary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-001-primary-find-frame-1-secondary-page.png",
+      "bytes": 1121,
+      "sha256": "803b5c37e9c7ad5e1ef462d0f24887e6903818cf62adf45fc49221bf202a29f8"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-002-primary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-002-primary-find-frame-2.png",
+      "bytes": 50014,
+      "sha256": "443244475cf03311ccad137d1ed02277f9b6733672ec88d33a14bad2dca956be"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-002-primary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-002-primary-find-frame-2-status.png",
+      "bytes": 1654,
+      "sha256": "1894d17f74a0fa768267c2730e7ab94e252e6dbdd2751a0b00cd67039ed55599"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-002-primary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-002-primary-find-frame-2-primary-page.png",
+      "bytes": 1299,
+      "sha256": "7e371423f21b999416f6c1520f35282da239365222a7435ef28beadea7e11b58"
+    },
+    {
+      "path": "captures/closure-331f-03/completion-002-primary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/trace-0/candidate/completion-002-primary-find-frame-2-secondary-page.png",
+      "bytes": 1121,
+      "sha256": "803b5c37e9c7ad5e1ef462d0f24887e6903818cf62adf45fc49221bf202a29f8"
+    },
+    {
+      "path": "captures/closure-331f-04/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/identity.json",
+      "bytes": 1878,
+      "sha256": "94211f64bc1e5a0933faddc9f36fb9c2f9ca8ce5597fa23fe72ca1f61533a0e7"
+    },
+    {
+      "path": "captures/closure-331f-04/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/appearance.json",
+      "bytes": 434,
+      "sha256": "88a7a28c41b41479edf94dc255d4687ec420cdc3f0677d946608ec877e2bed8c"
+    },
+    {
+      "path": "captures/closure-331f-04/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/presentation-completion.json",
+      "bytes": 2335,
+      "sha256": "b92dee842d6afa95c277377e1a4147ebb80abbab126f5cb74b971e4e273a8f21"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-captures.json",
+      "bytes": 137226,
+      "sha256": "ec5b4cb3277238902ab0bf4858f1d51ebca977648664e7bfccd58e33b0bb39ab"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-006-secondary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-006-secondary-find-frame-0.png",
+      "bytes": 52955,
+      "sha256": "5bd2e0db2b4a71e1551efd8f968a9865475119ef9cc94650ff1e471900af40f3"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-006-secondary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-006-secondary-find-frame-0-status.png",
+      "bytes": 1510,
+      "sha256": "43389eb93909be0d6a8f82d50d53f88e411ec3469b603191dec656642ab32789"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-006-secondary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-006-secondary-find-frame-0-primary-page.png",
+      "bytes": 1158,
+      "sha256": "d91921307d42c161c670bbab3c4e625f7e29f1e391af65b09f177aaeea795238"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-006-secondary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-006-secondary-find-frame-0-secondary-page.png",
+      "bytes": 815,
+      "sha256": "42c03e361072969fe08f666a8c48a39193e83138e5259b4d8f9503944508fbc4"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-007-secondary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-007-secondary-find-frame-1.png",
+      "bytes": 55688,
+      "sha256": "5642fa5c1cbde07bd2420fa96d3b36b7133257eacebc98d350782fffdf885831"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-007-secondary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-007-secondary-find-frame-1-status.png",
+      "bytes": 1571,
+      "sha256": "e333d820fe7ddc84671c87a69071b108a282cf5bdddcb31231bfa15f4a59259a"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-007-secondary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-007-secondary-find-frame-1-primary-page.png",
+      "bytes": 1337,
+      "sha256": "41bbf05e0ad9319e09990599fa9101c8a9737348c7a930e9bc755a4317ead039"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-007-secondary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-007-secondary-find-frame-1-secondary-page.png",
+      "bytes": 823,
+      "sha256": "3c0f534fe50f10d403fb946b030457e481b5032a1d0fe43d265d05961ea47d17"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-008-secondary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-008-secondary-find-frame-2.png",
+      "bytes": 55916,
+      "sha256": "2ffb7a6a46daf88281b61554bfb54d17de2dcd0868c0c5dd94815ab7b16d46be"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-008-secondary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-008-secondary-find-frame-2-status.png",
+      "bytes": 1571,
+      "sha256": "e333d820fe7ddc84671c87a69071b108a282cf5bdddcb31231bfa15f4a59259a"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-008-secondary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-008-secondary-find-frame-2-primary-page.png",
+      "bytes": 1337,
+      "sha256": "41bbf05e0ad9319e09990599fa9101c8a9737348c7a930e9bc755a4317ead039"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-008-secondary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-008-secondary-find-frame-2-secondary-page.png",
+      "bytes": 1062,
+      "sha256": "bbacb111873d4f9e24e0df846131a157b5f083a814bc5efa34788f33ae025f66"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-trace.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-trace.jsonl",
+      "bytes": 705359,
+      "sha256": "59652310bdb9fed8688e26782155f767219ce8b1370295bb8ea4fab6a28b27f7"
+    },
+    {
+      "path": "captures/closure-331f-04/completion-trace-metadata.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixels/trace-1/baseline/completion-trace-metadata.json",
+      "bytes": 2414,
+      "sha256": "4c258f520f9f300c88ea2fdd590c2a42dfff1b2f2855df9585d2d932965896fd"
+    },
+    {
+      "path": "captures/closure-331f-05/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/identity.json",
+      "bytes": 1878,
+      "sha256": "d32b88e389520189f36920dddd2f695132a3792d6dbbf88ce7004492d3fd5c19"
+    },
+    {
+      "path": "captures/closure-331f-05/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/appearance.json",
+      "bytes": 434,
+      "sha256": "88a7a28c41b41479edf94dc255d4687ec420cdc3f0677d946608ec877e2bed8c"
+    },
+    {
+      "path": "captures/closure-331f-05/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/presentation-completion.json",
+      "bytes": 446,
+      "sha256": "be54ea72418d33d5b9cdc7f2bfd4d435397a6269b70bfd552d9a37dd739829a0"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-captures.json",
+      "bytes": 112125,
+      "sha256": "ddb28d737b0bc2f8550272ac6b76fabb8b7ef20293e77e35858bcb3403f5920f"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-006-secondary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-006-secondary-find-frame-0.png",
+      "bytes": 52608,
+      "sha256": "4dcafa5644d0469738934e1abf7f42fa66429359e10afe90b327acd38fe335d2"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-006-secondary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-006-secondary-find-frame-0-status.png",
+      "bytes": 1510,
+      "sha256": "43389eb93909be0d6a8f82d50d53f88e411ec3469b603191dec656642ab32789"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-006-secondary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-006-secondary-find-frame-0-primary-page.png",
+      "bytes": 1158,
+      "sha256": "d91921307d42c161c670bbab3c4e625f7e29f1e391af65b09f177aaeea795238"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-006-secondary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-006-secondary-find-frame-0-secondary-page.png",
+      "bytes": 1281,
+      "sha256": "380e2d58fd6504128afd22c695c5b7191bb445221091ba4a090f6744b0a7b890"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-007-secondary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-007-secondary-find-frame-1.png",
+      "bytes": 53162,
+      "sha256": "de24d2408694623f70acb2868d592dd861ed59b9034c6d8a3b76b6e058395d71"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-007-secondary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-007-secondary-find-frame-1-status.png",
+      "bytes": 1591,
+      "sha256": "309327f0c962750fd4f86e7d88a67cb217649356de9a280bca49f86a82a5be70"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-007-secondary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-007-secondary-find-frame-1-primary-page.png",
+      "bytes": 1337,
+      "sha256": "41bbf05e0ad9319e09990599fa9101c8a9737348c7a930e9bc755a4317ead039"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-007-secondary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-007-secondary-find-frame-1-secondary-page.png",
+      "bytes": 1281,
+      "sha256": "380e2d58fd6504128afd22c695c5b7191bb445221091ba4a090f6744b0a7b890"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-008-secondary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-008-secondary-find-frame-2.png",
+      "bytes": 53162,
+      "sha256": "de24d2408694623f70acb2868d592dd861ed59b9034c6d8a3b76b6e058395d71"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-008-secondary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-008-secondary-find-frame-2-status.png",
+      "bytes": 1591,
+      "sha256": "309327f0c962750fd4f86e7d88a67cb217649356de9a280bca49f86a82a5be70"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-008-secondary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-008-secondary-find-frame-2-primary-page.png",
+      "bytes": 1337,
+      "sha256": "41bbf05e0ad9319e09990599fa9101c8a9737348c7a930e9bc755a4317ead039"
+    },
+    {
+      "path": "captures/closure-331f-05/completion-008-secondary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-0/baseline/completion-008-secondary-find-frame-2-secondary-page.png",
+      "bytes": 1281,
+      "sha256": "380e2d58fd6504128afd22c695c5b7191bb445221091ba4a090f6744b0a7b890"
+    },
+    {
+      "path": "captures/closure-331f-06/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/identity.json",
+      "bytes": 1878,
+      "sha256": "e3e9aa90ec07a1353571e624d6fbad528f0049d44e3fd8caec624dfc628377fc"
+    },
+    {
+      "path": "captures/closure-331f-06/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/appearance.json",
+      "bytes": 434,
+      "sha256": "88a7a28c41b41479edf94dc255d4687ec420cdc3f0677d946608ec877e2bed8c"
+    },
+    {
+      "path": "captures/closure-331f-06/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/presentation-completion.json",
+      "bytes": 2335,
+      "sha256": "00f4256c4e9bb4e89696a95e224e1ec1953dfab6da72d438870c579f543736a4"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-captures.json",
+      "bytes": 137115,
+      "sha256": "cd5bb22cc4a5c1adcf92ff54d2f797e64056744cd5bc41658ab1e36be30ea6f4"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-006-secondary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0.png",
+      "bytes": 52170,
+      "sha256": "2728ef92d25339775e73d2ec43236df52ac2e91edc4edc2931e2b70bf9a479fa"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-006-secondary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0-status.png",
+      "bytes": 1510,
+      "sha256": "43389eb93909be0d6a8f82d50d53f88e411ec3469b603191dec656642ab32789"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-006-secondary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0-primary-page.png",
+      "bytes": 1107,
+      "sha256": "dc5cc8e719c270c6c58e430aede17303b2b988bcb672d59a3b9aff7d62c60bee"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-006-secondary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-006-secondary-find-frame-0-secondary-page.png",
+      "bytes": 1281,
+      "sha256": "380e2d58fd6504128afd22c695c5b7191bb445221091ba4a090f6744b0a7b890"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-007-secondary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1.png",
+      "bytes": 52761,
+      "sha256": "097cae4bdeb97567dcc5de86e1a5353560a60ad0887c654ff699d5cea367a0eb"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-007-secondary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1-status.png",
+      "bytes": 1583,
+      "sha256": "dfb924b1524437159961bcce3118caa0e6ca3187cae2c0dbff131f82e9a591ab"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-007-secondary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1-primary-page.png",
+      "bytes": 1337,
+      "sha256": "41bbf05e0ad9319e09990599fa9101c8a9737348c7a930e9bc755a4317ead039"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-007-secondary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-007-secondary-find-frame-1-secondary-page.png",
+      "bytes": 1281,
+      "sha256": "380e2d58fd6504128afd22c695c5b7191bb445221091ba4a090f6744b0a7b890"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-008-secondary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2.png",
+      "bytes": 52761,
+      "sha256": "097cae4bdeb97567dcc5de86e1a5353560a60ad0887c654ff699d5cea367a0eb"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-008-secondary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2-status.png",
+      "bytes": 1583,
+      "sha256": "dfb924b1524437159961bcce3118caa0e6ca3187cae2c0dbff131f82e9a591ab"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-008-secondary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2-primary-page.png",
+      "bytes": 1337,
+      "sha256": "41bbf05e0ad9319e09990599fa9101c8a9737348c7a930e9bc755a4317ead039"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-008-secondary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-008-secondary-find-frame-2-secondary-page.png",
+      "bytes": 1281,
+      "sha256": "380e2d58fd6504128afd22c695c5b7191bb445221091ba4a090f6744b0a7b890"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-trace.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-trace.jsonl",
+      "bytes": 603327,
+      "sha256": "cddf23d0862aeecf40a3caf56e85335de49538a0d1d324b9aed1a458410080fe"
+    },
+    {
+      "path": "captures/closure-331f-06/completion-trace-metadata.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixels/trace-1/candidate/completion-trace-metadata.json",
+      "bytes": 2414,
+      "sha256": "1195e161c06557e5ca9c0f2534dcba744ad41af1d7385894a99d8e71806407fa"
+    },
+    {
+      "path": "hosted-331f/pixel-review/blind-transcription.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/pixel-review/blind-transcription.json",
+      "bytes": 722,
+      "sha256": "6d846cfb2e15495febe748eda7295b5a95d3cac8ff5582a38a7416dc75915ab1"
+    },
+    {
+      "path": "hosted-331f/pixel-review/independent-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/pixel-review/independent-review.json",
+      "bytes": 130048,
+      "sha256": "5504a93aa98d6bfbe0812e0a9ff47e220f2c8f3aec7857cfb305f66e12547a38"
+    },
+    {
+      "path": "hosted-331f/pixel-frame-correlation.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/pixel-frame-correlation.json",
+      "bytes": 146501,
+      "sha256": "b5670fceee330ad25c7bbc044cf9e10e018dcbc520073b5ab75666550f3c5abe"
+    },
+    {
+      "path": "captures/hosted-331f-01/identity.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/identity.json",
+      "bytes": 1878,
+      "sha256": "a80caed62feaa927c6923a57875c28984458b832e206a2b77900ac31391ef0f6"
+    },
+    {
+      "path": "captures/hosted-331f-01/appearance.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/appearance.json",
+      "bytes": 434,
+      "sha256": "88a7a28c41b41479edf94dc255d4687ec420cdc3f0677d946608ec877e2bed8c"
+    },
+    {
+      "path": "captures/hosted-331f-01/presentation-completion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/presentation-completion.json",
+      "bytes": 446,
+      "sha256": "51286bf37fe34957d629fe4a8344443dfffbae3fadd79271e5c281fe17ad0cbd"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-captures.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-captures.json",
+      "bytes": 112286,
+      "sha256": "ab611563646e295812b3d717040be7f8cd1499d212568845651c45f53684f054"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-000-primary-find-frame-0.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-000-primary-find-frame-0.png",
+      "bytes": 55916,
+      "sha256": "6c8c6e10247a8e8040130488982d883da5308c181762d04720695212ed7ae9e8"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-000-primary-find-frame-0-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-000-primary-find-frame-0-status.png",
+      "bytes": 1636,
+      "sha256": "02fb7c283505fc8b12181889c53cbdc0573677dcb89f3c73570956690f7ff914"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-000-primary-find-frame-0-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-000-primary-find-frame-0-primary-page.png",
+      "bytes": 1072,
+      "sha256": "b77621d76445ea6dcf9329d2a9a1f46011d157a54aa7f5ee7803deeb5c7a3c2d"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-000-primary-find-frame-0-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-000-primary-find-frame-0-secondary-page.png",
+      "bytes": 1135,
+      "sha256": "02009275eeab1d3127258f0baf09432a037cdcbec6762eceedae002b9165b87c"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-001-primary-find-frame-1.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-001-primary-find-frame-1.png",
+      "bytes": 52677,
+      "sha256": "01acbdfaa49687bad9e0832e3e3976e66f66e7884df7cb0c31353c597313cb12"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-001-primary-find-frame-1-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-001-primary-find-frame-1-status.png",
+      "bytes": 1636,
+      "sha256": "02fb7c283505fc8b12181889c53cbdc0573677dcb89f3c73570956690f7ff914"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-001-primary-find-frame-1-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-001-primary-find-frame-1-primary-page.png",
+      "bytes": 1238,
+      "sha256": "73c926fb91318f96d5c8fb868f2b714d6a89aa313229953abf7a1868602dcc08"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-001-primary-find-frame-1-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-001-primary-find-frame-1-secondary-page.png",
+      "bytes": 1135,
+      "sha256": "02009275eeab1d3127258f0baf09432a037cdcbec6762eceedae002b9165b87c"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-002-primary-find-frame-2.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-002-primary-find-frame-2.png",
+      "bytes": 52677,
+      "sha256": "01acbdfaa49687bad9e0832e3e3976e66f66e7884df7cb0c31353c597313cb12"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-002-primary-find-frame-2-status.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-002-primary-find-frame-2-status.png",
+      "bytes": 1636,
+      "sha256": "02fb7c283505fc8b12181889c53cbdc0573677dcb89f3c73570956690f7ff914"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-002-primary-find-frame-2-primary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-002-primary-find-frame-2-primary-page.png",
+      "bytes": 1238,
+      "sha256": "73c926fb91318f96d5c8fb868f2b714d6a89aa313229953abf7a1868602dcc08"
+    },
+    {
+      "path": "captures/hosted-331f-01/completion-002-primary-find-frame-2-secondary-page.png",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/completion-Pages-normal/foreground/trace-0/pixels-primary/completion-002-primary-find-frame-2-secondary-page.png",
+      "bytes": 1135,
+      "sha256": "02009275eeab1d3127258f0baf09432a037cdcbec6762eceedae002b9165b87c"
+    },
+    {
+      "path": "closure-331f/independent-targeted-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/independent-targeted-review.json",
+      "bytes": 48646,
+      "sha256": "8c82178b003ca5209a66f2b11004401487186c7ad6597423b54b4ce7c7df1e03"
+    },
+    {
+      "path": "closure-331f/independent-semantic-audit.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/independent-semantic-audit.json",
+      "bytes": 201,
+      "sha256": "40bd894c41e3408720e5621c5de5cc011ce6d1c743eb514f029cec80da5851d2"
+    },
+    {
+      "path": "closure-331f/presentation-timing-analysis.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/presentation-timing-analysis.json",
+      "bytes": 17827,
+      "sha256": "8becf2d4d5fff27919846788710c0be137f9e51a036d6d84de79ffb362fad6e6"
+    },
+    {
+      "path": "hosted-331f/independent-final-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/hosted-331f/independent-final-review.json",
+      "bytes": 45654,
+      "sha256": "4651996c6f34cc5a180a763f3b0e288a709437c2e688e5f948df7336445dd635"
+    },
+    {
+      "path": "integration-331f/independent-integration-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/integration-331f/independent-integration-review.json",
+      "bytes": 164524,
+      "sha256": "46a834b41719d9e8ab77e345a7d2821b193e83cf9979ac345ca7978ea1e1db01"
+    },
+    {
+      "path": "performance-331f/independent-performance-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/performance-331f/independent-performance-review.json",
+      "bytes": 841,
+      "sha256": "dfa2dd32755012285932cae3a54f5c2cd84d3369a637ae5055b441872c6ea03f"
+    },
+    {
+      "path": "treeview-331f/independent-treeview-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/independent-treeview-review.json",
+      "bytes": 122175,
+      "sha256": "8f051e86d89898d82fed463b7324a50879a8a600eebfa4724dea2bee956215b3"
+    },
+    {
+      "path": "treeview-331f/ordinary-treeview-review.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/ordinary-treeview-review.json",
+      "bytes": 2899,
+      "sha256": "6c1e570f56e1e6fd346b30f01e82696db503bfab1d500cb274b0042158bea8b0"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-0/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-0/treeview-closure/protocol.json",
+      "bytes": 522,
+      "sha256": "0eb89e14be64a0b5957afe5a80a68d59561104dc594db668e5f75049d14892e5"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-0/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-0/treeview-closure/processes.json",
+      "bytes": 632,
+      "sha256": "a52cf682ff8b298bf50b60393d056c26dd4a692d1f7a442fa3deb19e2ce94bea"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-0/331f7a85/treeview-installer-results.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-0/treeview-install-smoke/8c593265ee7c49b2a2ff39c5510b3835/treeview-installer-results.json",
+      "bytes": 33522,
+      "sha256": "9ba444cd6118352a67653cf628995c6c190164d7f62095af8e79c0775a0d9847"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-1/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-1/treeview-closure/protocol.json",
+      "bytes": 522,
+      "sha256": "9a972fbd6c2f0c431feab8fb43542449b66c5839b99ed816941f259f34b272d4"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-1/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-1/treeview-closure/processes.json",
+      "bytes": 632,
+      "sha256": "1f2801fb6413449cb3dd67b4ec4ea4de2b03de46fa43782965525233b211cbd6"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-1/331f7a85/treeview-installer-results.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/treeview-installer-results.json",
+      "bytes": 34205,
+      "sha256": "4417fb1e3ef60958f0145d861d9ccc889b35972833aa3c34d1cee9845fd5fc14"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-1/331f7a85/install/saved-closure.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/install/saved-closure.jsonl",
+      "bytes": 4672,
+      "sha256": "fe1b7490441456674582d107d900e754747ae6b971c1521641fc720b5f21137a"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-1/331f7a85/reinstall/saved-closure.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/reinstall/saved-closure.jsonl",
+      "bytes": 4581,
+      "sha256": "9d6da4b61fc0d24d6f225bce65e7bc673decd8e31373fd141f0ef2bb78b5b8f6"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-baseline-first-trace-1/331f7a85/upgrade/saved-closure.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-baseline-first-trace-1/treeview-install-smoke/85b49ecf19414dfe9cd6d0f2c194f61f/upgrade/saved-closure.jsonl",
+      "bytes": 4663,
+      "sha256": "0c266b1bbc27a86d2838c9d22c14288b883f35da1f4d964a68902883973632ec"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-0/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-0/treeview-closure/protocol.json",
+      "bytes": 523,
+      "sha256": "74ca614c379147669310271266cee37678bd288935c551f4334998237ee4a4cb"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-0/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-0/treeview-closure/processes.json",
+      "bytes": 632,
+      "sha256": "1b33559dc7eccdbd62331ab0237d938dc42f7147edf082f76dd06f3cf3be7a1b"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-0/331f7a85/treeview-installer-results.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-0/treeview-install-smoke/89b2004682024c719c44d724e9160264/treeview-installer-results.json",
+      "bytes": 33522,
+      "sha256": "e709a3a2db3101272fbdc3643cbe122f7e7c90d588b92629568243f28213fb38"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-1/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-1/treeview-closure/protocol.json",
+      "bytes": 523,
+      "sha256": "170ab6a5a9e1a934eb1bed24d404d92278acd051266dfdbefa935f5af14d2661"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-1/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-1/treeview-closure/processes.json",
+      "bytes": 632,
+      "sha256": "02a23a0e38f296413bdce0b9f0a8603ec424b9057827c24579dcab59429f73bf"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-1/331f7a85/treeview-installer-results.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/treeview-installer-results.json",
+      "bytes": 34205,
+      "sha256": "37b4df178259a31075b28485bb15c5ab5c4725356300fb1e73a9f22c7b546419"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-1/331f7a85/install/saved-closure.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/install/saved-closure.jsonl",
+      "bytes": 4599,
+      "sha256": "e12baa6d1e3425929a0079724ba5193fc2f2c2b99f894cd13508038f79c90777"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-1/331f7a85/reinstall/saved-closure.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/reinstall/saved-closure.jsonl",
+      "bytes": 4628,
+      "sha256": "b1ab9576f16f845292278426a8590e7dd7b6cd9412c6c83fcf8939df2aab789d"
+    },
+    {
+      "path": "treeview-331f/treeview-closure-candidate-first-trace-1/331f7a85/upgrade/saved-closure.jsonl",
+      "sourcePath": "artifacts/native-regression-closure-investigation/treeview-331f/treeview-closure-candidate-first-trace-1/treeview-install-smoke/cee558f780344827b55d53dde542423b/upgrade/saved-closure.jsonl",
+      "bytes": 4546,
+      "sha256": "7cd15022ecbb167de948ec013eea6a20b94a82b52c81cbd05fd5778d15163d00"
+    },
+    {
+      "path": "protocols/high-contrast-baseline-first/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/protocol.json",
+      "bytes": 8908,
+      "sha256": "0c637560b2845806946702f0ec6291a99eeffe3c80dbc4598082f2ce15fab24f"
+    },
+    {
+      "path": "protocols/high-contrast-baseline-first/closure-protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/closure-protocol.json",
+      "bytes": 760,
+      "sha256": "ca586bd76f8e650d1139aa7bffd2f7806205b4298c6ac35cd6c46df4a652ebc2"
+    },
+    {
+      "path": "protocols/high-contrast-baseline-first/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/processes.json",
+      "bytes": 5902,
+      "sha256": "74ad79767842cf71de39955010e725f959cfe53d7ad1012af032b743039ced85"
+    },
+    {
+      "path": "offline-pixels/high-contrast-baseline-first.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-baseline-first/pixels/pixel-readings.json",
+      "bytes": 154998,
+      "sha256": "839df0bb0d2624224188f3915806e3251653dcccb4e4a0828d6d7450b66fd582"
+    },
+    {
+      "path": "protocols/high-contrast-candidate-first/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/protocol.json",
+      "bytes": 8909,
+      "sha256": "b08cabeac9556fb9dda0f08e04f30f1963b68c78de2a923d6c0093ad68db996e"
+    },
+    {
+      "path": "protocols/high-contrast-candidate-first/closure-protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/closure-protocol.json",
+      "bytes": 761,
+      "sha256": "66007569d24c0ca2658e1ffffc4b09287702a078a6c3f1cc8d76a77f4dcfcec9"
+    },
+    {
+      "path": "protocols/high-contrast-candidate-first/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/processes.json",
+      "bytes": 5906,
+      "sha256": "98abf4146dbca650bde6f6dd71662bd4f3187dce04135988563f038b144865a4"
+    },
+    {
+      "path": "offline-pixels/high-contrast-candidate-first.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-high-contrast-candidate-first/pixels/pixel-readings.json",
+      "bytes": 154761,
+      "sha256": "40b1073cd679b389972eed1427207766fd548ca3f3de5f9b0205a1480ef8f495"
+    },
+    {
+      "path": "protocols/normal-baseline-first/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/protocol.json",
+      "bytes": 8901,
+      "sha256": "c861d639973e0969bf43f1f7997cc372855befd829f45f0f3ba81c263c089d39"
+    },
+    {
+      "path": "protocols/normal-baseline-first/closure-protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/closure-protocol.json",
+      "bytes": 753,
+      "sha256": "c4c51d191b9f4243df154a28ab6ca156c07703bd02abaf897a207d517dccbbc0"
+    },
+    {
+      "path": "protocols/normal-baseline-first/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/processes.json",
+      "bytes": 5897,
+      "sha256": "dc985ef1a4ee78fec0bcad410d65141b3990a772b5120f6a8bef7d321e1f0774"
+    },
+    {
+      "path": "offline-pixels/normal-baseline-first.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-baseline-first/pixel-readings.json",
+      "bytes": 157448,
+      "sha256": "475dfec891b9a2b2dc16dcb08927f2e4ba5a83e401b79beeee0c12dc43f0c80a"
+    },
+    {
+      "path": "protocols/normal-candidate-first/protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/protocol.json",
+      "bytes": 8902,
+      "sha256": "1cf8c14c9cb2cef1bdf46740f8a49a5a990006ddbdd5b895ecba09708872c636"
+    },
+    {
+      "path": "protocols/normal-candidate-first/closure-protocol.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/closure-protocol.json",
+      "bytes": 754,
+      "sha256": "aece1e9d2e2d7e00a6319bc7ea1e73419c0b9e8d8f509cd8ff0f7148c2045dca"
+    },
+    {
+      "path": "protocols/normal-candidate-first/processes.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/processes.json",
+      "bytes": 5900,
+      "sha256": "cb5575810f34c5e65339b3988f2d206ff086e8eddce5ae67024183b5d721f20d"
+    },
+    {
+      "path": "offline-pixels/normal-candidate-first.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/closure-331f/regression-closure-normal-candidate-first/pixel-readings.json",
+      "bytes": 157538,
+      "sha256": "012eb32c033c285e9f6432dd7bfbb166e5f858bd7095c7e157ddfbb1d8e3fa75"
+    },
+    {
+      "path": "recovery-331f/develop-high-contrast-packaged-10.0.13-baseline-first/baseline/high-contrast-pre-assertion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/recovery-331f/develop-high-contrast-packaged-10.0.13-baseline-first/baseline/high-contrast-pre-assertion.json",
+      "bytes": 3940,
+      "sha256": "8e4fcabfefebd659ec2482108bd7f9c9006884d12eb3c4f7f7c32902cbab1f39"
+    },
+    {
+      "path": "recovery-331f/develop-high-contrast-packaged-10.0.13-candidate-first/candidate/high-contrast-pre-assertion.json",
+      "sourcePath": "artifacts/native-regression-closure-investigation/recovery-331f/develop-high-contrast-packaged-10.0.13-candidate-first/candidate/high-contrast-pre-assertion.json",
+      "bytes": 4136,
+      "sha256": "d7909f291093d64e75bc346c239729b6859efda6186e0f6be9019ab919f42930"
+    },
+    {
+      "path": "original-treeview-358/failure.png",
+      "sourcePath": "artifacts/preview-completion-investigation/native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/failure.png",
+      "bytes": 123755,
+      "sha256": "ece73338ed3dcd90216943319466675e93faf7734b6435817c9afc781b4eb1d1"
+    },
+    {
+      "path": "original-treeview-358/failure-controls.txt",
+      "sourcePath": "artifacts/preview-completion-investigation/native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/failure-controls.txt",
+      "bytes": 461,
+      "sha256": "9ac60dc934137e8dab7e1bd2b8c503b410dd8043db173528c8668543f6cd1f4f"
+    }
+  ]
+}

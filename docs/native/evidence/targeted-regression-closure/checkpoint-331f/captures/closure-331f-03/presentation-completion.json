@@ -1,0 +1,14 @@
+{
+  "functional": "PASS",
+  "scenario": "pixels",
+  "target": "primary",
+  "mode": "Pages",
+  "instrumented": false,
+  "verdict": {
+    "pendingInterruption": "NOT QUALIFIED; uninstrumented functional check"
+  },
+  "sourceIntegrity": "PASS",
+  "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "elapsedMs": 10489.4896,
+  "pixelAcceptance": "PENDING independent pixel correlation; no frame is discarded"
+}

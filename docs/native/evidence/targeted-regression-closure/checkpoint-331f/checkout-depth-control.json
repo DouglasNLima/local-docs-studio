@@ -1,0 +1,99 @@
+{
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "baseline": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "baselineTree": "81a5921ddc41780ae7aa644a9c2fb37aaef6e70b",
+  "shallowReadExitCode": 128,
+  "fullHistoryReadExitCode": 0,
+  "licenceSha256": "f4126eb8680101babaa6c1ee89b9693320eb204139f3ee3fcd08abb66eb31261",
+  "scope": "Isolated Git objects only. Reproduces the pinned source lookup failure and verifies that fetching history restores the exact existing licence bytes. No licence assertion or product behaviour changes.",
+  "commands": [
+    {
+      "arguments": [
+        "init"
+      ],
+      "exitCode": 0,
+      "stdout": "Initialized empty Git repository in C:/Code/MarkdownReader-reading-productivity/artifacts/native-regression-closure-investigation/checkout-depth-control/.git/\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "remote",
+        "add",
+        "origin",
+        "C:\\Code\\MarkdownReader-reading-productivity"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "fetch",
+        "--depth=1",
+        "--no-tags",
+        "origin",
+        "331f7a85385449e779a12a6c045365de2931e4a2"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "remote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/3d56d4a05fd04b77a5854d0d851b7f00/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/3d56d4a05fd04b77a5854d0d851b7f00/install/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/478bd0124a1d4202bdf5d92f26c8dba4/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/install/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/reinstall/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/upgrade/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/install/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/reinstall/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-14c9/closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/upgrade/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-358/integration-358/comparison-Continuous-high-contrast-candidate-first/controls/resize-compact/candidate/state/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-358/native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-358/native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/install/.gitattributes': Filename too long        \nremote: warning: unable to access 'docs/native/evidence/targeted-regression-closure/checkpoint-358/native-failures-358/native-TreeView-installed-authoring/treeview-install-smoke/1d82563300364f56abba9be4b5d1a451/upgrade/.gitattributes': Filename too long        \nFrom C:\\Code\\MarkdownReader-reading-productivity\n * branch            331f7a85385449e779a12a6c045365de2931e4a2 -> FETCH_HEAD\n"
+    },
+    {
+      "arguments": [
+        "rev-parse",
+        "--is-shallow-repository"
+      ],
+      "exitCode": 0,
+      "stdout": "true\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "show",
+        "358d2a6f4b8028461fb535f2f71a9b7c71636760:LICENSE"
+      ],
+      "exitCode": 128,
+      "stdout": "",
+      "stderr": "fatal: path 'LICENSE' does not exist in '358d2a6f4b8028461fb535f2f71a9b7c71636760'\n"
+    },
+    {
+      "arguments": [
+        "fetch",
+        "--unshallow",
+        "--no-tags",
+        "origin",
+        "331f7a85385449e779a12a6c045365de2931e4a2"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "From C:\\Code\\MarkdownReader-reading-productivity\n * branch              331f7a85385449e779a12a6c045365de2931e4a2 -> FETCH_HEAD\n"
+    },
+    {
+      "arguments": [
+        "rev-parse",
+        "--is-shallow-repository"
+      ],
+      "exitCode": 0,
+      "stdout": "false\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "show",
+        "358d2a6f4b8028461fb535f2f71a9b7c71636760:LICENSE"
+      ],
+      "exitCode": 0,
+      "stdout": "MIT License\n\nCopyright (c) 2026 DouglasNLima\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "rev-parse",
+        "358d2a6f4b8028461fb535f2f71a9b7c71636760^{tree}"
+      ],
+      "exitCode": 0,
+      "stdout": "81a5921ddc41780ae7aa644a9c2fb37aaef6e70b\n",
+      "stderr": ""
+    }
+  ]
+}

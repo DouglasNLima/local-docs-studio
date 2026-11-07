@@ -1,0 +1,93 @@
+{
+  "functional": "PASS",
+  "scenario": "pixels",
+  "target": "primary",
+  "mode": "Pages",
+  "instrumented": true,
+  "verdict": {
+    "pendingInterruption": "INCONCLUSIVE",
+    "qualifiedDeliveries": 0,
+    "cancellationsVerified": false,
+    "staleReady": 0,
+    "offeredOperation": null,
+    "deliveries": [],
+    "operations": [
+      {
+        "id": 49746524,
+        "reader": "primary",
+        "start": 2981617873,
+        "end": 2981877586,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 12
+      },
+      {
+        "id": 39883909,
+        "reader": "secondary",
+        "start": 2981639603,
+        "end": 2984962290,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 1
+      },
+      {
+        "id": 34427365,
+        "reader": "primary",
+        "start": 2994629113,
+        "end": 2997970321,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 15
+      },
+      {
+        "id": 5231694,
+        "reader": "secondary",
+        "start": 2994630382,
+        "end": 2996498889,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 1
+      },
+      {
+        "id": 63304808,
+        "reader": "primary",
+        "start": 3005897899,
+        "end": 3006233070,
+        "cancelled": 3006227512,
+        "outcome": "rejected",
+        "generation": 22
+      },
+      {
+        "id": 55812490,
+        "reader": "primary",
+        "start": 3017646171,
+        "end": 3021756859,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 25
+      },
+      {
+        "id": 12147927,
+        "reader": "secondary",
+        "start": 3017647050,
+        "end": 3020971475,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 2
+      },
+      {
+        "id": 57445808,
+        "reader": "primary",
+        "start": 3048210645,
+        "end": 3049346680,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 46
+      }
+    ]
+  },
+  "sourceIntegrity": "PASS",
+  "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "elapsedMs": 10660.8975,
+  "pixelAcceptance": "PENDING independent pixel correlation; no frame is discarded"
+}

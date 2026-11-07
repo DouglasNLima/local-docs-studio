@@ -1,0 +1,116 @@
+[
+  {
+    "id": 13587832029,
+    "name": "develop-high-contrast-packaged-10.0.13-baseline-first",
+    "size_in_bytes": 439591,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587832029",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587832029/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:32:11Z",
+    "expires_at": "2026-12-07T19:32:10Z",
+    "updated_at": "2026-11-07T19:32:11Z",
+    "digest": "sha256:9c2ec872a5ac3f1adb7054ad2f6cd8d1388620309a4e259206ae84b67fe2035d",
+    "workflow_run": {
+      "id": 42405138388,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587631786,
+    "name": "develop-high-contrast-packaged-10.0.13-candidate-first",
+    "size_in_bytes": 433400,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587631786",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587631786/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:29:38Z",
+    "expires_at": "2026-12-07T19:29:37Z",
+    "updated_at": "2026-11-07T19:29:38Z",
+    "digest": "sha256:a0d2ffa43221a55358a84b269338eaade253d6082e8903de420100cd68a412ff",
+    "workflow_run": {
+      "id": 42405138388,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587611043,
+    "name": "develop-high-contrast-hosted-candidate-first",
+    "size_in_bytes": 867512,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587611043",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587611043/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:21:52Z",
+    "expires_at": "2026-12-07T19:21:50Z",
+    "updated_at": "2026-11-07T19:21:52Z",
+    "digest": "sha256:4c1245bdd688f4d67251ade94b4930400ed44449458f0b252ce2ca6b51568c2d",
+    "workflow_run": {
+      "id": 42405138388,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587357574,
+    "name": "develop-performance-1",
+    "size_in_bytes": 2403408,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587357574",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587357574/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:22:08Z",
+    "expires_at": "2026-12-07T19:22:06Z",
+    "updated_at": "2026-11-07T19:22:08Z",
+    "digest": "sha256:2e883078fa987b054d863400032af2082d656ab509c270297997b8992ac606c2",
+    "workflow_run": {
+      "id": 42405138388,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13587103884,
+    "name": "develop-performance-2",
+    "size_in_bytes": 2403271,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587103884",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13587103884/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:26:56Z",
+    "expires_at": "2026-12-07T19:26:54Z",
+    "updated_at": "2026-11-07T19:26:56Z",
+    "digest": "sha256:10b40241804c720e528867d08e6385f314e758070e761a2afd54128e88242643",
+    "workflow_run": {
+      "id": 42405138388,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  },
+  {
+    "id": 13586824525,
+    "name": "develop-high-contrast-hosted-baseline-first",
+    "size_in_bytes": 867019,
+    "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13586824525",
+    "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13586824525/zip",
+    "expired": false,
+    "created_at": "2026-11-07T19:21:58Z",
+    "expires_at": "2026-12-07T19:21:57Z",
+    "updated_at": "2026-11-07T19:21:58Z",
+    "digest": "sha256:31923c398f5012cb4cba9c3781631c6f5f803e3d8b4c2c268d386ae6812eb793",
+    "workflow_run": {
+      "id": 42405138388,
+      "repository_id": 1248627951,
+      "head_repository_id": 1248627951,
+      "head_branch": "feature/reading-experience-productivity",
+      "head_sha": "331f7a85385449e779a12a6c045365de2931e4a2"
+    }
+  }
+]

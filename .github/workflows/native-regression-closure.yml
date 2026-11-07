@@ -27,7 +27,7 @@ jobs:
       - name: Independently read every fixed Pages label capture
         if: ${{ !cancelled() }}
         shell: powershell
-        run: scripts/native/Read-CompletionPixels.ps1 -EvidenceDirectory artifacts/native-regression-closure
+        run: scripts/native/Read-CompletionPixels.ps1 -EvidenceDirectory artifacts/native-regression-closure/pixels
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -36,7 +36,6 @@ jobs:
             artifacts/native-regression-closure/closure-protocol.json
             artifacts/native-regression-closure/protocol.json
             artifacts/native-regression-closure/processes.json
-            artifacts/native-regression-closure/pixel-readings.json
             artifacts/native-regression-closure/startup/
             artifacts/native-regression-closure/pixels/
           retention-days: 14

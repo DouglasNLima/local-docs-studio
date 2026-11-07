@@ -1,0 +1,5 @@
+Window:  ·  · enabled=True
+ToolTip:  · D:\a\local-docs-studio\local-docs-studio\artifacts\native\treeview-install-smoke\1d82563300364f56abba9be4b5d1a451\upgrade\fixture\TreeView.md · enabled=True
+Text:  · D:\a\local-docs-studio\local-docs-studio\artifacts\native\treeview-install-smoke\1d82563300364f56abba9be4b5d1a451\upgrade\fixture\TreeView.md · enabled=True
+TitleBar: TitleBar ·  · enabled=True
+MenuBar: SystemMenuBar · System · enabled=True

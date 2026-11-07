@@ -1,0 +1,24 @@
+{
+  "foregroundProcesses": 4,
+  "acceptance": "Diagnostic collection only; no passing repeat erases an original failure. No performance policy transition.",
+  "pixels": "Exactly three fixed frames at each existing Pages boundary. Traced cells add passive desktop-wide DWM counters. Uninstrumented cells retain the original capture path.",
+  "controlledProcesses": 8,
+  "bounds": {
+    "childSeconds": 240,
+    "logBytes": 16777216,
+    "privateBytes": 2147483648
+  },
+  "appearance": "normal",
+  "tree": "3e9e9cb53d40cfd8c80c4f55baee0149be015400",
+  "schema": 1,
+  "source": "331f7a85385449e779a12a6c045365de2931e4a2",
+  "startupSamplesSeconds": [
+    0,
+    1,
+    5,
+    30,
+    120,
+    220
+  ],
+  "order": "baseline-first"
+}
