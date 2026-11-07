@@ -1,0 +1,114 @@
+name: Native targeted regression closure
+on:
+  push:
+    branches: [feature/reading-experience-productivity]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression-closure:
+    name: Regression closure (${{ matrix.appearance }}, ${{ matrix.order }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Bounded startup and Pages observations on exact baseline and candidate
+        run: scripts/native/Test-NativeRegressionClosure.ps1 -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}'
+      - name: Independently read every fixed Pages label capture
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: scripts/native/Read-CompletionPixels.ps1 -EvidenceDirectory artifacts/native-regression-closure
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-closure-${{ matrix.appearance }}-${{ matrix.order }}
+          path: |
+            artifacts/native-regression-closure/closure-protocol.json
+            artifacts/native-regression-closure/protocol.json
+            artifacts/native-regression-closure/processes.json
+            artifacts/native-regression-closure/pixel-readings.json
+            artifacts/native-regression-closure/startup/
+            artifacts/native-regression-closure/pixels/
+          retention-days: 14
+  treeview-closure:
+    name: TreeView closure (${{ matrix.order }}, trace ${{ matrix.trace }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        order: [baseline-first, candidate-first]
+        trace: ['1', '0']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Retrieve original exact-source installed baseline
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          run-id: 42391694305
+          github-token: ${{ github.token }}
+          path: artifacts/treeview-baseline
+      - name: Resolve the exact native package workflow without rerunning it
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $deadline = [Diagnostics.Stopwatch]::StartNew()
+          $found = $null
+          while ($deadline.Elapsed.TotalMinutes -lt 30) {
+            $runs = gh api 'repos/${{ github.repository }}/actions/workflows/native.yml/runs?head_sha=${{ github.sha }}&per_page=10' | ConvertFrom-Json
+            if ($LASTEXITCODE) { throw 'Cannot read native workflow identity.' }
+            $run = @($runs.workflow_runs | Where-Object { $_.head_sha -eq '${{ github.sha }}' -and $_.event -eq 'pull_request' } | Sort-Object id -Descending) | Select-Object -First 1
+            if ($run) {
+              $artifacts = gh api "repos/${{ github.repository }}/actions/runs/$($run.id)/artifacts" | ConvertFrom-Json
+              if ($LASTEXITCODE) { throw 'Cannot read native package artefacts.' }
+              $found = @($artifacts.artifacts | Where-Object { $_.name -eq 'native-validation' -and !$_.expired }) | Select-Object -First 1
+              if ($found) { break }
+              if ($run.status -eq 'completed') { throw 'Native workflow finished without its package artefact.' }
+            }
+            Start-Sleep -Seconds 15
+          }
+          if (!$found) { throw 'Package orchestration exceeded its separate 30-minute bound; no product observation attempted.' }
+          "run=$($run.id)" >> $env:GITHUB_OUTPUT
+          "number=$($run.run_number)" >> $env:GITHUB_OUTPUT
+          New-Item -ItemType Directory artifacts/package-origin -Force | Out-Null
+          @{workflow=$run;artifact=$found} | ConvertTo-Json -Depth 10 | Set-Content artifacts/package-origin/candidate.json
+      - name: Retrieve this run's exact-source installed candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          run-id: ${{ steps.candidate.outputs.run }}
+          github-token: ${{ github.token }}
+          path: artifacts/treeview-candidate
+      - name: Build the identical lifecycle observer
+        run: dotnet build src/native/LensDocsStudio.Native.Validation -c Release -p:RestoreLockedMode=true
+      - name: Preserve full independent install upgrade and reinstall observations
+        run: scripts/native/Test-TreeViewClosure.ps1 -CandidatePackageNumber '${{ steps.candidate.outputs.number }}' -Order '${{ matrix.order }}' -Trace '${{ matrix.trace }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: treeview-closure-${{ matrix.order }}-trace-${{ matrix.trace }}
+          path: |
+            artifacts/package-origin/
+            artifacts/native/treeview-closure/
+            artifacts/native/treeview-install-smoke/
+          retention-days: 14

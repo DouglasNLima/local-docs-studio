@@ -1,5 +1,7 @@
 # Preview completion evidence
 
+The [targeted regression closure](targeted-regression-closure.md) continues from exact `358d2a6f4b8028461fb535f2f71a9b7c71636760`. Its bounded campaign investigates installed TreeView closure, a pre-binding comparison startup timeout and retained stale Pages pixels. Diagnostic-only changes preserve every original failure, deadline, source/state assertion and acceptance gate. No product correction is justified yet; unresolved causes remain INCONCLUSIVE and overall acceptance remains NO-GO.
+
 Goal #75 / Draft PR #76 continues from `06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d`, tree `5e1de180dc2cd62440e8f4c6a8abdd692aa37e69`. Scope is limited to foreground interruption during actual pending restoration and visible completion status/page counters. The five functional workstreams and integrated source-position correction retain their previous bounded functional verdicts. Overall acceptance remains **NO-GO**; the original Continuous 250 ms and High Contrast gates and the inactive proposed ADR 007 are unchanged.
 
 ## Preserved starting evidence

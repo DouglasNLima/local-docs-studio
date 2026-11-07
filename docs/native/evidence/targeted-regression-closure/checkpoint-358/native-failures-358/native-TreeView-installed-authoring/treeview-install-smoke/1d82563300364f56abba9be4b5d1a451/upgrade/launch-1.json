@@ -1,0 +1,1676 @@
+{
+  "Status": "PASS",
+  "Phase": "Native owner launch",
+  "RestartOrdinal": 1,
+  "SourceRevision": "0.1.0-preview.1\u002B358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "Pid": 5804,
+  "Hwnd": 1573418,
+  "Process": {
+    "Id": 5804,
+    "Exited": false,
+    "ExitCode": null,
+    "Responding": true
+  },
+  "BudgetMilliseconds": 25000,
+  "AcceptanceElapsedMilliseconds": 1200.5034,
+  "EvidenceElapsedMilliseconds": 1237.9604,
+  "ResizeActionCount": 1,
+  "FileBeforeSha256": "07d610b8198778e8a677531e90fb934ae53b10c860e13d4461a06f5f5a831145",
+  "FileAfterSha256": "07d610b8198778e8a677531e90fb934ae53b10c860e13d4461a06f5f5a831145",
+  "OwnerExpectedSha256": "07d610b8198778e8a677531e90fb934ae53b10c860e13d4461a06f5f5a831145",
+  "OwnerObservedSha256": "07d610b8198778e8a677531e90fb934ae53b10c860e13d4461a06f5f5a831145",
+  "Failure": null,
+  "CaptureError": null,
+  "Observations": [
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 30.0065,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 30.4122,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 135.2429,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 135.2482,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 237.2173,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 237.2289,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 338.7427,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 338.75,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 450.8877,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 450.8986,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 551.8632,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 551.8703,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 657.354,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 657.3621,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 0,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": false,
+        "NativePid": 0,
+        "Owner": 0,
+        "Visible": false,
+        "Enabled": false,
+        "Responding": false,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 827.6137,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "uia-window",
+      "ElapsedMilliseconds": 926.0652,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "window-readiness",
+      "ElapsedMilliseconds": 1061.226,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": true,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "Ready": true,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "transform-acquired",
+      "ElapsedMilliseconds": 1062.4593,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": true,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "Ready": true,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 1062.6971,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "uia-window",
+      "ElapsedMilliseconds": 1064.1036,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "before-resize",
+      "ElapsedMilliseconds": 1114.6536,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": true,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "Ready": true,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "resize-issued",
+      "ElapsedMilliseconds": 1114.6655,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": true,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1440,
+            "Height": 900
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1440,
+          "Height": 900,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1680,
+          "Bottom": 990,
+          "IsEmpty": false
+        },
+        "Ready": true,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 0
+    },
+    {
+      "Phase": "native-window",
+      "ElapsedMilliseconds": 1133.5167,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 0,
+        "UiaPid": 0,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1280,
+            "Height": 800
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1280,
+          "Height": 800,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1520,
+          "Bottom": 890,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": true,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "IsEmpty": true,
+            "Width": 0,
+            "Height": 0
+          },
+          "X": 0,
+          "Y": 0,
+          "Width": 0,
+          "Height": 0,
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0,
+          "IsEmpty": true
+        },
+        "Ready": false,
+        "HasTargetBounds": false
+      },
+      "Error": null,
+      "ResizeActionCount": 1
+    },
+    {
+      "Phase": "uia-window",
+      "ElapsedMilliseconds": 1142.0745,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": false,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1280,
+            "Height": 800
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1280,
+          "Height": 800,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1520,
+          "Bottom": 890,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1280,
+            "Height": 800
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1280,
+          "Height": 800,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1520,
+          "Bottom": 890,
+          "IsEmpty": false
+        },
+        "Ready": false,
+        "HasTargetBounds": true
+      },
+      "Error": null,
+      "ResizeActionCount": 1
+    },
+    {
+      "Phase": "resized-bounds",
+      "ElapsedMilliseconds": 1199.8978,
+      "Window": {
+        "ExpectedPid": 5804,
+        "ProcessHandle": 1573418,
+        "Exited": false,
+        "ExitCode": null,
+        "Exists": true,
+        "NativePid": 5804,
+        "Owner": 0,
+        "Visible": true,
+        "Enabled": true,
+        "Responding": true,
+        "UiaHandle": 1573418,
+        "UiaPid": 5804,
+        "EditorReady": true,
+        "HighContrast": false,
+        "Bounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1280,
+            "Height": 800
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1280,
+          "Height": 800,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1520,
+          "Bottom": 890,
+          "IsEmpty": false
+        },
+        "UiaBounds": {
+          "Location": {
+            "IsEmpty": false,
+            "X": 240,
+            "Y": 90
+          },
+          "Size": {
+            "IsEmpty": false,
+            "Width": 1280,
+            "Height": 800
+          },
+          "X": 240,
+          "Y": 90,
+          "Width": 1280,
+          "Height": 800,
+          "Left": 240,
+          "Top": 90,
+          "Right": 1520,
+          "Bottom": 890,
+          "IsEmpty": false
+        },
+        "Ready": true,
+        "HasTargetBounds": true
+      },
+      "Error": null,
+      "ResizeActionCount": 1
+    }
+  ]
+}

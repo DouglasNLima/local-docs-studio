@@ -4,7 +4,7 @@
   "files": {
     ".gitattributes": {
       "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
-      "current": "585c8645c5a5edb4340d8285440ab5a0cd7c4321f65fda5f34e203e4a659a94f"
+      "current": "d7d4338ba64685ee463c22c2e8d478d923010c29704fdfd5da93860ffa720042"
     },
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
@@ -60,15 +60,15 @@
     },
     "docs/native/architecture-decisions.md": {
       "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
-      "current": "ad2743e33acd0cda22d2a5c76459de985abe2a827e1064013f46e6190aedb53f"
+      "current": "43cdfc000212f792b704cfbcbebf73061f4703325f711454c4f588198580bc72"
     },
     "docs/native/functional-parity-matrix.md": {
       "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
-      "current": "38b1b9f264809d1c6292fb7c9edad5940d319933e7b66d6e5c22e991db7eb892"
+      "current": "af7aae23eb9abcd0e45280f6a2e8a4fea1c9923679c1dbae8e5d6eaf3b5da341"
     },
     "docs/native/implementation-progress.md": {
       "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
-      "current": "5c6288c660cc550c793fa9f66279b5fabf39c4a6a1ca29d5433d2e05335b50f9"
+      "current": "45bcb8178d39f58572af48d5bcded66cd1285010cbb1006587a9f64925298d86"
     },
     "docs/native/user-guide.md": {
       "previous": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327",
@@ -76,7 +76,7 @@
     },
     "docs/native/validation-report.md": {
       "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
-      "current": "ee221ce168120176a50a81881ea144cb893766e91b9dea2dd461190422df72e9"
+      "current": "188ce4168f31104bdb2c6cbb7c01d5426f9d8e66a71042060adc06a1642ebb67"
     },
     "docs/tool-guide.md": {
       "previous": "70945830852bf75c68f35284fe56416a1422fdfa5af731c26e27ac2039833d04",

@@ -1,0 +1,26 @@
+{
+  "Status": "FAIL",
+  "Family": "TreeView",
+  "SourceRevision": "0.1.0-preview.1\u002B358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "Checks": [
+    "Independent native UIA connections agree on exact source occurrence selection",
+    "Actual native geometry has an unambiguous pointer interior",
+    "Real pointer selection uses actual native geometry, guarding overlapping Venn circles",
+    "Hidden icon/zero-area occurrence has complete keyboard and direct-source access",
+    "Invalid native pending field remains visible, keeps last valid draft and disables Apply",
+    "Private source, inspector and history preserve owner and disk before Apply",
+    "Apply/Cancel and inspector remain reachable at 880x600",
+    "Apply/Cancel and inspector remain reachable at 1280x800",
+    "Exact duplicate-fence ownership, one-step owner Undo/Redo and Save preserve every neighbouring byte"
+  ],
+  "Observations": [
+    {
+      "Operation": "Canonical pointer",
+      "Bounds": "25,33.5,14,10",
+      "Scale": 1,
+      "ScreenX": 507.7,
+      "ScreenY": 182
+    }
+  ],
+  "Error": "System.InvalidOperationException: Saved application did not close.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func\u00601 condition, String failure, Int32 seconds) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1807\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass28_0.\u003CRunExpansionViEditor\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeExpansionViEditorUiChecks.cs:line 83"
+}

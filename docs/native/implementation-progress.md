@@ -1,5 +1,7 @@
 # Native implementation progress
 
+The [targeted regression closure](targeted-regression-closure.md) continues from exact `358d2a6f4b8028461fb535f2f71a9b7c71636760`. Its bounded campaign investigates installed TreeView closure, a pre-binding comparison startup timeout and retained stale Pages pixels. Diagnostic-only changes preserve every original failure, deadline, source/state assertion and acceptance gate. No product correction is justified yet; unresolved causes remain INCONCLUSIVE and overall acceptance remains NO-GO.
+
 The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. Both diagnostic checkpoints and their failures are preserved. A controlled negative case justifies separating UIA-only publication from actual bound-text changes in the passive render-commit observer. Product presentation behaviour, fixed pixel assertions and acceptance thresholds remain unchanged; exact final-source verdicts and all terminal workflows remain in Goal #75 and Draft PR #76.
 
 ## PR #80 preview correction integrated into PR #76 — 7 November 2026

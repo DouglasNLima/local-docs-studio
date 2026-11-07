@@ -189,6 +189,19 @@ def apply_preview_reflow_refresh(preserved, refresh):
     return result
 
 
+def apply_regression_closure_refresh(preserved, refresh):
+    path = 'src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs'
+    require(refresh['baseCommit'] == '358d2a6f4b8028461fb535f2f71a9b7c71636760',
+            'Closure diagnostics must identify the exact retained failure source')
+    require(set(refresh['files']) == {path}, 'Closure diagnostics must retain their single harness path scope')
+    entry = refresh['files'][path]
+    require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+            'Closure diagnostics changed historical evidence: ' + path)
+    require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+            'Closure diagnostics require an exact canonical source digest')
+    return {**preserved, path: entry['current']}
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -236,6 +249,8 @@ def main():
     preserved = apply_reading_productivity_refresh(preserved, reading_refresh)
     reflow_refresh = json.loads((ROOT / 'docs/open-source/evidence/preview-reflow-integration/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_preview_reflow_refresh(preserved, reflow_refresh)
+    closure_refresh = json.loads((ROOT / 'docs/open-source/evidence/targeted-regression-closure/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_regression_closure_refresh(preserved, closure_refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

@@ -1,0 +1,15 @@
+  LensDocsStudio.Core -> C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Core\bin\Release\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Core.Tests -> C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Core.Tests\bin\Release\net10.0\LensDocsStudio.Core.Tests.dll
+Test run for C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Core.Tests\bin\Release\net10.0\LensDocsStudio.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:54.98]     LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(name: "complete-detailed", entities: 39, relationships: 115, attributes: 284) [FAIL]
+  Failed LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(name: "complete-detailed", entities: 39, relationships: 115, attributes: 284) [9 s]
+  Error Message:
+   Rendering resource deadline reached (6 seconds). Retry the preview or reduce the diagram size.
+  Stack Trace:
+     at LensDocsStudio.Core.Tests.ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(String name, Int32 entities, Int32 relationships, Int32 attributes) in C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Core.Tests\ComplexErRenderingTests.cs:line 28
+   at InvokeStub_ComplexErRenderingTests.Complex_fixture_preserves_every_semantic_occurrence_and_exact_source(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+Results File: C:\Code\MarkdownReader-reading-productivity\artifacts\native-regression-closure-investigation\tests\core.trx
+
+Failed!  - Failed:     1, Passed:  2381, Skipped:     0, Total:  2382, Duration: 1 m 23 s - LensDocsStudio.Core.Tests.dll (net10.0)

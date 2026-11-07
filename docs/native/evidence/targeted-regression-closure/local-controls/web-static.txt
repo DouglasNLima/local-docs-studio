@@ -1,0 +1,6 @@
+
+> lens-docs-studio@0.1.0 test:static
+> node tests/static/check-assets.mjs
+
+Service worker installation checks passed for 218 attempted assets with 6 concurrent cache fetches, including an optional failure.
+Static checks passed for 56 module files, 67 shell assets, 151 vendor assets, and 65 runtime external-dependency scans.

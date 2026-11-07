@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "productRevision": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "fixture": "mixed",
+  "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "highContrast": false,
+  "iterations": 1,
+  "harness": {
+    "sha256": "AF32A6AC1D07D67BBDB435CD2D1D4454183E18B53082608B1DF8C70265567874",
+    "name": "LensDocsStudio.Native.UxProbe",
+    "version": "0.1.0-preview.1\u002B358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "fileVersion": "0.1.0.0"
+  },
+  "product": {
+    "sha256": "5E71DB13A150D24E4977FBE0576A1E076DC757695D03BC1A783802C3357931A4",
+    "name": "LensDocsStudio.Native",
+    "version": "0.1.0-preview.1\u002B358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "fileVersion": "0.1.0.0"
+  },
+  "core": {
+    "sha256": "1014241AA9F289638C57933C3699B06EE6FCC5D808B473DC14617B4E7C2E852F",
+    "name": "LensDocsStudio.Core",
+    "version": "0.1.0-preview.1\u002B358d2a6f4b8028461fb535f2f71a9b7c71636760",
+    "fileVersion": "0.1.0.0"
+  },
+  "wpf": {
+    "sha256": "15EC7AC7EAECDEABF3BFB378711F2C45BCD8A59D77BCD8254B9E90B776385189",
+    "name": "PresentationFramework",
+    "version": "10.0.14-servicing.26522.126\u002B0427b9abbead3fa64c6655eb4290c537397131fa",
+    "fileVersion": "10.0.1426.52326"
+  },
+  "runtime": ".NET 10.0.14",
+  "os": "Microsoft Windows NT 10.0.26100.0",
+  "processors": 4,
+  "processId": 8064,
+  "stopwatchFrequency": 10000000,
+  "sourceBytes": 4475,
+  "sourceCharacters": 4471,
+  "lineEnding": "LF",
+  "capabilities": {
+    "slash": true,
+    "comparison": true,
+    "secondaryCompletionStatus": true,
+    "legacySecondaryStatus": false,
+    "attachmentMarker": true
+  },
+  "image": "20261103.298.1",
+  "run": "42391689023",
+  "protocol": "foreground SendInput to semantic state plus captured desktop response; software observation upper bound, not physical scan-out"
+}

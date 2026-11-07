@@ -1,0 +1,10 @@
+{
+  "baseCommit": "358d2a6f4b8028461fb535f2f71a9b7c71636760",
+  "purpose": "Single test harness call-site amendment for opt-in shutdown observations; original close action, assertion and deadline preserved. No licence grant, trust, performance or policy change.",
+  "files": {
+    "src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs": {
+      "previous": "d3fde69f93d5232434296b3146fe021e65d053b4547c802f02603a3dfa29ef2a",
+      "current": "6ad31baf488e58aceeb8fc5591ad27765040d6a258dfd4954e43a840b07cf033"
+    }
+  }
+}

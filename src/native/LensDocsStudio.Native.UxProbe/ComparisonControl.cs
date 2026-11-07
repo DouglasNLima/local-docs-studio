@@ -42,13 +42,18 @@ internal static class ComparisonControl
         var secondPath = Path.Combine(output, "second.md"); var secondSource = "# Secondary owner\n\n" + source; File.WriteAllText(secondPath, secondSource);
         File.Copy(Path.Combine(fixtures, "pixel.png"), Path.Combine(output, "pixel.png"));
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        using var startup = new StartupTrace(output, app.Dispatcher);
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(app.Dispatcher));
+        startup.Mark("theme-begin");
         ThemeService.Apply(app.Resources, "System");
+        startup.Mark("theme-end");
         var dialogs = new DesktopDialogs();
         using var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), dialogs);
         var compact = args.Contains("--compact");
+        startup.Mark("window-create-begin");
         var window = new MainWindow(model, dialogs, []) { Width = compact ? 1024 : 1440, Height = compact ? 720 : 900, Left = -20000, Top = -20000,
             ShowActivated = false, ShowInTaskbar = false, WindowStartupLocation = WindowStartupLocation.Manual };
+        startup.Mark("window-create-end");
         var loaded = typeof(MainWindow).GetMethod("WindowLoaded", BindingFlags.Instance | BindingFlags.NonPublic)!;
         window.Loaded -= (RoutedEventHandler)loaded.CreateDelegate(typeof(RoutedEventHandler), window);
         var closing = typeof(MainWindow).GetMethod("WindowClosing", BindingFlags.Instance | BindingFlags.NonPublic)!;
@@ -101,12 +106,18 @@ internal static class ComparisonControl
                 sourceSha256 = Program.Hash(System.Text.Encoding.UTF8.GetBytes(owner.EditorDocument.Text)),
                 media = result.Media.Select(m => new { m.Image.ActualWidth, m.Image.ActualHeight }).ToArray() };
         }
+        startup.Mark("show-begin");
         window.Show();
-        _ = window.Dispatcher.BeginInvoke(async () =>
+        startup.Mark("show-end", new { window.IsLoaded });
+        var initialisation = window.Dispatcher.BeginInvoke(async () =>
         {
+            startup.Mark("initialisation-callback");
             try
             {
-                await model.InitialiseAsync([secondPath, firstPath]); Call("ApplyTheme"); Call("ApplyReadingPreferences");
+                startup.Mark("model-initialise-begin");
+                await model.InitialiseAsync([secondPath, firstPath]);
+                startup.Mark("model-initialise-end", new { documents = model.Documents.Count, active = model.ActiveDocument?.Id, model.IsBusy });
+                Call("ApplyTheme"); Call("ApplyReadingPreferences");
                 Call("BindActiveDocument"); Call("SetLayout", "Preview"); await (Task)Call("UpdatePreviewAsync", false)!;
                 var first = model.ActiveDocument!; var second = model.Documents.Single(d => d.FilePath == secondPath);
                 preview.Zoom = zoom;
@@ -295,6 +306,8 @@ internal static class ComparisonControl
             }
             finally { if (completionTrace is not null) { completionTrace.Save(output); completionTrace.Dispose(); } app.Shutdown(code); }
         });
-        app.Run(); return code;
+        startup.Mark("initialisation-posted", new { operation = System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(initialisation), priority = initialisation.Priority.ToString() });
+        startup.Mark("message-loop-enter");
+        app.Run(); startup.Mark("message-loop-exit", new { code }); return code;
     }
 }

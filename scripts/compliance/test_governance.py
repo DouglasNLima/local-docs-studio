@@ -255,6 +255,30 @@ class ScopedLicenceTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 apply_preview_reflow_refresh(preserved, changed)
 
+    def test_closure_observer_amendment_cannot_change_other_acceptance_pins(self):
+        from licence_scope import apply_regression_closure_refresh
+        preserved = json.loads((EVIDENCE / 'preserved-files.json').read_text())['sha256']
+        refresh = json.loads((ROOT / 'docs/open-source/evidence/targeted-regression-closure/preserved-refresh.json').read_text())
+        path = 'src/native/LensDocsStudio.Native.Validation/NativeExpansionViEditorUiChecks.cs'
+        updated = apply_regression_closure_refresh(preserved, refresh)
+        self.assertEqual({p: v for p, v in preserved.items() if p != path},
+                         {p: v for p, v in updated.items() if p != path})
+        for mutation in ('baseline', 'previous', 'missing', 'policy', 'performance', 'digest'):
+            changed = copy.deepcopy(refresh)
+            if mutation == 'baseline':
+                changed['baseCommit'] = '0' * 40
+            elif mutation == 'previous':
+                changed['files'][path]['previous'] = '0' * 64
+            elif mutation == 'missing':
+                del changed['files'][path]
+            elif mutation in ('policy', 'performance'):
+                extra = 'LICENSE' if mutation == 'policy' else 'src/native/LensDocsStudio.Native.Validation/ContinuousPreviewPerformanceChecks.cs'
+                changed['files'][extra] = changed['files'][path]
+            else:
+                changed['files'][path]['current'] = 'not-a-digest'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                apply_regression_closure_refresh(preserved, changed)
+
     def test_rejects_continuous_check_in_ordinary_integration(self):
         payload = json.loads((CONFIG / 'develop-ruleset.json').read_text())
         observed = {(r['name'], r['integrationId']) for r in

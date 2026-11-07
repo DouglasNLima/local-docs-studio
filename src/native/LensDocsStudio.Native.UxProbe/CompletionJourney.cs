@@ -109,7 +109,7 @@ internal sealed partial class Probe
                 using var file = File.Create(Path.Combine(output, stem + "-" + region.Name + ".png")); encoder.Save(file);
             }
             completionCaptures.Add(new { action, frameIndex, file = stem + ".png", frame.Sha256, frame.Started, frame.DwmReturned,
-                frame.PixelsStarted, frame.PixelsFinished, committed, before, after, regions, completedReaders,
+                frame.PixelsStarted, frame.PixelsFinished, frame.CompositionBefore, frame.CompositionAfter, committed, before, after, regions, completedReaders,
                 observationStarted = started, observationDeadlineSeconds = ActionSeconds,
                 scope = "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out" });
             Program.Write(output, "completion-captures.json", completionCaptures);
