@@ -12,10 +12,23 @@ public static class PreviewNavigationService
     private sealed class NavigationState
     {
         public CancellationTokenSource? Pending;
+        public TextPointer? LastPosition;
     }
     private static readonly ConditionalWeakTable<FlowDocumentReader, NavigationState> States = new();
     public static void CancelPending(FlowDocumentReader viewer)
-    { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
+    {
+        if (!States.TryGetValue(viewer, out var state)) return;
+        state.Pending?.Cancel();
+        if (viewer.Document is null || state.LastPosition?.IsInSameDocument(viewer.Document.ContentStart) != true) state.LastPosition = null;
+    }
+
+    internal static TextPointer? VisiblePageTarget(FlowDocumentReader viewer)
+    {
+        if (!States.TryGetValue(viewer, out var state) || state.LastPosition is not { } position || viewer.Document is null
+            || !position.IsInSameDocument(viewer.Document.ContentStart) || !position.HasValidLayout) return null;
+        var rectangle = position.GetCharacterRect(LogicalDirection.Forward);
+        return !rectangle.IsEmpty && rectangle.Bottom > 0 && rectangle.Top < viewer.ActualHeight ? position : null;
+    }
 
     // Keep the existing compiled entry point for paired validation of older products.
     public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
@@ -115,7 +128,9 @@ public static class PreviewNavigationService
                         diagnostic?.Invoke("native selection visual is not ready");
                     selected = true;
                 }, DispatcherPriority.Loaded);
-                return selected && !cancellation.IsCancellationRequested && viewer.Document == document;
+                var completed = selected && !cancellation.IsCancellationRequested && viewer.Document == document;
+                if (completed) state.LastPosition = position;
+                return completed;
             }
             catch (OperationCanceledException) { return false; }
             finally

@@ -184,6 +184,7 @@ public partial class MainWindow
             || AutomationProperties.GetItemStatus(reader).StartsWith("Busy", StringComparison.Ordinal)
             || result.TextMap.VisibleSource(reader.ActualHeight) is not { } source) return;
         var anchor = PreviewViewportAnchor.Capture(reader, result);
+        if (anchor is not null && result.TextMap.TrySourceOffset(anchor.Position, out var anchoredSource)) source = anchoredSource;
         // The secondary reader belongs to its document too. Save its source position
         // before activation replaces the shared reader and its immutable source map.
         document.PreviewSourceOffset = source;

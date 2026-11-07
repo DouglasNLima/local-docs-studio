@@ -6,14 +6,19 @@ using System.Windows.Threading;
 namespace LensDocsStudio.Native.Rendering;
 
 /// <summary>A visible source position, rather than a pixel offset that changes meaning during reflow.</summary>
-internal sealed record PreviewViewportAnchor(FlowDocument Document, TextPointer Position, double VerticalFraction)
+internal sealed partial record PreviewViewportAnchor(FlowDocument Document, TextPointer Position, double VerticalFraction)
 {
     internal static PreviewViewportAnchor? Capture(DocumentPreview viewer, PreviewResult result)
     {
         if (viewer.Document != result.Document || !viewer.IsVisible || !viewer.IsMeasureValid || !viewer.IsArrangeValid
-            || viewer.ViewingMode != FlowDocumentReaderViewingMode.Scroll || viewer.ActualHeight <= 0
-            || result.TextMap.VisibleSource(viewer.ActualHeight) is not { } source
-            || !result.TextMap.TryPreviewRange(source, 0, out var position, out _) || position is null || !position.HasValidLayout) return null;
+            || viewer.ActualHeight <= 0) return null;
+        // Pagination can move adjacent visible paragraphs onto different pages.
+        // A still-visible explicit Find/navigation target owns the reading position.
+        var pageTarget = viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll ? null : PreviewNavigationService.VisiblePageTarget(viewer);
+        var source = pageTarget is not null && result.TextMap.TrySourceOffset(pageTarget, out var target)
+            ? target : result.TextMap.VisibleSource(viewer.ActualHeight);
+        if (source is not { } offset
+            || !result.TextMap.TryPreviewRange(offset, 0, out var position, out _) || position is null || !position.HasValidLayout) return null;
         var rectangle = position.GetCharacterRect(LogicalDirection.Forward);
         if (rectangle.IsEmpty || rectangle.Bottom <= 0 || rectangle.Top >= viewer.ActualHeight) return null;
         return new(result.Document, position, Math.Clamp(rectangle.Top / viewer.ActualHeight, 0, 1));
@@ -21,6 +26,7 @@ internal sealed record PreviewViewportAnchor(FlowDocument Document, TextPointer 
 
     internal Task<bool> RestoreAsync(DocumentPreview viewer, Func<bool> current, CancellationToken cancellation)
     {
+        if (viewer.ViewingMode != FlowDocumentReaderViewingMode.Scroll) return RestorePageAsync(viewer, current, cancellation);
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var zoom = viewer.Zoom;
         double? requestedOffset = null;

@@ -51,18 +51,25 @@ public partial class MainWindow
     private void OpenReplace(object sender, RoutedEventArgs e) => ShowFind(true);
     private void ShowFind(bool replace)
     {
+        var changed = FindBar.Visibility != Visibility.Visible;
+        var previewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        if (changed) { CapturePreviewLayoutAnchor(); CancelSynchronisation(); }
         searchPreview = previewFocused && !replace;
         FindContext.Text = searchPreview ? "Find in preview" : "Find in editor";
         FindContext.ToolTip = searchPreview ? "Rendered text and formula source. Mermaid diagram labels are not searchable." : "Case-insensitive literal source text";
         ReplaceText.Visibility = ReplaceButton.Visibility = replace ? Visibility.Visible : Visibility.Collapsed;
         FindBar.Visibility = Visibility.Visible; FindText.Focus(); FindText.SelectAll();
         InvalidateFind(FindRefreshCause.Query);
+        if (changed && Preview.IsVisible && SyncCurrent) _ = RestorePreviewLayoutAsync(previewStatus);
     }
     private void CloseFind(object sender, RoutedEventArgs e) => HideFind();
     private void HideFind()
     {
+        var previewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        CapturePreviewLayoutAnchor(); CancelSynchronisation();
         FindBar.Visibility = Visibility.Collapsed; InvalidateFind(FindRefreshCause.Closed);
         if (searchPreview) Preview.Focus(); else Editor.Focus();
+        if (Preview.IsVisible && SyncCurrent) _ = RestorePreviewLayoutAsync(previewStatus);
     }
     private void FindQueryChanged(object sender, TextChangedEventArgs e) => InvalidateFind(FindRefreshCause.Query);
     private void ObserveEditorFindKey(object sender, KeyEventArgs e)
@@ -75,6 +82,7 @@ public partial class MainWindow
     }
     private void CancelFindNavigation()
     {
+        CancelPreviewLayout();
         findInteraction++;
         if (Preview is not null) PreviewNavigationService.CancelPending(Preview);
         if (Editor is not null) EditorNavigationService.CancelPending(Editor);

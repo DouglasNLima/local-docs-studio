@@ -63,6 +63,7 @@ public partial class MainWindow
         Preview.LayoutUpdated += PreviewLayoutUpdated;
         Editor.PreviewMouseWheel += UserScrollInput; Preview.PreviewMouseWheel += UserScrollInput;
         Editor.PreviewMouseDown += UserSelectionInput; Preview.PreviewMouseDown += UserSelectionInput;
+        Preview.PreviewKeyDown += UserPreviewNavigationInput;
         Editor.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
         Preview.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
         Closed += (_, _) =>
@@ -74,6 +75,7 @@ public partial class MainWindow
             Preview.RemoveHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(PreviewScrollChanged));
             Editor.PreviewMouseWheel -= UserScrollInput; Preview.PreviewMouseWheel -= UserScrollInput;
             Editor.PreviewMouseDown -= UserSelectionInput; Preview.PreviewMouseDown -= UserSelectionInput;
+            Preview.PreviewKeyDown -= UserPreviewNavigationInput;
             Editor.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
             Preview.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
@@ -164,6 +166,11 @@ public partial class MainWindow
     }
     private void UserSelectionInput(object sender, MouseButtonEventArgs e)
     { TraceSelection("mouse-down " + (ReferenceEquals(sender, Editor) ? "editor" : "preview")); CancelSynchronisation(); }
+    private void UserPreviewNavigationInput(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.PageUp or Key.PageDown or Key.Home or Key.End)
+            CancelSynchronisation();
+    }
     private void SelectionInputCompleted(object sender, MouseButtonEventArgs e)
         => TraceSelection("mouse-up " + (ReferenceEquals(sender, Editor) ? "editor" : "preview"));
     private void EditorSelectionChanged(object? sender, EventArgs e)
@@ -347,7 +354,7 @@ public partial class MainWindow
     private void PreviewZoomChanged(object sender, RoutedEventArgs e)
     {
         var difference = (sender as FrameworkElement)?.Tag as string == "in" ? 10 : -10;
-        Preview.Zoom = Math.Clamp(Preview.Zoom + difference, 50, 200);
+        SetPreviewZoom(Math.Clamp(Preview.Zoom + difference, 50, 200));
 
     }
     private void FindPreviewFromToolbar(object sender, RoutedEventArgs e) { previewFocused = true; ShowFind(false); }
