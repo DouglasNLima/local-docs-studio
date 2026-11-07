@@ -10,14 +10,18 @@ $sides = if ($protocol.order -eq 'candidate-first') { @('candidate', 'baseline')
 foreach ($side in $sides) {
     $product = $protocol.products.$side
     foreach ($mode in 'Continuous', 'Automatic', 'Pages') {
-        $directory = Join-Path $output "$side-$mode"
-        $arguments = @('--controlled-layout', [IO.Path]::GetFullPath('tests/fixtures/native-ux'), $directory, "--mode=$mode")
+      $zooms = if ($side -eq 'candidate' -and $mode -eq 'Continuous') { @(100, 50, 75, 150, 200) } else { @(100) }
+      foreach ($zoom in $zooms) {
+        $label = if ($zoom -eq 100) { "$side-$mode" } else { "$side-$mode-zoom-$zoom" }
+        $directory = Join-Path $output $label
+        $arguments = @('--controlled-layout', [IO.Path]::GetFullPath('tests/fixtures/native-ux'), $directory, "--mode=$mode", "--zoom=$zoom")
         if ($side -eq 'baseline' -and $mode -ne 'Pages') { $arguments += '--expect-displacement' }
         if ($protocol.appearance -eq 'high-contrast') { $arguments += '--high-contrast' }
         & (Join-Path $product.binary 'LensDocsStudio.Native.UxProbe.exe') @arguments 2>&1 | Tee-Object -FilePath "$directory-terminal.txt"
-        $outcomes.Add(@{side=$side;mode=$mode;revision=$product.revision;tree=$product.tree;exitCode=$LASTEXITCODE;
+        $outcomes.Add(@{side=$side;mode=$mode;zoom=$zoom;revision=$product.revision;tree=$product.tree;exitCode=$LASTEXITCODE;
             expectation=if ($side -eq 'baseline' -and $mode -ne 'Pages') { 'Reproduce source-position loss; not an acceptance PASS' } else { 'Retain visible source, selection, caret and documents' }})
         $outcomes | ConvertTo-Json -Depth 5 | Set-Content "$output/results.json" -Encoding utf8NoBOM
+      }
     }
 }
 if (@($outcomes | Where-Object exitCode -ne 0).Count) { throw 'Controlled geometry or preservation checks failed. Every outcome is retained.' }

@@ -1,0 +1,235 @@
+{
+  "verdict": "VISIBLE TEXT",
+  "facts": [
+    {
+      "stage": "split-at-end",
+      "layout": "Split",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10366.173333333334,
+      "extentHeight": 10935.663333333334,
+      "viewportHeight": 569.49,
+      "actualWidth": 384.6666666666667,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.869999999999,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 456.89,
+          "isVisible": true,
+          "bounds": "21,-163.69500000000016,342.6675,342.6675"
+        },
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 132.0409039213548,
+          "isVisible": true,
+          "bounds": "21,190.9724999999994,342.6675,99.03067794101611"
+        }
+      ]
+    },
+    {
+      "stage": "preview-after-reflow",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10747.483333333334,
+      "extentHeight": 11316.973333333333,
+      "viewportHeight": 569.49,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.87000000000035,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720,
+          "isVisible": true,
+          "bounds": "21,-449.6774999999998,540,540"
+        },
+        {
+          "actualWidth": 976.4433333333334,
+          "actualHeight": 282.19146919677405,
+          "isVisible": true,
+          "bounds": "21,102.32250000000022,732.3325,211.64360189758054"
+        }
+      ]
+    },
+    {
+      "stage": "retained-Split",
+      "layout": "Split",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10366.173333333334,
+      "extentHeight": 10935.663333333334,
+      "viewportHeight": 569.49,
+      "actualWidth": 384.6666666666667,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.869999999999,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 456.89,
+          "isVisible": true,
+          "bounds": "21,-163.69500000000016,342.6675,342.6675"
+        },
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 132.0409039213548,
+          "isVisible": true,
+          "bounds": "21,190.9724999999994,342.6675,99.03067794101611"
+        }
+      ]
+    },
+    {
+      "stage": "retained-Preview",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10747.483333333334,
+      "extentHeight": 11316.973333333333,
+      "viewportHeight": 569.49,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.87000000000035,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720,
+          "isVisible": true,
+          "bounds": "21,-449.6774999999998,540,540"
+        },
+        {
+          "actualWidth": 976.4433333333334,
+          "actualHeight": 282.19146919677405,
+          "isVisible": true,
+          "bounds": "21,102.32250000000022,732.3325,211.64360189758054"
+        }
+      ]
+    },
+    {
+      "stage": "retained-Split",
+      "layout": "Split",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10366.173333333334,
+      "extentHeight": 10935.663333333334,
+      "viewportHeight": 569.49,
+      "actualWidth": 384.6666666666667,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.869999999999,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 456.89,
+          "isVisible": true,
+          "bounds": "21,-163.69500000000016,342.6675,342.6675"
+        },
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 132.0409039213548,
+          "isVisible": true,
+          "bounds": "21,190.9724999999994,342.6675,99.03067794101611"
+        }
+      ]
+    },
+    {
+      "stage": "retained-Preview",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10747.483333333334,
+      "extentHeight": 11316.973333333333,
+      "viewportHeight": 569.49,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.87000000000035,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720,
+          "isVisible": true,
+          "bounds": "21,-449.6774999999998,540,540"
+        },
+        {
+          "actualWidth": 976.4433333333334,
+          "actualHeight": 282.19146919677405,
+          "isVisible": true,
+          "bounds": "21,102.32250000000022,732.3325,211.64360189758054"
+        }
+      ]
+    },
+    {
+      "stage": "rapid-transitions",
+      "layout": "Preview",
+      "previewStatus": "Preview updated in 576 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10747.483333333334,
+      "extentHeight": 11316.973333333333,
+      "viewportHeight": 569.49,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.87000000000035,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720,
+          "isVisible": true,
+          "bounds": "21,-449.6774999999998,540,540"
+        },
+        {
+          "actualWidth": 976.4433333333334,
+          "actualHeight": 282.19146919677405,
+          "isVisible": true,
+          "bounds": "21,102.32250000000022,732.3325,211.64360189758054"
+        }
+      ]
+    },
+    {
+      "stage": "superseded-by-document",
+      "currentSource": true,
+      "outgoingUnsavedPreserved": true,
+      "fixtureUnchanged": true
+    }
+  ],
+  "fixtureSha256": "6B7CD92A7DCF1DD88FF31E68FB196BDE2AB76655F99E9F9FEE93D82BF57280A0",
+  "product": "0.1.0-preview.1\u002B4f133d1b110dd6b600d3e1ae06fe725a598feb4a",
+  "mode": "Continuous",
+  "zoom": 75,
+  "highContrast": false,
+  "osHighContrast": false,
+  "scope": "Controlled off-screen natural WPF layout; no real input or physical display acceptance"
+}

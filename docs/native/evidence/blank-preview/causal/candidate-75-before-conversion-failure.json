@@ -1,0 +1,67 @@
+{
+  "error": "System.TimeoutException: Controlled semantic response was not observed within 30 seconds.\r\n   at LensDocsStudio.Native.UxProbe.LayoutControl.\u003CRun\u003Eg__Until|0_7(Func\u00601 predicate) in C:\\Code\\MarkdownReader-blank-preview\\src\\native\\LensDocsStudio.Native.UxProbe\\LayoutControl.cs:line 69\r\n   at LensDocsStudio.Native.UxProbe.LayoutControl.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CRun\u003Eb__10\u003Ed.MoveNext() in C:\\Code\\MarkdownReader-blank-preview\\src\\native\\LensDocsStudio.Native.UxProbe\\LayoutControl.cs:line 110",
+  "facts": [
+    {
+      "stage": "split-at-end",
+      "layout": "Split",
+      "previewStatus": "Preview updated in 615 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10366.173333333334,
+      "extentHeight": 10935.663333333334,
+      "viewportHeight": 569.49,
+      "actualWidth": 384.6666666666667,
+      "actualHeight": 427.1166666666667,
+      "end": "21,388.869999999999,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 456.89,
+          "isVisible": true,
+          "bounds": "21,-163.69500000000016,342.6675,342.6675"
+        },
+        {
+          "actualWidth": 456.89,
+          "actualHeight": 132.0409039213548,
+          "isVisible": true,
+          "bounds": "21,190.9724999999994,342.6675,99.03067794101611"
+        }
+      ]
+    },
+    {
+      "stage": "preview-after-reflow",
+      "layout": "Preview",
+      "previewStatus": "Updating preview layout\u2026",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": 10652.155833333334,
+      "extentHeight": 11316.973333333333,
+      "viewportHeight": 569.49,
+      "actualWidth": 774.3333333333334,
+      "actualHeight": 427.1166666666667,
+      "end": "21,460.3656249999999,0,14.962500000000002",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 720,
+          "actualHeight": 720,
+          "isVisible": true,
+          "bounds": "21,-378.1818750000002,540,540"
+        },
+        {
+          "actualWidth": 976.4433333333334,
+          "actualHeight": 282.19146919677405,
+          "isVisible": true,
+          "bounds": "21,173.81812499999978,732.3325,211.64360189758054"
+        }
+      ]
+    }
+  ]
+}

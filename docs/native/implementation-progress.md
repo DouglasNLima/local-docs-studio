@@ -1,5 +1,19 @@
 # Native implementation progress
 
+## Blank preview source-position recovery — 7 November 2026
+
+Goal #79 / Draft PR #80 isolates a shared layout-reuse defect: width reflow enlarges
+media while the reader retains an obsolete pixel scroll position. The correction
+retains a mapped source position, checks current ownership and visible layout, and
+withholds success while restoration is pending. The original six failures are
+preserved; the first complete campaign records 96/96 candidate foreground journeys
+and 72/72 controlled mode checks, alongside 14 unchanged-baseline blank failures.
+Additional zoom checks found and corrected a screen/document-unit conversion.
+The [causal report and source-labelled evidence](native-blank-preview-recovery.md)
+and PR #80's terminal receipt own final verification and residual limits. PR #76
+requires separate integration and independent revalidation. All related PRs remain
+Draft; the 250 ms gate, High Contrast requirements and performance policy are unchanged.
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.

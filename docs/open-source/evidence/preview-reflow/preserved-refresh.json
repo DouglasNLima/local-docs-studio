@@ -1,0 +1,42 @@
+{
+  "baseCommit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+  "purpose": "Goal #79 correctness correction; no licence grant, notice, trust or performance-policy change",
+  "files": {
+    ".gitattributes": {
+      "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
+      "current": "4ff968a6938bbeb5c202436da07ee3244d19a8632d14b067d4138b6fc47797b0"
+    },
+    ".github/workflows/native.yml": {
+      "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
+      "current": "cb7e8e1252bc78c669eca4a967f1222cc93d189a1c1e7fa9cee995f19c68a181"
+    },
+    "docs/native/architecture-decisions.md": {
+      "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
+      "current": "23f3db42f99ceb610572e543f51e08b18a1344c045eb1026b4a9327e7b738e3a"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
+      "current": "4f7f299a4dfae2d160c9586f366806dbc53fb202b01922b711bbd3edb6a97287"
+    },
+    "docs/native/implementation-progress.md": {
+      "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
+      "current": "1f58593920b5757a25ee9ce34bb7cbce8f59a9d20c10da2372068b61fb2ef347"
+    },
+    "docs/native/native-experience-improvements.md": {
+      "previous": "93d6e98b8ed54744484d00a132795851251ca09c1eba029efdd444a5124a283f",
+      "current": "5d328da28c3622c6a005867df317ee2c19f0adac1ee13561ee1c0227a05d0aed"
+    },
+    "docs/native/validation-report.md": {
+      "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
+      "current": "95238c30614627d6115abd5e7afcfa29a5ac51041ea4dc3e766cc2b79ee4c8a0"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
+      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
+      "current": "8a7e197f2e850c9eebf4d2e14d312e87cb20a1568a462ab44b5d4cb63b504907"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+      "previous": "50888389971d81a765bc00b3607baa26cc5e9982f5679779e3d87cbebbfa4585",
+      "current": "f25fab26ad12dbbfd78890392960c4f2a8b3909ed6ba5a6627ff696172ddee38"
+    }
+  }
+}

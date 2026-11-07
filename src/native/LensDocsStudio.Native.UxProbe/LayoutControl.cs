@@ -28,6 +28,7 @@ internal static class LayoutControl
     {
         var fixtures = Path.GetFullPath(args[1]); var output = Path.GetFullPath(args[2]);
         var mode = args.FirstOrDefault(a => a.StartsWith("--mode=", StringComparison.Ordinal))?[7..] ?? "Continuous";
+        var zoom = double.Parse(args.FirstOrDefault(a => a.StartsWith("--zoom=", StringComparison.Ordinal))?[7..] ?? "100", System.Globalization.CultureInfo.InvariantCulture);
         using var contrast = args.Contains("--high-contrast") ? new NativeTestHighContrast() : null;
         if (Directory.Exists(output)) throw new IOException("Use a fresh controlled evidence directory.");
         Directory.CreateDirectory(output);
@@ -61,6 +62,12 @@ internal static class LayoutControl
             if (!Result().TextMap.TryPreviewRange(source.IndexOf("ReadableEnd", StringComparison.Ordinal), 11, out var first, out _)) throw new IOException("Distant source map missing.");
             return first!;
         }
+        double ContextSpan()
+        {
+            if (!Result().TextMap.TryPreviewRange(source.IndexOf("Distant target", StringComparison.Ordinal), 14, out var first, out _))
+                throw new IOException("Distant heading source map missing.");
+            return End().GetCharacterRect(LogicalDirection.Forward).Top - first!.GetCharacterRect(LogicalDirection.Forward).Top;
+        }
         async Task Until(Func<bool> predicate)
         {
             var clock = Stopwatch.StartNew();
@@ -88,14 +95,18 @@ internal static class LayoutControl
                 await model.InitialiseAsync([sourcePath]); Call("ApplyTheme"); Call("ApplyReadingPreferences");
                 Call("BindActiveDocument"); Call("SetLayout", "Split");
                 await (Task)Call("UpdatePreviewAsync", false)!;
+                preview.Zoom = zoom;
                 await Until(() => Field("rendered") is PreviewResult && preview.IsMeasureValid && preview.IsArrangeValid && (mode == "Pages" || End().HasValidLayout) && VisibleText());
                 // Select a real source-mapped end position, then let normal scroll layout settle.
                 await PreviewNavigationService.BringIntoViewAsync(preview, End());
                 await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
                 await Until(() => End().GetCharacterRect(LogicalDirection.Forward).Bottom <= preview.ActualHeight && VisibleText());
                 facts.Add(Snapshot("split-at-end"));
+                var readingPosition = End().GetCharacterRect(LogicalDirection.Forward).Top;
+                var contextSpan = ContextSpan();
                 var document = preview.Document;
                 Call("SetLayout", "Preview");
+                if (!args.Contains("--expect-displacement")) Call("SetLayout", "Preview"); // Re-select while presentation is pending.
                 if (!args.Contains("--expect-displacement") && mode != "Pages" && model.PreviewStatus.StartsWith("Preview updated", StringComparison.Ordinal))
                     throw new IOException("An unfinished reflow falsely announced an updated preview.");
                 await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
@@ -106,19 +117,26 @@ internal static class LayoutControl
                 if (!args.Contains("--expect-displacement"))
                 {
                     await Until(() => !AutomationProperties.GetItemStatus(preview).StartsWith("Busy", StringComparison.Ordinal) && VisibleText());
+                    if (mode != "Pages" && Math.Abs(End().GetCharacterRect(LogicalDirection.Forward).Top - readingPosition) > Math.Abs(ContextSpan() - contextSpan) + 2)
+                        throw new IOException("Reflow changed the visible reading position at the selected zoom.");
                     var owner = model.ActiveDocument!;
                     preview.Selection.Select(End(), End().GetPositionAtOffset(11));
                     editor.Select(4, 5); var caret = editor.CaretOffset;
                     foreach (var layout in new[] { "Split", "Editor", "Preview", "Split", "Preview" })
                     {
+                        if (preview.IsVisible) { readingPosition = End().GetCharacterRect(LogicalDirection.Forward).Top; contextSpan = ContextSpan(); }
                         Call("SetLayout", layout);
                         if (layout == "Editor") continue;
                         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
                         await Until(() => !AutomationProperties.GetItemStatus(preview).StartsWith("Busy", StringComparison.Ordinal)
-                            && VisibleText() && End().GetCharacterRect(LogicalDirection.Forward).Bottom <= preview.ActualHeight);
+                            && VisibleText() && End().GetCharacterRect(LogicalDirection.Forward).Top < preview.ActualHeight);
                         if (preview.Document != document || editor.CaretOffset != caret || editor.SelectionStart != 4 || editor.SelectionLength != 5
                             || preview.Selection.Text != "ReadableEnd" || editor.Text != source)
                             throw new IOException("Layout reflow changed independent selection, caret, source or document ownership.");
+                        // At high zoom the preceding heading can wrap onto another
+                        // line; account for that measured change in source geometry.
+                        if (mode != "Pages" && Math.Abs(End().GetCharacterRect(LogicalDirection.Forward).Top - readingPosition) > Math.Abs(ContextSpan() - contextSpan) + 2)
+                            throw new IOException("Repeated reflow changed the visible reading position at the selected zoom.");
                         facts.Add(Snapshot("retained-" + layout));
                     }
                     // Supersede queued reflows before their callbacks can run.
@@ -144,7 +162,7 @@ internal static class LayoutControl
                 }
                 Program.Write(output, "control.json", new { verdict = displaced ? "OBSERVED EMPTY TEXT VIEWPORT" : "VISIBLE TEXT", facts,
                     fixtureSha256 = Program.Hash(File.ReadAllBytes(sourcePath)),
-                    product = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion, mode,
+                    product = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion, mode, zoom,
                     highContrast = SystemParameters.HighContrast, osHighContrast = NativeTestHighContrast.IsEnabledNow,
                     scope = "Controlled off-screen natural WPF layout; no real input or physical display acceptance" });
                 code = displaced == args.Contains("--expect-displacement") ? 0 : 1;
