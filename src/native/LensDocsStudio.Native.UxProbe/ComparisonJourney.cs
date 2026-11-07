@@ -132,15 +132,20 @@ internal sealed partial class Probe
 
         if (scenario == "resize")
         {
-            await PointAt(await Ui(() => Tree(window).OfType<GridSplitter>().Single(e => e.IsVisible && AutomationProperties.GetName(e) == "Resize comparison panes")));
+            var splitter = await Ui(() => Tree(window).OfType<GridSplitter>().Single(e => e.IsVisible && AutomationProperties.GetName(e) == "Resize comparison panes"));
+            await PointAt(splitter);
             Desktop.Click();
-            for (var i = 0; i < 8; i++) Desktop.Key(0x27);
-            await Until(() => ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
+            await Until(() => splitter.IsKeyboardFocusWithin);
+            var before = await Ui(() => preview.RenderSize);
+            var direction = await Ui(() => splitter.ResizeDirection == GridResizeDirection.Rows ? (ushort)0x28 : (ushort)0x27);
+            for (var i = 0; i < 8; i++) Desktop.Key(direction);
+            await Until(() => preview.RenderSize != before && ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
             await ComparisonEvidence("resized-comparison");
             await PointAt(await Ui(() => Tree(window).OfType<Button>().First(e => e.IsVisible && AutomationProperties.GetName(e) == "Zoom in")));
-            Desktop.Click(); await Until(() => preview.Zoom > 100 && ComparisonReady(first, false));
+            Desktop.Click(); await Until(() => preview.Zoom > 100 && ComparisonReady(first, false, "ReadableEnd"));
             await ComparisonEvidence("zoomed-comparison");
-            await ClickControl("PreviewZoomLabel"); await Until(() => preview.Zoom == 100 && ComparisonReady(first, false));
+            await ClickControl("PreviewZoomLabel"); await Until(() => preview.Zoom == 100 && ComparisonReady(first, false, "ReadableEnd"));
+            await ComparisonEvidence("restored-comparison-zoom");
         }
         if (scenario == "pending")
         {

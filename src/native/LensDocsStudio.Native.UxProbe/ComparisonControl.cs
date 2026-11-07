@@ -46,7 +46,8 @@ internal static class ComparisonControl
         ThemeService.Apply(app.Resources, "System");
         var dialogs = new DesktopDialogs();
         using var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), dialogs);
-        var window = new MainWindow(model, dialogs, []) { Width = 1440, Height = 900, Left = -20000, Top = -20000,
+        var compact = args.Contains("--compact");
+        var window = new MainWindow(model, dialogs, []) { Width = compact ? 1024 : 1440, Height = compact ? 720 : 900, Left = -20000, Top = -20000,
             ShowActivated = false, ShowInTaskbar = false, WindowStartupLocation = WindowStartupLocation.Manual };
         var loaded = typeof(MainWindow).GetMethod("WindowLoaded", BindingFlags.Instance | BindingFlags.NonPublic)!;
         window.Loaded -= (RoutedEventHandler)loaded.CreateDelegate(typeof(RoutedEventHandler), window);
@@ -117,7 +118,31 @@ internal static class ComparisonControl
                 await Until(() => EndVisible(false, first) && EndVisible(true, second));
                 facts.Add(Snapshot("comparison-deep-primary", false, first));
                 facts.Add(Snapshot("comparison-deep-secondary", true, second));
-                if (scenario == "switch")
+                if (scenario == "findchrome")
+                {
+                    Call("ShowFind", false);
+                    await Until(() => EndVisible(false, first));
+                    facts.Add(Snapshot("find-open", false, first));
+                    Call("HideFind");
+                    await Until(() => EndVisible(false, first));
+                    facts.Add(Snapshot("find-closed", false, first));
+                }
+                if (scenario == "zoom")
+                {
+                    Call("PreviewZoomChanged", new Button { Tag = "in" }, new RoutedEventArgs());
+                    await Until(() => EndVisible(false, first));
+                    facts.Add(Snapshot("zoomed-primary", false, first));
+                    Call("ResetPreviewZoom", new Button(), new RoutedEventArgs());
+                    await Until(() => EndVisible(false, first));
+                    facts.Add(Snapshot("zoom-restored-primary", false, first));
+                }
+                if (scenario == "selection")
+                {
+                    var firstEnd = End(false, source); preview.Selection.Select(firstEnd, firstEnd.GetPositionAtOffset(11));
+                    var secondEnd = End(true, secondSource); Reader(true).Selection.Select(secondEnd, secondEnd.GetPositionAtOffset(11));
+                    editor.Select(4, 5);
+                }
+                if (scenario is "switch" or "selection" or "findchrome")
                 {
                     Call("ActivateComparison", 1, false);
                     await Until(() => EndVisible(false, second) && EndVisible(true, first));
@@ -125,15 +150,19 @@ internal static class ComparisonControl
                     facts.Add(Snapshot("switched-secondary", true, first));
                     Call("ActivateComparison", 0, false);
                     await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                    if (scenario == "selection" && (preview.Selection.Text != "ReadableEnd" || Reader(true).Selection.Text != "ReadableEnd"
+                        || editor.SelectionStart != 4 || editor.SelectionLength != 5))
+                        throw new IOException("Pane activation lost independent preview/editor selection.");
                     facts.Add(Snapshot("returned-primary", false, first));
                 }
                 if (scenario == "resize")
                 {
                     var splitter = (GridSplitter)Field("comparisonSplitter")!;
+                    var before = preview.RenderSize;
                     for (var i = 0; i < 8; i++) splitter.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice,
-                        PresentationSource.FromVisual(window), 0, Key.Right) { RoutedEvent = Keyboard.KeyDownEvent });
+                        PresentationSource.FromVisual(window), 0, splitter.ResizeDirection == GridResizeDirection.Rows ? Key.Down : Key.Right) { RoutedEvent = Keyboard.KeyDownEvent });
                     await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
-                    await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                    await Until(() => preview.RenderSize != before && EndVisible(false, first) && EndVisible(true, second));
                     facts.Add(Snapshot("resized-primary", false, first));
                     facts.Add(Snapshot("resized-secondary", true, second));
                 }
@@ -150,7 +179,7 @@ internal static class ComparisonControl
                 if (preview.Document != attached || model.ActiveDocument != first || editor.Text != source || second.EditorDocument.Text != secondSource
                     || File.ReadAllText(firstPath) != source || File.ReadAllText(secondPath) != secondSource)
                     throw new IOException("Comparison closure changed source or current document ownership.");
-                Program.Write(output, "control.json", new { verdict = "PASS", scenario, mode, zoom, facts,
+                Program.Write(output, "control.json", new { verdict = "PASS", scenario, mode, zoom, compact, facts,
                     fixtureSha256 = Program.Hash(File.ReadAllBytes(Path.Combine(fixtures, "mixed.md"))),
                     product = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
                     highContrast = SystemParameters.HighContrast, osHighContrast = NativeTestHighContrast.IsEnabledNow,
