@@ -1,0 +1,128 @@
+{
+  "atUtc": "2026-11-07T10:38:47.2277198+00:00",
+  "scope": "VALIDATION_PROCESS_PRE_ASSERTION; capture application not yet launched",
+  "revisionArgument": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+  "githubSha": "81c1b27efc011a62b713a07d0ddf161140ef0d33",
+  "runId": "42363211828",
+  "attempt": "1",
+  "runnerImage": "win25-vs2026",
+  "imageVersion": "20261103.298.1",
+  "os": "Microsoft Windows 10.0.26100",
+  "osVersion": "Microsoft Windows NT 10.0.26100.0",
+  "runtime": ".NET 10.0.13",
+  "processId": 4472,
+  "sessionId": 2,
+  "harness": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\appearance-probe\\LensDocsStudio.Native.Validation.dll",
+    "sha256": "fbe9b5d47a91c89f2e733b7950c34c39e548b5e23ad3165a20c4b62de37f6328",
+    "version": "0.1.0-preview.1\u002Be18b081aa53fca14d5db110e6624d5ccbe4580e3"
+  },
+  "themeAssembly": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\appearance-probe\\LensDocsStudio.Native.dll",
+    "sha256": "7768e6155928915c2fd1642bc40230551e11e4af632c615fae7370a17c0a8aac",
+    "version": "0.1.0-preview.1\u002B99349d82eb06960eb1f9785cf384db2373aed4fa"
+  },
+  "wpf": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\appearance-runtime\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+    "sha256": "c6950a0d6addfb7a365c11fe0aa82a4677043a263102f1779aa9be8fd3624019",
+    "version": "10.0.13-servicing.26504.104\u002B4099f83977f4d29604a9aeb971fb0a7bc1d5f699"
+  },
+  "targetExecutable": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\appearance-probe\\LensDocsStudio.Native.exe",
+    "sha256": "41966b8bd806091c5d16a910ee711a822e899ffd8dfd0f733da271d5b071d27e",
+    "version": "0.1.0-preview.1\u002B99349d82eb06960eb1f9785cf384db2373aed4fa"
+  },
+  "targetAssembly": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\appearance-probe\\LensDocsStudio.Native.dll",
+    "sha256": "7768e6155928915c2fd1642bc40230551e11e4af632c615fae7370a17c0a8aac",
+    "version": "0.1.0-preview.1\u002B99349d82eb06960eb1f9785cf384db2373aed4fa"
+  },
+  "requestedTheme": "System",
+  "wpfHighContrast": true,
+  "osHighContrast": true,
+  "themeDictionaries": [
+    "pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.HC.xaml"
+  ],
+  "pressedText": {
+    "effective": {
+      "argb": "#FF263B50",
+      "A": 255,
+      "R": 38,
+      "G": 59,
+      "B": 80
+    },
+    "requested": {
+      "argb": "#FF263B50",
+      "A": 255,
+      "R": 38,
+      "G": 59,
+      "B": 80
+    },
+    "bindingStatus": "Active",
+    "IsFrozen": false
+  },
+  "pressedBackground": {
+    "effective": {
+      "argb": "#FF0078D4",
+      "A": 255,
+      "R": 0,
+      "G": 120,
+      "B": 212
+    },
+    "requested": {
+      "argb": "#FF0078D4",
+      "A": 255,
+      "R": 0,
+      "G": 120,
+      "B": 212
+    },
+    "bindingStatus": "Active",
+    "IsFrozen": false
+  },
+  "wpfHighlightText": {
+    "argb": "#FF263B50",
+    "A": 255,
+    "R": 38,
+    "G": 59,
+    "B": 80
+  },
+  "wpfHighlight": {
+    "argb": "#FF0078D4",
+    "A": 255,
+    "R": 0,
+    "G": 120,
+    "B": 212
+  },
+  "win32HighlightText": {
+    "argb": "#FF263B50",
+    "A": 255,
+    "R": 38,
+    "G": 59,
+    "B": 80
+  },
+  "win32Highlight": {
+    "argb": "#FF8EE3F0",
+    "A": 255,
+    "R": 142,
+    "G": 227,
+    "B": 240
+  },
+  "pressedContrast": 2.542596386238992,
+  "wpfContrast": 2.542596386238992,
+  "win32Contrast": 7.893273424942036,
+  "foregroundEqualsWpfHighlightText": true,
+  "requiredContrast": 4.5,
+  "screenshotInputs": {
+    "themes": [
+      "System"
+    ],
+    "sizes": [
+      "860x540",
+      "1280x800",
+      "1440x900",
+      "1920x1080"
+    ],
+    "source": "Unchanged synthetic Documentation workspace fixture in NativeUxScreenshots.cs",
+    "capturesStarted": false
+  }
+}

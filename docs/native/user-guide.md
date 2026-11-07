@@ -267,7 +267,7 @@ Choose **File → Open beside…** after opening two documents. Select a documen
 
 Scroll is independent by default. Enable **Synchronise scroll** for proportional scrolling between continuous views; paged native readers retain independent page navigation. Adjust the pane widths (Web) or drag/keyboard-operate the divider (Native). Narrow windows stack the panes vertically. Preview navigation resolves links from the owning document. **Close comparison** restores the previous single-document layout without closing or saving either document. Existing external-change checks and recovery still apply. Comparison arrangement is session-only; reopened documents retain the normal recovery contract.
 
-Preview retains a source reading position when changing layout or zoom, opening or closing Find, resizing or switching comparison panes, and closing comparison. Continuous and Pages modes retain a visible navigation target as the viewport changes. Each document keeps its own editor selection, preview selection and Find query; a layout operation does not save either file. A pending layout reports that it is updating until the current source position is visible.
+Preview retains a source reading position when changing layout or zoom, opening or closing Find, resizing or switching comparison panes, and closing comparison. Continuous and Pages modes retain a visible navigation target as the viewport changes. Reading positions also follow source edits and Undo/Redo. Each document keeps its own editor selection, preview selection and Find query; a layout operation does not save either file. A pending layout reports that it is updating until the current source position is visible.
 
 ## Getting started
 
