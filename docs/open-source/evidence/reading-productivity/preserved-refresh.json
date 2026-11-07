@@ -72,7 +72,7 @@
     },
     "docs/native/user-guide.md": {
       "previous": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327",
-      "current": "c7dd359b08fa21d5753172b2c736fcf30a85ea4f1e928cb7c61f0f19a0b897c5"
+      "current": "3f208ce8d7fb142d87c7519941d66c3ff070e7b6d7ec76a2b0ba9070d885de4b"
     },
     "docs/native/validation-report.md": {
       "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
@@ -160,7 +160,7 @@
     },
     "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
       "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
-      "current": "f7eabf602da245662aae19f64db5f3a78c127c41ecaa67dbfe1806137c6e9053"
+      "current": "f060cbd75ccdc569704128e30247b1cc558ee28fa08b9a254c60156d7391a6d9"
     },
     "src/native/LensDocsStudio.Native/MainWindow.WorkspaceChrome.cs": {
       "previous": "b80ada80d49aa569100a3ef1e67da1a2e49b81d994f997da2959575b9b58f748",

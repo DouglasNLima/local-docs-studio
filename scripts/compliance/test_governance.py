@@ -11,7 +11,7 @@ from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_
 from rights_ledger import boundary
 from check_foundation import documentation_links
 from licence_scope import (ROOT, SCOPE, validate_licence, validate_scope,
-                           validate_metadata, validate_preserved, apply_find_caret_refresh, apply_selection_sync_refresh, apply_reading_productivity_refresh)
+                           validate_metadata, validate_preserved, apply_find_caret_refresh, apply_selection_sync_refresh, apply_reading_productivity_refresh, apply_preview_reflow_refresh)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -227,6 +227,33 @@ class ScopedLicenceTests(unittest.TestCase):
         actual['assets/scripts/files/file-service.js'] = '0' * 64
         with self.assertRaises(ValueError):
             validate_preserved(updated, actual)
+
+    def test_preview_reflow_refresh_preserves_historical_and_acceptance_pins(self):
+        preserved = json.loads((EVIDENCE / 'preserved-files.json').read_text())['sha256']
+        for directory, apply in [('find-caret', apply_find_caret_refresh), ('selection-sync', apply_selection_sync_refresh),
+                                 ('reading-productivity', apply_reading_productivity_refresh)]:
+            preserved = apply(preserved, json.loads((ROOT / ('docs/open-source/evidence/' + directory + '/preserved-refresh.json')).read_text()))
+        refresh = json.loads((ROOT / 'docs/open-source/evidence/preview-reflow-integration/preserved-refresh.json').read_text())
+        updated = apply_preview_reflow_refresh(preserved, refresh)
+        self.assertEqual({p: v for p, v in preserved.items() if p not in refresh['files']},
+                         {p: v for p, v in updated.items() if p not in refresh['files']})
+        for mutation in ('baseline', 'previous', 'missing', 'notice', 'performance', 'digest'):
+            changed = copy.deepcopy(refresh)
+            path = 'src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs'
+            if mutation == 'baseline':
+                changed['baseCommit'] = '0' * 40
+            elif mutation == 'previous':
+                changed['files'][path]['previous'] = '0' * 64
+            elif mutation == 'missing':
+                del changed['files'][path]
+            elif mutation == 'notice':
+                changed['files']['LICENSE'] = changed['files'][path]
+            elif mutation == 'performance':
+                changed['files']['src/native/LensDocsStudio.Native.Validation/ContinuousPreviewPerformanceChecks.cs'] = changed['files'][path]
+            else:
+                changed['files'][path]['current'] = 'not-a-digest'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                apply_preview_reflow_refresh(preserved, changed)
 
     def test_rejects_continuous_check_in_ordinary_integration(self):
         payload = json.loads((CONFIG / 'develop-ruleset.json').read_text())

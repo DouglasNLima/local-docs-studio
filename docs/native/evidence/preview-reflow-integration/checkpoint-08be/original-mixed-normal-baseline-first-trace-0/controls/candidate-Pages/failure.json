@@ -1,0 +1,36 @@
+{
+  "error": "System.TimeoutException: Controlled semantic response was not observed within 30 seconds.\r\n   at LensDocsStudio.Native.UxProbe.LayoutControl.\u003CRun\u003Eg__Until|0_8(Func\u00601 predicate) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.UxProbe\\LayoutControl.cs:line 75\r\n   at LensDocsStudio.Native.UxProbe.LayoutControl.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CRun\u003Eb__11\u003Ed.MoveNext() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.UxProbe\\LayoutControl.cs:line 113",
+  "facts": [
+    {
+      "stage": "split-at-end",
+      "layout": "Split",
+      "previewStatus": "Preview updated in 433 ms",
+      "sourceMatches": true,
+      "sameAttachedDocument": true,
+      "isVisible": true,
+      "isMeasureValid": true,
+      "isArrangeValid": true,
+      "verticalOffset": null,
+      "extentHeight": null,
+      "viewportHeight": null,
+      "actualWidth": 384,
+      "actualHeight": 402.49,
+      "end": "28,228.66666666666666,0,19.950000000000003",
+      "textPatternVisible": true,
+      "media": [
+        {
+          "actualWidth": 285.53000000000003,
+          "actualHeight": 285.53000000000003,
+          "isVisible": false,
+          "bounds": null
+        },
+        {
+          "actualWidth": 328,
+          "actualHeight": 94.79178026703227,
+          "isVisible": true,
+          "bounds": "28,34,328,94.79178026703227"
+        }
+      ]
+    }
+  ]
+}

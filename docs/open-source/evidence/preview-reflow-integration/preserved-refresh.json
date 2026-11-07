@@ -1,0 +1,18 @@
+{
+  "baseCommit": "75de42474514af0e7a6e521235a6517f4acad14b",
+  "purpose": "Source-position integration only; original notices, historical evidence and acceptance gate bytes remain pinned.",
+  "files": {
+    "src/native/LensDocsStudio.Native/MainWindow.Find.cs": {
+      "previous": "9e8bcd8b2fbbcdf7d073a61f98b500e54c2c58dd6341e9dc506fab5fa6e7ac7e",
+      "current": "373d669137bf0f6b026a53db7e0f954d1d772fd5c35acc89ce5a43066e50f7bb"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Zoom.cs": {
+      "previous": "56ed43dbeecd78f474d941e686df74092e66bcc4063a6a8099d7fa4c6c306fd5",
+      "current": "44c2cf8198b998436c441f189750c5ce6f7cc1bcdfbd2fa3c2cd5250d6559354"
+    },
+    "src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs": {
+      "previous": "3bf9d9a067c433463da1d8a8939e229161d5148d5bc9d643f195486a55d19678",
+      "current": "50d540006485a29a6ba00509906d6658b29eab8c1b51b0c1ad4d4d92c7f9b8eb"
+    }
+  }
+}

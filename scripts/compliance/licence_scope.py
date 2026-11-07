@@ -170,6 +170,25 @@ def apply_reading_productivity_refresh(preserved, refresh):
     return result
 
 
+def apply_preview_reflow_refresh(preserved, refresh):
+    allowed = {
+        'src/native/LensDocsStudio.Native/MainWindow.Find.cs',
+        'src/native/LensDocsStudio.Native/MainWindow.Zoom.cs',
+        'src/native/LensDocsStudio.Native/Rendering/PreviewNavigationService.cs',
+    }
+    require(refresh['baseCommit'] == '75de42474514af0e7a6e521235a6517f4acad14b',
+            'Preview integration must identify the exact original PR #76 source')
+    require(set(refresh['files']) == allowed, 'Preview integration must retain its exact reviewed source scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'Preview integration changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'Preview integration requires an exact canonical source digest: ' + path)
+        result[path] = entry['current']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -215,6 +234,8 @@ def main():
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
     reading_refresh = json.loads((ROOT / 'docs/open-source/evidence/reading-productivity/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_reading_productivity_refresh(preserved, reading_refresh)
+    reflow_refresh = json.loads((ROOT / 'docs/open-source/evidence/preview-reflow-integration/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_preview_reflow_refresh(preserved, reflow_refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}
