@@ -22,6 +22,11 @@ test('accepted interruption must cancel its own task and cannot publish stale Re
   }
   assert.equal(qualifyInterruption({...pending(),staleReady:1},native),'FAIL');
 });
+test('keyboard qualification needs the native key-down before WPF consumes it',()=> {
+  const data=pending();data.deliveries[0].action='find';
+  assert.equal(qualifyInterruption(data,[{...native[0],message:0x101,key:27}]),'INCONCLUSIVE');
+  assert.equal(qualifyInterruption(data,[{...native[0],message:0x100,key:27,source:'thread-filter'}]),'PASS');
+});
 function state() {
   const reader={isVisible:true,currentOwner:true,attachedMatches:true,itemStatus:'Ready',isMeasureValid:true,isArrangeValid:true,source:40,
     textPattern:[{meaningful:true,rectangles:[1,2,3,4]}],mode:'Page',pageNumber:4,pageCount:5,nativePage:4,nativeCount:5,pageText:'Page 4 of 5',pageUia:'Page 4 of 5'};
@@ -33,4 +38,11 @@ test('semantic Ready does not conceal stale page counters, UIA, ownership or mis
     const data=state();Object.assign(data.secondary,patch);assert.ok(checkPresentation(data).length);
   }
   const data=state();data.statusText='Preview layout changed';assert.ok(checkPresentation(data).length);
+});
+test('an unfinished independent pane is not completion evidence and Ready still requires full checks',()=> {
+  const data=state();Object.assign(data.secondary,{itemStatus:'Busy; comparison preview is being updated',currentOwner:false,textPattern:[]});
+  assert.ok(checkPresentation(data).length);
+  assert.deepEqual(checkPresentation(data,['primary']),[]);
+  data.secondary.itemStatus='Ready';assert.ok(checkPresentation(data,['primary']).length);
+  data.primary.currentOwner=false;assert.ok(checkPresentation(data,['primary']).length);
 });

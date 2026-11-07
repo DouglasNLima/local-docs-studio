@@ -4,7 +4,7 @@
   "files": {
     ".gitattributes": {
       "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
-      "current": "d5a8adb58be2e3a9ce64831a1b0e4c1a227ca5f5cc41ab7dd5294711c34e682e"
+      "current": "585c8645c5a5edb4340d8285440ab5a0cd7c4321f65fda5f34e203e4a659a94f"
     },
     ".github/workflows/native.yml": {
       "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
@@ -60,23 +60,23 @@
     },
     "docs/native/architecture-decisions.md": {
       "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
-      "current": "1434a349c364120b3fcd34bc6435e472c7497528d82ea713d98865fcec0b57fb"
+      "current": "85aabfcb8d1bf667c761c9d687c8e4423a65e5a26916c275aca16c51e0e11149"
     },
     "docs/native/functional-parity-matrix.md": {
       "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
-      "current": "f5ebf2b326a486cd437a390bdd5a1390726d4328431930d5978ba786a3723b0c"
+      "current": "bd204c56be0e1120a146d01d49ce64c5dcacc29001acaad71f3a234784ce03f9"
     },
     "docs/native/implementation-progress.md": {
       "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
-      "current": "74d2072d821721cda7ea00234e0e43176868e9234ca65b930a0d7d7148996c34"
+      "current": "897113e81fd76ffe4a35cc52f35d11050871cbde6b9936b454addfa32ceca2e2"
     },
     "docs/native/user-guide.md": {
       "previous": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327",
-      "current": "d5daef4ae5ca048aea39e38a1313ec7e54214ba2ac905d390038cb84512167db"
+      "current": "f6e5daaeda79670f784f7edd4dca0443f8b503ef934dcc5cfcbd5b840b4fa5a2"
     },
     "docs/native/validation-report.md": {
       "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
-      "current": "044a611cc83d4798ef5c880940c694f0823cac35cfb00a3cfe595eebab02b1cd"
+      "current": "978745fc4366b3186ab85317d8e720543fcc85ab6430dd602d59c46e01e4ff0e"
     },
     "docs/tool-guide.md": {
       "previous": "70945830852bf75c68f35284fe56416a1422fdfa5af731c26e27ac2039833d04",

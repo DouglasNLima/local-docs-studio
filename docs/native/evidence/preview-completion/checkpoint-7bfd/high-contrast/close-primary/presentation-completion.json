@@ -1,0 +1,57 @@
+{
+  "functional": "PASS",
+  "scenario": "close",
+  "target": "primary",
+  "mode": "Pages",
+  "instrumented": true,
+  "verdict": {
+    "pendingInterruption": "PASS",
+    "qualifiedDeliveries": 1,
+    "cancellationsVerified": true,
+    "staleReady": 0,
+    "offeredOperation": 50524846,
+    "deliveries": [
+      {
+        "tick": 1947753194,
+        "operation": 50524846,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      }
+    ],
+    "operations": [
+      {
+        "id": 50524846,
+        "reader": "primary",
+        "start": 1947647298,
+        "end": 1948148351,
+        "cancelled": 1947768904,
+        "outcome": "rejected"
+      },
+      {
+        "id": 15873365,
+        "reader": "secondary",
+        "start": 1947649565,
+        "end": 1948100035,
+        "cancelled": 1947774027,
+        "outcome": "rejected"
+      },
+      {
+        "id": 22684935,
+        "reader": "primary",
+        "start": 1948214818,
+        "end": 1948861764,
+        "cancelled": null,
+        "outcome": "restored"
+      }
+    ]
+  },
+  "sourceIntegrity": "PASS",
+  "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "elapsedMs": 6615.9015,
+  "pixelAcceptance": "PENDING independent pixel correlation; no frame is discarded"
+}

@@ -26,28 +26,31 @@ internal sealed partial class Probe
     {
         object Reader(DocumentPreview reader, bool secondary)
         {
+            var started = Stopwatch.GetTimestamp();
             var result = Field<PreviewResult>(secondary ? "comparisonPreviewResult" : "rendered");
             var page = reader.Template?.FindName("PageNumber", reader) as Label;
             var native = Tree(reader).OfType<FlowDocumentPageViewer>().FirstOrDefault();
             var peer = UIElementAutomationPeer.CreatePeerForElement(reader);
-            var owner = secondary ? model.Documents.FirstOrDefault(d => d.Id == Field<Guid?>("comparisonRenderedId")) : model.ActiveDocument;
+            var owner = CompletionTrace.ExpectedOwner(window, model, secondary);
             var version = Field<ITextSourceVersion>(secondary ? "comparisonRenderedVersion" : "renderedVersion");
             var currentOwner = owner is not null && version is not null && version.BelongsToSameDocumentAs(owner.EditorDocument.Version)
-                && version.CompareAge(owner.EditorDocument.Version) == 0 && Field<Guid?>(secondary ? "comparisonRenderedId" : "renderedDocumentId") == owner.Id;
-            return new { itemStatus = AutomationProperties.GetItemStatus(reader), reader.IsVisible, reader.IsMeasureValid, reader.IsArrangeValid,
-                attachedMatches = reader.Document == result?.Document, currentOwner, owner = Field<Guid?>(secondary ? "comparisonRenderedId" : "renderedDocumentId"),
+                && version.CompareAge(owner.EditorDocument.Version) == 0 && Field<Guid?>(secondary ? "comparisonRenderedId" : "renderedDocumentId") == owner.Id
+                && (secondary || owner == model.ActiveDocument);
+            return new { started, itemStatus = AutomationProperties.GetItemStatus(reader), reader.IsVisible, reader.IsMeasureValid, reader.IsArrangeValid,
+                attachedMatches = reader.Document == result?.Document, currentOwner, owner = Field<Guid?>(secondary ? "comparisonRenderedId" : "renderedDocumentId"), expectedOwner = owner?.Id,
                 mode = reader.ViewingMode.ToString(), reader.PageNumber, reader.PageCount, nativePage = native?.MasterPageNumber, nativeCount = native?.PageCount,
                 pageText = page?.Content?.ToString(), pageUia = page is null ? null : UIElementAutomationPeer.CreatePeerForElement(page)?.GetName(),
                 source = reader.IsVisible ? result?.TextMap.VisibleSource(reader.ActualHeight) : null,
                 textPattern = reader.IsVisible && peer?.GetPattern(PatternInterface.Text) is ITextProvider provider
-                    ? provider.GetVisibleRanges().Select(r => new { meaningful = !string.IsNullOrWhiteSpace(r.GetText(128)), rectangles = r.GetBoundingRectangles() }).ToArray() : null };
+                    ? provider.GetVisibleRanges().Select(r => new { meaningful = !string.IsNullOrWhiteSpace(r.GetText(128)), rectangles = r.GetBoundingRectangles() }).ToArray() : null,
+                finished = Stopwatch.GetTimestamp() };
         }
         var label = (TextBlock)window.FindName("PreviewStatusLabel");
         return new { tick = Stopwatch.GetTimestamp(), active = model.ActiveDocument?.Id, model.PreviewStatus, statusText = label.Text,
             statusUia = UIElementAutomationPeer.CreatePeerForElement(label)?.GetName(),
             primary = Reader(preview, false), secondary = Reader(Field<DocumentPreview>("comparisonPreview")!, true),
             primaryPending = Field<object>("previewLayoutCancellation") is not null,
-            secondaryPending = Field<object>("comparisonLayoutCancellation") is not null };
+            secondaryPending = Field<object>("comparisonLayoutCancellation") is not null, finished = Stopwatch.GetTimestamp() };
     }
 
     private PixelRegion[] CompletionRegions()
@@ -69,18 +72,27 @@ internal sealed partial class Probe
         return regions.ToArray();
     }
 
-    private async Task CompletionFrames(string action, CompletionTrace? trace)
+    private static TimeSpan CompletionRemaining(long started)
     {
+        var remaining = TimeSpan.FromSeconds(ActionSeconds) - Stopwatch.GetElapsedTime(started);
+        if (remaining <= TimeSpan.Zero) throw new TimeoutException("Completion observation exceeded the unchanged 30-second deadline.");
+        return remaining;
+    }
+
+    private async Task CompletionFrames(string action, CompletionTrace? trace, string[]? completedReaders = null, long? origin = null)
+    {
+        completedReaders ??= ["primary", "secondary"];
+        var started = origin ?? Stopwatch.GetTimestamp();
         // Exactly three captures, declared before collection. The first is never
         // replaced. Later frames explain a boundary; they cannot erase a mismatch.
-        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task.WaitAsync(TimeSpan.FromSeconds(ActionSeconds));
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task.WaitAsync(CompletionRemaining(started));
         for (var frameIndex = 0; frameIndex < 3; frameIndex++)
         {
             long? committed = null;
             if (frameIndex == 1 && trace is not null)
             {
                 var pendingCommit = await Ui(trace.CommitAfterCurrentChanges);
-                committed = await pendingCommit.WaitAsync(TimeSpan.FromSeconds(ActionSeconds));
+                committed = await pendingCommit.WaitAsync(CompletionRemaining(started));
             }
             var before = await Ui(CompletionState);
             var regions = await Ui(CompletionRegions);
@@ -97,9 +109,11 @@ internal sealed partial class Probe
                 using var file = File.Create(Path.Combine(output, stem + "-" + region.Name + ".png")); encoder.Save(file);
             }
             completionCaptures.Add(new { action, frameIndex, file = stem + ".png", frame.Sha256, frame.Started, frame.DwmReturned,
-                frame.PixelsStarted, frame.PixelsFinished, committed, before, after, regions,
+                frame.PixelsStarted, frame.PixelsFinished, committed, before, after, regions, completedReaders,
+                observationStarted = started, observationDeadlineSeconds = ActionSeconds,
                 scope = "Displayed desktop pixels; DWM surface flush is not physical monitor scan-out" });
             Program.Write(output, "completion-captures.json", completionCaptures);
+            _ = CompletionRemaining(started);
         }
     }
 
@@ -108,9 +122,16 @@ internal sealed partial class Probe
         currentAction = label;
         await PointAt(preview); Desktop.Click(); await Until(() => preview.IsKeyboardFocusWithin);
         Desktop.Key(0x46, 0x11); await Until(() => ((FrameworkElement)window.FindName("FindText")).IsVisible);
-        Desktop.Key(0x41, 0x11); Desktop.Text("ReadableEnd"); Desktop.Key(0x0D);
-        await Until(() => FindQueryReady("ReadableEnd", 1) && ComparisonReady(owner, false, "ReadableEnd"));
-        await CompletionFrames(label, trace);
+        Desktop.Key(0x41, 0x11);
+        var started = Stopwatch.GetTimestamp(); Desktop.Text("ReadableEnd"); Desktop.Key(0x0D);
+        await Until(() => FindQueryReady("ReadableEnd", 1) && ComparisonReady(owner, false, "ReadableEnd")).WaitAsync(CompletionRemaining(started));
+        // Preserve the original active-reader boundary, even while the other
+        // reader truthfully reports Busy. Its completion is qualified separately.
+        await CompletionFrames(label, trace, ["primary"], started);
+        var other = await Ui(() => model.Documents.Single(document => document != owner));
+        await Until(() => ComparisonReady(owner, false, "ReadableEnd") && ComparisonReady(other, true)
+            && Field<object>("previewLayoutCancellation") is null && Field<object>("comparisonLayoutCancellation") is null).WaitAsync(CompletionRemaining(started));
+        await CompletionFrames(label + "-all-readers", trace, origin: started);
         Desktop.Key(0x1B); await Until(() => !((FrameworkElement)window.FindName("FindBar")).IsVisible
             && ComparisonReady(owner, false, "ReadableEnd"));
     }
@@ -200,7 +221,7 @@ internal sealed partial class Probe
         }
         finally
         {
-            if (trace is not null) await Ui(() => { trace.Save(output); trace.Dispose(); });
+            if (trace is not null) await Ui(() => { try { trace.Save(output); } finally { trace.Dispose(); } });
         }
     }
 }

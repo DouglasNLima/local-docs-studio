@@ -1,6 +1,6 @@
 # Native implementation progress
 
-The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. Its diagnostics do not change presentation behaviour or acceptance thresholds; exact final verdicts remain in Goal #75 and Draft PR #76.
+The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. The first diagnostic checkpoint and its observer failures are preserved; pre-consumption keyboard observation, passive render commits and independent reader completion boundaries require a second finite campaign. Product presentation behaviour and acceptance thresholds remain unchanged; exact final verdicts remain in Goal #75 and Draft PR #76.
 
 ## PR #80 preview correction integrated into PR #76 — 7 November 2026
 

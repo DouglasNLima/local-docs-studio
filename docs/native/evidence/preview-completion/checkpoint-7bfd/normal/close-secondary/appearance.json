@@ -1,0 +1,15 @@
+{
+  "highContrast": false,
+  "osContrast": false,
+  "wpfHighContrast": false,
+  "foreground": "#FF202124",
+  "background": "#FFDDE1E6",
+  "ratio": 12.256016681911959,
+  "required": 4.5,
+  "win32Highlight": 13924352,
+  "win32Text": 16777215,
+  "wpfHighlight": "#FF0078D4",
+  "wpfText": "#FFFFFFFF",
+  "verdict": "NOT RUN",
+  "scope": "FIRST PROBE HOST PALETTE; distinct from the unchanged historical pre-assertion test"
+}

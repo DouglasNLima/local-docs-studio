@@ -18,10 +18,10 @@ $fixtures = [IO.Path]::GetFullPath('tests/fixtures/native-ux')
 $protocol = [ordered]@{source=$revision;tree=(git rev-parse 'HEAD^{tree}').Trim();startingHead='06073c0bf5a10da6b93c8a26d6d2a8c89b4ce41d';mode=$Mode;appearance=$Appearance;
     binaries=@('LensDocsStudio.Native.UxProbe.dll','LensDocsStudio.Native.dll','LensDocsStudio.Core.dll') | ForEach-Object { @{file=$_;sha256=(Get-FileHash (Join-Path $binary $_)).Hash} };
     fixtureSha256=(Get-FileHash "$fixtures/mixed.md").Hash;manifestSha256=(Get-FileHash "$fixtures/manifest.json").Hash;
-    foregroundProcesses=11;controlledProcesses=4;fixedFramesPerBoundary=3;
+    foregroundProcesses=11;controlledProcesses=4;fixedFramesPerBoundary=3;pixelJourneyBoundaries=7;
     observationSeconds=30;childSeconds=240;privateBytes=2147483648;logBytes=16777216;
     qualification='An actual unfinished anchor task at WPF delivery, the same uncancelled layout token, subsequent cancellation and rejection; a late arrival is INCONCLUSIVE.';
-    pixelProtocol='Every boundary retains exactly three frames. First after semantic readiness and Background; second after observed natural WPF commit in traced runs; third at the next DWM capture. No pixel-dependent retries.';
+    pixelProtocol='Every boundary retains exactly three frames. First after semantic readiness and Background; second after observed natural WPF commit in traced runs; third at the next DWM capture. Active-reader Find and all-reader readiness are separate boundaries; both are retained. No pixel-dependent retries.';
     uninstrumented='No completion EventSource, property, input or compositor subscriptions. Functional and pixel evidence only; no pending-interruption qualification.';
     noProductDelay=$true;image=$env:ImageVersion;runtimes=(dotnet --list-runtimes)}
 $protocol | ConvertTo-Json -Depth 8 | Set-Content "$evidence/protocol.json" -Encoding utf8NoBOM
