@@ -1,10 +1,5 @@
 # Lens Docs Studio native guide
 
-## PR #80 preview correction integrated into PR #76 — 7 November 2026
-
-The three reviewed source-position commits and focused comparison ownership/closure corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
-
-
 ER and Flowchart visual editors now offer **Arrange…** for separate visual
 positions without editing Mermaid. Navigate pans and inspects by default; select
 Arrange to drag nodes or use arrow keys on a selected node (Shift: one unit).
@@ -271,6 +266,8 @@ In the rendered diagram window, **left-click and drag** to pan after a small mov
 Choose **File → Open beside…** after opening two documents. Select a document and Editor or Preview in each pane's header. **Activate** makes that pane the target for Find, Undo/Redo, paste, Save, Save As and document export. Focusing the secondary source also activates it; the existing editor, its formatting controls and commands follow the active document. Each document retains its own buffer, selection, editing history and Find query. The inactive source is a view of that buffer, not another editable copy.
 
 Scroll is independent by default. Enable **Synchronise scroll** for proportional scrolling between continuous views; paged native readers retain independent page navigation. Adjust the pane widths (Web) or drag/keyboard-operate the divider (Native). Narrow windows stack the panes vertically. Preview navigation resolves links from the owning document. **Close comparison** restores the previous single-document layout without closing or saving either document. Existing external-change checks and recovery still apply. Comparison arrangement is session-only; reopened documents retain the normal recovery contract.
+
+Preview retains a source reading position when changing layout or zoom, opening or closing Find, switching comparison panes, and closing comparison. Pages mode retains a visible navigation target across repagination. Each document keeps its own editor selection, preview selection and Find query; a layout operation does not save either file. A pending layout reports that it is updating until the current source position is visible.
 
 ## Getting started
 
