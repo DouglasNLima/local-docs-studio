@@ -15,6 +15,7 @@ public sealed record DocumentReviewIssue(string Rule, ReviewSeverity Severity, s
 public sealed record DocumentReviewMetrics(int Words, int Headings, int Links, int Images, int Tables, int CodeBlocks, int Diagrams)
 {
     public int ReadingMinutes => Words == 0 ? 0 : Math.Max(1, (Words + 219) / 220);
+    public int Characters { get; init; }
 }
 public enum WorkspaceLinkReviewState { NotChecked, Complete, Incomplete }
 public sealed record DocumentReviewResult(DocumentReviewMetrics Metrics, IReadOnlyList<DocumentReviewIssue> Issues, bool Limited)
@@ -62,7 +63,7 @@ public sealed partial class DocumentReviewService
         else if (!standaloneMermaid && !parsed.Headings.Any(heading => heading.Level == 1))
             Add("Headings", ReviewSeverity.Warning, "Missing H1 title.", "Add a level-one heading to identify this document.", 0, 0);
         cancellationToken.ThrowIfCancellationRequested();
-        return new(new(words, headings, links, images, tables, code, diagrams), issues.OrderBy(issue => issue.Severity).ThenBy(issue => issue.Start).ToArray(), limited);
+        return new(new(words, headings, links, images, tables, code, diagrams) { Characters = DocumentStatisticsService.MeasureParsed(parsed, cancellationToken).Characters }, issues.OrderBy(issue => issue.Severity).ThenBy(issue => issue.Start).ToArray(), limited);
 
         void WalkBlocks(ContainerBlock container, int depth)
         {
@@ -133,7 +134,7 @@ public sealed partial class DocumentReviewService
         }
         void CountWords(string text)
         {
-            foreach (var match in Words().EnumerateMatches(text)) { cancellationToken.ThrowIfCancellationRequested(); words++; }
+            words += DocumentStatisticsService.CountWords(text, cancellationToken);
         }
         void ScanProse(SourceSpan span)
         {
@@ -177,6 +178,5 @@ public sealed partial class DocumentReviewService
         return starts;
     }
     private static string Short(string text) => text.Length > 160 ? text[..157] + "…" : text;
-    [GeneratedRegex(@"[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*", RegexOptions.CultureInvariant, 100)] private static partial Regex Words();
     [GeneratedRegex(@"\b[A-Za-z]+\b", RegexOptions.CultureInvariant, 100)] private static partial Regex Terms();
 }

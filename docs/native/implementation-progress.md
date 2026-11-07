@@ -1,5 +1,16 @@
 # Native implementation progress
 
+## PR #80 preview correction integrated into PR #76 — 7 November 2026
+
+The three reviewed source-position commits and focused comparison ownership, closure, Find-bar, divider, edited-source, cancelled-replacement and interrupted-Find completion corrections are integrated. See the [source review and bounded acceptance protocol](reading-preview-reflow-integration.md); Goal #75 and Draft PR #76 retain exact terminal evidence and independent gate verdicts. Release readiness remains **NO-GO** while any mandatory gate is FAIL or INCONCLUSIVE. Historical failures, the 250 ms threshold, actual OS High Contrast requirements and the inactive status of proposed ADR 007 are preserved.
+
+
+## Reading experience and productivity — 6 November 2026
+
+One consolidated Draft PR implements readable-buffer statistics, hierarchical H1–H6 outline/Copy TOC, contextual slash commands, two-document comparison, and a separately validated pinned-Mermaider flowchart correction. Web remains buildless/offline and Native remains WPF/AvalonEdit/Markdig/Mermaider 0.15.1. Shared command ownership and canonical buffers preserve persistence, recovery, independent Undo/Redo and conflict checks.
+
+Checkpoint evidence includes Chromium/Edge workflows, Core regressions and 42 cumulative compiled WPF/AvalonEdit/UIA-peer checks. The first complete Core consolidation found two compatibility regressions; both were corrected against unchanged historical tests. The complete corrected Core run passed 2,382 tests; earlier timing failures remain recorded. Final commit-specific results, workflow links, limitations and per-phase verdicts belong to the [consolidated engineering receipt](../engineering/reading-experience-receipt.md) and its Draft PR. Current release readiness is **NOT READY**. Historical Continuous 250 ms and High Contrast failures are unchanged; physical-machine, clean-install and physical screen-reader certification is NOT RUN.
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.
@@ -269,3 +280,6 @@ The original brief's completion clause allows explicit evidence-backed residual 
 [Historical progress through the application baseline](history/implementation-progress-through-7008751.md) preserves all prior milestones and failures. The [continuation handoff](continuation-handoff.md) describes how to resume only outstanding acceptance work when its required resources become available. Do not recreate the native project or repeat completed implementation.
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+
+Native hardening continuation from `adc68a9`: [investigation and acceptance](native-hardening-acceptance.md). Scope is P0/P1 remediation and independent unchanged-gate acceptance. Five functional workstreams remain intact; integration remains NO-GO pending final-source evidence.

@@ -63,6 +63,7 @@ public partial class MainWindow
         Preview.LayoutUpdated += PreviewLayoutUpdated;
         Editor.PreviewMouseWheel += UserScrollInput; Preview.PreviewMouseWheel += UserScrollInput;
         Editor.PreviewMouseDown += UserSelectionInput; Preview.PreviewMouseDown += UserSelectionInput;
+        Preview.PreviewKeyDown += UserPreviewNavigationInput;
         Editor.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
         Preview.AddHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted), true);
         Closed += (_, _) =>
@@ -74,6 +75,7 @@ public partial class MainWindow
             Preview.RemoveHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(PreviewScrollChanged));
             Editor.PreviewMouseWheel -= UserScrollInput; Preview.PreviewMouseWheel -= UserScrollInput;
             Editor.PreviewMouseDown -= UserSelectionInput; Preview.PreviewMouseDown -= UserSelectionInput;
+            Preview.PreviewKeyDown -= UserPreviewNavigationInput;
             Editor.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
             Preview.RemoveHandler(Mouse.MouseUpEvent, new MouseButtonEventHandler(SelectionInputCompleted));
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
@@ -100,6 +102,7 @@ public partial class MainWindow
     {
         TraceSelection("install-map");
         CancelSynchronisation(); renderedVersion = version;
+        previewLayoutAnchor = null; interruptedPreviewLayoutStatus = null;
         syncAnchors = rendered is null ? null : new(rendered);
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)
@@ -151,6 +154,7 @@ public partial class MainWindow
     }
     private void CancelSynchronisation([System.Runtime.CompilerServices.CallerMemberName] string reason = "")
     {
+        CancelPreviewLayout();
         TraceSelection("cancel " + reason);
         syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false; applyingSyncOrigin = null;
         PreviewNavigationService.CancelPending(Preview); EditorNavigationService.CancelPending(Editor); semanticHighlight?.Show(null);
@@ -162,6 +166,11 @@ public partial class MainWindow
     }
     private void UserSelectionInput(object sender, MouseButtonEventArgs e)
     { TraceSelection("mouse-down " + (ReferenceEquals(sender, Editor) ? "editor" : "preview")); CancelSynchronisation(); }
+    private void UserPreviewNavigationInput(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right or Key.PageUp or Key.PageDown or Key.Home or Key.End)
+            CancelSynchronisation();
+    }
     private void SelectionInputCompleted(object sender, MouseButtonEventArgs e)
         => TraceSelection("mouse-up " + (ReferenceEquals(sender, Editor) ? "editor" : "preview"));
     private void EditorSelectionChanged(object? sender, EventArgs e)
@@ -288,14 +297,17 @@ public partial class MainWindow
                     var position = view.GetPositionFloor(new Point(0, view.VerticalOffset + view.ActualHeight / 3));
                     if (position is null) return;
                     offset = Editor.Document.GetOffset(position.Value.Line, position.Value.Column);
-                    // Prefer a section heading already visible above the scroll point. Its following
-                    // paragraph can start on the next printed page; keep that section identifiable.
-                    // Long paragraphs/code without a visible heading still use their exact source point.
-                    if (view.GetPositionFloor(new Point(0, view.VerticalOffset)) is { } first)
+                    // Use a representative visible heading when a viewport contains several
+                    // sections. A physical one-third point can fall in the previous paragraph
+                    // after a small height change and select the preceding printed page.
+                    // Long paragraphs/code without visible headings retain their exact point.
+                    if (view.GetPositionFloor(new Point(0, view.VerticalOffset)) is { } first
+                        && view.GetPositionFloor(new Point(0, view.VerticalOffset + view.ActualHeight)) is { } last)
                     {
                         var visibleStart = Editor.Document.GetOffset(first.Line, first.Column);
-                        var heading = parsed?.Headings.LastOrDefault(candidate => candidate.SourceStart >= visibleStart && candidate.SourceStart <= offset);
-                        if (heading is not null) offset = heading.SourceStart;
+                        var visibleEnd = Editor.Document.GetOffset(last.Line, last.Column);
+                        var headings = parsed?.Headings.Where(candidate => candidate.SourceStart >= visibleStart && candidate.SourceStart <= visibleEnd).ToArray();
+                        if (headings is { Length: > 0 }) offset = headings[headings.Length / 3].SourceStart;
                     }
                 }
                 result.RevealSource(offset);
@@ -337,12 +349,16 @@ public partial class MainWindow
         await PersistDesktop(current => current with { Preview = (current.Preview ?? new()) with { ReadingMode = mode } });
         Preview.ApplyReadingMode(mode);
     }
-    private int? VisiblePreviewSource() => Preview.ViewingMode == FlowDocumentReaderViewingMode.Scroll
-        ? rendered?.TextMap.VisibleSource(Preview.ActualHeight) ?? syncAnchors?.VisibleSource(Preview) : syncAnchors?.VisibleSource(Preview);
+    private int? VisiblePreviewSource()
+    {
+        if (rendered is { } result && PreviewViewportAnchor.Capture(Preview, result) is { } anchor
+            && result.TextMap.TrySourceOffset(anchor.Position, out var source)) return source;
+        return rendered?.TextMap.VisibleSource(Preview.ActualHeight) ?? syncAnchors?.VisibleSource(Preview);
+    }
     private void PreviewZoomChanged(object sender, RoutedEventArgs e)
     {
         var difference = (sender as FrameworkElement)?.Tag as string == "in" ? 10 : -10;
-        Preview.Zoom = Math.Clamp(Preview.Zoom + difference, 50, 200);
+        SetPreviewZoom(Math.Clamp(Preview.Zoom + difference, 50, 200));
 
     }
     private void FindPreviewFromToolbar(object sender, RoutedEventArgs e) { previewFocused = true; ShowFind(false); }

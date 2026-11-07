@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -60,10 +61,13 @@ public partial class MainWindow : Window
         DocumentTabs.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(TabStripViewportChanged));
         InitialiseSynchronisation();
         InitialiseFind();
+        InitialiseStatistics();
         InitialisePreviewZoom();
         InitialisePreviewLoading();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
+        slashCommands = new(Editor, SlashCommandsPermitted, SlashCommandUnavailable, ExecuteSlashCommand, completion.Close);
+        Closed += (_, _) => slashCommands.Dispose();
         Closed += (_, _) => completion.Dispose();
         WindowStateService.FitInitialWindow(this);
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
@@ -74,7 +78,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); QueueComparisonPreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -113,7 +117,12 @@ public partial class MainWindow : Window
         if (displayedTab is null || bindingViewport) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
+        // An accepted view remains usable while an edit is rendering. Translate
+        // its source through the version change; only intermediate reflow views
+        // must be prevented from replacing the intended reading position.
         if (pendingViewportDocument != displayedTab.Id && renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
+            && Preview.IsMeasureValid && Preview.IsArrangeValid
+            && AutomationProperties.GetItemStatus(Preview) is ("Ready" or "Busy; preview is being updated")
             && VisiblePreviewSource() is { } source)
             displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
         TraceViewport("viewport-saved");
@@ -121,9 +130,10 @@ public partial class MainWindow : Window
     private void BindActiveDocument()
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
-        SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
+        CaptureComparisonView(); SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
         mermaidOwnerGeneration++;
         CancelSynchronisation(); CancelPreview(); viewportGeneration++;
+        previewLayoutAnchor = null;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
         // The shared reader may still display the outgoing document while rendering.
         // Its visible position must never be captured for the incoming tab.
@@ -142,7 +152,7 @@ public partial class MainWindow : Window
         InvalidateFind(FindRefreshCause.ActiveDocument);
         UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
-        RefreshNavigationControls();
+        RefreshNavigationControls(); ComparisonDocumentBound();
     }
     private void UpdateCaretStatus() => CaretStatus.Text = displayedTab is null ? "UTF-8"
         : $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
@@ -287,7 +297,7 @@ public partial class MainWindow : Window
             InstallSyncPreview(sourceVersion);
             Phase("sync-install-end");
             Phase("selection-restore-start");
-            RestorePreviewSelection(previewSelection);
+            RestorePreviewSelection(previewSelection ?? (comparisonSlots is not null ? comparisonViews.GetValueOrDefault(tab.Id)?.PreviewSelection : null));
             Phase("selection-restore-end");
             Phase("outline-start");
             RefreshOutline();
@@ -351,8 +361,8 @@ public partial class MainWindow : Window
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
         if (updatingOutline) return;
-        if (Outline.SelectedItem is not DocumentHeading heading) return;
-        if (parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
+        if (Outline.SelectedItem is not OutlineEntry heading) return;
+        if (parsedDocumentId != model.ActiveDocument?.Id || parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
         JumpToSource(heading.SourceStart, focusEditor: model.Layout == "Editor");
         if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
         { rendered.RevealSource(heading.SourceStart); _ = PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
@@ -636,11 +646,16 @@ public partial class MainWindow : Window
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
         Editor.TextArea.TextView.Redraw();
+        QueueComparisonPreview();
     }
     private async void ChangeLayout(object sender, RoutedEventArgs e) { SetLayout((string)((FrameworkElement)sender).Tag); await SavePreferences(); }
     private void SetLayout(string layout)
     {
+        if (comparisonSlots is not null)
+        { layout = layout == "Preview" ? "Preview" : "Editor"; comparisonSlots[comparisonActive].Mode = layout; }
         var changed = model.Layout != layout;
+        var completedPreviewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        if (changed) CapturePreviewLayoutAnchor();
         model.Layout = layout;
         EditorColumn.Width = layout == "Preview" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         PreviewColumn.Width = layout == "Editor" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
@@ -650,7 +665,8 @@ public partial class MainWindow : Window
         EditorSplitter.Visibility = layout == "Split" ? Visibility.Visible : Visibility.Collapsed;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
         PreviewPane.Visibility = Preview.Visibility;
-        CancelSynchronisation();
+        // Re-selecting the same layout does not supersede its pending presentation.
+        if (changed || previewLayoutCancellation is null) CancelSynchronisation();
         ApplyPanels();
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
@@ -661,20 +677,24 @@ public partial class MainWindow : Window
                 // Native layout can reuse an unchanged completed preview. Hidden source
                 // edits still invalidate it through the normal preview scheduling path.
                 if (layout == "Editor")
-                { previewBeforeEditorStatus = model.PreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
-                else if (previewBeforeEditorStatus is { } status)
-                { model.PreviewStatus = status; previewBeforeEditorStatus = null; }
+                { previewBeforeEditorStatus = completedPreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
+                else
+                {
+                    model.PreviewStatus = completedPreviewStatus; previewBeforeEditorStatus = null;
+                    _ = RestorePreviewLayoutAsync(completedPreviewStatus);
+                }
             }
             else { previewBeforeEditorStatus = null; QueuePreview(); }
         }
     }
     private async Task SavePreferences()
     {
-        try { await model.UpdatePreferencesAsync(current => current with { Theme = model.Theme, Layout = model.Layout }); }
+        try { await model.UpdatePreferencesAsync(current => current with { Theme = model.Theme, Layout = comparisonSlots is null ? model.Layout : comparisonOriginalLayout }); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { model.Status = "Preferences could not be saved: " + ex.Message; }
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (slashCommands.HandleKey(e)) return;
         if (Editor.IsKeyboardFocusWithin) ObserveEditorFindKey(sender, e);
         // Native command surfaces consume Escape before Find and viewing modes.
         if (e.Key == Key.Escape && CommandSurfaceOpen) return;

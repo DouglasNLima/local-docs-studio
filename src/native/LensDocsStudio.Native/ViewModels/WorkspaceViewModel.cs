@@ -181,7 +181,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         }
         if (Documents.Any(other => other != tab && string.Equals(other.FilePath, path, StringComparison.OrdinalIgnoreCase)))
             throw new IOException("This destination is already open in another tab. Close that tab or choose another filename.");
-        tab.IsSaving = true;
+        tab.IsSaving = true; tab.SaveFailed = false;
         try
         {
             var text = tab.EditorDocument.Text;
@@ -206,6 +206,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             await PersistSessionAsync();
             return true;
         }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        { tab.SaveFailed = true; if (error is DocumentConflictException) tab.ExternalChange = true; throw; }
         finally { tab.IsSaving = false; }
     }
 

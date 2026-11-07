@@ -159,7 +159,7 @@ public sealed class MermaidSourceParser
             if (error is null)
             {
                 Mermaider.Models.MermaidGraph graph;
-                using (Rendering.MermaidDiagnostics.Measure("renderer.parse.flowchart-source")) graph = MermaidRenderer.Parse(source);
+                using (Rendering.MermaidDiagnostics.Measure("renderer.parse.flowchart-source")) graph = MermaidRenderer.Parse(Rendering.FlowchartCompatibility.Prepare(source));
                 if (graph.Nodes.Count != nodes.Length || graph.Edges.Count != edges.Count
                     || nodes.Any(node => !graph.Nodes.TryGetValue(node.Id, out var parsed) || parsed.Label != RendererLabel(node, source) || parsed.Shape.ToString() != RendererShape(node.Shape))
                     || edges.Where((edge, index) => graph.Edges[index].Source != edge.Source.Id || graph.Edges[index].Target != edge.Target.Id
@@ -175,7 +175,7 @@ public sealed class MermaidSourceParser
         catch (RegexMatchTimeoutException)
         { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Protected,
             "The bounded source dependency scan could not complete. Inspect the original diagram or edit its source.") { DiagramType = diagramType }; }
-        catch (Exception ex) when (ex is ArgumentException or MermaidParseException)
+        catch (Exception ex) when (ex is ArgumentException or MermaidParseException or NotSupportedException)
         { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Invalid, ex.Message) { DiagramType = diagramType }; }
     }
 
@@ -229,6 +229,9 @@ public sealed class MermaidSourceParser
         text = NormaliseRawLabelLines(text);
         if (text.Length >= 2 && text[0] == '"' && text[^1] == '"') text = text[1..^1];
         text = Regex.Replace(text, "<br\\s*/?>", "\n", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(50));
+        // Match the pinned renderer's readable labels for protected inspection.
+        // HasUnsupportedMarkup still prevents edits that could discard typography.
+        text = Regex.Replace(text, @"</?(?:small|sub|sup|mark)\s*>", "", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(50));
         text = WebUtility.HtmlDecode(text).Replace("\\n", "\n");
         text = Regex.Replace(text, @"#(\d+);", match => int.TryParse(match.Groups[1].Value, out var value) && System.Text.Rune.IsValid(value)
             ? char.ConvertFromUtf32(value) : match.Value, RegexOptions.None, TimeSpan.FromMilliseconds(50));

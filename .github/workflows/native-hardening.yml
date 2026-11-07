@@ -1,0 +1,83 @@
+name: Native hardening controlled diagnostics
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [develop]
+    paths:
+      - '.github/workflows/native-hardening.yml'
+      - 'scripts/native/Invoke-NativeAcceptanceDiagnostic.ps1'
+      - 'src/native/**'
+permissions:
+  contents: read
+jobs:
+  controlled:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'feature/reading-experience-productivity'
+    runs-on: windows-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [arrangement, lifecycle, timeline, packet, selection]
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build identical diagnostic harness and both exact products
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/hardening-baseline 99349d82eb06960eb1f9785cf384db2373aed4fa
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/hardening-baseline/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $validation = 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows'
+          New-Item -ItemType Directory -Force artifacts/hardening-probe | Out-Null
+          Copy-Item "$validation/*" artifacts/hardening-probe -Recurse
+          Copy-Item artifacts/hardening-baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.dll artifacts/hardening-probe -Force
+          Copy-Item artifacts/hardening-baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Core.dll artifacts/hardening-probe -Force
+      - name: Install pinned diagnostic tools
+        run: |
+          dotnet tool install dotnet-stack --version 10.0.750501 --tool-path artifacts/hardening-tools
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet tool install dotnet-dump --version 10.0.750501 --tool-path artifacts/hardening-tools
+      - name: Verify concurrent diagnostic journal observation before GUI work
+        run: |
+          $env:LENS_NATIVE_ACCEPTANCE_TRACE = [IO.Path]::GetFullPath('artifacts/hardening-journal-control')
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --acceptance-diagnostics $env:LENS_NATIVE_ACCEPTANCE_TRACE
+          exit $LASTEXITCODE
+      - name: Observe both products without changing original actions or deadlines
+        run: |
+          $order = if ('${{ matrix.order }}' -eq 'baseline-first') { @('baseline','candidate') } else { @('candidate','baseline') }
+          $harness = 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'
+          $out = 'artifacts/hardening-results'
+          New-Item -ItemType Directory -Force $out | Out-Null
+          @{ baseline='99349d82eb06960eb1f9785cf384db2373aed4fa'; candidate=(git rev-parse HEAD); order=$order; case='${{ matrix.case }}';
+              harnessSha256=(Get-FileHash $harness).Hash; diagnosticOnly=$true; image=$env:ImageVersion; os=[Environment]::OSVersion.VersionString } |
+              ConvertTo-Json | Set-Content "$out/protocol.json"
+          $failed = $false
+          foreach ($side in $order) {
+            $probe = if ($side -eq 'baseline') { 'artifacts/hardening-probe/LensDocsStudio.Native.Validation.exe' } else { $harness }
+            $app = if ($side -eq 'baseline') { 'artifacts/hardening-baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe' } else { 'src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe' }
+            $result = "$out/$side"
+            $arguments = switch ('${{ matrix.case }}') {
+              'arrangement' { @('--arrangement-latency', $result, '.') }
+              'lifecycle' { @('--suite-lifecycle', $result, '--normal') }
+              'timeline' { @('--source-editor-ui', $app, $result, 'Timeline', '--normal') }
+              'packet' { @('--source-editor-ui', $app, $result, 'Packet', '--high-contrast') }
+              'selection' { @('--selection-interactions', $app, $result, '--high-contrast', '--no-diagnostics') }
+            }
+            & scripts/native/Invoke-NativeAcceptanceDiagnostic.ps1 -Executable $probe -ValidationArguments $arguments -OutputDirectory "$out/$side-supervisor" -StackTool artifacts/hardening-tools/dotnet-stack.exe -DumpTool artifacts/hardening-tools/dotnet-dump.exe
+            if ($LASTEXITCODE -ne 0) { $failed = $true }
+          }
+          if ($failed) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-hardening-${{ matrix.case }}-${{ matrix.order }}
+          path: artifacts/hardening-results/
+          retention-days: 30

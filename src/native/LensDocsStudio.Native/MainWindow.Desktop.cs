@@ -22,7 +22,7 @@ public partial class MainWindow
     private void ApplyPanels()
     {
         var sidebar = DesktopState.ShowSidebar && !focusMode;
-        var outline = model.Preferences.ShowOutline && !focusMode;
+        var outline = model.Preferences.ShowOutline && !focusMode && comparisonSlots is null;
         var widths = DesktopPanelSizing.Fit(ActualWidth > 0 ? ActualWidth : Width, model.Layout == "Split",
             sidebar ? DesktopState.SidebarWidth : 0, outline ? DesktopState.OutlineWidth : 0);
         SidebarColumn.MinWidth = sidebar ? 150 : 0; SidebarColumn.MaxWidth = sidebar ? 600 : 0;

@@ -18,6 +18,19 @@ internal static class NativeLaunchReadinessChecks
         var denied = new PatternNotSupportedException(automation.PatternLibrary.TransformPattern,
             new COMException("Injected access denied", unchecked((int)0x80070005)));
         var checks = new List<object>();
+        foreach (var remaining in new[] { 0d, .1, 49, 49.999 })
+        {
+            try { _ = NativeLaunchReadiness.ProviderTimeout(TimeSpan.FromMilliseconds(remaining)); throw new IOException("An unsupported provider timeout was accepted."); }
+            catch (TimeoutException) { }
+        }
+        foreach (var remaining in new[] { 50d, 50.9, 2999.9, 3000, 25000 })
+        {
+            var limit = NativeLaunchReadiness.ProviderTimeout(TimeSpan.FromMilliseconds(remaining));
+            if (limit.TotalMilliseconds < 50 || limit.TotalMilliseconds > remaining || limit.TotalMilliseconds > 3000)
+                throw new IOException("Provider configuration enlarged the original launch budget.");
+            automation.TransactionTimeout = limit; automation.ConnectionTimeout = limit;
+        }
+        checks.Add(new { Name = "Actual Windows UIA accepts bounded provider values; sub-50 ms remaining budgets fail before provider calls", RejectedBudgets = 4, AcceptedBudgets = 5 });
         var target = new Rectangle(20, 30, 1280, 800);
         var ready = new NativeLaunchWindow(7, 123, false, null, true, 7, 0, true, true, true, 123, 7, true, true, target, target);
 

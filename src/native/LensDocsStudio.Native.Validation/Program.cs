@@ -17,6 +17,28 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--acceptance-diagnostics" && args.Length == 2)
+        {
+            try { NativeAcceptanceDiagnostics.CheckJournal(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--reading-productivity-ui" && args.Length == 5 && args[4] is "--normal" or "--high-contrast")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Reading-productivity pointer/keyboard and High Contrast acceptance require disposable GitHub-hosted Windows."); return 1; }
+            return NativeUiChecks.RunReadingProductivity(args[1], args[2], args[3], args.Contains("--high-contrast"));
+        }
+        if (args.FirstOrDefault() == "--flowchart-compatibility" && args.Length == 3)
+        {
+            try { NativeFlowchartCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--reading-productivity" && args.Length == 2)
+        {
+            try { NativeReadingProductivityChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--selection-visual")
         {
             try { NativeSelectionVisualChecks.Run(Path.GetFullPath(args[1]), args.Contains("--expect-cold-invisible")); return 0; }

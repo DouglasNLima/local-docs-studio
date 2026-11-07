@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using LensDocsStudio.Core.Imports;
+using LensDocsStudio.Core.Parsing;
 
 namespace LensDocsStudio.Core.Editing;
 
@@ -41,6 +42,15 @@ public sealed partial class MarkdownEditService
         }
         MarkdownEdit Block(string value, string? selectText = null)
             => PlanBlock(source, start, length, value, selectText);
+        if (action == "paragraph") return Edit(start, length, "", 0, 0);
+        if (action == "date-time") return Edit(start, length, DateTimeOffset.Now.ToString("yyyy-MM-dd'T'HH:mm:sszzz", System.Globalization.CultureInfo.InvariantCulture));
+        if (action == "details")
+            return DetailsEditService.Plan(new MarkdownService().Parse(source), start, length, new("More details", length == 0 ? "Add supporting details here." : selected));
+        if (action == "figure")
+        {
+            var image = new MarkdownService().Parse("![Image description](image.png)");
+            return Block(ImageFigureEditService.Plan(image, 0, 0, new("Image description", "Image caption")).Replacement);
+        }
         if (action is "bold" or "italic" or "strike") return Wrap(action == "bold" ? "**" : action == "italic" ? "*" : "~~", action == "strike" ? "deleted text" : action + " text");
         if (action == "inline-code")
         {

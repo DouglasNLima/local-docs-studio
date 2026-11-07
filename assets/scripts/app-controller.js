@@ -2,6 +2,7 @@ import { createContentRegistries } from './registries/content.js';
 import { getDomElements } from './dom.js';
 import { APP_BUILD, APP_VERSION, createInitialState, storageKeys } from './state/config.js';
 import { createEditorService } from './editor/editor-service.js';
+import { createSlashCommandService } from './editor/slash-command-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
 import { createInsertHelperService } from './editor/insert-helper-service.js';
@@ -22,6 +23,9 @@ import { createDialogService } from './ui/dialog-service.js';
 import { createSupportBundle, redactSupportBundleText } from './ui/support-bundle-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createWindowsSetupService } from './ui/windows-setup-service.js';
+import { collectDocumentHeadings } from './document/table-of-contents.js';
+import { createDocumentStatisticsService } from './document/document-statistics-service.js';
+import { createComparisonService } from './document/comparison-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
@@ -299,12 +303,18 @@ export function createAppController() {
       },
       callbacks: {
         commandHandlers: {
-          table: () => openTableEditor(),
+          table: (range) => openTableEditor(range),
           progressBar: () => openProgressBarEditor(),
-          insertHelper: (type) => openInsertHelper(type),
+          insertHelper: (type, range) => openInsertHelper(type, range),
+          snippet: () => insertGeneratorSnippet('project.usage'),
         },
         getAutocompleteFiles: () => state.files,
       },
+    });
+    const slashTools = createSlashCommandService({ editor, state, execute: executeMarkdownCommand,
+      closeOther: hideMermaidAutocomplete,
+      available: command => command === 'documentLink' && !state.files.some(file => file.path !== state.activePath)
+        ? 'Open another workspace document first' : command === 'snippet' && !state.activePath ? 'Open or create a document first' : '',
     });
     const {
       renderFileList,
@@ -493,14 +503,23 @@ export function createAppController() {
       },
     });
     openInsertHelper = insertHelperTools.openInsertHelper;
+    const statisticsTools = createDocumentStatisticsService({
+      state, editor, button: document.getElementById('documentStatistics'),
+      stateLabel: document.getElementById('documentPersistenceState'),
+      reviewButton: documentReviewToggleButton,
+      onMetrics: () => document.dispatchEvent(new Event('lens-statistics-updated')),
+    });
     const {
       installDocumentUxHandlers,
       toggleOutline,
       updateDocumentUx,
+      capturePreviewFind,
+      restorePreviewFind,
     } = createDocumentUxService({
       state,
       dom: {
         preview,
+        editor,
         outlineToggleButton,
         outlinePanel,
         outlineLinks,
@@ -518,6 +537,17 @@ export function createAppController() {
         documentReviewAlerts,
       },
       callbacks: {
+        getStatistics: statisticsTools.getMetrics,
+        setStatus,
+        navigateOutlineLine: line => focusEditorAtLine(line),
+        copyTableOfContents: value => copyToClipboard(value, 'Table of contents copied.', 'Clipboard access blocked. Try copying again.'),
+        getCurrentHeadings: async () => {
+          const source = editor.value; const path = state.activePath;
+          if (resolveMode(source) === 'mermaid') return [];
+          const template = document.createElement('template');
+          template.innerHTML = await buildMarkdownHtml(source);
+          return source === editor.value && path === state.activePath ? collectDocumentHeadings(template.content) : null;
+        },
         getBacklinks,
         getWorkspaceAudit,
         getGovernanceAudit,
@@ -868,9 +898,12 @@ export function createAppController() {
     installSelectionSyncHandlers();
     installContextMenuHandlers();
     windowsSetupTools.installWindowsSetupHandlers();
+    createComparisonService({ state, editor, preview, workspace, setEditorLayout, selectFile,
+      find: findReplaceTools, capturePreviewFind, restorePreviewFind, onPreviewClick: handlePreviewClick, setStatus });
     installEventHandlers();
     renderLocalLibrary();
     initialiseWelcome();
+    statisticsTools.schedule();
     localStorage.removeItem(storageKeys.typewriterMode);
     initRecentHandles();
     registerServiceWorker();
@@ -1121,6 +1154,7 @@ export function createAppController() {
       });
 
       editor.addEventListener('keydown', (event) => {
+        if (slashTools.keydown(event)) return;
         if (handleMermaidAutocompleteKeydown(event)) return;
 
         const isShortcut = event.ctrlKey || event.metaKey;
@@ -3726,6 +3760,16 @@ ${unresolvedRows}
     }
 
     async function handlePreviewClick(event) {
+      const fragmentLink = event.target.closest('a[href^="#"]');
+      if (fragmentLink && !fragmentLink.dataset.docPath && !fragmentLink.dataset.wikilinkTarget) {
+        event.preventDefault();
+        try {
+          const id = decodeURIComponent(fragmentLink.getAttribute('href').slice(1));
+          const target = [...preview.querySelectorAll('[id]')].find(element => element.id === id);
+          if (target) { for (let parent = target.parentElement; parent && parent !== preview; parent = parent.parentElement) if (parent.tagName === 'DETAILS') parent.open = true; target.scrollIntoView({ block: 'start' }); }
+        } catch { /* A malformed fragment cannot identify a section. */ }
+        return;
+      }
       const welcomeAction = event.target.closest('[data-welcome-action]');
       if (welcomeAction) {
         event.stopPropagation();

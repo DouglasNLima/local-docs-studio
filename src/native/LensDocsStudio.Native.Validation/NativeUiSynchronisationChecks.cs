@@ -173,6 +173,7 @@ internal static partial class NativeUiChecks
 
             void AssertSelection(string word, int occurrence, string input, System.Diagnostics.Stopwatch watch)
             {
+                NativeAcceptanceDiagnostics.Mark("selection/observe", new { Input = input, Occurrence = occurrence, CompletedObservations = observations.Count });
                 var expected = Occurrence(preview, word, occurrence);
                 bool Matches(FlaUI.Core.ITextRange selected) => selected.CompareEndpoints(TextPatternRangeEndpoint.Start, expected, TextPatternRangeEndpoint.Start) == 0
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.End, expected, TextPatternRangeEndpoint.End) == 0;
@@ -194,6 +195,7 @@ internal static partial class NativeUiChecks
                     SourceLength = selectedSource.GetText(-1).Length, Rendered = preview.Patterns.Text.Pattern.GetSelection().Single().GetText(-1),
                     Milliseconds = watch.Elapsed.TotalMilliseconds, Geometry = geometry, FocusRetained = true,
                     ActionCount = input is "rapid-alternation" or "natural-rapid" ? 2 : input == "rapid-settled" ? 0 : 1 });
+                NativeAcceptanceDiagnostics.Mark("selection/observed", new { Input = input, CompletedObservations = observations.Count });
             }
             string modeName() => Find(window, "PreviewReadingMode").AsComboBox().SelectedItem?.Text ?? "unknown";
             void NaturalSelections(string mode)

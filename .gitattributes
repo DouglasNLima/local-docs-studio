@@ -2,3 +2,8 @@
 /assets/vendor/THIRD-PARTY-NOTICES.txt -text
 /docs/open-source/evidence/upstream-notices/*.txt -text
 /docs/open-source/evidence/goal58/mammoth-notices/*.txt -text
+
+/tests/fixtures/native-flowchart/spc-application-architecture.md text eol=lf
+# Keep the inherited PR #78 workloads byte-identical on Windows too.
+/tests/fixtures/native-ux/*.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/docs/native/evidence/preview-reflow-integration/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

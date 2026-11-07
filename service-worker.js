@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v73';
+const CACHE_NAME = 'lens-docs-studio-v77';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -13,11 +13,16 @@ const LOCAL_ASSETS = [
   './assets/scripts/app-controller.js',
   './assets/scripts/dom.js',
   './assets/scripts/document/document-ux-service.js',
+  './assets/scripts/document/table-of-contents.js',
+  './assets/scripts/document/document-statistics-service.js',
+  './assets/scripts/document/comparison-service.js',
+  './assets/scripts/document/document-statistics-worker.js',
   './assets/scripts/document/markdown-governance-service.js',
   './assets/scripts/document/selection-sync-service.js',
   './assets/scripts/document/scroll-sync-service.js',
   './assets/scripts/editor/draft-service.js',
   './assets/scripts/editor/editor-service.js',
+  './assets/scripts/editor/slash-command-service.js',
   './assets/scripts/editor/find-replace-service.js',
   './assets/scripts/editor/insert-helper-service.js',
   './assets/scripts/editor/paste-service.js',
@@ -49,6 +54,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/utils/devops-markdown.js',
   './assets/scripts/utils/files.js',
   './assets/scripts/utils/format.js',
+  './assets/scripts/utils/markdown-details.js',
   './assets/scripts/utils/front-matter.js',
   './assets/scripts/utils/html-markdown.js',
   './assets/scripts/utils/idb.js',

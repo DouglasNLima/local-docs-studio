@@ -40,6 +40,7 @@
             <button type="button" data-menu-action="openFile">Open file</button>
             <button type="button" data-menu-action="openFolder">Open folder</button>
             <button type="button" data-menu-action="addFile">Add file to workspace</button>
+            <button type="button" id="openBesideButton">Open beside…</button>
             <div class="menu-note">Local files stay in this browser until you save, copy, export, or import new content.</div>
             <hr>
             <div class="menu-heading">Import</div>
@@ -617,7 +618,18 @@
             <button id="previewFindClearButton" type="button" aria-label="Close preview search">Close</button>
           </section>
           <nav class="outline-panel" id="outlinePanel" aria-label="Document outline" hidden>
-            <span class="outline-title">Outline</span>
+            <div class="outline-heading"><strong class="outline-title">Outline</strong>
+              <button type="button" id="outlineExpandAll">Expand All</button>
+              <button type="button" id="outlineCollapseAll">Collapse All</button>
+              <button type="button" id="copyTableOfContents">Copy Table of Contents</button>
+              <details class="toc-options"><summary>TOC options</summary>
+                <label>Start level <select id="tocStartLevel"><option value="1">H1</option><option value="2">H2</option><option value="3">H3</option><option value="4">H4</option><option value="5">H5</option><option value="6">H6</option></select></label>
+                <label>End level <select id="tocEndLevel"><option value="1">H1</option><option value="2">H2</option><option value="3">H3</option><option value="4">H4</option><option value="5">H5</option><option value="6" selected>H6</option></select></label>
+                <label>Style <select id="tocStyle"><option value="bullets">Bullet list</option><option value="numbered">Numbered list</option><option value="plain">Plain text</option></select></label>
+                <label><input type="checkbox" id="tocNormalise" checked>Normalise levels</label>
+                <label><input type="checkbox" id="tocDetails">Collapsible wrapper</label>
+              </details>
+            </div>
             <div class="outline-links" id="outlineLinks"></div>
           </nav>
           <section class="document-review-panel" id="documentReviewPanel" aria-label="Document review" hidden>
@@ -633,6 +645,8 @@
       </section>
     </section>
     <div class="statusbar">
+      <button id="documentStatistics" class="document-statistics" type="button" title="Open Document Review">Counting…</button>
+      <span id="documentPersistenceState" class="document-persistence-state"></span>
       <div class="status" id="status" role="status" aria-live="polite">Ready</div>
       <button class="focus-mode-exit" id="focusModeExitButton" type="button" title="Exit Focus Mode (Esc / Ctrl+F11)" aria-label="Exit Focus Mode" hidden>
         <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>

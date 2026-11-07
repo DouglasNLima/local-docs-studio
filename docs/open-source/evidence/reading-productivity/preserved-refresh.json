@@ -1,0 +1,194 @@
+{
+  "baseCommit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+  "purpose": "Bounded reading-productivity source and current guidance amendment; historical evidence, notices, trust and performance gates remain unchanged.",
+  "files": {
+    ".gitattributes": {
+      "previous": "aff4d18824c92e543476ef072c1aea275d98745addb202e1b48805977d4b1e5a",
+      "current": "d5a8adb58be2e3a9ce64831a1b0e4c1a227ca5f5cc41ab7dd5294711c34e682e"
+    },
+    ".github/workflows/native.yml": {
+      "previous": "c732c75e3e677abd7b62c0118e779b6a3c47103cf3366d24950b879767ed7a70",
+      "current": "c9395c23cf2b106a279ba6aee43a9c9e82e96724ed40816328d779e03662672f"
+    },
+    "assets/scripts/app-controller.js": {
+      "previous": "346bd413a4faaa696d339e84fcb4a322840c71495d490cd0a6ac890a049dd0d1",
+      "current": "f6fbd36b3d4ae88ac7ed2918a63d4d5dcc79b2350de6808baa950ba9df64a959"
+    },
+    "assets/scripts/document/document-ux-service.js": {
+      "previous": "e4d8eda3dcfe1008e956385053dcac56e6e16ae24535102a1907a6941fcb446f",
+      "current": "9bea966a18a3f6049c7544131654d1a96ce997371f93bfc4649fa30842c80a9a"
+    },
+    "assets/scripts/editor/draft-service.js": {
+      "previous": "aecd49cecd3b1447666da7da26edf7a708a449fb70f5654a47326aeeb50871c0",
+      "current": "c8207569b1c827b54f7662d61f3397584200c7a009fdf589432868b299e8c7a7"
+    },
+    "assets/scripts/editor/editor-service.js": {
+      "previous": "d5f91886c0a3866f3ff1b0c8b0c3ec8a0b5930a3a1b4dfcf9d8449524b4b9c3d",
+      "current": "f3e8d19e8f65ea610ac269cf359a165f38b9cb7e4f4f666b336f4329f0dac26a"
+    },
+    "assets/scripts/editor/find-replace-service.js": {
+      "previous": "b4f7d58b43c56deebb4e490399bb4c8554e6f17e2aa22c7dd618eb339a8c9176",
+      "current": "f7e009d71497113f20f35a2ff5da29a9b9e37c0429f203bb0859f16cd6569cc3"
+    },
+    "assets/scripts/editor/insert-helper-service.js": {
+      "previous": "04a92f9fd5646cd2fdf790febb4d7e24ff172f6538a08447bee94a80c59a4b7a",
+      "current": "3b7909107298205071ea3a685ce446831e4da6e60df8007ee3398215b91f024d"
+    },
+    "assets/scripts/editor/table-editor-service.js": {
+      "previous": "aacf920de06e467f1e92f5b399cf86b7dcd655b9fa8b55d4bf9171a734d02e5b",
+      "current": "6fb820d9e8aa41a6133fbb3e9049f33d3432d371d70d673a4abc957fb8697c06"
+    },
+    "assets/scripts/exports/export-service.js": {
+      "previous": "ebc3e8bc4e7b64e866c0a9ca14ae2d17c6d7870613aa9129df0476a81a173144",
+      "current": "b02badc73957d358a34334244567ba3489408cc299503a852ca59f06aa5ccd87"
+    },
+    "assets/scripts/files/file-service.js": {
+      "previous": "28c96ebe73c7509d4ba7155ea386c86facf50f9e3c31b9177e48a14570b66874",
+      "current": "04ef4a2b89f931c3a00b412f9d93b2eca51aea5e263ca9a5b56bfc353b0c1177"
+    },
+    "assets/scripts/rendering/render-service.js": {
+      "previous": "9cef140bb1039ae859ed0bf704f4d5cf3e525e78180e8ec0c76040ca4dba7203",
+      "current": "3427bb23ed36fb6f4f2523b00b4822da8996d426ef22f4ec2eef43be7383f3f7"
+    },
+    "assets/scripts/ui/ui-service.js": {
+      "previous": "c9dba79b2efafc73ef149a92e408fa6fabb19dc73f3f2f0a7c014b5d4124c6f4",
+      "current": "ba7b93c8121edac7ded2e775c50eb5157c21f5199406ebda2fac8a682075700e"
+    },
+    "assets/styles/app.css": {
+      "previous": "c6955817cbefb3161c504206290d101b25144b0925e15b60087806521185351d",
+      "current": "2e7d3554ac461013b3796c19b5673412491c150350b05e0ae77a0abd5ae934dd"
+    },
+    "docs/native/architecture-decisions.md": {
+      "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
+      "current": "4590e338451ea2e5833839b38afbdddb607e50b5ec614f6cbeb5b121b5bfc214"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
+      "current": "e4a2b0a80abefceb6e8d7dbd8cbddd0ec6a9132325a2d9fbad71788ba454e655"
+    },
+    "docs/native/implementation-progress.md": {
+      "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
+      "current": "5eb284a585ca7560e812a65e2f28c24c47f8e973066b02dafc6de793a6dc1ea9"
+    },
+    "docs/native/user-guide.md": {
+      "previous": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327",
+      "current": "eacfd6442503effc3634e5b6b1f301cc996a2c5ba223992a5e9540c9851bb035"
+    },
+    "docs/native/validation-report.md": {
+      "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
+      "current": "105ae9ed138ef31801d926523ed4efcff04566c34f2841f968ed2955f17e6315"
+    },
+    "docs/tool-guide.md": {
+      "previous": "70945830852bf75c68f35284fe56416a1422fdfa5af731c26e27ac2039833d04",
+      "current": "a975431a55b896fc427e366074b02462d5015f8e3d73e07a289db501bfafccc9"
+    },
+    "index.html": {
+      "previous": "e53298168f5b58acdcde6962e5ec0279e20bbd2de263ff52d47843edbb66f80c",
+      "current": "38bbf6dfbbf8237db783370461dc34a3635e754b80a6635f9b8aa3ec623cbb4b"
+    },
+    "src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj": {
+      "previous": "5744f4a8b7e8784519a74b362d3a7f7f5a1d657b2c295b6c3d4d2b66ff585316",
+      "current": "bcc5936898b464e3da8116937349c04a411755db2d78e4376d3d763017c275b4"
+    },
+    "src/native/LensDocsStudio.Core.Tests/MermaidVisualCorpusTests.cs": {
+      "previous": "08e4bc4c5b0aabb34110f699be6d0a5e3e5a5e9201a61afb181c3757d022bd11",
+      "current": "ec8f1de14f24e0463938b3e38fc6f690a6f38d49e1e15852e1ef8849385de9a5"
+    },
+    "src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs": {
+      "previous": "8e12c1260ad97b08b509b1210dafe0124c2b117701f5d2a160b3a59f356af859",
+      "current": "ae71b419863ebf55de83e48984106023c583cf76520edd77d12d93d966120d77"
+    },
+    "src/native/LensDocsStudio.Core/Editing/MarkdownEditService.cs": {
+      "previous": "eae07475a0439273bd314e938bbecb60b5fd96a242bf547cc4f1459884407ea9",
+      "current": "21c00e8276e3afe724210500f2f6089715d55992745ecb925e4b8db2bf25c3ee"
+    },
+    "src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs": {
+      "previous": "d2860c996f00e0a6a145ed1e006069b1118aab033c75d249ab13fc384e49a6a5",
+      "current": "258b877d879230a29cc3a990673936a8bc701e44568cb53455f810c46f38616e"
+    },
+    "src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs": {
+      "previous": "ca956434be85b52c1ec5c66d3bcded2b4145fc4517de72f0c77fac18464dce8c",
+      "current": "7e8304ebb33911ceb58ec63401d3f17cc67b11ef26d912abca8b6e07a20af5d3"
+    },
+    "src/native/LensDocsStudio.Core/Rendering/DiagramService.cs": {
+      "previous": "c8a3b7b97bf0fc91e3aa7adfbce99646709380083fd53015eea9742192df4d0d",
+      "current": "158554c6f6d661e9563c8515f91a6985234da59aec123eeaf06246ae60961275"
+    },
+    "src/native/LensDocsStudio.Core/Review/DocumentReviewService.cs": {
+      "previous": "9fd3e1f0a8ac8f7ac84f87fb06d64725024e62e3432bc3d3b8fb24a8dc39738e",
+      "current": "aa2519219c7ad3ecb97f4439ddee10608d236966c0585932874a7c04a08448fe"
+    },
+    "src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs": {
+      "previous": "33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738",
+      "current": "7c99911849b28f54be0b0615b4c91374a0b791d86e897a40fa177e6d0cad888c"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeArrangementLatencyChecks.cs": {
+      "previous": "8ee6774e806f92eaf065d6d72d9ddd31e47a7e0ea604228b392066817eb6ccab",
+      "current": "0b8fe3d063bf3984bba0ee953246f1247242e571ee6ac4d78334c468a184d625"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeExpansionLaunch.cs": {
+      "previous": "1080069ca8310995402706e1042c714037e445919fc4720fe82ae8c7761ffe63",
+      "current": "5173fc68dfc1cd6a008b2a15e7cacd6d6bec309e0540530de77e5420227febf5"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadiness.cs": {
+      "previous": "047fb5496b80324374294373e09f45dab0ba80a804bda5e51dee295deddf74b6",
+      "current": "7a88afabdb6d896545004aabde2fce76312a0eb04f34dba169693031b1e26917"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeLaunchReadinessChecks.cs": {
+      "previous": "b07be4aaaf75433bd05f04fe59302befc02df7e1b1c47c048423076ea49d0b64",
+      "current": "e06065ef08ffd77f994ee54bd38325cba99dc894e32bfee1df0e896a59e87021"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeSuiteLifecycleChecks.cs": {
+      "previous": "4ac3bb2b4b54b04f7fd8796eaa3f23b58aa9ce7da28a374558da183ba67ba718",
+      "current": "2e4fc18f56ae3b8136a17f3ce30150106941fe7e7ef4d250b6947659914031e1"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativeUiSynchronisationChecks.cs": {
+      "previous": "a3cc8ac2c2e47d49f72f4bddd37a5f98ace9d183f736ffe8ea4a94245c07aa3f",
+      "current": "0e7b8355957735fb9477ffe7d0f5add978db746ddd37e11067126001557762b8"
+    },
+    "src/native/LensDocsStudio.Native.Validation/Program.cs": {
+      "previous": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
+      "current": "ca42bfef4f7bc3a64622ee42f9f4624fb566cc102f173118d4ae2846e69d2473"
+    },
+    "src/native/LensDocsStudio.Native/DocumentReviewWindow.xaml.cs": {
+      "previous": "4f3c558461ae6e3751b8139bbb5ade0d541a404c1b566d2bef31f51d4e7807a9",
+      "current": "897d75579807b1346c5305913989c657c1c5fd657901465d43b8bf39683ad1ec"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Desktop.cs": {
+      "previous": "31a29022ed66677121fb2ced6f7fb8bb6b98a964227e0008c8ba1f8a70eb3f6f",
+      "current": "7544ed2ec03e9c2f0fbc5695ed5cd97178d308d23ff2c9b396a1ea6a3e526cc4"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
+      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
+      "current": "f5f881a99aa5d0ccdf87ca1316b138f205a0c72948d5bbd6ba62c83815fcff61"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.WorkspaceChrome.cs": {
+      "previous": "b80ada80d49aa569100a3ef1e67da1a2e49b81d994f997da2959575b9b58f748",
+      "current": "96352ed5e602762034c045a833d26d2069a6959eef2eddc322cfcd74943ef347"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml": {
+      "previous": "6cc4bfdfb12a723f96b0480149b0c882cb68d862618028c050f09dbc342ffb42",
+      "current": "d5d7dc5a9d1729f961afadcf9b61929132bf9941282d7c62c251e9c469cfea6a"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+      "previous": "50888389971d81a765bc00b3607baa26cc5e9982f5679779e3d87cbebbfa4585",
+      "current": "e81555e94728d4160fab2c645c7a9a430667a636f7196bc3ccb73762fc1d0ef4"
+    },
+    "src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs": {
+      "previous": "60ab0564756fc1a336656d437eea5ae16705db2620c3913dc2c797afe7c9c649",
+      "current": "a71d05d445699f1ed8adf8fa385c886b55613a74bd822af86ea98fbd20f3083c"
+    },
+    "src/native/LensDocsStudio.Native/ViewModels/DocumentViewModel.cs": {
+      "previous": "450056d1b4165da14b191739a923f98f8e6c96aeed66126b3d2ce1af7bc44261",
+      "current": "8df4297936253e2919f4f2ad2778c9476d47ba9f560abd4d15d12c397777b941"
+    },
+    "src/native/LensDocsStudio.Native/ViewModels/WorkspaceViewModel.cs": {
+      "previous": "3dcb3a424a8a2c95aef1f029f5d6888cfb53211ecc2d934fb1cd0c886b86a393",
+      "current": "4ca0f4876c3ee923dd7a67fd552cf1ff1f79438b5d207ec3a0bb2b5db46c40eb"
+    },
+    "tests/browser/app-smoke.spec.mjs": {
+      "previous": "abee2b5033359030900829977f5181cc7b47728b8ab5fd397f2582250b09595e",
+      "current": "a3bb83de885bc7f52e45200c26fb425d4d9318bdd3ceb574ad64c6b8d8c33e22"
+    }
+  }
+}

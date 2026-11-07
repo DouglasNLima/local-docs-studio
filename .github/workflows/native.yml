@@ -22,6 +22,42 @@ env:
   LENS_NATIVE_WIZARD_ARGUMENTS: --no-file-associations
   LENS_NATIVE_LIFECYCLE_ARGUMENTS: -NoFileAssociations
 jobs:
+  reading-productivity:
+    if: ${{ !inputs.replay_original_853 }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact reading-productivity candidate
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify compiled controls and canonical SPC rendering
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --reading-productivity artifacts/native/reading-productivity-controls
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --flowchart-compatibility artifacts/native/flowchart-compatibility .
+      - name: Exercise actual editor comparison and SPC preview
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --reading-productivity-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/reading-productivity-ui . $appearance
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-reading-productivity-${{ matrix.appearance }}
+          path: |
+            artifacts/native/reading-productivity*/
+            artifacts/native/flowchart-compatibility/
+          include-hidden-files: true
+          retention-days: 14
   find-editor-caret:
     if: ${{ !inputs.replay_original_853 }}
     runs-on: windows-latest
@@ -192,6 +228,9 @@ jobs:
       - name: Validate pluggable signing policy
         run: pwsh -NoProfile -File scripts/native/Test-NativeSigning.ps1
       - name: Validate Windows signature trust with a disposable certificate
+        # Goal #75 continuation explicitly excludes signing, including disposable
+        # fixtures. Record NOT RUN for this branch; retain the trust test elsewhere.
+        if: github.head_ref != 'feature/reading-experience-productivity' && github.ref != 'refs/heads/feature/reading-experience-productivity'
         timeout-minutes: 3
         run: pwsh -NoProfile -File scripts/native/Test-NativeAuthenticode.ps1
       - name: Validate native diagram corpus
@@ -200,6 +239,12 @@ jobs:
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --quadrant-compatibility artifacts/native/quadrant-compatibility .
       - name: Prove pinned XY Radar Sankey compatibility through ordinary preview and exports
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --chart-compatibility artifacts/native/chart-compatibility .
+      - name: Verify reading productivity controls and SPC flowchart compatibility
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --reading-productivity artifacts/native/reading-productivity
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --flowchart-compatibility artifacts/native/flowchart-compatibility .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify chart canonical editor fidelity and atomic owner sessions
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --chart-editor-fidelity artifacts/native/chart-editor-fidelity .
       - name: Prove pinned workflow preview exports and canonical editor correspondence
@@ -311,6 +356,8 @@ jobs:
             artifacts/native/quadrant-compatibility/
             artifacts/native/source-editor-fidelity/
             artifacts/native/chart-compatibility/
+            artifacts/native/reading-productivity/
+            artifacts/native/flowchart-compatibility/
             artifacts/native/chart-editor-fidelity/
             artifacts/native/workflow-compatibility/
             artifacts/native/workflow-editor-fidelity/

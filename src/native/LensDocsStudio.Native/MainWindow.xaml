@@ -42,6 +42,7 @@
     <MenuItem Header="_Open document…" InputGestureText="Ctrl+O" Command="{Binding OpenDocumentCommand}"/>
     <MenuItem Header="Open _folder…" InputGestureText="Ctrl+Shift+O" Command="{Binding OpenFolderCommand}"/>
     <MenuItem Header="Close _workspace" Command="{Binding CloseWorkspaceCommand}" AutomationProperties.AutomationId="CloseWorkspaceMenu"><MenuItem.Icon><ui:CommandIcon Kind="CloseWorkspace"/></MenuItem.Icon></MenuItem>
+    <MenuItem Header="Open _beside…" Click="OpenBeside" AutomationProperties.AutomationId="OpenBeside"/>
     <MenuItem Header="Recent _documents" ItemsSource="{Binding RecentDocuments}" AutomationProperties.AutomationId="RecentDocuments">
      <MenuItem.ItemTemplate><DataTemplate><TextBlock Text="{Binding Path}"/></DataTemplate></MenuItem.ItemTemplate>
      <MenuItem.ItemContainerStyle><Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
@@ -257,6 +258,11 @@
    <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
     <Grid>
      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+     <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="0,3,0,0">
+      <Button x:Name="DocumentStatisticsButton" Content="Counting…" Click="ReviewDocument" HorizontalAlignment="Left" Padding="3,1" AutomationProperties.AutomationId="DocumentStatistics" AutomationProperties.Name="Open Document Review"/>
+      <TextBlock Text="{Binding ActiveDocument.PersistenceState}" FontSize="11" Margin="10,0,0,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DocumentPersistenceState"/>
+     </StackPanel>
      <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/>
      <StackPanel Grid.Column="1" Orientation="Horizontal" AutomationProperties.AutomationId="ExportCompletionActions">
       <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding CompletedExport}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
@@ -451,6 +457,7 @@
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>
       <ToolBar x:Name="OutlineToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Outline groups">
        <Button Click="ExpandOutlineGroups" ToolTip="Expand all heading groups" AutomationProperties.Name="Expand all heading groups"><ui:CommandIcon Kind="Expand"/></Button>
+       <Button Click="CopyDocumentTableOfContents" Content="TOC" ToolTip="Copy Table of Contents" AutomationProperties.Name="Copy Table of Contents"/>
        <Button Click="CollapseOutlineGroups" ToolTip="Collapse all heading groups" AutomationProperties.Name="Collapse all heading groups"><ui:CommandIcon Kind="Collapse"/></Button>
       </ToolBar>
       <Grid DockPanel.Dock="Top" Margin="10,0,10,10">
@@ -460,7 +467,10 @@
       <Grid><ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
        AutomationProperties.Name="Document outline">
        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
-      <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" Margin="{Binding Level, Converter={StaticResource HeadingIndent}}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
+      <ListBox.ItemTemplate><DataTemplate><DockPanel Margin="{Binding Level, Converter={StaticResource HeadingIndent}}">
+       <Button DockPanel.Dock="Left" Content="{Binding Glyph}" Visibility="{Binding ToggleVisibility}" Click="ToggleOutlineBranch" Padding="3,0" Margin="0,0,4,0" ToolTip="{Binding ToggleLabel}" AutomationProperties.Name="{Binding ToggleLabel}"/>
+       <TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+      </DockPanel></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
        <TextBlock TextWrapping="Wrap" Margin="14,10" VerticalAlignment="Top" Foreground="{DynamicResource MutedTextBrush}">
         <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Text" Value="No headings match this filter."/><Style.Triggers>

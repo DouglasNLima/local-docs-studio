@@ -71,6 +71,7 @@ public sealed record SourceText(IReadOnlyList<SourceLine> Lines)
     public static string Header(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) ?? "";
     public static string PrepareRendererSource(string source)
     {
+        if (Rendering.FlowchartCompatibility.IsFlowchart(source)) return Rendering.FlowchartCompatibility.Prepare(source);
         // The renderer counts non-blank/non-comment lines. Its raw trivia must not acquire the editor's line limit.
         if (source.Length <= 100_000 && (TopologySource.IsTopology(source) || ExpansionViSource.IsFamily(source))) return ChartSource.Prepare(source, int.MaxValue);
         if (source.Length <= 100_000 && (ChartSource.IsChart(source) || WorkflowSource.IsWorkflow(source))) return ChartSource.Prepare(source);

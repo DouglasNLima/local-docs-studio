@@ -1,0 +1,69 @@
+name: Native first-layout attribution
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [develop]
+    paths:
+      - '.github/workflows/native-first-layout-attribution.yml'
+      - 'scripts/native/Measure-FirstLayoutAttribution.ps1'
+      - 'scripts/native/Measure-LineHeightAlternative.ps1'
+      - 'scripts/native/diagnostics/FirstLayoutTrace/**'
+permissions:
+  contents: read
+jobs:
+  profile:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        order: [baseline-first, candidate-first]
+        observation: [untraced-first, sampled-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Bounded attribution, separate from unchanged performance acceptance
+        run: pwsh -NoProfile -File scripts/native/Measure-FirstLayoutAttribution.ps1 -Order '${{ matrix.order }}' -ObservationOrder '${{ matrix.observation }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-layout-${{ matrix.order }}-${{ matrix.observation }}
+          path: |
+            artifacts/first-layout-attribution/protocol.json
+            artifacts/first-layout-attribution/completion.json
+            artifacts/first-layout-attribution/untraced/
+            artifacts/first-layout-attribution/sampled/
+          retention-days: 30
+  line-height-alternative:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        order: [stock-first, alternative-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Isolated causal alternative, never eligible for acceptance
+        run: pwsh -NoProfile -File scripts/native/Measure-LineHeightAlternative.ps1 -Order '${{ matrix.order }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: line-height-${{ matrix.order }}
+          path: |
+            artifacts/line-height-alternative/protocol.json
+            artifacts/line-height-alternative/completion.json
+            artifacts/line-height-alternative/alternative.patch
+            artifacts/line-height-alternative/stock/
+            artifacts/line-height-alternative/alternative/
+          retention-days: 30
