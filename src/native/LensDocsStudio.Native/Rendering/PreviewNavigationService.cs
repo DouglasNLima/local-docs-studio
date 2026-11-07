@@ -22,7 +22,7 @@ public static class PreviewNavigationService
         if (viewer.Document is null || state.LastPosition?.IsInSameDocument(viewer.Document.ContentStart) != true) state.LastPosition = null;
     }
 
-    internal static TextPointer? VisiblePageTarget(FlowDocumentReader viewer)
+    internal static TextPointer? VisibleNavigationTarget(FlowDocumentReader viewer)
     {
         if (!States.TryGetValue(viewer, out var state) || state.LastPosition is not { } position || viewer.Document is null
             || !position.IsInSameDocument(viewer.Document.ContentStart) || !position.HasValidLayout) return null;
@@ -99,7 +99,9 @@ public static class PreviewNavigationService
                         }
                         shown = true;
                     }, DispatcherPriority.Loaded);
-                    return shown && !cancellation.IsCancellationRequested && viewer.Document == document;
+                    var completedScroll = shown && !cancellation.IsCancellationRequested && viewer.Document == document;
+                    if (completedScroll) state.LastPosition = position;
+                    return completedScroll;
                 }
                 var paginator = (DynamicDocumentPaginator)((IDocumentPaginatorSource)document).DocumentPaginator;
                 var page = await GetPageNumber(paginator, position, cancellation.Token);

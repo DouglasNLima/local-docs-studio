@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -117,6 +118,7 @@ public partial class MainWindow : Window
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
         if (pendingViewportDocument != displayedTab.Id && renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
+            && Preview.IsMeasureValid && Preview.IsArrangeValid && AutomationProperties.GetItemStatus(Preview) == "Ready"
             && VisiblePreviewSource() is { } source)
             displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
         TraceViewport("viewport-saved");

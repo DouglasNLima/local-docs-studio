@@ -18,6 +18,11 @@ public partial class MainWindow
         if (previewLayoutCancellation is null && Preview.IsVisible)
             previewLayoutAnchor = PreviewViewportAnchor.Capture(Preview, rendered);
         if (previewLayoutAnchor?.Document != Preview.Document) previewLayoutAnchor = null;
+        // Persist the intended source before geometry changes. A pane switch may
+        // cancel presentation while the old page is still an intermediate view.
+        if (previewLayoutAnchor is { } anchor && model.ActiveDocument is { } owner
+            && rendered.TextMap.TrySourceOffset(anchor.Position, out var source))
+            owner.PreviewSourceOffset = source;
     }
 
     private void CancelPreviewLayout()

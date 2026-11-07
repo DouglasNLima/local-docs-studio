@@ -12,10 +12,10 @@ internal sealed partial record PreviewViewportAnchor(FlowDocument Document, Text
     {
         if (viewer.Document != result.Document || !viewer.IsVisible || !viewer.IsMeasureValid || !viewer.IsArrangeValid
             || viewer.ActualHeight <= 0) return null;
-        // Pagination can move adjacent visible paragraphs onto different pages.
-        // A still-visible explicit Find/navigation target owns the reading position.
-        var pageTarget = viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll ? null : PreviewNavigationService.VisiblePageTarget(viewer);
-        var source = pageTarget is not null && result.TextMap.TrySourceOffset(pageTarget, out var target)
+        // Resizing can clip a requested literal or move adjacent paragraphs onto
+        // different pages. A still-visible explicit navigation target owns this position.
+        var navigationTarget = PreviewNavigationService.VisibleNavigationTarget(viewer);
+        var source = navigationTarget is not null && result.TextMap.TrySourceOffset(navigationTarget, out var target)
             ? target : result.TextMap.VisibleSource(viewer.ActualHeight);
         if (source is not { } offset
             || !result.TextMap.TryPreviewRange(offset, 0, out var position, out _) || position is null || !position.HasValidLayout) return null;

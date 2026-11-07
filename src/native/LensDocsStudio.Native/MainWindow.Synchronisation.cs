@@ -349,8 +349,12 @@ public partial class MainWindow
         await PersistDesktop(current => current with { Preview = (current.Preview ?? new()) with { ReadingMode = mode } });
         Preview.ApplyReadingMode(mode);
     }
-    private int? VisiblePreviewSource() => Preview.ViewingMode == FlowDocumentReaderViewingMode.Scroll
-        ? rendered?.TextMap.VisibleSource(Preview.ActualHeight) ?? syncAnchors?.VisibleSource(Preview) : syncAnchors?.VisibleSource(Preview);
+    private int? VisiblePreviewSource()
+    {
+        if (rendered is { } result && PreviewViewportAnchor.Capture(Preview, result) is { } anchor
+            && result.TextMap.TrySourceOffset(anchor.Position, out var source)) return source;
+        return rendered?.TextMap.VisibleSource(Preview.ActualHeight) ?? syncAnchors?.VisibleSource(Preview);
+    }
     private void PreviewZoomChanged(object sender, RoutedEventArgs e)
     {
         var difference = (sender as FrameworkElement)?.Tag as string == "in" ? 10 : -10;

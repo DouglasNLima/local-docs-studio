@@ -111,6 +111,9 @@ public partial class MainWindow
         }
         comparisonGrid.Children.Add(comparisonSplitter); comparisonSplitter.Width = 5;
         AutomationProperties.SetName(comparisonSplitter, "Resize comparison panes"); comparisonSplitter.Focusable = true;
+        comparisonSplitter.PreviewKeyDown += ComparisonResizeKey;
+        comparisonSplitter.DragStarted += (_, _) => BeginComparisonReflow();
+        comparisonSplitter.DragCompleted += (_, _) => FinishComparisonReflow();
         comparisonSplitter.KeyDown += (_, e) =>
         {
             if (e.Key is not (Key.Left or Key.Right or Key.Up or Key.Down)) return;
@@ -158,7 +161,7 @@ public partial class MainWindow
         comparisonTimer.Tick += async (_, _) => { comparisonTimer.Stop(); await RenderComparisonAsync(); };
         SizeChanged += (_, _) => LayoutComparison();
         model.DocumentRemoved += _ => { if (comparisonSlots?.Any(slot => !model.Documents.Contains(slot.Document)) == true) CloseComparison(); };
-        Closed += (_, _) => { comparisonTimer.Stop(); comparisonCancellation?.Cancel(); comparisonEditor.Document = new(); comparisonPreview.Document = new(); };
+        Closed += (_, _) => { comparisonTimer.Stop(); comparisonCancellation?.Cancel(); CancelComparisonLayout(); comparisonEditor.Document = new(); comparisonPreview.Document = new(); };
     }
     private void CaptureComparisonView()
     {
@@ -180,17 +183,25 @@ public partial class MainWindow
     {
         if (owner != document.Id || result is null || reader.Document != result.Document || !reader.IsVisible
             || version is null || !version.BelongsToSameDocumentAs(document.EditorDocument.Version)
-            || version.CompareAge(document.EditorDocument.Version) != 0 || !reader.IsMeasureValid || !reader.IsArrangeValid
-            || AutomationProperties.GetItemStatus(reader).StartsWith("Busy", StringComparison.Ordinal)
-            || result.TextMap.VisibleSource(reader.ActualHeight) is not { } source) return;
-        var anchor = PreviewViewportAnchor.Capture(reader, result);
-        if (anchor is not null && result.TextMap.TrySourceOffset(anchor.Position, out var anchoredSource)) source = anchoredSource;
+            || version.CompareAge(document.EditorDocument.Version) != 0) return;
+        var anchor = ReferenceEquals(reader, Preview) && previewLayoutCancellation is not null
+            && previewLayoutAnchor?.Document == result.Document ? previewLayoutAnchor : null;
+        if (ReferenceEquals(reader, comparisonPreview) && comparisonLayoutCancellation is not null
+            && comparisonLayoutAnchor?.Document == result.Document) anchor = comparisonLayoutAnchor;
+        if (anchor is null)
+        {
+            if (!reader.IsMeasureValid || !reader.IsArrangeValid || AutomationProperties.GetItemStatus(reader) != "Ready") return;
+            anchor = PreviewViewportAnchor.Capture(reader, result);
+        }
+        var source = anchor is not null && result.TextMap.TrySourceOffset(anchor.Position, out var anchoredSource)
+            ? anchoredSource : result.TextMap.VisibleSource(reader.ActualHeight);
+        if (source is not { } sourceOffset) return;
         // The secondary reader belongs to its document too. Save its source position
         // before activation replaces the shared reader and its immutable source map.
-        document.PreviewSourceOffset = source;
+        document.PreviewSourceOffset = sourceOffset;
         var view = comparisonViews.GetValueOrDefault(document.Id) ?? new(0, 0, 0, document.VerticalOffset, 0, "", "", false, false, false);
         comparisonViews[document.Id] = view with { PreviewTop = ComparisonScroller(reader)?.VerticalOffset ?? 0,
-            PreviewAnchor = (source, anchor?.VerticalFraction ?? 0), PreviewVersion = version,
+            PreviewAnchor = (sourceOffset, anchor?.VerticalFraction ?? 0), PreviewVersion = version,
             PreviewSelection = reader.Selection is { IsEmpty: false } selection
                 && result.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length) ? (start, length) : null };
     }
@@ -282,7 +293,7 @@ public partial class MainWindow
         var completedPreviewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
         CapturePreviewLayoutAnchor();
         CancelSynchronisation();
-        CaptureComparisonView(); comparisonSlots = null; comparisonGeneration++; comparisonCancellation?.Cancel(); comparisonTimer.Stop();
+        CaptureComparisonView(); comparisonSlots = null; comparisonGeneration++; comparisonCancellation?.Cancel(); CancelComparisonLayout(); comparisonTimer.Stop();
         foreach (var body in comparisonBodies) body.Children.Clear();
         comparisonGrid.Children.Clear(); comparisonGrid.RowDefinitions.Clear(); comparisonGrid.ColumnDefinitions.Clear();
         comparisonGrid.Children.Add(ContentGrid); Grid.SetRow(ContentGrid, 0); Grid.SetColumn(ContentGrid, 0);
@@ -306,7 +317,7 @@ public partial class MainWindow
         { highlighting.Dark = ThemeService.IsDark(model.Theme); highlighting.HighContrast = SystemParameters.HighContrast; }
         comparisonEditor.TextArea.TextView.Redraw();
         if (slot.Mode == "Preview" && comparisonRequestedId == document.Id && comparisonRequestedVersion?.CompareAge(document.EditorDocument.Version) == 0 && comparisonRequestedContext == context) return;
-        comparisonGeneration++; comparisonCancellation?.Cancel(); comparisonTimer.Stop();
+        comparisonGeneration++; comparisonCancellation?.Cancel(); CancelComparisonLayout(); comparisonTimer.Stop();
         comparisonRequestedId = slot.Mode == "Preview" ? document.Id : null;
         comparisonRequestedVersion = document.EditorDocument.Version; comparisonRequestedContext = context;
         if (slot.Mode == "Preview") comparisonTimer.Start();
