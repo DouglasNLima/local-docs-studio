@@ -1,0 +1,104 @@
+Preparing worktree (detached HEAD 358d2a6)
+Updating files:  11% (323/2913)Updating files:  12% (350/2913)Updating files:  13% (379/2913)Updating files:  14% (408/2913)error: unable to create file docs/native/evidence/continuous-preview-performance/application-4e55d15/interactions-high-contrast.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-comparison-1-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-comparison-2-protocol.json: Filename too long
+Updating files:  15% (437/2913)error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-framework-marker-1-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-framework-marker-1.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-framework-marker-2-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-framework-marker-2.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-1-baseline-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-1-baseline-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-1-baseline-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-1-candidate-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-1-candidate-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-1-candidate-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-2-baseline-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-2-baseline-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-2-baseline-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-2-candidate-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-2-candidate-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-paired-2-candidate-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/1f0463e-temperature-samples.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/2134fe8-native-prototype-1.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/2134fe8-native-prototype-2.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/2134fe8-normal-watch-phase-failure.txt: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/2134fe8-replication-1-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/2134fe8-replication-2-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-actual-dark-1280x800.png: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-actual-high-contrast-1280x800.png: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-1-baseline-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-1-baseline-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-1-baseline-shell-phases.json: Filename too long
+Updating files:  16% (467/2913)error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-1-candidate-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-1-candidate-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-1-candidate-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-2-baseline-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-2-baseline-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-2-baseline-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-2-candidate-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-2-candidate-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-paired-2-candidate-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-replication-1-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/7e80d1a-replication-2-protocol.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/local-palette-resource-consumer.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/local-palette-scheduling-three-processes.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/original-749-launches-1-2134fe8.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/original-749-launches-1-29b728f.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/original-749-launches-2-2134fe8.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/original-749-launches-2-29b728f.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/rejected-resource-batch-experiment.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-2134fe8-high-contrast-disable.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-2134fe8-high-contrast-transition-initial.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-2134fe8-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-2134fe8-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-29b728f-native-preview-scheduling.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-29b728f-shell-phases.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/continuation-0237/shown-profile-29b728f-provenance.json: Filename too long
+Updating files:  17% (496/2913)error: unable to create file docs/native/evidence/continuous-preview-performance/contrast-transition-current-render-pending-adfb3be.json: Filename too long
+error: unable to create file docs/native/evidence/continuous-preview-performance/contrast-transition-stale-appearance-f8a74af.json: Filename too long
+Updating files:  18% (525/2913)Updating files:  19% (554/2913)Updating files:  19% (565/2913)Updating files:  20% (583/2913)Updating files:  21% (612/2913)error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/11063-push-high-contrast-drag-capture-failure.txt: Filename too long
+Updating files:  22% (641/2913)error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/e1fad08-er-deadline-recognition-high-contrast.json: Filename too long
+Updating files:  23% (670/2913)error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-performance-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-performance-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-display-restoration.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-suite-lifecycle.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/historical-pointer-high-contrast-windows-events.txt: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/historical-pointer-normal-windows-events.txt: Filename too long
+Updating files:  24% (700/2913)error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/independent-package-verification.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-install-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-reinstall-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-upgrade-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-install-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-reinstall-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-upgrade-ui.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-high-contrast-mermaid-ui.json: Filename too long
+Updating files:  25% (729/2913)error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-after-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-before-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-after-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-before-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-high-contrast-fidelity.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-performance-ui.json: Filename too long
+Updating files:  26% (758/2913)error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/high-contrast-suite-lifecycle.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/resource-feedback-local-diagnostic.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/second-after-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/second-before-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/second-uncached-after-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/second-uncached-before-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/uncached-after-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/mermaid-suite-ux-performance/verified-589dad/uncached-before-suite-performance.json: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-primary/appearance.json: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-primary/completion-trace.jsonl: Filename too long
+Updating files:  27% (787/2913)error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-primary/presentation-completion.json: Filename too long
+warning: unable to access 'docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-secondary/.gitattributes': Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-secondary/appearance.json: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-secondary/completion-trace.jsonl: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-secondary/identity.json: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/close-secondary/presentation-completion.json: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/completion-012-closed-comparison-frame-0.png: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/completion-013-closed-comparison-frame-1.png: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/high-contrast/completion-014-closed-comparison-frame-2.png: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/normal/close-primary/completion-trace.jsonl: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/normal/close-primary/presentation-completion.json: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/normal/close-secondary/completion-trace.jsonl: Filename too long
+error: unable to create file docs/native/evidence/preview-completion/checkpoint-7bfd/normal/close-secondary/presentation-completion.json: Filename too long
+Updating files:  28% (816/2913)fatal: cannot create directory at 'docs/native/evidence/preview-completion/checkpoint-945/completion-Automatic-high-contrast': Filename too long

@@ -1,0 +1,262 @@
+{
+  "source": "14c9b056974f43810e2ad7d45376dd516d4ebd71",
+  "tree": "0d34d8d025d1725aa4a3f466187e72395b9a44e5",
+  "scope": "Complete 14c9 terminal workflow manifest and selected retained failed/passing observations. Full logs and 27 digest-verified ZIP archives remain retained locally and identified by hosted artefact metadata.",
+  "files": [
+    {
+      "path": "preparation-failure-128486259935.log",
+      "bytes": 32383,
+      "sha256": "776a9e75fdabe0eb26b4f0d52c2f5a4b00b5c41f45ffa433d76d275350e1302c"
+    },
+    {
+      "path": "long-path-control/result.json",
+      "bytes": 707,
+      "sha256": "4ac58928f76cae7e281615b1cf1e713fe9027c4dc1dfaae5f8ce4735b6f6eb95"
+    },
+    {
+      "path": "long-path-control/false-stderr.txt",
+      "bytes": 16875,
+      "sha256": "f3b2f3bfd69fa7d285437a5a0e512e17c1fd0a085000786d8c269c567d47f294"
+    },
+    {
+      "path": "long-path-control/true-stdout.txt",
+      "bytes": 81,
+      "sha256": "c56f1e1ac5fd362eaf7846c66524f8eff8c9764bf1eeea374381b6eea59dd45d"
+    },
+    {
+      "path": "long-path-control/true-stderr.txt",
+      "bytes": 3291,
+      "sha256": "8ef3a9d0cbef5c7eae26ef6642de2a2464b80fe8411e18edcb42d1ccaf97a3e1"
+    },
+    {
+      "path": "hosted-14c9/artefacts.json",
+      "bytes": 4962,
+      "sha256": "64eb5ce492a348b65bac05b776660e20b92f3313424eb3ea882434cd30f2f627"
+    },
+    {
+      "path": "hosted-14c9/independent-final-review.json",
+      "bytes": 45905,
+      "sha256": "e3938213c207389a73aecb44149a79337d9c587584db1a43894ec3937e4f16ad"
+    },
+    {
+      "path": "hosted-14c9/pixel-review/independent-review.json",
+      "bytes": 127514,
+      "sha256": "7328cb2f01f2605a527f8ae18ec301b78fa347aa3f241121b98bbf5918b41ac6"
+    },
+    {
+      "path": "hosted-14c9/pixel-frame-correlation.json",
+      "bytes": 27165,
+      "sha256": "d20abdd3826dfa7925a5982beb21a78e8ffafc0e7a2e778b008035e8ce046ed1"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-high-contrast/foreground/trace-0/pixels-primary/identity.json",
+      "bytes": 1877,
+      "sha256": "68c4b743912a714bbe62774e6ccb26ccec7c2fbc0d67f8d22edfc959ecfb4959"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-high-contrast/foreground/trace-0/pixels-primary/appearance.json",
+      "bytes": 426,
+      "sha256": "1e977584bf6e9d6c61aa6acaf33cc3b7c89b09665e2ec6b6d4bd4887ed676e6a"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-high-contrast/foreground/trace-0/pixels-primary/completion-captures.json",
+      "bytes": 112238,
+      "sha256": "643bcde998b1805b8b50e03cd1933bf7717cb9b10fb7452ab739dbfc9612ea99"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-high-contrast/foreground/trace-0/pixels-primary/completion-006-secondary-find-frame-0.png",
+      "bytes": 50964,
+      "sha256": "eb19b58d39b1cfea1acbab478ff0bb60cbd1957bfea0e791f2e04126de2e20a7"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-high-contrast/foreground/trace-0/pixels-primary/completion-007-secondary-find-frame-1.png",
+      "bytes": 53674,
+      "sha256": "52b5497f4a1ee2e43f755edcc8c304d2065841e9b6f6952661acb3e478ff9be0"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-high-contrast/foreground/trace-0/pixels-primary/presentation-completion.json",
+      "bytes": 445,
+      "sha256": "1e0fd34cc727b5949f7b661a613c1c44c75924ddee7d895513a41371310e0432"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-normal/foreground/trace-1/pixels-primary/identity.json",
+      "bytes": 1878,
+      "sha256": "fe2fc8ce1b330144e95abe645840c7a5a0f4bca73a9635da56e36a8518ccaec9"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-normal/foreground/trace-1/pixels-primary/completion-captures.json",
+      "bytes": 112396,
+      "sha256": "09ace614d6623793a88ed2b8b29fda03cedff48044db207dd0686a17070e194d"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-normal/foreground/trace-1/pixels-primary/completion-trace.jsonl",
+      "bytes": 800788,
+      "sha256": "4e814d6b04b8e7d41f204ef7aa416fcd642c42c0d47d2d08f26aab5090c1b29c"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-normal/foreground/trace-1/pixels-primary/completion-007-secondary-find-frame-1.png",
+      "bytes": 56068,
+      "sha256": "95e4901e8c98f68af5aa3a86f014b64bfbd91baaf0f09c59186fe5b3e3e561b8"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-normal/foreground/trace-1/pixels-primary/completion-008-secondary-find-frame-2.png",
+      "bytes": 55972,
+      "sha256": "c20d03560c12613d02d9183dc6cd20ea56d8d70ce5ad187902ee103db61d5a47"
+    },
+    {
+      "path": "hosted-14c9/completion-Pages-normal/foreground/trace-1/pixels-primary/completion-009-secondary-find-all-readers-frame-0.png",
+      "bytes": 53018,
+      "sha256": "006cc79d079b15c7474453deaa750c7b0a70e4780860d678486681d1427d4042"
+    },
+    {
+      "path": "recovery-14c9/artefacts.json",
+      "bytes": 5017,
+      "sha256": "519027005c1ef16d1d7dc6fcd6c9100b53626912402986106effb59bddabaea5"
+    },
+    {
+      "path": "recovery-14c9/develop-high-contrast-packaged-10.0.13-candidate-first/candidate/failure.json",
+      "bytes": 418,
+      "sha256": "e6bed73a974dbd6b44b479054048e205cbc8a2ac17b5d73fe2bdb812b0be72a2"
+    },
+    {
+      "path": "recovery-14c9/develop-high-contrast-packaged-10.0.13-candidate-first/candidate/high-contrast-pre-assertion.json",
+      "bytes": 4136,
+      "sha256": "0e42f2494d56a7c9a5cf1bb9cd6ea4c67daed27785074cee3dad75fdac8ad072"
+    },
+    {
+      "path": "terminal-receipt-14c9.json",
+      "bytes": 491640,
+      "sha256": "e5eba9231101776b59f7ffdef5a4159858e9f9e86dfc0f1408a89600e8a6dfec"
+    },
+    {
+      "path": "treeview-review-14c9.json",
+      "bytes": 217451,
+      "sha256": "c6216c0121a2e3cf511b4b7e7220044f8d2a90b9a0e9bbc34c1c28648165ee06"
+    },
+    {
+      "path": "closure-14c9/artefacts.json",
+      "bytes": 5025,
+      "sha256": "1da8bf8c22e5f801fc08b20ce8d031bb01f7fb0a10095f690d20d6335440af77"
+    },
+    {
+      "path": "native-14c9/artefacts.json",
+      "bytes": 835,
+      "sha256": "fbcb7a12a6c0a3c1db4f677c51a0237849b8eb557c5862bc287f4e39a7e3c289"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/3d56d4a05fd04b77a5854d0d851b7f00/treeview-installer-results.json",
+      "bytes": 33522,
+      "sha256": "bf889cafefad0372fc85f6b90a20de76a45bb45736602450c13fdc1d49b2746e"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/478bd0124a1d4202bdf5d92f26c8dba4/treeview-installer-results.json",
+      "bytes": 33522,
+      "sha256": "3e433cc8a92fe8be8516f33d855a6dbfe2aa5b1af93434f644f934695d7b7f29"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/treeview-installer-results.json",
+      "bytes": 34205,
+      "sha256": "9ce4e50575c8ce7c44edaa13ad05776f086f86483d64812b0711ab5b78bc6ce5"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/treeview-installer-results.json",
+      "bytes": 34205,
+      "sha256": "b1a84616ae55f42b6f51cc2670151b3a8e29cb3908d48e528805394cc812fa23"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/install/saved-closure.jsonl",
+      "bytes": 4738,
+      "sha256": "badc9976b48ba9ce323b7882e90fa90767dd39f8f777e33f0b66d2953321918c"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/reinstall/saved-closure.jsonl",
+      "bytes": 4607,
+      "sha256": "b077c6aa3d71a0b75310beba9855bdb0bba7065b481aa3ae1e77b427e0dd376a"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/upgrade/saved-closure.jsonl",
+      "bytes": 4590,
+      "sha256": "1bd80da6eacd698eea5af795206a917c4bb770f01f8c9807ec6faba6d46ca7b9"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/install/saved-closure.jsonl",
+      "bytes": 4670,
+      "sha256": "074b9ce5c13def3e29be7a40e8caa2afcd90eff884bb47fbfbe44bfea28799c5"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/reinstall/saved-closure.jsonl",
+      "bytes": 4659,
+      "sha256": "a863423b73a6c0de24fc826c56f7f82f59a985b67f17241a8aec35ae3e08add9"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/upgrade/saved-closure.jsonl",
+      "bytes": 4694,
+      "sha256": "45e11d9625199d24886a633044576cbf7aebc4ad8f20fa8cd7d9adecf31bbdb0"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/3d56d4a05fd04b77a5854d0d851b7f00/install/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/3d56d4a05fd04b77a5854d0d851b7f00/reinstall/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/3d56d4a05fd04b77a5854d0d851b7f00/upgrade/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/478bd0124a1d4202bdf5d92f26c8dba4/install/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/478bd0124a1d4202bdf5d92f26c8dba4/reinstall/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-0/native/treeview-install-smoke/478bd0124a1d4202bdf5d92f26c8dba4/upgrade/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/install/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/reinstall/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/1b4fb760f7da462a8458c058895b7587/upgrade/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/install/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/reinstall/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "closure-14c9/treeview-closure-baseline-first-trace-1/native/treeview-install-smoke/b369fa270a4e4e548cdc9fe070b95d2c/upgrade/authoring-ui.json",
+      "bytes": 1716,
+      "sha256": "322bff24d0a643905ffbbd2e54e5f77ea835f6bd55da86ad5d83cd7714ada331"
+    },
+    {
+      "path": "native-14c9/native-TreeView-installed-authoring/treeview-install-smoke/66177da1445d4001ae13e6142ef90e45/treeview-installer-results.json",
+      "bytes": 33522,
+      "sha256": "d609e15b99c3451fb076a6c7fea786c3f3981eeec38634fef74f525e86f602ae"
+    }
+  ]
+}

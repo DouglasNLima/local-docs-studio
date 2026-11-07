@@ -1,0 +1,1587 @@
+{
+  "source": "14c9b056974f43810e2ad7d45376dd516d4ebd71",
+  "tree": "0d34d8d025d1725aa4a3f466187e72395b9a44e5",
+  "cohorts": [
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "mode": "Automatic",
+      "appearance": "high-contrast",
+      "collection": "PASS",
+      "pendingInterruption": "INCONCLUSIVE",
+      "rawPresentation": "PASS",
+      "fullFrames": 69,
+      "labelCrops": 69,
+      "deferredReaderSamples": 8
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "mode": "Automatic",
+      "appearance": "normal",
+      "collection": "PASS",
+      "pendingInterruption": "INCONCLUSIVE",
+      "rawPresentation": "PASS",
+      "fullFrames": 69,
+      "labelCrops": 69,
+      "deferredReaderSamples": 0
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "mode": "Continuous",
+      "appearance": "high-contrast",
+      "collection": "PASS",
+      "pendingInterruption": "INCONCLUSIVE",
+      "rawPresentation": "PASS",
+      "fullFrames": 69,
+      "labelCrops": 69,
+      "deferredReaderSamples": 0
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "mode": "Continuous",
+      "appearance": "normal",
+      "collection": "PASS",
+      "pendingInterruption": "INCONCLUSIVE",
+      "rawPresentation": "INCONCLUSIVE",
+      "fullFrames": 69,
+      "labelCrops": 69,
+      "deferredReaderSamples": 6
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "mode": "Pages",
+      "appearance": "high-contrast",
+      "collection": "PASS",
+      "pendingInterruption": "PASS",
+      "rawPresentation": "INCONCLUSIVE",
+      "fullFrames": 69,
+      "labelCrops": 192,
+      "deferredReaderSamples": 8
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "mode": "Pages",
+      "appearance": "normal",
+      "collection": "PASS",
+      "pendingInterruption": "PASS",
+      "rawPresentation": "INCONCLUSIVE",
+      "fullFrames": 69,
+      "labelCrops": 192,
+      "deferredReaderSamples": 11
+    }
+  ],
+  "foregroundProcesses": 66,
+  "controlledProcesses": 24,
+  "qualifiedPendingPages": [
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "completion-Pages-high-contrast/foreground/trace-1/close-primary",
+      "action": "close",
+      "reader": "primary",
+      "operation": {
+        "id": 33403180,
+        "reader": "primary",
+        "start": 1751606178,
+        "end": 1752028127,
+        "cancelled": 1751707402,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 1751693800,
+        "operation": 33403180,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 1751690616,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 524808,
+          "message": 514,
+          "key": 0,
+          "offered": 33403180
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 8.4438,
+        "wpfDelivery": 8.7622,
+        "cancelled": 10.1224,
+        "rejected": 42.1949
+      }
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "completion-Pages-high-contrast/foreground/trace-1/close-secondary",
+      "action": "close",
+      "reader": "secondary",
+      "operation": {
+        "id": 41060200,
+        "reader": "secondary",
+        "start": 1816328841,
+        "end": 1816940840,
+        "cancelled": 1816480673,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 1816455150,
+        "operation": 41060200,
+        "reader": "secondary",
+        "action": "close",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 1816452941,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 262754,
+          "message": 514,
+          "key": 0,
+          "offered": 41060200
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 12.41,
+        "wpfDelivery": 12.6309,
+        "cancelled": 15.1832,
+        "rejected": 61.1999
+      }
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "completion-Pages-high-contrast/foreground/trace-1/find-primary",
+      "action": "find",
+      "reader": "primary",
+      "operation": {
+        "id": 65129872,
+        "reader": "primary",
+        "start": 2024526302,
+        "end": 2024650503,
+        "cancelled": 2024610166,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2024599758,
+        "operation": 65129872,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2024599122,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 917654,
+          "message": 256,
+          "key": 27,
+          "offered": 65129872
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 7.282,
+        "wpfDelivery": 7.3456,
+        "cancelled": 8.3864,
+        "rejected": 12.4201
+      }
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "completion-Pages-high-contrast/foreground/trace-1/find-secondary",
+      "action": "find",
+      "reader": "secondary",
+      "operation": {
+        "id": 53787560,
+        "reader": "secondary",
+        "start": 2092073422,
+        "end": 2092218129,
+        "cancelled": 2092175222,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2092160971,
+        "operation": 53787560,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2092160327,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 1441954,
+          "message": 256,
+          "key": 27,
+          "offered": 53787560
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 8.6905,
+        "wpfDelivery": 8.7549,
+        "cancelled": 10.18,
+        "rejected": 14.4707
+      }
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "completion-Pages-high-contrast/foreground/trace-1/switch-primary",
+      "action": "switch",
+      "reader": "primary",
+      "operation": {
+        "id": 43913088,
+        "reader": "primary",
+        "start": 1881903227,
+        "end": 1882423926,
+        "cancelled": 1882011869,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 1882004837,
+        "operation": 43913088,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 1882004016,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 393822,
+          "message": 256,
+          "key": 9,
+          "offered": 43913088
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 10.0789,
+        "wpfDelivery": 10.161,
+        "cancelled": 10.8642,
+        "rejected": 52.0699
+      }
+    },
+    {
+      "cohort": "completion-Pages-high-contrast",
+      "cell": "completion-Pages-high-contrast/foreground/trace-1/switch-secondary",
+      "action": "switch",
+      "reader": "secondary",
+      "operation": {
+        "id": 62483905,
+        "reader": "secondary",
+        "start": 1953660181,
+        "end": 1954150304,
+        "cancelled": 1954140972,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 1953742825,
+        "operation": 62483905,
+        "reader": "secondary",
+        "action": "switch",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 1953742221,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 655966,
+          "message": 256,
+          "key": 9,
+          "offered": 62483905
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 8.204,
+        "wpfDelivery": 8.2644,
+        "cancelled": 48.0791,
+        "rejected": 49.0123
+      }
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "completion-Pages-normal/foreground/trace-1/close-primary",
+      "action": "close",
+      "reader": "primary",
+      "operation": {
+        "id": 35827188,
+        "reader": "primary",
+        "start": 1836053348,
+        "end": 1836831494,
+        "cancelled": 1836223601,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 1836202680,
+        "operation": 35827188,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 1836198983,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 131412,
+          "message": 514,
+          "key": 0,
+          "offered": 35827188
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 14.5635,
+        "wpfDelivery": 14.9332,
+        "cancelled": 17.0253,
+        "rejected": 77.8146
+      }
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "completion-Pages-normal/foreground/trace-1/close-secondary",
+      "action": "close",
+      "reader": "secondary",
+      "operation": {
+        "id": 6558137,
+        "reader": "secondary",
+        "start": 1913921813,
+        "end": 1914551809,
+        "cancelled": 1914078644,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 1914053681,
+        "operation": 6558137,
+        "reader": "secondary",
+        "action": "close",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 1914050795,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 196962,
+          "message": 514,
+          "key": 0,
+          "offered": 6558137
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 12.8982,
+        "wpfDelivery": 13.1868,
+        "cancelled": 15.6831,
+        "rejected": 62.9996
+      }
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "completion-Pages-normal/foreground/trace-1/find-primary",
+      "action": "find",
+      "reader": "primary",
+      "operation": {
+        "id": 1927678,
+        "reader": "primary",
+        "start": 2167607998,
+        "end": 2167788809,
+        "cancelled": 2167736126,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2167723635,
+        "operation": 1927678,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2167722676,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 393570,
+          "message": 256,
+          "key": 27,
+          "offered": 1927678
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 11.4678,
+        "wpfDelivery": 11.5637,
+        "cancelled": 12.8128,
+        "rejected": 18.0811
+      }
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "completion-Pages-normal/foreground/trace-1/find-secondary",
+      "action": "find",
+      "reader": "secondary",
+      "operation": {
+        "id": 17959024,
+        "reader": "secondary",
+        "start": 2246488305,
+        "end": 2246653054,
+        "cancelled": 2246598259,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2246582039,
+        "operation": 17959024,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2246580941,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 459106,
+          "message": 256,
+          "key": 27,
+          "offered": 17959024
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 9.2636,
+        "wpfDelivery": 9.3734,
+        "cancelled": 10.9954,
+        "rejected": 16.4749
+      }
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "completion-Pages-normal/foreground/trace-1/switch-primary",
+      "action": "switch",
+      "reader": "primary",
+      "operation": {
+        "id": 61994265,
+        "reader": "primary",
+        "start": 1994709632,
+        "end": 1995390866,
+        "cancelled": 1994852485,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 1994844174,
+        "operation": 61994265,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 1994843179,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 328064,
+          "message": 256,
+          "key": 9,
+          "offered": 61994265
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 13.3547,
+        "wpfDelivery": 13.4542,
+        "cancelled": 14.2853,
+        "rejected": 68.1234
+      }
+    },
+    {
+      "cohort": "completion-Pages-normal",
+      "cell": "completion-Pages-normal/foreground/trace-1/switch-secondary",
+      "action": "switch",
+      "reader": "secondary",
+      "operation": {
+        "id": 50401813,
+        "reader": "secondary",
+        "start": 2079931688,
+        "end": 2080476515,
+        "cancelled": 2080466055,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2080035129,
+        "operation": 50401813,
+        "reader": "secondary",
+        "action": "switch",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2080034076,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 459140,
+          "message": 256,
+          "key": 9,
+          "offered": 50401813
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "millisecondsAfterStart": {
+        "native": 10.2388,
+        "wpfDelivery": 10.3441,
+        "cancelled": 53.4367,
+        "rejected": 54.4827
+      }
+    }
+  ],
+  "lateScrollDeliveries": [
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "completion-Automatic-high-contrast/foreground/trace-1/close-primary",
+      "action": "close",
+      "reader": "primary",
+      "operation": {
+        "id": 51553599,
+        "reader": "primary",
+        "start": 2545897377,
+        "end": 2546191426,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2546747035,
+        "operation": 51553599,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 2546742738,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 262500,
+          "message": 514,
+          "key": 0,
+          "offered": 51553599
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 55.5609
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "completion-Automatic-high-contrast/foreground/trace-1/close-secondary",
+      "action": "close",
+      "reader": "secondary",
+      "operation": {
+        "id": 27175164,
+        "reader": "secondary",
+        "start": 2634397386,
+        "end": 2634547113,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2635125351,
+        "operation": 27175164,
+        "reader": "secondary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 2635119978,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 328124,
+          "message": 514,
+          "key": 0,
+          "offered": 27175164
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 57.8238
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "completion-Automatic-high-contrast/foreground/trace-1/find-primary",
+      "action": "find",
+      "reader": "primary",
+      "operation": {
+        "id": 28825921,
+        "reader": "primary",
+        "start": 2894329165,
+        "end": 2894586126,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2895008319,
+        "operation": 28825921,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2895007700,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 2162808,
+          "message": 256,
+          "key": 27,
+          "offered": 28825921
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 42.2193
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "completion-Automatic-high-contrast/foreground/trace-1/find-secondary",
+      "action": "find",
+      "reader": "secondary",
+      "operation": {
+        "id": 35436034,
+        "reader": "secondary",
+        "start": 2974024839,
+        "end": 2974153832,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2974661505,
+        "operation": 35436034,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2974660714,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 393782,
+          "message": 256,
+          "key": 27,
+          "offered": 35436034
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 50.7673
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "completion-Automatic-high-contrast/foreground/trace-1/switch-primary",
+      "action": "switch",
+      "reader": "primary",
+      "operation": {
+        "id": 28773715,
+        "reader": "primary",
+        "start": 2716979115,
+        "end": 2717233864,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2717678871,
+        "operation": 28773715,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2717678090,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 590180,
+          "message": 256,
+          "key": 9,
+          "offered": 28773715
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 44.5007
+    },
+    {
+      "cohort": "completion-Automatic-high-contrast",
+      "cell": "completion-Automatic-high-contrast/foreground/trace-1/switch-secondary",
+      "action": "switch",
+      "reader": "secondary",
+      "operation": {
+        "id": 28825921,
+        "reader": "secondary",
+        "start": 2805369502,
+        "end": 2805500652,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2806010827,
+        "operation": 28825921,
+        "reader": "secondary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2806010104,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 1376556,
+          "message": 256,
+          "key": 9,
+          "offered": 28825921
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 51.0175
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "completion-Automatic-normal/foreground/trace-1/close-primary",
+      "action": "close",
+      "reader": "primary",
+      "operation": {
+        "id": 29367324,
+        "reader": "primary",
+        "start": 2627107512,
+        "end": 2627363701,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2627753322,
+        "operation": 29367324,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 2627750191,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 131480,
+          "message": 514,
+          "key": 0,
+          "offered": 29367324
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 38.9621
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "completion-Automatic-normal/foreground/trace-1/close-secondary",
+      "action": "close",
+      "reader": "secondary",
+      "operation": {
+        "id": 59223530,
+        "reader": "secondary",
+        "start": 2684492404,
+        "end": 2684610114,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2685046146,
+        "operation": 59223530,
+        "reader": "secondary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 2685042605,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 196774,
+          "message": 514,
+          "key": 0,
+          "offered": 59223530
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 43.6032
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "completion-Automatic-normal/foreground/trace-1/find-primary",
+      "action": "find",
+      "reader": "primary",
+      "operation": {
+        "id": 43261599,
+        "reader": "primary",
+        "start": 2870122854,
+        "end": 2870590385,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2870970857,
+        "operation": 43261599,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2870969891,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 393736,
+          "message": 256,
+          "key": 27,
+          "offered": 43261599
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 38.0472
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "completion-Automatic-normal/foreground/trace-1/find-secondary",
+      "action": "find",
+      "reader": "secondary",
+      "operation": {
+        "id": 36352739,
+        "reader": "secondary",
+        "start": 2928408031,
+        "end": 2928523964,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2928942473,
+        "operation": 36352739,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2928941837,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 524654,
+          "message": 256,
+          "key": 27,
+          "offered": 36352739
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 41.8509
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "completion-Automatic-normal/foreground/trace-1/switch-primary",
+      "action": "switch",
+      "reader": "primary",
+      "operation": {
+        "id": 2823569,
+        "reader": "primary",
+        "start": 2742201688,
+        "end": 2742418393,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2742758390,
+        "operation": 2823569,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2742757676,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 262552,
+          "message": 256,
+          "key": 9,
+          "offered": 2823569
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 33.9997
+    },
+    {
+      "cohort": "completion-Automatic-normal",
+      "cell": "completion-Automatic-normal/foreground/trace-1/switch-secondary",
+      "action": "switch",
+      "reader": "secondary",
+      "operation": {
+        "id": 46230895,
+        "reader": "secondary",
+        "start": 2805975483,
+        "end": 2806081483,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2806477727,
+        "operation": 46230895,
+        "reader": "secondary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2806476875,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 327846,
+          "message": 256,
+          "key": 9,
+          "offered": 46230895
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 39.6244
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "completion-Continuous-high-contrast/foreground/trace-1/close-primary",
+      "action": "close",
+      "reader": "primary",
+      "operation": {
+        "id": 7933208,
+        "reader": "primary",
+        "start": 2401525217,
+        "end": 2401735133,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2402098741,
+        "operation": 7933208,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 2402095639,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 196974,
+          "message": 514,
+          "key": 0,
+          "offered": 7933208
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 36.3608
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "completion-Continuous-high-contrast/foreground/trace-1/close-secondary",
+      "action": "close",
+      "reader": "secondary",
+      "operation": {
+        "id": 2682025,
+        "reader": "secondary",
+        "start": 2471286308,
+        "end": 2471408142,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2471897728,
+        "operation": 2682025,
+        "reader": "secondary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 2471894059,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 459286,
+          "message": 514,
+          "key": 0,
+          "offered": 2682025
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 48.9586
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "completion-Continuous-high-contrast/foreground/trace-1/find-primary",
+      "action": "find",
+      "reader": "primary",
+      "operation": {
+        "id": 33706320,
+        "reader": "primary",
+        "start": 2701704947,
+        "end": 2701933970,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2702292818,
+        "operation": 33706320,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2702292163,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 1049188,
+          "message": 256,
+          "key": 27,
+          "offered": 33706320
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 35.8848
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "completion-Continuous-high-contrast/foreground/trace-1/find-secondary",
+      "action": "find",
+      "reader": "secondary",
+      "operation": {
+        "id": 20855190,
+        "reader": "secondary",
+        "start": 2774085270,
+        "end": 2774202349,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2774624284,
+        "operation": 20855190,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2774623563,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 1442184,
+          "message": 256,
+          "key": 27,
+          "offered": 20855190
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 42.1935
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "completion-Continuous-high-contrast/foreground/trace-1/switch-primary",
+      "action": "switch",
+      "reader": "primary",
+      "operation": {
+        "id": 16894936,
+        "reader": "primary",
+        "start": 2541534347,
+        "end": 2541781983,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 2543017053,
+        "operation": 16894936,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2543014865,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 459124,
+          "message": 256,
+          "key": 9,
+          "offered": 16894936
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 123.507
+    },
+    {
+      "cohort": "completion-Continuous-high-contrast",
+      "cell": "completion-Continuous-high-contrast/foreground/trace-1/switch-secondary",
+      "action": "switch",
+      "reader": "secondary",
+      "operation": {
+        "id": 30107593,
+        "reader": "secondary",
+        "start": 2622223031,
+        "end": 2622347145,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 2622785456,
+        "operation": 30107593,
+        "reader": "secondary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 2622784615,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 918072,
+          "message": 256,
+          "key": 9,
+          "offered": 30107593
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 43.8311
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "completion-Continuous-normal/foreground/trace-1/close-primary",
+      "action": "close",
+      "reader": "primary",
+      "operation": {
+        "id": 30919674,
+        "reader": "primary",
+        "start": 4516725506,
+        "end": 4517001902,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 4517521209,
+        "operation": 30919674,
+        "reader": "primary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 4517516282,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 262244,
+          "message": 514,
+          "key": 0,
+          "offered": 30919674
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 51.9307
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "completion-Continuous-normal/foreground/trace-1/close-secondary",
+      "action": "close",
+      "reader": "secondary",
+      "operation": {
+        "id": 38861390,
+        "reader": "secondary",
+        "start": 4588528365,
+        "end": 4588687166,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 4589271685,
+        "operation": 38861390,
+        "reader": "secondary",
+        "action": "close",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": "CloseComparison"
+      },
+      "nativeMessages": [
+        {
+          "tick": 4589266572,
+          "boundary": "native-input",
+          "source": "hwnd-hook",
+          "handle": 262490,
+          "message": 514,
+          "key": 0,
+          "offered": 38861390
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 58.4519
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "completion-Continuous-normal/foreground/trace-1/find-primary",
+      "action": "find",
+      "reader": "primary",
+      "operation": {
+        "id": 28773715,
+        "reader": "primary",
+        "start": 4804992079,
+        "end": 4805256598,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 4805688147,
+        "operation": 28773715,
+        "reader": "primary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 4805687504,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 524632,
+          "message": 256,
+          "key": 27,
+          "offered": 28773715
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 43.1549
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "completion-Continuous-normal/foreground/trace-1/find-secondary",
+      "action": "find",
+      "reader": "secondary",
+      "operation": {
+        "id": 55018480,
+        "reader": "secondary",
+        "start": 4873231040,
+        "end": 4873416883,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 4873983533,
+        "operation": 55018480,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 4873982862,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 590168,
+          "message": 256,
+          "key": 27,
+          "offered": 55018480
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 56.665
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "completion-Continuous-normal/foreground/trace-1/switch-primary",
+      "action": "switch",
+      "reader": "primary",
+      "operation": {
+        "id": 28773715,
+        "reader": "primary",
+        "start": 4657062979,
+        "end": 4657316043,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 34
+      },
+      "delivery": {
+        "tick": 4657766626,
+        "operation": 28773715,
+        "reader": "primary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 4657765826,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 262512,
+          "message": 256,
+          "key": 9,
+          "offered": 28773715
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 45.0583
+    },
+    {
+      "cohort": "completion-Continuous-normal",
+      "cell": "completion-Continuous-normal/foreground/trace-1/switch-secondary",
+      "action": "switch",
+      "reader": "secondary",
+      "operation": {
+        "id": 28825921,
+        "reader": "secondary",
+        "start": 4730785563,
+        "end": 4730925083,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      },
+      "delivery": {
+        "tick": 4731458918,
+        "operation": 28825921,
+        "reader": "secondary",
+        "action": "switch",
+        "pendingTask": false,
+        "sameCancellation": false,
+        "cancellationRequested": true,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      },
+      "nativeMessages": [
+        {
+          "tick": 4731458104,
+          "boundary": "native-input",
+          "source": "thread-filter",
+          "handle": 328088,
+          "message": 256,
+          "key": 9,
+          "offered": 28825921
+        }
+      ],
+      "frequency": 10000000,
+      "sourceIntegrity": "PASS",
+      "deliveryAfterCompletionMs": 53.3835
+    }
+  ],
+  "maximumTraceRecords": 1086,
+  "fullFrames": 414,
+  "labelCrops": 660,
+  "independentPixels": {
+    "OCR recognition error": 218,
+    "REAL PIXEL DIFFERENCE": 4
+  },
+  "visualFailure": "FAIL retained: one uninstrumented actual OS High Contrast frame has stale Ready-reader status and page labels. Exact cause INCONCLUSIVE without compositor trace. Two other real pixel differences belong to an explicitly Busy secondary reader at a primary-only boundary; its later mandatory all-readers boundary is independently accepted. No raw assertion is suppressed.",
+  "overall": "NO-GO: full collection is not visual-completion acceptance. Pages cancellation is qualified; Continuous/Automatic pending interruption and exact original High Contrast cause remain INCONCLUSIVE. One final-source diagnostics-disabled frame is visually stale."
+}

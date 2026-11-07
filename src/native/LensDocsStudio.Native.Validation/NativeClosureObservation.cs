@@ -95,6 +95,7 @@ internal static class NativeClosureObservation
                 var cancel = owner.FindFirstDescendant(cf => cf.ByAutomationId("CancelOperation"));
                 var text = status?.Name;
                 Record("uia-after-close", new { elapsedMs = timer.Elapsed.TotalMilliseconds,
+                    statusPresent = status is not null, cancelPresent = cancel is not null,
                     busyCloseRejected = text == "Wait for the current operation to finish, or cancel it before closing.",
                     savedStatus = text?.StartsWith("Saved ", StringComparison.Ordinal), cancelEnabled = cancel?.IsEnabled,
                     owner.IsEnabled, owner.IsOffscreen, owner.Properties.ProcessId.Value });

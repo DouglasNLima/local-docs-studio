@@ -33,7 +33,7 @@ $products = @{}
 foreach ($side in 'baseline','candidate') {
     $revision = if ($side -eq 'baseline') { $BaselineRevision } else { $CandidateRevision }
     $checkout = Join-Path $output "$side-source"
-    git worktree add --detach $checkout $revision
+    git -c core.longpaths=true worktree add --detach $checkout $revision
     if ($LASTEXITCODE) { throw "Cannot check out $side exact source." }
     dotnet build "$checkout/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj" -c Release -p:RestoreLockedMode=true "-p:SourceRevisionId=$revision"
     if ($LASTEXITCODE) { throw "Cannot build $side product." }

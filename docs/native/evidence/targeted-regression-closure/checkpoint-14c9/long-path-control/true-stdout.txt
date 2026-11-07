@@ -1,0 +1,1 @@
+HEAD is now at 358d2a6 test(native): fence completion captures on visual changes

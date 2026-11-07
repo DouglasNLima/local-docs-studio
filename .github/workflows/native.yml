@@ -636,6 +636,51 @@ jobs:
             artifacts/native/treemap-install-smoke/
             artifacts/native/venn-install-smoke/
           retention-days: 14
+  treeview-closure:
+    name: TreeView closure (${{ matrix.order }}, trace ${{ matrix.trace }})
+    needs: native
+    if: ${{ !cancelled() && !inputs.replay_original_853 && (github.head_ref == 'feature/reading-experience-productivity' || github.ref == 'refs/heads/feature/reading-experience-productivity') }}
+    runs-on: windows-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        order: [baseline-first, candidate-first]
+        trace: ['1', '0']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Retrieve original exact-source installed baseline
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          run-id: 42391694305
+          github-token: ${{ github.token }}
+          path: artifacts/treeview-baseline
+      - name: Retrieve this run's exact-source installed candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          path: artifacts/treeview-candidate
+      - name: Build the identical lifecycle observer
+        run: dotnet build src/native/LensDocsStudio.Native.Validation -c Release -p:RestoreLockedMode=true
+      - name: Preserve full independent install upgrade and reinstall observations
+        run: scripts/native/Test-TreeViewClosure.ps1 -CandidatePackageNumber '${{ github.run_number }}' -Order '${{ matrix.order }}' -Trace '${{ matrix.trace }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: treeview-closure-${{ matrix.order }}-trace-${{ matrix.trace }}
+          path: |
+            artifacts/native/treeview-closure/
+            artifacts/native/treeview-install-smoke/
+          retention-days: 14
   historical-upgrade:
     name: Historical upgrade (${{ matrix.preview }})
     needs: native
