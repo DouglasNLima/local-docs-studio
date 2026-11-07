@@ -124,14 +124,17 @@ internal sealed partial class Probe
             await ComparisonMode(0, "Preview"); await Until(() => ComparisonReady(first, false));
         }
         await ComparisonFindEnd(first);
+        currentAction = "comparison-activate-secondary";
         await ClickControl("ActivateComparison1"); await Until(() => model.ActiveDocument == second && ComparisonReady(second, false));
         await ComparisonFindEnd(second);
+        currentAction = "comparison-return-primary";
         await ClickControl("ActivateComparison0");
         await Until(() => model.ActiveDocument == first && ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
         await ComparisonEvidence("preview-preview-deep");
 
         if (scenario == "resize")
         {
+            currentAction = "comparison-keyboard-resize";
             var splitter = await Ui(() => Tree(window).OfType<GridSplitter>().Single(e => e.IsVisible && AutomationProperties.GetName(e) == "Resize comparison panes"));
             await PointAt(splitter);
             Desktop.Click();
@@ -141,6 +144,7 @@ internal sealed partial class Probe
             for (var i = 0; i < 8; i++) Desktop.Key(direction);
             await Until(() => preview.RenderSize != before && ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
             await ComparisonEvidence("resized-comparison");
+            currentAction = "comparison-pointer-resize";
             await PointAt(splitter);
             var dragStart = await Ui(() => splitter.PointToScreen(new Point(splitter.ActualWidth / 2, splitter.ActualHeight / 2)));
             var dragEnd = await Ui(() => splitter.ResizeDirection == GridResizeDirection.Rows
@@ -156,9 +160,11 @@ internal sealed partial class Probe
             finally { Desktop.LeftUp(); }
             await Until(() => ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
             await ComparisonEvidence("dragged-comparison");
+            currentAction = "comparison-zoom-in";
             await PointAt(await Ui(() => Tree(window).OfType<Button>().First(e => e.IsVisible && AutomationProperties.GetName(e) == "Zoom in")));
             Desktop.Click(); await Until(() => preview.Zoom > 100 && ComparisonReady(first, false, "ReadableEnd"));
             await ComparisonEvidence("zoomed-comparison");
+            currentAction = "comparison-reset-zoom";
             await ClickControl("PreviewZoomLabel"); await Until(() => preview.Zoom == 100 && ComparisonReady(first, false, "ReadableEnd"));
             await ComparisonEvidence("restored-comparison-zoom");
         }
