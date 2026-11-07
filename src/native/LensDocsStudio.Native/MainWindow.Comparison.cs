@@ -161,7 +161,7 @@ public partial class MainWindow
         comparisonTimer.Tick += async (_, _) => { comparisonTimer.Stop(); await RenderComparisonAsync(); };
         SizeChanged += (_, _) => LayoutComparison();
         model.DocumentRemoved += _ => { if (comparisonSlots?.Any(slot => !model.Documents.Contains(slot.Document)) == true) CloseComparison(); };
-        Closed += (_, _) => { comparisonTimer.Stop(); comparisonCancellation?.Cancel(); CancelComparisonLayout(); comparisonEditor.Document = new(); comparisonPreview.Document = new(); };
+        Closed += (_, _) => { comparisonTimer.Stop(); comparisonCancellation?.Cancel(); CancelComparisonLayout(); PreviewNavigationService.CancelPending(comparisonPreview); comparisonEditor.Document = new(); comparisonPreview.Document = new(); };
     }
     private void CaptureComparisonView()
     {
@@ -294,6 +294,7 @@ public partial class MainWindow
         CapturePreviewLayoutAnchor();
         CancelSynchronisation();
         CaptureComparisonView(); comparisonSlots = null; comparisonGeneration++; comparisonCancellation?.Cancel(); CancelComparisonLayout(); comparisonTimer.Stop();
+        PreviewNavigationService.CancelPending(comparisonPreview);
         foreach (var body in comparisonBodies) body.Children.Clear();
         comparisonGrid.Children.Clear(); comparisonGrid.RowDefinitions.Clear(); comparisonGrid.ColumnDefinitions.Clear();
         comparisonGrid.Children.Add(ContentGrid); Grid.SetRow(ContentGrid, 0); Grid.SetColumn(ContentGrid, 0);
@@ -318,6 +319,7 @@ public partial class MainWindow
         comparisonEditor.TextArea.TextView.Redraw();
         if (slot.Mode == "Preview" && comparisonRequestedId == document.Id && comparisonRequestedVersion?.CompareAge(document.EditorDocument.Version) == 0 && comparisonRequestedContext == context) return;
         comparisonGeneration++; comparisonCancellation?.Cancel(); CancelComparisonLayout(); comparisonTimer.Stop();
+        PreviewNavigationService.CancelPending(comparisonPreview);
         comparisonRequestedId = slot.Mode == "Preview" ? document.Id : null;
         comparisonRequestedVersion = document.EditorDocument.Version; comparisonRequestedContext = context;
         if (slot.Mode == "Preview") comparisonTimer.Start();

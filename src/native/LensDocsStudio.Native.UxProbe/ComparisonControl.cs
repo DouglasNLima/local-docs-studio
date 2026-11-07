@@ -118,6 +118,18 @@ internal static class ComparisonControl
                 await Until(() => EndVisible(false, first) && EndVisible(true, second));
                 facts.Add(Snapshot("comparison-deep-primary", false, first));
                 facts.Add(Snapshot("comparison-deep-secondary", true, second));
+                if (scenario == "cancelnav")
+                {
+                    // The old reader's queued native navigation must be cancelled
+                    // before the same control is assigned to another comparison owner.
+                    var obsolete = PreviewNavigationService.BringIntoViewAsync(Reader(true), Reader(true).Document.ContentStart);
+                    Call("ActivateComparison", 1, false);
+                    if (await obsolete) throw new IOException("Obsolete secondary navigation completed after its owner changed.");
+                    await Until(() => EndVisible(false, second) && EndVisible(true, first));
+                    facts.Add(Snapshot("obsolete-navigation-rejected", true, first));
+                    Call("ActivateComparison", 0, false);
+                    await Until(() => EndVisible(false, first) && EndVisible(true, second));
+                }
                 if (scenario == "placeholder")
                 {
                     // Hold the existing worker gate at the same replacement boundary

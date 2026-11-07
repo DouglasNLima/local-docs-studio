@@ -48,14 +48,14 @@ foreach ($replication in 0,1) {
     }
 }
 foreach ($side in $sides) {
-    foreach ($scenario in 'close','switch','resize','switchresize','pending','zoom','selection','findchrome','pendingfind','pendingfindclose','edit','placeholder') {
+    foreach ($scenario in 'close','switch','resize','switchresize','pending','zoom','selection','findchrome','pendingfind','pendingfindclose','edit','placeholder','cancelnav') {
         $zooms = if ($side -eq 'candidate' -and $Mode -eq 'Continuous' -and $scenario -in 'close','switch') { @(100,50,75,150,200) } else { @(100) }
         foreach ($zoom in $zooms) {
             $arguments = @('--controlled-comparison',$fixtures,'{output}',"--mode=$Mode","--zoom=$zoom","--scenario=$scenario")
             if ($protocol.appearance -eq 'high-contrast') { $arguments += '--high-contrast' }
             Run-BoundedProbe $side "controls/$scenario-$zoom/$side" $arguments @{}
         }
-        if ($scenario -in 'resize','switchresize','zoom','selection','findchrome','pendingfind','pendingfindclose','edit','placeholder') {
+        if ($scenario -in 'resize','switchresize','zoom','selection','findchrome','pendingfind','pendingfindclose','edit','placeholder','cancelnav') {
             $arguments = @('--controlled-comparison',$fixtures,'{output}',"--mode=$Mode",'--zoom=100',"--scenario=$scenario",'--compact')
             if ($protocol.appearance -eq 'high-contrast') { $arguments += '--high-contrast' }
             Run-BoundedProbe $side "controls/$scenario-compact/$side" $arguments @{}

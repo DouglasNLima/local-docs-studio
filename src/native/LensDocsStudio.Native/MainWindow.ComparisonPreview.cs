@@ -70,7 +70,7 @@ public partial class MainWindow
                 if (comparisonPreview.ViewingMode == FlowDocumentReaderViewingMode.Scroll)
                     restored = await new PreviewViewportAnchor(result.Document, position, anchor.Fraction)
                         .RestoreAsync(comparisonPreview, Current, cancellation);
-                else restored = await PreviewNavigationService.BringIntoViewAsync(comparisonPreview, position);
+                else restored = await PreviewNavigationService.BringIntoViewAsync(comparisonPreview, position, null, null, Current);
                 // A reconstructed secondary reader must retain the same literal
                 // target for its next capture, rather than fall back to a nearby heading.
                 if (restored && Current()) PreviewNavigationService.RetainVisibleTarget(comparisonPreview, position);
