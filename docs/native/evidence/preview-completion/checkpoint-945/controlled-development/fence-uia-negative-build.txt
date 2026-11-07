@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  LensDocsStudio.Core -> C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Core\bin\Release\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Native -> C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Native\bin\Release\net10.0-windows\LensDocsStudio.Native.dll
+  LensDocsStudio.Native.UxProbe -> C:\Code\MarkdownReader-reading-productivity\src\native\LensDocsStudio.Native.UxProbe\bin\Release\net10.0-windows\LensDocsStudio.Native.UxProbe.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.83

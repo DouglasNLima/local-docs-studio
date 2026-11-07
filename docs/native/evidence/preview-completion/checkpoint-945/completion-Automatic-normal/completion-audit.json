@@ -1,0 +1,173 @@
+{
+  "collection": "FAIL",
+  "pendingInterruption": "INCONCLUSIVE",
+  "presentation": "FAIL",
+  "pending": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\close-primary\\presentation-completion.json",
+      "scenario": "close",
+      "reader": "primary",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\close-secondary\\presentation-completion.json",
+      "scenario": "close",
+      "reader": "secondary",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\find-primary\\presentation-completion.json",
+      "scenario": "find",
+      "reader": "primary",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\find-secondary\\presentation-completion.json",
+      "scenario": "find",
+      "reader": "secondary",
+      "verdict": "INCONCLUSIVE"
+    }
+  ],
+  "semantic": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "returned-primary",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\switch-primary\\completion-captures.json",
+      "action": "interrupted-switch",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\switch-secondary\\completion-captures.json",
+      "action": "interrupted-switch",
+      "failures": [
+        "not exactly three fixed frames"
+      ]
+    }
+  ],
+  "deferred": [
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "after",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-0\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 1,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "before",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    },
+    {
+      "file": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\preview-completion\\foreground\\trace-1\\pixels-primary\\completion-captures.json",
+      "action": "secondary-find",
+      "frame": 0,
+      "boundary": "after",
+      "reader": "secondary",
+      "status": "Busy; comparison preview is being updated",
+      "verdict": "NOT QUALIFIED; pane still pending"
+    }
+  ],
+  "pixelReview": [
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 532 ms",
+      "sha256": "3C2E272C8B0E1FBE3A6AC0948F335CA4228E67A12573A1790575201F578883DE",
+      "observed": "Preview updated in 532 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-000-primary-find-frame-0-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 532 ms",
+      "sha256": "3C2E272C8B0E1FBE3A6AC0948F335CA4228E67A12573A1790575201F578883DE",
+      "observed": "Preview updated in 532 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-001-primary-find-frame-1-status.png"
+    },
+    {
+      "action": "primary-find",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 532 ms",
+      "sha256": "3C2E272C8B0E1FBE3A6AC0948F335CA4228E67A12573A1790575201F578883DE",
+      "observed": "Preview updated in 532 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-002-primary-find-frame-2-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 0,
+      "expected": "Preview updated in 532 ms",
+      "sha256": "3C2E272C8B0E1FBE3A6AC0948F335CA4228E67A12573A1790575201F578883DE",
+      "observed": "Preview updated in 532 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-003-primary-find-all-readers-frame-0-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 1,
+      "expected": "Preview updated in 532 ms",
+      "sha256": "3C2E272C8B0E1FBE3A6AC0948F335CA4228E67A12573A1790575201F578883DE",
+      "observed": "Preview updated in 532 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-004-primary-find-all-readers-frame-1-status.png"
+    },
+    {
+      "action": "primary-find-all-readers",
+      "verdict": "REQUIRES INDEPENDENT PIXEL REVIEW",
+      "region": "status",
+      "frameIndex": 2,
+      "expected": "Preview updated in 532 ms",
+      "sha256": "3C2E272C8B0E1FBE3A6AC0948F335CA4228E67A12573A1790575201F578883DE",
+      "observed": "Preview updated in 532 msl",
+      "match": false,
+      "file": "foreground\\trace-1\\pixels-primary\\completion-005-primary-find-all-readers-frame-2-status.png"
+    }
+  ],
+  "fullFrames": 57,
+  "pixelReadings": 57,
+  "verdict": "NO-GO",
+  "scope": "Finite observation, not universal intermittent-failure elimination; OCR mismatches require independent review and are never silently accepted."
+}

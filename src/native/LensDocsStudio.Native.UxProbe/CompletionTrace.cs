@@ -38,7 +38,7 @@ internal sealed class CompletionTrace : EventListener
     private TaskCompletionSource<Operation>? armed;
     private TaskCompletionSource<long>? commitWaiter;
     private long commitMinimum;
-    private long lastMutation, lastCommit;
+    private long lastMutation, lastVisualMutation, lastCommit;
     private long mutationEpoch;
     private readonly Dictionary<string, long> observedEpochs = [];
     private readonly Dictionary<string, int> unchangedEvents = [];
@@ -185,6 +185,8 @@ internal sealed class CompletionTrace : EventListener
         EventHandler handler = (_, _) =>
         {
             lastMutation = Stopwatch.GetTimestamp();
+            if (property == TextBlock.TextProperty || property == ContentControl.ContentProperty)
+                lastVisualMutation = lastMutation;
             mutationEpoch++;
             if (property == AutomationProperties.ItemStatusProperty && owner is DocumentPreview reader
                 && reader.IsVisible && AutomationProperties.GetItemStatus(reader) == "Ready")
@@ -274,7 +276,11 @@ internal sealed class CompletionTrace : EventListener
     }
     internal Task<long> CommitAfterCurrentChanges()
     {
-        commitMinimum = lastMutation;
+        // ItemStatus and UIA names can change after the last visual commit and
+        // schedule no new rendering. Fence actual bound text mutations only;
+        // ownership and semantic publications remain separately recorded/audited.
+        commitMinimum = lastVisualMutation;
+        Snapshot("commit-fence", new { lastMutation, lastVisualMutation, lastCommit });
         if (lastCommit >= commitMinimum) return Task.FromResult(lastCommit);
         commitWaiter = new(TaskCreationOptions.RunContinuationsAsynchronously); return commitWaiter.Task;
     }

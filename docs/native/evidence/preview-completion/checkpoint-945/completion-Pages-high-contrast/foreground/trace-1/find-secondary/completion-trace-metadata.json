@@ -1,0 +1,72 @@
+{
+  "recordOverflow": false,
+  "byteOverflow": false,
+  "written": 110,
+  "bytes": 95618,
+  "unchangedEvents": {
+    "render-started": 9,
+    "media/CommittingBatch": 7,
+    "media/RenderComplete": 7,
+    "render-completed": 7,
+    "render-posted": 6
+  },
+  "verdict": {
+    "pendingInterruption": "PASS",
+    "qualifiedDeliveries": 1,
+    "cancellationsVerified": true,
+    "staleReady": 0,
+    "offeredOperation": 6771187,
+    "deliveries": [
+      {
+        "tick": 3668109720,
+        "operation": 6771187,
+        "reader": "secondary",
+        "action": "find",
+        "pendingTask": true,
+        "sameCancellation": true,
+        "cancellationRequested": false,
+        "boundary": "wpf-input-delivery",
+        "inputTarget": ""
+      }
+    ],
+    "operations": [
+      {
+        "id": 20896328,
+        "reader": "primary",
+        "start": 3668030995,
+        "end": 3668155894,
+        "cancelled": 3668119595,
+        "outcome": "rejected",
+        "generation": 34
+      },
+      {
+        "id": 6771187,
+        "reader": "secondary",
+        "start": 3668034027,
+        "end": 3668156957,
+        "cancelled": 3668121805,
+        "outcome": "rejected",
+        "generation": 3
+      },
+      {
+        "id": 10606729,
+        "reader": "primary",
+        "start": 3668154289,
+        "end": 3669655499,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 37
+      },
+      {
+        "id": 16207842,
+        "reader": "secondary",
+        "start": 3668154843,
+        "end": 3669806524,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 3
+      }
+    ]
+  },
+  "scope": "All subscribed mutations and input events; first render boundary per mutation epoch, with unchanged render events counted separately"
+}

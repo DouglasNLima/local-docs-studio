@@ -251,6 +251,22 @@ internal static class ComparisonControl
                     facts.Add(Snapshot("resized-primary", false, first));
                     facts.Add(Snapshot("resized-secondary", true, second));
                 }
+                if (args.Contains("--completion-commit-control") && completionTrace is not null)
+                {
+                    var started = Stopwatch.GetTimestamp();
+                    var committed = await completionTrace.CommitAfterCurrentChanges().WaitAsync(TimeSpan.FromSeconds(30));
+                    var originalStatus = AutomationProperties.GetItemStatus(preview);
+                    try
+                    {
+                        // An explicit observer control, never a foreground result:
+                        // a UIA-only mutation cannot require another visual commit.
+                        AutomationProperties.SetItemStatus(preview, "Observer control");
+                        var nonVisualFence = completionTrace.CommitAfterCurrentChanges();
+                        facts.Add(new { stage = "completion-commit-control", started, committed, nonVisualFenceCompleted = nonVisualFence.IsCompletedSuccessfully });
+                        if (!nonVisualFence.IsCompletedSuccessfully) throw new InvalidOperationException("A UIA-only mutation incorrectly requires another visual commit.");
+                    }
+                    finally { AutomationProperties.SetItemStatus(preview, originalStatus); }
+                }
                 var attached = preview.Document;
                 Call("CloseComparison");
                 if (scenario == "pending")

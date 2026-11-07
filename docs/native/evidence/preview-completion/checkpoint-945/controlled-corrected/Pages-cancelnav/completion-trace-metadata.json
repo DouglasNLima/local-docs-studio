@@ -1,0 +1,33 @@
+{
+  "recordOverflow": false,
+  "byteOverflow": false,
+  "written": 485,
+  "bytes": 431139,
+  "unchangedEvents": {
+    "render-started": 64,
+    "media/CommittingBatch": 64,
+    "media/RenderComplete": 56,
+    "render-completed": 63,
+    "render-posted": 57
+  },
+  "verdict": {
+    "pendingInterruption": "INCONCLUSIVE",
+    "qualifiedDeliveries": 0,
+    "cancellationsVerified": false,
+    "staleReady": 0,
+    "offeredOperation": null,
+    "deliveries": [],
+    "operations": [
+      {
+        "id": 64694731,
+        "reader": "primary",
+        "start": 5324350025902,
+        "end": 5324352015975,
+        "cancelled": null,
+        "outcome": "restored",
+        "generation": 19
+      }
+    ]
+  },
+  "scope": "All subscribed mutations and input events; first render boundary per mutation epoch, with unchanged render events counted separately"
+}

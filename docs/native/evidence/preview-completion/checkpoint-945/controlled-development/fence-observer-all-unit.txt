@@ -1,0 +1,23 @@
+✔ qualification needs native delivery inside the actual unfinished operation (1.7408ms)
+✔ accepted interruption must cancel its own task and cannot publish stale Ready (0.2201ms)
+✔ keyboard qualification needs the native key-down before WPF consumes it (0.1672ms)
+✔ semantic Ready does not conceal stale page counters, UIA, ownership or missing text (0.9605ms)
+✔ an unfinished independent pane is not completion evidence and Ready still requires full checks (0.2656ms)
+✔ committed UX fixtures preserve exact UTF-8, line endings and local assets (9.7602ms)
+✔ native UX withholds unsupported tails and retains the maximum (0.3548ms)
+✔ repeated input samples do not become independent tail evidence (0.5802ms)
+✔ missing measurements are unknown and malformed timings are rejected (0.6138ms)
+✔ a semantic handler response without foreground screen evidence is rejected (0.4897ms)
+✔ complete collection remains pending policy approval and cannot grant non-regression (24.5139ms)
+✔ missing independent processes cannot be silently dropped (16.1274ms)
+✔ wrong binary identity and absent candidate features invalidate collection (21.5282ms)
+✔ exact content disagreement and false monotonic duration are rejected (18.8771ms)
+✔ lost diagnostic observations and absent complete-content facts cannot pass collection (21.0497ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 244.405

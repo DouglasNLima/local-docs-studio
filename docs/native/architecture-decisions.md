@@ -1,6 +1,6 @@
 # Native architecture decisions
 
-The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. The first diagnostic checkpoint and its observer failures are preserved; pre-consumption keyboard observation, passive render commits and independent reader completion boundaries require a second finite campaign. Product presentation behaviour and acceptance thresholds remain unchanged; exact final verdicts remain in Goal #75 and Draft PR #76.
+The focused [completion-evidence continuation](preview-completion-evidence.md) investigates actual pending-reflow input delivery and visible status/page-counter timing. Both diagnostic checkpoints and their failures are preserved. A controlled negative case justifies separating UIA-only publication from actual bound-text changes in the passive render-commit observer. Product presentation behaviour, fixed pixel assertions and acceptance thresholds remain unchanged; exact final-source verdicts and all terminal workflows remain in Goal #75 and Draft PR #76.
 
 ## PR #80 preview correction integrated into PR #76 — 7 November 2026
 
