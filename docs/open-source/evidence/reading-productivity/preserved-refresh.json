@@ -60,23 +60,23 @@
     },
     "docs/native/architecture-decisions.md": {
       "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
-      "current": "ddc04249ca2561fc30bb465755bc9184f9ff74ffdef6f954655b9ec821f270f8"
+      "current": "4590e338451ea2e5833839b38afbdddb607e50b5ec614f6cbeb5b121b5bfc214"
     },
     "docs/native/functional-parity-matrix.md": {
       "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
-      "current": "d99ef08815d2e38d44590312adfd1513124fbd28f4cb1f1a2ccea5b1c27cfd1c"
+      "current": "e4a2b0a80abefceb6e8d7dbd8cbddd0ec6a9132325a2d9fbad71788ba454e655"
     },
     "docs/native/implementation-progress.md": {
       "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
-      "current": "222799436c87a67665c44c80570110811ef56c3d85ef9d7cf3392860e986dc76"
+      "current": "5eb284a585ca7560e812a65e2f28c24c47f8e973066b02dafc6de793a6dc1ea9"
     },
     "docs/native/user-guide.md": {
       "previous": "62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327",
-      "current": "e5b27b5f0cdff156deb67376105e8f7330625129d1d4ac00dcf89dd70dcd1aa1"
+      "current": "eacfd6442503effc3634e5b6b1f301cc996a2c5ba223992a5e9540c9851bb035"
     },
     "docs/native/validation-report.md": {
       "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
-      "current": "5d2ce34bf4bb09722534aa8cff6d8e93e0d76016763ca989f92a7c57fed4baa6"
+      "current": "105ae9ed138ef31801d926523ed4efcff04566c34f2841f968ed2955f17e6315"
     },
     "docs/tool-guide.md": {
       "previous": "70945830852bf75c68f35284fe56416a1422fdfa5af731c26e27ac2039833d04",

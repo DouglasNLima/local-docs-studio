@@ -1,0 +1,128 @@
+{
+  "atUtc": "2026-11-07T11:44:08.1437701+00:00",
+  "scope": "VALIDATION_PROCESS_PRE_ASSERTION; capture application not yet launched",
+  "revisionArgument": "db8e6f95eb22a89652e515f038ff13d96e63202a",
+  "githubSha": "e023490fe5a6fc6ea626a2d39ca41637b9999021",
+  "runId": "42367627035",
+  "attempt": "1",
+  "runnerImage": "win25-vs2026",
+  "imageVersion": "20261103.298.1",
+  "os": "Microsoft Windows 10.0.26100",
+  "osVersion": "Microsoft Windows NT 10.0.26100.0",
+  "runtime": ".NET 10.0.13",
+  "processId": 8504,
+  "sessionId": 2,
+  "harness": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.Validation.dll",
+    "sha256": "ba41547068645578a7cdc2a7a646d5fcbbc8b9637a85dbad96d3fa904e7cf93a",
+    "version": "0.1.0-preview.1\u002Bdb8e6f95eb22a89652e515f038ff13d96e63202a"
+  },
+  "themeAssembly": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.dll",
+    "sha256": "c1852e3cc32ae352a46ab246e9d28a6d888e9b1a9ff22f00cd0946e23d3b45e2",
+    "version": "0.1.0-preview.1\u002Bdb8e6f95eb22a89652e515f038ff13d96e63202a"
+  },
+  "wpf": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\appearance-runtime\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+    "sha256": "c6950a0d6addfb7a365c11fe0aa82a4677043a263102f1779aa9be8fd3624019",
+    "version": "10.0.13-servicing.26504.104\u002B4099f83977f4d29604a9aeb971fb0a7bc1d5f699"
+  },
+  "targetExecutable": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+    "sha256": "4fa57bdd1ee051e1622acbbe662244bc6d0cce4e6c86f14b2c165ba9aa837980",
+    "version": "0.1.0-preview.1\u002Bdb8e6f95eb22a89652e515f038ff13d96e63202a"
+  },
+  "targetAssembly": {
+    "path": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.dll",
+    "sha256": "c1852e3cc32ae352a46ab246e9d28a6d888e9b1a9ff22f00cd0946e23d3b45e2",
+    "version": "0.1.0-preview.1\u002Bdb8e6f95eb22a89652e515f038ff13d96e63202a"
+  },
+  "requestedTheme": "System",
+  "wpfHighContrast": true,
+  "osHighContrast": true,
+  "themeDictionaries": [
+    "pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.HC.xaml"
+  ],
+  "pressedText": {
+    "effective": {
+      "argb": "#FF263B50",
+      "A": 255,
+      "R": 38,
+      "G": 59,
+      "B": 80
+    },
+    "requested": {
+      "argb": "#FF263B50",
+      "A": 255,
+      "R": 38,
+      "G": 59,
+      "B": 80
+    },
+    "bindingStatus": "Active",
+    "IsFrozen": false
+  },
+  "pressedBackground": {
+    "effective": {
+      "argb": "#FF0078D4",
+      "A": 255,
+      "R": 0,
+      "G": 120,
+      "B": 212
+    },
+    "requested": {
+      "argb": "#FF0078D4",
+      "A": 255,
+      "R": 0,
+      "G": 120,
+      "B": 212
+    },
+    "bindingStatus": "Active",
+    "IsFrozen": false
+  },
+  "wpfHighlightText": {
+    "argb": "#FF263B50",
+    "A": 255,
+    "R": 38,
+    "G": 59,
+    "B": 80
+  },
+  "wpfHighlight": {
+    "argb": "#FF0078D4",
+    "A": 255,
+    "R": 0,
+    "G": 120,
+    "B": 212
+  },
+  "win32HighlightText": {
+    "argb": "#FF263B50",
+    "A": 255,
+    "R": 38,
+    "G": 59,
+    "B": 80
+  },
+  "win32Highlight": {
+    "argb": "#FF8EE3F0",
+    "A": 255,
+    "R": 142,
+    "G": 227,
+    "B": 240
+  },
+  "pressedContrast": 2.542596386238992,
+  "wpfContrast": 2.542596386238992,
+  "win32Contrast": 7.893273424942036,
+  "foregroundEqualsWpfHighlightText": true,
+  "requiredContrast": 4.5,
+  "screenshotInputs": {
+    "themes": [
+      "System"
+    ],
+    "sizes": [
+      "860x540",
+      "1280x800",
+      "1440x900",
+      "1920x1080"
+    ],
+    "source": "Unchanged synthetic Documentation workspace fixture in NativeUxScreenshots.cs",
+    "capturesStarted": false
+  }
+}
