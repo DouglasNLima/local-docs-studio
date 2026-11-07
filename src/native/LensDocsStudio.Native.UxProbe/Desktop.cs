@@ -83,6 +83,8 @@ internal static class Desktop
         if (!SetCursorPos((int)point.X, (int)point.Y)) throw new Win32Exception(Marshal.GetLastWin32Error());
     }
     internal static void Click() => Send(new Input { Value = new() { Mouse = new() { Flags = 2 } } }, new Input { Value = new() { Mouse = new() { Flags = 4 } } });
+    internal static void LeftDown() => Send(new Input { Value = new() { Mouse = new() { Flags = 2 } } });
+    internal static void LeftUp() => Send(new Input { Value = new() { Mouse = new() { Flags = 4 } } });
     internal static void Wheel(int delta) => Send(new Input { Value = new() { Mouse = new() { Flags = 0x800, Data = unchecked((uint)delta) } } });
 
     internal sealed record Frame(string Sha256, int Width, int Height, int DistinctColours, BitmapSource Bitmap);

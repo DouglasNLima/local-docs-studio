@@ -141,6 +141,21 @@ internal sealed partial class Probe
             for (var i = 0; i < 8; i++) Desktop.Key(direction);
             await Until(() => preview.RenderSize != before && ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
             await ComparisonEvidence("resized-comparison");
+            await PointAt(splitter);
+            var dragStart = await Ui(() => splitter.PointToScreen(new Point(splitter.ActualWidth / 2, splitter.ActualHeight / 2)));
+            var dragEnd = await Ui(() => splitter.ResizeDirection == GridResizeDirection.Rows
+                ? new Point(dragStart.X, dragStart.Y - 40) : new Point(dragStart.X - 40, dragStart.Y));
+            before = await Ui(() => preview.RenderSize);
+            Desktop.LeftDown();
+            try
+            {
+                await Until(() => splitter.IsMouseCaptured);
+                Desktop.Move(dragEnd);
+                await Until(() => preview.RenderSize != before);
+            }
+            finally { Desktop.LeftUp(); }
+            await Until(() => ComparisonReady(first, false, "ReadableEnd") && ComparisonReady(second, true, "ReadableEnd"));
+            await ComparisonEvidence("dragged-comparison");
             await PointAt(await Ui(() => Tree(window).OfType<Button>().First(e => e.IsVisible && AutomationProperties.GetName(e) == "Zoom in")));
             Desktop.Click(); await Until(() => preview.Zoom > 100 && ComparisonReady(first, false, "ReadableEnd"));
             await ComparisonEvidence("zoomed-comparison");

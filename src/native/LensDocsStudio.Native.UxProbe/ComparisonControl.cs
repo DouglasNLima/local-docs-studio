@@ -81,7 +81,7 @@ internal static class ComparisonControl
         {
             if (!Visible(secondary, owner) || !End(secondary, owner.EditorDocument.Text).HasValidLayout) return false;
             var rectangle = End(secondary, owner.EditorDocument.Text).GetCharacterRect(LogicalDirection.Forward);
-            return !rectangle.IsEmpty && rectangle.Bottom > 0 && rectangle.Top < Reader(secondary).ActualHeight;
+            return !rectangle.IsEmpty && rectangle.Top >= 0 && rectangle.Bottom <= Reader(secondary).ActualHeight;
         }
         async Task Until(Func<bool> predicate)
         {
@@ -118,14 +118,18 @@ internal static class ComparisonControl
                 await Until(() => EndVisible(false, first) && EndVisible(true, second));
                 facts.Add(Snapshot("comparison-deep-primary", false, first));
                 facts.Add(Snapshot("comparison-deep-secondary", true, second));
-                if (scenario == "findchrome")
+                if (scenario is "findchrome" or "pendingfind" or "pendingfindclose")
                 {
                     Call("ShowFind", false);
                     await Until(() => EndVisible(false, first));
                     facts.Add(Snapshot("find-open", false, first));
                     Call("HideFind");
-                    await Until(() => EndVisible(false, first));
-                    facts.Add(Snapshot("find-closed", false, first));
+                    if (scenario == "findchrome")
+                    {
+                        await Until(() => EndVisible(false, first));
+                        facts.Add(Snapshot("find-closed", false, first));
+                    }
+                    if (scenario == "pendingfindclose") Call("CloseComparison");
                 }
                 if (scenario == "zoom")
                 {
@@ -142,7 +146,7 @@ internal static class ComparisonControl
                     var secondEnd = End(true, secondSource); Reader(true).Selection.Select(secondEnd, secondEnd.GetPositionAtOffset(11));
                     editor.Select(4, 5);
                 }
-                if (scenario is "switch" or "selection" or "findchrome")
+                if (scenario is "switch" or "selection" or "findchrome" or "pendingfind")
                 {
                     Call("ActivateComparison", 1, false);
                     await Until(() => EndVisible(false, second) && EndVisible(true, first));
@@ -159,8 +163,15 @@ internal static class ComparisonControl
                 {
                     var splitter = (GridSplitter)Field("comparisonSplitter")!;
                     var before = preview.RenderSize;
-                    for (var i = 0; i < 8; i++) splitter.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice,
-                        PresentationSource.FromVisual(window), 0, splitter.ResizeDirection == GridResizeDirection.Rows ? Key.Down : Key.Right) { RoutedEvent = Keyboard.KeyDownEvent });
+                    for (var i = 0; i < 8; i++)
+                    {
+                        var key = splitter.ResizeDirection == GridResizeDirection.Rows ? Key.Down : Key.Right;
+                        splitter.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), 0, key) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
+                        splitter.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), 0, key) { RoutedEvent = Keyboard.KeyDownEvent });
+                        // Real key events are separated by native layout. Without
+                        // that boundary all eight synthetic moves reuse one size.
+                        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+                    }
                     await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
                     await Until(() => preview.RenderSize != before && EndVisible(false, first) && EndVisible(true, second));
                     facts.Add(Snapshot("resized-primary", false, first));
