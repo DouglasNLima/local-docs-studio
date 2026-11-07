@@ -52,7 +52,10 @@ internal sealed record PreviewViewportAnchor(FlowDocument Document, TextPointer 
                 if (rectangle.IsEmpty) return;
                 if (requestedOffset is null)
                 {
-                    var desired = Math.Clamp(scrolling.VerticalOffset + rectangle.Top - VerticalFraction * viewer.ActualHeight,
+                    // Character rectangles include the reader's zoom; its scroll
+                    // offsets remain in document units.
+                    var displacement = (rectangle.Top - VerticalFraction * viewer.ActualHeight) / (zoom / 100);
+                    var desired = Math.Clamp(scrolling.VerticalOffset + displacement,
                         0, scrolling.ScrollableHeight);
                     requestedOffset = desired;
                     if (Math.Abs(scrolling.VerticalOffset - desired) > 0.5)
