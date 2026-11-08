@@ -10,6 +10,16 @@ eligibility, collection validity, original correctness and presentation attribut
 Discovery success cannot make any qualification result PASS. R02 and calibration
 remain NOT RUN; PRs #76/#78/#80 remain Draft and PR #76 remains **NO-GO**.
 
+The first [read-only discovery, run 42500058059](../evidence/infrastructure-recovery/run-42500058059/receipt.json),
+failed after the exact image/SDK checks and successful console build. The child
+returned non-zero with empty stdout/stderr; its initial wrapper omitted the numeric
+exit code. No API boundary or desktop value can be inferred from that absence.
+The entire first artefact and workflow log are retained. A narrowly changed-source
+follow-up adds flushed read-boundary records and supervised PID/exit/timeout evidence;
+it changes no interop call or product control and still creates no qualification
+window. Partial boundary records are diagnostic facts, never a valid full discovery
+or a substitute qualification result.
+
 ## Geometry: established mechanism and missing historical observation
 
 The exact sealed R01 source creates its window with

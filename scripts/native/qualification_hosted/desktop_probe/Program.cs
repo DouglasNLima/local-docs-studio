@@ -22,6 +22,7 @@ internal static class Program
                 Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows" ||
                 Environment.GetEnvironmentVariable("GOAL77_READ_ONLY_DISCOVERY") != "true")
                 throw new InvalidOperationException("Only explicitly guarded hosted read-only discovery is permitted.");
+            Journal("guardedStart", new { processId = Environment.ProcessId, runtime = Environment.Version.ToString() });
             if (Marshal.SizeOf<Rect>() != 16 || Marshal.SizeOf<MonitorInfo>() != 104 ||
                 Marshal.SizeOf<DisplayDevice>() != 840 || Marshal.SizeOf<DevMode>() != 220 ||
                 Marshal.SizeOf<HighContrast>() != 16 || IntPtr.Size != 8)
@@ -48,16 +49,26 @@ internal static class Program
     }
 
     private static string Hash(string path) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant();
+    private static void Journal(string boundary, object? data = null)
+    {
+        // Flush fixed read boundaries so a native failure cannot erase earlier facts.
+        Console.Error.WriteLine(JsonSerializer.Serialize(new { boundary, processId = Environment.ProcessId,
+            timestamp = Stopwatch.GetTimestamp(), data }, new JsonSerializerOptions { IncludeFields = true }));
+        Console.Error.Flush();
+    }
     private static void Check(bool success) { if (!success) throw new Win32Exception(Marshal.GetLastWin32Error()); }
     private static void CheckHr(int value) { if (value < 0) Marshal.ThrowExceptionForHR(value); }
 
     private static object Snapshot()
     {
         var started = Stopwatch.GetTimestamp();
+        Journal("dpiReadBegin");
         CheckHr(GetProcessDpiAwareness(IntPtr.Zero, out var awareness));
         var context = GetThreadDpiAwarenessContext();
         var threadAwareness = GetAwarenessFromDpiAwarenessContext(context);
+        Journal("workAreaReadBegin", new { awareness, threadAwareness });
         Check(SystemParametersInfoRect(GetWorkArea, 0, out var primaryWork, 0));
+        Journal("monitorEnumerationBegin", primaryWork);
         var monitors = new List<object>();
         Exception? callbackFailure = null;
         MonitorCallback callback = (IntPtr handle, IntPtr _, ref Rect __, IntPtr ___) =>
@@ -66,10 +77,14 @@ internal static class Program
             {
                 if (monitors.Count >= MaximumMonitors) throw new IOException("Monitor observation bound exceeded.");
                 var info = new MonitorInfo { size = (uint)Marshal.SizeOf<MonitorInfo>(), device = "" };
+                Journal("monitorInfoBegin");
                 Check(GetMonitorInfoW(handle, ref info));
+                Journal("monitorScaleBegin", new { info.device, info.monitor, info.work });
                 CheckHr(GetScaleFactorForMonitor(handle, out var scale));
                 var device = new DisplayDevice { size = (uint)Marshal.SizeOf<DisplayDevice>() };
+                Journal("monitorDeviceBegin");
                 Check(EnumDisplayDevicesW(info.device, 0, ref device, 0));
+                Journal("displayModesBegin");
                 var current = Mode(info.device, -1);
                 var modes = new List<object>();
                 var complete = false;
@@ -91,23 +106,27 @@ internal static class Program
         var enumerated = EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
         if (callbackFailure is not null) throw callbackFailure;
         Check(enumerated);
+        Journal("sessionReadBegin");
         Check(ProcessIdToSessionId((uint)Environment.ProcessId, out var session));
         var input = OpenInputDesktop(0, false, 1); // DESKTOP_READOBJECTS; no switch/write rights.
         Check(input != IntPtr.Zero);
         string inputName;
         try { inputName = ObjectName(input); }
         finally { Check(CloseDesktop(input)); }
+        var dpi = new { processAwareness = awareness, threadAwareness, system = GetDpiForSystem(),
+            declaration = "System aware apphost; no DPI-setting API" };
+        var activeConsoleSession = WTSGetActiveConsoleSessionId();
+        var remoteSession = GetSystemMetrics(0x1000) != 0;
+        var desktop = ObjectName(GetThreadDesktop(GetCurrentThreadId()));
+        var windowStation = ObjectName(GetProcessWindowStation());
+        var constraints = new { maximumTrackWidth = GetSystemMetrics(59), maximumTrackHeight = GetSystemMetrics(60),
+            minimumTrackWidth = GetSystemMetrics(34), minimumTrackHeight = GetSystemMetrics(35) };
+        Journal("geometryComplete", new { primaryWorkPixels = primaryWork, dpi, monitors, sessionId = session,
+            activeConsoleSession, remoteSession, desktop, inputDesktop = inputName, windowStation, windowConstraintsPixels = constraints });
         return new
         {
-            started, primaryWorkPixels = primaryWork,
-            dpi = new { processAwareness = awareness, threadAwareness, system = GetDpiForSystem(),
-                declaration = "System aware apphost; no DPI-setting API" },
-            monitors, sessionId = session, activeConsoleSession = WTSGetActiveConsoleSessionId(),
-            remoteSession = GetSystemMetrics(0x1000) != 0,
-            desktop = ObjectName(GetThreadDesktop(GetCurrentThreadId())), inputDesktop = inputName,
-            windowStation = ObjectName(GetProcessWindowStation()),
-            windowConstraintsPixels = new { maximumTrackWidth = GetSystemMetrics(59), maximumTrackHeight = GetSystemMetrics(60),
-                minimumTrackWidth = GetSystemMetrics(34), minimumTrackHeight = GetSystemMetrics(35) },
+            started, primaryWorkPixels = primaryWork, dpi, monitors, sessionId = session, activeConsoleSession,
+            remoteSession, desktop, inputDesktop = inputName, windowStation, windowConstraintsPixels = constraints,
             appearance = ReadAppearance(), finished = Stopwatch.GetTimestamp()
         };
     }
@@ -115,7 +134,9 @@ internal static class Program
     private static object ReadAppearance()
     {
         var state = new HighContrast { size = (uint)Marshal.SizeOf<HighContrast>() };
+        Journal("highContrastGetBegin");
         Check(SystemParametersInfoContrast(GetHighContrast, state.size, ref state, 0));
+        Journal("highContrastCopyBegin", new { state.flags, pointerWasNull = state.scheme == IntPtr.Zero });
         string? scheme = null;
         var wasNull = state.scheme == IntPtr.Zero;
         try
@@ -132,17 +153,22 @@ internal static class Program
                 }
                 scheme = value.ToString();
             }
+            Journal("highContrastCopied", new { state.flags, pointerWasNull = wasNull, scheme });
         }
         finally
         {
             // HIGHCONTRASTW documents system allocation and LocalFree ownership.
+            Journal("highContrastFreeBegin", new { pointerWasNull = wasNull });
             if (!wasNull && LocalFree(state.scheme) != IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error());
+            Journal("highContrastFreeComplete");
         }
         var theme = new StringBuilder(260); var colour = new StringBuilder(260); var size = new StringBuilder(260);
+        Journal("themeReadBegin");
         var themeResult = GetCurrentThemeName(theme, theme.Capacity, colour, colour.Capacity, size, size.Capacity);
         var colours = new Dictionary<string, uint>();
         foreach (var index in new[] { 2, 3, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 20, 26 })
             colours[index.ToString(System.Globalization.CultureInfo.InvariantCulture)] = GetSysColor(index);
+        Journal("appearanceReadComplete");
         return new { flags = state.flags, enabled = (state.flags & 1) != 0, schemePointerWasNull = wasNull,
             schemeKind = wasNull ? "NULL" : scheme!.Length == 0 ? "EMPTY" : "NAMED", scheme,
             getBufferReleased = true, colours, theme = new { hresult = themeResult,

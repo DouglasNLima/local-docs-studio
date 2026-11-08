@@ -11,7 +11,7 @@
   "previewCorrection": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
   "originalFailedRun": {"id": 42495945111, "attempt": 1, "collectionValidity": "INVALID", "originalAssertions": "FAIL", "presentationOrder": "INCONCLUSIVE", "R02": "NOT_RUN", "evidenceUnchanged": true},
   "originalEnvironment": {"imageOS": "win25-vs2026", "imageVersion": "20261103.298.1", "windowsBuild": "26100", "UBR": 33674, "sdk": "10.0.403"},
-  "discovery": {"status": "PENDING_READ_ONLY_DISCOVERY", "qualificationProcesses": 0, "liveAppearanceChangesAuthorised": false, "liveDisplayChangesAuthorised": false},
+  "discovery": {"status": "FIRST_READ_ONLY_DISCOVERY_FAILED_FOLLOW_UP_PREPARED", "failedRunId": 42500058059, "attempt": 1, "failedSource": "a0e6fd05a930fbb1d483a9929bf2969277f0bdc6", "artifactSha256": "e1549ab66703379edb6abbb1c9a723ee67464e4b5eee03f31450fda9e5eab3b4", "desktopObservation": "ABSENT", "qualificationProcesses": 0, "liveAppearanceChangesAuthorised": false, "liveDisplayChangesAuthorised": false},
   "infrastructureEligibility": "BLOCKED",
   "geometryEligibility": "PENDING_READ_ONLY_DISCOVERY",
   "appearanceRestoration": "UNVERIFIED",

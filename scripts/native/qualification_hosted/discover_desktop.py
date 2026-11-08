@@ -52,6 +52,33 @@ def guard(env):
     return revision
 
 
+def collect_probe(binary, child_env, output):
+    timed_out = False
+    with (output / 'desktop.json').open('xb') as stdout, (output / 'stderr.txt').open('xb') as stderr:
+        child = subprocess.Popen([str(binary)], env=child_env, stdout=stdout, stderr=stderr,
+                                 stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
+        try:
+            child.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            child.kill(); child.wait(timeout=5)
+        finally:
+            write(output / 'child-process.json', {'processId': child.pid, 'exitCode': child.returncode,
+                  'exitCodeHex': None if child.returncode is None else format(child.returncode & 0xffffffff, '08x'),
+                  'timedOut': timed_out, 'qualificationProcess': False, 'retryCount': 0})
+    require(not timed_out and child.returncode == 0, 'Read-only probe failed; exact child result and partial output retained')
+    return child.pid
+
+
+def verify_probe(observation, binary_files, revision, child_pid):
+    require(type(observation['processId']) is int and observation['processId'] == child_pid, 'Read-only probe PID differs')
+    require(observation['runtimeVersion'] == '10.0.14' and observation['coreSha256'] == CORE_SHA256,
+            'Read-only probe loaded a different runtime')
+    require(observation['processSha256'] == binary_files['DesktopProbe.exe']
+            and observation['assemblySha256'] == binary_files['DesktopProbe.dll']
+            and observation['sourceRevision'].endswith('+' + revision), 'Observed probe source/binary identity differs')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True)
@@ -88,16 +115,9 @@ def main():
         child_env = {k: v for k, v in os.environ.items() if not k.upper().startswith(('DOTNET_', 'COMPLUS_', 'CORECLR_', 'COR_', 'STARTUP_HOOKS', 'LENS_'))
                      and k not in ('GH_TOKEN', 'GITHUB_TOKEN')}
         child_env.update(DOTNET_ROLL_FORWARD='Disable', DOTNET_MULTILEVEL_LOOKUP='0', DOTNET_EnableDiagnostics='0')
-        with (output / 'desktop.json').open('xb') as stdout, (output / 'stderr.txt').open('xb') as stderr:
-            child = subprocess.run([str(binary)], env=child_env, stdout=stdout, stderr=stderr,
-                                   stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW, timeout=30)
-        require(child.returncode == 0, 'Read-only probe failed; partial output retained')
+        child_pid = collect_probe(binary, child_env, output)
         observation = read_json(output / 'desktop.json')
-        require(observation['runtimeVersion'] == '10.0.14' and observation['coreSha256'] == CORE_SHA256,
-                'Read-only probe loaded a different runtime')
-        require(observation['processSha256'] == binary_files['DesktopProbe.exe']
-                and observation['assemblySha256'] == binary_files['DesktopProbe.dll']
-                and observation['sourceRevision'].endswith('+' + revision), 'Observed probe source/binary identity differs')
+        verify_probe(observation, binary_files, revision, child_pid)
         write(output / 'eligibility.json', assess(observation))
         require(not git('status', '--porcelain', '--untracked-files=all'), 'Discovery changed tracked source')
         write(output / 'terminal.json', {'status': 'READ_ONLY_DISCOVERY_COMPLETE', 'sourceCommit': revision,

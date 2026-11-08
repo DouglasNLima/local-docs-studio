@@ -172,6 +172,44 @@ class InfrastructureControls(unittest.TestCase):
             self.assertFalse(output.exists())
             self.assertIn('discovery guard failed', result.stderr)
 
+    def test_read_only_native_failure_retains_exact_exit_pid_and_no_retry(self):
+        for code in (0, 2, 0xc0000374):
+            with tempfile.TemporaryDirectory() as temporary, patch.object(discovery.subprocess, 'Popen') as launch:
+                child = launch.return_value; child.pid = 501; child.returncode = code
+                if code:
+                    with self.assertRaisesRegex(ValueError, 'exact child result'):
+                        discovery.collect_probe(Path('never-launched.exe'), {}, Path(temporary))
+                else:
+                    self.assertEqual(discovery.collect_probe(Path('never-launched.exe'), {}, Path(temporary)), 501)
+                record = discovery.read_json(Path(temporary) / 'child-process.json')
+                self.assertEqual(record['exitCode'], code)
+                self.assertEqual(record['exitCodeHex'], format(code, '08x'))
+                self.assertEqual(record['processId'], 501)
+                self.assertFalse(record['qualificationProcess'])
+                self.assertEqual(record['retryCount'], 0)
+                launch.assert_called_once(); child.wait.assert_called_once_with(timeout=30)
+                child.kill.assert_not_called()
+
+    def test_read_only_timeout_retains_failure_after_killing_only_the_mock_child(self):
+        with tempfile.TemporaryDirectory() as temporary, patch.object(discovery.subprocess, 'Popen') as launch:
+            child = launch.return_value; child.pid = 502; child.returncode = -9
+            child.wait.side_effect = [subprocess.TimeoutExpired('mock', 30), -9]
+            with self.assertRaisesRegex(ValueError, 'exact child result'):
+                discovery.collect_probe(Path('never-launched.exe'), {}, Path(temporary))
+            record = discovery.read_json(Path(temporary) / 'child-process.json')
+            self.assertTrue(record['timedOut']); self.assertEqual(record['exitCodeHex'], 'fffffff7')
+            child.kill.assert_called_once(); launch.assert_called_once()
+
+    def test_read_only_self_report_must_match_supervised_child_and_exact_binary(self):
+        source = 'a' * 40
+        binaries = {'DesktopProbe.exe': 'host', 'DesktopProbe.dll': 'assembly'}
+        record = dict(processId=503, runtimeVersion='10.0.14', coreSha256=discovery.CORE_SHA256,
+                      processSha256='host', assemblySha256='assembly', sourceRevision='1.0.0+' + source)
+        discovery.verify_probe(record, binaries, source, 503)
+        for key, value in [('processId', 504), ('processId', True), ('runtimeVersion', '10.0.15'),
+                           ('coreSha256', 'wrong'), ('processSha256', 'wrong'), ('assemblySha256', 'wrong'), ('sourceRevision', 'moving')]:
+            with self.assertRaises(ValueError): discovery.verify_probe(dict(record, **{key: value}), binaries, source, 503)
+
     def test_win32_imports_are_getters_only_and_no_ui_framework_is_referenced(self):
         source = (MODULES / 'desktop_probe/Program.cs').read_text()
         externs = set(re.findall(r'extern \w+ (\w+)\(', source))

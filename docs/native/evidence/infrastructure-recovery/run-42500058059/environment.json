@@ -1,0 +1,15 @@
+{
+  "imageOS": "win25-vs2026",
+  "imageVersion": "20261103.298.1",
+  "runnerOS": "Windows",
+  "runnerArch": "X64",
+  "runnerEnvironment": "github-hosted",
+  "windows": {
+    "CurrentBuildNumber": "26100",
+    "UBR": 33674,
+    "EditionID": "ServerDatacenter",
+    "BuildLabEx": "26100.1.amd64fre.ge_release.240331-1435",
+    "ProductName": "Windows Server 2025 Datacenter",
+    "version": "10.0.26100"
+  }
+}
