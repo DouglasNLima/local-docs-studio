@@ -7,6 +7,10 @@ Continues tooling source `4a340fb66ae410f5216310845848197518d4975c` and the
 discovery records a candidate configuration; it cannot execute R01, R02 or the
 56-process calibration pilot. Existing acceptance and ADR activation remain pending.
 
+[Observed configuration, run identities and delivery receipt](../evidence/hosted-environment-lock/receipt.md)
+record the completed discovery and the remaining owner decision. The candidate
+itself remains unauthorised.
+
 ## Discovery boundary
 
 The existing registered `native-ux-performance.yml` gains one explicit Boolean
@@ -44,6 +48,15 @@ and all three harnesses, with distinct product/tooling revision metadata, comple
 binary receipts and pure metadata/contrast self-tests. No qualification execution
 flags are supplied. The original mixed fixture, seven anchors, journeys, frame
 ceilings and observation/child limits are unchanged.
+
+The captured product snapshots reproduce `git -c core.autocrlf=true archive` exactly:
+426 candidate and 407 baseline files. Of these, 831 text files have Git's LF→CRLF
+export conversion; two are raw-byte exact. The original hosted job did not query
+the Git configuration setting itself. The independent check establishes the exact
+exported bytes, not identity with raw Git blobs or a measured configuration value.
+Seven source fixtures remain byte-exact under their existing attributes. The
+strict raw-blob comparison failure is retained alongside the successful export
+reconstruction; neither source receipts nor original evidence are rewritten.
 
 ## Candidate and execution checks
 

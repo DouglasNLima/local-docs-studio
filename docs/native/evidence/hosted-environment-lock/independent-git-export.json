@@ -1,0 +1,31 @@
+{
+  "scope": "Read-only complete reconstruction of the reviewed Git archive export with committed attributes and core.autocrlf=true",
+  "gitVersion": "git version 2.43.0.windows.1",
+  "exportProfile": {
+    "core.autocrlf": true,
+    "configurationExplicitlyRecordedOnHost": false,
+    "basis": "Exact reconstruction of every retained exported file; this is not a claim that host Git configuration was separately captured"
+  },
+  "products": {
+    "candidate": {
+      "commit": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "exportedFiles": 426,
+      "retainedFiles": 426,
+      "missing": [],
+      "extra": [],
+      "changed": [],
+      "status": "PASS"
+    },
+    "baseline": {
+      "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "exportedFiles": 407,
+      "retainedFiles": 407,
+      "missing": [],
+      "extra": [],
+      "changed": [],
+      "status": "PASS"
+    }
+  },
+  "failures": [],
+  "status": "PASS_GIT_EXPORT_RECONSTRUCTION"
+}

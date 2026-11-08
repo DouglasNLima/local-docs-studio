@@ -1,0 +1,37 @@
+{
+  "status": "PASS_OFFLINE_RETAINED_BYTES",
+  "sourceCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "candidateConfigSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+  "environmentLockSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+  "generatedSources": 874,
+  "runtimes": {
+    "10.0.13": 480,
+    "10.0.14": 480
+  },
+  "bundles": {
+    "r01": {
+      "files": 52,
+      "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "sdk": "10.0.403",
+      "productSha256": "B78C4CC073F941E7918BD5F12A0A3B3A7F9DD4428A842B8A7D3ED7AAF30807FC",
+      "harnessSha256": "EE083CB234039B8379F8F96EA120ED33AD3B623897F09C05C3A873261070998B"
+    },
+    "r02-baseline": {
+      "files": 52,
+      "productRevision": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "sdk": "10.0.403",
+      "productSha256": "BD88A967EA1A373E91AD10F0E0DFD8F19DEB2D32FAB43F7727C1AA0A31B65DFF",
+      "harnessSha256": "25830E17ED49FECE46BD9E8721F7701C13B5BC18BC7C926AD7770D2E11755847"
+    },
+    "r02-candidate": {
+      "files": 52,
+      "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "sdk": "10.0.403",
+      "productSha256": "B78C4CC073F941E7918BD5F12A0A3B3A7F9DD4428A842B8A7D3ED7AAF30807FC",
+      "harnessSha256": "F1FAC40B49537DEF6D070EDF5C1CF91F25ABC039BDF789B3DC4D4896B2ABBEF6"
+    }
+  },
+  "campaignExecutionApproved": false,
+  "configurationRewritten": false,
+  "executionValidatorInvokedOnDeveloperHost": false
+}

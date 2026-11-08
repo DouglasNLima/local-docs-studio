@@ -23,8 +23,11 @@ the contrast requirement remains **4.5:1**.
 Product pins: develop `99349d82eb06960eb1f9785cf384db2373aed4fa` and candidate
 `7b1334b09a02ad2fbfd4a0234798e6c387d3e634`. PR #80 remains separately pinned at
 `22c223c6f56fa41fda2a36102e1eed0af44974ec`. No branch is merged or rewritten.
-Build inputs come from Git blobs in isolated directories, not mutable product
-worktree globs. Source files, generated overlay/diff, fixtures, compiler identity
+Build inputs come from pinned Git archives in isolated directories, not mutable
+product worktree globs. Git's platform text conversion can make exported bytes
+differ from canonical Git blobs. The hosted delivery independently reproduces and
+hashes the captured export bytes, including line endings. Source files, generated
+overlay/diff, fixtures, compiler identity
 and complete binary output are hashed in new receipts. Input drift or extra source
 files invalidates a build. Original product source and evidence remain untouched.
 

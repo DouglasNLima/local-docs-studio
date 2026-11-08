@@ -1,0 +1,20 @@
+{
+  "scope": "Read-only explanation of strict raw-Git-byte mismatch; no source/evidence rewriting",
+  "files": 833,
+  "counts": {
+    "rawGitExact": 2,
+    "onlyGitLfToCrlf": 831,
+    "other": 0
+  },
+  "otherDifferences": [],
+  "gitArchiveCoreAutocrlfSample": {
+    "true": {
+      "matchesHostedSnapshot": true,
+      "sha256": "84cd5c66811e38174b73fc2733ee4c7d98d381a733d298f73ed7da8ba1e1eab8"
+    },
+    "false": {
+      "matchesHostedSnapshot": false,
+      "sha256": "e81555e94728d4160fab2c645c7a9a430667a636f7196bc3ccb73762fc1d0ef4"
+    }
+  }
+}
