@@ -2,6 +2,10 @@
 
 Goal #77 / Draft PR #78 · 7 November 2026 · **PREPARED; execution NOT RUN**
 
+8 November tooling continuation: [implementation, evidence schema and execution
+boundary](qualification/tooling.md). The original preparation below and its
+manifest remain the approved scope; tooling validation does not execute or certify it.
+
 The [owner decision](https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6714211040)
 approves D01–D13 at **design level**, reviewed commit
 `bc092512c30e152cd1e4384c1eab4f8ba30e059f`, tree

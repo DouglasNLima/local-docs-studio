@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Goal 77 offline qualification audit envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "protocol", "outcomes", "collection", "existingCorrectness", "policyAcceptance", "pr76Integration", "historicalFailuresReclassified"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "protocol": {"enum": ["R01", "R02"]},
+    "collection": {"enum": ["VALID", "INVALID"]},
+    "existingCorrectness": {"enum": ["PASS", "FAIL", "INCONCLUSIVE"]},
+    "policyAcceptance": {"const": "NOT_ACTIVATED"},
+    "pr76Integration": {"const": "NO-GO"},
+    "historicalFailuresReclassified": {"const": false},
+    "outcomes": {
+      "type": "array", "minItems": 4, "maxItems": 18,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "collection", "existingCorrectness"],
+        "properties": {
+          "id": {"type": "string", "minLength": 2},
+          "collection": {"enum": ["VALID", "INVALID"]},
+          "existingCorrectness": {"enum": ["PASS", "FAIL", "INCONCLUSIVE"]},
+          "presentationOrder": {"enum": ["SUPPORTED_SOFTWARE_ORDER_ONLY", "INCONCLUSIVE", "NOT_CLAIMED"]},
+          "collectionErrors": {"type": "array", "items": {"type": "string"}},
+          "correctnessErrors": {"type": "array", "items": {"type": "string"}},
+          "frameOrder": {"type": "array", "maxItems": 21, "items": {"enum": ["SUPPORTED_SOFTWARE_ORDER_ONLY", "INCONCLUSIVE"]}},
+          "scope": {"type": "string"},
+          "reason": {"type": "string"}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"protocol": {"const": "R01"}}}, "then": {"properties": {"outcomes": {"minItems": 4, "maxItems": 4}}}},
+    {"if": {"properties": {"protocol": {"const": "R02"}}}, "then": {"properties": {"outcomes": {"minItems": 18, "maxItems": 18}}}}
+  ]
+}
