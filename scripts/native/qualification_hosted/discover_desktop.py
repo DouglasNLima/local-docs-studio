@@ -52,6 +52,13 @@ def guard(env):
     return revision
 
 
+def require_safe_buffer_ownership():
+    # Run42500925642 reached a native heap-corruption exit at the second
+    # HIGHCONTRAST GET-buffer release. Retain that implementation for review;
+    # do not execute it again until a separately reviewed ownership repair.
+    raise ValueError('BLOCKED: read-only probe buffer ownership is unqualified after run42500925642')
+
+
 def collect_probe(binary, child_env, output):
     timed_out = False
     with (output / 'desktop.json').open('xb') as stdout, (output / 'stderr.txt').open('xb') as stderr:
@@ -84,6 +91,7 @@ def main():
     parser.add_argument('--output', required=True)
     args = parser.parse_args()
     revision = guard(os.environ)
+    require_safe_buffer_ownership()
     require(os.name == 'nt', 'Windows only')
     git = lambda *a: subprocess.check_output(['git', '-C', str(ROOT), *a]).decode().strip()
     require(git('rev-parse', 'HEAD') == revision and not git('status', '--porcelain', '--untracked-files=all'), 'Exact clean checkout required')

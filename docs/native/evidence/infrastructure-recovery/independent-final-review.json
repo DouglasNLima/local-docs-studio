@@ -1,0 +1,465 @@
+{
+  "schemaVersion": 1,
+  "reviewKind": "Independent technical evidence and final fail-closed documentation review",
+  "reviewedAtUtc": "2026-11-08T16:49:02.143222+00:00",
+  "reviewer": "/root/acceptance_review",
+  "verdict": "BLOCKED",
+  "evidencePackageTechnicalReviewability": "READY_WITH_EXPLICIT_FAILURE_AND_CAUSAL_LIMITS",
+  "scope": {
+    "readOnlyReview": true,
+    "reviewerNativeProbeExecutions": 0,
+    "reviewerHostedDispatches": 0,
+    "reviewerQualificationExecutions": 0,
+    "reviewerAppearanceDisplayOrInputChanges": 0,
+    "allowedWrites": "This receipt and its independently obtained offline-test transcript under ignored artifacts/goal77-recovery only",
+    "notApproval": [
+      "ADR operational activation",
+      "risk waiver",
+      "new execution authority",
+      "numeric SLO",
+      "integration of PR76",
+      "distribution or release"
+    ]
+  },
+  "source": {
+    "reviewedBaseCommit": "dcb1536a9299f65f94d140877042b844f03356e2",
+    "reviewedBaseTree": "7b78528cd5c724faa325c1b78bdcf3ada3738123",
+    "finalDispositionInputs": "Current uncommitted file contents bound below; parent must retain and seal those contents",
+    "frozenQualificationCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+    "candidatePR76Commit": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "bindings": [
+      {
+        "path": "scripts/native/qualification_hosted/discover_desktop.py",
+        "bytes": 8428,
+        "sha256": "b526d0eb512dfd977a57d01b3d21582e6c16500ca5c5ab576238b5133c43cf57",
+        "gitCanonicalBlob": "253084c90d01995854bf09044aff3915a2d9a580"
+      },
+      {
+        "path": "scripts/native/qualification_hosted/eligibility.py",
+        "bytes": 9425,
+        "sha256": "bdbb40221e84398a81c86a97da9461b82a157a25d71d464afa1f5ebdfa1beeff",
+        "gitCanonicalBlob": "b69d2699ec0cd9b3cd60b15a2f5c065dccef0629"
+      },
+      {
+        "path": "scripts/native/qualification_hosted/execute_locked.py",
+        "bytes": 16083,
+        "sha256": "7311cf287315d8d42e5e6688bcbff6592cf698325d6f671853541cdf54fec800",
+        "gitCanonicalBlob": "317d9ca32690ed62a4ffa7511effe71f0c278768"
+      },
+      {
+        "path": "scripts/native/qualification_hosted/desktop_probe/Program.cs",
+        "bytes": 16163,
+        "sha256": "c7e6df00a0df85d9dd7d9076258eedd07bbf8805b6a7ad076c2fb32cf838b2e1",
+        "gitCanonicalBlob": "18b090d86a0a9e70e968d948d9c565a1837f8200"
+      },
+      {
+        "path": "scripts/native/qualification_hosted/desktop_probe/DesktopProbe.csproj",
+        "bytes": 634,
+        "sha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+        "gitCanonicalBlob": "f5d9d82ee498865c53e103bc4275aefa7df88568"
+      },
+      {
+        "path": "scripts/native/qualification_hosted/desktop_probe/desktop.manifest",
+        "bytes": 790,
+        "sha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+        "gitCanonicalBlob": "78c6ac3968f9b0b1c1feb4012f8b9d25a8906d14"
+      },
+      {
+        "path": ".github/workflows/native-ux-performance.yml",
+        "bytes": 12957,
+        "sha256": "cd94ad465ad3ebcdd82855e645526bde49c209ddd83b2f8a79bc39bd9985d375",
+        "gitCanonicalBlob": "172a2d706b81ba29279083b424e709f72d65e280"
+      },
+      {
+        "path": "tests/unit/test_native_infrastructure.py",
+        "bytes": 17384,
+        "sha256": "f5cb11c36d42db95dba9559f12c328f36f72de4ecef9f5da6adeccdcab9ac2de",
+        "gitCanonicalBlob": "d754a10ba6720b59e417e1ab27df3945de8d23d9"
+      },
+      {
+        "path": "tests/unit/test_native_hosted_execution.py",
+        "bytes": 15644,
+        "sha256": "2cfd6ee6a22c9677f6ffe9bb17548f1d6b0ed2ae180cf38628db4ebc8d3d5e84",
+        "gitCanonicalBlob": "7a21cfcd03299892af9bd43173d79bc0f8ff5aab"
+      },
+      {
+        "path": "docs/native/qualification/hosted-infrastructure-recovery.md",
+        "bytes": 15367,
+        "sha256": "107fc0b074f1a10ee5650ecac2f6f1827cc97346133515a5e5e2cf4212ca9dff",
+        "gitCanonicalBlob": "fb1fd2d90563561955f16ad9afb033ad5240aefb"
+      },
+      {
+        "path": "docs/native/qualification/goal77-infrastructure-readiness.json",
+        "bytes": 4738,
+        "sha256": "156e376271547f2383956cd44ac6e484341ea690843124726d6c61c6998226f8",
+        "gitCanonicalBlob": "2c5294779b057bf13c7d4770a24f735aa283a61e"
+      },
+      {
+        "path": "docs/native/evidence/infrastructure-recovery/receipt.md",
+        "bytes": 5967,
+        "sha256": "410db7133bef5b3674d0b27d3496f97c22c2d147aa7992c861c3cfc5b774ce7a",
+        "gitCanonicalBlob": "ccc41708caab0b59731592759741d3a1bb4f7fe2"
+      },
+      {
+        "path": "docs/native/native-acceptance-risk-register.md",
+        "bytes": 15742,
+        "sha256": "52f420c70e925b7b308817b4ebaceef7a1df856e5e515f7f9bcf05fa12178c83",
+        "gitCanonicalBlob": "f2cdb32a6254b833de093d92004cd7b7fbd47ed5"
+      },
+      {
+        "path": "docs/native/evidence/infrastructure-recovery/run-42500925642/receipt.json",
+        "bytes": 5812,
+        "sha256": "1053f8e598c162b82693596b10b3f9fd6914811eb5852ae949a3bf5a36eca4de",
+        "gitCanonicalBlob": "11ca1504ef8f95cea4327f5cb4e2d7b4b2b3645b"
+      }
+    ],
+    "bindingNote": "sha256 covers current raw working-tree bytes. gitCanonicalBlob uses git hash-object --path without -w and records Git's canonical content after configured attributes/EOL handling. Historical retained ZIP bytes are authoritative."
+  },
+  "actualRun": {
+    "runId": 42500925642,
+    "attempt": 1,
+    "jobId": 128793284951,
+    "sourceCommit": "dcb1536a9299f65f94d140877042b844f03356e2",
+    "sourceTree": "7b78528cd5c724faa325c1b78bdcf3ada3738123",
+    "artifact": {
+      "id": 13624668945,
+      "name": "goal77-infrastructure-42500925642-1",
+      "size_in_bytes": 242013,
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13624668945",
+      "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13624668945/zip",
+      "expired": false,
+      "created_at": "2026-11-08T16:39:09Z",
+      "expires_at": "2026-12-08T16:39:08Z",
+      "updated_at": "2026-11-08T16:39:09Z",
+      "digest": "sha256:0deafb2fd7daa16cc283be5941b763cd720d67d0dd5ab51d4653e75b50a99f21",
+      "workflow_run": {
+        "id": 42500925642,
+        "repository_id": 1248627951,
+        "head_repository_id": 1248627951,
+        "head_branch": "feature/native-ux-performance-contract",
+        "head_sha": "dcb1536a9299f65f94d140877042b844f03356e2"
+      }
+    },
+    "archiveRelativePath": "docs/native/evidence/infrastructure-recovery/run-42500925642/original-artefact.zip",
+    "archiveSha256": "0deafb2fd7daa16cc283be5941b763cd720d67d0dd5ab51d4653e75b50a99f21",
+    "archiveBytes": 242013,
+    "archiveMembers": 37,
+    "manifestEntries": 36,
+    "liveGithubJobs": [
+      {
+        "id": 128793284951,
+        "name": "Read-only geometry and appearance discovery (no qualification)",
+        "conclusion": "failure"
+      },
+      {
+        "id": 128793286115,
+        "name": "contract-controls",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 128793286240,
+        "name": "Owner-authorised bounded R01 (R02 independently gated)",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 128793286257,
+        "name": "Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 128793286387,
+        "name": "Hosted environment discovery only (no qualification)",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 128793287021,
+        "name": "UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})",
+        "conclusion": "skipped"
+      }
+    ],
+    "jobIsolation": "One read-only discovery job failed; all five other jobs skipped",
+    "collectionValidity": "INVALID",
+    "completeObservationJsonBytes": 0,
+    "loadedCoreAndSelfHashAcceptance": "NOT_REACHED",
+    "child": {
+      "pid": 9612,
+      "exitCode": 3221226356,
+      "exitHex": "c0000374",
+      "status": "STATUS_HEAP_CORRUPTION",
+      "timedOut": false,
+      "retries": 0,
+      "qualificationProcess": false
+    },
+    "retainedEvidenceBindings": [
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/desktop.json",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/child-process.json",
+        "bytes": 152,
+        "sha256": "2bbfe9dcc8b99b2b10032374553952b28006b061eac5afd05c02a313caf5178f"
+      },
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/stderr.txt",
+        "bytes": 7680,
+        "sha256": "d1f09ae3c297ab44375700a9f56fbb51fc99d76fccfec70158afa6596741c012"
+      },
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/environment.json",
+        "bytes": 408,
+        "sha256": "e73c106585dc56ece5eddc35554a9b0cccdaa07ccd79250f7a0ee5266fb21dab"
+      },
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/failure.json",
+        "bytes": 228,
+        "sha256": "bcefccd7bd69b21c4d281a53bc342f4f1e16f77da7894727c8903973a8f0d9d7"
+      },
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/files.json",
+        "bytes": 4604,
+        "sha256": "2470d31ee2348b369b46dec725a58342d97d9a3dc5ce9621e73ef4f4ebf331c2"
+      },
+      {
+        "path": "artifacts/goal77-recovery/run-42500925642/extracted/probe-identity.json",
+        "bytes": 1153,
+        "sha256": "2c70915752d876b19b0a638407d8ad452604c902c0c172ac1e16f4a0a9aa80d4"
+      }
+    ]
+  },
+  "independentIntegrityChecks": {
+    "status": "PASS",
+    "details": {
+      "integrity": "PASS",
+      "archiveSha256": "0deafb2fd7daa16cc283be5941b763cd720d67d0dd5ab51d4653e75b50a99f21",
+      "bytes": 242013,
+      "files": 37,
+      "manifestEntries": 36,
+      "binaryFiles": 5,
+      "sourceBindings": "three source files and two wrapper files match sealed commit after exact LF-to-CRLF conversion",
+      "journalEvents": 30,
+      "pid": 9612,
+      "timestampsStrictlyIncreasing": true,
+      "geometryRecordsAgree": true,
+      "geometry": {
+        "primaryWorkPixels": {
+          "left": 0,
+          "top": 0,
+          "right": 1024,
+          "bottom": 720
+        },
+        "monitorPixels": {
+          "left": 0,
+          "top": 0,
+          "right": 1024,
+          "bottom": 768
+        },
+        "dpi": {
+          "processAwareness": 1,
+          "threadAwareness": 1,
+          "system": 96,
+          "declaration": "System aware apphost; no DPI-setting API"
+        },
+        "scalePercent": 100,
+        "windowConstraintsPixels": {
+          "maximumTrackWidth": 1044,
+          "maximumTrackHeight": 788,
+          "minimumTrackWidth": 136,
+          "minimumTrackHeight": 39
+        },
+        "sessionId": 2,
+        "activeConsoleSession": 2,
+        "remoteSession": false,
+        "desktop": "Default",
+        "inputDesktop": "Default",
+        "windowStation": "WinSta0",
+        "modes": [
+          [
+            640,
+            480
+          ],
+          [
+            800,
+            600
+          ],
+          [
+            1024,
+            768
+          ],
+          [
+            1152,
+            864
+          ],
+          [
+            1280,
+            720
+          ],
+          [
+            1280,
+            800
+          ],
+          [
+            1280,
+            1024
+          ],
+          [
+            1366,
+            768
+          ],
+          [
+            1440,
+            900
+          ],
+          [
+            1600,
+            900
+          ],
+          [
+            1600,
+            1200
+          ],
+          [
+            1680,
+            1050
+          ],
+          [
+            1920,
+            1080
+          ]
+        ]
+      },
+      "highContrastCopies": [
+        {
+          "flags": 126,
+          "pointerWasNull": false,
+          "scheme": ""
+        },
+        {
+          "flags": 126,
+          "pointerWasNull": false,
+          "scheme": ""
+        }
+      ],
+      "boundaryCounts": {
+        "guardedStart": 1,
+        "geometryComplete": 2,
+        "highContrastGetBegin": 2,
+        "highContrastCopied": 2,
+        "highContrastFreeBegin": 2,
+        "highContrastFreeComplete": 1,
+        "appearanceReadComplete": 1
+      },
+      "lastBoundary": {
+        "boundary": "highContrastFreeBegin",
+        "processId": 9612,
+        "timestamp": 1217490638,
+        "data": {
+          "pointerWasNull": false
+        }
+      }
+    },
+    "archiveRetention": "Downloaded and canonical retained ZIP have identical SHA256 and size",
+    "runtimeLimit": "Image/OS/SDK guard and build records passed. The partial guarded-start record reports 10.0.14, but the required complete loaded Core-file/self-hash acceptance was not reached; no runtime qualification is inferred."
+  },
+  "findings": [
+    {
+      "id": "INFRA-COLLECTION",
+      "severity": "BLOCKS_EXECUTION",
+      "status": "OPEN_RETAINED",
+      "observed": "The child terminated with STATUS_HEAP_CORRUPTION; stdout is empty. All 30 partial journal records have the same supervised PID and strictly increasing monotonic timestamps.",
+      "consequence": "No valid full discovery observation or application acceptance result exists."
+    },
+    {
+      "id": "INFRA-HC-BUFFER-BOUNDARY",
+      "severity": "BLOCKS_EXECUTION",
+      "status": "OPEN_RETAINED",
+      "observed": "Both High Contrast copies report flags126, non-null pointer and empty scheme. The first release has a completion marker and an appearance-read completion marker. The second release has only its begin marker before the heap-corruption exit.",
+      "establishedBoundary": "Between the second highContrastFreeBegin marker and its missing completion marker",
+      "notEstablished": [
+        "actual pointer values or aliasing",
+        "a confirmed double-free",
+        "where any earlier heap damage began",
+        "the precise faulting native instruction",
+        "the cause of the earlier no-output run42500058059"
+      ],
+      "consequence": "Returned-buffer ownership and lifetime remain unqualified. Official ownership guidance does not certify this implementation. No speculative interop repair is approved."
+    },
+    {
+      "id": "INFRA-GEOMETRY",
+      "severity": "BLOCKS_QUALIFICATION",
+      "status": "PARTIAL_DIAGNOSTIC_NOT_VALID_COLLECTION",
+      "observed": "Two matching partial geometry records show one1024x768 primary monitor,1024x720 workarea,96DPI/100%, System-aware process/thread, maximum tracking size1044x788 and Default/WinSta0 session2.",
+      "classification": "INELIGIBLE for fixed1280x800 geometry on this observed desktop",
+      "supportedInference": "The frozen source's Math.Min clamp with this observed workarea predicts1024x720. No WPF window was created or measured by discovery.",
+      "historicalLimit": "Original R01 WorkArea/DPI/pointer nullness were not captured. Its exact original environment attribution remains INCONCLUSIVE.",
+      "futureModeLimit": "1920x1080 occurs in the13 enumerated modes; it is only a possible separately authorised experiment, not proof of successful mode change, usable workarea, stable display or restoration."
+    },
+    {
+      "id": "FINAL-EXECUTION-GUARD",
+      "severity": "CONTROL",
+      "status": "VERIFIED_OFFLINE",
+      "observed": "The reviewed discover_desktop main calls unconditional require_safe_buffer_ownership after hosted authorisation guard and before OS checks, Git reads, output creation, build or probe launch.",
+      "control": "The new mocked guarded-entry test verifies no child launch, Git subprocess or output directory creation.",
+      "limit": "This is a fail-closed guard for the reviewed CLI/workflow; it does not repair the retained probe. Frozen qualification code and the existing spent-authority block remain unchanged."
+    }
+  ],
+  "offlineValidation": {
+    "independentlyExecuted": [
+      {
+        "command": "python -m unittest discover -s tests/unit -p test_native_infrastructure.py -v",
+        "tests": 21,
+        "exitCode": 0,
+        "durationSeconds": 0.135,
+        "result": "PASS",
+        "transcript": "artifacts/goal77-recovery/independent-final-infrastructure-controls.txt",
+        "sha256": "78155a511834ac9473b129ae054cf01e353862e958dba098c8ce711734b5053d",
+        "safety": "Mocks/guarded subprocess entry only; no Win32 probe, GUI or qualification launched"
+      }
+    ],
+    "parentReportedOnly": "The final documentation also records17 coordinator,14 environment and43 qualification controls. They were not repeated in this final review and are not represented as this reviewer's current execution.",
+    "notRun": [
+      "native probe",
+      "native application",
+      "R01",
+      "R02",
+      "calibration",
+      "display-mode experiment",
+      "theme or High Contrast mutation",
+      "full CI"
+    ]
+  },
+  "documentationAssessment": {
+    "status": "CONSISTENT_WITH_RETAINED_EVIDENCE",
+    "reviewedClaims": [
+      "both failed discovery records retained",
+      "partial geometry distinct from valid collection",
+      "no confirmed double-free",
+      "original R01 attribution remains inconclusive",
+      "appearance restoration remains unverified",
+      "runtime file/self-hash acceptance not reached",
+      "all historical risk entries remain open",
+      "no further hosted run",
+      "1920x1080 is a separate proposal only"
+    ],
+    "additionalPreDeliveryDocumentationBlockers": [],
+    "technicalReadinessBoundary": "Evidence retention and failure/decision communication are review-ready; no execution or application readiness is certified."
+  },
+  "requiredDisposition": {
+    "furtherReadOnlyProbeExecution": "DISABLED_PENDING_SEPARATELY_REVIEWED_BUFFER_OWNERSHIP_REPAIR",
+    "newQualification": "NOT_RUN_AND_NOT_AUTHORISED",
+    "R02": "NOT_RUN",
+    "appearanceRestoration": "UNVERIFIED",
+    "PR76Integration": "NO-GO",
+    "PR76PR78PR80": "Remain Draft",
+    "historicalBenchmarksAndRisks": "Retain unchanged; no threshold, required-check, protection or waiver transition",
+    "minimumNextTechnicalWork": "Review and resolve returned-buffer ownership/lifetime offline, then independently review the repair. Any subsequent read-only probe, display/appearance experiment or qualification needs its own applicable authority; this review authorises none."
+  },
+  "officialReferences": [
+    "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-highcontrastw",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiforsystem",
+    "https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/troubleshoot-application-service-crashing-behavior"
+  ]
+}

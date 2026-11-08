@@ -30,6 +30,10 @@ authority before V1. Its [readiness manifest](qualification/goal77-infrastructur
 keeps exact restoration UNVERIFIED and campaign execution NOT_AUTHORISED. A new
 host observation cannot reconstruct the original VM's missing DPI/work-area or
 nullable-scheme evidence. This preparation closes none of R01–R06.
+The final read-only follow-up observed a matching 1024 × 720 work area at 96 DPI,
+then failed with native heap corruption at the collector's second HC-buffer release
+boundary. Discovery is disabled pending a reviewed ownership repair; partial
+geometry records do not make collection valid or establish exact restoration.
 
 | ID | Classification / present decision | Existing controls | Smallest next evidence / explicit closure decision |
 |---|---|---|---|

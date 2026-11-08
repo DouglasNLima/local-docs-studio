@@ -172,6 +172,14 @@ class InfrastructureControls(unittest.TestCase):
             self.assertFalse(output.exists())
             self.assertIn('discovery guard failed', result.stderr)
 
+    def test_known_native_buffer_failure_blocks_even_guarded_discovery_before_side_effects(self):
+        with tempfile.TemporaryDirectory() as temporary, patch.object(discovery, 'guard', return_value='a' * 40), \
+                patch.object(discovery.subprocess, 'Popen') as launch, patch.object(discovery.subprocess, 'check_output') as read:
+            output = Path(temporary) / 'never-created'
+            with patch.object(sys, 'argv', ['discover_desktop.py', '--output', str(output)]):
+                with self.assertRaisesRegex(ValueError, 'buffer ownership is unqualified'): discovery.main()
+            self.assertFalse(output.exists()); launch.assert_not_called(); read.assert_not_called()
+
     def test_read_only_native_failure_retains_exact_exit_pid_and_no_retry(self):
         for code in (0, 2, 0xc0000374):
             with tempfile.TemporaryDirectory() as temporary, patch.object(discovery.subprocess, 'Popen') as launch:

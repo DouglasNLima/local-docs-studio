@@ -1,0 +1,223 @@
+{
+  "runId": 42500925642,
+  "attempt": 1,
+  "jobId": 128793284951,
+  "sourceCommit": "dcb1536a9299f65f94d140877042b844f03356e2",
+  "sourceTree": "7b78528cd5c724faa325c1b78bdcf3ada3738123",
+  "status": "READ_ONLY_DISCOVERY_FAILED",
+  "artifactId": 13624668945,
+  "artifactSha256": "0deafb2fd7daa16cc283be5941b763cd720d67d0dd5ab51d4653e75b50a99f21",
+  "bytes": 242013,
+  "members": 37,
+  "hashVerifiedMembers": 36,
+  "sourceBytesMatchGitAfterCRLFCheckout": true,
+  "imageSdkChecks": "PASS",
+  "consoleBuild": "PASS",
+  "child": {
+    "processId": 9612,
+    "exitCode": 3221226356,
+    "exitCodeHex": "c0000374",
+    "timedOut": false,
+    "qualificationProcess": false,
+    "retryCount": 0
+  },
+  "journalRecords": 30,
+  "geometryRecordsEqual": true,
+  "geometry": {
+    "primaryWorkPixels": {
+      "left": 0,
+      "top": 0,
+      "right": 1024,
+      "bottom": 720
+    },
+    "dpi": {
+      "processAwareness": 1,
+      "threadAwareness": 1,
+      "system": 96,
+      "declaration": "System aware apphost; no DPI-setting API"
+    },
+    "monitors": [
+      {
+        "device": "\\\\.\\DISPLAY1",
+        "primary": true,
+        "monitorPixels": {
+          "left": 0,
+          "top": 0,
+          "right": 1024,
+          "bottom": 768
+        },
+        "workPixels": {
+          "left": 0,
+          "top": 0,
+          "right": 1024,
+          "bottom": 720
+        },
+        "scalePercent": 100,
+        "monitorDevice": {
+          "name": "\\\\.\\DISPLAY1\\Monitor0",
+          "description": "Generic PnP Monitor",
+          "id": "MONITOR\\MSH062E\\{4d36e96e-e325-11ce-bfc1-08002be10318}\\0000",
+          "key": "\\Registry\\Machine\\System\\CurrentControlSet\\Control\\Class\\{4d36e96e-e325-11ce-bfc1-08002be10318}\\0000",
+          "flags": 3
+        },
+        "currentMode": {
+          "width": 1024,
+          "height": 768,
+          "bitsPerPixel": 32,
+          "refreshHz": 64,
+          "x": 0,
+          "y": 0,
+          "orientation": 0
+        },
+        "enumeratedModes": [
+          {
+            "width": 640,
+            "height": 480,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1152,
+            "height": 864,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1280,
+            "height": 800,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1280,
+            "height": 1024,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1366,
+            "height": 768,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1440,
+            "height": 900,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1600,
+            "height": 900,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1600,
+            "height": 1200,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1680,
+            "height": 1050,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "bitsPerPixel": 32,
+            "refreshHz": 64,
+            "x": 0,
+            "y": 0,
+            "orientation": 0
+          }
+        ],
+        "modesComplete": true
+      }
+    ],
+    "sessionId": 2,
+    "activeConsoleSession": 2,
+    "remoteSession": false,
+    "desktop": "Default",
+    "inputDesktop": "Default",
+    "windowStation": "WinSta0",
+    "windowConstraintsPixels": {
+      "maximumTrackWidth": 1044,
+      "maximumTrackHeight": 788,
+      "minimumTrackWidth": 136,
+      "minimumTrackHeight": 39
+    }
+  },
+  "highContrastCopiesEqual": true,
+  "highContrastCopy": {
+    "flags": 126,
+    "pointerWasNull": false,
+    "scheme": ""
+  },
+  "lastBoundary": "highContrastFreeBegin",
+  "nativeFailure": "STATUS_HEAP_CORRUPTION",
+  "causeLimit": "Second LocalFree boundary localised; pointer aliasing or earlier heap damage not causally established. First run cannot be retroactively assigned this cause.",
+  "completeDiscovery": "INVALID",
+  "loadedCoreAndSelfHashAcceptance": "NOT_REACHED",
+  "qualificationProcesses": 0,
+  "otherJobsSkipped": 5,
+  "campaignExecutionApproved": false,
+  "executionStatus": "NOT_AUTHORISED",
+  "furtherHostedDiscovery": "STOPPED_PENDING_REVIEWED_BUFFER_OWNERSHIP_REPAIR"
+}

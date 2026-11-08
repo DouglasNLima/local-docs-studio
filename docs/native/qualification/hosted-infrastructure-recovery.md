@@ -20,6 +20,13 @@ it changes no interop call or product control and still creates no qualification
 window. Partial boundary records are diagnostic facts, never a valid full discovery
 or a substitute qualification result.
 
+The [journalled follow-up, run 42500925642](../evidence/infrastructure-recovery/run-42500925642/receipt.json),
+also failed. It retained useful geometry facts, then exited with `0xC0000374` at
+the second HC-buffer release boundary. **Further discovery is disabled before
+build or process launch**, pending a reviewed buffer-ownership repair. The
+[delivery receipt](../evidence/infrastructure-recovery/receipt.md) links both
+unchanged failed archives, exact identities, offline controls and independent review.
+
 ## Geometry: established mechanism and missing historical observation
 
 The exact sealed R01 source creates its window with
@@ -36,6 +43,17 @@ monitor identity. Therefore its exact desktop cause cannot be established solely
 from the failed dimension assertion. A new observation can confirm the clamp's
 prediction on another host with the same image; it cannot reconstruct the deleted
 original VM or prove an unrecorded historical DPI value.
+
+On the same image `win25-vs2026/20261103.298.1`, the follow-up's two flushed
+geometry records reported one primary Generic PnP Monitor (`MSH062E`), a physical
+mode of **1024 × 768**, a usable work area of **1024 × 720**, **96 DPI / 100% scaling**,
+and maximum tracking dimensions **1044 × 788**. The active and process console
+session were 2, with `WinSta0/Default`, and no remote session was reported. The
+source clamp therefore predicts exactly 1024 × 720 on that observed configuration.
+**The clamp mechanism and matching hosted limitation are confirmed; precise
+attribution of the original run's unrecorded desktop state remains INCONCLUSIVE.**
+The records are partial diagnostics from a subsequently failed process, not a
+complete, valid eligibility collection or an actual WPF measurement.
 
 The new console probe reads, twice at fixed boundaries, primary/monitor rectangles,
 current and enumerated display modes, monitor device identity, system DPI, process
@@ -59,6 +77,16 @@ documented Windows display APIs, with original mode/appearance restoration verif
 Enumeration alone does not establish that a change succeeds or survives runner
 session behaviour. No such setter is implemented or executed here.
 
+The observed enumeration contained 13 modes, including **1920 × 1080, 32-bit, 64 Hz**.
+That is the recommended next *experiment target*, conditional on repairing the
+read-only collector. A 1280 × 800 display mode alone would not establish an
+800-DIP usable height after desktop chrome. A separately approved disposable-host
+experiment would use the documented [ChangeDisplaySettingsEx](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsexw)
+test/apply path without registry persistence, verify the actual work area/DPI/session,
+then restore and independently compare the original mode and appearance. There
+would be no qualification window or product process. This is a proposal only;
+1920 × 1080 mode availability is not verified switching, stability or restoration.
+
 If this hosted image exposes no suitable mode, the alternative is an isolated,
 disposable Windows VM with an actual interactive display adapter/session meeting
 those requirements, never the developer's desktop. Its image, hardware/display,
@@ -80,6 +108,14 @@ They cannot now establish which original representation was returned. This is an
 observation limitation, not permission to call either representation equivalent
 to the named scheme or to close the failure.
 
+The new host returned a **non-null pointer containing an empty string**, with raw
+flags 126, in both recorded HC copies. That establishes EMPTY for this observation,
+not retrospectively for the original VM. Microsoft's [ThemeSettings design](https://github.com/microsoft/WindowsAppSDK/blob/main/specs/themes/ThemeSettings.md)
+also distinguishes a selected HC scheme from whether HC is enabled. Persisting
+the selected named scheme after disabling HC is consistent with the original
+failure; the precise reason the original empty restore request did not round-trip
+is still unproved.
+
 [HIGHCONTRASTW](https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-highcontrastw)
 documents separate flags and default scheme fields. Its GET string is system
 allocated and must be released with LocalFree. The new getter copies a bounded
@@ -97,6 +133,20 @@ comparison only. There is no live setter in this recovery probe. The documentati
 does not guarantee that passing NULL or an empty string clears a previously selected
 scheme. Consequently this proposal is **not a guaranteed restoration method**, and
 exact restoration remains UNVERIFIED even when a read-only snapshot is stable.
+
+There is an additional **demonstrated collector failure**. In PID 9612, the first
+GET/copy/LocalFree completed; the second GET again copied an empty string, then
+the last marker was `highContrastFreeBegin`, without its completion marker. The
+child exited `3221226356 / 0xC0000374`, [STATUS_HEAP_CORRUPTION](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55),
+without a timeout or retry. Pointer addresses/aliasing and a crash dump were not
+collected. This localises the observed abort boundary; it does **not** prove double
+free, identify the origin of earlier heap damage, or explain the first unjournalled
+failure. The documented ownership recommendation does not establish that this
+implementation is safe on the observed host. No deallocation is removed, no second
+read is skipped, and no partial result is promoted to PASS. Safe repeated GET-buffer
+ownership must be resolved and independently validated before appearance experiments.
+Final loaded-Core/self-hash acceptance was not reached, although the journal reports
+runtime 10.0.14 and the image/SDK/build identities were verified before launch.
 
 A controlled live round trip on a disposable VM requires separate explicit owner
 authorisation. It must retain the first mismatch and stop; no retries, registry
@@ -137,14 +187,15 @@ is treated as evidence of displayed pixels.
 
 ## Owner decisions after discovery
 
-1. Select a proposed disposable host/display path after reviewing its observed
-   capabilities; approve any display configuration experiment separately.
-2. Decide whether to authorise one bounded appearance-restoration infrastructure
-   experiment, with an exact initial-state contract and independent readback. A
-   deliberately provisioned named baseline needs an explicit decision of its own.
-3. After those prerequisites pass, commission the narrowly reviewed gate integration,
-   new source/binary/configuration receipts and fresh execution authority. This
-   continuation does not authorise that campaign or reuse the spent approval.
+| Decision | Recommendation ready for review | Prerequisite / excluded authority |
+|---|---|---|
+| Disposable-host geometry | Approve or reject a separate 1920 × 1080 mode experiment on the observed hosted image, with measured work area at least 1280 × 800 DIPs and exact restoration. Use an explicitly approved disposable VM if that path cannot qualify. | First repair the read-only collector. No mode change, new image or self-hosted guard substitution is approved here. |
+| Original appearance baseline | Preserve the exact observed flags and EMPTY/NULL/NAMED distinction. Decide explicitly whether a separately provisioned named baseline is acceptable for a future experiment. | A named baseline cannot rewrite or waive the original empty-to-named failure. |
+| Restoration experiment | Approve or reject a separately bounded HC round trip only after the getter's ownership is qualified; require independent exact readback and stop on the first mismatch. | No appearance change or claim of reliable empty-scheme restoration is currently authorised or established. |
+| Fresh qualification | After infrastructure passes, review integration of the pre-V1/per-cell gates, exact new source/binary/configuration receipts, then issue fresh campaign authority if appropriate. | R01/R02 and calibration remain blocked; the earlier authority is spent. |
+
+The minimum technical follow-up is the collector's returned-buffer ownership,
+not a product or renderer change. No further hosted run is made in this continuation.
 
 Hardware/corpus selection and statistical review remain governed by the existing
 [selection sheet](hardware-corpus-selection.md); no specifications or user documents

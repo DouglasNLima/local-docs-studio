@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "status": "BLOCKED",
+  "campaignExecutionApproved": false,
+  "executionStatus": "NOT_AUTHORISED",
+  "testedChanges": "Final discovery stop guard and offline controls; original qualification source and product unchanged",
+  "tests": {
+    "total": 95,
+    "receipts": {
+      "infrastructure-controls-blocked.txt": {
+        "count": 21,
+        "sha256CanonicalLf": "15b2f92daeb460109ac763ce1e4f76d0728ee9c8f993cd6f9cbe152538e9dd4c"
+      },
+      "hosted-controls.txt": {
+        "count": 17,
+        "sha256CanonicalLf": "aa6e5f0eb796e51c122b8818b4514c33eb00e39b3b62b6b4a875c05a0ef98ea8"
+      },
+      "environment-controls.txt": {
+        "count": 14,
+        "sha256CanonicalLf": "217ae29e137d0253e76d6edb8a2f9e35f651db0d8b65e098a50e08825fc584bd"
+      },
+      "qualification-controls.txt": {
+        "count": 43,
+        "sha256CanonicalLf": "899308257737b99807e9f734bfadf894aefd654458cc4d0f3eebfc233152793e"
+      }
+    }
+  },
+  "checks": {
+    "static": "PASS_UNCHANGED_WEB_SURFACE",
+    "foundation": "PASS",
+    "governance": "PASS",
+    "whitespace": "PASS_EXCLUDING_RETAINED_RAW_JOB_LOG_WHITESPACE"
+  },
+  "independentReviewSha256": "7c258f3584c74c3f699e25dd05ff3062171395104757e09ffe8e1483a5b3169f",
+  "protectedPathsUnchanged": [
+    "src",
+    "assets",
+    "tests/fixtures",
+    "scripts/native/qualification",
+    "docs/native/evidence/bounded-qualification",
+    "docs/native/evidence/hosted-environment-lock",
+    ".gitattributes",
+    "docs/adr"
+  ],
+  "qualificationProcesses": 0,
+  "hostedReadOnlyProbeProcesses": 2,
+  "fullHostedQualification": "NOT_RUN",
+  "fullWebNativeCi": "NOT_RUN_VALIDATION_ONLY_SCOPE",
+  "appearanceOrDisplayChanges": false,
+  "pr76Integration": "NO-GO",
+  "sourceIdentityNote": "Actual discovery source/tree is recorded per run; final delivery commit/tree are recorded in the canonical GitHub delivery comment.",
+  "independentOriginalBytes": {
+    "path": "independent-final-original-bytes.zip",
+    "sha256": "d18446725e433f29b57c2eef144aa6389128282c276ad40ec11a9f85fbe8f1a8",
+    "receiptSha256": "7c258f3584c74c3f699e25dd05ff3062171395104757e09ffe8e1483a5b3169f",
+    "rawTranscriptSha256": "78155a511834ac9473b129ae054cf01e353862e958dba098c8ce711734b5053d",
+    "canonicalLfTranscriptSha256": "951db68ba835291a57cd380b5fc3b71b08d90c7c6b1357dc38d00637c7b96459"
+  }
+}
