@@ -1,0 +1,177 @@
+{
+  "schema": "goal77-independent-pre-dispatch-review-v1",
+  "recordedAtUtc": "2026-11-08T15:39:13.012319+00:00",
+  "reviewer": "Independent technical review agent /root/acceptance_review",
+  "verdict": "READY_FOR_ONE_OWNER_AUTHORISED_R01_DISPATCH",
+  "reviewedCommit": "ffc8660100b19944905e2d699e8a27d866904b83",
+  "reviewedTree": "53f8aa3cde645f302d6ec9a804c87241ae555795",
+  "cleanAtReview": true,
+  "frozenExecutionImplementation": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "frozenImplementationDiff": "EMPTY for scripts/native/qualification between frozen implementation and reviewed commit",
+  "reviewedFiles": {
+    "scripts/native/qualification_hosted/execute_locked.py": {
+      "gitBlobOid": "1573c0ca3862eeeef0f10c4e8a23c5f38ddecdcf",
+      "gitBlobSha256": "a6e96ba50db7c386f69b00329d19ab041a79d6a312721bb457d45bacf79a74dc",
+      "workingTreeSha256": "a6e96ba50db7c386f69b00329d19ab041a79d6a312721bb457d45bacf79a74dc",
+      "workingTreeBytes": 15674
+    },
+    ".github/workflows/native-ux-performance.yml": {
+      "gitBlobOid": "16b5dd7edda4812019bfc181f485355462ad27ca",
+      "gitBlobSha256": "3a9cb8b5ff0e1e6a698c7fd3232c4af83e4efa19552226a9052b1cd480a38baa",
+      "workingTreeSha256": "ceaaed095f0780f7ca68b9b106eab7c9a8237b4ac9c2038994c94ca59c39084d",
+      "workingTreeBytes": 10640
+    },
+    "tests/unit/test_native_hosted_execution.py": {
+      "gitBlobOid": "8cea5f117603fca800c3ee1e0d59526153f727f6",
+      "gitBlobSha256": "eb2963948750a69973c9ecfe7626fca104925f6306e5d76ecdfa151ea1888685",
+      "workingTreeSha256": "eb2963948750a69973c9ecfe7626fca104925f6306e5d76ecdfa151ea1888685",
+      "workingTreeBytes": 15558
+    },
+    "docs/native/qualification/bounded-execution.md": {
+      "gitBlobOid": "9bda4031afef7aa5dc589bdd4574117818bec419",
+      "gitBlobSha256": "6a44f71ecc42bd80775a3bea86a9790a481279dc828fef8830ad734094e361ae",
+      "workingTreeSha256": "6a44f71ecc42bd80775a3bea86a9790a481279dc828fef8830ad734094e361ae",
+      "workingTreeBytes": 4144
+    },
+    "docs/native/evidence/bounded-qualification/pre-dispatch-validation.json": {
+      "gitBlobOid": "f76341f5555fdd5cd7770a06cbac1c07ef318da5",
+      "gitBlobSha256": "03bf9a48030b5d744d40e1754789cbdfe8ab438726773f9a85c42391f941492f",
+      "workingTreeSha256": "dac09074980d6d195abd518cefff325e695eee0111473a73d8b474fcaa910199",
+      "workingTreeBytes": 2925
+    },
+    "docs/native/evidence/bounded-qualification/owner-record.json": {
+      "gitBlobOid": "f97384d279d6456ce1885d12c976aa34acd0d0ba",
+      "gitBlobSha256": "f32f7edaef24b3751a933f4261e6b15a5e1023bdc7e0c9417735af84adc2d624",
+      "workingTreeSha256": "723f626a86a66e488c6639961d6d7da2fc5ca21d2952d9d9868b93f10847784f",
+      "workingTreeBytes": 3725
+    },
+    "docs/native/evidence/bounded-qualification/owner-attachment.json": {
+      "gitBlobOid": "194b2305c9d0890f49004c47eee425a4ade5fe5c",
+      "gitBlobSha256": "5f270065fea2eea3b9cce3e82d2a6e6fe76537c1e4756b7a0b3692140a96ad75",
+      "workingTreeSha256": "0d00731ee9cd6e0a0a2cf07ddec91f37ffb2a125b3caf386ae291645c81ae141",
+      "workingTreeBytes": 3952
+    },
+    "docs/native/evidence/bounded-qualification/owner-authorisation.txt": {
+      "gitBlobOid": "bd532d2648898746d2420014f806606cf43d64d6",
+      "gitBlobSha256": "7f5e4362887efbbac92e8508954b956a65a7f75f3a9ec59f2ce9c6e178147d7d",
+      "workingTreeSha256": "0a4d82c72a81ba40a38952105502d71e9d680f86751289dc92cddbedbfe7cd4b",
+      "workingTreeBytes": 2839
+    }
+  },
+  "sourceFunctionLines": {
+    "require": 31,
+    "sha": 36,
+    "read_json": 41,
+    "write_json": 52,
+    "guard": 58,
+    "git": 71,
+    "verify_authority": 75,
+    "verify_metadata": 82,
+    "extract_archive": 94,
+    "api": 120,
+    "prepare": 126,
+    "authorised_copy": 150,
+    "safe_processes": 161,
+    "verify_restored": 172,
+    "terminal_exit": 186,
+    "execute": 194,
+    "main": 262
+  },
+  "scope": {
+    "readOnlySourceReview": true,
+    "offlineControlsOnly": true,
+    "hostedWorkLaunched": false,
+    "nativeForegroundOrHighContrastExecuted": false,
+    "productionOrFrozenHarnessChangedByReviewer": false,
+    "reviewArtifactOnlyWritten": true
+  },
+  "authority": {
+    "url": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720",
+    "ownerLogin": "DouglasNLima",
+    "commentBodySha256": "fe514835d3b73cb946bde7f82700936a0422d727dfbdca6e5ea10406847be080",
+    "originalAttachmentSha256": "0a4d82c72a81ba40a38952105502d71e9d680f86751289dc92cddbedbfe7cd4b",
+    "meaning": "Owner instruction supplies execution authority. This review supplies technical evidence only; it is not owner or policy approval."
+  },
+  "sealedInputs": {
+    "discoveryRun": 42484885426,
+    "attempt": 1,
+    "artefactId": 13618494876,
+    "archiveSha256": "8b3d50ff7b9b394867fdc9598fe14e47d980e865c7d74f389d7802be90c7f812",
+    "candidateConfigSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+    "environmentLockSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+    "restoredFiles": 2019
+  },
+  "independentChecks": [
+    {
+      "check": "17 offline coordinator controls",
+      "command": "python -m unittest discover -s tests/unit -p test_native_hosted_execution.py -v",
+      "result": "PASS",
+      "exitCode": 0,
+      "tests": 17,
+      "reportedSeconds": 3.826
+    },
+    {
+      "check": "Exact commit, tree and clean worktree",
+      "result": "PASS"
+    },
+    {
+      "check": "Frozen qualification implementation unchanged",
+      "result": "PASS"
+    },
+    {
+      "check": "Coordinator, workflow diff, tests and stated execution boundary inspection",
+      "result": "PASS"
+    }
+  ],
+  "findings": [
+    {
+      "id": "R01-PRE-01",
+      "priority": "P1",
+      "status": "RESOLVED",
+      "finding": "Original wrapper could return zero despite a known audit FAIL or INVALID collection.",
+      "disposition": "terminal_exit now requires launcher zero, verified restoration, unchanged environment, VALID collection, PASS or INCONCLUSIVE correctness, and no audit/general error. Known product or audit failure retains a non-zero terminal result. A valid collection awaiting pixel review remains INCONCLUSIVE and cannot authorise R02 automatically.",
+      "source": "scripts/native/qualification_hosted/execute_locked.py:terminal_exit",
+      "control": "test_audit_failure_or_invalid_collection_never_yields_zero_exit"
+    },
+    {
+      "id": "R01-PRE-02",
+      "priority": "P2",
+      "status": "RESOLVED",
+      "finding": "Pinned checkout was originally verified after importing its modules.",
+      "disposition": "Exact frozen HEAD and a clean checkout are now required before qualification, environment_lock or audit imports. Windows input/appearance APIs remain after full candidate validation.",
+      "source": "scripts/native/qualification_hosted/execute_locked.py:execute",
+      "control": "Source-order inspection and test_environment_mismatch_precedes_windows_api_and_child_access"
+    },
+    {
+      "id": "R01-PRE-03",
+      "priority": "P2",
+      "status": "RESOLVED",
+      "finding": "The complete restored-file manifest was recorded but not consumed at execution preflight.",
+      "disposition": "verify_restored rechecks manifest SHA256, exactly 2,019 entries, actual file-set/hash equality and absence of links/junctions before importing the frozen implementation.",
+      "source": "scripts/native/qualification_hosted/execute_locked.py:verify_restored",
+      "control": "test_complete_restored_closure_detects_changed_missing_extra_files_and_manifest"
+    }
+  ],
+  "confirmedBoundaries": [
+    "Only workflow_dispatch R01 on the owner repository/feature branch and attempt 1 is eligible; R02 and calibration are rejected.",
+    "An exact wrapper commit is required; the copied coordinator is retained and the checkout detaches to the frozen 77664fbe implementation without a rebuild.",
+    "Owner comment identity/body, discovery identity, raw ZIP SHA256 and complete restored closure are checked.",
+    "The original candidate remains byte-exact. Only three authority fields change in a separate execution copy.",
+    "Source, fixture, generated inputs, three bundle closures, both runtime closures, SDK files and host/image identity are validated before Windows input/appearance access.",
+    "API credentials are confined to the download step; checkout does not retain credentials and execution rejects inherited API-token variables.",
+    "The fixed four R01 cells are executed once by the unchanged launcher; original and discovery workflow jobs are excluded in bounded mode.",
+    "Per-process cleanup, empty job trees, appearance restoration and final held-input state are required for a safe collection disposition.",
+    "Partial output and failure records are retained. Product failure is distinct from unsafe collection; neither yields policy or integration approval."
+  ],
+  "limitationsAndFollowThrough": [
+    "Offline controls do not demonstrate actual hosted image eligibility, Windows behaviour, process cleanup or product correctness. The real preflight and retained R01 evidence must establish them.",
+    "This disposition covers one authorised first-attempt R01 dispatch. The coordinator contains no retry loop; an operator must not issue a second fresh dispatch or rerun after failure.",
+    "If an evidence-only follow-up commit precedes dispatch, verify the reviewed coordinator/workflow/test Git blob identities remain unchanged and use the actual live HEAD as expected_wrapper_sha.",
+    "R02 is deliberately absent. A separate independent review of actual R01 evidence, including full-frame pixel review, audit and cleanup/environment evidence, must precede any R02 exposure.",
+    "A valid known product FAIL does not automatically prohibit R02. Unsafe cleanup, identity drift or invalid shared infrastructure does prohibit progression.",
+    "No integration, release, gate migration, threshold change, risk waiver, compositor guarantee or physical-display certification is established. PR76 remains NO-GO and PRs remain Draft.",
+    "The broader existing test suites are recorded in the implementation receipt; this reviewer reran only the 17 relevant coordinator controls in this final review.",
+    "Working-tree byte hashes may differ from committed blob hashes due to Git EOL conversion. Both identities are retained explicitly."
+  ],
+  "remainingBlockingFindings": []
+}
