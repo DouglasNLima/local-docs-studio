@@ -1,9 +1,17 @@
 # Windows Job Object supervisor closure
 
 **Current verdict: BLOCKED / NOT_AUTHORISED for native execution.** The revised
-diagnostics and offline controls are prepared for independent review. One local
+diagnostics and offline controls have passed independent source review. One local
 fixture control is proposed, not executed. Neither supervisor qualification nor a
 new HIGHCONTRAST observation has been established.
+
+[Sealed local plan](job-supervisor-control.json), SHA-256
+`415e0ecb2e10328e3a6850da926ab1c9ef237072352a7a903fb1f46424081be3`;
+[test/source receipts](../evidence/job-supervisor-closure/README.md) and
+[independent review](job-supervisor-review.md). Source S is
+`331dc5ab220e5ca7dd145ff21a650d3d2578111f`, tree
+`776ef245307e9e969e19352597662de46bd35907`. The final owner proposal binds the
+package E separately and defaults to `approved=false`.
 
 Starting commit: `a38131cced93f5c29c1a7aafdb5316b97e8c5903`; tree:
 `fa5ceba3952aa1a18fbe8401735a208ba390e276`. PR #76 remains

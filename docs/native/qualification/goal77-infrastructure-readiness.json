@@ -73,6 +73,7 @@
   "spentCoordinatorAuthorityBlockedBeforeSideEffects": true,
   "supplementalContinuationGate": "OFFLINE_VALIDATED_NOT_INTEGRATED_IN_FROZEN_LAUNCHER",
   "unresolved": [
+    "Job supervisor remains unqualified: revised diagnostics require separate owner authority for at most one harmless local fixture control and independent evidence review",
     "Corrected collector live-readiness supervisor is BLOCKED: local harmless control reported Job total 2 / active 1; empty membership and cleanup remain unverified",
     "Corrected borrowed-pointer collector requires separately authorised actual-host native verification; exact historical corruption origin remains inconclusive",
     "Verified disposable-host work area at least 1280 x 800 DIPs; enumerated 1920 x 1080 is not a verified mode change",
@@ -213,5 +214,48 @@
       "New unedited explicit owner authority bound to the revised exact package; no current authority",
       "Independent final native evidence review after any separately authorised single process"
     ]
+  },
+  "jobSupervisorClosure": {
+    "startingCommit": "a38131cced93f5c29c1a7aafdb5316b97e8c5903",
+    "startingTree": "fa5ceba3952aa1a18fbe8401735a208ba390e276",
+    "sourceCommit": "331dc5ab220e5ca7dd145ff21a650d3d2578111f",
+    "sourceTree": "776ef245307e9e969e19352597662de46bd35907",
+    "status": "NOT_AUTHORISED",
+    "campaignExecutionApproved": false,
+    "supervisorQualification": "BLOCKED_UNPROVEN_PENDING_SEPARATE_LOCAL_CONTROL",
+    "historicalCause": "INCONCLUSIVE",
+    "confirmedDefect": "FAILED_TERMINATION_SKIPPED_LATER_CLEANUP_OBSERVATIONS",
+    "correction": "INDEPENDENT_CLEANUP_STAGES_WITH_STICKY_ERRORS",
+    "historicalObservation": {
+      "pid": 37804,
+      "totalProcesses": 2,
+      "activeProcesses": 1,
+      "cleanupVerified": false,
+      "status": "FAIL_RETAINED"
+    },
+    "plan": "job-supervisor-control.json",
+    "planSha256": "415e0ecb2e10328e3a6850da926ab1c9ef237072352a7a903fb1f46424081be3",
+    "sourceReceiptSha256": "ce52f5bb9d472f7d42e2e9f0305d2d916317f2ab14a0badd880e8fd3f5f1ec6f",
+    "offlineEvidenceSha256": "36355fb0469dc7b0a4cd5ced4c051a3c48233730952775faaf1cfd06e7898c92",
+    "rawSourceSha256": "6da92b5c88c1a3d511fd9b7aab742e29fc3c59d1dfc97137723099f58887602e",
+    "proposedLocalControls": 1,
+    "authorisedLocalControls": 0,
+    "nativeControlsExecuted": 0,
+    "collectorExecuted": false,
+    "hostedRuns": 0,
+    "offlineControls": {
+      "supervisorAndLocalDriver": 29,
+      "liveVerification": 17,
+      "hostedExecution": 17,
+      "infrastructure": 21,
+      "governance": 25,
+      "static": "PASS"
+    },
+    "collectorConfiguration": "UNCHANGED_BLOCKED_RESEAL_REQUIRED_AFTER_SUPERVISOR_DISPOSITION",
+    "report": "job-supervisor-closure.md",
+    "independentReview": "job-supervisor-review.md",
+    "evidence": "../evidence/job-supervisor-closure/README.md",
+    "nextOwnerDecision": "AUTHORISE_OR_REJECT_ONE_EXACT_LOCAL_JOB_FIXTURE_CONTROL_ONLY_AFTER_INDEPENDENT_REVIEW",
+    "nextEvidence": "Initial zero Job state, exact assignment/PID and limits, all fixed raw observations, direct exit and handle release, final empty membership within bounds; no retry"
   }
 }
