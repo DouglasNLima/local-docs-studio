@@ -195,6 +195,8 @@ finding also blocks execution. The [owner selection sheet](hardware-corpus-selec
 keeps H0/H1, three real documents, finite complexity/resource limits and the
 56-process pilot pending; that pilot is not implemented as an executable mode.
 
-The delivery receipt binds the final commit/tree, checks and independent review.
+The [delivery receipt](../evidence/qualification-tooling/receipt.md) binds the
+tested implementation commit/tree, checks and independent review; the final
+receipt-only commit/tree is recorded in the PR/Goal delivery comments.
 PRs #76/#78/#80 remain Draft. No production code, thresholds, required checks,
 rulesets, signing, distribution or ADR operational authority changes.
