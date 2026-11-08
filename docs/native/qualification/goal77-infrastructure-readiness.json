@@ -73,6 +73,8 @@
   "spentCoordinatorAuthorityBlockedBeforeSideEffects": true,
   "supplementalContinuationGate": "OFFLINE_VALIDATED_NOT_INTEGRATED_IN_FROZEN_LAUNCHER",
   "unresolved": [
+    "Offline null-identity and fixed-window corrections are validated only by mocks; unchanged execution plans no longer match their source and grant no new authority",
+    "A foreign-member read-only design cannot be wired into terminating or kill-on-close Job supervision without resolving borrowed Job-handle lifetime and cleanup compatibility",
     "One authorised local fixture control is spent and FAIL: PROCESS_EXIT reported total 2 / active 1 and unidentified Job PID 57332; no retry is authorised",
     "Supervisor remains BLOCKED: at-exit image query failed with WinError 31 and CLEANUP_1 was recorded before its fixed lower bound; final empty membership and successful closes do not qualify the run",
     "Historical PID 37804 total 2 / active 1 and cleanupVerified=false remain FAIL with INCONCLUSIVE cause; the new execution does not establish its cause",
@@ -315,5 +317,58 @@
     "report": "job-supervisor-control-result.md",
     "independentReview": "job-supervisor-control-review.md",
     "evidence": "../evidence/job-supervisor-authorised-control/README.md"
+  },
+  "supervisorOfflineRecovery": {
+    "sourceReceiptSha256": "0439aa325fa7f82a55ef25e4d01222ce4ebe2ab858ec379226ed8e2634c15864",
+    "offlineArchiveSha256": "cf48d4a01d9da163073b26271de37521af9f3668e184b16f1a1e8fcd0c6a8a7d",
+    "independentReviewSha256": "6037fc75d236b450191381358285c93cb8b052eb3964c8d344ebb45cc66def5c",
+    "startingCommit": "b5ca97716e3b1596a0e6684786624c27937403b0",
+    "startingTree": "5095477179948c1f625741b76dce2220250d38c1",
+    "status": "NOT_AUTHORISED",
+    "executionReadiness": "BLOCKED",
+    "campaignExecutionApproved": false,
+    "nativeExecutions": 0,
+    "collectorExecutions": 0,
+    "hostedRuns": 0,
+    "originalAuthority": "SPENT_UNCHANGED",
+    "originalControlResult": "FAIL_BLOCKED_UNCHANGED",
+    "exitIdentity": {
+      "nativeError31Cause": "INCONCLUSIVE",
+      "secondaryNullValidation": "CORRECTED_OFFLINE",
+      "fullBeforeAfterIdentityRequired": true,
+      "alternativeContract": "PROPOSED_NOT_IMPLEMENTED_OR_ACTIVATED"
+    },
+    "cleanupScheduling": {
+      "targets": [0, 0.1, 1, 4],
+      "supervisionSeconds": 30,
+      "cleanupSeconds": 5,
+      "requiredCompleteJobObservations": 10,
+      "maximumClockOnlyWaitsPerPhase": 8,
+      "maximumCumulativeRequestedSleepSeconds": 5,
+      "invalidOrNonProgressingClock": "STOP_TIMED_COLLECTION_CONTINUE_HANDLE_CLOSURE",
+      "missedWindow": "FAIL_INCOMPLETE_NO_REPLACEMENT",
+      "lateRawQueryAfterPreemption": "RETAIN_AND_REJECT",
+      "additionalJobObservations": 0,
+      "timingTolerance": 0
+    },
+    "foreignMember": {
+      "historicalPid": 57332,
+      "identityAndCause": "INCONCLUSIVE",
+      "diagnostic": "DESIGN_ONLY_NO_OPENPROCESS_PATH",
+      "processMutationAuthorised": false,
+      "jobLifetimeAndCleanupCompatibility": "BLOCKED_REQUIRES_SEPARATE_DESIGN_DECISION"
+    },
+    "offlineControls": {
+      "recoveryRegressions": 16,
+      "existingSupervisorAndDriver": 29,
+      "existingLiveEvidence": 17,
+      "total": 62,
+      "independentlyRepeated": true
+    },
+    "newLivePlanPrepared": false,
+    "frozenExecutionPlans": "UNCHANGED_HASH_MISMATCH_WITH_CORRECTED_SOURCE",
+    "report": "supervisor-offline-recovery.md",
+    "independentReview": "supervisor-offline-review.md",
+    "evidence": "../evidence/supervisor-offline-recovery/README.md"
   }
 }

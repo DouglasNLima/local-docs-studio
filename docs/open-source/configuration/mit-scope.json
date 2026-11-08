@@ -44,6 +44,8 @@
     "docs/native/qualification/job-supervisor-control.json",
     "docs/native/qualification/job-supervisor-review.md",
     "docs/native/qualification/runtime-downloads.json",
+    "docs/native/qualification/supervisor-offline-recovery.md",
+    "docs/native/qualification/supervisor-offline-review.md",
     "docs/native/qualification/tooling.md",
     "docs/open-source/configuration/admin-activation-plan.json",
     "docs/open-source/configuration/mit-scope.json",
@@ -116,7 +118,8 @@
     "tests/unit/test_native_infrastructure.py",
     "tests/unit/test_native_job_supervisor.py",
     "tests/unit/test_native_live_verification.py",
-    "tests/unit/test_native_qualification.py"
+    "tests/unit/test_native_qualification.py",
+    "tests/unit/test_native_supervisor_recovery.py"
   ],
   "spdxPaths": [
     "scripts/compliance/licence_scope.py",
@@ -302,6 +305,8 @@
     "docs/native/qualification/job-supervisor-control.json",
     "docs/native/qualification/job-supervisor-review.md",
     "docs/native/qualification/runtime-downloads.json",
+    "docs/native/qualification/supervisor-offline-recovery.md",
+    "docs/native/qualification/supervisor-offline-review.md",
     "docs/native/qualification/tooling.md",
     "docs/native/reconstruction-brief.txt",
     "docs/native/settings-transfer-format.md",
@@ -1289,6 +1294,7 @@
     "tests/unit/test_native_infrastructure.py",
     "tests/unit/test_native_job_supervisor.py",
     "tests/unit/test_native_live_verification.py",
-    "tests/unit/test_native_qualification.py"
+    "tests/unit/test_native_qualification.py",
+    "tests/unit/test_native_supervisor_recovery.py"
   ]
 }

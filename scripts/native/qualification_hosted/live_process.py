@@ -9,7 +9,42 @@ import subprocess
 import threading
 import time
 
-from job_evidence import CLEANUP_TARGETS, PID_CAPACITY, check_identity, check_snapshot, decode_snapshot
+from job_evidence import CLEANUP_TARGETS, PID_CAPACITY, check_cleanup_window, check_identity, check_snapshot, decode_snapshot, number
+
+
+# A finite clock-only waiting bound, not an extra evidence attempt or time budget.
+MAX_CLEANUP_WAITS = 8
+
+
+class CleanupClockFailure(RuntimeError):
+    """The clock cannot support further timed collection; still close handles."""
+
+
+def wait_cleanup_window(now, sleep, start, target, upper, waiting):
+    """Wait for one fixed target; never inspect Job state or move a deadline."""
+    stamp = now()
+    if not number(stamp) or stamp < waiting['lastStamp']:
+        raise CleanupClockFailure('Invalid or regressing cleanup clock')
+    waiting['lastStamp'] = stamp
+    for _ in range(MAX_CLEANUP_WAITS):
+        if stamp >= start + target:
+            check_cleanup_window(start, target, upper, stamp)
+            return
+        seconds = start + target - stamp
+        # A stalled/coarse clock must not turn eight remainder waits into eight
+        # full delays. The original five seconds also bounds requested sleep
+        # across ALL cleanup phases; this never extends or resets the deadline.
+        if seconds > min(start + 5 - stamp, 5 - waiting['requestedSeconds']):
+            raise CleanupClockFailure('Fixed cleanup clock wait bound exhausted')
+        waiting['requestedSeconds'] += seconds
+        sleep(seconds)
+        previous, stamp = stamp, now()
+        if not number(stamp) or stamp <= previous:
+            raise CleanupClockFailure('Invalid, stalled or regressing cleanup clock')
+        waiting['lastStamp'] = stamp
+    if stamp < start + target:
+        raise CleanupClockFailure('Fixed cleanup clock wait bound exhausted')
+    check_cleanup_window(start, target, upper, stamp)
 
 
 class Basic(c.Structure):
@@ -278,8 +313,16 @@ def supervise(binary, environment, output, write, backend=None, clock=time.monot
         entry = dict(phase=phase, startedSeconds=now())
         if target is not None:
             entry['targetSeconds'] = target
+            upper = (*CLEANUP_TARGETS[1:], 5)[CLEANUP_TARGETS.index(target)]
+            check_cleanup_window(record['cleanupStartedSeconds'], target, upper, entry['startedSeconds'])
         record['jobObservations'].append(entry)
-        entry['raw'] = call('observe:' + phase, backend.inspect, job, details=dict(jobHandle=job))
+        def inspect():
+            # Journal I/O can consume the remaining window. Check again before
+            # entering the backend; an earlier entry timestamp is insufficient.
+            if target is not None:
+                check_cleanup_window(record['cleanupStartedSeconds'], target, upper, now())
+            return backend.inspect(job)
+        entry['raw'] = call('observe:' + phase, inspect, details=dict(jobHandle=job))
         entry['finishedSeconds'] = now()
         entry['decoded'] = decode_snapshot(entry['raw'])
         if phase == 'CREATED_EMPTY' and bytes.fromhex(entry['raw']['accounting']['rawBytes']) != bytes(48):
@@ -288,6 +331,11 @@ def supervise(binary, environment, output, write, backend=None, clock=time.monot
             record['assignmentObservation'] = entry['decoded']
         if phase == 'CLEANUP_3':
             record['cleanupObservation'] = entry['decoded']
+        if target is not None:
+            check_cleanup_window(record['cleanupStartedSeconds'], target, upper,
+                                 entry['raw']['accounting']['startedSeconds'])
+            if not number(entry['finishedSeconds']) or entry['finishedSeconds'] > record['cleanupStartedSeconds'] + 5:
+                raise TimeoutError('Fixed cleanup query exceeded its original bound')
         seen = check_snapshot(entry['decoded'], phase, record['processId'], seen)
         return entry['decoded']
 
@@ -309,6 +357,7 @@ def supervise(binary, environment, output, write, backend=None, clock=time.monot
 
     def capture_exit():
         record['exitCode'] = attempt(lambda: call('exit', backend.exit, process, details=dict(processHandle=process)))
+        previous_errors = len(record['errors'])
         record['childIdentityAtExit'] = attempt(lambda: call('identity-at-exit', backend.identity, process, thread,
                                                           details=dict(processHandle=process, threadHandle=thread)))
         def validate():
@@ -316,7 +365,12 @@ def supervise(binary, environment, output, write, backend=None, clock=time.monot
                            record['binaryPath'], record['binarySha256'], record['supervisorPid'])
             if record['childIdentityAtExit'] != record['childIdentityBefore']:
                 raise ValueError('Child identity changed before handle release')
-        attempt(validate)
+        if record['childIdentityAtExit'] is not None:
+            attempt(validate)
+        elif len(record['errors']) == previous_errors:
+            failed(ValueError('Missing child exit identity'))
+        # A failed native query already has its original error/result in the
+        # journal. Keep identity absent; do not dereference it or invent a fallback.
         attempt(lambda: observe('PROCESS_EXIT'))
 
     def close(handle, kind):
@@ -427,16 +481,19 @@ def supervise(binary, environment, output, write, backend=None, clock=time.monot
             if thread_closed and process_closed:
                 record['childHandlesClosedSeconds'] = now()
         if job:
+            waiting = dict(lastStamp=record['cleanupStartedSeconds'], requestedSeconds=0)
             for index, target in enumerate(CLEANUP_TARGETS):
-                due = record['cleanupStartedSeconds'] + target
-                if now() < due:
-                    sleep(due - now())
-                if now() >= record['cleanupStartedSeconds'] + 5:
-                    failed(TimeoutError('Fixed cleanup observation missed its bound'))
-                    continue
                 upper = (*CLEANUP_TARGETS[1:], 5)[index]
-                if now() >= record['cleanupStartedSeconds'] + upper:
-                    failed(TimeoutError('Fixed cleanup observation missed its scheduling window'))
+                # Missed windows remain incomplete/failed. No out-of-window
+                # query, replacement phase or evidence-dependent polling.
+                try:
+                    wait_cleanup_window(now, sleep, record['cleanupStartedSeconds'], target, upper, waiting)
+                except CleanupClockFailure as error:
+                    failed(error)
+                    break  # An invalid clock cannot justify another timed wait.
+                except BaseException as error:
+                    failed(error)
+                    continue
                 attempt(lambda i=index, t=target: observe('CLEANUP_' + str(i), t))
             record['jobHandleClosed'] = bool(attempt(lambda: close(job, 'job')))
             record['jobHandleClosedSeconds'] = now()

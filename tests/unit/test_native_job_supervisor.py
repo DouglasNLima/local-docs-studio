@@ -148,14 +148,18 @@ class JobSupervisorControls(unittest.TestCase):
             value=raw_job(1,1);value[part]['returnedBytes']=size
             with self.assertRaises(ValueError):decode_snapshot(value)
 
-    def test_failed_termination_cannot_skip_wait_exit_or_job_observations(self):
+    def test_failed_termination_continues_cleanup_without_sampling_a_missed_window(self):
         kernel=FakeKernel('stop-job')
         original=kernel.resume
         def fail_resume(*args):original(*args);raise RuntimeError('Injected post-resume failure')
         kernel.resume=fail_resume
         result,kernel=self.run_fake(kernel)
         self.assertIn('wait',kernel.calls);self.assertIn('exit',kernel.calls)
-        self.assertEqual([e['phase'] for e in result['jobObservations'][-4:]],list(PHASES[-4:]))
+        # The cleanup wait consumes the first [0, 0.1) window. Preserve the
+        # remaining fixed phases, but do not fabricate a late CLEANUP_0 sample.
+        self.assertNotIn('CLEANUP_0', [e['phase'] for e in result['jobObservations']])
+        self.assertEqual([e['phase'] for e in result['jobObservations'][-3:]], list(PHASES[-3:]))
+        self.assertTrue(any('scheduling window' in e for e in result['errors']))
         error=next(o['error'] for o in result['operations'] if o['name']=='terminate' and o['phase']=='END')
         self.assertEqual(error['winError'],5);self.rejected(result)
 

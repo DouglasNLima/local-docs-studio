@@ -19,6 +19,12 @@ def number(value):
     return type(value) in (int, float) and math.isfinite(value) and value >= 0
 
 
+def check_cleanup_window(start, target, upper, stamp):
+    require(number(start) and number(stamp), 'Invalid cleanup clock value')
+    require(start + target <= stamp < start + upper,
+            'Fixed cleanup observation outside its scheduling window')
+
+
 def decode_query(query, information_class, capacity):
     require(set(query) == {'informationClass','returnValue','winError','capacityBytes','returnedBytes',
                           'rawBytes','startedSeconds','finishedSeconds'}, 'Missing or extra native query fields')
@@ -89,6 +95,7 @@ def check_snapshot(value, phase, pid, seen=None):
 
 
 def check_identity(value, pid, tid, path, sha256, parent_pid):
+    require(type(value) is dict, 'Missing or invalid child identity')
     require(type(value['processId']) is int and value['processId'] == pid and pid != parent_pid
             and type(value['threadId']) is int and value['threadId'] == tid
             and type(value['threadProcessId']) is int and value['threadProcessId'] == pid, 'Wrong process/thread handle identity')
@@ -151,6 +158,7 @@ def verify_supervision(record):
     require(record['childHandlesClosedSeconds'] >= entries[5]['finishedSeconds']
             and record['childHandlesClosedSeconds'] <= entries[6]['startedSeconds'], 'Child handles released at wrong boundary')
     for entry, target, upper in zip(entries[6:], CLEANUP_TARGETS, (*CLEANUP_TARGETS[1:], 5)):
+        check_cleanup_window(start, target, upper, entry['raw']['accounting']['startedSeconds'])
         require(entry['targetSeconds'] == target and start + target <= entry['startedSeconds']
                 and entry['startedSeconds'] < start + upper and entry['finishedSeconds'] <= start + 5,
                 'Missing, bunched or late fixed cleanup observation')

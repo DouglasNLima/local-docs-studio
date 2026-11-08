@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "kind": "OFFLINE_DELIVERY_VALIDATION",
+  "status": "OFFLINE_CORRECTIONS_VALIDATED",
+  "nativeReadiness": "BLOCKED",
+  "executionAuthority": "NOT_AUTHORISED",
+  "baselineCommit": "b5ca97716e3b1596a0e6684786624c27937403b0",
+  "baselineTree": "5095477179948c1f625741b76dce2220250d38c1",
+  "finalCommitAndTree": "PUBLISHED_IN_GOAL_77_AFTER_COMMIT_EXISTS",
+  "sourceReceiptSha256": "0439aa325fa7f82a55ef25e4d01222ce4ebe2ab858ec379226ed8e2634c15864",
+  "archiveSha256": "cf48d4a01d9da163073b26271de37521af9f3668e184b16f1a1e8fcd0c6a8a7d",
+  "independentReviewSha256": "6037fc75d236b450191381358285c93cb8b052eb3964c8d344ebb45cc66def5c",
+  "rootTests": {
+    "recovery": 16,
+    "existingSupervisor": 29,
+    "existingLiveEvidence": 17,
+    "total": 62,
+    "result": "PASS_FAKE_KERNEL_CLOCK_ONLY"
+  },
+  "independentTests": {
+    "recovery": 16,
+    "existingSupervisor": 29,
+    "existingLiveEvidence": 17,
+    "total": 62,
+    "result": "PASS_FAKE_KERNEL_CLOCK_ONLY"
+  },
+  "checks": {
+    "static": {
+      "chunk_id": "dd6dc6",
+      "wall_time_seconds": 2.7020676999999997,
+      "exit_code": 0,
+      "original_token_count": 63,
+      "output": "Service worker installation checks passed for 212 attempted assets with 6 concurrent cache fetches, including an optional failure.\nStatic checks passed for 50 module files, 61 shell assets, 151 vendor assets, and 59 runtime external-dependency scans.\n"
+    },
+    "governance": {
+      "chunk_id": "23736a",
+      "wall_time_seconds": 2.8492419,
+      "exit_code": 0,
+      "original_token_count": 82,
+      "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1168, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n"
+    },
+    "package": {
+      "command": "@'\nimport ast,hashlib,json,re,subprocess,zipfile\nfrom pathlib import Path\nroot=Path.cwd();p=root/'docs/native/evidence/supervisor-offline-recovery';inputs=root/'artifacts/goal77-supervisor-offline-recovery'\nsha=lambda b:hashlib.sha256(b).hexdigest()\nm=json.loads((p/'member-sha256.json').read_text(encoding='utf-8'))\nassert sha((p/m['archive']).read_bytes())==m['sha256']=='cf48d4a01d9da163073b26271de37521af9f3668e184b16f1a1e8fcd0c6a8a7d'\nwith zipfile.ZipFile(p/m['archive']) as z:\n assert len(z.namelist())==len(set(z.namelist()))==len(m['members'])==67 and z.testzip() is None\n for name,v in m['members'].items():\n  data=z.read(name);assert len(data)==v['bytes'] and sha(data)==v['sha256'] and data==(inputs/name).read_bytes()\n assert z.read('independent/review.md')==(root/'docs/native/qualification/supervisor-offline-review.md').read_bytes()\nfor name,digest in json.loads((p/'files.json').read_text(encoding='utf-8')).items():assert sha((p/name).read_bytes())==digest\nr=json.loads((p/'source-receipt.json').read_text(encoding='utf-8'))\nfor name,v in r['sourceFiles'].items():\n assert sha((root/name).read_bytes())==v['rawSha256']\n oid=subprocess.check_output(['git','hash-object','--path='+name,name]).decode().strip()\n assert oid==v['gitBlob'] and sha(subprocess.check_output(['git','cat-file','blob',oid]))==v['canonicalSha256']\nfor name,digest in r['protectedFilesUnchanged'].items():\n assert sha((root/name).read_bytes())==digest and sha(subprocess.check_output(['git','show','b5ca97716e3b1596a0e6684786624c27937403b0:'+name]))==digest\nold=subprocess.check_output(['git','show','b5ca97716e3b1596a0e6684786624c27937403b0:scripts/native/qualification_hosted/live_process.py']).decode()\nnew=(root/'scripts/native/qualification_hosted/live_process.py').read_text(encoding='utf-8')\nkernel=lambda s:ast.dump(next(n for n in ast.parse(s).body if isinstance(n,ast.ClassDef) and n.name=='Kernel'))\nassert kernel(old)==kernel(new)\npaths=['docs/native/qualification/supervisor-offline-recovery.md','docs/native/qualification/supervisor-offline-review.md','docs/native/evidence/supervisor-offline-recovery/README.md']\nlinks=0\nfor name in paths:\n doc=root/name;prose=re.sub(r'`[^`\\n]*`','',doc.read_text(encoding='utf-8'))\n for dest in re.findall(r'\\]\\(([^)]+)\\)',prose):\n  if re.match(r'^[a-z]+:',dest) or dest.startswith('#'):continue\n  assert (doc.parent/dest.split('#',1)[0]).exists(),(name,dest)\n  links+=1\nchanged=subprocess.check_output(['git','diff','--name-only','b5ca97716e3b1596a0e6684786624c27937403b0','--','assets','src','.github','docs/adr','docs/native/evidence','docs/native/qualification/job-supervisor-control.json','docs/native/qualification/highcontrast-live/config.json']).decode().splitlines()\nassert all(n.startswith('docs/native/evidence/supervisor-offline-recovery/') for n in changed),changed\nstate=json.loads((root/'docs/native/qualification/goal77-infrastructure-readiness.json').read_text(encoding='utf-8'))\nassert state['status']=='NOT_AUTHORISED' and state['executionReadiness']=='BLOCKED' and not state['campaignExecutionApproved']\nassert state['pr76Integration']=='NO-GO' and state['supervisorOfflineRecovery']['newLivePlanPrepared'] is False\nprint(json.dumps(dict(status='PASS_OFFLINE_PACKAGE_AND_DOC_PROVENANCE',archiveMembers=67,sourceBindings=6,protectedFiles=5,localLinks=links,nativeKernelAstUnchanged=True,originalNativeResult='FAIL',liveReadiness='BLOCKED',nativeExecutions=0,newLivePlanPrepared=False)))\n'@ | & 'C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe' -I -S -",
+      "chunk_id": "bb3478",
+      "wall_time_seconds": 1.3718242,
+      "exit_code": 0,
+      "original_token_count": 71,
+      "output": "{\"status\": \"PASS_OFFLINE_PACKAGE_AND_DOC_PROVENANCE\", \"archiveMembers\": 67, \"sourceBindings\": 6, \"protectedFiles\": 5, \"localLinks\": 13, \"nativeKernelAstUnchanged\": true, \"originalNativeResult\": \"FAIL\", \"liveReadiness\": \"BLOCKED\", \"nativeExecutions\": 0, \"newLivePlanPrepared\": false}\r\n"
+    }
+  },
+  "preservedFailures": "All native archives and all offline failing iterations retained unchanged",
+  "nativeExecutions": 0,
+  "hostedRuns": 0,
+  "newLivePlanPrepared": false,
+  "skipped": {
+    "browserSuite": "No product/UI changes",
+    "hostedCI": "Not authorised; focused local checks only",
+    "nativeFixture": "Not authorised",
+    "collector": "Not authorised",
+    "releaseCalibration": "Not authorised"
+  },
+  "finalTreeProvenance": "Final Git tree, rights-ledger and whitespace receipt published in Goal #77"
+}
