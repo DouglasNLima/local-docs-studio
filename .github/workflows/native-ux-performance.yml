@@ -5,6 +5,13 @@ on:
     paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
   workflow_dispatch:
     inputs:
+      environment_lock_only:
+        description: 'Discovery/build only; exclude every foreground qualification job'
+        type: boolean
+        default: false
+      expected_tooling_sha:
+        description: 'Exact reviewed commit for discovery (required when environment_lock_only=true)'
+        type: string
       iterations:
         description: 'Actual interaction cycles per fresh process; 1–100, no discarded warm-up'
         default: '21'
@@ -15,6 +22,7 @@ permissions:
   contents: read
 jobs:
   observer-smoke:
+    if: ${{ inputs.environment_lock_only != true }}
     name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
     runs-on: windows-latest
     timeout-minutes: 15
@@ -51,6 +59,7 @@ jobs:
             artifacts/native-ux/samples/
           retention-days: 30
   contract-controls:
+    if: ${{ inputs.environment_lock_only != true }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +73,7 @@ jobs:
     needs: [contract-controls, observer-smoke]
     # Retain a failed observer job and still gather independent cells. Neither
     # those cells nor the overall workflow can clear an observer failure.
-    if: ${{ !cancelled() && needs.contract-controls.result == 'success' }}
+    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.environment_lock_only != true }}
     name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
     runs-on: windows-latest
     timeout-minutes: 60
@@ -108,3 +117,47 @@ jobs:
             artifacts/native-ux/report*
             artifacts/native-ux/samples/
           retention-days: 30
+  environment-lock:
+    name: Hosted environment discovery only (no qualification)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      GOAL77_DISCOVERY_ONLY: 'true'
+      EXPECTED_TOOLING_SHA: ${{ inputs.expected_tooling_sha }}
+    steps:
+      - name: Check out exact dispatched source without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify source and collect console-only runtime/build identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:EXPECTED_TOOLING_SHA -notmatch '^[0-9a-f]{40}$' -or (git rev-parse HEAD) -ne $env:EXPECTED_TOOLING_SHA -or $env:GITHUB_SHA -ne $env:EXPECTED_TOOLING_SHA) {
+            throw 'Exact reviewed/dispatched source differs; discovery blocked.'
+          }
+          python scripts/native/qualification/discover_hosted.py --output artifacts/qualification-environment
+          exit $LASTEXITCODE
+      - name: Retain discovery evidence and complete reusable runtime/binary closures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-environment-${{ github.sha }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 30
+          path: |
+            artifacts/qualification-environment/
+            !artifacts/qualification-environment/downloads/
+            !artifacts/qualification-environment/worktrees/
+            !artifacts/qualification-environment/**/obj/
+            !artifacts/qualification-environment/build/product-*/**/bin/

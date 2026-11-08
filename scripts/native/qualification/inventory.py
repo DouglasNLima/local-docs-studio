@@ -9,7 +9,7 @@ from sources import ROOT, START, blob, sha, verify_sources
 def inventory():
     plan, identities = verify_sources()
     paths = sorted(p for p in (ROOT/'scripts/native/qualification').rglob('*') if p.is_file() and '__pycache__' not in p.parts)
-    paths += [ROOT/'tests/unit/test_native_qualification.py']
+    paths += [ROOT/'tests/unit/test_native_qualification.py', ROOT/'tests/unit/test_native_environment_lock.py']
     return {'schemaVersion': 1, 'status': 'TOOLING_PREPARATION_NOT_EXECUTED', 'campaignExecutionApproved': False,
             'sourcePins': identities, 'preparationGitSha256': sha(blob(START, 'docs/native/qualification/goal77-preparation.json')),
             'toolFiles': {p.relative_to(ROOT).as_posix(): {'sha256CanonicalLf': sha(p.read_bytes().replace(b'\r\n',b'\n'))} for p in paths},

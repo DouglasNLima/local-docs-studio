@@ -61,6 +61,7 @@ def template():
     return {'schemaVersion': 1, 'status': 'NOT_AUTHORISED', 'campaignExecutionApproved': False,
             'ownerAuthorisationUrl': None, 'toolingCommit': None, 'sourceReceipt': None,
             'sourceReceiptSha256': None, 'imageVersion': None, 'osVersion': None,
+            'environmentLock': None, 'environmentLockSha256': None,
             'runtimePins': {v: {'dotnet': None, 'dotnetSha256': None, 'core': None, 'coreSha256': None,
                                'wpf': None, 'wpfSha256': None} for v in RUNTIMES},
             'bundles': {name: {'receipt': None, 'receiptSha256': None} for name in ('r01', 'r02-baseline', 'r02-candidate')},
@@ -88,12 +89,23 @@ def safe_relative(root, value):
 
 
 def validate_config(config, protocol):
+    return _validate_config(config, protocol, authorised=True)
+
+
+def validate_candidate_config(config, protocol):
+    """Read-only preparation check; this function never authorises or executes cells."""
+    return _validate_config(config, protocol, authorised=False)
+
+
+def _validate_config(config, protocol, authorised):
     expected = template()
     if set(config) != set(expected) or config['schemaVersion'] != 1 or config['limits'] != expected['limits'] or config['calibrationPilotEnabled'] is not False:
         raise ValueError('Configuration fields/limits differ from the finite contract')
-    if config['campaignExecutionApproved'] is not True or config['status'] != 'OWNER_AUTHORISED':
+    if authorised and (config['campaignExecutionApproved'] is not True or config['status'] != 'OWNER_AUTHORISED'):
         raise ValueError('Separate owner campaign execution authorisation is absent')
-    if not re.fullmatch(r'https://github\.com/DouglasNLima/local-docs-studio/(issues/77|pull/78)#issuecomment-\d+', config['ownerAuthorisationUrl'] or ''):
+    if not authorised and (config['campaignExecutionApproved'] is not False or config['status'] != 'NOT_AUTHORISED' or config['ownerAuthorisationUrl'] is not None):
+        raise ValueError('Candidate configuration must remain NOT_AUTHORISED')
+    if authorised and not re.fullmatch(r'https://github\.com/DouglasNLima/local-docs-studio/(issues/77|pull/78)#issuecomment-\d+', config['ownerAuthorisationUrl'] or ''):
         raise ValueError('An explicit Goal77/PR78 execution-authorisation record is required')
     # This is a recorded-authority guard, not an assertion that a URL authorises itself.
     if config['toolingCommit'] != git('rev-parse', 'HEAD').decode().strip() or git('status', '--porcelain', '--untracked-files=all').strip():
@@ -121,6 +133,9 @@ def validate_config(config, protocol):
         if receipt['bundle'] != name or receipt['productRevision'] != product or receipt['sourceReceiptSha256'] != sha(receipt_path.read_bytes()):
             raise ValueError('Product/harness receipt belongs to another process/source')
         root = path.parent
+        actual_files = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file() and p != path}
+        if actual_files != set(receipt['files']):
+            raise ValueError('Extra or missing file in binary closure')
         for file, digest in receipt['files'].items():
             verify_file(safe_relative(root, file), digest)
         entry = 'LensDocsStudio.Native.UxProbe.dll' if name == 'r01' else 'LensDocsStudio.Native.Qualification.dll'
@@ -129,6 +144,8 @@ def validate_config(config, protocol):
                 raise ValueError('Incomplete binary closure: ' + file)
         bundles[name] = (root, receipt)
     for version, pin in config['runtimePins'].items(): validate_runtime(version, pin)
+    from environment_lock import validate_lock
+    validate_lock(config)
     return cells(protocol), bundles, receipt_path.parent / 'fixtures'
 
 

@@ -105,6 +105,10 @@ the job/memory API without WPF or appearance calls; actual HC cleanup remains un
 
 ## Execution manifest and runtime binding
 
+The [hosted environment lock](hosted-environment-lock.md) adds discovery-only
+configuration preparation and mandatory complete-runtime/image verification.
+It preserves separate owner execution authority and all original protocol bounds.
+
 [The execution inventory](goal77-execution.json) lists every cell, source and safety
 bound. [The configuration template](goal77-execution-config.template.json) is
 deliberately **NOT_AUTHORISED** and has no invented image, runtime or binary hashes.

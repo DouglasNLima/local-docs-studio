@@ -8,6 +8,8 @@
   "sourceReceiptSha256": null,
   "imageVersion": null,
   "osVersion": null,
+  "environmentLock": null,
+  "environmentLockSha256": null,
   "runtimePins": {
     "10.0.13": {
       "dotnet": null,

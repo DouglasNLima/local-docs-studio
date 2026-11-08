@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "metadataUrl": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json",
+  "metadataSha256AtSelection": "8fa7ae2d46b1f94416d5458c7ed68b0c3cafc5efb8e34d89dea3a98bf0a38b33",
+  "versions": {
+    "10.0.13": {
+      "runtime": {
+        "url": "https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.13/dotnet-runtime-10.0.13-win-x64.zip",
+        "sha512": "2b98792ce86adc50899764ad2e4d21bd25cfda5432eeb0b4dfe7944f3ea049f9e0570a8f4aee92314d97cdb5f8b7be1363d501fc5012e680371e607af648ef40"
+      },
+      "windowsdesktop": {
+        "url": "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.13/windowsdesktop-runtime-10.0.13-win-x64.zip",
+        "sha512": "7cd78051b34f12239852e3685de57630aaeca0fd36e6ef3b41df3f256cf45a820377f316696c5e11316f0bb6e4e84e07fa99367e71472623b33c5d07405c4568"
+      }
+    },
+    "10.0.14": {
+      "runtime": {
+        "url": "https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.14/dotnet-runtime-10.0.14-win-x64.zip",
+        "sha512": "a176095f1db69b42c81acc60940744078d6bf2d2ac643e418342aa9c81889f4bd13e42f4621b131f9e77e4bc781ad46e375956219df9a4f979031d2a5a8d93cd"
+      },
+      "windowsdesktop": {
+        "url": "https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.14/windowsdesktop-runtime-10.0.14-win-x64.zip",
+        "sha512": "3214913702264452ac4b283b6fb2f6c14ab748cea36c7561608245c4a7d8cc10436a160032038865d039a016eab4975f65f1ae906de7615953fbec760f764ac4"
+      }
+    }
+  }
+}

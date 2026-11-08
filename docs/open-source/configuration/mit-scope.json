@@ -29,6 +29,8 @@
     "docs/native/qualification/goal77-execution.json",
     "docs/native/qualification/goal77-preparation.json",
     "docs/native/qualification/hardware-corpus-selection.md",
+    "docs/native/qualification/hosted-environment-lock.md",
+    "docs/native/qualification/runtime-downloads.json",
     "docs/native/qualification/tooling.md",
     "docs/open-source/configuration/admin-activation-plan.json",
     "docs/open-source/configuration/mit-scope.json",
@@ -52,7 +54,10 @@
     "scripts/native/Copy-NativeLicence.ps1",
     "scripts/native/Measure-NativeUx.ps1",
     "scripts/native/Test-NativeLicence.ps1",
+    "scripts/native/qualification/RuntimeIdentityProbe.cs",
     "scripts/native/qualification/audit.py",
+    "scripts/native/qualification/discover_hosted.py",
+    "scripts/native/qualification/environment_lock.py",
     "scripts/native/qualification/inventory.py",
     "scripts/native/qualification/observer/Appearance.cs",
     "scripts/native/qualification/observer/ApplicationObservation.cs",
@@ -74,6 +79,7 @@
     "src/native/LensDocsStudio.Native/MainWindow.SelectionDiagnostics.cs",
     "src/native/LensDocsStudio.Native/Rendering/PreviewSelectionVisuals.cs",
     "tests/unit/native-ux-report.test.mjs",
+    "tests/unit/test_native_environment_lock.py",
     "tests/unit/test_native_qualification.py"
   ],
   "spdxPaths": [
@@ -245,6 +251,8 @@
     "docs/native/qualification/goal77-execution.json",
     "docs/native/qualification/goal77-preparation.json",
     "docs/native/qualification/hardware-corpus-selection.md",
+    "docs/native/qualification/hosted-environment-lock.md",
+    "docs/native/qualification/runtime-downloads.json",
     "docs/native/qualification/tooling.md",
     "docs/native/reconstruction-brief.txt",
     "docs/native/settings-transfer-format.md",
@@ -426,7 +434,10 @@
     "scripts/native/experiments/MarkerReuse/Program.cs",
     "scripts/native/experiments/MarkerReuse/README.md",
     "scripts/native/experiments/MarkerReuse/packages.lock.json",
+    "scripts/native/qualification/RuntimeIdentityProbe.cs",
     "scripts/native/qualification/audit.py",
+    "scripts/native/qualification/discover_hosted.py",
+    "scripts/native/qualification/environment_lock.py",
     "scripts/native/qualification/inventory.py",
     "scripts/native/qualification/observer/Appearance.cs",
     "scripts/native/qualification/observer/ApplicationObservation.cs",
@@ -1205,6 +1216,7 @@
     "tests/static/check-native-acceptance-policy.mjs",
     "tests/static/check-service-worker-install.mjs",
     "tests/unit/native-ux-report.test.mjs",
+    "tests/unit/test_native_environment_lock.py",
     "tests/unit/test_native_qualification.py"
   ]
 }

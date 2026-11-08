@@ -25,8 +25,14 @@
     "scripts/native/qualification/audit.py": {
       "sha256CanonicalLf": "111278cd142ddbd16fa947680ac7e63b958cfae03286da5c092d1e77cc26af0b"
     },
+    "scripts/native/qualification/discover_hosted.py": {
+      "sha256CanonicalLf": "87409b7cc42e51dc7276ee2e4c8d9660921c6315a39a97e19d66b769efbe6149"
+    },
+    "scripts/native/qualification/environment_lock.py": {
+      "sha256CanonicalLf": "3644394b062e571e5b9ec57d61b12dbbe6325286b9d2d70cc2ddaa9b80948b7b"
+    },
     "scripts/native/qualification/inventory.py": {
-      "sha256CanonicalLf": "cfaea902c585e35a11453f7bdcdf9f45f9dd1ae12cdf261268fadbd82cf80eeb"
+      "sha256CanonicalLf": "663a7bfa06098e2317a15701fda475e531215443719b6ae61a4238dd30da3ab9"
     },
     "scripts/native/qualification/observer/Appearance.cs": {
       "sha256CanonicalLf": "aa2ca23e5b48d158140db233f5b6d2b119bcc44636999dd4737ea1e8c48be1f9"
@@ -44,7 +50,10 @@
       "sha256CanonicalLf": "93c88dadcf4b094c5587ba18f0861b69f2777f796895382895ed10f61865a2a0"
     },
     "scripts/native/qualification/qualification.py": {
-      "sha256CanonicalLf": "7b250db1bd8f3518b5d569bf25f4be4517ff7a1aed18390756c9f0929f8aff61"
+      "sha256CanonicalLf": "73ee1ddab27c8a7a96b247dc73de99de56240d31fbfa12ef06b35852a2034f62"
+    },
+    "scripts/native/qualification/RuntimeIdentityProbe.cs": {
+      "sha256CanonicalLf": "812341e3c94ccfa222bfc57d6242d841e3125026b618de069a55ed61083bb0bc"
     },
     "scripts/native/qualification/sources.py": {
       "sha256CanonicalLf": "7559980f57056baa24820c883bc2ae9e0e5984731905452db228b55900726a4e"
@@ -54,6 +63,9 @@
     },
     "tests/unit/test_native_qualification.py": {
       "sha256CanonicalLf": "56b9aa00fa36efceb5912098e6a00557e16bc7111c1ab9c0cb48e7ce02cbb28a"
+    },
+    "tests/unit/test_native_environment_lock.py": {
+      "sha256CanonicalLf": "94c34bc29b7c4fdb1b408ef0785281c376757f748386b34a370332c025ef7a13"
     }
   },
   "R01": {
