@@ -109,7 +109,7 @@ def main():
             require(digest(item['path']) == item['sha256'], 'SDK identity file changed')
         build = output / 'probe-build'; build.mkdir()
         copied = {}
-        for name in ('DesktopProbe.csproj', 'desktop.manifest', 'Program.cs', 'HighContrastReader.cs'):
+        for name in ('DesktopProbe.csproj', 'desktop.manifest', 'Program.cs', 'HighContrastReader.cs', 'RuntimeIdentity.cs'):
             shutil.copyfile(SOURCE / name, build / name); copied[name] = digest(build / name)
         write(build / 'global.json', {'sdk': {'version': '10.0.403', 'rollForward': 'disable', 'allowPrerelease': False}})
         with (output / 'build.log').open('xb') as log:

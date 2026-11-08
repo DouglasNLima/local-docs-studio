@@ -163,7 +163,7 @@ class HostedExecutionControls(unittest.TestCase):
                                 ('calibration', 'environment-lock'), ('environment-lock', 'bounded-qualification')]:
             section = workflow.split('  ' + name + ':\n')[1].split('  ' + following + ':\n')[0]
             self.assertIn("inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none'", section)
-        bounded = workflow.split('  bounded-qualification:\n')[1].split('  infrastructure-discovery:\n')[0]
+        bounded = workflow.split('  bounded-qualification:\n')[1].split('  highcontrast-verification:\n')[0]
         for required in ('persist-credentials: false', 'github.run_attempt == 1', 'github.triggering_actor',
                          'actions: read', 'contents: read', 'timeout-minutes: 30', 'if: always()',
                          'git checkout --detach ' + coordinator.TOOLING, 'exit $LASTEXITCODE'):

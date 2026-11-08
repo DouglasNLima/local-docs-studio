@@ -23,12 +23,16 @@ internal static class Program
                 Environment.GetEnvironmentVariable("GOAL77_READ_ONLY_DISCOVERY") != "true")
                 throw new InvalidOperationException("Only explicitly guarded hosted read-only discovery is permitted.");
             Journal("guardedStart", new { processId = Environment.ProcessId, runtime = Environment.Version.ToString() });
+            var identity = RuntimeIdentity.Verify("BEFORE_GETS");
+            Journal("runtimeIdentity", identity); // Reject wrong loaded files before either fixed GET.
             if (Marshal.SizeOf<Rect>() != 16 || Marshal.SizeOf<MonitorInfo>() != 104 ||
                 Marshal.SizeOf<DisplayDevice>() != 840 || Marshal.SizeOf<DevMode>() != 220 ||
                 Marshal.SizeOf<HighContrastNative>() != 16 || IntPtr.Size != 8)
                 throw new InvalidOperationException("Win32 x64 observation ABI differs.");
             var before = Snapshot();
             var after = Snapshot(); // Two fixed reads; no waiting or retry-until-equal.
+            var identityAfter = RuntimeIdentity.Verify("AFTER_GETS");
+            Journal("runtimeIdentityAfter", identityAfter);
             var assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).Order().ToArray();
             if (assemblies.Any(n => n is "PresentationFramework" or "PresentationCore" or "WindowsBase" or "System.Windows.Forms"))
                 throw new InvalidOperationException("A forbidden UI assembly was loaded.");
@@ -40,6 +44,7 @@ internal static class Program
                 sourceRevision = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion,
                 runtimeVersion = Environment.Version.ToString(), corePath = typeof(object).Assembly.Location,
                 coreSha256 = Hash(typeof(object).Assembly.Location), assemblies, before, after,
+                identity, identityAfter,
                 qualificationProcesses = 0, windowCreation = false, wpfResourceAccess = false,
                 inputChanges = false, displayChanges = false, appearanceChanges = false
             }, Json));

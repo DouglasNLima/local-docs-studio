@@ -5,6 +5,19 @@ on:
     paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
   workflow_dispatch:
     inputs:
+      highcontrast_verification_only:
+        description: 'One separately authorised corrected HIGHCONTRAST process; no qualification'
+        type: boolean
+        default: false
+      expected_verification_sha:
+        description: 'Exact final execution commit approved by the owner'
+        type: string
+      authorisation_comment_id:
+        description: 'New unedited owner issue77 comment ID; no previous authority is valid'
+        type: string
+      authorisation_body_sha256:
+        description: 'SHA-256 of the exact owner JSON comment body'
+        type: string
       infrastructure_discovery_only:
         description: 'Read-only Win32 geometry/appearance discovery; no qualification or desktop changes'
         type: boolean
@@ -37,7 +50,7 @@ permissions:
   contents: read
 jobs:
   observer-smoke:
-    if: ${{ inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    if: ${{ inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
     runs-on: windows-latest
     timeout-minutes: 15
@@ -74,7 +87,7 @@ jobs:
             artifacts/native-ux/samples/
           retention-days: 30
   contract-controls:
-    if: ${{ inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    if: ${{ inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -88,7 +101,7 @@ jobs:
     needs: [contract-controls, observer-smoke]
     # Retain a failed observer job and still gather independent cells. Neither
     # those cells nor the overall workflow can clear an observer failure.
-    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
     runs-on: windows-latest
     timeout-minutes: 60
@@ -135,7 +148,7 @@ jobs:
   environment-lock:
     name: Hosted environment discovery only (no qualification)
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true && inputs.infrastructure_discovery_only != true &&
+      ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true &&
           (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') &&
           github.repository == 'DouglasNLima/local-docs-studio' &&
           github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
@@ -181,7 +194,7 @@ jobs:
   bounded-qualification:
     name: Owner-authorised bounded R01 (R02 independently gated)
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' && inputs.bounded_protocol == 'R01' && inputs.infrastructure_discovery_only != true &&
+      ${{ github.event_name == 'workflow_dispatch' && inputs.bounded_protocol == 'R01' && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true &&
           inputs.environment_lock_only != true && github.run_attempt == 1 &&
           github.repository == 'DouglasNLima/local-docs-studio' &&
           github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
@@ -230,10 +243,61 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  highcontrast-verification:
+    name: One corrected HIGHCONTRAST process (separate owner authority)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.highcontrast_verification_only == true &&
+          inputs.infrastructure_discovery_only == false && inputs.environment_lock_only == false &&
+          inputs.bounded_protocol == 'none' && github.run_attempt == 1 &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      issues: read
+    concurrency:
+      group: goal77-single-highcontrast-verification
+      cancel-in-progress: false
+    env:
+      GOAL77_HIGHCONTRAST_VERIFICATION: 'true'
+      EXPECTED_VERIFICATION_SHA: ${{ inputs.expected_verification_sha }}
+      AUTHORISATION_COMMENT_ID: ${{ inputs.authorisation_comment_id }}
+      AUTHORISATION_BODY_SHA256: ${{ inputs.authorisation_body_sha256 }}
+    steps:
+      - name: Check out the exact execution commit without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        env:
+          GIT_CONFIG_COUNT: '1'
+          GIT_CONFIG_KEY_0: core.autocrlf
+          GIT_CONFIG_VALUE_0: 'false'
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate independent authority and run the sealed collector once
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -I scripts/native/qualification_hosted/live_verification.py execute
+          exit $LASTEXITCODE
+      - name: Preserve complete and failed native observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-highcontrast-live-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/goal77-highcontrast-live/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+
   infrastructure-discovery:
     name: Read-only geometry and appearance discovery (no qualification)
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' && inputs.infrastructure_discovery_only == true &&
+      ${{ github.event_name == 'workflow_dispatch' && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only == true &&
           inputs.environment_lock_only != true && inputs.bounded_protocol == 'none' && github.run_attempt == 1 &&
           github.repository == 'DouglasNLima/local-docs-studio' &&
           github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
