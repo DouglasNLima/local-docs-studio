@@ -15,6 +15,14 @@ Starting source is `4e2e37f2aa285cf318edd50d9cf2d0233b7eb4e6`, tree
 PR #76 remains **NO-GO**. No product/renderer, performance threshold, 4.5:1
 requirement, historical evidence, branch protection or ADR operational policy changes.
 
+The [sealed configuration](highcontrast-live/config.json) has SHA-256
+`c2cf91cbd5678752d028d7f64a6d87a90e183fb1f73c12de35b9cc967ef13d7a`.
+Its source/build commit is `2a9608f6af5f4847c9ed13a19ba3466a25da1f47`, tree
+`c8075f2a2fdac6fb60c77697bb741285931267a6`. See the
+[build, binary and test receipts](../evidence/highcontrast-live-readiness/README.md)
+and [independent review](highcontrast-live-review.md). The package is reviewable;
+it is **not ready for a hosted collector run**.
+
 ## Prepared protocol
 
 | Boundary | Exact proposed contract |

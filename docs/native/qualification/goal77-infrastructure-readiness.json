@@ -73,6 +73,7 @@
   "spentCoordinatorAuthorityBlockedBeforeSideEffects": true,
   "supplementalContinuationGate": "OFFLINE_VALIDATED_NOT_INTEGRATED_IN_FROZEN_LAUNCHER",
   "unresolved": [
+    "Corrected collector live-readiness supervisor is BLOCKED: local harmless control reported Job total 2 / active 1; empty membership and cleanup remain unverified",
     "Corrected borrowed-pointer collector requires separately authorised actual-host native verification; exact historical corruption origin remains inconclusive",
     "Verified disposable-host work area at least 1280 x 800 DIPs; enumerated 1920 x 1080 is not a verified mode change",
     "Exact appearance round-trip validation including nullable scheme identity",
@@ -153,5 +154,64 @@
     "report": "highcontrast-buffer-safety.md",
     "independentReview": "highcontrast-buffer-review.md",
     "evidence": "../evidence/buffer-safety-recovery/README.md"
+  },
+  "correctedCollectorLiveReadiness": {
+    "startingCommit": "4e2e37f2aa285cf318edd50d9cf2d0233b7eb4e6",
+    "startingTree": "e86f3367e3ac0dc8d95de8d2ef026dcbb36ba8c5",
+    "sourceCommit": "2a9608f6af5f4847c9ed13a19ba3466a25da1f47",
+    "sourceTree": "c8075f2a2fdac6fb60c77697bb741285931267a6",
+    "status": "NOT_AUTHORISED",
+    "readOnlyVerificationApproved": false,
+    "campaignExecutionApproved": false,
+    "executionReadiness": "BLOCKED_LOCAL_JOB_ACCOUNTING_UNRESOLVED",
+    "configuration": "highcontrast-live/config.json",
+    "configurationSha256": "c2cf91cbd5678752d028d7f64a6d87a90e183fb1f73c12de35b9cc967ef13d7a",
+    "collectorArchiveSha256": "9c544090eacaa75170110201240f5a64d1476ea7e99de079a6b6e879daf10fdf",
+    "runtimeArchiveSha256": "d861ab80f232adf3bdce83293bc1fa92868400330c477bf854d8558eb91c7ca6",
+    "bounds": {
+      "collectorProcesses": 1,
+      "highContrastGets": 2,
+      "supervisionSeconds": 30,
+      "cleanupSeconds": 5,
+      "retries": 0,
+      "qualificationProcesses": 0,
+      "calibrationProcesses": 0
+    },
+    "localSupervisorControl": {
+      "status": "FAIL_UNRESOLVED",
+      "fixture": "NativeBufferSelfTest.exe",
+      "processId": 37804,
+      "exitCode": 0,
+      "fixtureChecks": 21,
+      "totalProcesses": 2,
+      "activeProcesses": 1,
+      "cleanupVerified": false,
+      "collectorExecuted": false,
+      "actualHighContrastCalls": 0,
+      "repeated": false
+    },
+    "collectorCompiledNotExecuted": true,
+    "hostedRuns": 0,
+    "nativeVerification": "NOT_RUN",
+    "originalCorrectness": "NOT_RUN",
+    "presentationOrder": "INCONCLUSIVE",
+    "offlineControls": {
+      "liveVerification": 17,
+      "hostedExecution": 17,
+      "infrastructure": 21,
+      "environmentLock": 14,
+      "governance": 25,
+      "static": "PASS"
+    },
+    "report": "highcontrast-live-readiness.md",
+    "independentReview": "highcontrast-live-review.md",
+    "evidence": "../evidence/highcontrast-live-readiness/README.md",
+    "remainingPrerequisites": [
+      "Independent disposition and verified cleanup of the unresolved local supervisor Job accounting failure; proposed readback instrumentation is mocked only",
+      "Fresh reviewed source/configuration/package after supervisor qualification",
+      "Exact hosted image/runtime/source/file match; image drift invalidates the package",
+      "New unedited explicit owner authority bound to the revised exact package; no current authority",
+      "Independent final native evidence review after any separately authorised single process"
+    ]
   }
 }
