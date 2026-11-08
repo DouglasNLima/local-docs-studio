@@ -163,7 +163,7 @@ class HostedExecutionControls(unittest.TestCase):
                                 ('calibration', 'environment-lock'), ('environment-lock', 'bounded-qualification')]:
             section = workflow.split('  ' + name + ':\n')[1].split('  ' + following + ':\n')[0]
             self.assertIn("inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none'", section)
-        bounded = workflow.split('  bounded-qualification:\n')[1]
+        bounded = workflow.split('  bounded-qualification:\n')[1].split('  infrastructure-discovery:\n')[0]
         for required in ('persist-credentials: false', 'github.run_attempt == 1', 'github.triggering_actor',
                          'actions: read', 'contents: read', 'timeout-minutes: 30', 'if: always()',
                          'git checkout --detach ' + coordinator.TOOLING, 'exit $LASTEXITCODE'):
@@ -193,7 +193,7 @@ class HostedExecutionControls(unittest.TestCase):
             try:
                 with patch.dict(sys.modules, modules), patch.dict(os.environ, {'GITHUB_SHA': 'a' * 40}, clear=True), \
                         patch.object(coordinator, 'git', side_effect=[coordinator.TOOLING, '']), \
-                        patch.object(coordinator, 'verify_restored'):
+                        patch.object(coordinator, 'verify_restored'), patch.object(coordinator, 'recovery_gate'):
                     with self.assertRaisesRegex(ValueError, 'identity changed'): coordinator.execute(root, output, 'R01')
                 windows.assert_not_called()
                 self.assertFalse((output / 'execution-config.json').exists())

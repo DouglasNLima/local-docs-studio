@@ -24,6 +24,13 @@ Its historical 2.542596:1 failure remains unchanged. R03–R06 retain the contro
 this geometry failure does not reattribute their original incidents. No retry or
 expanded campaign is authorised by that attempt.
 
+The [infrastructure recovery](qualification/hosted-infrastructure-recovery.md)
+isolates read-only geometry/appearance discovery and blocks spent execution
+authority before V1. Its [readiness manifest](qualification/goal77-infrastructure-readiness.json)
+keeps exact restoration UNVERIFIED and campaign execution NOT_AUTHORISED. A new
+host observation cannot reconstruct the original VM's missing DPI/work-area or
+nullable-scheme evidence. This preparation closes none of R01–R06.
+
 | ID | Classification / present decision | Existing controls | Smallest next evidence / explicit closure decision |
 |---|---|---|---|
 | R01 Visible completion | **Observed visual FAIL; original attribution INCONCLUSIVE.** Semantic Ready and current text do not clear stale required labels or earlier stale source pixels. Blocks current A and B. | Owner/version/generation, source mapping, geometry/UIA, fixed full frames/crops, passive WPF batch traces; no forced layout or capture-until-pass. | Qualification owner + technical reviewer validate the observer against the design-approved boundary below, check negative controls and inspect one bounded affected journey. No historical FAIL conversion. |

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "startingCommit": "d2529cb10196589422650f35f647019965ff11be",
+  "startingTree": "6c81db13d4f896d455174e3ccc97d4b40dccaefd",
+  "safeLocalTests": {
+    "infrastructure": 17,
+    "hostedCoordinator": 17,
+    "environmentLock": 14,
+    "qualification": 43,
+    "total": 91
+  },
+  "static": "PASS",
+  "documentationAndProvenance": "PASS",
+  "governance": "PASS",
+  "probeCompile": {
+    "sdk": "10.0.401",
+    "warnings": 0,
+    "errors": 0,
+    "executed": false,
+    "qualificationRuntimeIdentityClaimed": false
+  },
+  "protectedPathsUnchanged": [
+    "src",
+    "assets",
+    "tests/fixtures",
+    "scripts/native/qualification",
+    "docs/native/evidence/bounded-qualification",
+    "docs/native/evidence/hosted-environment-lock",
+    ".gitattributes"
+  ],
+  "localAppearanceOrDisplayChange": false,
+  "qualificationProcesses": 0,
+  "campaignExecutionApproved": false,
+  "status": "NOT_AUTHORISED",
+  "logs": {
+    "infrastructure-controls.txt": "1b1465f1f948c0a0e7cb84c0c20f5be7c0df69a253ade973446a8122ab23284a",
+    "hosted-controls.txt": "aa6e5f0eb796e51c122b8818b4514c33eb00e39b3b62b6b4a875c05a0ef98ea8",
+    "environment-controls.txt": "217ae29e137d0253e76d6edb8a2f9e35f651db0d8b65e098a50e08825fc584bd",
+    "qualification-controls.txt": "899308257737b99807e9f734bfadf894aefd654458cc4d0f3eebfc233152793e",
+    "static.txt": "40830da40886a2ece86353b8b10c8936872b7c37250ec36dcc37d7ef8d22e6c4",
+    "foundation.txt": "8b8ed7814311a7f5d3304f9a69e747fc3a271515a048f369c54ed75995e93281",
+    "governance.txt": "07f3f076332c36e094a27f82357105b6cb0af607711bab848bdf1cef9210ed4b",
+    "local-compile.txt": "79bbf47b246786b835ea0ca250d9fbfc05ace2d4297b5518496370f69ac7ebf8"
+  },
+  "scopeNote": "Tests are offline or harmless console job controls only. Compile does not execute the Win32 probe. These pre-discovery checks do not establish hosted geometry or live appearance restoration."
+}

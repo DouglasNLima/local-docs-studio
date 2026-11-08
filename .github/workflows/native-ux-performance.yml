@@ -5,6 +5,13 @@ on:
     paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
   workflow_dispatch:
     inputs:
+      infrastructure_discovery_only:
+        description: 'Read-only Win32 geometry/appearance discovery; no qualification or desktop changes'
+        type: boolean
+        default: false
+      expected_infrastructure_sha:
+        description: 'Exact reviewed source for read-only infrastructure discovery'
+        type: string
       bounded_protocol:
         description: 'Owner-authorised stage only; R02 remains blocked pending independent R01 review'
         type: choice
@@ -30,7 +37,7 @@ permissions:
   contents: read
 jobs:
   observer-smoke:
-    if: ${{ inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    if: ${{ inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
     runs-on: windows-latest
     timeout-minutes: 15
@@ -67,7 +74,7 @@ jobs:
             artifacts/native-ux/samples/
           retention-days: 30
   contract-controls:
-    if: ${{ inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    if: ${{ inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,7 +88,7 @@ jobs:
     needs: [contract-controls, observer-smoke]
     # Retain a failed observer job and still gather independent cells. Neither
     # those cells nor the overall workflow can clear an observer failure.
-    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
     runs-on: windows-latest
     timeout-minutes: 60
@@ -128,7 +135,7 @@ jobs:
   environment-lock:
     name: Hosted environment discovery only (no qualification)
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true &&
+      ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true && inputs.infrastructure_discovery_only != true &&
           (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') &&
           github.repository == 'DouglasNLima/local-docs-studio' &&
           github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
@@ -174,7 +181,7 @@ jobs:
   bounded-qualification:
     name: Owner-authorised bounded R01 (R02 independently gated)
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' && inputs.bounded_protocol == 'R01' &&
+      ${{ github.event_name == 'workflow_dispatch' && inputs.bounded_protocol == 'R01' && inputs.infrastructure_discovery_only != true &&
           inputs.environment_lock_only != true && github.run_attempt == 1 &&
           github.repository == 'DouglasNLima/local-docs-studio' &&
           github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
@@ -219,6 +226,43 @@ jobs:
         with:
           name: goal77-bounded-R01-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/goal77-bounded-R01/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+
+  infrastructure-discovery:
+    name: Read-only geometry and appearance discovery (no qualification)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.infrastructure_discovery_only == true &&
+          inputs.environment_lock_only != true && inputs.bounded_protocol == 'none' && github.run_attempt == 1 &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GOAL77_READ_ONLY_DISCOVERY: 'true'
+      EXPECTED_INFRASTRUCTURE_SHA: ${{ inputs.expected_infrastructure_sha }}
+    steps:
+      - name: Check out exact read-only discovery source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Collect Win32 desktop facts without windows, input or setters
+        shell: pwsh
+        run: |
+          python scripts/native/qualification_hosted/discover_desktop.py --output artifacts/goal77-infrastructure
+          exit $LASTEXITCODE
+      - name: Retain discovery and separate eligibility verdict
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-infrastructure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/goal77-infrastructure/
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30

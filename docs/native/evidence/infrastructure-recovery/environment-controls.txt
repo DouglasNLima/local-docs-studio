@@ -1,0 +1,19 @@
+test_archive_path_traversal_duplicate_and_conflicting_overlap_fail (test_native_environment_lock.HostedLock.test_archive_path_traversal_duplicate_and_conflicting_overlap_fail) ... ok
+test_archive_selection_requires_exact_both_components_and_unique_release (test_native_environment_lock.HostedLock.test_archive_selection_requires_exact_both_components_and_unique_release) ... ok
+test_discovery_rejects_developer_desktop_before_output_or_process (test_native_environment_lock.HostedLock.test_discovery_rejects_developer_desktop_before_output_or_process) ... ok
+test_discovery_remains_opt_in_with_original_jobs_excluded (test_native_environment_lock.HostedLock.test_discovery_remains_opt_in_with_original_jobs_excluded) ... ok
+test_exact_frameworks_disable_roll_forward_and_scrub_loader_environment (test_native_environment_lock.HostedLock.test_exact_frameworks_disable_roll_forward_and_scrub_loader_environment) ... ok
+test_full_synthetic_lock_passes_read_only_and_keeps_authority_false (test_native_environment_lock.HostedLock.test_full_synthetic_lock_passes_read_only_and_keeps_authority_false) ... ok
+test_image_os_ubr_and_architecture_drift_rejected (test_native_environment_lock.HostedLock.test_image_os_ubr_and_architecture_drift_rejected) ... ok
+test_missing_extra_changed_runtime_files_and_sdk_change_fail (test_native_environment_lock.HostedLock.test_missing_extra_changed_runtime_files_and_sdk_change_fail) ... ok
+test_missing_truncated_duplicate_and_unbound_lock_rejected (test_native_environment_lock.HostedLock.test_missing_truncated_duplicate_and_unbound_lock_rejected) ... ok
+test_product_checkout_does_not_expand_historical_evidence (test_native_environment_lock.HostedLock.test_product_checkout_does_not_expand_historical_evidence) ... ok
+test_unauthorised_execution_stops_before_lock_or_windows_import (test_native_environment_lock.HostedLock.test_unauthorised_execution_stops_before_lock_or_windows_import) ... ok
+test_untrusted_archive_origin_is_rejected_before_network (test_native_environment_lock.HostedLock.test_untrusted_archive_origin_is_rejected_before_network) ... ok
+test_wrong_archive_digest_is_rejected_before_extraction (test_native_environment_lock.HostedLock.test_wrong_archive_digest_is_rejected_before_extraction) ... ok
+test_wrong_loaded_runtime_process_assembly_and_native_host_fail (test_native_environment_lock.HostedLock.test_wrong_loaded_runtime_process_assembly_and_native_host_fail) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.665s
+
+OK

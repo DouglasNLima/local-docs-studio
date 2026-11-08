@@ -1,4 +1,4 @@
-"""One authorised hosted stage; restore sealed inputs before importing any GUI API.
+"""Historical hosted coordinator; spent authority is now blocked before side effects.
 
 R02 is deliberately unavailable until an independent disposition of actual R01
 evidence. This coordinator does not alter the reviewed launcher or its binaries.
@@ -31,6 +31,13 @@ SCRIPT = 'scripts/native/qualification_hosted/execute_locked.py'
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def recovery_gate():
+    # The sole authority above was consumed by run42495945111. The owner's
+    # recovery continuation permits read-only discovery only. Fail before V1,
+    # before Windows imports and before any restore/launch side effect.
+    raise ValueError('NOT_AUTHORISED: spent R01 authority; geometry and exact appearance recovery remain unqualified')
 
 
 def sha(path):
@@ -192,6 +199,7 @@ def terminal_exit(terminal):
 
 
 def execute(workspace, output, protocol):
+    recovery_gate()
     require(os.name == 'nt' and not any(os.environ.get(k) for k in ('GH_TOKEN', 'GITHUB_TOKEN', 'GH_ENTERPRISE_TOKEN')),
             'Execution requires Windows and no inherited API credential')
     restored = read_json(output / 'restore.json')
@@ -265,6 +273,7 @@ def main():
     parser.add_argument('--protocol', required=True)
     args = parser.parse_args()
     guard(os.environ, args.protocol)
+    recovery_gate()
     require(os.name == 'nt', 'Hosted Windows only')
     workspace = Path(os.environ['GITHUB_WORKSPACE']).resolve()
     output = workspace / ('artifacts/goal77-bounded-' + args.protocol)
