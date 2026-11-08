@@ -26,7 +26,7 @@
       "sha256CanonicalLf": "111278cd142ddbd16fa947680ac7e63b958cfae03286da5c092d1e77cc26af0b"
     },
     "scripts/native/qualification/discover_hosted.py": {
-      "sha256CanonicalLf": "87409b7cc42e51dc7276ee2e4c8d9660921c6315a39a97e19d66b769efbe6149"
+      "sha256CanonicalLf": "83113416b042b071ca0a15d5950f3c6e91a853998c18cc0a4da9138b80ef714d"
     },
     "scripts/native/qualification/environment_lock.py": {
       "sha256CanonicalLf": "3644394b062e571e5b9ec57d61b12dbbe6325286b9d2d70cc2ddaa9b80948b7b"
@@ -65,7 +65,7 @@
       "sha256CanonicalLf": "56b9aa00fa36efceb5912098e6a00557e16bc7111c1ab9c0cb48e7ce02cbb28a"
     },
     "tests/unit/test_native_environment_lock.py": {
-      "sha256CanonicalLf": "94c34bc29b7c4fdb1b408ef0785281c376757f748386b34a370332c025ef7a13"
+      "sha256CanonicalLf": "0051a73a4c205aabdc2fff8760ca98ae76d44d27aebb16217f42760119bf7ae4"
     }
   },
   "R01": {

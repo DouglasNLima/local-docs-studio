@@ -101,6 +101,17 @@ def runtime_config(version):
         {'name': 'Microsoft.NETCore.App', 'version': version}, {'name': 'Microsoft.WindowsDesktop.App', 'version': version}]}}
 
 
+def product_worktree(path, revision):
+    # The immutable archive builder reads Git blobs. Do not expand unrelated deep
+    # historical evidence paths into a hosted Windows working directory.
+    git('worktree', 'add', '--detach', '--no-checkout', str(path), revision)
+    git('sparse-checkout', 'set', '--cone', 'src/native/LensDocsStudio.Core',
+        'src/native/LensDocsStudio.Native', root=path)
+    git('read-tree', '-mu', 'HEAD', root=path)
+    if git('rev-parse', 'HEAD', root=path).decode().strip() != revision or git('status', '--porcelain', '--untracked-files=no', root=path).strip():
+        raise ValueError('Sparse product checkout is not the clean pinned source')
+
+
 def discovery(output):
     if os.name != 'nt' or any(os.environ.get(k) != v for k, v in {
         'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted', 'RUNNER_OS': 'Windows',
@@ -178,7 +189,7 @@ def collect(output, head):
     roots = {}
     for label, revision in [('candidate', CANDIDATE), ('baseline', BASELINE)]:
         roots[label] = output/'worktrees'/label
-        git('worktree', 'add', '--detach', str(roots[label]), revision)
+        product_worktree(roots[label], revision)
     build = output/'build'
     source = q.build_sources(build, roots['candidate'], roots['baseline'])
     if source['toolingDirty']: raise ValueError('Build source receipt is dirty')

@@ -122,6 +122,16 @@ class HostedLock(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'hosted discovery'):d.discovery('must-not-exist')
             process.assert_not_called()
 
+    def test_product_checkout_does_not_expand_historical_evidence(self):
+        revision='a'*40;path=Path('synthetic-product-root')
+        with patch('discover_hosted.git',side_effect=[b'',b'',b'',revision.encode(),b'']) as git:
+            d.product_worktree(path,revision)
+            self.assertIn('--no-checkout',git.call_args_list[0].args)
+            self.assertEqual(git.call_args_list[1].args,('sparse-checkout','set','--cone','src/native/LensDocsStudio.Core','src/native/LensDocsStudio.Native'))
+            self.assertEqual(git.call_args_list[2].args,('read-tree','-mu','HEAD'))
+        with patch('discover_hosted.git',side_effect=[b'',b'',b'',b'wrong',b'']):
+            with self.assertRaisesRegex(ValueError,'clean pinned'):d.product_worktree(path,revision)
+
     def test_exact_frameworks_disable_roll_forward_and_scrub_loader_environment(self):
         for v in q.RUNTIMES:
             r=d.runtime_config(v)['runtimeOptions'];self.assertEqual(r['rollForward'],'Disable')
