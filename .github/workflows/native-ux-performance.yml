@@ -5,6 +5,14 @@ on:
     paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
   workflow_dispatch:
     inputs:
+      bounded_protocol:
+        description: 'Owner-authorised stage only; R02 remains blocked pending independent R01 review'
+        type: choice
+        options: [none, R01]
+        default: none
+      expected_wrapper_sha:
+        description: 'Exact reviewed coordinator commit (required for a bounded stage)'
+        type: string
       environment_lock_only:
         description: 'Discovery/build only; exclude every foreground qualification job'
         type: boolean
@@ -22,7 +30,7 @@ permissions:
   contents: read
 jobs:
   observer-smoke:
-    if: ${{ inputs.environment_lock_only != true }}
+    if: ${{ inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
     runs-on: windows-latest
     timeout-minutes: 15
@@ -59,7 +67,7 @@ jobs:
             artifacts/native-ux/samples/
           retention-days: 30
   contract-controls:
-    if: ${{ inputs.environment_lock_only != true }}
+    if: ${{ inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +81,7 @@ jobs:
     needs: [contract-controls, observer-smoke]
     # Retain a failed observer job and still gather independent cells. Neither
     # those cells nor the overall workflow can clear an observer failure.
-    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.environment_lock_only != true }}
+    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
     name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
     runs-on: windows-latest
     timeout-minutes: 60
@@ -121,6 +129,7 @@ jobs:
     name: Hosted environment discovery only (no qualification)
     if: >-
       ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true &&
+          (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') &&
           github.repository == 'DouglasNLima/local-docs-studio' &&
           github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
           github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
@@ -161,3 +170,55 @@ jobs:
             !artifacts/qualification-environment/worktrees/
             !artifacts/qualification-environment/**/obj/
             !artifacts/qualification-environment/build/product-*/**/bin/
+
+  bounded-qualification:
+    name: Owner-authorised bounded R01 (R02 independently gated)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.bounded_protocol == 'R01' &&
+          inputs.environment_lock_only != true && github.run_attempt == 1 &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    concurrency:
+      group: goal77-authorised-bounded-qualification
+      cancel-in-progress: false
+    env:
+      EXPECTED_WRAPPER_SHA: ${{ inputs.expected_wrapper_sha }}
+      BOUNDED_PROTOCOL: ${{ inputs.bounded_protocol }}
+    steps:
+      - name: Check out the exact coordinator without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify owner authority and restore the exact sealed artefact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Copy-Item -LiteralPath scripts/native/qualification_hosted/execute_locked.py -Destination "$env:RUNNER_TEMP/goal77-execute-locked.py"
+          python "$env:RUNNER_TEMP/goal77-execute-locked.py" prepare --protocol $env:BOUNDED_PROTOCOL
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git checkout --detach 77664fbeed39162e17c6d0d2ff24a65f8a7f9d13
+          exit $LASTEXITCODE
+      - name: Revalidate every identity then execute R01 once
+        shell: pwsh
+        run: |
+          python "$env:RUNNER_TEMP/goal77-execute-locked.py" execute --protocol $env:BOUNDED_PROTOCOL
+          exit $LASTEXITCODE
+      - name: Preserve every failed or incomplete observation
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-bounded-R01-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/goal77-bounded-R01/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30

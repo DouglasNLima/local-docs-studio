@@ -1,0 +1,27 @@
+test_changed_authority_identity_body_or_url_is_rejected (test_native_hosted_execution.HostedExecutionControls.test_changed_authority_identity_body_or_url_is_rejected) ... ok
+test_duplicate_and_nonfinite_json_fail (test_native_hosted_execution.HostedExecutionControls.test_duplicate_and_nonfinite_json_fail) ... ok
+test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected (test_native_hosted_execution.HostedExecutionControls.test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected) ... 
+  test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected (test_native_hosted_execution.HostedExecutionControls.test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected) (names=['a\\b']) ... FAIL
+test_exact_owner_record_and_attachment_are_bound (test_native_hosted_execution.HostedExecutionControls.test_exact_owner_record_and_attachment_are_bound) ... ok
+test_local_cli_rejects_without_gui_or_api_import (test_native_hosted_execution.HostedExecutionControls.test_local_cli_rejects_without_gui_or_api_import) ... ok
+test_only_first_attempt_on_owner_hosted_branch_is_eligible (test_native_hosted_execution.HostedExecutionControls.test_only_first_attempt_on_owner_hosted_branch_is_eligible) ... ok
+test_only_three_authority_fields_change (test_native_hosted_execution.HostedExecutionControls.test_only_three_authority_fields_change) ... ok
+test_original_successful_discovery_is_required (test_native_hosted_execution.HostedExecutionControls.test_original_successful_discovery_is_required) ... ok
+test_r02_and_calibration_are_unavailable_before_independent_review (test_native_hosted_execution.HostedExecutionControls.test_r02_and_calibration_are_unavailable_before_independent_review) ... ok
+test_retained_product_failure_is_distinct_from_cleanup_safety (test_native_hosted_execution.HostedExecutionControls.test_retained_product_failure_is_distinct_from_cleanup_safety) ... ok
+test_safe_zip_restores_exact_bytes_and_cannot_overwrite (test_native_hosted_execution.HostedExecutionControls.test_safe_zip_restores_exact_bytes_and_cannot_overwrite) ... ok
+test_truncated_zip_is_not_repaired_or_retried (test_native_hosted_execution.HostedExecutionControls.test_truncated_zip_is_not_repaired_or_retried) ... ok
+test_unknown_cleanup_missing_duplicate_wrong_pid_and_timeout_stop (test_native_hosted_execution.HostedExecutionControls.test_unknown_cleanup_missing_duplicate_wrong_pid_and_timeout_stop) ... ok
+
+======================================================================
+FAIL: test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected (test_native_hosted_execution.HostedExecutionControls.test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected) (names=['a\\b'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Code\MarkdownReader-native-ux-contract\tests\unit\test_native_hosted_execution.py", line 115, in test_escaping_ambiguous_duplicate_or_unexpected_zip_is_rejected
+    with self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.274s
+
+FAILED (failures=1)

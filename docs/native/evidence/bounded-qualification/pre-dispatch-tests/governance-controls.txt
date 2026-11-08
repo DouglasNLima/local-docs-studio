@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Code\MarkdownReader-native-ux-contract\scripts\compliance\check_governance.py", line 135, in <module>
+    main()
+  File "C:\Code\MarkdownReader-native-ux-contract\scripts\compliance\check_governance.py", line 123, in main
+    check_licence()
+  File "C:\Code\MarkdownReader-native-ux-contract\scripts\compliance\licence_scope.py", line 174, in main
+    validate_preserved(preserved, current_digests(set(preserved)))
+  File "C:\Code\MarkdownReader-native-ux-contract\scripts\compliance\licence_scope.py", line 47, in validate_preserved
+    require(actual.get(name) == digest, 'Protected notice/trust/performance bytes changed: ' + name)
+  File "C:\Code\MarkdownReader-native-ux-contract\scripts\compliance\licence_scope.py", line 17, in require
+    raise ValueError(message)
+ValueError: Protected notice/trust/performance bytes changed: .gitattributes

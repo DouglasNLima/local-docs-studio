@@ -24,6 +24,7 @@
     "docs/native/native-ux-performance-contract.md",
     "docs/native/native-ux-performance-report.md",
     "docs/native/pr76-review-index.md",
+    "docs/native/qualification/bounded-execution.md",
     "docs/native/qualification/evidence.schema.json",
     "docs/native/qualification/goal77-execution-config.template.json",
     "docs/native/qualification/goal77-execution.json",
@@ -67,6 +68,7 @@
     "scripts/native/qualification/qualification.py",
     "scripts/native/qualification/sources.py",
     "scripts/native/qualification/windows.py",
+    "scripts/native/qualification_hosted/execute_locked.py",
     "scripts/native/ux/create-fixtures.mjs",
     "scripts/native/ux/report.mjs",
     "src/native/LensDocsStudio.Native.UxProbe/Desktop.cs",
@@ -80,6 +82,7 @@
     "src/native/LensDocsStudio.Native/Rendering/PreviewSelectionVisuals.cs",
     "tests/unit/native-ux-report.test.mjs",
     "tests/unit/test_native_environment_lock.py",
+    "tests/unit/test_native_hosted_execution.py",
     "tests/unit/test_native_qualification.py"
   ],
   "spdxPaths": [
@@ -246,6 +249,7 @@
     "docs/native/packet-treeview-treemap-venn-editors.md",
     "docs/native/performance-and-responsiveness.md",
     "docs/native/pr76-review-index.md",
+    "docs/native/qualification/bounded-execution.md",
     "docs/native/qualification/evidence.schema.json",
     "docs/native/qualification/goal77-execution-config.template.json",
     "docs/native/qualification/goal77-execution.json",
@@ -447,6 +451,7 @@
     "scripts/native/qualification/qualification.py",
     "scripts/native/qualification/sources.py",
     "scripts/native/qualification/windows.py",
+    "scripts/native/qualification_hosted/execute_locked.py",
     "scripts/native/ux/create-fixtures.mjs",
     "scripts/native/ux/report.mjs",
     "scripts/windows/Build-WindowsInnoInstaller.ps1",
@@ -1217,6 +1222,7 @@
     "tests/static/check-service-worker-install.mjs",
     "tests/unit/native-ux-report.test.mjs",
     "tests/unit/test_native_environment_lock.py",
+    "tests/unit/test_native_hosted_execution.py",
     "tests/unit/test_native_qualification.py"
   ]
 }

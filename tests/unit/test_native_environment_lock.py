@@ -176,11 +176,12 @@ class HostedLock(unittest.TestCase):
                 with self.assertRaises(ValueError):d.fetch(url,'not-created',1)
             request.assert_not_called()
 
-    def test_workflow_is_opt_in_and_original_jobs_are_excluded_only_for_discovery(self):
+    def test_discovery_remains_opt_in_with_original_jobs_excluded(self):
         text=(ROOT/'.github/workflows/native-ux-performance.yml').read_text()
-        self.assertEqual(text.count('inputs.environment_lock_only != true'),3)
+        original=text.split('  environment-lock:\n')[0]
+        self.assertEqual(original.count('inputs.environment_lock_only != true'),3)
         self.assertIn('inputs.environment_lock_only == true',text)
-        discovery=text.split('  environment-lock:\n')[1]
+        discovery=text.split('  environment-lock:\n')[1].split('  bounded-qualification:\n')[0]
         for item in ('persist-credentials: false','github.triggering_actor','EXPECTED_TOOLING_SHA','contents: read','windows-2025'):
             self.assertIn(item,discovery)
         for item in ('Measure-NativeUx','qualification.py execute','secrets.','LENS_QUALIFICATION_EXECUTION_ID','strategy:'):
