@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from discover_desktop import digest, read_json, write
 from eligibility import appearance_state
 from execute_locked import extract_archive
+from job_evidence import verify_supervision
 
 ROOT = Path(__file__).resolve().parents[3]
 CONFIG = 'docs/native/qualification/highcontrast-live/config.json'
@@ -28,7 +29,7 @@ BOUNDS = dict(collectorProcesses=1, highContrastGets=2, supervisionSeconds=30, c
 COLLECTOR_SOURCES = tuple('scripts/native/qualification_hosted/desktop_probe/' + name for name in
                          ('Program.cs','HighContrastReader.cs','RuntimeIdentity.cs','DesktopProbe.csproj','desktop.manifest'))
 IMPLEMENTATION = (WORKFLOW, *COLLECTOR_SOURCES, *tuple('scripts/native/qualification_hosted/'+name for name in
-                  ('live_verification.py','live_process.py','discover_desktop.py','eligibility.py','execute_locked.py')),
+                  ('live_verification.py','live_process.py','job_evidence.py','discover_desktop.py','eligibility.py','execute_locked.py')),
                   *tuple('scripts/native/qualification/'+name for name in ('environment_lock.py','qualification.py','sources.py')))
 DECISION = 'AUTHORISE_ONE_CORRECTED_HIGHCONTRAST_READ_ONLY_PROCESS'
 
@@ -192,6 +193,14 @@ def verify_job(record, pid, before):
 
 def audit(output, expected):
     process = read_json(output / 'process.json')
+    verify_supervision(process)
+    require(process['binaryPath'].casefold() == expected['process']['path'].casefold()
+            and process['binarySha256'] == expected['process']['sha256'], 'Supervisor observed the wrong executable')
+    journal = (output/'supervisor.jsonl').read_bytes()
+    require(journal.endswith(b'\n') and digest(output/'supervisor.jsonl') == process['supervisorJournalSha256'],
+            'Missing or changed supervisor journal')
+    require([json.loads(line, object_pairs_hook=_unique) for line in journal.splitlines()] == process['operations'],
+            'Supervisor journal contradicts final record')
     require(type(process['processId']) is int and process['processId'] > 0 and type(process['exitCode']) is int
             and process['exitCode'] == 0 and process['exitCodeHex'] == '00000000' and process['error'] is None,
             'Native process failed or identity is missing')

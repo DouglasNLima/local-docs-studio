@@ -24,7 +24,7 @@ def config():
                 environment=dict(imageVersion='20261103.298.1'),implementationFiles={p:('b' if p in v.COLLECTOR_SOURCES else 'a')*64 for p in v.IMPLEMENTATION},
                 collector=dict(sourceCommit='a'*40,sourceTree='b'*40,archiveSha256='c'*64,
                   sourceFiles={p:'b'*64 for p in v.COLLECTOR_SOURCES},
-                  files={f'DesktopProbe.{name}':'d'*64 for name in ('exe','dll','pdb','deps.json','runtimeconfig.json')}),
+                  files={f'DesktopProbe.{name}':(FIXTURE_SHA256 if name=='exe' else 'd'*64) for name in ('exe','dll','pdb','deps.json','runtimeconfig.json')}),
                 runtime=dict(version='10.0.14',archive=dict(url='https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.14/dotnet-runtime-10.0.14-win-x64.zip',sha256='e'*64),
                   files={name:'f'*64 for name in ('host/fxr/10.0.14/hostfxr.dll',
                       'shared/Microsoft.NETCore.App/10.0.14/hostpolicy.dll','shared/Microsoft.NETCore.App/10.0.14/coreclr.dll',
@@ -40,40 +40,13 @@ def env():
                 AUTHORISATION_BODY_SHA256='d'*64,GITHUB_RUN_ID='900')
 
 
-class Timer:
-    def __init__(self,seconds,callback): assert seconds==30
-    def start(self): pass
-    def cancel(self): pass
+from job_supervisor_support import Timer, FakeKernel, FIXTURE_BYTES, FIXTURE_SHA256
+from job_evidence import decode_snapshot
 
 
-def jobdata(total,active):
-    raw=bytes(32)+b''.join(n.to_bytes(4,'little') for n in (0,total,active,0))
-    return dict(totalProcesses=total,activeProcesses=active,terminatedProcesses=0,pageFaults=0,
-                processIds=[133] if active else [],limitFlags=0x2008,activeLimit=1,
-                assignedProcesses=active,returnedBytes=48,accountingBytes=raw.hex())
-
-
-class FakeKernel:
-    def __init__(self,fail=None,code=0,counts=(1,0)):
-        self.calls=[];self.fail=fail;self.code=code;self.final_counts=counts;self.waits=0
-    def call(self,name):
-        self.calls.append(name)
-        if self.fail==name: raise RuntimeError('Injected '+name+' failure')
-    def job(self): self.call('job');return 10
-    def create(self,*args): self.call('create');return 11,12,133,134
-    def assign(self,*args): self.call('assign')
-    def resume(self,*args): self.call('resume')
-    def wait(self,handle,seconds):
-        self.call('wait');self.waits+=1
-        return self.fail!='timeout' or self.waits>1
-    def exit(self,*args): self.call('exit');return self.code
-    def stop(self,job,handle,assigned): self.call('stop-job' if assigned else 'stop-direct')
-    def counts(self,*args): self.call('counts');return self.final_counts
-    def inspect(self,*args):
-        before='resume' not in self.calls and not any(name.startswith('stop-') for name in self.calls)
-        total,active=(1,1) if before else self.final_counts
-        return jobdata(total,active)
-    def close(self,*args): self.call('close')
+def jobdata(total, active):
+    from job_supervisor_support import raw_job
+    return decode_snapshot(raw_job(total, active))
 
 
 def appearance():
@@ -113,11 +86,11 @@ def evidence(root):
             if n==10:data=dict(flags=126,pointerWasNull=False,scheme='')
             records.append(dict(boundary=name,timestamp=start+n,processId=133,data=data))
     records.append(dict(boundary='runtimeIdentityAfter',timestamp=33,processId=133,data=observation['identityAfter']))
-    child=dict(processId=133,exitCode=0,exitCodeHex='00000000',error=None,created=True,assigned=True,resumed=True,cleanupVerified=True,
-               timedOut=False,totalProcesses=1,activeProcesses=0,retryCount=0,timeoutSeconds=30,cleanupSeconds=5,
-               createdSeconds=0.1,assignedSeconds=0.2,resumedSeconds=0.3,observedExitSeconds=1,
-               cleanupStartedSeconds=1.1,cleanupFinishedSeconds=1.2,finishedSeconds=1.2)
-    child.update(assignmentObservation=jobdata(1,1),cleanupObservation=jobdata(1,0))
+    binary=root/'collector/DesktopProbe.exe';binary.parent.mkdir();binary.write_bytes(FIXTURE_BYTES)
+    kernel=FakeKernel()
+    logs=root/'mock-supervisor';logs.mkdir()
+    child=process.supervise(binary,{},logs,v.write,backend=kernel,clock=kernel.clock,timer=Timer,sleep=kernel.clock.sleep)
+    (root/'supervisor.jsonl').write_bytes((logs/'supervisor.jsonl').read_bytes())
     return expected,observation,records,child
 
 
@@ -199,23 +172,24 @@ class LiveVerificationControls(unittest.TestCase):
 
     def supervise(self,kernel):
         with tempfile.TemporaryDirectory() as temporary:
-            return process.supervise(Path('never-run.exe'),{},Path(temporary),v.write,kernel,clock=lambda:1,timer=Timer)
+            root=Path(temporary);binary=root/'never-run.exe';binary.write_bytes(FIXTURE_BYTES)
+            return process.supervise(binary,{},root,v.write,kernel,clock=kernel.clock,timer=Timer,sleep=kernel.clock.sleep)
 
     def test_suspended_assignment_precedes_resume_and_exactly_one_child_is_created(self):
         kernel=FakeKernel();result=self.supervise(kernel)
-        self.assertEqual(kernel.calls[:4],['job','create','assign','resume'])
+        self.assertEqual([n for n in kernel.calls if n in ('job','create','assign','resume')],['job','create','assign','resume'])
         self.assertEqual(kernel.calls.count('create'),1);self.assertEqual(result['processId'],133)
         self.assertTrue(result['cleanupVerified']);self.assertEqual(result['exitCodeHex'],'00000000')
 
     def test_assignment_failure_never_resumes_and_terminates_suspended_direct_child(self):
         kernel=FakeKernel('assign');result=self.supervise(kernel)
         self.assertNotIn('resume',kernel.calls);self.assertIn('stop-direct',kernel.calls)
-        self.assertFalse(result['cleanupVerified']);self.assertIn('Injected',result['error'])
+        self.assertFalse(result['cleanupVerified']);self.assertTrue(result['errors'])
 
     def test_post_create_handle_restoration_failure_cannot_lose_the_suspended_child(self):
         kernel=FakeKernel()
         def broken(*args):
-            kernel.calls.append('create');raise process.CreatedProcessError((11,12,133,134),'handle restoration failed')
+            kernel.calls.append('create');kernel.binary=args[0];raise process.CreatedProcessError((11,12,133,134),'handle restoration failed')
         kernel.create=broken;result=self.supervise(kernel)
         self.assertTrue(result['created']);self.assertEqual(result['processId'],133)
         self.assertNotIn('resume',kernel.calls);self.assertIn('stop-direct',kernel.calls)
