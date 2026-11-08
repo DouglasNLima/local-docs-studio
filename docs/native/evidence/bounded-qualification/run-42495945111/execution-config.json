@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "status": "OWNER_AUTHORISED",
+  "campaignExecutionApproved": true,
+  "ownerAuthorisationUrl": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720",
+  "toolingCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "sourceReceipt": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\build\\source-receipt.json",
+  "sourceReceiptSha256": "1002de18b43d7983fad65be60f659d71ff2aa2e838da0147eda6d2e0d003abd3",
+  "imageVersion": "20261103.298.1",
+  "osVersion": "10.0.26100",
+  "environmentLock": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\environment-lock.json",
+  "environmentLockSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+  "runtimePins": {
+    "10.0.13": {
+      "dotnet": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\runtimes\\10.0.13\\dotnet.exe",
+      "dotnetSha256": "abce6623a6729059cf39bb0f728c4a7804f625895099c88c17e6e704661e09eb",
+      "core": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\runtimes\\10.0.13\\shared\\Microsoft.NETCore.App\\10.0.13\\System.Private.CoreLib.dll",
+      "coreSha256": "0a175cdd09067c52f8b2477cfcebf894b2f926d7302e55ae76fc921529662c7b",
+      "wpf": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\runtimes\\10.0.13\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+      "wpfSha256": "c6950a0d6addfb7a365c11fe0aa82a4677043a263102f1779aa9be8fd3624019"
+    },
+    "10.0.14": {
+      "dotnet": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\runtimes\\10.0.14\\dotnet.exe",
+      "dotnetSha256": "1e881ec1786c31ba712d052258b4ad4202ac155df5965794030037878abb822f",
+      "core": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\runtimes\\10.0.14\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll",
+      "coreSha256": "69d56e12535d3a8f2f8f89ac8f97577e6dc788d26f2e7b69be8fb5f6ff17ff28",
+      "wpf": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\runtimes\\10.0.14\\shared\\Microsoft.WindowsDesktop.App\\10.0.14\\PresentationFramework.dll",
+      "wpfSha256": "15ec7ac7eaecdeabf3bfb378711f2c45bcd8a59d77bcd8254b9e90b776385189"
+    }
+  },
+  "bundles": {
+    "r01": {
+      "receipt": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\build\\r01\\bin\\Release\\net10.0-windows\\bundle-receipt.json",
+      "receiptSha256": "ece0fcf72db4ffa81d1991e989d5e783cf389711f942d49e054cee52789e27f4"
+    },
+    "r02-baseline": {
+      "receipt": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\build\\r02-baseline\\bin\\Release\\net10.0-windows\\bundle-receipt.json",
+      "receiptSha256": "21e2c41d5f587b3c7ca6ec8c34362a23970439b8e8df722e59b128a2effdeb2c"
+    },
+    "r02-candidate": {
+      "receipt": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\qualification-environment\\build\\r02-candidate\\bin\\Release\\net10.0-windows\\bundle-receipt.json",
+      "receiptSha256": "43e79337dbfcfc6c0f344747b33816f51b064d2eebaddb5f19302646eebb26f5"
+    }
+  },
+  "limits": {
+    "childSeconds": 240,
+    "privateBytes": 2147483648,
+    "logBytes": 16777216
+  },
+  "calibrationPilotEnabled": false
+}

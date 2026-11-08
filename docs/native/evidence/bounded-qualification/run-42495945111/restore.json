@@ -1,0 +1,13 @@
+{
+  "status": "SEALED_ARTEFACT_RESTORED",
+  "wrapperCommit": "72794c53ea53d2ff13efd85a66d416f33edcc344",
+  "wrapperSha256": "aae7a1756129bc5c2e53e27913650fce625229f95f47d737e9479ffc86d50e5d",
+  "runId": "42495945111",
+  "attempt": 1,
+  "discoveryRun": 42484885426,
+  "artefact": 13618494876,
+  "archiveSha256": "8b3d50ff7b9b394867fdc9598fe14e47d980e865c7d74f389d7802be90c7f812",
+  "fileCount": 2019,
+  "filesManifestSha256": "3ede94108157151b65bd67539bd14ada927ed053694ca020ef765824a81df48c",
+  "ownerAuthorisationUrl": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720"
+}

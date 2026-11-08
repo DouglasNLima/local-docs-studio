@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "protocol": "R01",
+  "outcomes": [
+    {
+      "id": "V1",
+      "collection": "INVALID",
+      "existingCorrectness": "FAIL",
+      "presentationOrder": "INCONCLUSIVE",
+      "reason": "[Errno 2] No such file or directory: 'D:\\\\a\\\\local-docs-studio\\\\local-docs-studio\\\\artifacts\\\\goal77-bounded-R01\\\\collection\\\\V1\\\\evidence\\\\presentation-completion.json'"
+    },
+    {
+      "id": "V2",
+      "collection": "INVALID",
+      "existingCorrectness": "FAIL",
+      "presentationOrder": "INCONCLUSIVE",
+      "reason": "[Errno 2] No such file or directory: 'D:\\\\a\\\\local-docs-studio\\\\local-docs-studio\\\\artifacts\\\\goal77-bounded-R01\\\\collection\\\\V2\\\\evidence\\\\presentation-completion.json'"
+    },
+    {
+      "id": "V3",
+      "collection": "INVALID",
+      "existingCorrectness": "FAIL",
+      "presentationOrder": "INCONCLUSIVE",
+      "reason": "[Errno 2] No such file or directory: 'D:\\\\a\\\\local-docs-studio\\\\local-docs-studio\\\\artifacts\\\\goal77-bounded-R01\\\\collection\\\\V3\\\\evidence\\\\presentation-completion.json'"
+    },
+    {
+      "id": "V4",
+      "collection": "INVALID",
+      "existingCorrectness": "INCONCLUSIVE",
+      "reason": "MISSING_PROCESS"
+    }
+  ],
+  "collection": "INVALID",
+  "existingCorrectness": "FAIL",
+  "policyAcceptance": "NOT_ACTIVATED",
+  "pr76Integration": "NO-GO",
+  "historicalFailuresReclassified": false
+}

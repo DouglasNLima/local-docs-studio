@@ -1,0 +1,16 @@
+{
+  "protocol": "R01",
+  "status": "STOP_UNSAFE_OR_INCOMPLETE",
+  "originalLauncherExit": 1,
+  "environmentUnchanged": true,
+  "restorationVerified": false,
+  "r02Disposition": "PENDING_INDEPENDENT_REVIEW",
+  "policyAcceptance": "NOT_ACTIVATED",
+  "pr76Integration": "NO-GO",
+  "processCount": 3,
+  "initialAudit": {
+    "collection": "INVALID",
+    "existingCorrectness": "FAIL"
+  },
+  "auditFailure": "KNOWN_AUDIT_FAILURE_RETAINS_NONZERO_EXIT"
+}

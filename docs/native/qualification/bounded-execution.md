@@ -1,5 +1,10 @@
 # Bounded hosted execution — Goal #77
 
+**Terminal outcome:** the single [R01 attempt and full receipt](../evidence/bounded-qualification/receipt.md)
+are retained as **BLOCKED**. Exact identities passed; fixed geometry failed and
+exact appearance restoration was unverified after V3. V4, R02 and calibration
+were not run. The execution authorisation is not permission to retry.
+
 8 November 2026. The [owner's execution authorisation](https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720)
 supersedes the previous execution prohibition only for the fixed R01/R02 protocols.
 The [original attachment bytes](../evidence/bounded-qualification/owner-attachment.json),

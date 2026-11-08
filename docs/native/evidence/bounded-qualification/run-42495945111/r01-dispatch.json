@@ -1,0 +1,18 @@
+{
+  "runId": 42495945111,
+  "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42495945111",
+  "attempt": 1,
+  "wrapperCommit": "72794c53ea53d2ff13efd85a66d416f33edcc344",
+  "wrapperTree": "6b5a403b9de6c3d6e82efb150974b0bc5ecbd0f2",
+  "reviewedImplementationCommit": "ffc8660100b19944905e2d699e8a27d866904b83",
+  "frozenTooling": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "inputs": {
+    "bounded_protocol": "R01",
+    "environment_lock_only": false,
+    "expected_wrapper_sha": "72794c53ea53d2ff13efd85a66d416f33edcc344"
+  },
+  "ownerAuthorisationUrl": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720",
+  "dispatchesIssued": 1,
+  "r02Dispatched": false,
+  "noRetries": true
+}

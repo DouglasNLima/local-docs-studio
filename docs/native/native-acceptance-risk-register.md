@@ -1,6 +1,6 @@
 # Native acceptance risk register
 
-7 November 2026 · Goal #77 · **Design-level criteria approved; no failure closed**
+8 November 2026 · Goal #77 · **Design-level criteria approved; no failure closed**
 
 Decision authority is [ADR 007 D10/D13](../adr/007-native-document-rendering-performance.md#decision-matrix--7-november-continuation).
 Contract A and Contract B are in the [decision package](native-acceptance-decision-package.md).
@@ -11,6 +11,18 @@ and calibration; R03–R06 retain the controls and escalation boundaries below.
 Unless noted otherwise, facts below come from the [exact 7b1334b0 terminal receipt](https://github.com/DouglasNLima/local-docs-studio/pull/76#issuecomment-6713058791)
 and [targeted investigation](https://github.com/DouglasNLima/local-docs-studio/blob/7b1334b09a02ad2fbfd4a0234798e6c387d3e634/docs/native/targeted-regression-closure.md).
 All owner assignments below are roles to nominate, not accepted assignments or waivers.
+
+The [owner-authorised bounded attempt](evidence/bounded-qualification/receipt.md)
+on 8 November passed exact source/runtime/image verification but failed R01's
+fixed geometry prerequisite in three processes (1024 × 720 observed; 1280 × 800
+required). V3 also failed exact appearance restoration; V4 was stopped. Collection
+is **INVALID**, original assertions remain **FAIL**, and visible-completion/order
+attribution is **INCONCLUSIVE** with zero qualifying frames. These are qualification
+prerequisite failures, not new proof of candidate-specific preview defects or safety.
+**R02 was not run** because shared infrastructure and exact cleanup were unqualified.
+Its historical 2.542596:1 failure remains unchanged. R03–R06 retain the controls below;
+this geometry failure does not reattribute their original incidents. No retry or
+expanded campaign is authorised by that attempt.
 
 | ID | Classification / present decision | Existing controls | Smallest next evidence / explicit closure decision |
 |---|---|---|---|

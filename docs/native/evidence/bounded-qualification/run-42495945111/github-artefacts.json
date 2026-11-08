@@ -1,0 +1,23 @@
+{
+  "artifacts": [
+    {
+      "id": 13623780293,
+      "name": "goal77-bounded-R01-42495945111-1",
+      "size_in_bytes": 148276,
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13623780293",
+      "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13623780293/zip",
+      "expired": false,
+      "created_at": "2026-11-08T15:40:49Z",
+      "expires_at": "2026-12-08T15:40:48Z",
+      "updated_at": "2026-11-08T15:40:49Z",
+      "digest": "sha256:3bb3212f99811c44d31fef9fb0b7f6652ea0a906c29ae41e7bca1e70f62bbbea",
+      "workflow_run": {
+        "id": 42495945111,
+        "repository_id": 1248627951,
+        "head_repository_id": 1248627951,
+        "head_branch": "feature/native-ux-performance-contract",
+        "head_sha": "72794c53ea53d2ff13efd85a66d416f33edcc344"
+      }
+    }
+  ]
+}
