@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT_AUTHORISED",
+  "approved": false,
+  "campaignExecutionApproved": false,
+  "supervisorQualification": "UNPROVEN_PENDING_SEPARATE_LOCAL_CONTROL",
+  "sourceCommit": "331dc5ab220e5ca7dd145ff21a650d3d2578111f",
+  "sourceTree": "776ef245307e9e969e19352597662de46bd35907",
+  "workspace": "C:\\Code\\MarkdownReader-native-ux-contract",
+  "sourceFiles": {
+    ".github/workflows/native-ux-performance.yml": "08ec4169156e3aacad81127e4c29106fa279513a6516221e1b2ca32703b7cbb8",
+    "scripts/native/qualification_hosted/desktop_probe/Program.cs": "a354592d5ef53855c210aba0c411a1d6b10bb536830482249f1bc5eadf542b26",
+    "scripts/native/qualification_hosted/desktop_probe/HighContrastReader.cs": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+    "scripts/native/qualification_hosted/desktop_probe/RuntimeIdentity.cs": "1bf02673719b2af4289811bff1556df2ea48e7f84623ef82522a952514176807",
+    "scripts/native/qualification_hosted/desktop_probe/DesktopProbe.csproj": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+    "scripts/native/qualification_hosted/desktop_probe/desktop.manifest": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+    "scripts/native/qualification_hosted/live_verification.py": "62c358eb7cbccf0f8ee4db23735638fcbb12fcb88d13041e977b1ba9a6a893dc",
+    "scripts/native/qualification_hosted/live_process.py": "227495954a6822d9ea672fa1c00a410da9d3582ff74fd67022c8e31fbb79e3d4",
+    "scripts/native/qualification_hosted/job_evidence.py": "62e413974daef35e4e14ba9f68a0c9cd29eeaf3f79542dbfef4333d36e8b3f1b",
+    "scripts/native/qualification_hosted/discover_desktop.py": "7e002360a72d68caf2ab60d1af8cd484c7704082542b4e6a565fc084b53f4d37",
+    "scripts/native/qualification_hosted/eligibility.py": "18df748d3f4f5229903a2f867feb0518a37ad73ffefe57749c47ae7a317fc005",
+    "scripts/native/qualification_hosted/execute_locked.py": "7311cf287315d8d42e5e6688bcbff6592cf698325d6f671853541cdf54fec800",
+    "scripts/native/qualification/environment_lock.py": "3644394b062e571e5b9ec57d61b12dbbe6325286b9d2d70cc2ddaa9b80948b7b",
+    "scripts/native/qualification/qualification.py": "73ee1ddab27c8a7a96b247dc73de99de56240d31fbfa12ef06b35852a2034f62",
+    "scripts/native/qualification/sources.py": "7559980f57056baa24820c883bc2ae9e0e5984731905452db228b55900726a4e",
+    "scripts/native/qualification_hosted/local_job_control.py": "627a4ddd0a6dc9d9b2275ef67bf240426fed249bed1595360b2f21558913e5ac"
+  },
+  "executionFiles": {
+    ".github/workflows/native-ux-performance.yml": "68dee2e7213899740e521d7248d2df20ab4ca6e1358e41c38e57855b711a8b7a",
+    "scripts/native/qualification_hosted/desktop_probe/Program.cs": "a354592d5ef53855c210aba0c411a1d6b10bb536830482249f1bc5eadf542b26",
+    "scripts/native/qualification_hosted/desktop_probe/HighContrastReader.cs": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+    "scripts/native/qualification_hosted/desktop_probe/RuntimeIdentity.cs": "1bf02673719b2af4289811bff1556df2ea48e7f84623ef82522a952514176807",
+    "scripts/native/qualification_hosted/desktop_probe/DesktopProbe.csproj": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+    "scripts/native/qualification_hosted/desktop_probe/desktop.manifest": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+    "scripts/native/qualification_hosted/live_verification.py": "62c358eb7cbccf0f8ee4db23735638fcbb12fcb88d13041e977b1ba9a6a893dc",
+    "scripts/native/qualification_hosted/live_process.py": "227495954a6822d9ea672fa1c00a410da9d3582ff74fd67022c8e31fbb79e3d4",
+    "scripts/native/qualification_hosted/job_evidence.py": "62e413974daef35e4e14ba9f68a0c9cd29eeaf3f79542dbfef4333d36e8b3f1b",
+    "scripts/native/qualification_hosted/discover_desktop.py": "7e002360a72d68caf2ab60d1af8cd484c7704082542b4e6a565fc084b53f4d37",
+    "scripts/native/qualification_hosted/eligibility.py": "18df748d3f4f5229903a2f867feb0518a37ad73ffefe57749c47ae7a317fc005",
+    "scripts/native/qualification_hosted/execute_locked.py": "7311cf287315d8d42e5e6688bcbff6592cf698325d6f671853541cdf54fec800",
+    "scripts/native/qualification/environment_lock.py": "3644394b062e571e5b9ec57d61b12dbbe6325286b9d2d70cc2ddaa9b80948b7b",
+    "scripts/native/qualification/qualification.py": "73ee1ddab27c8a7a96b247dc73de99de56240d31fbfa12ef06b35852a2034f62",
+    "scripts/native/qualification/sources.py": "7559980f57056baa24820c883bc2ae9e0e5984731905452db228b55900726a4e",
+    "scripts/native/qualification_hosted/local_job_control.py": "627a4ddd0a6dc9d9b2275ef67bf240426fed249bed1595360b2f21558913e5ac"
+  },
+  "pythonExecutable": "C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "pythonVersion": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]",
+  "pythonFiles": {
+    "C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe": "42ac541168e97dedb9aabd8be335539fc41c682e414b9e8d137b164fb68683b0",
+    "C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python312.dll": "e7890e38256f04ee0b55ac5276bbf3ac61392c3a3ce150bb5497b709803e17ce"
+  },
+  "bounds": {
+    "fixtureProcesses": 1,
+    "assignmentAttempts": 1,
+    "supervisionSeconds": 30,
+    "cleanupSeconds": 5,
+    "jobObservations": 10,
+    "pidListCapacity": 8,
+    "retries": 0,
+    "collectorProcesses": 0,
+    "hostedRuns": 0,
+    "qualificationProcesses": 0,
+    "calibrationProcesses": 0
+  },
+  "cleanupTargets": [
+    0,
+    0.1,
+    1,
+    4
+  ],
+  "phases": [
+    "CREATED_EMPTY",
+    "CONFIGURED_EMPTY",
+    "BEFORE_ASSIGNMENT",
+    "AFTER_ASSIGNMENT",
+    "AFTER_RESUME",
+    "PROCESS_EXIT",
+    "CLEANUP_0",
+    "CLEANUP_1",
+    "CLEANUP_2",
+    "CLEANUP_3"
+  ],
+  "fixture": {
+    "sha256": "311655cd165d4a82631efce4b827decea6a5199d2e723da67175b94a4539e549",
+    "archive": "docs/native/evidence/buffer-safety-recovery/offline-original-bytes.zip",
+    "archiveSha256": "d28cc4f433b02f93bdfac1604b270123a16419da0229387104ccc990f5a29c27",
+    "member": "attempt-6/NativeBufferSelfTest.exe",
+    "bytes": 20480
+  },
+  "expectedFixtureReport": {
+    "nativeChecks": 21,
+    "pointerBytes": 8,
+    "structureBytes": 16,
+    "offsets": [
+      0,
+      4,
+      8
+    ],
+    "wcharBytes": 2,
+    "boolBytes": 4,
+    "allocations": 2,
+    "ownerReleases": 2,
+    "borrowerReleaseDenials": 1,
+    "activeAllocations": 0,
+    "actualHighContrastCalls": 0
+  },
+  "commandAfterExplicitOwnerApproval": [
+    "C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-I",
+    "-S",
+    "scripts/native/qualification_hosted/local_job_control.py",
+    "--authorisation-comment-id",
+    "<NEW_OWNER_COMMENT_ID>",
+    "--authorisation-body-sha256",
+    "<EXACT_NEW_OWNER_BODY_SHA256>"
+  ]
+}

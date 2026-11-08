@@ -1,0 +1,71 @@
+[
+  {
+    "id": "V1",
+    "kind": "completion",
+    "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "runtime": "10.0.14",
+    "bundle": "r01",
+    "initialAppearance": {
+      "flags": 126,
+      "scheme": ""
+    },
+    "processId": 7420,
+    "exitCode": 1,
+    "supervisionFailure": null,
+    "elapsedSeconds": 2.25,
+    "logBytes": 662,
+    "jobTreeEmpty": true,
+    "releasedInput": [],
+    "restoredAppearance": {
+      "flags": 126,
+      "scheme": ""
+    },
+    "restored": true,
+    "cleanupVerified": true
+  },
+  {
+    "id": "V2",
+    "kind": "completion",
+    "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "runtime": "10.0.14",
+    "bundle": "r01",
+    "initialAppearance": {
+      "flags": 126,
+      "scheme": ""
+    },
+    "processId": 2008,
+    "exitCode": 1,
+    "supervisionFailure": null,
+    "elapsedSeconds": 1.2659999999999911,
+    "logBytes": 662,
+    "jobTreeEmpty": true,
+    "releasedInput": [],
+    "restoredAppearance": {
+      "flags": 126,
+      "scheme": ""
+    },
+    "restored": true,
+    "cleanupVerified": true
+  },
+  {
+    "id": "V3",
+    "kind": "completion",
+    "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "runtime": "10.0.14",
+    "bundle": "r01",
+    "initialAppearance": {
+      "flags": 126,
+      "scheme": ""
+    },
+    "processId": 7372,
+    "exitCode": 1,
+    "supervisionFailure": null,
+    "elapsedSeconds": 1.781000000000006,
+    "logBytes": 662,
+    "jobTreeEmpty": true,
+    "releasedInput": [],
+    "restored": false,
+    "restoreError": "OS appearance restoration/change is unverified",
+    "cleanupVerified": false
+  }
+]

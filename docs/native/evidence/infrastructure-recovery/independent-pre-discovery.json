@@ -1,0 +1,178 @@
+{
+  "schema": "goal77-independent-pre-discovery-review-v1",
+  "recordedAtUtc": "2026-11-08T16:27:26.219415+00:00",
+  "reviewer": "Independent technical review agent /root/acceptance_review",
+  "verdict": "READY_FOR_ONE_AUTHORISED_READ_ONLY_HOSTED_DISCOVERY",
+  "baseCommit": "d2529cb10196589422650f35f647019965ff11be",
+  "baseTree": "6c81db13d4f896d455174e3ccc97d4b40dccaefd",
+  "reviewedState": "Uncommitted focused recovery implementation; exact reviewed content is bound below",
+  "reviewedFiles": {
+    "scripts/native/qualification_hosted/desktop_probe/Program.cs": {
+      "workingTreeSha256": "0bd12247edb57ce7becfdf909bb74e9a8118e4f0771c6c37589eb93212f83dfe",
+      "bytes": 14386,
+      "gitFilteredBlobOid": "30d510388cb8389b7165ba9d1039267701e74758",
+      "lfNormalisedSha256": "0bd12247edb57ce7becfdf909bb74e9a8118e4f0771c6c37589eb93212f83dfe"
+    },
+    "scripts/native/qualification_hosted/desktop_probe/DesktopProbe.csproj": {
+      "workingTreeSha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+      "bytes": 634,
+      "gitFilteredBlobOid": "f5d9d82ee498865c53e103bc4275aefa7df88568",
+      "lfNormalisedSha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f"
+    },
+    "scripts/native/qualification_hosted/desktop_probe/desktop.manifest": {
+      "workingTreeSha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+      "bytes": 790,
+      "gitFilteredBlobOid": "78c6ac3968f9b0b1c1feb4012f8b9d25a8906d14",
+      "lfNormalisedSha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a"
+    },
+    "scripts/native/qualification_hosted/eligibility.py": {
+      "workingTreeSha256": "bdbb40221e84398a81c86a97da9461b82a157a25d71d464afa1f5ebdfa1beeff",
+      "bytes": 9425,
+      "gitFilteredBlobOid": "b69d2699ec0cd9b3cd60b15a2f5c065dccef0629",
+      "lfNormalisedSha256": "bdbb40221e84398a81c86a97da9461b82a157a25d71d464afa1f5ebdfa1beeff"
+    },
+    "scripts/native/qualification_hosted/discover_desktop.py": {
+      "workingTreeSha256": "0357c97680a98af737e9cc38b326fd788625d1a790b4fdc827defaf12336f41e",
+      "bytes": 7119,
+      "gitFilteredBlobOid": "88dee9c3b6fd3db34015fa1a12187a862c55c8ec",
+      "lfNormalisedSha256": "0357c97680a98af737e9cc38b326fd788625d1a790b4fdc827defaf12336f41e"
+    },
+    "scripts/native/qualification_hosted/execute_locked.py": {
+      "workingTreeSha256": "7311cf287315d8d42e5e6688bcbff6592cf698325d6f671853541cdf54fec800",
+      "bytes": 16083,
+      "gitFilteredBlobOid": "317d9ca32690ed62a4ffa7511effe71f0c278768",
+      "lfNormalisedSha256": "7311cf287315d8d42e5e6688bcbff6592cf698325d6f671853541cdf54fec800"
+    },
+    ".github/workflows/native-ux-performance.yml": {
+      "workingTreeSha256": "cd94ad465ad3ebcdd82855e645526bde49c209ddd83b2f8a79bc39bd9985d375",
+      "bytes": 12957,
+      "gitFilteredBlobOid": "172a2d706b81ba29279083b424e709f72d65e280",
+      "lfNormalisedSha256": "dc633f2674ef8342d9b6b0dc9763f9e26e514c8b987731d853efbf585c105a8c"
+    },
+    "tests/unit/test_native_infrastructure.py": {
+      "workingTreeSha256": "b4cdb269cd18f51d29baf654350e553848424baa43272bc83670bd00d6d1befd",
+      "bytes": 13869,
+      "gitFilteredBlobOid": "4f2fca15a6eac1d1b580f3401c88e816f6174a48",
+      "lfNormalisedSha256": "b4cdb269cd18f51d29baf654350e553848424baa43272bc83670bd00d6d1befd"
+    },
+    "tests/unit/test_native_hosted_execution.py": {
+      "workingTreeSha256": "2cfd6ee6a22c9677f6ffe9bb17548f1d6b0ed2ae180cf38628db4ebc8d3d5e84",
+      "bytes": 15644,
+      "gitFilteredBlobOid": "7a21cfcd03299892af9bd43173d79bc0f8ff5aab",
+      "lfNormalisedSha256": "2cfd6ee6a22c9677f6ffe9bb17548f1d6b0ed2ae180cf38628db4ebc8d3d5e84"
+    },
+    "docs/native/qualification/hosted-infrastructure-recovery.md": {
+      "workingTreeSha256": "fe0f1938eea50288e274a8fb0acb9d4cc17f1447c94e27ea9c1c99a92d50065a",
+      "bytes": 9887,
+      "gitFilteredBlobOid": "04596a87fcc490533bf8114fec5f0c94562109a6",
+      "lfNormalisedSha256": "fe0f1938eea50288e274a8fb0acb9d4cc17f1447c94e27ea9c1c99a92d50065a"
+    },
+    "docs/native/qualification/goal77-infrastructure-readiness.json": {
+      "workingTreeSha256": "04994c1a55e33666e7fa028ef9a26ebb9741469be528ab5a58dd38fb3c2b9592",
+      "bytes": 2492,
+      "gitFilteredBlobOid": "cd5b6600664239aaa28f8977e34af428380589e2",
+      "lfNormalisedSha256": "04994c1a55e33666e7fa028ef9a26ebb9741469be528ab5a58dd38fb3c2b9592"
+    }
+  },
+  "scope": {
+    "sourceAndDocumentationReview": true,
+    "offlineTestsOnly": true,
+    "probeExecuted": false,
+    "hostedJobLaunched": false,
+    "guiOrWin32DesktopApisCalledByReviewer": false,
+    "productionAndFrozenQualificationSourceChangedByReviewer": false,
+    "reviewerWrittenFiles": "This ignored review receipt only"
+  },
+  "authorisedBoundary": {
+    "permitted": "One guarded read-only hosted Win32 discovery with two fixed snapshots; no qualification cell",
+    "forbidden": [
+      "R01 or R02 execution",
+      "Calibration",
+      "Appearance or display changes",
+      "Input injection",
+      "WPF or Windows Forms resource access",
+      "Local desktop probe execution",
+      "Reusing spent campaign authority"
+    ],
+    "campaignExecutionApproved": false,
+    "campaignStatus": "BLOCKED / NOT_AUTHORISED",
+    "appearanceRestoration": "UNVERIFIED",
+    "newCollectionValidity": "NOT_RUN",
+    "newCorrectness": "NOT_RUN",
+    "newPresentationOrder": "INCONCLUSIVE",
+    "R02": "NOT_RUN",
+    "pr76Integration": "NO-GO"
+  },
+  "independentTests": [
+    {
+      "command": "python -m unittest discover -s tests/unit -p test_native_infrastructure.py -v",
+      "tests": 17,
+      "result": "PASS",
+      "exitCode": 0,
+      "reportedSeconds": 0.134,
+      "scope": "Final classifier with strict JSON/type checks and explicit restored=True requirement"
+    },
+    {
+      "command": "python -m unittest discover -s tests/unit -p test_native_hosted_execution.py -v",
+      "tests": 17,
+      "result": "PASS",
+      "exitCode": 0,
+      "reportedSeconds": 3.904,
+      "scope": "Reviewed recovery-gated coordinator and isolated workflow sections; no original execute path invoked without mocks"
+    }
+  ],
+  "independentTestCount": 34,
+  "compileOnlyEvidence": {
+    "reportedByImplementer": "Console probe compilation passed; the probe was not run",
+    "independentlyRepeated": false,
+    "reason": "Relevant offline controls passed; another unchanged compile was unnecessary"
+  },
+  "findings": [
+    {
+      "id": "RECOVERY-PRE-01",
+      "priority": "P2",
+      "status": "RESOLVED",
+      "finding": "The initial supplemental continuation classifier accepted cleanupVerified=true together with restored=false.",
+      "reproduction": "Pure offline call returned REVIEW_PRODUCT_RESULT_INDEPENDENTLY for a contradictory restoration record.",
+      "fix": "continuation now requires an explicit restored=True as well as cleanupVerified=True, empty child job tree, no supervisor failure, exact PID and a verified scope.",
+      "validation": "Final 17 infrastructure controls cover false and missing restored evidence and pass.",
+      "source": "scripts/native/qualification_hosted/eligibility.py:continuation"
+    },
+    {
+      "id": "RECOVERY-PRE-02",
+      "priority": "P2",
+      "status": "RESOLVED",
+      "finding": "The initial supplemental classifier also accepted a non-numeric child exit code; permissive JSON/type handling could weaken evidence classification.",
+      "fix": "Strict JSON rejects duplicates, non-finite constants and malformed data. Process/PID/exit-code/schema/chronology checks now reject the relevant missing or mistyped fields.",
+      "validation": "The new strict-data control and existing negative controls pass; an exit code alone still cannot establish a product failure.",
+      "source": "scripts/native/qualification_hosted/discover_desktop.py:read_json and eligibility.py"
+    }
+  ],
+  "remainingPreDiscoveryBlockers": [],
+  "confirmedSafetyAndIdentityControls": [
+    "Source/ABI inspection found Win32 getters and enumeration APIs only. The only SPI actions are GETWORKAREA 0x30 and GETHIGHCONTRAST 0x42; no display, input, theme or DPI setters are imported.",
+    "Rect 16, MONITORINFOEXW 104, DISPLAY_DEVICEW 840, DEVMODEW 220 and HIGHCONTRASTW 16-byte x64 layouts were statically reviewed and have runtime size assertions. PInvoke behaviour itself has not yet been exercised.",
+    "The GET-returned HC scheme pointer is copied with a finite UTF-16 bound, preserves NULL/EMPTY/NAMED, and is released with LocalFree in finally. The owned input-desktop handle is closed; borrowed thread-desktop/window-station handles are not closed.",
+    "The console apphost declares System DPI awareness without a setter, creates no window, references no UI framework and rejects loaded WPF/Windows Forms assemblies. CREATE_NO_WINDOW avoids a console window.",
+    "The classifier accepts its geometry inference only for observed System-aware process/thread state, one primary monitor, 96 DPI/100-percent scaling, consistent physical mode/work-area rectangles and adequate tracking limits. It expressly does not measure a WPF window.",
+    "Two fixed snapshots must agree after excluding only their monotonic clocks. They are observations, not a restoration round trip or retry-until-pass loop.",
+    "Exact owner/repository/branch/attempt/source guards and a clean checkout precede discovery. Original full image/OS/UBR identity and SDK identity files are checked before building or launching the probe.",
+    "The apphost pins Core 10.0.14 with roll-forward disabled. Loaded Core SHA256 and self/binary/source identities are checked after the read-only child and before its eligibility result is accepted. This is not a claim that all loaded-runtime checks precede the Win32 reads.",
+    "The discovery workflow excludes all five existing jobs. It has no qualification command, matrix, API-token environment or runtime installation step; checkout credentials are not persisted.",
+    "The historical coordinator CLI and execute entry point reject spent authority before restore, Windows imports or child launch. Frozen qualification source and bundles remain unchanged.",
+    "Infrastructure eligibility is always BLOCKED, restoration remains UNVERIFIED and campaignExecutionApproved remains false. The pure continuation proposal is explicitly not wired into the frozen launcher."
+  ],
+  "limitsAndRequiredFollowThrough": [
+    "Seal the reviewed content, verify every listed Git-filtered blob identity after commit, then dispatch using the actual live HEAD as expected_infrastructure_sha. Evidence-only additions do not authorise executable changes.",
+    "Discovery can fail on API/resource unavailability, image drift or an incompatible runtime. Retain its first failure; do not substitute a host, install a runtime or mutate display/appearance to obtain a pass.",
+    "An ELIGIBLE geometry field is a narrow 96-DPI diagnostic inference, not campaign eligibility, actual WPF measurement, foreground/input viability, compositor evidence or a product support limit.",
+    "Active theme identity and selected Win32 colour readings are additional bounded evidence. Stable reads do not prove complete visual state restoration, and NULL/empty setter semantics remain unvalidated.",
+    "Actual discovery artefacts, process identity and source/binary hashes still require independent final review. No new R01/R02 authority follows from a successful discovery job.",
+    "A future live appearance/display experiment and later gate integration require separately reviewed scope, evidence and explicit owner authority. The original failed R01, historical High Contrast failure and 250 ms policy remain unchanged."
+  ],
+  "primaryReferences": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-highcontrastw",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdpiforsystem"
+  ]
+}

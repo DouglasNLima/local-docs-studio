@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS_DELIVERY_CHECKS_ONLY_NATIVE_RESULT_FAIL",
+  "executionCommit": "d4261e58b55d6755feddf179ea9e922a687e3e9f",
+  "executionTree": "2768237f85171258cded141101a1213d3c9bd1c6",
+  "sourceCommit": "331dc5ab220e5ca7dd145ff21a650d3d2578111f",
+  "sourceTree": "776ef245307e9e969e19352597662de46bd35907",
+  "authorityCommentId": 6726673440,
+  "authorityBodySha256": "5550d95aafd502981f91a439447e689e61827bf31350341d2285c5b3a13e7e59",
+  "nativeControl": "FAIL",
+  "supervisorReadiness": "BLOCKED",
+  "authorisationSpent": true,
+  "retries": 0,
+  "rawArchiveSha256": "c0157c0a66e11baf8b10eb5ecf545456fa4278c30b2f8c5d7bc63d1c08d0f2f9",
+  "rawArchiveMembers": 26,
+  "independentReviewSha256": "99b16ce5abf16ef11c1898afeb1f1452991773be7ca2025c254f5ab4224c41c6",
+  "independentAuditSha256": "0d0fd960f85a99d06a205ee8f589baef2b49b1bc3bc34fb9b25b7336585a64ca",
+  "byteAndQueryChecks": "See capture/audit-result.json and independent/audit.json in the raw ZIP",
+  "checks": {
+    "static": {
+      "name": "static",
+      "command": "node tests/static/check-assets.mjs",
+      "chunk_id": "d89f44",
+      "wall_time_seconds": 2.8580408999999998,
+      "exit_code": 0,
+      "original_token_count": 63,
+      "output": "Service worker installation checks passed for 212 attempted assets with 6 concurrent cache fetches, including an optional failure.\nStatic checks passed for 50 module files, 61 shell assets, 151 vendor assets, and 59 runtime external-dependency scans.\n"
+    },
+    "governanceBeforeReviewFile": {
+      "name": "governance",
+      "command": "& 'C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe' scripts/compliance/check_governance.py",
+      "chunk_id": "099898",
+      "wall_time_seconds": 0.5022916,
+      "exit_code": 1,
+      "original_token_count": 219,
+      "output": "Traceback (most recent call last):\r\n  File \"C:\\Code\\MarkdownReader-native-ux-contract\\scripts\\compliance\\check_governance.py\", line 135, in <module>\r\n    main()\r\n  File \"C:\\Code\\MarkdownReader-native-ux-contract\\scripts\\compliance\\check_governance.py\", line 123, in main\r\n    check_licence()\r\n  File \"C:\\Code\\MarkdownReader-native-ux-contract\\scripts\\compliance\\licence_scope.py\", line 133, in main\r\n    granted = validate_scope(scope, paths)\r\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Code\\MarkdownReader-native-ux-contract\\scripts\\compliance\\licence_scope.py\", line 30, in validate_scope\r\n    require(granted == sorted(set(granted)) and set(granted) <= paths,\r\n  File \"C:\\Code\\MarkdownReader-native-ux-contract\\scripts\\compliance\\licence_scope.py\", line 17, in require\r\n    raise ValueError(message)\r\nValueError: Grant paths must be unique, sorted and present\r\n"
+    },
+    "governanceFinal": {
+      "chunk_id": "f62188",
+      "wall_time_seconds": 1.8097678,
+      "exit_code": 0,
+      "original_token_count": 82,
+      "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1165, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n"
+    },
+    "packageProvenanceAndDocumentation": {
+      "command": "@'\nimport hashlib,json,re,subprocess,zipfile\nfrom pathlib import Path\nroot=Path.cwd()\np=root/'docs/native/evidence/job-supervisor-authorised-control'\nsha=lambda data:hashlib.sha256(data).hexdigest()\nm=json.loads((p/'member-sha256.json').read_text(encoding='utf-8'))\nassert sha((p/m['archive']).read_bytes())==m['archiveSha256']=='c0157c0a66e11baf8b10eb5ecf545456fa4278c30b2f8c5d7bc63d1c08d0f2f9'\nlocations={'attempt':root/'artifacts/goal77-job-control-d4261e58b55d6755feddf179ea9e922a687e3e9f','capture':root/'artifacts/goal77-job-authorised-execution','independent':root/'artifacts/goal77-job-authorised-independent'}\nwith zipfile.ZipFile(p/m['archive']) as z:\n assert z.testzip() is None and len(z.namelist())==len(set(z.namelist()))==len(m['members'])==26\n for n,v in m['members'].items():\n  data=z.read(n);prefix,name=n.split('/',1)\n  assert len(data)==v['bytes'] and sha(data)==v['sha256'] and data==(locations[prefix]/name).read_bytes()\n assert z.read('independent/review.md')==(root/'docs/native/qualification/job-supervisor-control-review.md').read_bytes()\nfor name,digest in json.loads((p/'files.json').read_text(encoding='utf-8')).items():assert sha((p/name).read_bytes())==digest\npaths=['docs/native/qualification/job-supervisor-control-result.md','docs/native/qualification/job-supervisor-control-review.md','docs/native/evidence/job-supervisor-authorised-control/README.md']\nlinks=0\nfor name in paths:\n doc=root/name\n prose=re.sub(r'`[^`\\n]*`','',doc.read_text(encoding='utf-8'))\n for target in re.findall(r'\\]\\(([^)]+)\\)',prose):\n  if re.match(r'^[a-z]+:',target) or target.startswith('#'):continue\n  assert (doc.parent/target.split('#',1)[0]).exists(),(name,target)\n  links+=1\nchanged=subprocess.check_output(['git','diff','--name-only','d4261e58b55d6755feddf179ea9e922a687e3e9f','--','assets','src','scripts','tests','.github','docs/adr','docs/native/evidence','docs/native/qualification/job-supervisor-control.json']).decode().splitlines()\nassert all(n.startswith('docs/native/evidence/job-supervisor-authorised-control/') for n in changed),changed\nr=json.loads((root/'docs/native/qualification/goal77-infrastructure-readiness.json').read_text(encoding='utf-8'))\nassert r['status']=='NOT_AUTHORISED' and r['campaignExecutionApproved'] is False and r['executionReadiness']=='BLOCKED'\nassert r['authorisedLocalJobControl']['status']=='AUTHORISATION_SPENT_RESULT_FAIL' and r['pr76Integration']=='NO-GO'\nprint(json.dumps(dict(status='PASS_PACKAGE_PROVENANCE_AND_DOCUMENTATION_ONLY',nativeControl='FAIL',archiveMembers=26,localLinks=links,independentReviewCopy='EXACT_BYTES',historicalEvidenceAndImplementation='UNCHANGED',campaignExecutionApproved=False)))\n'@ | & 'C:\\Users\\dougl\\AppData\\Local\\Programs\\Python\\Python312\\python.exe' -I -S -",
+      "chunk_id": "8c8117",
+      "wall_time_seconds": 0.2885166,
+      "exit_code": 0,
+      "original_token_count": 64,
+      "output": "{\"status\": \"PASS_PACKAGE_PROVENANCE_AND_DOCUMENTATION_ONLY\", \"nativeControl\": \"FAIL\", \"archiveMembers\": 26, \"localLinks\": 13, \"independentReviewCopy\": \"EXACT_BYTES\", \"historicalEvidenceAndImplementation\": \"UNCHANGED\", \"campaignExecutionApproved\": false}\r\n"
+    }
+  },
+  "historicalEvidence": "UNCHANGED",
+  "skipped": {
+    "nativeUnitSuite": "No source changes; no new unit coverage required for evidence/docs",
+    "nativeControlRetry": "PROHIBITED_AND_NOT_EXECUTED",
+    "browserSuite": "No product or UI changes",
+    "hostedWorkflows": "NOT_EXECUTED"
+  },
+  "finalSealedTreeProvenance": "Receipt recorded in Goal #77 after the final Git tree exists"
+}

@@ -1,0 +1,332 @@
+name: Native UX performance evidence (proposed policy)
+on:
+  pull_request:
+    branches: [develop]
+    paths: ['src/native/LensDocsStudio.Native.UxProbe/**', 'scripts/native/ux/**', 'scripts/native/Measure-NativeUx.ps1', 'tests/fixtures/native-ux/**', 'tests/unit/native-ux-report.test.mjs', '.github/workflows/native-ux-performance.yml', 'docs/adr/**', 'docs/native/native-ux-performance-contract.md']
+  workflow_dispatch:
+    inputs:
+      highcontrast_verification_only:
+        description: 'One separately authorised corrected HIGHCONTRAST process; no qualification'
+        type: boolean
+        default: false
+      expected_verification_sha:
+        description: 'Exact final execution commit approved by the owner'
+        type: string
+      authorisation_comment_id:
+        description: 'New unedited owner issue77 comment ID; no previous authority is valid'
+        type: string
+      authorisation_body_sha256:
+        description: 'SHA-256 of the exact owner JSON comment body'
+        type: string
+      infrastructure_discovery_only:
+        description: 'Read-only Win32 geometry/appearance discovery; no qualification or desktop changes'
+        type: boolean
+        default: false
+      expected_infrastructure_sha:
+        description: 'Exact reviewed source for read-only infrastructure discovery'
+        type: string
+      bounded_protocol:
+        description: 'Owner-authorised stage only; R02 remains blocked pending independent R01 review'
+        type: choice
+        options: [none, R01]
+        default: none
+      expected_wrapper_sha:
+        description: 'Exact reviewed coordinator commit (required for a bounded stage)'
+        type: string
+      environment_lock_only:
+        description: 'Discovery/build only; exclude every foreground qualification job'
+        type: boolean
+        default: false
+      expected_tooling_sha:
+        description: 'Exact reviewed commit for discovery (required when environment_lock_only=true)'
+        type: string
+      iterations:
+        description: 'Actual interaction cycles per fresh process; 1–100, no discarded warm-up'
+        default: '21'
+      processes:
+        description: 'Fresh processes per workload/product; 1–300'
+        default: '3'
+permissions:
+  contents: read
+jobs:
+  observer-smoke:
+    if: ${{ inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    name: Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: [develop, historical]
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check LF and CRLF journeys before scheduling the comparison matrix
+        shell: pwsh
+        run: |
+          $baseline = if ('${{ matrix.baseline }}' -eq 'develop') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Fixtures 'small,technical' -Processes 1 -Iterations 1
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-observer-${{ matrix.baseline }}-${{ matrix.appearance }}
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+          retention-days: 30
+  contract-controls:
+    if: ${{ inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/unit/native-ux-report.test.mjs
+  calibration:
+    needs: [contract-controls, observer-smoke]
+    # Retain a failed observer job and still gather independent cells. Neither
+    # those cells nor the overall workflow can clear an observer failure.
+    if: ${{ !cancelled() && needs.contract-controls.result == 'success' && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true && inputs.environment_lock_only != true && (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') }}
+    name: UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: [develop, historical]
+        appearance: [normal, high-contrast]
+        order: [baseline-first, candidate-first]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Measure exact products with one probe binary and real Windows input
+        shell: pwsh
+        run: |
+          $baseline = if ('${{ matrix.baseline }}' -eq 'develop') { '99349d82eb06960eb1f9785cf384db2373aed4fa' } else { '0237b08390d5d1d946c0b19b81d671ccd54fb951' }
+          $iterations = if ('${{ inputs.iterations }}') { [int]'${{ inputs.iterations }}' } else { 3 }
+          $processes = if ('${{ inputs.processes }}') { [int]'${{ inputs.processes }}' } else { 2 }
+          & scripts/native/Measure-NativeUx.ps1 -BaselineRevision $baseline -Appearance '${{ matrix.appearance }}' -Order '${{ matrix.order }}' -Iterations $iterations -Processes $processes
+          exit $LASTEXITCODE
+      - name: Publish the source-labelled evidence summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/native-ux/report.md) { Get-Content artifacts/native-ux/report.md | Add-Content $env:GITHUB_STEP_SUMMARY }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-${{ matrix.baseline }}-${{ matrix.appearance }}-${{ matrix.order }}
+          path: |
+            artifacts/native-ux/protocol.json
+            artifacts/native-ux/processes.json
+            artifacts/native-ux/report*
+            artifacts/native-ux/samples/
+          retention-days: 30
+  environment-lock:
+    name: Hosted environment discovery only (no qualification)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.environment_lock_only == true && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true &&
+          (inputs.bounded_protocol == '' || inputs.bounded_protocol == 'none') &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      GOAL77_DISCOVERY_ONLY: 'true'
+      EXPECTED_TOOLING_SHA: ${{ inputs.expected_tooling_sha }}
+    steps:
+      - name: Check out exact dispatched source without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify source and collect console-only runtime/build identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:EXPECTED_TOOLING_SHA -notmatch '^[0-9a-f]{40}$' -or (git rev-parse HEAD) -ne $env:EXPECTED_TOOLING_SHA -or $env:GITHUB_SHA -ne $env:EXPECTED_TOOLING_SHA) {
+            throw 'Exact reviewed/dispatched source differs; discovery blocked.'
+          }
+          python scripts/native/qualification/discover_hosted.py --output artifacts/qualification-environment
+          exit $LASTEXITCODE
+      - name: Retain discovery evidence and complete reusable runtime/binary closures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-environment-${{ github.sha }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 30
+          path: |
+            artifacts/qualification-environment/
+            !artifacts/qualification-environment/downloads/
+            !artifacts/qualification-environment/worktrees/
+            !artifacts/qualification-environment/**/obj/
+            !artifacts/qualification-environment/build/product-*/**/bin/
+
+  bounded-qualification:
+    name: Owner-authorised bounded R01 (R02 independently gated)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.bounded_protocol == 'R01' && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only != true &&
+          inputs.environment_lock_only != true && github.run_attempt == 1 &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    concurrency:
+      group: goal77-authorised-bounded-qualification
+      cancel-in-progress: false
+    env:
+      EXPECTED_WRAPPER_SHA: ${{ inputs.expected_wrapper_sha }}
+      BOUNDED_PROTOCOL: ${{ inputs.bounded_protocol }}
+    steps:
+      - name: Check out the exact coordinator without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify owner authority and restore the exact sealed artefact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Copy-Item -LiteralPath scripts/native/qualification_hosted/execute_locked.py -Destination "$env:RUNNER_TEMP/goal77-execute-locked.py"
+          python "$env:RUNNER_TEMP/goal77-execute-locked.py" prepare --protocol $env:BOUNDED_PROTOCOL
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git checkout --detach 77664fbeed39162e17c6d0d2ff24a65f8a7f9d13
+          exit $LASTEXITCODE
+      - name: Revalidate every identity then execute R01 once
+        shell: pwsh
+        run: |
+          python "$env:RUNNER_TEMP/goal77-execute-locked.py" execute --protocol $env:BOUNDED_PROTOCOL
+          exit $LASTEXITCODE
+      - name: Preserve every failed or incomplete observation
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-bounded-R01-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/goal77-bounded-R01/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+
+  highcontrast-verification:
+    name: One corrected HIGHCONTRAST process (separate owner authority)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.highcontrast_verification_only == true &&
+          inputs.infrastructure_discovery_only == false && inputs.environment_lock_only == false &&
+          inputs.bounded_protocol == 'none' && github.run_attempt == 1 &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      issues: read
+    concurrency:
+      group: goal77-single-highcontrast-verification
+      cancel-in-progress: false
+    env:
+      GOAL77_HIGHCONTRAST_VERIFICATION: 'true'
+      EXPECTED_VERIFICATION_SHA: ${{ inputs.expected_verification_sha }}
+      AUTHORISATION_COMMENT_ID: ${{ inputs.authorisation_comment_id }}
+      AUTHORISATION_BODY_SHA256: ${{ inputs.authorisation_body_sha256 }}
+    steps:
+      - name: Check out the exact execution commit without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        env:
+          GIT_CONFIG_COUNT: '1'
+          GIT_CONFIG_KEY_0: core.autocrlf
+          GIT_CONFIG_VALUE_0: 'false'
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate independent authority and run the sealed collector once
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -I scripts/native/qualification_hosted/live_verification.py execute
+          exit $LASTEXITCODE
+      - name: Preserve complete and failed native observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-highcontrast-live-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/goal77-highcontrast-live/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+
+  infrastructure-discovery:
+    name: Read-only geometry and appearance discovery (no qualification)
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.highcontrast_verification_only != true && inputs.infrastructure_discovery_only == true &&
+          inputs.environment_lock_only != true && inputs.bounded_protocol == 'none' && github.run_attempt == 1 &&
+          github.repository == 'DouglasNLima/local-docs-studio' &&
+          github.ref == 'refs/heads/feature/native-ux-performance-contract' &&
+          github.actor == 'DouglasNLima' && github.triggering_actor == 'DouglasNLima' }}
+    runs-on: windows-2025
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GOAL77_READ_ONLY_DISCOVERY: 'true'
+      EXPECTED_INFRASTRUCTURE_SHA: ${{ inputs.expected_infrastructure_sha }}
+    steps:
+      - name: Check out exact read-only discovery source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Collect Win32 desktop facts without windows, input or setters
+        shell: pwsh
+        run: |
+          python scripts/native/qualification_hosted/discover_desktop.py --output artifacts/goal77-infrastructure
+          exit $LASTEXITCODE
+      - name: Retain discovery and separate eligibility verdict
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: goal77-infrastructure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/goal77-infrastructure/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30

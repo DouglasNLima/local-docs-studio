@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "status": "TOOLING_OFFLINE_VALIDATED_CAMPAIGN_NOT_RUN",
+  "testedImplementation": {
+    "commit": "87b60456970f1414a68a1c0950d051a9fa0daedd",
+    "tree": "4e4c5e990ca8e1fb67ff89b7797b3a1b13276173",
+    "sourcePreparationTrackedWorktreeClean": true
+  },
+  "deliveryCommit": "Containing Git commit; final commit/tree recorded in PR #78 and Goal #77 delivery comments, not self-referentially embedded",
+  "sourcePins": {
+    "start": {
+      "commit": "45eccf7b3bd4c266b3a3223cbfe007248f03f39d",
+      "tree": "2955061c992c96523cff1f9d42ef999b2f9bd747"
+    },
+    "candidate": {
+      "commit": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "tree": "887856d293114442e97e0d06bef2928b340b639a"
+    },
+    "develop": {
+      "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "tree": "e4d137a12cbdd827583fcb841612890dd88736ec"
+    },
+    "correction": {
+      "commit": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+      "tree": "89e012f468801ac7f445113b811ca2fbe041c8d9"
+    }
+  },
+  "sourcePreparation": {
+    "generatedInputsVerified": 874,
+    "originalSourceFiles": 12,
+    "toolSourceFiles": 10
+  },
+  "environment": {
+    "python": "3.12.0",
+    "node": "24.22.1",
+    "dotnetSdk": "10.0.401",
+    "localNetCoreAndWindowsDesktopRuntime": "10.0.12",
+    "localRuntimeUse": "Pure metadata/contrast self-test only, not qualification; diagnostic 10.0.13 and 10.0.14 unavailable locally"
+  },
+  "checks": {
+    "offlineControls": {
+      "status": "PASS",
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 17.67
+    },
+    "existingAuditorTests": {
+      "status": "PASS",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "build": {
+      "status": "PASS",
+      "productBuilds": 2,
+      "harnessBuilds": 3,
+      "warnings": 0,
+      "errors": 0
+    },
+    "compiledProductAndHarnessIdentity": "PASS",
+    "sourceAndCompleteBundleHashes": "PASS",
+    "independentReview": "No outstanding focused findings; see independent-review.md"
+  },
+  "bundles": {
+    "r01": {
+      "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "files": 52,
+      "metadata": {
+        "product": {
+          "sha256": "E9ADDF0E192444CD92295ED793AB5692019CC26F728BCCBC6AD676E5D0BA6DEB",
+          "name": "LensDocsStudio.Native",
+          "version": "0.1.0-preview.1+7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+          "fileVersion": "0.1.0.0"
+        },
+        "core": {
+          "sha256": "51316ED1EB576109931760D6EAA1086B003410715C12C3AE07B9A49561438A77",
+          "name": "LensDocsStudio.Core",
+          "version": "0.1.0-preview.1+7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+          "fileVersion": "0.1.0.0"
+        },
+        "harness": {
+          "sha256": "6D052F60A34945E7944BA068D86A3487FC483E3B50BC4C25452D45478EE9D256",
+          "name": "LensDocsStudio.Native.UxProbe",
+          "version": "0.1.0-preview.1+87b60456970f1414a68a1c0950d051a9fa0daedd",
+          "fileVersion": "0.1.0.0"
+        }
+      }
+    },
+    "r02-baseline": {
+      "productRevision": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "files": 52,
+      "metadata": {
+        "status": "OFFLINE_PASS",
+        "ratio": 2.542596386238992,
+        "historicalAcceptance": "FAIL",
+        "requirement": 4.5,
+        "appearanceChanges": 0,
+        "windows": 0,
+        "foregroundInput": 0,
+        "product": {
+          "name": "LensDocsStudio.Native",
+          "sha256": "D660531D9863EB6C60DE0A912207A7E5F3718625CAA8CE292245AF988BAD2D44",
+          "version": "0.1.0-preview.1+99349d82eb06960eb1f9785cf384db2373aed4fa",
+          "fileVersion": "0.1.0.0"
+        },
+        "core": {
+          "name": "LensDocsStudio.Core",
+          "sha256": "9909D65D11FA1373DCF91A4E193FD6465D8D7BFCE0C9D9F16B4E5CC44F0A77DC",
+          "version": "0.1.0-preview.1+99349d82eb06960eb1f9785cf384db2373aed4fa",
+          "fileVersion": "0.1.0.0"
+        },
+        "harness": {
+          "name": "LensDocsStudio.Native.Qualification",
+          "sha256": "BCFD09E8A8AA223FCCFA31994939816EB11A3666A76AF236DD17C0991241CDD2",
+          "version": "0.1.0-preview.1+87b60456970f1414a68a1c0950d051a9fa0daedd",
+          "fileVersion": "0.1.0.0"
+        }
+      }
+    },
+    "r02-candidate": {
+      "productRevision": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "files": 52,
+      "metadata": {
+        "status": "OFFLINE_PASS",
+        "ratio": 2.542596386238992,
+        "historicalAcceptance": "FAIL",
+        "requirement": 4.5,
+        "appearanceChanges": 0,
+        "windows": 0,
+        "foregroundInput": 0,
+        "product": {
+          "name": "LensDocsStudio.Native",
+          "sha256": "E9ADDF0E192444CD92295ED793AB5692019CC26F728BCCBC6AD676E5D0BA6DEB",
+          "version": "0.1.0-preview.1+7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+          "fileVersion": "0.1.0.0"
+        },
+        "core": {
+          "name": "LensDocsStudio.Core",
+          "sha256": "51316ED1EB576109931760D6EAA1086B003410715C12C3AE07B9A49561438A77",
+          "version": "0.1.0-preview.1+7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+          "fileVersion": "0.1.0.0"
+        },
+        "harness": {
+          "name": "LensDocsStudio.Native.Qualification",
+          "sha256": "295F64AFF58D0FA58BAF699BE59C79CAF4A9F703A108E8E6773BC9ADD51F3BC0",
+          "version": "0.1.0-preview.1+87b60456970f1414a68a1c0950d051a9fa0daedd",
+          "fileVersion": "0.1.0.0"
+        }
+      }
+    }
+  },
+  "retainedArtefacts": {
+    "source-receipt.json": {
+      "sha256CanonicalLf": "38bb9bbe54e92db8fec759eae57de53451ee99a008943ef7a53b0e29ba2c78d9",
+      "originalLocalSha256": "38bb9bbe54e92db8fec759eae57de53451ee99a008943ef7a53b0e29ba2c78d9",
+      "lineEndingsNormalised": false
+    },
+    "r01-bundle-receipt.json": {
+      "sha256CanonicalLf": "b7e1bd2cd1d522b2a22be007e3d41daad573155767f1ef80c846adae9be170c3",
+      "originalLocalSha256": "b7e1bd2cd1d522b2a22be007e3d41daad573155767f1ef80c846adae9be170c3",
+      "lineEndingsNormalised": false
+    },
+    "r02-baseline-bundle-receipt.json": {
+      "sha256CanonicalLf": "db7796f73adef2e761fe23b0cf7e06f894eea1e0372edcc86947ad7741a3bb77",
+      "originalLocalSha256": "db7796f73adef2e761fe23b0cf7e06f894eea1e0372edcc86947ad7741a3bb77",
+      "lineEndingsNormalised": false
+    },
+    "r02-candidate-bundle-receipt.json": {
+      "sha256CanonicalLf": "8c45ca41261f8e1f5c2448bcba0627fe84e22b5a91b2e0b0358580c2db604ab4",
+      "originalLocalSha256": "8c45ca41261f8e1f5c2448bcba0627fe84e22b5a91b2e0b0358580c2db604ab4",
+      "lineEndingsNormalised": false
+    },
+    "build-output.txt": {
+      "sha256CanonicalLf": "bec0603137ca16b839abeca31b33c877eee158d970fb5095c32b34e4d32daf88",
+      "originalLocalSha256": "ff8b95d2c99568ee30030a6a0f77f739d5f52cee07fe18963c6c2ff2bb3ebbff",
+      "lineEndingsNormalised": true
+    },
+    "offline-controls-output.txt": {
+      "sha256CanonicalLf": "9b28285a77d472d0638ad6fb824c9ba8a5765fbb04539807b0d6ca20b32115c4",
+      "originalLocalSha256": "b2f16bb0ca819f9a1b2af5c440139fdaf2b2855e12789f8eb72d696f32186632",
+      "lineEndingsNormalised": true
+    },
+    "existing-auditor-output.txt": {
+      "sha256CanonicalLf": "47cb195454491104a965e122fe54480f294ed348c104eba06d990f55c36fa26f",
+      "originalLocalSha256": "a307832d7943c79f4331b52534c86d84c6b6c5ec2dcd2c6720d8a8557e77663b",
+      "lineEndingsNormalised": true
+    },
+    "r01-overlay.diff.json": {
+      "sha256CanonicalLf": "2fa2f0688b8e99567bb7279257a292da88bff331e1b2a125154a6ddee85759fa",
+      "originalLocalSha256": "4e55d047636cde42c175a4a5e49c9e825d44236a7cc31c023d251001e5d6e61b",
+      "lineEndingsNormalised": false,
+      "encoding": "Lossless JSON escaped lines; original diff hash verified after reconstruction"
+    }
+  },
+  "notRun": [
+    "R01 foreground collection",
+    "R02 preflight/application/stock collection",
+    "Physical desktop input or appearance changes",
+    "Actual HC restoration/notification qualification",
+    "Runtime 10.0.13 or 10.0.14 execution",
+    "56-process calibration pilot",
+    "Full Web/Native browser or hosted CI",
+    "Signing, release, distribution and deployment"
+  ],
+  "campaignReadiness": {
+    "status": "BLOCKED",
+    "prerequisites": [
+      "Exact hosted image/OS build and runtime file identities for both diagnostic versions",
+      "Clean execution-source and complete binary receipts bound to the selected configuration",
+      "Separate explicit owner execution authorisation tied to that configuration"
+    ],
+    "toolingReviewOutstanding": false,
+    "liveBehaviourCertified": false
+  },
+  "policy": {
+    "operationalTransition": "NOT_ACTIVATED",
+    "historicalFailuresReclassified": false,
+    "continuousMilliseconds": 250,
+    "contrastMinimum": 4.5,
+    "historicalContrast": 2.542596386238992,
+    "pr76Integration": "NO-GO",
+    "allThreePullRequests": "Draft"
+  },
+  "earlierDevelopmentCheckpoints": [
+    {
+      "observation": "Prototype compiled product carried the tooling revision",
+      "classification": "INVALID prototype provenance, retained locally",
+      "resolution": "Build immutable products with their own source revisions separately; final compiled metadata and closure hashes verified"
+    },
+    {
+      "observation": "Invalid cleanup could leave correctness PASS; missing result could become fabricated FAIL",
+      "classification": "Offline auditor defects, not product observations",
+      "resolution": "Negative controls now enforce INVALID/INCONCLUSIVE unless a retained original assertion proves FAIL"
+    },
+    {
+      "observation": "First real console-child test could not delete its temporary stderr file (WinError 32)",
+      "classification": "Test cleanup observation; file-lock cause not established",
+      "resolution": "Retain bounded console logs; verify zero active job processes independently; do not infer product/HC safety"
+    }
+  ]
+}

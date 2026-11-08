@@ -1,0 +1,21 @@
+{
+  "sourceCommit": "a0e6fd05a930fbb1d483a9929bf2969277f0bdc6",
+  "sourceTree": "5596e55012022921c9435306ad1bdaba510a678b",
+  "sources": {
+    "DesktopProbe.csproj": "d42185eaaa71d60625992574d633fa15c4212ac1579c03be781ad44c0dc9cf4a",
+    "desktop.manifest": "70445c11db7fda1faf56c8e04ca557fa4744b85d4538de957f292dfdc581e8a2",
+    "Program.cs": "7cceba4a7765d7b24446d0fb9c4b1999e2e4a29835ea11e6efcd1ab0a994d710"
+  },
+  "binaryFiles": {
+    "DesktopProbe.deps.json": "9c2ef70d198253d937b961960c4de53cce477bb9e09a5990575207fd5e8aaff2",
+    "DesktopProbe.dll": "f928d2595b7aa1340d89bd8151c0edb025dc9c505c005717e1ebf82be53db016",
+    "DesktopProbe.exe": "bca9b36794fa73a1a2bc41ac3ead7e2393bf9e75cd1e619d12117aa2008973a0",
+    "DesktopProbe.pdb": "4d35bc4b042449af8ed036571cb7075110a83b4fa550f5121206e996e86ff676",
+    "DesktopProbe.runtimeconfig.json": "13a73aba9a05d93aab51d1edee476df13d89bf8705f28bc69bea1b31b816efd9"
+  },
+  "sdk": "10.0.403",
+  "implementation": {
+    "discover_desktop.py": "3650590dc3172000c40ec1374b1f0caa740b94639057157cf1292a202e2e88c0",
+    "eligibility.py": "49f687f41c9b61d5690bdb3b4f74b55a39cd7cd3e1716bc0e434a0d1db7f685f"
+  }
+}

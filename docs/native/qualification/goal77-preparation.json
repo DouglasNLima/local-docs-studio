@@ -1,0 +1,467 @@
+{
+  "schemaVersion": 1,
+  "status": "PREPARED_NOT_EXECUTED",
+  "goal": 77,
+  "draftPr": 78,
+  "ownerDecision": {
+    "url": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6714211040",
+    "reviewedCommit": "bc092512c30e152cd1e4384c1eab4f8ba30e059f",
+    "reviewedTree": "90f2dc1480a5eaed7b6628d4a41d6cce9e2265aa",
+    "approvedDesignDecisions": [
+      "D01",
+      "D02",
+      "D03",
+      "D04",
+      "D05",
+      "D06",
+      "D07",
+      "D08",
+      "D09",
+      "D10",
+      "D11",
+      "D12",
+      "D13"
+    ],
+    "operationalTransitionApproved": false
+  },
+  "sourcePins": {
+    "develop": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+    "candidatePr76": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "correctionPr80": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+    "existingObserverReference": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "newNarrowWrapperCommit": null
+  },
+  "unapproved": {
+    "performanceBudgets": null,
+    "regressionMargins": null,
+    "certifiedEnvelope": null,
+    "gateRetirement": false,
+    "requiredCheckChanges": false,
+    "riskWaivers": false,
+    "pr76Integration": false,
+    "releaseSigningDistribution": false
+  },
+  "r01": {
+    "cells": [
+      {
+        "id": "V1",
+        "appearance": "normal",
+        "trace": false,
+        "product": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+        "scenario": "pixels",
+        "mode": "Pages",
+        "applicationZoomPercent": 100,
+        "processes": 1,
+        "iterations": 1,
+        "environment": {
+          "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_STARTUP_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "0",
+          "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+          "LENS_NATIVE_COMPLETION_READER": "primary",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPLETION_TRACE": "0",
+          "LENS_NATIVE_COMPOSITION_TRACE": "0"
+        }
+      },
+      {
+        "id": "V2",
+        "appearance": "normal",
+        "trace": true,
+        "product": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+        "scenario": "pixels",
+        "mode": "Pages",
+        "applicationZoomPercent": 100,
+        "processes": 1,
+        "iterations": 1,
+        "environment": {
+          "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_STARTUP_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "0",
+          "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+          "LENS_NATIVE_COMPLETION_READER": "primary",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPLETION_TRACE": "1",
+          "LENS_NATIVE_COMPOSITION_TRACE": "1"
+        }
+      },
+      {
+        "id": "V3",
+        "appearance": "high-contrast",
+        "trace": false,
+        "product": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+        "scenario": "pixels",
+        "mode": "Pages",
+        "applicationZoomPercent": 100,
+        "processes": 1,
+        "iterations": 1,
+        "environment": {
+          "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_STARTUP_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "0",
+          "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+          "LENS_NATIVE_COMPLETION_READER": "primary",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPLETION_TRACE": "0",
+          "LENS_NATIVE_COMPOSITION_TRACE": "0"
+        }
+      },
+      {
+        "id": "V4",
+        "appearance": "high-contrast",
+        "trace": true,
+        "product": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+        "scenario": "pixels",
+        "mode": "Pages",
+        "applicationZoomPercent": 100,
+        "processes": 1,
+        "iterations": 1,
+        "environment": {
+          "LENS_NATIVE_COMPLETION_JOURNEY": "1",
+          "LENS_NATIVE_TRANSITION_TRACE": "0",
+          "LENS_NATIVE_STARTUP_TRACE": "0",
+          "LENS_NATIVE_COMPARISON_JOURNEY": "0",
+          "LENS_NATIVE_COMPLETION_SCENARIO": "pixels",
+          "LENS_NATIVE_COMPLETION_READER": "primary",
+          "LENS_NATIVE_COMPARISON_MODE": "Pages",
+          "LENS_NATIVE_COMPLETION_TRACE": "1",
+          "LENS_NATIVE_COMPOSITION_TRACE": "1"
+        }
+      }
+    ],
+    "fixedBoundaries": [
+      "primary-find",
+      "primary-find-all-readers",
+      "secondary-find",
+      "secondary-find-all-readers",
+      "returned-primary",
+      "rapid-switch",
+      "closed-comparison"
+    ],
+    "framesPerBoundary": 3,
+    "maximumProcesses": 4,
+    "maximumFullFrames": 84,
+    "maximumLabelCrops": 252,
+    "viewportDips": [
+      1280,
+      800
+    ],
+    "runtimeReference": "10.0.14",
+    "osImage": null,
+    "runtimeExecutableSha256": null,
+    "observationSeconds": 30,
+    "childSeconds": 240,
+    "observedPrivateBytes": 2147483648,
+    "childLogBytes": 16777216,
+    "requiresObserverNegativeControlReview": true,
+    "latencyAcceptance": "NOT_QUALIFIED"
+  },
+  "r02": {
+    "cells": [
+      {
+        "id": "C1",
+        "runtime": "10.0.13",
+        "order": "baseline-first",
+        "products": [
+          "99349d82eb06960eb1f9785cf384db2373aed4fa",
+          "7b1334b09a02ad2fbfd4a0234798e6c387d3e634"
+        ],
+        "preflightProcesses": 2,
+        "applicationProcesses": 2
+      },
+      {
+        "id": "C2",
+        "runtime": "10.0.13",
+        "order": "candidate-first",
+        "products": [
+          "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+          "99349d82eb06960eb1f9785cf384db2373aed4fa"
+        ],
+        "preflightProcesses": 2,
+        "applicationProcesses": 2
+      },
+      {
+        "id": "C3",
+        "runtime": "10.0.14",
+        "order": "baseline-first",
+        "products": [
+          "99349d82eb06960eb1f9785cf384db2373aed4fa",
+          "7b1334b09a02ad2fbfd4a0234798e6c387d3e634"
+        ],
+        "preflightProcesses": 2,
+        "applicationProcesses": 2
+      },
+      {
+        "id": "C4",
+        "runtime": "10.0.14",
+        "order": "candidate-first",
+        "products": [
+          "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+          "99349d82eb06960eb1f9785cf384db2373aed4fa"
+        ],
+        "preflightProcesses": 2,
+        "applicationProcesses": 2
+      }
+    ],
+    "stockWpfControls": [
+      {
+        "runtime": "10.0.13",
+        "processes": 1
+      },
+      {
+        "runtime": "10.0.14",
+        "processes": 1
+      }
+    ],
+    "maximumPreflightProcesses": 8,
+    "maximumApplicationProcesses": 8,
+    "maximumStockProcesses": 2,
+    "viewportDips": [
+      1280,
+      800
+    ],
+    "osImage": null,
+    "runtimeExecutableHashes": {
+      "10.0.13": null,
+      "10.0.14": null
+    },
+    "originalContrastRequirement": 4.5,
+    "retainedFailureApproximateRatio": 2.542596,
+    "mainWindowAndDefaultUiWaitSeconds": 20,
+    "outerSupervisorSeconds": 240,
+    "preflightOrder": "Original validation process enables HC, evaluates theme resources, records and applies unchanged assertion before product launch",
+    "applicationOrder": "Independent HC-active launch; pointer press/cancel; one HC-normal-HC transition; restore initial OS state",
+    "controlAutomationName": "New document (Ctrl+N)",
+    "controlType": "Button",
+    "style": "Desktop.CommandButton",
+    "preflightFailureRemainsFailure": true
+  },
+  "retainedRiskControls": {
+    "R03": "OPEN; existing controls and bounded escalation retained; no new campaign in this preparation",
+    "R04": "OPEN; existing controls and bounded escalation retained; no new campaign in this preparation",
+    "R05": "OPEN; existing controls and bounded escalation retained; no new campaign in this preparation",
+    "R06": "OPEN; existing controls and bounded escalation retained; no new campaign in this preparation"
+  },
+  "corpus": {
+    "fixtureManifestSource": "bc092512c30e152cd1e4384c1eab4f8ba30e059f",
+    "fixtureManifestPath": "tests/fixtures/native-ux/manifest.json",
+    "fixtureManifestSha256": "dc6d55ec039c788ec74d84690abe12f87c33ac8f9e42e04c0564c54ba2580187",
+    "assetSha256": "a38a4ff7320a3d8764ac959b264f15e335360d7c1e23a0627dee7f366c95c58f",
+    "syntheticAnchors": [
+      {
+        "id": "small",
+        "category": "Small prose",
+        "file": "small.md",
+        "sha256": "4f9fae8673044bddb6c0890338f261a112540f53a2dab139b28633a4b0badaf7",
+        "bytes": 634,
+        "lineEnding": "LF",
+        "listItems": 0,
+        "tableRows": 0,
+        "diagrams": 0,
+        "images": 0
+      },
+      {
+        "id": "technical",
+        "category": "Typical technical documentation",
+        "file": "technical.md",
+        "sha256": "4537dfaf3627226d63bdf1286659f4893acbc3bd437b0d7db7af92c764b9885d",
+        "bytes": 7761,
+        "lineEnding": "CRLF",
+        "listItems": 160,
+        "tableRows": 0,
+        "diagrams": 0,
+        "images": 0
+      },
+      {
+        "id": "long",
+        "category": "Long prose",
+        "file": "long.md",
+        "sha256": "122d7e8d79a8bb56c1657caf9cddfc80ce84fcbde98f84a04691921ec175e4ff",
+        "bytes": 91384,
+        "lineEnding": "LF",
+        "listItems": 0,
+        "tableRows": 0,
+        "diagrams": 0,
+        "images": 0
+      },
+      {
+        "id": "table",
+        "category": "Large table",
+        "file": "table.md",
+        "sha256": "420e51a0c00af1facb797e5f5a19ae7cfa68037cf98ee3526950625cd7623437",
+        "bytes": 29913,
+        "lineEnding": "CRLF",
+        "listItems": 0,
+        "tableRows": 1001,
+        "diagrams": 0,
+        "images": 0
+      },
+      {
+        "id": "nested-list",
+        "category": "Long and nested lists",
+        "file": "nested-list.md",
+        "sha256": "473734ae45d19bbd0b5dee165fa25fedaf144d006a8b3737830331e32e80be52",
+        "bytes": 52663,
+        "lineEnding": "LF",
+        "listItems": 4000,
+        "tableRows": 0,
+        "diagrams": 0,
+        "images": 0
+      },
+      {
+        "id": "mermaid",
+        "category": "Complex Mermaid",
+        "file": "mermaid.md",
+        "sha256": "546b7ec7f3f8ec1106b1fa88b654f8637e51242757ce1b9306508a50113fd0f8",
+        "bytes": 1956,
+        "lineEnding": "CRLF",
+        "listItems": 0,
+        "tableRows": 0,
+        "diagrams": 1,
+        "images": 0
+      },
+      {
+        "id": "mixed",
+        "category": "Mixed text, table, diagram and local image",
+        "file": "mixed.md",
+        "sha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+        "bytes": 4475,
+        "lineEnding": "LF",
+        "listItems": 150,
+        "tableRows": 101,
+        "diagrams": 1,
+        "images": 1
+      }
+    ],
+    "tableRowsIncludeHeader": true,
+    "realSlots": [
+      {
+        "id": "U1",
+        "purpose": "Ordinary prose/operating guide",
+        "originPermission": null,
+        "scrubReview": null,
+        "fileAssetHashes": null,
+        "structuralCounts": null,
+        "taskTolerability": null
+      },
+      {
+        "id": "U2",
+        "purpose": "Table/list-heavy technical reference",
+        "originPermission": null,
+        "scrubReview": null,
+        "fileAssetHashes": null,
+        "structuralCounts": null,
+        "taskTolerability": null
+      },
+      {
+        "id": "U3",
+        "purpose": "Mixed local-media/diagram documentation",
+        "originPermission": null,
+        "scrubReview": null,
+        "fileAssetHashes": null,
+        "structuralCounts": null,
+        "taskTolerability": null
+      }
+    ],
+    "boundarySlots": [
+      {
+        "kind": "boundary",
+        "selectedLimits": null,
+        "fixture": null
+      },
+      {
+        "kind": "oversize",
+        "selectedLimits": null,
+        "fixture": null
+      },
+      {
+        "kind": "recovery",
+        "selectedLimits": null,
+        "fixture": null
+      }
+    ]
+  },
+  "hardwareSlots": [
+    {
+      "id": "H0",
+      "proposal": "Proposed four physical cores, 8 GiB, SSD, integrated GPU, 1920x1080 at 60 Hz",
+      "certified": false,
+      "cpuModel": null,
+      "gpuModel": null,
+      "gpuDriver": null,
+      "ramGiB": null,
+      "storage": null,
+      "powerThermalState": null,
+      "osEditionBuild": null,
+      "osServicingStatus": null,
+      "runtimePackageSha256": null,
+      "physicalDisplay": null,
+      "scalingRefresh": null,
+      "operator": null
+    },
+    {
+      "id": "H1",
+      "proposal": "Typical 16 GiB reference control",
+      "certified": false,
+      "cpuModel": null,
+      "gpuModel": null,
+      "gpuDriver": null,
+      "ramGiB": null,
+      "storage": null,
+      "powerThermalState": null,
+      "osEditionBuild": null,
+      "osServicingStatus": null,
+      "runtimePackageSha256": null,
+      "physicalDisplay": null,
+      "scalingRefresh": null,
+      "operator": null
+    }
+  ],
+  "calibrationPilot": {
+    "status": "PREPARED_NOT_EXECUTED",
+    "baselineProducts": [
+      "0237b08390d5d1d946c0b19b81d671ccd54fb951",
+      "99349d82eb06960eb1f9785cf384db2373aed4fa"
+    ],
+    "candidateUsedToSetLimits": false,
+    "hardwareSlots": [
+      "H0",
+      "H1"
+    ],
+    "fixtures": [
+      "small",
+      "technical",
+      "long",
+      "table",
+      "nested-list",
+      "mermaid",
+      "mixed"
+    ],
+    "startingOrders": [
+      "historical-first",
+      "develop-first"
+    ],
+    "processesPerProductFixtureOrderHardware": 1,
+    "cyclesPerProcess": 3,
+    "maximumProcesses": 56,
+    "mode": "Continuous",
+    "appearance": "normal",
+    "applicationZoomPercent": 100,
+    "maximumRealCorpusHumanJourneys": 6,
+    "tailOrNonRegressionAcceptance": "NOT_QUALIFIED",
+    "physicalRunnerBoundaryImplemented": false,
+    "independentSamplingValidation": "PENDING"
+  },
+  "stopRules": [
+    "No retries or replacement of failed cells",
+    "Safety breach or unknown restored OS state stops state-dependent collection",
+    "Identity or fixture drift invalidates collection",
+    "Missing ordering or colour evidence remains INCONCLUSIVE",
+    "No wider workflow dispatch to bypass missing narrow launchers",
+    "No policy activation, numeric acceptance or risk closure from collection success"
+  ],
+  "r02FirstReadBoundary": "Entry OS inspection is Win32 only. No added WPF/SystemColors/resource reads or WPF window creation before the original sequence; record WPF values only at the original post-resource-evaluation diagnostic point."
+}

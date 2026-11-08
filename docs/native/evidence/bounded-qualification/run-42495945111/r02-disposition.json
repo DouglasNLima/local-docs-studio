@@ -1,0 +1,25 @@
+{
+  "status": "BLOCKED_NOT_RUN",
+  "ownerAuthorisationUrl": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720",
+  "r01Run": 42495945111,
+  "r01Artefact": 13623780293,
+  "r01ArtefactSha256": "3bb3212f99811c44d31fef9fb0b7f6652ea0a906c29ae41e7bca1e70f62bbbea",
+  "reasons": [
+    "SHARED_GEOMETRY_PRECONDITION_UNAVAILABLE",
+    "EXACT_APPEARANCE_RESTORATION_UNVERIFIED"
+  ],
+  "processesExecuted": {
+    "preflight": 0,
+    "application": 0,
+    "stock": 0
+  },
+  "calibrationProcesses": 0,
+  "retryAuthorised": false,
+  "independentFinalReview": {
+    "status": "R01_FAILED_COLLECTION_INVALID_R02_NOT_RUN_BLOCKED",
+    "file": "independent-final-review.json",
+    "sha256": "62cb9995e4775327a08dff31ca9aa23f3b3ca1fd1a5604454b0c9c1915c67c16"
+  },
+  "historicalHighContrastFailureRetained": 2.542596,
+  "contrastRequirement": 4.5
+}

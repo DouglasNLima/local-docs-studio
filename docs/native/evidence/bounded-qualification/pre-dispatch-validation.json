@@ -1,0 +1,69 @@
+{
+  "status": "OFFLINE_VALIDATED_AWAITING_INDEPENDENT_REVIEW",
+  "baseCommit": "06057ecf1a070c5275ff39a8427314287e8a0490",
+  "executionImplementation": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "ownerAuthorisationUrl": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6723189720",
+  "checks": {
+    "coordinator": {
+      "tests": 17,
+      "exit": 0,
+      "log": "pre-dispatch-tests/hosted-controls-v6.txt"
+    },
+    "qualification": {
+      "tests": 43,
+      "exit": 0,
+      "log": "pre-dispatch-tests/qualification-controls.txt"
+    },
+    "environment": {
+      "tests": 14,
+      "exit": 0,
+      "log": "pre-dispatch-tests/environment-controls-v2.txt"
+    },
+    "report": {
+      "tests": 10,
+      "exit": 0,
+      "log": "pre-dispatch-tests/report-controls.txt"
+    },
+    "governanceNegative": {
+      "tests": 25,
+      "exit": 0,
+      "log": "pre-dispatch-tests/governance-negative-controls.txt"
+    },
+    "static": {
+      "exit": 0,
+      "log": "pre-dispatch-tests/static-controls.txt"
+    }
+  },
+  "retainedDevelopmentFailures": [
+    {
+      "log": "pre-dispatch-tests/hosted-controls.txt",
+      "cause": "Windows ZipInfo normalised raw backslashes before validation; coordinator now checks orig_filename and filename equality before extraction."
+    },
+    {
+      "log": "pre-dispatch-tests/environment-controls.txt",
+      "cause": "Discovery-only workflow count assertion included the new bounded job; test now scopes discovery and independently checks every old job is excluded in bounded mode."
+    },
+    {
+      "log": "pre-dispatch-tests/governance-controls.txt",
+      "cause": "Proposed attachment-only .gitattributes addition touched a protected file. Addition removed; original attachment bytes retained as Base64 JSON without changing protected attributes."
+    }
+  ],
+  "unrecordedInitialTerminalFailure": "First coordinator test attempt also exposed ZipInfo backslash normalisation; tool transcript retained, subsequent failed log above records the same rejection gap. No hosted execution took place during these fixes.",
+  "scope": {
+    "productionChanges": false,
+    "frozenToolingChanges": false,
+    "historicalEvidenceChanged": false,
+    "r02Exposed": false,
+    "calibrationExposed": false,
+    "developerGuiUsed": false
+  },
+  "whitespace": {
+    "sourceAndDocumentation": "PASS",
+    "retainedRawLogs": "One original unittest failure line ends in whitespace; the raw failed transcript is deliberately retained, not edited."
+  },
+  "independentReviewCorrections": [
+    "A known audit FAIL/INVALID or missing audit cannot yield a zero terminal exit even when launcher and cleanup pass.",
+    "Exact clean pinned Git HEAD is checked before importing its modules.",
+    "All2019 restored files and manifest hash are revalidated before importing the pinned implementation."
+  ]
+}

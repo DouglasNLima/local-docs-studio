@@ -1,0 +1,92 @@
+{
+  "jobs": [
+    {
+      "id": 128778220808,
+      "name": "Owner-authorised bounded R01 (R02 independently gated)",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_id": 42495945111,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Check out the exact coordinator without retained credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Verify owner authority and restore the exact sealed artefact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Revalidate every identity then execute R01 once",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 4
+        },
+        {
+          "name": "Preserve every failed or incomplete observation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Check out the exact coordinator without retained credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 128778221986,
+      "name": "Hosted environment discovery only (no qualification)",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42495945111,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 128778222050,
+      "name": "contract-controls",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42495945111,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 128778222272,
+      "name": "Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42495945111,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 128778246989,
+      "name": "UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42495945111,
+      "logs_url": null,
+      "steps": null
+    }
+  ]
+}

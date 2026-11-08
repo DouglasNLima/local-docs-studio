@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT_AUTHORISED",
+  "campaignExecutionApproved": false,
+  "ownerAuthorisationUrl": null,
+  "toolingCommit": null,
+  "sourceReceipt": null,
+  "sourceReceiptSha256": null,
+  "imageVersion": null,
+  "osVersion": null,
+  "environmentLock": null,
+  "environmentLockSha256": null,
+  "runtimePins": {
+    "10.0.13": {
+      "dotnet": null,
+      "dotnetSha256": null,
+      "core": null,
+      "coreSha256": null,
+      "wpf": null,
+      "wpfSha256": null
+    },
+    "10.0.14": {
+      "dotnet": null,
+      "dotnetSha256": null,
+      "core": null,
+      "coreSha256": null,
+      "wpf": null,
+      "wpfSha256": null
+    }
+  },
+  "bundles": {
+    "r01": {
+      "receipt": null,
+      "receiptSha256": null
+    },
+    "r02-baseline": {
+      "receipt": null,
+      "receiptSha256": null
+    },
+    "r02-candidate": {
+      "receipt": null,
+      "receiptSha256": null
+    }
+  },
+  "limits": {
+    "childSeconds": 240,
+    "privateBytes": 2147483648,
+    "logBytes": 16777216
+  },
+  "calibrationPilotEnabled": false
+}

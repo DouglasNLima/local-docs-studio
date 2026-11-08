@@ -1,0 +1,13 @@
+{
+  "status": "CANDIDATE_VERIFIED_NOT_AUTHORISED",
+  "configurationSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+  "toolingCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "R01ProcessesExecuted": 0,
+  "R02ProcessesExecuted": 0,
+  "calibrationProcessesExecuted": 0,
+  "configurationProtocols": {
+    "R01": 4,
+    "R02": 18
+  },
+  "campaignExecutionApproved": false
+}

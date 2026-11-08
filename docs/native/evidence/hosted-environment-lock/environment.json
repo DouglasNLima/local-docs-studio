@@ -1,0 +1,28 @@
+{
+  "environment": {
+    "imageOS": "win25-vs2026",
+    "imageVersion": "20261103.298.1",
+    "runnerOS": "Windows",
+    "runnerArch": "X64",
+    "runnerEnvironment": "github-hosted",
+    "windows": {
+      "CurrentBuildNumber": "26100",
+      "UBR": 33674,
+      "EditionID": "ServerDatacenter",
+      "BuildLabEx": "26100.1.amd64fre.ge_release.240331-1435",
+      "ProductName": "Windows Server 2025 Datacenter",
+      "version": "10.0.26100"
+    }
+  },
+  "github": {
+    "GITHUB_RUN_ID": "42484885426",
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_WORKFLOW": "Native UX performance evidence (proposed policy)",
+    "GITHUB_WORKFLOW_REF": "DouglasNLima/local-docs-studio/.github/workflows/native-ux-performance.yml@refs/heads/feature/native-ux-performance-contract",
+    "GITHUB_SHA": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+    "RUNNER_NAME": "GitHub Actions 1000020087"
+  },
+  "toolingCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "toolingTree": "bcdf6ac20347ac8a81fcf417864657a5fd2e4a09",
+  "campaignExecutionApproved": false
+}

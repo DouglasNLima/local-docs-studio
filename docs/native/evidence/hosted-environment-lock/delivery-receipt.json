@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "status": "TECHNICALLY_VERIFIED_PENDING_OWNER_EXECUTION_DECISION",
+  "toolingCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "toolingTree": "bcdf6ac20347ac8a81fcf417864657a5fd2e4a09",
+  "deliveryCommit": "Containing receipt-only commit; final SHA/tree recorded in PR #78 and Goal #77 delivery comments",
+  "discoveryRun": 42484885426,
+  "discoveryAttempt": 1,
+  "configurationSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+  "environmentLockSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+  "artefacts": {
+    "candidate-config.json": {
+      "originalSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+      "canonicalLfSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+      "lineEndingsNormalised": false
+    },
+    "environment-lock.json": {
+      "originalSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+      "canonicalLfSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+      "lineEndingsNormalised": false
+    },
+    "environment.json": {
+      "originalSha256": "d7c3526abcee9d3e85cb169aeef32340030c70fda76b49cb2739238a4f99a2b5",
+      "canonicalLfSha256": "d7c3526abcee9d3e85cb169aeef32340030c70fda76b49cb2739238a4f99a2b5",
+      "lineEndingsNormalised": false
+    },
+    "validation.json": {
+      "originalSha256": "b52fa99ea07a95946ea75c69dcfd7011a49b8ee365f36a52228255e3d2643395",
+      "canonicalLfSha256": "b52fa99ea07a95946ea75c69dcfd7011a49b8ee365f36a52228255e3d2643395",
+      "lineEndingsNormalised": false
+    },
+    "available-runtime-files.json": {
+      "originalSha256": "e71363f2a797dd3d8f62db6d0104ca033aa92e6b9705901de9d9b4bb3f270506",
+      "canonicalLfSha256": "e71363f2a797dd3d8f62db6d0104ca033aa92e6b9705901de9d9b4bb3f270506",
+      "lineEndingsNormalised": false
+    },
+    "source-receipt.json": {
+      "originalSha256": "1002de18b43d7983fad65be60f659d71ff2aa2e838da0147eda6d2e0d003abd3",
+      "canonicalLfSha256": "1002de18b43d7983fad65be60f659d71ff2aa2e838da0147eda6d2e0d003abd3",
+      "lineEndingsNormalised": false
+    },
+    "r01-bundle-receipt.json": {
+      "originalSha256": "ece0fcf72db4ffa81d1991e989d5e783cf389711f942d49e054cee52789e27f4",
+      "canonicalLfSha256": "ece0fcf72db4ffa81d1991e989d5e783cf389711f942d49e054cee52789e27f4",
+      "lineEndingsNormalised": false
+    },
+    "r02-baseline-bundle-receipt.json": {
+      "originalSha256": "21e2c41d5f587b3c7ca6ec8c34362a23970439b8e8df722e59b128a2effdeb2c",
+      "canonicalLfSha256": "21e2c41d5f587b3c7ca6ec8c34362a23970439b8e8df722e59b128a2effdeb2c",
+      "lineEndingsNormalised": false
+    },
+    "r02-candidate-bundle-receipt.json": {
+      "originalSha256": "43e79337dbfcfc6c0f344747b33816f51b064d2eebaddb5f19302646eebb26f5",
+      "canonicalLfSha256": "43e79337dbfcfc6c0f344747b33816f51b064d2eebaddb5f19302646eebb26f5",
+      "lineEndingsNormalised": false
+    },
+    "dotnet-info.txt": {
+      "originalSha256": "c1bafff9f48bee18ad707cf6a2364462995be3274cad8571458c441871f549af",
+      "canonicalLfSha256": "c6fbc111d32d4ce434c35f7322f6b57817292f9d24ed1a7d5475677adefe4f15",
+      "lineEndingsNormalised": true
+    },
+    "available-sdks.txt": {
+      "originalSha256": "14c7019e69d762b3e637254a55ba37a9674996707a7d7544a0d17182affbbf3d",
+      "canonicalLfSha256": "47a0eb215f33b9ce64dfc47d8bdf6d3438ac50f909e4ed77662f5d24187db8a7",
+      "lineEndingsNormalised": true
+    },
+    "available-runtimes.txt": {
+      "originalSha256": "80e329b838c22e4f57c3ef18018b43e4ebc1967d4b985fa09fd958149f847914",
+      "canonicalLfSha256": "b306a150611d487b3212dde94c8ceb1e49e039ed0b24ccb22191b91f9e0f0d45",
+      "lineEndingsNormalised": true
+    },
+    "bundle-build.txt": {
+      "originalSha256": "48f736d13f40a233acf04faa533e7cd7e395b89514c8756b3138dc3b2167a069",
+      "canonicalLfSha256": "e57d272cf975c52a31f4ee7968c240542ea498429f4e8b9b3dd19398aa406a42",
+      "lineEndingsNormalised": true
+    },
+    "runtime-probe-build.txt": {
+      "originalSha256": "647e574efd6f2c49f85363c69fe9f2521a39a5a13a3aedf9ca61473eabecbaf5",
+      "canonicalLfSha256": "1490711858ddd42e4b5dd326670262084d5c5f5f0d2e5406530231fa649a7c36",
+      "lineEndingsNormalised": true
+    },
+    "github-terminal.json": {
+      "originalSha256": "9af4267685087f314cfd5553a0af67045ea1b82e04ab9a3b55573fb84da3fde3",
+      "canonicalLfSha256": "9af4267685087f314cfd5553a0af67045ea1b82e04ab9a3b55573fb84da3fde3",
+      "lineEndingsNormalised": false
+    },
+    "retained-bytes-verification.json": {
+      "originalSha256": "ae794138df43a5e9a3f3c9d6720fdff4584063e717c960ee58fcb632ad36a019",
+      "canonicalLfSha256": "ae794138df43a5e9a3f3c9d6720fdff4584063e717c960ee58fcb632ad36a019",
+      "lineEndingsNormalised": false
+    },
+    "environment-controls.txt": {
+      "originalSha256": "7547845f37683d079655349f3ec82ae514f35485c35e34e2ad116fffa4e438e7",
+      "canonicalLfSha256": "4a4791f7b9abf1419ec0d0ef447ad75867fa7a0b17d7a4119509d2bce7da662a",
+      "lineEndingsNormalised": true
+    },
+    "qualification-controls.txt": {
+      "originalSha256": "edaf0e09ff82109b4f6e494d4b064f45cd18b0dff10cc0195bb8bf69bc0dbd3f",
+      "canonicalLfSha256": "54a9762ef758db863baf2ba5f8fbf4d4fafa8c13ab2c1c34cd0447e2212ad69c",
+      "lineEndingsNormalised": true
+    },
+    "independent-raw-source-check.json": {
+      "originalSha256": "dd8c698309bf981e5c3b5f541b0ea013a27ea0efdfe4c7417db6de731bb93192",
+      "canonicalLfSha256": "a502a3871a69e27ad0cefdeb12760fe1f851daa4f434f51193338e775740a6ee",
+      "lineEndingsNormalised": false
+    },
+    "independent-source-eol.json": {
+      "originalSha256": "0e351f10f0053a5c7ab92fccaf3d0911d3793f39bfbbc703b14d1571a7ff4856",
+      "canonicalLfSha256": "c86d9e8f092caf85e10ce208a04aff000498582e4bb7ecb9dc171304b4c53ff0",
+      "lineEndingsNormalised": false
+    },
+    "independent-git-export.json": {
+      "originalSha256": "d9cc3e7d6276de35a48a1092dbd210c8a0c5203b5006ee3c490af970752ab54f",
+      "canonicalLfSha256": "a140ec0d3d955ac00adcf18e7c17a79830b508092e4b13941b8060322c189839",
+      "lineEndingsNormalised": false
+    },
+    "independent-github-observation.json": {
+      "originalSha256": "4136d41eb12ce6388be78d0b1598245502d6515317ac7d85aa0fe798bce56135",
+      "canonicalLfSha256": "4136d41eb12ce6388be78d0b1598245502d6515317ac7d85aa0fe798bce56135",
+      "lineEndingsNormalised": false
+    },
+    "independent-review-script.py": {
+      "originalSha256": "282dcb5fe11574bea4d8e3bb1d29aab80088ecb40a0065bc6f98dd2496468fb2",
+      "canonicalLfSha256": "282dcb5fe11574bea4d8e3bb1d29aab80088ecb40a0065bc6f98dd2496468fb2",
+      "lineEndingsNormalised": false
+    },
+    "independent-final-review.json": {
+      "originalSha256": "98a1544f79f446c9127191759cf640eac9c22164b4bdd9df2c56b9dab26d5414",
+      "canonicalLfSha256": "054826f8b21be648d8184e7a1947e79bef77b0118e8bbb411293fdd7649586fe",
+      "lineEndingsNormalised": false
+    }
+  },
+  "checks": {
+    "environmentControls": {
+      "pass": 14,
+      "fail": 0
+    },
+    "existingQualificationControls": {
+      "pass": 43,
+      "fail": 0
+    },
+    "existingAuditorControls": {
+      "pass": 10,
+      "fail": 0
+    },
+    "governanceControls": {
+      "pass": 25,
+      "fail": 0
+    },
+    "productAndHarnessBuilds": {
+      "pass": 5,
+      "warnings": 0,
+      "errors": 0
+    },
+    "consoleRuntimeProbeBuild": {
+      "pass": 1,
+      "warnings": 0,
+      "errors": 0
+    },
+    "static": "PASS",
+    "documentation": "PASS",
+    "provenanceAndGovernance": "PASS",
+    "retainedRuntimeAndBundleBytes": "PASS"
+  },
+  "executed": {
+    "discoveryOnlyRuns": 2,
+    "R01Processes": 0,
+    "R02Processes": 0,
+    "calibrationProcesses": 0
+  },
+  "originalDiscoveryFailure": {
+    "runId": 42484264490,
+    "status": "FAIL_RETAINED",
+    "record": "first-discovery-failure.json"
+  },
+  "unresolvedBeforeAnyCampaign": [
+    "Separate explicit owner approval of the exact source/configuration and bounded protocol(s)",
+    "Fresh hosted job must pass the same image/full OS, source, SDK, runtime and bundle checks; image availability is not guaranteed",
+    "Restore the complete retained artefact to its observed paths before expiry, or repeat discovery/review without substituting identities"
+  ],
+  "notCertified": [
+    "Actual foreground/visible-completion behaviour",
+    "High Contrast propagation/restoration and accessibility correctness",
+    "Minimum physical hardware or workload envelope",
+    "Statistical sampling/calibration",
+    "Integration or release acceptance"
+  ],
+  "campaignExecutionApproved": false,
+  "candidateStatus": "NOT_AUTHORISED",
+  "calibrationPilotEnabled": false,
+  "pr76Integration": "NO-GO",
+  "prStates": "All three Draft",
+  "operationalTransition": "NOT_ACTIVATED",
+  "sourceProvenance": {
+    "rawBlobComparison": "FAIL_RETAINED",
+    "productTextFilesWithLfToCrlf": 831,
+    "productRawByteExactFiles": 2,
+    "gitArchiveReconstruction": "PASS_833_OF_833",
+    "profile": "git -c core.autocrlf=true archive with original four path selections",
+    "hostGitConfigurationQueried": false,
+    "unknownByteChanges": 0,
+    "statement": "Captured exports reproduce this profile exactly; no claim of raw-Git-byte identity or measured host Git setting"
+  },
+  "independentReview": {
+    "status": "DISCOVERY_REVIEW_PASS",
+    "outstandingFindings": 0,
+    "reviewFile": "independent-final-review.json",
+    "rawComparisonFailureRetained": true
+  }
+}

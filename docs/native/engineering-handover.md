@@ -1,5 +1,17 @@
 # Native Windows engineering handover
 
+## Proposed native UX performance contract — 6 November 2026
+
+[Goal #77](https://github.com/DouglasNLima/local-docs-studio/issues/77) and
+[Draft PR #78](https://github.com/DouglasNLima/local-docs-studio/pull/78) add a
+[Proposed ADR](../adr/007-native-document-rendering-performance.md) and independent
+[foreground measurement protocol](native-ux-performance-contract.md). No product
+renderer, historical threshold or required-check policy changes are authorised.
+PR #76 remains separately Draft: its five functional workstreams do not clear the
+historical 250 ms FAIL or unresolved 2.542596:1 High Contrast failure. UX collection
+is calibration, not acceptance; owner approval and independent certification remain
+pending. The source-labelled final receipt is maintained on PR #78.
+
 ## Find editor caret stability — 1 November 2026
 
 Search refresh is passive during editing; explicit navigation and still-focused query changes own result selection. The native 180 ms debounce and existing release/performance decisions remain unchanged. See the [focused Web/Native correction and validation receipt](../release/find-editor-caret-stability.md); final-source hosted evidence and approval remain recorded on its Draft PR.

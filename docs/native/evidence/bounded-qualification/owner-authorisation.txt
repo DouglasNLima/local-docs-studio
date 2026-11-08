@@ -1,0 +1,44 @@
+Goal #77 — Owner Authorisation: Bounded R01/R02 Execution
+As repository owner, I authorise execution of the previously approved, bounded R01 and R02 qualification protocols only, subject to strict verification of the locked environment.
+Reviewed configuration
+
+Draft PR #78 commit: 06057ecf1a070c5275ff39a8427314287e8a0490
+Tooling implementation: 77664fbeed39162e17c6d0d2ff24a65f8a7f9d13
+Candidate configuration SHA-256: 7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f
+Discovery run: 42484885426, attempt 1
+Reusable artefact: 13618494876
+Artefact SHA-256: 8b3d50ff7b9b394867fdc9598fe14e47d980e865c7d74f389d7802be90c7f812
+
+Execution scope
+
+R01: four fixed foreground processes, Pages at 100% zoom, with the prescribed appearance/tracing combinations and maximum 84 frames.
+R02: eight original-sequence preflights, eight independent application observations and two stock-WPF controls, preserving the exact runtime/order matrix.
+
+Execute R01 first, independently audit its evidence, then execute R02. A validly observed R01 product failure does not automatically prevent the independent R02 investigation; unsafe cleanup, environment drift or invalid shared infrastructure must stop further execution.
+Mandatory preflight
+
+Restore and verify the complete retained artefact.
+Confirm the exact hosted image win25-vs2026 / 20261103.298.1, Windows build 26100.33674, SDK 10.0.403, both pinned runtimes and all actual file hashes.
+Revalidate source, binary, runtime and harness identities.
+Preserve the original unauthorised configuration. Create a separate execution configuration referencing this explicit owner authorisation.
+Reject any mismatch before launching GUI processes or changing High Contrast.
+
+Evidence and safety
+
+Preserve every failed and incomplete observation.
+No retry-to-PASS, extra test cells or expanded campaign.
+Keep collection validity, original correctness and presentation-order attribution independent.
+Verify actual restoration of Windows appearance, input and process state.
+Record exact source identities, complete logs, images, hashes and terminal workflow results.
+Perform an independent final review.
+
+Not authorised
+
+The 56-process performance calibration pilot.
+Physical desktop testing.
+Changes to production code, thresholds, original 250 ms benchmark, 4.5:1 contrast requirement, historical evidence, rulesets or mandatory checks.
+ADR operational activation or any risk waiver.
+Merge, deployment, signing, release or distribution.
+
+Record this authorisation in Goal #77, then execute the exact bounded protocols only after all preflight checks succeed.
+Deliver separate R01/R02 verdicts and an updated risk assessment. Keep PRs #76, #78 and #80 in Draft. PR #76 remains NO-GO pending independent acceptance and a separate integration decision.

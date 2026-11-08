@@ -1,0 +1,54 @@
+  Determining projects to restore...
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-candidate\src\native\LensDocsStudio.Native\LensDocsStudio.Native.csproj (in 14.2 sec).
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-candidate\src\native\LensDocsStudio.Core\LensDocsStudio.Core.csproj (in 14.2 sec).
+  LensDocsStudio.Core -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-candidate\src\native\LensDocsStudio.Core\bin\Release\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Native -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-candidate\src\native\LensDocsStudio.Native\bin\Release\net10.0-windows\LensDocsStudio.Native.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:42.82
+  Determining projects to restore...
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-baseline\src\native\LensDocsStudio.Native\LensDocsStudio.Native.csproj (in 435 ms).
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-baseline\src\native\LensDocsStudio.Core\LensDocsStudio.Core.csproj (in 435 ms).
+  LensDocsStudio.Core -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-baseline\src\native\LensDocsStudio.Core\bin\Release\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Native -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-baseline\src\native\LensDocsStudio.Native\bin\Release\net10.0-windows\LensDocsStudio.Native.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:24.44
+  Determining projects to restore...
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-candidate\src\native\LensDocsStudio.Native\LensDocsStudio.Native.csproj (in 424 ms).
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-candidate\src\native\LensDocsStudio.Core\LensDocsStudio.Core.csproj (in 424 ms).
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\r01\Qualification.csproj (in 424 ms).
+  Qualification -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\r01\bin\Release\net10.0-windows\LensDocsStudio.Native.UxProbe.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.78
+  Determining projects to restore...
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\r02-candidate\Qualification.csproj (in 394 ms).
+  2 of 3 projects are up-to-date for restore.
+  Qualification -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\r02-candidate\bin\Release\net10.0-windows\LensDocsStudio.Native.Qualification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.97
+  Determining projects to restore...
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-baseline\src\native\LensDocsStudio.Native\LensDocsStudio.Native.csproj (in 430 ms).
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\product-baseline\src\native\LensDocsStudio.Core\LensDocsStudio.Core.csproj (in 430 ms).
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\r02-baseline\Qualification.csproj (in 430 ms).
+  Qualification -> D:\a\local-docs-studio\local-docs-studio\artifacts\qualification-environment\build\r02-baseline\bin\Release\net10.0-windows\LensDocsStudio.Native.Qualification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.26

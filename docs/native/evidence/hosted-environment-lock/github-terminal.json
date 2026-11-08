@@ -1,0 +1,107 @@
+{
+  "run": {
+    "id": 42484885426,
+    "attempt": 1,
+    "head": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+    "tree": "bcdf6ac20347ac8a81fcf417864657a5fd2e4a09",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/42484885426",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "jobs": [
+    {
+      "id": 128744491680,
+      "name": "Hosted environment discovery only (no qualification)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42484885426,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Check out exact dispatched source without retained credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Verify source and collect console-only runtime/build identities",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Retain discovery evidence and complete reusable runtime/binary closures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Post Check out exact dispatched source without retained credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        }
+      ]
+    },
+    {
+      "id": 128744492393,
+      "name": "Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42484885426,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 128744492819,
+      "name": "UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42484885426,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 128744492933,
+      "name": "contract-controls",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 42484885426,
+      "logs_url": null,
+      "steps": null
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13618494876,
+      "name": "goal77-environment-77664fbeed39162e17c6d0d2ff24a65f8a7f9d13-1",
+      "size_in_bytes": 185677817,
+      "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13618494876",
+      "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13618494876/zip",
+      "expired": false,
+      "created_at": "2026-11-08T13:28:14Z",
+      "expires_at": "2026-12-08T13:27:56Z",
+      "updated_at": "2026-11-08T13:28:14Z",
+      "digest": "sha256:8b3d50ff7b9b394867fdc9598fe14e47d980e865c7d74f389d7802be90c7f812",
+      "workflow_run": {
+        "id": 42484885426,
+        "repository_id": 1248627951,
+        "head_repository_id": 1248627951,
+        "head_branch": "feature/native-ux-performance-contract",
+        "head_sha": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13"
+      }
+    }
+  ]
+}

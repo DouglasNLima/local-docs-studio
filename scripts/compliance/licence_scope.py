@@ -105,6 +105,27 @@ def apply_selection_sync_refresh(preserved, refresh):
     return result
 
 
+def apply_native_ux_refresh(preserved, refresh):
+    # Goal #77 changes only new-fixture byte handling and its no-signing branch
+    # guard, plus current tracking notes. Historical snapshots and original
+    # performance/HC fixtures, workflows and trust remain frozen.
+    allowed = {'.gitattributes', '.github/workflows/native.yml',
+        'docs/native/architecture-decisions.md', 'docs/native/engineering-handover.md',
+        'docs/native/functional-parity-matrix.md', 'docs/native/implementation-progress.md',
+        'docs/native/validation-report.md'}
+    require(refresh['baseCommit'] == '99349d82eb06960eb1f9785cf384db2373aed4fa',
+            'UX amendment must identify exact develop')
+    require(set(refresh['files']) == allowed, 'UX amendment exceeds its reviewed scope')
+    result = dict(preserved)
+    for path, entry in refresh['files'].items():
+        require(set(entry) == {'previous', 'current'} and preserved.get(path) == entry['previous'],
+                'UX amendment changed historical evidence: ' + path)
+        require(re.fullmatch(r'[0-9a-f]{64}', entry['current']) is not None,
+                'UX amendment requires a canonical source digest')
+        result[path] = entry['current']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -148,6 +169,8 @@ def main():
     preserved = apply_find_caret_refresh(preserved, refresh)
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
+    ux_refresh = json.loads((ROOT / 'docs/open-source/evidence/native-ux-contract/preserved-refresh.json').read_text(encoding='utf-8'))
+    preserved = apply_native_ux_refresh(preserved, ux_refresh)
     validate_preserved(preserved, current_digests(set(preserved)))
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

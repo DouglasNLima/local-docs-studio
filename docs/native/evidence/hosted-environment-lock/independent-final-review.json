@@ -1,0 +1,109 @@
+{
+  "status": "DISCOVERY_REVIEW_PASS",
+  "scope": "Captured unauthorised configuration is ready for owner execution decision; no qualification or execution permission granted",
+  "runId": 42484885426,
+  "runAttempt": 1,
+  "artifactId": 13618494876,
+  "artifactSha256": "8b3d50ff7b9b394867fdc9598fe14e47d980e865c7d74f389d7802be90c7f812",
+  "toolingCommit": "77664fbeed39162e17c6d0d2ff24a65f8a7f9d13",
+  "toolingTree": "bcdf6ac20347ac8a81fcf417864657a5fd2e4a09",
+  "candidateConfigSha256": "7d0d520d2045c9b547c968882e93e2c48c408effce32d602fde30f7546af1a2f",
+  "environmentLockSha256": "45a6aa515df05d93169521119b3bdab59db9512a439041e987495e373d5c466e",
+  "verified": {
+    "artifactFiles": 2019,
+    "source": {
+      "generatedFiles": 874,
+      "pinnedOriginalFiles": 12,
+      "toolSources": {
+        "gitBlobExact": 0,
+        "windowsCheckoutCRLF": 13
+      },
+      "gitSnapshotFiles": {
+        "candidate": 426,
+        "baseline": 407
+      }
+    },
+    "runtimeClosureFiles": {
+      "10.0.13": 480,
+      "10.0.14": 480
+    },
+    "runtimeProbePids": [
+      1360,
+      3664
+    ],
+    "bundleClosureFiles": {
+      "r01": 52,
+      "r02-baseline": 52,
+      "r02-candidate": 52
+    },
+    "buildsPassed": 5
+  },
+  "sourceDisposition": {
+    "rawGitBlobEquality": "FAIL retained unchanged",
+    "failedRawBytePredicates": 831,
+    "unexplainedInitialFailures": [],
+    "fullPinnedGitArchiveReconstruction": "PASS 833/833 files with committed attributes and core.autocrlf=true",
+    "hostGitConfigurationSeparatelyMeasured": false,
+    "actualRetainedBytesModified": false,
+    "toolSourceContent": "13/13 match their pinned Git content with Windows CRLF checkout conversion",
+    "semanticEquivalenceOfDifferentLineEndingBuilds": "Not claimed; review binds the actual retained compiled source bytes"
+  },
+  "environment": {
+    "imageOS": "win25-vs2026",
+    "imageVersion": "20261103.298.1",
+    "windowsVersion": "10.0.26100",
+    "UBR": 33674,
+    "edition": "ServerDatacenter",
+    "architecture": "X64",
+    "sdk": "10.0.403"
+  },
+  "authority": {
+    "candidateStatus": "NOT_AUTHORISED",
+    "campaignExecutionApproved": false,
+    "ownerAuthorisationUrl": null,
+    "calibrationPilotEnabled": false
+  },
+  "processBounds": {
+    "R01": 4,
+    "R02": 18,
+    "calibration": 0
+  },
+  "qualificationProcessesExecuted": 0,
+  "jobResults": {
+    "discovery": "success",
+    "originalQualificationJobs": "3 skipped"
+  },
+  "unresolvedReviewFindings": [],
+  "limitations": [
+    "SDK/compiler bytes reside on the hosted image and are not included in this artifact; their observed hashes must be rechecked on a future exact host.",
+    "Original runtime ZIPs are deliberately omitted; their SHA-512 verification is retained from the reviewed hosted collector. Complete extracted runtime bytes and official selected identities were independently checked.",
+    "No local execution validator, product, WPF probe, foreground action or appearance API was run. Hosted absolute paths were mapped read-only to the extracted artifact.",
+    "Discovery success is not R01/R02 qualification, owner execution authorisation, policy activation or PR76 integration acceptance.",
+    "A future execution must restore the retained paths and revalidate the exact source, full runtime/binary closures, SDK and image/OS before Windows execution APIs are imported."
+  ],
+  "evidence": [
+    {
+      "file": "independent-run-42484885426.py",
+      "sha256": "282dcb5fe11574bea4d8e3bb1d29aab80088ecb40a0065bc6f98dd2496468fb2"
+    },
+    {
+      "file": "independent-run-42484885426-report.json",
+      "sha256": "dd8c698309bf981e5c3b5f541b0ea013a27ea0efdfe4c7417db6de731bb93192"
+    },
+    {
+      "file": "independent-run-42484885426-source-eol.json",
+      "sha256": "0e351f10f0053a5c7ab92fccaf3d0911d3793f39bfbbc703b14d1571a7ff4856"
+    },
+    {
+      "file": "independent-run-42484885426-git-export.json",
+      "sha256": "d9cc3e7d6276de35a48a1092dbd210c8a0c5203b5006ee3c490af970752ab54f"
+    },
+    {
+      "file": "independent-run-42484885426-remote.json",
+      "sha256": "4136d41eb12ce6388be78d0b1598245502d6515317ac7d85aa0fe798bce56135"
+    }
+  ],
+  "pr76Integration": "NO-GO",
+  "policyActivation": "NOT_APPROVED",
+  "R01R02Acceptance": "NOT_EVALUATED"
+}

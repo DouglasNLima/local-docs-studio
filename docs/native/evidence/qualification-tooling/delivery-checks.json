@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "status": "PASS",
+  "testedImplementationCommit": "87b60456970f1414a68a1c0950d051a9fa0daedd",
+  "testedImplementationTree": "4e4c5e990ca8e1fb67ff89b7797b3a1b13276173",
+  "scope": "Local checks after receipt assembly. This check summary and its current rights-ledger hashes are subsequently revalidated; final commit/tree recorded in PR/Goal delivery comments.",
+  "checks": [
+    {
+      "name": "static",
+      "command": "npm run test:static",
+      "exitCode": 0,
+      "output": "\n> lens-docs-studio@0.1.0 test:static\n> node tests/static/check-assets.mjs\n\nService worker installation checks passed for 212 attempted assets with 6 concurrent cache fetches, including an optional failure.\nStatic checks passed for 50 module files, 61 shell assets, 151 vendor assets, and 59 runtime external-dependency scans.\n"
+    },
+    {
+      "name": "foundation",
+      "command": "python scripts/compliance/check_foundation.py",
+      "exitCode": 0,
+      "output": "{\"highlight\": \"exact historical bytes\", \"originalWebNotices\": 68, \"nativeFiles\": 537, \"exactNativeMatches\": 522, \"rightsPaths\": 2592, \"localLinks\": 215, \"operativeLicenceApproval\": true}\n"
+    },
+    {
+      "name": "governance",
+      "command": "python scripts/compliance/check_governance.py",
+      "exitCode": 0,
+      "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1123, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\n"
+    },
+    {
+      "name": "governanceControls",
+      "command": "python scripts/compliance/test_governance.py",
+      "exitCode": 0,
+      "output": ".........................\n----------------------------------------------------------------------\nRan 25 tests in 5.661s\n\nOK\n"
+    },
+    {
+      "name": "sourceInventory",
+      "command": "python scripts/native/qualification/inventory.py --check",
+      "exitCode": 0,
+      "output": "EXECUTION_INVENTORY_VALIDATED_NOT_EXECUTED\n"
+    },
+    {
+      "name": "documentationScope",
+      "command": "python artifacts/goal77-tooling/verify_delivery.py",
+      "exitCode": 0,
+      "output": "{\"documentationLinks\": 34, \"productionOrWorkflowChanges\": 0, \"historicalNativeEvidenceModifiedOrDeleted\": 0, \"executionAuthorised\": false, \"runtimeOrHardwareClaims\": \"UNSELECTED\"}\n"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --cached --check",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "hostedWorkflows": "NOT_RUN",
+  "campaigns": "NOT_RUN",
+  "requiredChecksSatisfiedByThisReceipt": false
+}

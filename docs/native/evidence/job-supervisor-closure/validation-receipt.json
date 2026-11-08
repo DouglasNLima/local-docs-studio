@@ -1,0 +1,15 @@
+{
+  "status": "PASS_OFFLINE_BINDINGS_AND_PRESERVATION",
+  "sourceCommit": "331dc5ab220e5ca7dd145ff21a650d3d2578111f",
+  "sourceTree": "776ef245307e9e969e19352597662de46bd35907",
+  "planSha256": "415e0ecb2e10328e3a6850da926ab1c9ef237072352a7a903fb1f46424081be3",
+  "independentReviewSha256": "0bc0a9c4fd3d04e484d2144adc036528dba85c164be11eb3dd1e9cdcd7b7ac98",
+  "canonicalSources": 16,
+  "rawSources": 16,
+  "offlineArchiveMembers": 72,
+  "localDocumentationLinks": 26,
+  "productRendererWorkflowsAndHistoricalEvidenceUnchanged": true,
+  "nativeControlsExecuted": 0,
+  "collectorExecuted": false,
+  "hostedRuns": 0
+}

@@ -1,0 +1,18 @@
+✔ committed UX fixtures preserve exact UTF-8, line endings and local assets (9.9965ms)
+✔ native UX withholds unsupported tails and retains the maximum (0.3099ms)
+✔ repeated input samples do not become independent tail evidence (0.4985ms)
+✔ missing measurements are unknown and malformed timings are rejected (0.4066ms)
+✔ a semantic handler response without foreground screen evidence is rejected (0.4596ms)
+✔ complete collection remains pending policy approval and cannot grant non-regression (19.4171ms)
+✔ missing independent processes cannot be silently dropped (13.0212ms)
+✔ wrong binary identity and absent candidate features invalidate collection (13.7833ms)
+✔ exact content disagreement and false monotonic duration are rejected (16.9983ms)
+✔ lost diagnostic observations and absent complete-content facts cannot pass collection (20.7198ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 210.6693

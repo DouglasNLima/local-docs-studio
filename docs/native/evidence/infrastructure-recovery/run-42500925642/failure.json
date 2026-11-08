@@ -1,0 +1,7 @@
+{
+  "status": "DISCOVERY_FAILED",
+  "error": "Read-only probe failed; exact child result and partial output retained",
+  "qualificationProcesses": 0,
+  "campaignExecutionApproved": false,
+  "executionStatus": "NOT_AUTHORISED"
+}

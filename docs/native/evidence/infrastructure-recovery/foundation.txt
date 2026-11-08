@@ -1,0 +1,1 @@
+{"highlight": "exact historical bytes", "originalWebNotices": 68, "nativeFiles": 537, "exactNativeMatches": 522, "rightsPaths": 2680, "localLinks": 215, "operativeLicenceApproval": true}

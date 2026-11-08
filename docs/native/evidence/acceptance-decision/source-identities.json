@@ -1,0 +1,79 @@
+{
+  "reviewDate": "2026-11-07",
+  "repository": "DouglasNLima/local-docs-studio",
+  "scope": "Read-only source/policy snapshot; not acceptance or a new product run",
+  "develop": {
+    "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+    "tree": "e4d137a12cbdd827583fcb841612890dd88736ec"
+  },
+  "prs": [
+    {
+      "number": 76,
+      "url": "https://github.com/DouglasNLima/local-docs-studio/pull/76",
+      "state": "open",
+      "draft": true,
+      "base": "develop",
+      "baseSha": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "head": "feature/reading-experience-productivity",
+      "headSha": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "headTree": "887856d293114442e97e0d06bef2928b340b639a",
+      "remoteHeadVerified": true
+    },
+    {
+      "number": 78,
+      "url": "https://github.com/DouglasNLima/local-docs-studio/pull/78",
+      "state": "open",
+      "draft": true,
+      "base": "develop",
+      "baseSha": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "head": "feature/native-ux-performance-contract",
+      "headSha": "f839182ceb16c20c4a8d58ddd39513aa81c267b5",
+      "headTree": "62c359f62ff9ca3ebd66fe1ac2246277ecf0653d",
+      "remoteHeadVerified": true
+    },
+    {
+      "number": 80,
+      "url": "https://github.com/DouglasNLima/local-docs-studio/pull/80",
+      "state": "open",
+      "draft": true,
+      "base": "develop",
+      "baseSha": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "head": "fix/native-blank-preview-lifecycle",
+      "headSha": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+      "headTree": "89e012f468801ac7f445113b811ca2fbe041c8d9",
+      "remoteHeadVerified": true
+    }
+  ],
+  "ownerDirection": "https://github.com/DouglasNLima/local-docs-studio/issues/77#issuecomment-6713735024",
+  "authority": "B+C in principle only; ADR Proposed; current campaign NO-GO",
+  "pr76Diff": {
+    "mergeBase": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+    "head": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "count": 727,
+    "categories": {
+      "Automated tests and validation": 69,
+      "Core/domain production": 12,
+      "Documentation and governance": 21,
+      "Immutable historical evidence": 579,
+      "Native UI production": 26,
+      "Web production": 20
+    },
+    "manifestSha256": "23224d746d6f44c679827011fb771b7b67c1d47869e9321aad4c91446a8ad44a"
+  },
+  "pr76ProductUnchangedSince358": true,
+  "pr76TerminalReceipt": {
+    "source": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/pull/76#issuecomment-6713058791",
+    "localRelativePath": "artifacts/native-regression-closure-investigation/terminal-receipt-7b1334b0.json",
+    "sha256": "32784dfb676e1bc896602c118ab12ff8acc5078940e50a73e18c4d2ce8ebb5a4"
+  },
+  "ruleset": {
+    "id": 26127883,
+    "enforcement": "active",
+    "requiredContextCount": 30,
+    "snapshotSha256": "dab5b8e185292064e515ca5de271b28d32bf554b1831f31f15adf40f8d5a46f1",
+    "mutations": 0
+  },
+  "legacyBranchProtection": "GET returned 404; ruleset enforcement independently verified",
+  "deliveryStart": "f839182ceb16c20c4a8d58ddd39513aa81c267b5"
+}

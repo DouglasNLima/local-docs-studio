@@ -1,0 +1,20 @@
+{
+  "status": "PASS_OFFLINE_PREPARATION_VALIDATION_ONLY",
+  "sourceCommit": "2a9608f6af5f4847c9ed13a19ba3466a25da1f47",
+  "sourceTree": "c8075f2a2fdac6fb60c77697bb741285931267a6",
+  "configurationSha256": "c2cf91cbd5678752d028d7f64a6d87a90e183fb1f73c12de35b9cc967ef13d7a",
+  "implementationFiles": 14,
+  "collectorSourceFiles": 5,
+  "collectorBinaryFiles": 5,
+  "runtimeFiles": 193,
+  "rawArchiveMembers": 68,
+  "buildOutputFiles": 35,
+  "historicalEvidenceAndProductUnchanged": true,
+  "collectorReaderUnchanged": true,
+  "localSupervisorControl": "FAIL_UNRESOLVED_JOB_ACCOUNTING",
+  "supervisorQualification": "BLOCKED_LOCAL_JOB_ACCOUNTING_UNRESOLVED",
+  "collectorExecuted": false,
+  "hostedRuns": 0,
+  "readOnlyVerificationApproved": false,
+  "campaignExecutionApproved": false
+}

@@ -1,5 +1,17 @@
 # Native architecture decisions
 
+## Proposed native UX performance contract — 6 November 2026
+
+[Goal #77](https://github.com/DouglasNLima/local-docs-studio/issues/77) and
+[Draft PR #78](https://github.com/DouglasNLima/local-docs-studio/pull/78) add a
+[Proposed ADR](../adr/007-native-document-rendering-performance.md) and independent
+[foreground measurement protocol](native-ux-performance-contract.md). No product
+renderer, historical threshold or required-check policy changes are authorised.
+PR #76 remains separately Draft: its five functional workstreams do not clear the
+historical 250 ms FAIL or unresolved 2.542596:1 High Contrast failure. UX collection
+is calibration, not acceptance; owner approval and independent certification remain
+pending. The source-labelled final receipt is maintained on PR #78.
+
 ## Editor-to-preview selection reliability — 2 November 2026
 
 Draft PR #74 reproduces the reported Native .1104 editor-first failure as native highlight initialisation: source, mapped and logical/UIA ranges are correct while paint is absent until preview focus. The correction refreshes WPF selection geometry without moving focus or changing the range or native focus owner. Natural mouse sequences and cold-paint pixel checks extend the earlier 480 Find-prepared word operations. The zoom correction, four-argument API, 60 ms timer and 250 ms gate are preserved. See the [source-labelled engineering receipt](editor-preview-selection-reliability.md). Keep Draft; High Contrast appearance, performance, SignPath and Native Stable blockers remain independent. PR #73 is untouched.

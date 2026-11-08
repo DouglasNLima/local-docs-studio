@@ -1,0 +1,120 @@
+{
+  "jobs": {
+    "jobs": [
+      {
+        "id": 128793284951,
+        "name": "Read-only geometry and appearance discovery (no qualification)",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_id": 42500925642,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Check out exact read-only discovery source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Collect Win32 desktop facts without windows, input or setters",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 3
+          },
+          {
+            "name": "Retain discovery and separate eligibility verdict",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Post Check out exact read-only discovery source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          }
+        ]
+      },
+      {
+        "id": 128793286115,
+        "name": "contract-controls",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 42500925642,
+        "logs_url": null,
+        "steps": null
+      },
+      {
+        "id": 128793286240,
+        "name": "Owner-authorised bounded R01 (R02 independently gated)",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 42500925642,
+        "logs_url": null,
+        "steps": null
+      },
+      {
+        "id": 128793286257,
+        "name": "Foreground observer controls (${{ matrix.baseline }}, ${{ matrix.appearance }})",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 42500925642,
+        "logs_url": null,
+        "steps": null
+      },
+      {
+        "id": 128793286387,
+        "name": "Hosted environment discovery only (no qualification)",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 42500925642,
+        "logs_url": null,
+        "steps": null
+      },
+      {
+        "id": 128793287021,
+        "name": "UX collection (${{ matrix.baseline }}, ${{ matrix.appearance }}, ${{ matrix.order }})",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 42500925642,
+        "logs_url": null,
+        "steps": null
+      }
+    ]
+  },
+  "artifacts": {
+    "artifacts": [
+      {
+        "id": 13624668945,
+        "name": "goal77-infrastructure-42500925642-1",
+        "size_in_bytes": 242013,
+        "url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13624668945",
+        "archive_download_url": "https://api.github.com/repos/DouglasNLima/local-docs-studio/actions/artifacts/13624668945/zip",
+        "expired": false,
+        "created_at": "2026-11-08T16:39:09Z",
+        "expires_at": "2026-12-08T16:39:08Z",
+        "updated_at": "2026-11-08T16:39:09Z",
+        "digest": "sha256:0deafb2fd7daa16cc283be5941b763cd720d67d0dd5ab51d4653e75b50a99f21",
+        "workflow_run": {
+          "id": 42500925642,
+          "repository_id": 1248627951,
+          "head_repository_id": 1248627951,
+          "head_branch": "feature/native-ux-performance-contract",
+          "head_sha": "dcb1536a9299f65f94d140877042b844f03356e2"
+        }
+      }
+    ]
+  }
+}

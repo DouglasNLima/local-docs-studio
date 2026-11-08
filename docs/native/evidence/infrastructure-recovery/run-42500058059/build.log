@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  Restored D:\a\local-docs-studio\local-docs-studio\artifacts\goal77-infrastructure\probe-build\DesktopProbe.csproj (in 146 ms).
+  DesktopProbe -> D:\a\local-docs-studio\local-docs-studio\artifacts\goal77-infrastructure\probe-build\bin\Release\net10.0-windows\win-x64\DesktopProbe.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:12.60

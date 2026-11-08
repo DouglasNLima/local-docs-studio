@@ -1,0 +1,265 @@
+﻿2026-11-08T15:39:59.6744304Z Current runner version: '2.338.2'
+2026-11-08T15:39:59.6766408Z ##[group]Runner Image Provisioner
+2026-11-08T15:39:59.6767167Z Hosted Compute Agent
+2026-11-08T15:39:59.6767631Z Version: 20261103.629
+2026-11-08T15:39:59.6768115Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-08T15:39:59.6768680Z Build Date: 2026-11-03T17:26:59Z
+2026-11-08T15:39:59.6769259Z Worker ID: {67f075bc-7a00-4b0c-9a08-046f13be80d5}
+2026-11-08T15:39:59.6769819Z Region: westus2
+2026-11-08T15:39:59.6770216Z Cloud: Azure
+2026-11-08T15:39:59.6770649Z ##[endgroup]
+2026-11-08T15:39:59.6771669Z ##[group]Operating System
+2026-11-08T15:39:59.6772157Z Microsoft Windows Server 2025
+2026-11-08T15:39:59.6772674Z 10.0.26100
+2026-11-08T15:39:59.6773057Z Datacenter
+2026-11-08T15:39:59.6773488Z ##[endgroup]
+2026-11-08T15:39:59.6774143Z ##[group]Runner Image
+2026-11-08T15:39:59.6774649Z Image: windows-2025-vs2026
+2026-11-08T15:39:59.6775265Z Version: 20261103.298.1
+2026-11-08T15:39:59.6776480Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261103.298/images/windows/Windows2025-VS2026-Readme.md
+2026-11-08T15:39:59.6777838Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261103.298
+2026-11-08T15:39:59.6778624Z ##[endgroup]
+2026-11-08T15:39:59.6779565Z ##[group]GITHUB_TOKEN Permissions
+2026-11-08T15:39:59.6781115Z Actions: read
+2026-11-08T15:39:59.6781556Z Contents: read
+2026-11-08T15:39:59.6781955Z Metadata: read
+2026-11-08T15:39:59.6782389Z ##[endgroup]
+2026-11-08T15:39:59.6784057Z Secret source: Actions
+2026-11-08T15:39:59.6784730Z Cache mode: write
+2026-11-08T15:39:59.6785332Z Prepare workflow directory
+2026-11-08T15:39:59.7242792Z Prepare all required actions
+2026-11-08T15:39:59.7285290Z Getting action download info
+2026-11-08T15:40:00.0483593Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-08T15:40:00.1679456Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-08T15:40:00.5017742Z Complete job name: Owner-authorised bounded R01 (R02 independently gated)
+2026-11-08T15:40:00.6217476Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-11-08T15:40:00.6218524Z with:
+2026-11-08T15:40:00.6218879Z   ref: 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:00.6219313Z   fetch-depth: 0
+2026-11-08T15:40:00.6219652Z   persist-credentials: false
+2026-11-08T15:40:00.6220389Z   repository: DouglasNLima/local-docs-studio
+2026-11-08T15:40:00.6223835Z   token: ***
+2026-11-08T15:40:00.6224152Z   ssh-strict: true
+2026-11-08T15:40:00.6224467Z   ssh-user: git
+2026-11-08T15:40:00.6224770Z   clean: true
+2026-11-08T15:40:00.6225100Z   sparse-checkout-cone-mode: true
+2026-11-08T15:40:00.6225483Z   fetch-tags: false
+2026-11-08T15:40:00.6225804Z   show-progress: true
+2026-11-08T15:40:00.6226149Z   lfs: false
+2026-11-08T15:40:00.6226457Z   submodules: false
+2026-11-08T15:40:00.6226810Z   set-safe-directory: true
+2026-11-08T15:40:00.6227175Z   allow-unsafe-pr-checkout: false
+2026-11-08T15:40:00.6227760Z env:
+2026-11-08T15:40:00.6228199Z   EXPECTED_WRAPPER_SHA: 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:00.6228721Z   BOUNDED_PROTOCOL: R01
+2026-11-08T15:40:00.6229052Z ##[endgroup]
+2026-11-08T15:40:00.7483209Z Syncing repository: DouglasNLima/local-docs-studio
+2026-11-08T15:40:00.7486542Z ##[group]Getting Git version info
+2026-11-08T15:40:00.7487404Z Working directory is 'D:\a\local-docs-studio\local-docs-studio'
+2026-11-08T15:40:00.8166795Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-08T15:40:01.1398518Z git version 2.56.0.windows.4
+2026-11-08T15:40:01.1448524Z ##[endgroup]
+2026-11-08T15:40:01.1465477Z Temporarily overriding HOME='D:\a\_temp\55d006bc-c634-4dca-a869-812b9898bfb8' before making global git config changes
+2026-11-08T15:40:01.1466711Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-08T15:40:01.1474907Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\local-docs-studio\local-docs-studio
+2026-11-08T15:40:01.2083578Z Deleting the contents of 'D:\a\local-docs-studio\local-docs-studio'
+2026-11-08T15:40:01.2089032Z ##[group]Initializing the repository
+2026-11-08T15:40:01.2096864Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\local-docs-studio\local-docs-studio
+2026-11-08T15:40:01.2805746Z Initialized empty Git repository in D:/a/local-docs-studio/local-docs-studio/.git/
+2026-11-08T15:40:01.2850228Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/DouglasNLima/local-docs-studio
+2026-11-08T15:40:01.3478736Z ##[endgroup]
+2026-11-08T15:40:01.3479659Z ##[group]Disabling automatic garbage collection
+2026-11-08T15:40:01.3486786Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-11-08T15:40:01.3841190Z ##[endgroup]
+2026-11-08T15:40:01.3842251Z ##[group]Setting up auth
+2026-11-08T15:40:01.3850124Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-08T15:40:01.4171090Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-08T15:40:02.8805757Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-08T15:40:02.9115595Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-08T15:40:03.3837400Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-08T15:40:03.4202328Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-08T15:40:03.8720242Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-11-08T15:40:03.9028192Z ##[endgroup]
+2026-11-08T15:40:03.9028581Z ##[group]Fetching the repository
+2026-11-08T15:40:03.9042866Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-08T15:40:12.3629517Z From https://github.com/DouglasNLima/local-docs-studio
+2026-11-08T15:40:12.3630589Z  * [new branch]        assessment/pr38-continuous-feasibility-2026-10 -> origin/assessment/pr38-continuous-feasibility-2026-10
+2026-11-08T15:40:12.3631570Z  * [new branch]        codex/document-navigation-history -> origin/codex/document-navigation-history
+2026-11-08T15:40:12.3633252Z  * [new branch]        codex/goal62-develop-policy -> origin/codex/goal62-develop-policy
+2026-11-08T15:40:12.3634025Z  * [new branch]        codex/goal62-main-public-docs -> origin/codex/goal62-main-public-docs
+2026-11-08T15:40:12.3634749Z  * [new branch]        codex/goal62-public-signing-privacy -> origin/codex/goal62-public-signing-privacy
+2026-11-08T15:40:12.3635511Z  * [new branch]        codex/goal62-signpath-eligibility -> origin/codex/goal62-signpath-eligibility
+2026-11-08T15:40:12.3636128Z  * [new branch]        codex/goal62-signpath-preliminary-enquiry -> origin/codex/goal62-signpath-preliminary-enquiry
+2026-11-08T15:40:12.3636697Z  * [new branch]        codex/local-docs-studio-feature-batch -> origin/codex/local-docs-studio-feature-batch
+2026-11-08T15:40:12.3637130Z  * [new branch]        develop      -> origin/develop
+2026-11-08T15:40:12.3637727Z  * [new branch]        experiment/goal56-high-contrast-colour-rca -> origin/experiment/goal56-high-contrast-colour-rca
+2026-11-08T15:40:12.3638299Z  * [new branch]        experiment/goal56-pr69-high-contrast-rca -> origin/experiment/goal56-pr69-high-contrast-rca
+2026-11-08T15:40:12.3639717Z  * [new branch]        experiment/goal56-preview-loading-lifecycle -> origin/experiment/goal56-preview-loading-lifecycle
+2026-11-08T15:40:12.3640303Z  * [new branch]        experiment/goal56-save-uia-causality -> origin/experiment/goal56-save-uia-causality
+2026-11-08T15:40:12.3641088Z  * [new branch]        experiment/native-continuous-layout-architecture -> origin/experiment/native-continuous-layout-architecture
+2026-11-08T15:40:12.3642130Z  * [new branch]        feature/goal56-native-continuous-layout-prototype -> origin/feature/goal56-native-continuous-layout-prototype
+2026-11-08T15:40:12.3643682Z  * [new branch]        feature/goal56-native-installer-privacy -> origin/feature/goal56-native-installer-privacy
+2026-11-08T15:40:12.3644454Z  * [new branch]        feature/goal62-scoped-mit -> origin/feature/goal62-scoped-mit
+2026-11-08T15:40:12.3645230Z  * [new branch]        feature/native-continuous-preview-performance -> origin/feature/native-continuous-preview-performance
+2026-11-08T15:40:12.3646258Z  * [new branch]        feature/native-desktop-ux-modernisation -> origin/feature/native-desktop-ux-modernisation
+2026-11-08T15:40:12.3647163Z  * [new branch]        feature/native-desktop-ux-refinements -> origin/feature/native-desktop-ux-refinements
+2026-11-08T15:40:12.3648213Z  * [new branch]        feature/native-mermaid-advanced-partial-editing -> origin/feature/native-mermaid-advanced-partial-editing
+2026-11-08T15:40:12.3649485Z  * [new branch]        feature/native-mermaid-architecture-c4-block-editors -> origin/feature/native-mermaid-architecture-c4-block-editors
+2026-11-08T15:40:12.3650587Z  * [new branch]        feature/native-mermaid-class-visual-editor -> origin/feature/native-mermaid-class-visual-editor
+2026-11-08T15:40:12.3651441Z  * [new branch]        feature/native-mermaid-creation-hub -> origin/feature/native-mermaid-creation-hub
+2026-11-08T15:40:12.3652336Z  * [new branch]        feature/native-mermaid-editor-visual-polish -> origin/feature/native-mermaid-editor-visual-polish
+2026-11-08T15:40:12.3654033Z  * [new branch]        feature/native-mermaid-er-visual-editor -> origin/feature/native-mermaid-er-visual-editor
+2026-11-08T15:40:12.3655032Z  * [new branch]        feature/native-mermaid-gantt-mindmap-pie-editors -> origin/feature/native-mermaid-gantt-mindmap-pie-editors
+2026-11-08T15:40:12.3656234Z  * [new branch]        feature/native-mermaid-kanban-requirement-gitgraph-editors -> origin/feature/native-mermaid-kanban-requirement-gitgraph-editors
+2026-11-08T15:40:12.3657570Z  * [new branch]        feature/native-mermaid-packet-treeview-treemap-venn-editors -> origin/feature/native-mermaid-packet-treeview-treemap-venn-editors
+2026-11-08T15:40:12.3658694Z  * [new branch]        feature/native-mermaid-preview-fidelity -> origin/feature/native-mermaid-preview-fidelity
+2026-11-08T15:40:12.3659921Z  * [new branch]        feature/native-mermaid-sequence-visual-editor -> origin/feature/native-mermaid-sequence-visual-editor
+2026-11-08T15:40:12.3660803Z  * [new branch]        feature/native-mermaid-state-visual-editor -> origin/feature/native-mermaid-state-visual-editor
+2026-11-08T15:40:12.3661591Z  * [new branch]        feature/native-mermaid-suite-ux-performance -> origin/feature/native-mermaid-suite-ux-performance
+2026-11-08T15:40:12.3662320Z  * [new branch]        feature/native-mermaid-timeline-journey-quadrant-editors -> origin/feature/native-mermaid-timeline-journey-quadrant-editors
+2026-11-08T15:40:12.3662954Z  * [new branch]        feature/native-mermaid-visual-editor -> origin/feature/native-mermaid-visual-editor
+2026-11-08T15:40:12.3663517Z  * [new branch]        feature/native-mermaid-xy-radar-sankey-editors -> origin/feature/native-mermaid-xy-radar-sankey-editors
+2026-11-08T15:40:12.3664099Z  * [new branch]        feature/native-smart-diagram-arrangement -> origin/feature/native-smart-diagram-arrangement
+2026-11-08T15:40:12.3664641Z  * [new branch]        feature/native-ux-performance-contract -> origin/feature/native-ux-performance-contract
+2026-11-08T15:40:12.3665296Z  * [new branch]        feature/native-ux-refinement -> origin/feature/native-ux-refinement
+2026-11-08T15:40:12.3665859Z  * [new branch]        feature/native-windows-development-host-acceptance -> origin/feature/native-windows-development-host-acceptance
+2026-11-08T15:40:12.3666523Z  * [new branch]        feature/native-windows-ux-release-readiness -> origin/feature/native-windows-ux-release-readiness
+2026-11-08T15:40:12.3667197Z  * [new branch]        feature/native-workspace-mermaid-interaction-stability -> origin/feature/native-workspace-mermaid-interaction-stability
+2026-11-08T15:40:12.3667754Z  * [new branch]        feature/native-wpf-rebuild -> origin/feature/native-wpf-rebuild
+2026-11-08T15:40:12.3668164Z  * [new branch]        feature/open-source-readiness -> origin/feature/open-source-readiness
+2026-11-08T15:40:12.3668607Z  * [new branch]        feature/oss-foundation-closeout -> origin/feature/oss-foundation-closeout
+2026-11-08T15:40:12.3669118Z  * [new branch]        feature/reading-experience-productivity -> origin/feature/reading-experience-productivity
+2026-11-08T15:40:12.3669858Z  * [new branch]        feature/solo-maintainer-governance -> origin/feature/solo-maintainer-governance
+2026-11-08T15:40:12.3670344Z  * [new branch]        fix/find-editor-caret-stability -> origin/fix/find-editor-caret-stability
+2026-11-08T15:40:12.3670783Z  * [new branch]        fix/goal56-diagnostic-inventory -> origin/fix/goal56-diagnostic-inventory
+2026-11-08T15:40:12.3671283Z  * [new branch]        fix/goal56-mermaid-creation-save-readiness -> origin/fix/goal56-mermaid-creation-save-readiness
+2026-11-08T15:40:12.3672101Z  * [new branch]        fix/goal56-native-third-party-notices -> origin/fix/goal56-native-third-party-notices
+2026-11-08T15:40:12.3672916Z  * [new branch]        fix/native-853-postmerge-pdf-lifecycle -> origin/fix/native-853-postmerge-pdf-lifecycle
+2026-11-08T15:40:12.3673454Z  * [new branch]        fix/native-blank-preview-lifecycle -> origin/fix/native-blank-preview-lifecycle
+2026-11-08T15:40:12.3674128Z  * [new branch]        fix/native-complex-mermaid-rendering -> origin/fix/native-complex-mermaid-rendering
+2026-11-08T15:40:12.3674632Z  * [new branch]        fix/native-editor-preview-selection -> origin/fix/native-editor-preview-selection
+2026-11-08T15:40:12.3675161Z  * [new branch]        integration/native-consolidation-workflow -> origin/integration/native-consolidation-workflow
+2026-11-08T15:40:12.3675686Z  * [new branch]        integration/native-wpf-candidate -> origin/integration/native-wpf-candidate
+2026-11-08T15:40:12.3676029Z  * [new branch]        main         -> origin/main
+2026-11-08T15:40:12.3676499Z  * [new branch]        release/native-preview-readiness -> origin/release/native-preview-readiness
+2026-11-08T15:40:12.3676964Z  * [new branch]        spike/native-continuous-viewer -> origin/spike/native-continuous-viewer
+2026-11-08T15:40:12.3677307Z  * [new tag]           v0.1.0-dev   -> v0.1.0-dev
+2026-11-08T15:40:12.3677540Z  * [new tag]           v0.1.0-dev.1 -> v0.1.0-dev.1
+2026-11-08T15:40:12.3677761Z  * [new tag]           v0.1.0-dev.2 -> v0.1.0-dev.2
+2026-11-08T15:40:12.3677975Z  * [new tag]           v0.1.0-dev.3 -> v0.1.0-dev.3
+2026-11-08T15:40:12.3678181Z  * [new tag]           v0.1.0-dev.4 -> v0.1.0-dev.4
+2026-11-08T15:40:12.3690190Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse --verify --quiet 72794c53ea53d2ff13efd85a66d416f33edcc344^{object}
+2026-11-08T15:40:12.4049898Z 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:12.4085383Z ##[endgroup]
+2026-11-08T15:40:12.4085741Z ##[group]Determining the checkout info
+2026-11-08T15:40:12.4086082Z ##[endgroup]
+2026-11-08T15:40:12.4094341Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-11-08T15:40:12.4481823Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-11-08T15:40:12.4814341Z ##[group]Checking out the ref
+2026-11-08T15:40:12.4822584Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:13.5350114Z Updating files:  93% (2483/2650)
+2026-11-08T15:40:13.5418895Z Updating files:  94% (2491/2650)
+2026-11-08T15:40:13.5467304Z Updating files:  95% (2518/2650)
+2026-11-08T15:40:13.5512203Z Updating files:  96% (2544/2650)
+2026-11-08T15:40:13.5552821Z Updating files:  97% (2571/2650)
+2026-11-08T15:40:13.5601397Z Updating files:  98% (2597/2650)
+2026-11-08T15:40:13.5655278Z Updating files:  99% (2624/2650)
+2026-11-08T15:40:13.5655736Z Updating files: 100% (2650/2650)
+2026-11-08T15:40:13.5656048Z Updating files: 100% (2650/2650), done.
+2026-11-08T15:40:13.5767233Z Note: switching to '72794c53ea53d2ff13efd85a66d416f33edcc344'.
+2026-11-08T15:40:13.5767619Z 
+2026-11-08T15:40:13.5767832Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-08T15:40:13.5768523Z changes and commit them, and you can discard any commits you make in this
+2026-11-08T15:40:13.5768963Z state without impacting any branches by switching back to a branch.
+2026-11-08T15:40:13.5769432Z 
+2026-11-08T15:40:13.5769698Z If you want to create a new branch to retain commits you create, you may
+2026-11-08T15:40:13.5770058Z do so (now or later) by using -c with the switch command. Example:
+2026-11-08T15:40:13.5770243Z 
+2026-11-08T15:40:13.5770343Z   git switch -c <new-branch-name>
+2026-11-08T15:40:13.5770478Z 
+2026-11-08T15:40:13.5770549Z Or undo this operation with:
+2026-11-08T15:40:13.5770675Z 
+2026-11-08T15:40:13.5770739Z   git switch -
+2026-11-08T15:40:13.5770840Z 
+2026-11-08T15:40:13.5771005Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-08T15:40:13.5771226Z 
+2026-11-08T15:40:13.5771441Z HEAD is now at 72794c53 docs(native): retain independent R01 dispatch review [skip ci]
+2026-11-08T15:40:13.5972704Z ##[endgroup]
+2026-11-08T15:40:13.6397038Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-11-08T15:40:13.6695092Z 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:13.6741004Z ##[group]Removing auth
+2026-11-08T15:40:13.6750156Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-08T15:40:13.7119642Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-08T15:40:14.2580166Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-08T15:40:14.2874453Z http.https://github.com/.extraheader
+2026-11-08T15:40:14.2917351Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+2026-11-08T15:40:14.3250196Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-08T15:40:14.8272837Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-08T15:40:14.8580901Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-08T15:40:15.3160149Z ##[endgroup]
+2026-11-08T15:40:15.3471360Z ##[group]Run $ErrorActionPreference = 'Stop'
+2026-11-08T15:40:15.3471716Z [36;1m$ErrorActionPreference = 'Stop'[0m
+2026-11-08T15:40:15.3472229Z [36;1mCopy-Item -LiteralPath scripts/native/qualification_hosted/execute_locked.py -Destination "$env:RUNNER_TEMP/goal77-execute-locked.py"[0m
+2026-11-08T15:40:15.3472876Z [36;1mpython "$env:RUNNER_TEMP/goal77-execute-locked.py" prepare --protocol $env:BOUNDED_PROTOCOL[0m
+2026-11-08T15:40:15.3473266Z [36;1mif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }[0m
+2026-11-08T15:40:15.3474164Z [36;1mgit checkout --detach 77664fbeed39162e17c6d0d2ff24a65f8a7f9d13[0m
+2026-11-08T15:40:15.3474439Z [36;1mexit $LASTEXITCODE[0m
+2026-11-08T15:40:15.4049865Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-08T15:40:15.4050153Z env:
+2026-11-08T15:40:15.4050376Z   EXPECTED_WRAPPER_SHA: 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:15.4050638Z   BOUNDED_PROTOCOL: R01
+2026-11-08T15:40:15.4053100Z   GH_TOKEN: ***
+2026-11-08T15:40:15.4053259Z ##[endgroup]
+2026-11-08T15:40:31.2022615Z Previous HEAD position was 72794c53 docs(native): retain independent R01 dispatch review [skip ci]
+2026-11-08T15:40:31.2091994Z HEAD is now at 77664fbe test(native): use sparse pinned products for hosted discovery [skip ci]
+2026-11-08T15:40:31.2515099Z ##[group]Run python "$env:RUNNER_TEMP/goal77-execute-locked.py" execute --protocol $env:BOUNDED_PROTOCOL
+2026-11-08T15:40:31.2515740Z [36;1mpython "$env:RUNNER_TEMP/goal77-execute-locked.py" execute --protocol $env:BOUNDED_PROTOCOL[0m
+2026-11-08T15:40:31.2516123Z [36;1mexit $LASTEXITCODE[0m
+2026-11-08T15:40:31.2573424Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-08T15:40:31.2573700Z env:
+2026-11-08T15:40:31.2573916Z   EXPECTED_WRAPPER_SHA: 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:31.2574175Z   BOUNDED_PROTOCOL: R01
+2026-11-08T15:40:31.2574333Z ##[endgroup]
+2026-11-08T15:40:48.5492807Z ##[error]Process completed with exit code 1.
+2026-11-08T15:40:48.5676704Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-11-08T15:40:48.5677077Z with:
+2026-11-08T15:40:48.5677250Z   name: goal77-bounded-R01-42495945111-1
+2026-11-08T15:40:48.5677470Z   path: artifacts/goal77-bounded-R01/
+2026-11-08T15:40:48.5677701Z   include-hidden-files: true
+2026-11-08T15:40:48.5677887Z   if-no-files-found: error
+2026-11-08T15:40:48.5678058Z   retention-days: 30
+2026-11-08T15:40:48.5678221Z   compression-level: 6
+2026-11-08T15:40:48.5678382Z   overwrite: false
+2026-11-08T15:40:48.5678560Z env:
+2026-11-08T15:40:48.5678761Z   EXPECTED_WRAPPER_SHA: 72794c53ea53d2ff13efd85a66d416f33edcc344
+2026-11-08T15:40:48.5679019Z   BOUNDED_PROTOCOL: R01
+2026-11-08T15:40:48.5679176Z ##[endgroup]
+2026-11-08T15:40:48.7220766Z (node:9964) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-08T15:40:48.7221416Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-08T15:40:48.7407870Z With the provided path, there will be 63 files uploaded
+2026-11-08T15:40:48.7412167Z Artifact name is valid!
+2026-11-08T15:40:48.7413277Z Root directory input is valid!
+2026-11-08T15:40:49.1055148Z Beginning upload of artifact content to blob storage
+2026-11-08T15:40:49.1794143Z (node:9964) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-08T15:40:49.6187562Z Uploaded bytes 148276
+2026-11-08T15:40:49.6914815Z Finished uploading artifact content to blob storage!
+2026-11-08T15:40:49.6915621Z SHA256 digest of uploaded artifact zip is 3bb3212f99811c44d31fef9fb0b7f6652ea0a906c29ae41e7bca1e70f62bbbea
+2026-11-08T15:40:49.6917441Z Finalizing artifact upload
+2026-11-08T15:40:50.1202527Z Artifact goal77-bounded-R01-42495945111-1.zip successfully finalized. Artifact ID 13623780293
+2026-11-08T15:40:50.1203368Z Artifact goal77-bounded-R01-42495945111-1 has been successfully uploaded! Final size is 148276 bytes. Artifact ID is 13623780293
+2026-11-08T15:40:50.1212807Z Artifact download URL: https://github.com/DouglasNLima/local-docs-studio/actions/runs/42495945111/artifacts/13623780293
+2026-11-08T15:40:50.1533192Z Post job cleanup.
+2026-11-08T15:40:50.2871725Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-08T15:40:50.3160922Z git version 2.56.0.windows.4
+2026-11-08T15:40:50.3218854Z Temporarily overriding HOME='D:\a\_temp\da0028d6-8bd6-4261-86cc-e031abc67284' before making global git config changes
+2026-11-08T15:40:50.3219876Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-08T15:40:50.3227789Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\local-docs-studio\local-docs-studio
+2026-11-08T15:40:50.3561421Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-08T15:40:50.3908106Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-08T15:40:50.9014725Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-08T15:40:50.9338770Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-08T15:40:51.4233624Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-08T15:40:51.4554882Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-08T15:40:51.9947291Z Cleaning up orphan processes
+2026-11-08T15:40:52.0173820Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

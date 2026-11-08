@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "archive": "raw-evidence.zip",
+  "archiveBytes": 53990,
+  "archiveSha256": "c0157c0a66e11baf8b10eb5ecf545456fa4278c30b2f8c5d7bc63d1c08d0f2f9",
+  "members": {
+    "attempt/child-environment.json": {
+      "bytes": 236,
+      "sha256": "a13218bf49f6c0ec89712c11817b8fcb777ec3f23be734aaf347dcdccefd67a6"
+    },
+    "attempt/failure.json": {
+      "bytes": 142,
+      "sha256": "e412d9d71ebc79aed823ffa6a0b0887786c94cde53162b6066903c7b727f5ee2"
+    },
+    "attempt/files.json": {
+      "bytes": 902,
+      "sha256": "deedc4681fc82f8d2a1acbffdf8306fb86d37e85d39fe25acddde6647cb5a0f2"
+    },
+    "attempt/NativeBufferSelfTest.exe": {
+      "bytes": 20480,
+      "sha256": "311655cd165d4a82631efce4b827decea6a5199d2e723da67175b94a4539e549"
+    },
+    "attempt/owner-before-launch.json": {
+      "bytes": 5594,
+      "sha256": "4e293ae56daa020c9d692a1667c9af2dfd0f8fb0b09f35ba672873505eeaeb88"
+    },
+    "attempt/owner-before.json": {
+      "bytes": 5594,
+      "sha256": "4e293ae56daa020c9d692a1667c9af2dfd0f8fb0b09f35ba672873505eeaeb88"
+    },
+    "attempt/plan.json": {
+      "bytes": 6764,
+      "sha256": "415e0ecb2e10328e3a6850da926ab1c9ef237072352a7a903fb1f46424081be3"
+    },
+    "attempt/process.json": {
+      "bytes": 50389,
+      "sha256": "35ab4f7eb63a943ee5f09376d7d9d346a04e4b4ef3cbf53a37df93c21a8c789d"
+    },
+    "attempt/stderr.jsonl": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "attempt/stdout.json": {
+      "bytes": 216,
+      "sha256": "233a2a41997041f7c13cc37ae4fe92f597073a784be5771a3269c2d931aa366e"
+    },
+    "attempt/supervisor.jsonl": {
+      "bytes": 19536,
+      "sha256": "6dcfda7102792df97cb49b7210a2fbf04d55d926b9b6fdc4dffdb3c779dc02ca"
+    },
+    "capture/audit-result.json": {
+      "bytes": 5286,
+      "sha256": "311e8693a19ff856812ff6661b665c5ee8c7e9142e33e3033978f5c5fad7a987"
+    },
+    "capture/audit_evidence.py": {
+      "bytes": 6771,
+      "sha256": "25c9051cca2d0c177d0289cd525e710b8e6deb6d451d1a9b9d9a26bb40571825"
+    },
+    "capture/authority-api-after-observation.json": {
+      "bytes": 4959,
+      "sha256": "3471dc0f1d5c450f995206c1b98ee34f0da860a5077c96fba851476abef0a670"
+    },
+    "capture/authority-api-before.json": {
+      "bytes": 4959,
+      "sha256": "3471dc0f1d5c450f995206c1b98ee34f0da860a5077c96fba851476abef0a670"
+    },
+    "capture/authority-body.txt": {
+      "bytes": 1428,
+      "sha256": "5550d95aafd502981f91a439447e689e61827bf31350341d2285c5b3a13e7e59"
+    },
+    "capture/capture_driver.py": {
+      "bytes": 2977,
+      "sha256": "08d9f3d7ff4e50a5aedd92f189ab27cc360623d4322d6daf1d157c75654dc011"
+    },
+    "capture/driver-exit.json": {
+      "bytes": 942,
+      "sha256": "ebabda3279e52d21aedc0c5c877955499bbd666cc496cd042c88a4548da110e3"
+    },
+    "capture/driver-launch.json": {
+      "bytes": 644,
+      "sha256": "af6a947972f0d94f718b5d0b3b10b43de5e2d2a93f7d1f3078282ad42a198f25"
+    },
+    "capture/driver.stderr.bin": {
+      "bytes": 864,
+      "sha256": "6b47f8b244dbec4f0d43dbdbcdf9c875c22dbcd3bf5bf6d3f60ba6d69384a461"
+    },
+    "capture/driver.stdout.bin": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "capture/preflight.json": {
+      "bytes": 5732,
+      "sha256": "e316c07763ffc90accc6da570407d3555411dd77abe05dc1d80d480d29f16216"
+    },
+    "independent/audit.json": {
+      "bytes": 9814,
+      "sha256": "0d0fd960f85a99d06a205ee8f589baef2b49b1bc3bc34fb9b25b7336585a64ca"
+    },
+    "independent/audit.py": {
+      "bytes": 22461,
+      "sha256": "ffee174646c43f4eeb90e88289822143300c361c7f9cbe088f3fc2056ba5928a"
+    },
+    "independent/receipt.json": {
+      "bytes": 865,
+      "sha256": "bd99e803b12c18c03b1c7394e5d8e2dc68b5ac5445115f554620bbca3139c485"
+    },
+    "independent/review.md": {
+      "bytes": 10721,
+      "sha256": "99b16ce5abf16ef11c1898afeb1f1452991773be7ca2025c254f5ab4224c41c6"
+    }
+  },
+  "nativeResult": "FAIL",
+  "readiness": "BLOCKED",
+  "retries": 0
+}
