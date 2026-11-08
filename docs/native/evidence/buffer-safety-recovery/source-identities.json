@@ -1,0 +1,96 @@
+{
+  "startingCommit": "eddd6b5268215182991cbe5d71a3fd52ce93c9b9",
+  "startingTree": "58616bf13a4f0610b4fa86dffbc3a25d5dbbad3f",
+  "scope": "Reviewed uncommitted source bytes; final Git commit/tree bound in delivery receipt. Compile-only collector is not an execution bundle.",
+  "sources": {
+    "scripts/native/qualification_hosted/desktop_probe/DesktopProbe.csproj": {
+      "worktreeSha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+      "gitBlob": "f5d9d82ee498865c53e103bc4275aefa7df88568",
+      "canonicalGitBlobSha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f"
+    },
+    "scripts/native/qualification_hosted/desktop_probe/HighContrastReader.cs": {
+      "worktreeSha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "gitBlob": "e8ce4beb3809852113970bc3aacee5df6079730a",
+      "canonicalGitBlobSha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59"
+    },
+    "scripts/native/qualification_hosted/desktop_probe/Program.cs": {
+      "worktreeSha256": "c5594b642795785b192c7c6c420bbb84a3c09df1314a4deb037ee2896d62b54f",
+      "gitBlob": "4d0270e6d5f102278b6bdc7c6afd51282ceae7e9",
+      "canonicalGitBlobSha256": "c5594b642795785b192c7c6c420bbb84a3c09df1314a4deb037ee2896d62b54f"
+    },
+    "scripts/native/qualification_hosted/desktop_probe/desktop.manifest": {
+      "worktreeSha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+      "gitBlob": "78c6ac3968f9b0b1c1feb4012f8b9d25a8906d14",
+      "canonicalGitBlobSha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a"
+    },
+    "scripts/native/qualification_hosted/discover_desktop.py": {
+      "worktreeSha256": "2763e87949f69bed89617c233fe664b7becdd21664f652e29d27ca240337552e",
+      "gitBlob": "97f0374a49e052ec44eddf911006085e636a90d0",
+      "canonicalGitBlobSha256": "2763e87949f69bed89617c233fe664b7becdd21664f652e29d27ca240337552e"
+    },
+    "scripts/native/qualification_hosted/eligibility.py": {
+      "worktreeSha256": "18df748d3f4f5229903a2f867feb0518a37ad73ffefe57749c47ae7a317fc005",
+      "gitBlob": "824faaaacdd8cd06a1f58b09c6daf2c702dce996",
+      "canonicalGitBlobSha256": "18df748d3f4f5229903a2f867feb0518a37ad73ffefe57749c47ae7a317fc005"
+    },
+    "tests/unit/native_buffer/ManagedControls.cs": {
+      "worktreeSha256": "26045c726f1d78034b19d97743db17a3d7588f1872e5c1cfabe0669f2e9452b6",
+      "gitBlob": "80f7f3190420dbc0af75ca7089578fe0c55d5b64",
+      "canonicalGitBlobSha256": "26045c726f1d78034b19d97743db17a3d7588f1872e5c1cfabe0669f2e9452b6"
+    },
+    "tests/unit/native_buffer/NativeBufferTests.csproj": {
+      "worktreeSha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58",
+      "gitBlob": "0611665408cda8ad7539557cd85b017b04afcf71",
+      "canonicalGitBlobSha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58"
+    },
+    "tests/unit/native_buffer/fixture.cpp": {
+      "worktreeSha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1",
+      "gitBlob": "687be3a5147e50a409ecaf259d93b5ef55f144f9",
+      "canonicalGitBlobSha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1"
+    },
+    "tests/unit/native_buffer/run_controls.py": {
+      "worktreeSha256": "a33f4b49d10752187f532fb949545cbf9fe24a9dbe434304e380dd4a912a0a37",
+      "gitBlob": "4bd71314636efaba8f21d4c7f834ed0c2dba16b4",
+      "canonicalGitBlobSha256": "a33f4b49d10752187f532fb949545cbf9fe24a9dbe434304e380dd4a912a0a37"
+    },
+    "tests/unit/test_native_buffer_evidence.py": {
+      "worktreeSha256": "c752292ebbaeffc25c686356313fdae631fddf239d3770ce4a6e63a7d1ba986e",
+      "gitBlob": "64db19be4258c106c123612d9ac7239b79fb5277",
+      "canonicalGitBlobSha256": "c752292ebbaeffc25c686356313fdae631fddf239d3770ce4a6e63a7d1ba986e"
+    },
+    "tests/unit/test_native_hosted_execution.py": {
+      "worktreeSha256": "2cfd6ee6a22c9677f6ffe9bb17548f1d6b0ed2ae180cf38628db4ebc8d3d5e84",
+      "gitBlob": "7a21cfcd03299892af9bd43173d79bc0f8ff5aab",
+      "canonicalGitBlobSha256": "2cfd6ee6a22c9677f6ffe9bb17548f1d6b0ed2ae180cf38628db4ebc8d3d5e84"
+    },
+    "tests/unit/test_native_infrastructure.py": {
+      "worktreeSha256": "dae47352899fd3a70f1e1caf43ec695aff989d3dcdb38d14c89e8eee578041cf",
+      "gitBlob": "3755ead7fe1912e2293220bd78dc1319a86ddc36",
+      "canonicalGitBlobSha256": "dae47352899fd3a70f1e1caf43ec695aff989d3dcdb38d14c89e8eee578041cf"
+    },
+    "tests/unit/test_native_qualification.py": {
+      "worktreeSha256": "56b9aa00fa36efceb5912098e6a00557e16bc7111c1ab9c0cb48e7ce02cbb28a",
+      "gitBlob": "417fd3d28c429baa99a923a4d79f5572d4bc9dcb",
+      "canonicalGitBlobSha256": "56b9aa00fa36efceb5912098e6a00557e16bc7111c1ab9c0cb48e7ce02cbb28a"
+    }
+  },
+  "unchangedProtectedObjects": {
+    "src/native": "7b2875ad175424ff588c3d57d67bc8f237116d04",
+    "assets": "087e0dad051a709e2c0a29cafd72d8ed93b2f8c0",
+    "tests/fixtures/native-ux": "92693548fc0ee931442061b6f784a7c5bceec1f1",
+    ".github/workflows/native-ux-performance.yml": "172a2d706b81ba29279083b424e709f72d65e280",
+    "scripts/native/qualification": "458fe68891a4dd9925f0754a7b7247fb902cbd6c",
+    "scripts/native/qualification_hosted/execute_locked.py": "317d9ca32690ed62a4ffa7511effe71f0c278768",
+    "docs/native/qualification/goal77-execution.json": "10fcf1ba82b8922e11273d211a96edd598ea443b",
+    "docs/adr/007-native-document-rendering-performance.md": "0ec1b7721d5747f3f4e9764376a3b30fa65e4476",
+    ".gitattributes": "f73d506d69e26f10260e29fe1b38b1d41ebd2941"
+  },
+  "pr76": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+  "pr80": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+  "develop": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+  "drafts": [
+    76,
+    78,
+    80
+  ]
+}

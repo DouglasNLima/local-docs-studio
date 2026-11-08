@@ -2,6 +2,8 @@
 import copy
 import math
 
+HC_OWNERSHIP_CONTRACT = 'dotnet/winforms@295f067453524c1eef18fcbe85e14431bd8aef17:HIGHCONTRASTW-borrowed'
+
 
 def require(value, message):
     if not value:
@@ -28,7 +30,12 @@ def appearance_state(value):
         require(value['schemePointerWasNull'] is False and isinstance(scheme, str) and 0 < len(scheme) < 32768, 'Named scheme is incomplete')
     else:
         raise ValueError('Unknown scheme kind')
-    require(value['getBufferReleased'] is True, 'GET buffer ownership is unverified')
+    if isinstance(scheme, str):
+        require('\0' not in scheme and len(scheme.encode('utf-16-le', errors='strict')) < 65536,
+                'Invalid or overlong UTF-16 scheme copy')
+    require(value['schemeOwnership'] == 'BORROWED_OS' and value['schemeCopyComplete'] is True
+            and value['schemeReleaseAttempted'] is False and value['ownershipContract'] == HC_OWNERSHIP_CONTRACT
+            and 'getBufferReleased' not in value, 'Borrowed GET ownership evidence is missing or contradictory')
     require(type(value['theme']['hresult']) is int and value['theme']['hresult'] == 0
             and all(isinstance(value['theme'][k], str) for k in ('file', 'colour', 'size')), 'Active theme observation unavailable')
     require(set(value['colours']) == set(map(str, (2, 3, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 20, 26))), 'Incomplete Win32 palette')

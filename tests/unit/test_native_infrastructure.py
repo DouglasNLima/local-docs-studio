@@ -21,7 +21,8 @@ import execute_locked as coordinator
 
 def appearance(kind='NAMED'):
     return dict(flags=126, enabled=False, schemePointerWasNull=kind == 'NULL', schemeKind=kind,
-                scheme={'NULL': None, 'EMPTY': '', 'NAMED': 'High Contrast Black'}[kind], getBufferReleased=True,
+                scheme={'NULL': None, 'EMPTY': '', 'NAMED': 'High Contrast Black'}[kind], schemeOwnership='BORROWED_OS',
+                schemeCopyComplete=True, schemeReleaseAttempted=False, ownershipContract=gate.HC_OWNERSHIP_CONTRACT,
                 colours={str(n): 0 for n in (2, 3, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 20, 26)},
                 theme={'hresult': 0, 'file': 'normal.theme', 'colour': 'normal', 'size': 'normal'})
 
@@ -128,9 +129,17 @@ class InfrastructureControls(unittest.TestCase):
         for field, value in [('flags', 62), ('theme', {'hresult': 0, 'file': 'other.theme'}), ('colours', {'13': 1})]:
             self.assertFalse(gate.exact_restoration(appearance(), dict(appearance(), **{field: value})))
 
-    def test_failed_get_or_unreleased_buffer_or_inconsistent_pointer_is_not_safe(self):
-        for key, value in [('getBufferReleased', False), ('schemePointerWasNull', True), ('enabled', True), ('scheme', None), ('flags', True)]:
+    def test_failed_copy_or_wrong_ownership_or_inconsistent_pointer_is_not_safe(self):
+        for key, value in [('getBufferReleased', True), ('schemeOwnership', 'UNKNOWN'), ('schemeReleaseAttempted', True),
+                           ('schemeCopyComplete', False), ('ownershipContract', 'moving'), ('schemePointerWasNull', True),
+                           ('enabled', True), ('scheme', None), ('flags', True)]:
             self.assertFalse(gate.exact_restoration(appearance(), dict(appearance(), **{key: value})))
+        for key in ('schemeOwnership', 'schemeCopyComplete', 'schemeReleaseAttempted', 'ownershipContract'):
+            incomplete = appearance(); del incomplete[key]
+            self.assertFalse(gate.exact_restoration(appearance(), incomplete))
+        for scheme in ('\ud800', 'A\0B', '🎨' * 16384):
+            malformed = dict(appearance(), schemeKind='NAMED', scheme=scheme)
+            self.assertFalse(gate.exact_restoration(malformed, malformed))
 
     def process(self):
         return dict(processId=17, jobTreeEmpty=True, cleanupVerified=True, restored=True, supervisionFailure=None, exitCode=1)
@@ -225,11 +234,15 @@ class InfrastructureControls(unittest.TestCase):
             'GetMonitorInfoW', 'EnumDisplayDevicesW', 'EnumDisplaySettingsW', 'GetProcessDpiAwareness', 'GetScaleFactorForMonitor',
             'GetThreadDpiAwarenessContext', 'GetAwarenessFromDpiAwarenessContext', 'GetDpiForSystem', 'GetSystemMetrics',
             'GetSysColor', 'GetThreadDesktop', 'GetProcessWindowStation', 'OpenInputDesktop', 'CloseDesktop',
-            'GetUserObjectInformationW', 'LocalFree', 'GetCurrentThreadId', 'ProcessIdToSessionId', 'WTSGetActiveConsoleSessionId', 'GetCurrentThemeName'})
+            'GetUserObjectInformationW', 'GetCurrentThreadId', 'ProcessIdToSessionId', 'WTSGetActiveConsoleSessionId', 'GetCurrentThemeName'})
         self.assertEqual(source.count('SystemParametersInfoContrast(GetHighContrast,'), 1)
         self.assertIn('GetHighContrast = 0x42', source)
         for name in ('SendInput(', 'ChangeDisplaySettings', 'SetProcessDpi', 'SetThreadDpi', 'CreateWindow', 'SystemParametersInfoContrast(0x43', 'HCF_OPTION_NOTHEMECHANGE'):
             self.assertNotIn(name, source)
+        reader = (MODULES / 'desktop_probe/HighContrastReader.cs').read_text()
+        for name in ('LocalFree(', 'FreeHGlobal(', 'FreeCoTaskMem(', 'SafeHandle'):
+            self.assertNotIn(name, source + reader)
+        self.assertIn('HighContrastReader.cs', (MODULES / 'discover_desktop.py').read_text())
         project = (MODULES / 'desktop_probe/DesktopProbe.csproj').read_text()
         for name in ('UseWPF', 'UseWindowsForms', 'PackageReference', 'ProjectReference'):
             self.assertNotIn(name, project)

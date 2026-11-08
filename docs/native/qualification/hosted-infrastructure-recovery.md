@@ -117,11 +117,14 @@ failure; the precise reason the original empty restore request did not round-tri
 is still unproved.
 
 [HIGHCONTRASTW](https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-highcontrastw)
-documents separate flags and default scheme fields. Its GET string is system
-allocated and must be released with LocalFree. The new getter copies a bounded
-string, preserves NULL/EMPTY/NAMED, releases the returned allocation, and retains
-all raw flags, active theme identity and relevant Win32 system colours. It makes
-no WPF system-colour read. HCF_HIGHCONTRASTON alone does not describe the scheme;
+documents separate flags and default scheme fields. The historical getter followed
+that page's LocalFree instruction. Microsoft's explicit implementation guidance
+identifies that instruction as incorrect: the scheme is borrowed OS storage. The
+[buffer safety recovery](highcontrast-buffer-safety.md) corrects that source-level
+ownership defect, preserving all original sources and failed evidence. Live native
+verification remains pending. The getter retains NULL/EMPTY/NAMED, raw flags, active
+theme identity and relevant Win32 system colours without a WPF system-colour read.
+HCF_HIGHCONTRASTON alone does not describe the scheme;
 read-only/ignored flag bits are recorded without masking. HCF_OPTION_NOTHEMECHANGE
 is not used to suppress notifications or implement a toggle.
 
@@ -142,9 +145,10 @@ without a timeout or retry. Pointer addresses/aliasing and a crash dump were not
 collected. This localises the observed abort boundary; it does **not** prove double
 free, identify the origin of earlier heap damage, or explain the first unjournalled
 failure. The documented ownership recommendation does not establish that this
-implementation is safe on the observed host. No deallocation is removed, no second
-read is skipped, and no partial result is promoted to PASS. Safe repeated GET-buffer
-ownership must be resolved and independently validated before appearance experiments.
+implementation is safe on the observed host. The subsequent correction removes
+the invalid borrowed-pointer release, retains both fixed reads and promotes no
+partial result to PASS. Safe repeated GET on the actual host must still be
+independently verified before appearance experiments.
 Final loaded-Core/self-hash acceptance was not reached, although the journal reports
 runtime 10.0.14 and the image/SDK/build identities were verified before launch.
 
@@ -194,8 +198,10 @@ is treated as evidence of displayed pixels.
 | Restoration experiment | Approve or reject a separately bounded HC round trip only after the getter's ownership is qualified; require independent exact readback and stop on the first mismatch. | No appearance change or claim of reliable empty-scheme restoration is currently authorised or established. |
 | Fresh qualification | After infrastructure passes, review integration of the pre-V1/per-cell gates, exact new source/binary/configuration receipts, then issue fresh campaign authority if appropriate. | R01/R02 and calibration remain blocked; the earlier authority is spent. |
 
-The minimum technical follow-up is the collector's returned-buffer ownership,
-not a product or renderer change. No further hosted run is made in this continuation.
+The [buffer recovery](highcontrast-buffer-safety.md) now corrects the source-level
+ownership defect with controlled offline evidence. The minimum remaining technical
+follow-up is separately authorised native verification, not a product or renderer
+change. No further hosted run is made in this continuation.
 
 Hardware/corpus selection and statistical review remain governed by the existing
 [selection sheet](hardware-corpus-selection.md); no specifications or user documents

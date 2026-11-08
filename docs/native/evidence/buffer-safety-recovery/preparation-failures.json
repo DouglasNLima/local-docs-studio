@@ -1,0 +1,40 @@
+{
+  "recordType": "TRANSCRIBED_TOOL_RESULT_AND_SOURCE_DIAGNOSIS_NOT_RAW_CONSOLE_CAPTURE",
+  "aggregatePython": {
+    "command": "python -m unittest discover -s tests/unit -p test_native*.py -v",
+    "exitCode": 1,
+    "tests": 101,
+    "failed": 1,
+    "failedTest": "test_native_hosted_execution.HostedExecutionControls.test_local_cli_rejects_without_gui_or_api_import",
+    "cause": "Parent sys.modules already contains windows imported by test_native_qualification during discovery; both historical tests unchanged.",
+    "disposition": "FAIL retained; separate-process module results are separate evidence."
+  },
+  "toolchainFailures": [
+    {
+      "attempt": 1,
+      "outcome": "CalledProcessError, exit 1 during cmd/vcvars quote handling; no native controls executed; original receipt retained"
+    },
+    {
+      "attempt": 2,
+      "outcome": "VC setup exit 1, escaped quote rejected; original stderr and receipt retained; no native controls executed"
+    },
+    {
+      "attempt": 3,
+      "outcome": "FileNotFoundError before cl launch; child executable resolution did not use the supplied PATH; original logs/receipt retained"
+    }
+  ],
+  "emptyGovernanceDiscovery": {
+    "exitCode": 5,
+    "tests": 0,
+    "disposition": "Wrong test directory; NO TESTS RAN remains unsuccessful; correct existing script separately ran 25 tests."
+  },
+  "notRun": [
+    "Hosted discovery",
+    "Actual SPI_GETHIGHCONTRAST",
+    "Collector execution",
+    "R01",
+    "R02",
+    "Calibration",
+    "Display or appearance changes"
+  ]
+}

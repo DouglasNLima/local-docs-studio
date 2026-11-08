@@ -43,7 +43,7 @@
     "childPid": 9612,
     "exitCodeHex": "c0000374",
     "lastBoundary": "SECOND_HIGH_CONTRAST_FREE_BEGIN",
-    "furtherExecution": "DISABLED_PENDING_REVIEWED_BUFFER_OWNERSHIP_REPAIR",
+    "furtherExecution": "DISABLED_PENDING_OWNER_AUTHORITY_AND_LIVE_BUFFER_VERIFICATION",
     "liveAppearanceChangesAuthorised": false,
     "liveDisplayChangesAuthorised": false
   },
@@ -73,7 +73,7 @@
   "spentCoordinatorAuthorityBlockedBeforeSideEffects": true,
   "supplementalContinuationGate": "OFFLINE_VALIDATED_NOT_INTEGRATED_IN_FROZEN_LAUNCHER",
   "unresolved": [
-    "Safe repeated HIGHCONTRAST GET-buffer ownership; exact native failure origin is unproved",
+    "Corrected borrowed-pointer collector requires separately authorised actual-host native verification; exact historical corruption origin remains inconclusive",
     "Verified disposable-host work area at least 1280 x 800 DIPs; enumerated 1920 x 1080 is not a verified mode change",
     "Exact appearance round-trip validation including nullable scheme identity",
     "Separate owner authority for any live infrastructure change and explicit initial appearance baseline",
@@ -128,5 +128,30 @@
     "originalPointerKind": "UNRECORDED",
     "bufferOwnership": "UNQUALIFIED_NATIVE_FAILURE",
     "failureOrigin": "INCONCLUSIVE_SECOND_RELEASE_BOUNDARY_LOCALISED"
+  },
+  "bufferSafetyRecovery": {
+    "startingCommit": "eddd6b5268215182991cbe5d71a3fd52ce93c9b9",
+    "startingTree": "58616bf13a4f0610b4fa86dffbc3a25d5dbbad3f",
+    "sourceDefect": "CONFIRMED_INVALID_RELEASE_OF_BORROWED_OS_POINTER",
+    "historicalCrashOrigin": "INCONCLUSIVE",
+    "ownershipContract": "dotnet/winforms@295f067453524c1eef18fcbe85e14431bd8aef17:HIGHCONTRASTW-borrowed",
+    "implementation": "CORRECTED_COLLECTOR_ONLY",
+    "offlineStatus": "PASS_CONTROLLED_SIMULATION_ONLY",
+    "nativeChecks": 21,
+    "managedCases": 20,
+    "evidenceControlTests": 6,
+    "infrastructureTests": 21,
+    "fixtureAllocations": 53,
+    "fixtureOwnerReleases": 53,
+    "fixtureActiveAllocations": 0,
+    "actualHighContrastCallsThisContinuation": 0,
+    "collectorExecuted": false,
+    "hostedRunsThisContinuation": 0,
+    "newExecutionAuthorised": false,
+    "liveNativeVerification": "NOT_RUN",
+    "readiness": "READY_FOR_SEPARATE_EXECUTION_DECISION_ONLY",
+    "report": "highcontrast-buffer-safety.md",
+    "independentReview": "highcontrast-buffer-review.md",
+    "evidence": "../evidence/buffer-safety-recovery/README.md"
   }
 }

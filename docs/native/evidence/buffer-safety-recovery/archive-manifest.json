@@ -1,0 +1,1268 @@
+{
+  "archive": "offline-original-bytes.zip",
+  "sha256": "d28cc4f433b02f93bdfac1604b270123a16419da0229387104ccc990f5a29c27",
+  "bytes": 1229220,
+  "members": 314,
+  "files": {
+    "attempt-1/receipt.json": {
+      "sha256": "1d688fdc98e4f8d9e07f5ff64b3a2ded87e9ab69e2197523642ca49e5a20e6b7",
+      "bytes": 298
+    },
+    "attempt-2/receipt.json": {
+      "sha256": "4d9208b4d749adc98e2932186608a11756e4a9dd5ec311c187c29cddb07e2d77",
+      "bytes": 422
+    },
+    "attempt-2/vc-setup.stderr.txt": {
+      "sha256": "0fbe3f7c1e2db4a5054c5afad48749144feaa9be83333fe4bcdc3f3da19f54be",
+      "bytes": 189
+    },
+    "attempt-3/fixture.cpp": {
+      "sha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1",
+      "bytes": 7855
+    },
+    "attempt-3/global.json": {
+      "sha256": "47df8e0fd7714fdc7342c177e682bbe52a39d22ae5132d2b50ae98d196552a0c",
+      "bytes": 58
+    },
+    "attempt-3/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-3/ManagedControls.cs": {
+      "sha256": "ddd3bddaa8fa936cca9737004d7f6f06b0d8cac35b93892059c89e585a8467a3",
+      "bytes": 12403
+    },
+    "attempt-3/native-dll-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-3/native-dll-build.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-3/NativeBufferTests.csproj": {
+      "sha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58",
+      "bytes": 618
+    },
+    "attempt-3/receipt.json": {
+      "sha256": "41f6365af2312429ffb1436e837e7ee489dc73dff75e0963d60f7b96427bcd6b",
+      "bytes": 2771
+    },
+    "attempt-3/runtimes.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-3/runtimes.stdout.txt": {
+      "sha256": "82e50aa6826f49ab83c2c22db73f150c81e15835d128b6529f5e44b137038e8b",
+      "bytes": 2203
+    },
+    "attempt-3/sdk.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-3/sdk.stdout.txt": {
+      "sha256": "3db6bca4b50618b2e0d2d55d23b3d0541fe039ab6f731df0e9c47317b400ce52",
+      "bytes": 10
+    },
+    "attempt-3/vc-setup.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/collector-build-only.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/collector-build-only.stdout.txt": {
+      "sha256": "1cd5d028897a453922e3038d4905e79625646db60be83d4f95dc9fef381a17af",
+      "bytes": 422
+    },
+    "attempt-4/collector-compile-only/compiled/DesktopProbe.deps.json": {
+      "sha256": "9c2ef70d198253d937b961960c4de53cce477bb9e09a5990575207fd5e8aaff2",
+      "bytes": 484
+    },
+    "attempt-4/collector-compile-only/compiled/DesktopProbe.dll": {
+      "sha256": "9961909ec325d2344504638cadecb349020979afc670b939befec59d5ed10faf",
+      "bytes": 51712
+    },
+    "attempt-4/collector-compile-only/compiled/DesktopProbe.exe": {
+      "sha256": "a63261a050d1f5aca79fabe5cdde73dacf16e310bc74d747ce2e704d6f279198",
+      "bytes": 162816
+    },
+    "attempt-4/collector-compile-only/compiled/DesktopProbe.pdb": {
+      "sha256": "2fae116ab4a7ee39add8e6123a4ac121a1c3c31796f38aff5ef938c9e0accf3a",
+      "bytes": 21244
+    },
+    "attempt-4/collector-compile-only/compiled/DesktopProbe.runtimeconfig.json": {
+      "sha256": "13a73aba9a05d93aab51d1edee476df13d89bf8705f28bc69bea1b31b816efd9",
+      "bytes": 431
+    },
+    "attempt-4/collector-compile-only/desktop.manifest": {
+      "sha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+      "bytes": 790
+    },
+    "attempt-4/collector-compile-only/DesktopProbe.csproj": {
+      "sha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+      "bytes": 634
+    },
+    "attempt-4/collector-compile-only/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-4/collector-compile-only/obj/DesktopProbe.csproj.nuget.dgspec.json": {
+      "sha256": "f455062c7b967dafa05f4c0e1d0357e542c48658c98ca5a7326b8b4b6bdbde61",
+      "bytes": 22564
+    },
+    "attempt-4/collector-compile-only/obj/DesktopProbe.csproj.nuget.g.props": {
+      "sha256": "d4ba7ba123e183ef553c61c344785d70eb06b63615e7cbef8fd4d585dd703935",
+      "bytes": 1302
+    },
+    "attempt-4/collector-compile-only/obj/DesktopProbe.csproj.nuget.g.targets": {
+      "sha256": "971cc9b535384849b5c661d776cd7a80833a416265e32e8968e06c367368b8b5",
+      "bytes": 150
+    },
+    "attempt-4/collector-compile-only/obj/project.assets.json": {
+      "sha256": "bb4a55046dbea318830143df3598e6340a55fcce2ebf3946d6b43a2cb41571dc",
+      "bytes": 21881
+    },
+    "attempt-4/collector-compile-only/obj/project.nuget.cache": {
+      "sha256": "0188cf0bc2e986d5c0d9e34318c2eb4e49018f33b11eda60c004da50bc2d99d6",
+      "bytes": 425
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs": {
+      "sha256": "93d67476196ebfc80d1d7d8844b91146cfd678d105f5ce635eb900ca40610c9b",
+      "bytes": 200
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/apphost.exe": {
+      "sha256": "a63261a050d1f5aca79fabe5cdde73dacf16e310bc74d747ce2e704d6f279198",
+      "bytes": 162816
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.AssemblyInfo.cs": {
+      "sha256": "643c446ba38629b500fd80b634c30b77a1f48ed52ddccee8a02010c608aa3431",
+      "bytes": 1171
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.AssemblyInfoInputs.cache": {
+      "sha256": "41f0a42017abf95da803d8a11efcbc4f76df7dc5b35f9133b9cd82b79e0d5434",
+      "bytes": 66
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.assets.cache": {
+      "sha256": "849f267057b66c3b5b38c6f17172459ed5d2ee71b78d3b963501ebbd76b3bfbb",
+      "bytes": 228
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.csproj.CoreCompileInputs.cache": {
+      "sha256": "e55d35cef64e9b20970d9b25943716134253094f4f66f88a156d5ef10f9eabbe",
+      "bytes": 66
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.csproj.FileListAbsolute.txt": {
+      "sha256": "6bff9df87239f82152b6b161489181efb58b17e2239d83e2154cf35c83823c45",
+      "bytes": 2466
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.dll": {
+      "sha256": "9961909ec325d2344504638cadecb349020979afc670b939befec59d5ed10faf",
+      "bytes": 51712
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.GeneratedMSBuildEditorConfig.editorconfig": {
+      "sha256": "fcc6eebb2a8db75cd4a98f3f94f885f08806b9eaa8e7050558b619385d76770a",
+      "bytes": 962
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.genruntimeconfig.cache": {
+      "sha256": "c501fbb1e1c96644d44761f21a0be1d3eec59457f4e4665fa320294bb1177730",
+      "bytes": 66
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.GlobalUsings.g.cs": {
+      "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227",
+      "bytes": 239
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.pdb": {
+      "sha256": "2fae116ab4a7ee39add8e6123a4ac121a1c3c31796f38aff5ef938c9e0accf3a",
+      "bytes": 21244
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.sourcelink.json": {
+      "sha256": "339f566d4fe7c63976d8bb706760958d4b5771f1bdccda5fac2f937620f35ba5",
+      "bytes": 174
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/ref/DesktopProbe.dll": {
+      "sha256": "be3f2034278bd9a3f1edbdba6452c265e5633b253751f6f6ed08200c61d376b8",
+      "bytes": 8704
+    },
+    "attempt-4/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/refint/DesktopProbe.dll": {
+      "sha256": "be3f2034278bd9a3f1edbdba6452c265e5633b253751f6f6ed08200c61d376b8",
+      "bytes": 8704
+    },
+    "attempt-4/collector-compile-only/Program.cs": {
+      "sha256": "c5594b642795785b192c7c6c420bbb84a3c09df1314a4deb037ee2896d62b54f",
+      "bytes": 15407
+    },
+    "attempt-4/fixture-dll.obj": {
+      "sha256": "aca67ce71f62f5af48016ffa335eecf61ea11fda1d1b3dd9efbc43f1b4cb72d8",
+      "bytes": 8571
+    },
+    "attempt-4/fixture-test.obj": {
+      "sha256": "86b86a9018166fc07b80643f2085c88c06618f56a50783b9fe56f5ed97d53185",
+      "bytes": 70659
+    },
+    "attempt-4/fixture.cpp": {
+      "sha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1",
+      "bytes": 7855
+    },
+    "attempt-4/global.json": {
+      "sha256": "47df8e0fd7714fdc7342c177e682bbe52a39d22ae5132d2b50ae98d196552a0c",
+      "bytes": 58
+    },
+    "attempt-4/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-4/imports-NativeBufferFixture.dll.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/imports-NativeBufferFixture.dll.stdout.txt": {
+      "sha256": "3e59eff901c9eb11e7d9562882b59c5cb16eea1b59d9fcfc43336a4fa117ac22",
+      "bytes": 2356
+    },
+    "attempt-4/imports-NativeBufferSelfTest.exe.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/imports-NativeBufferSelfTest.exe.stdout.txt": {
+      "sha256": "007a224faeeb1504527dbdf47767e77091b74129896cd0fb400d2249e1ed2bff",
+      "bytes": 5079
+    },
+    "attempt-4/managed/NativeBufferFixture.dll": {
+      "sha256": "73fe74f8476259f06107692f1af2e8529103dde490794fc82153674eaa875bc2",
+      "bytes": 11264
+    },
+    "attempt-4/managed/NativeBufferTests.deps.json": {
+      "sha256": "366f0fea951513a1c82573340687a4bc7a31bd9caf5a685801a629bffa0dcc66",
+      "bytes": 445
+    },
+    "attempt-4/managed/NativeBufferTests.dll": {
+      "sha256": "ce46680e7f7d0ef3d51d765c62d6218eb5fab1e01cc13fd4a5074686fa52a306",
+      "bytes": 29184
+    },
+    "attempt-4/managed/NativeBufferTests.pdb": {
+      "sha256": "77f83a168900161d6097ee791c55c7af74f78d101215f19da4dd7145592a640f",
+      "bytes": 20452
+    },
+    "attempt-4/managed/NativeBufferTests.runtimeconfig.json": {
+      "sha256": "64f6e92559a3ff326652a277bceee9745d0fe35cde800954bec2d5e16aae7fdd",
+      "bytes": 374
+    },
+    "attempt-4/managed-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/managed-build.stdout.txt": {
+      "sha256": "45d3a4c195d6285cc4d29f198dc311f5cb584192b3db7e9a4d66e8029da9968b",
+      "bytes": 389
+    },
+    "attempt-4/managed-controls.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/managed-controls.stdout.txt": {
+      "sha256": "b25dbf8491d9ba8fe6f4ae0c589624748058c91b0b17e865bb41eb81d2ac6bc6",
+      "bytes": 2008
+    },
+    "attempt-4/ManagedControls.cs": {
+      "sha256": "ddd3bddaa8fa936cca9737004d7f6f06b0d8cac35b93892059c89e585a8467a3",
+      "bytes": 12403
+    },
+    "attempt-4/native-controls.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/native-controls.stdout.txt": {
+      "sha256": "233a2a41997041f7c13cc37ae4fe92f597073a784be5771a3269c2d931aa366e",
+      "bytes": 216
+    },
+    "attempt-4/native-dll-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/native-dll-build.stdout.txt": {
+      "sha256": "57b4816c23b22c4a5bde4fc1dddbbdf19dc6788549a697498c6b882336b756e0",
+      "bytes": 93
+    },
+    "attempt-4/native-test-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/native-test-build.stdout.txt": {
+      "sha256": "a99ef54a0d5d74cfd8dffa032ac9ac8b5aed20d01e848f4c7d208b6e8f77b8ca",
+      "bytes": 95
+    },
+    "attempt-4/NativeBufferFixture.dll": {
+      "sha256": "73fe74f8476259f06107692f1af2e8529103dde490794fc82153674eaa875bc2",
+      "bytes": 11264
+    },
+    "attempt-4/NativeBufferFixture.exp": {
+      "sha256": "f741b97ec9066a67a16e9d7ae2622be827ae7c5ec3256fedd08ec8137b2da9a9",
+      "bytes": 1718
+    },
+    "attempt-4/NativeBufferFixture.lib": {
+      "sha256": "6de1276edf5b5c58ab8b84eea43ed2a58c97dee05b2cb4009df76ba4fa296695",
+      "bytes": 3610
+    },
+    "attempt-4/NativeBufferSelfTest.exe": {
+      "sha256": "bbcb4b47ac3caddae5a3c5231d6d07d5844eda460c413596382404d17304d1fe",
+      "bytes": 20480
+    },
+    "attempt-4/NativeBufferSelfTest.exp": {
+      "sha256": "47d1732813e9e8437cf42da40b2c401fb2e5045c42502a0090597a3731514caf",
+      "bytes": 1719
+    },
+    "attempt-4/NativeBufferSelfTest.lib": {
+      "sha256": "8e8692e3660e4839757c6e07eea48693cd4849a08e36ae92f2d19b5039df3069",
+      "bytes": 3632
+    },
+    "attempt-4/NativeBufferTests.csproj": {
+      "sha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58",
+      "bytes": 618
+    },
+    "attempt-4/obj/NativeBufferTests.csproj.nuget.dgspec.json": {
+      "sha256": "5cb3c3d186ba0a599eb4ff6af58465aa5b60e05f80db5d74b1f70afc6785f1b4",
+      "bytes": 22129
+    },
+    "attempt-4/obj/NativeBufferTests.csproj.nuget.g.props": {
+      "sha256": "d4ba7ba123e183ef553c61c344785d70eb06b63615e7cbef8fd4d585dd703935",
+      "bytes": 1302
+    },
+    "attempt-4/obj/NativeBufferTests.csproj.nuget.g.targets": {
+      "sha256": "971cc9b535384849b5c661d776cd7a80833a416265e32e8968e06c367368b8b5",
+      "bytes": 150
+    },
+    "attempt-4/obj/project.assets.json": {
+      "sha256": "5dc1f33965dcbf82ad43cc6b6d6f0e56d21d678459022fc7dbef16bc4eea1f21",
+      "bytes": 21454
+    },
+    "attempt-4/obj/project.nuget.cache": {
+      "sha256": "fb2ccb86509fc9d9ac3eb3fa863a8b8e9cda15d4a2784ff94973fe35dc301c68",
+      "bytes": 258
+    },
+    "attempt-4/obj/x64/Release/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs": {
+      "sha256": "93d67476196ebfc80d1d7d8844b91146cfd678d105f5ce635eb900ca40610c9b",
+      "bytes": 200
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.AssemblyInfo.cs": {
+      "sha256": "be40275a2300c5d6e30b0610105ca66567b73888868b83eadb337de34a9f71df",
+      "bytes": 1027
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.AssemblyInfoInputs.cache": {
+      "sha256": "b9f7c0de702a5b323ebdca95a3da8cf2d9b5d8334144d2b6ad8d490283eaed94",
+      "bytes": 66
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.assets.cache": {
+      "sha256": "8ad29bdb18a3adbe130b861d3cbb24682da30ec82c042d5f1f645e6c40e839fe",
+      "bytes": 228
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.csproj.CoreCompileInputs.cache": {
+      "sha256": "841000677f5dd3d0f9b9ac682f960ab4edc7e257f1900e498ba50676262ebf44",
+      "bytes": 66
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.csproj.FileListAbsolute.txt": {
+      "sha256": "408cd9f187fe6486027eaedf1da31a3997f5405c77a5bf3c4b3532d13ec385ba",
+      "bytes": 1917
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.dll": {
+      "sha256": "ce46680e7f7d0ef3d51d765c62d6218eb5fab1e01cc13fd4a5074686fa52a306",
+      "bytes": 29184
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.GeneratedMSBuildEditorConfig.editorconfig": {
+      "sha256": "e3739afc19a235dfe913e089498ba569fde65c37c9f7d2cdfa31668ab15f9590",
+      "bytes": 874
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.genruntimeconfig.cache": {
+      "sha256": "c13fe7b0dc303e13555fb55139e0d8c6f222608bf54699135f8281e32222f936",
+      "bytes": 66
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.GlobalUsings.g.cs": {
+      "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227",
+      "bytes": 239
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.pdb": {
+      "sha256": "77f83a168900161d6097ee791c55c7af74f78d101215f19da4dd7145592a640f",
+      "bytes": 20452
+    },
+    "attempt-4/obj/x64/Release/net10.0/NativeBufferTests.sourcelink.json": {
+      "sha256": "339f566d4fe7c63976d8bb706760958d4b5771f1bdccda5fac2f937620f35ba5",
+      "bytes": 174
+    },
+    "attempt-4/obj/x64/Release/net10.0/ref/NativeBufferTests.dll": {
+      "sha256": "173801988bbf7939451e714429dd3dfa2d8633962b3b566347b9710b7033cdba",
+      "bytes": 8192
+    },
+    "attempt-4/obj/x64/Release/net10.0/refint/NativeBufferTests.dll": {
+      "sha256": "173801988bbf7939451e714429dd3dfa2d8633962b3b566347b9710b7033cdba",
+      "bytes": 8192
+    },
+    "attempt-4/receipt.json": {
+      "sha256": "9e2c59df9b3601f2d1897775fbb83fdc9ae3805b43e6dc5e531b9ca10cb37aa6",
+      "bytes": 18308
+    },
+    "attempt-4/runtimes.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/runtimes.stdout.txt": {
+      "sha256": "82e50aa6826f49ab83c2c22db73f150c81e15835d128b6529f5e44b137038e8b",
+      "bytes": 2203
+    },
+    "attempt-4/sdk.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-4/sdk.stdout.txt": {
+      "sha256": "3db6bca4b50618b2e0d2d55d23b3d0541fe039ab6f731df0e9c47317b400ce52",
+      "bytes": 10
+    },
+    "attempt-4/vc-setup.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/collector-build-only.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/collector-build-only.stdout.txt": {
+      "sha256": "b003c33075dfd006f6095997d44fd07546a062824fa5fe7abcf91c06168f9a64",
+      "bytes": 424
+    },
+    "attempt-5/collector-compile-only/compiled/DesktopProbe.deps.json": {
+      "sha256": "9c2ef70d198253d937b961960c4de53cce477bb9e09a5990575207fd5e8aaff2",
+      "bytes": 484
+    },
+    "attempt-5/collector-compile-only/compiled/DesktopProbe.dll": {
+      "sha256": "d728a788cb9e0e5ffced8f3ee8f96b23050115c1bd3e70d0e2570b5cd0b17efb",
+      "bytes": 51712
+    },
+    "attempt-5/collector-compile-only/compiled/DesktopProbe.exe": {
+      "sha256": "a63261a050d1f5aca79fabe5cdde73dacf16e310bc74d747ce2e704d6f279198",
+      "bytes": 162816
+    },
+    "attempt-5/collector-compile-only/compiled/DesktopProbe.pdb": {
+      "sha256": "5144468f978bd13f515d113db467fa49e3d8400b71e1b3489bc868d51538a03e",
+      "bytes": 21244
+    },
+    "attempt-5/collector-compile-only/compiled/DesktopProbe.runtimeconfig.json": {
+      "sha256": "13a73aba9a05d93aab51d1edee476df13d89bf8705f28bc69bea1b31b816efd9",
+      "bytes": 431
+    },
+    "attempt-5/collector-compile-only/desktop.manifest": {
+      "sha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+      "bytes": 790
+    },
+    "attempt-5/collector-compile-only/DesktopProbe.csproj": {
+      "sha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+      "bytes": 634
+    },
+    "attempt-5/collector-compile-only/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-5/collector-compile-only/obj/DesktopProbe.csproj.nuget.dgspec.json": {
+      "sha256": "4f6eaf8152d24bbb10ad8d86500e0442e7b2daa1149dee3c1d0eeb239e42fc5d",
+      "bytes": 22564
+    },
+    "attempt-5/collector-compile-only/obj/DesktopProbe.csproj.nuget.g.props": {
+      "sha256": "d4ba7ba123e183ef553c61c344785d70eb06b63615e7cbef8fd4d585dd703935",
+      "bytes": 1302
+    },
+    "attempt-5/collector-compile-only/obj/DesktopProbe.csproj.nuget.g.targets": {
+      "sha256": "971cc9b535384849b5c661d776cd7a80833a416265e32e8968e06c367368b8b5",
+      "bytes": 150
+    },
+    "attempt-5/collector-compile-only/obj/project.assets.json": {
+      "sha256": "b770f42a9fb410c0f56484d777f6053557377d266683232f130e563f66a2f226",
+      "bytes": 21881
+    },
+    "attempt-5/collector-compile-only/obj/project.nuget.cache": {
+      "sha256": "b464cf435be6c62a6ce856c2eeb48b76f87ccf965526a4996653e13fc33778d7",
+      "bytes": 425
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs": {
+      "sha256": "93d67476196ebfc80d1d7d8844b91146cfd678d105f5ce635eb900ca40610c9b",
+      "bytes": 200
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/apphost.exe": {
+      "sha256": "a63261a050d1f5aca79fabe5cdde73dacf16e310bc74d747ce2e704d6f279198",
+      "bytes": 162816
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.AssemblyInfo.cs": {
+      "sha256": "643c446ba38629b500fd80b634c30b77a1f48ed52ddccee8a02010c608aa3431",
+      "bytes": 1171
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.AssemblyInfoInputs.cache": {
+      "sha256": "41f0a42017abf95da803d8a11efcbc4f76df7dc5b35f9133b9cd82b79e0d5434",
+      "bytes": 66
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.assets.cache": {
+      "sha256": "f4e118b43e34e12247f1f6e08a693e9bb03b4727c13439f30a46ec437d4e8fe0",
+      "bytes": 228
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.csproj.CoreCompileInputs.cache": {
+      "sha256": "e55d35cef64e9b20970d9b25943716134253094f4f66f88a156d5ef10f9eabbe",
+      "bytes": 66
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.csproj.FileListAbsolute.txt": {
+      "sha256": "3bf1dc6f018b5bfa218b3e9e100d849b559f508ccccf0c7a858a8ed333adbed4",
+      "bytes": 2466
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.dll": {
+      "sha256": "d728a788cb9e0e5ffced8f3ee8f96b23050115c1bd3e70d0e2570b5cd0b17efb",
+      "bytes": 51712
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.GeneratedMSBuildEditorConfig.editorconfig": {
+      "sha256": "c496ce9f9ade306b53f5dda4f91b313af7f50bb9d13bf2505c0233e809936a08",
+      "bytes": 962
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.genruntimeconfig.cache": {
+      "sha256": "330fcf861286c6a80aed281b3eebbe3c23b155e5bb94c852e35156d639731027",
+      "bytes": 66
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.GlobalUsings.g.cs": {
+      "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227",
+      "bytes": 239
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.pdb": {
+      "sha256": "5144468f978bd13f515d113db467fa49e3d8400b71e1b3489bc868d51538a03e",
+      "bytes": 21244
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.sourcelink.json": {
+      "sha256": "339f566d4fe7c63976d8bb706760958d4b5771f1bdccda5fac2f937620f35ba5",
+      "bytes": 174
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/ref/DesktopProbe.dll": {
+      "sha256": "be3f2034278bd9a3f1edbdba6452c265e5633b253751f6f6ed08200c61d376b8",
+      "bytes": 8704
+    },
+    "attempt-5/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/refint/DesktopProbe.dll": {
+      "sha256": "be3f2034278bd9a3f1edbdba6452c265e5633b253751f6f6ed08200c61d376b8",
+      "bytes": 8704
+    },
+    "attempt-5/collector-compile-only/Program.cs": {
+      "sha256": "c5594b642795785b192c7c6c420bbb84a3c09df1314a4deb037ee2896d62b54f",
+      "bytes": 15407
+    },
+    "attempt-5/fixture-dll.obj": {
+      "sha256": "b3b7befd34fb3ff678a5e022b6b8259bc2b46d0b06281f0520e468c8e8d7e458",
+      "bytes": 8571
+    },
+    "attempt-5/fixture-test.obj": {
+      "sha256": "4e9376f504713188fe4e085d67ce5abc155c7fb1669abaa3fc476dc50476ba6f",
+      "bytes": 70659
+    },
+    "attempt-5/fixture.cpp": {
+      "sha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1",
+      "bytes": 7855
+    },
+    "attempt-5/global.json": {
+      "sha256": "47df8e0fd7714fdc7342c177e682bbe52a39d22ae5132d2b50ae98d196552a0c",
+      "bytes": 58
+    },
+    "attempt-5/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-5/imports-NativeBufferFixture.dll.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/imports-NativeBufferFixture.dll.stdout.txt": {
+      "sha256": "3e59eff901c9eb11e7d9562882b59c5cb16eea1b59d9fcfc43336a4fa117ac22",
+      "bytes": 2356
+    },
+    "attempt-5/imports-NativeBufferSelfTest.exe.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/imports-NativeBufferSelfTest.exe.stdout.txt": {
+      "sha256": "007a224faeeb1504527dbdf47767e77091b74129896cd0fb400d2249e1ed2bff",
+      "bytes": 5079
+    },
+    "attempt-5/managed/NativeBufferFixture.dll": {
+      "sha256": "0faf8a398df0b410e66bc82cea988d250ff9c2b4cd91ca003f52aa832cf5856c",
+      "bytes": 11264
+    },
+    "attempt-5/managed/NativeBufferTests.deps.json": {
+      "sha256": "366f0fea951513a1c82573340687a4bc7a31bd9caf5a685801a629bffa0dcc66",
+      "bytes": 445
+    },
+    "attempt-5/managed/NativeBufferTests.dll": {
+      "sha256": "d15ddc28559ddf2c524305a7c50bf37ece41f8107dc2ab135a057e5049f14b87",
+      "bytes": 29184
+    },
+    "attempt-5/managed/NativeBufferTests.pdb": {
+      "sha256": "7bc9f2f1c7d59fc45127f1f1c4f533e7d5b77039e875d237664853cc0e632767",
+      "bytes": 20452
+    },
+    "attempt-5/managed/NativeBufferTests.runtimeconfig.json": {
+      "sha256": "64f6e92559a3ff326652a277bceee9745d0fe35cde800954bec2d5e16aae7fdd",
+      "bytes": 374
+    },
+    "attempt-5/managed-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/managed-build.stdout.txt": {
+      "sha256": "bf532c1f5ec99c2103fb1c37bff5f357d01f668587b07c05103792f634dd3477",
+      "bytes": 390
+    },
+    "attempt-5/managed-controls.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/managed-controls.stdout.txt": {
+      "sha256": "b25dbf8491d9ba8fe6f4ae0c589624748058c91b0b17e865bb41eb81d2ac6bc6",
+      "bytes": 2008
+    },
+    "attempt-5/ManagedControls.cs": {
+      "sha256": "ddd3bddaa8fa936cca9737004d7f6f06b0d8cac35b93892059c89e585a8467a3",
+      "bytes": 12403
+    },
+    "attempt-5/native-controls.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/native-controls.stdout.txt": {
+      "sha256": "233a2a41997041f7c13cc37ae4fe92f597073a784be5771a3269c2d931aa366e",
+      "bytes": 216
+    },
+    "attempt-5/native-dll-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/native-dll-build.stdout.txt": {
+      "sha256": "57b4816c23b22c4a5bde4fc1dddbbdf19dc6788549a697498c6b882336b756e0",
+      "bytes": 93
+    },
+    "attempt-5/native-test-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/native-test-build.stdout.txt": {
+      "sha256": "a99ef54a0d5d74cfd8dffa032ac9ac8b5aed20d01e848f4c7d208b6e8f77b8ca",
+      "bytes": 95
+    },
+    "attempt-5/NativeBufferFixture.dll": {
+      "sha256": "0faf8a398df0b410e66bc82cea988d250ff9c2b4cd91ca003f52aa832cf5856c",
+      "bytes": 11264
+    },
+    "attempt-5/NativeBufferFixture.exp": {
+      "sha256": "590604ff67d5843b3351a7437d720e9483dbcca7e9bde881d8a4da2d260d823f",
+      "bytes": 1718
+    },
+    "attempt-5/NativeBufferFixture.lib": {
+      "sha256": "6de1276edf5b5c58ab8b84eea43ed2a58c97dee05b2cb4009df76ba4fa296695",
+      "bytes": 3610
+    },
+    "attempt-5/NativeBufferSelfTest.exe": {
+      "sha256": "6bfedbad0044ed202ff96b214ce252ba0e11631cb421709a77b9d44cf0dcf029",
+      "bytes": 20480
+    },
+    "attempt-5/NativeBufferSelfTest.exp": {
+      "sha256": "47432ffe0124d1b8e8ccb4dda05d22dcd47cbaaeeb2d88ad475d93fc4ef8bc67",
+      "bytes": 1719
+    },
+    "attempt-5/NativeBufferSelfTest.lib": {
+      "sha256": "8e8692e3660e4839757c6e07eea48693cd4849a08e36ae92f2d19b5039df3069",
+      "bytes": 3632
+    },
+    "attempt-5/NativeBufferTests.csproj": {
+      "sha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58",
+      "bytes": 618
+    },
+    "attempt-5/obj/NativeBufferTests.csproj.nuget.dgspec.json": {
+      "sha256": "a381aa36a1bb6185a9a5cebeeed2aacbc4ae269872c00bb409b3274ffc8893a7",
+      "bytes": 22129
+    },
+    "attempt-5/obj/NativeBufferTests.csproj.nuget.g.props": {
+      "sha256": "d4ba7ba123e183ef553c61c344785d70eb06b63615e7cbef8fd4d585dd703935",
+      "bytes": 1302
+    },
+    "attempt-5/obj/NativeBufferTests.csproj.nuget.g.targets": {
+      "sha256": "971cc9b535384849b5c661d776cd7a80833a416265e32e8968e06c367368b8b5",
+      "bytes": 150
+    },
+    "attempt-5/obj/project.assets.json": {
+      "sha256": "c3e03b03ce49118c19f1b9600c05d7c9631b2b7a23aeef7c160dc1d0d289f580",
+      "bytes": 21454
+    },
+    "attempt-5/obj/project.nuget.cache": {
+      "sha256": "0f9ba53b276295eb4e61d2fa72cfa06796a56f500849238b5aec6a4721bda882",
+      "bytes": 258
+    },
+    "attempt-5/obj/x64/Release/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs": {
+      "sha256": "93d67476196ebfc80d1d7d8844b91146cfd678d105f5ce635eb900ca40610c9b",
+      "bytes": 200
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.AssemblyInfo.cs": {
+      "sha256": "be40275a2300c5d6e30b0610105ca66567b73888868b83eadb337de34a9f71df",
+      "bytes": 1027
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.AssemblyInfoInputs.cache": {
+      "sha256": "b9f7c0de702a5b323ebdca95a3da8cf2d9b5d8334144d2b6ad8d490283eaed94",
+      "bytes": 66
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.assets.cache": {
+      "sha256": "89a5b1b440905fb4e9c0f714f09d8e79d0d9f57d94aa2d72e30d08b1671d086b",
+      "bytes": 228
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.csproj.CoreCompileInputs.cache": {
+      "sha256": "841000677f5dd3d0f9b9ac682f960ab4edc7e257f1900e498ba50676262ebf44",
+      "bytes": 66
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.csproj.FileListAbsolute.txt": {
+      "sha256": "53bdfab43369c4fc613d78a0d30a197b9006adb238d373861a7d3072b088251e",
+      "bytes": 1917
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.dll": {
+      "sha256": "d15ddc28559ddf2c524305a7c50bf37ece41f8107dc2ab135a057e5049f14b87",
+      "bytes": 29184
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.GeneratedMSBuildEditorConfig.editorconfig": {
+      "sha256": "3b38e90132acb62c3bd862e9d66b1d4f736b334f10a669dd51be23c50646a51b",
+      "bytes": 874
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.genruntimeconfig.cache": {
+      "sha256": "b707e13ad9b5474ee5e48af74febe933195b14062b3c2bbb6b88afad7dfeb047",
+      "bytes": 66
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.GlobalUsings.g.cs": {
+      "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227",
+      "bytes": 239
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.pdb": {
+      "sha256": "7bc9f2f1c7d59fc45127f1f1c4f533e7d5b77039e875d237664853cc0e632767",
+      "bytes": 20452
+    },
+    "attempt-5/obj/x64/Release/net10.0/NativeBufferTests.sourcelink.json": {
+      "sha256": "339f566d4fe7c63976d8bb706760958d4b5771f1bdccda5fac2f937620f35ba5",
+      "bytes": 174
+    },
+    "attempt-5/obj/x64/Release/net10.0/ref/NativeBufferTests.dll": {
+      "sha256": "173801988bbf7939451e714429dd3dfa2d8633962b3b566347b9710b7033cdba",
+      "bytes": 8192
+    },
+    "attempt-5/obj/x64/Release/net10.0/refint/NativeBufferTests.dll": {
+      "sha256": "173801988bbf7939451e714429dd3dfa2d8633962b3b566347b9710b7033cdba",
+      "bytes": 8192
+    },
+    "attempt-5/receipt.json": {
+      "sha256": "68a2707e2dabb3f061a45fa713d1020d3e42e63ba813445bea8394d48a09e6e3",
+      "bytes": 18425
+    },
+    "attempt-5/runtimes.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/runtimes.stdout.txt": {
+      "sha256": "82e50aa6826f49ab83c2c22db73f150c81e15835d128b6529f5e44b137038e8b",
+      "bytes": 2203
+    },
+    "attempt-5/sdk.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-5/sdk.stdout.txt": {
+      "sha256": "3db6bca4b50618b2e0d2d55d23b3d0541fe039ab6f731df0e9c47317b400ce52",
+      "bytes": 10
+    },
+    "attempt-5/vc-setup.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/collector-build-only.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/collector-build-only.stdout.txt": {
+      "sha256": "d03d4fd6f55c8ebb4a8face7ba51c433374b0b240cadee9b657643de4ef1af34",
+      "bytes": 422
+    },
+    "attempt-6/collector-compile-only/compiled/DesktopProbe.deps.json": {
+      "sha256": "9c2ef70d198253d937b961960c4de53cce477bb9e09a5990575207fd5e8aaff2",
+      "bytes": 484
+    },
+    "attempt-6/collector-compile-only/compiled/DesktopProbe.dll": {
+      "sha256": "6f7f36d115df8d76e3ffe94f4718eec55559de8db5e7bb9d4ed7bc5d31164d24",
+      "bytes": 51712
+    },
+    "attempt-6/collector-compile-only/compiled/DesktopProbe.exe": {
+      "sha256": "a63261a050d1f5aca79fabe5cdde73dacf16e310bc74d747ce2e704d6f279198",
+      "bytes": 162816
+    },
+    "attempt-6/collector-compile-only/compiled/DesktopProbe.pdb": {
+      "sha256": "de5841e152cb5f2e1d01305adec14f7c7d4e043532884065e86737e5a901902f",
+      "bytes": 21244
+    },
+    "attempt-6/collector-compile-only/compiled/DesktopProbe.runtimeconfig.json": {
+      "sha256": "13a73aba9a05d93aab51d1edee476df13d89bf8705f28bc69bea1b31b816efd9",
+      "bytes": 431
+    },
+    "attempt-6/collector-compile-only/desktop.manifest": {
+      "sha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+      "bytes": 790
+    },
+    "attempt-6/collector-compile-only/DesktopProbe.csproj": {
+      "sha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+      "bytes": 634
+    },
+    "attempt-6/collector-compile-only/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-6/collector-compile-only/obj/DesktopProbe.csproj.nuget.dgspec.json": {
+      "sha256": "c793dd3f6cab2a9bed1ffa45e910b3e447a21743a76390dad36bc55354a35243",
+      "bytes": 22564
+    },
+    "attempt-6/collector-compile-only/obj/DesktopProbe.csproj.nuget.g.props": {
+      "sha256": "d4ba7ba123e183ef553c61c344785d70eb06b63615e7cbef8fd4d585dd703935",
+      "bytes": 1302
+    },
+    "attempt-6/collector-compile-only/obj/DesktopProbe.csproj.nuget.g.targets": {
+      "sha256": "971cc9b535384849b5c661d776cd7a80833a416265e32e8968e06c367368b8b5",
+      "bytes": 150
+    },
+    "attempt-6/collector-compile-only/obj/project.assets.json": {
+      "sha256": "d9a4d8f6c9529a28ab734bcbb426c44a48dd8ffefab6a79aa0e8319d9079b209",
+      "bytes": 21881
+    },
+    "attempt-6/collector-compile-only/obj/project.nuget.cache": {
+      "sha256": "e37e9b40a84e3cf523348cb659b2d4c9cc6ff18bbf0ab971337d9990e9c557bf",
+      "bytes": 425
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs": {
+      "sha256": "93d67476196ebfc80d1d7d8844b91146cfd678d105f5ce635eb900ca40610c9b",
+      "bytes": 200
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/apphost.exe": {
+      "sha256": "a63261a050d1f5aca79fabe5cdde73dacf16e310bc74d747ce2e704d6f279198",
+      "bytes": 162816
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.AssemblyInfo.cs": {
+      "sha256": "643c446ba38629b500fd80b634c30b77a1f48ed52ddccee8a02010c608aa3431",
+      "bytes": 1171
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.AssemblyInfoInputs.cache": {
+      "sha256": "41f0a42017abf95da803d8a11efcbc4f76df7dc5b35f9133b9cd82b79e0d5434",
+      "bytes": 66
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.assets.cache": {
+      "sha256": "6b3bc87ffffa698a70b0d64550768ae60dc79ced57f56680b00d7d0ed5d52707",
+      "bytes": 228
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.csproj.CoreCompileInputs.cache": {
+      "sha256": "e55d35cef64e9b20970d9b25943716134253094f4f66f88a156d5ef10f9eabbe",
+      "bytes": 66
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.csproj.FileListAbsolute.txt": {
+      "sha256": "d8619641109889abc121d8507958fcad682282b735ba20ed7611af8e81a51ee0",
+      "bytes": 2466
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.dll": {
+      "sha256": "6f7f36d115df8d76e3ffe94f4718eec55559de8db5e7bb9d4ed7bc5d31164d24",
+      "bytes": 51712
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.GeneratedMSBuildEditorConfig.editorconfig": {
+      "sha256": "9723848fcdb969024b977e81419494c19118d294ac1ce1c57efaa7ff1d97f63f",
+      "bytes": 962
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.genruntimeconfig.cache": {
+      "sha256": "48d0121794e10d5fe56ebd50c20de004811426b4e169be4f85b8196536ee3a1c",
+      "bytes": 66
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.GlobalUsings.g.cs": {
+      "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227",
+      "bytes": 239
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.pdb": {
+      "sha256": "de5841e152cb5f2e1d01305adec14f7c7d4e043532884065e86737e5a901902f",
+      "bytes": 21244
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/DesktopProbe.sourcelink.json": {
+      "sha256": "339f566d4fe7c63976d8bb706760958d4b5771f1bdccda5fac2f937620f35ba5",
+      "bytes": 174
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/ref/DesktopProbe.dll": {
+      "sha256": "be3f2034278bd9a3f1edbdba6452c265e5633b253751f6f6ed08200c61d376b8",
+      "bytes": 8704
+    },
+    "attempt-6/collector-compile-only/obj/x64/Release/net10.0-windows/win-x64/refint/DesktopProbe.dll": {
+      "sha256": "be3f2034278bd9a3f1edbdba6452c265e5633b253751f6f6ed08200c61d376b8",
+      "bytes": 8704
+    },
+    "attempt-6/collector-compile-only/Program.cs": {
+      "sha256": "c5594b642795785b192c7c6c420bbb84a3c09df1314a4deb037ee2896d62b54f",
+      "bytes": 15407
+    },
+    "attempt-6/fixture-dll.obj": {
+      "sha256": "52e7ccd1bb63d3146c0beda1b2e35f7accf320e823142008c2282e42e52926ad",
+      "bytes": 8571
+    },
+    "attempt-6/fixture-test.obj": {
+      "sha256": "cdc9fd46cddd150c21b6a1c943f7626f7aa27c0d87c6342b5891a8dabadb2777",
+      "bytes": 70659
+    },
+    "attempt-6/fixture.cpp": {
+      "sha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1",
+      "bytes": 7855
+    },
+    "attempt-6/global.json": {
+      "sha256": "47df8e0fd7714fdc7342c177e682bbe52a39d22ae5132d2b50ae98d196552a0c",
+      "bytes": 58
+    },
+    "attempt-6/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "attempt-6/imports-NativeBufferFixture.dll.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/imports-NativeBufferFixture.dll.stdout.txt": {
+      "sha256": "3e59eff901c9eb11e7d9562882b59c5cb16eea1b59d9fcfc43336a4fa117ac22",
+      "bytes": 2356
+    },
+    "attempt-6/imports-NativeBufferSelfTest.exe.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/imports-NativeBufferSelfTest.exe.stdout.txt": {
+      "sha256": "007a224faeeb1504527dbdf47767e77091b74129896cd0fb400d2249e1ed2bff",
+      "bytes": 5079
+    },
+    "attempt-6/managed/NativeBufferFixture.dll": {
+      "sha256": "db3899602d2253976149a062226d8751726dfc737e9b67eae6e424b95212f350",
+      "bytes": 11264
+    },
+    "attempt-6/managed/NativeBufferTests.deps.json": {
+      "sha256": "366f0fea951513a1c82573340687a4bc7a31bd9caf5a685801a629bffa0dcc66",
+      "bytes": 445
+    },
+    "attempt-6/managed/NativeBufferTests.dll": {
+      "sha256": "7d69cf5957ad430a8963b332bddddd5ddf040f4844ee5f891158c5f4f38be9c7",
+      "bytes": 29696
+    },
+    "attempt-6/managed/NativeBufferTests.pdb": {
+      "sha256": "470ff5ec859e4a7c53e1ac072278057bfc971099b967b4953208b52262c93d48",
+      "bytes": 20724
+    },
+    "attempt-6/managed/NativeBufferTests.runtimeconfig.json": {
+      "sha256": "64f6e92559a3ff326652a277bceee9745d0fe35cde800954bec2d5e16aae7fdd",
+      "bytes": 374
+    },
+    "attempt-6/managed-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/managed-build.stdout.txt": {
+      "sha256": "2d310cab22ff6b25e744314181f734e91b13ced898a832cb78c9582ba6ec52ee",
+      "bytes": 390
+    },
+    "attempt-6/managed-controls.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/managed-controls.stdout.txt": {
+      "sha256": "84f28f6e8324fce53d6456fffe5df960f3a160fb8b25bd965f3a3040e0740f65",
+      "bytes": 2089
+    },
+    "attempt-6/ManagedControls.cs": {
+      "sha256": "26045c726f1d78034b19d97743db17a3d7588f1872e5c1cfabe0669f2e9452b6",
+      "bytes": 12932
+    },
+    "attempt-6/native-controls.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/native-controls.stdout.txt": {
+      "sha256": "233a2a41997041f7c13cc37ae4fe92f597073a784be5771a3269c2d931aa366e",
+      "bytes": 216
+    },
+    "attempt-6/native-dll-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/native-dll-build.stdout.txt": {
+      "sha256": "57b4816c23b22c4a5bde4fc1dddbbdf19dc6788549a697498c6b882336b756e0",
+      "bytes": 93
+    },
+    "attempt-6/native-test-build.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/native-test-build.stdout.txt": {
+      "sha256": "a99ef54a0d5d74cfd8dffa032ac9ac8b5aed20d01e848f4c7d208b6e8f77b8ca",
+      "bytes": 95
+    },
+    "attempt-6/NativeBufferFixture.dll": {
+      "sha256": "db3899602d2253976149a062226d8751726dfc737e9b67eae6e424b95212f350",
+      "bytes": 11264
+    },
+    "attempt-6/NativeBufferFixture.exp": {
+      "sha256": "ab158dfbebef808619338662601fcd805d7e6ae2b985da80276e0d5d27fb9ec9",
+      "bytes": 1718
+    },
+    "attempt-6/NativeBufferFixture.lib": {
+      "sha256": "6de1276edf5b5c58ab8b84eea43ed2a58c97dee05b2cb4009df76ba4fa296695",
+      "bytes": 3610
+    },
+    "attempt-6/NativeBufferSelfTest.exe": {
+      "sha256": "311655cd165d4a82631efce4b827decea6a5199d2e723da67175b94a4539e549",
+      "bytes": 20480
+    },
+    "attempt-6/NativeBufferSelfTest.exp": {
+      "sha256": "bf75e416c1421a60e82ba70bd5953a1c1b9bfff7257ed3d77bc18c3d6af5c549",
+      "bytes": 1719
+    },
+    "attempt-6/NativeBufferSelfTest.lib": {
+      "sha256": "8e8692e3660e4839757c6e07eea48693cd4849a08e36ae92f2d19b5039df3069",
+      "bytes": 3632
+    },
+    "attempt-6/NativeBufferTests.csproj": {
+      "sha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58",
+      "bytes": 618
+    },
+    "attempt-6/obj/NativeBufferTests.csproj.nuget.dgspec.json": {
+      "sha256": "ba5f0b887ea44cc7f5d6b8f924d7f6db8fe1308fcc8b86c9fde0dd0a81d3f164",
+      "bytes": 22129
+    },
+    "attempt-6/obj/NativeBufferTests.csproj.nuget.g.props": {
+      "sha256": "d4ba7ba123e183ef553c61c344785d70eb06b63615e7cbef8fd4d585dd703935",
+      "bytes": 1302
+    },
+    "attempt-6/obj/NativeBufferTests.csproj.nuget.g.targets": {
+      "sha256": "971cc9b535384849b5c661d776cd7a80833a416265e32e8968e06c367368b8b5",
+      "bytes": 150
+    },
+    "attempt-6/obj/project.assets.json": {
+      "sha256": "5c2d7f53b07af265c4d71e0aa3ce1c3952cccbb34e13d5fcfb13ded61411cc0b",
+      "bytes": 21454
+    },
+    "attempt-6/obj/project.nuget.cache": {
+      "sha256": "bc1387698dcb51b7eb5056f3956268e00c492bff8dcd465d0bc4aa8af664a909",
+      "bytes": 258
+    },
+    "attempt-6/obj/x64/Release/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs": {
+      "sha256": "93d67476196ebfc80d1d7d8844b91146cfd678d105f5ce635eb900ca40610c9b",
+      "bytes": 200
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.AssemblyInfo.cs": {
+      "sha256": "be40275a2300c5d6e30b0610105ca66567b73888868b83eadb337de34a9f71df",
+      "bytes": 1027
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.AssemblyInfoInputs.cache": {
+      "sha256": "b9f7c0de702a5b323ebdca95a3da8cf2d9b5d8334144d2b6ad8d490283eaed94",
+      "bytes": 66
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.assets.cache": {
+      "sha256": "cb13847f84dc3f4ebe981890b22d7972c5b16867ab32aad5282c54c73c31f1be",
+      "bytes": 228
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.csproj.CoreCompileInputs.cache": {
+      "sha256": "841000677f5dd3d0f9b9ac682f960ab4edc7e257f1900e498ba50676262ebf44",
+      "bytes": 66
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.csproj.FileListAbsolute.txt": {
+      "sha256": "353b9f844a116f36c87b11718945afb71bc1604d49ad7aa9163e30839f7b9614",
+      "bytes": 1917
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.dll": {
+      "sha256": "7d69cf5957ad430a8963b332bddddd5ddf040f4844ee5f891158c5f4f38be9c7",
+      "bytes": 29696
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.GeneratedMSBuildEditorConfig.editorconfig": {
+      "sha256": "06ba828a3adc1cb5043334fa1523abc2c4182ed2ba0d22902101e522793520c2",
+      "bytes": 874
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.genruntimeconfig.cache": {
+      "sha256": "c3cae4967556924643977f8c4ee4f937895306ba628636d0fb6952931dc57f0c",
+      "bytes": 66
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.GlobalUsings.g.cs": {
+      "sha256": "a3c6048bb4d922b1799a9977f84362a3787b68810cac67aa86ac3aa23295f227",
+      "bytes": 239
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.pdb": {
+      "sha256": "470ff5ec859e4a7c53e1ac072278057bfc971099b967b4953208b52262c93d48",
+      "bytes": 20724
+    },
+    "attempt-6/obj/x64/Release/net10.0/NativeBufferTests.sourcelink.json": {
+      "sha256": "339f566d4fe7c63976d8bb706760958d4b5771f1bdccda5fac2f937620f35ba5",
+      "bytes": 174
+    },
+    "attempt-6/obj/x64/Release/net10.0/ref/NativeBufferTests.dll": {
+      "sha256": "75618fc23f78b1ec16a0caf3315bf6114c021d71d076564915fa4b249d930107",
+      "bytes": 8192
+    },
+    "attempt-6/obj/x64/Release/net10.0/refint/NativeBufferTests.dll": {
+      "sha256": "75618fc23f78b1ec16a0caf3315bf6114c021d71d076564915fa4b249d930107",
+      "bytes": 8192
+    },
+    "attempt-6/receipt.json": {
+      "sha256": "5209898f9a3b600169963011ade7839b699a7bd3b989d4a8715d0ed34db0c75c",
+      "bytes": 18508
+    },
+    "attempt-6/runtimes.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/runtimes.stdout.txt": {
+      "sha256": "82e50aa6826f49ab83c2c22db73f150c81e15835d128b6529f5e44b137038e8b",
+      "bytes": 2203
+    },
+    "attempt-6/sdk.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "attempt-6/sdk.stdout.txt": {
+      "sha256": "3db6bca4b50618b2e0d2d55d23b3d0541fe039ab6f731df0e9c47317b400ce52",
+      "bytes": 10
+    },
+    "attempt-6/vc-setup.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/governance-controls-corrected.json": {
+      "sha256": "a2df5bfdda295530eef0de17ebfeace9ef9511d8f0614bd498bc988a9127a673",
+      "bytes": 116
+    },
+    "validation/governance-controls-corrected.stderr.txt": {
+      "sha256": "a3d965bfa7f0fd6c8eb4f16b0fafff01833d478aa0248d239b053cf50aeda74f",
+      "bytes": 3585
+    },
+    "validation/governance-controls-corrected.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/governance-controls.stderr.txt": {
+      "sha256": "b0281afc5a8f851fedc2bba09c88d720f4dcc47a2a487e40928c779cb967ff8c",
+      "bytes": 113
+    },
+    "validation/governance-controls.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/static-results.json": {
+      "sha256": "aa64e891c71f1633f0f8964d8146a4cf06e898d0619b17b977802c62a5825880",
+      "bytes": 386
+    },
+    "validation/static.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/static.stdout.txt": {
+      "sha256": "40830da40886a2ece86353b8b10c8936872b7c37250ec36dcc37d7ef8d22e6c4",
+      "bytes": 327
+    },
+    "validation/test_native_buffer_evidence.py.stderr.txt": {
+      "sha256": "afaee460668974b89b742489c7ac536dcaf39df229f53f06de8cd34d8577706f",
+      "bytes": 1137
+    },
+    "validation/test_native_buffer_evidence.py.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/test_native_environment_lock.py.stderr.txt": {
+      "sha256": "1d7aeee8876beb650c9e5d17e15e6817072a63ea2c0a1f49ba4588f9fefd776c",
+      "bytes": 2550
+    },
+    "validation/test_native_environment_lock.py.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/test_native_hosted_execution.py.stderr.txt": {
+      "sha256": "1979b49af81b372bdd8ae1e3c5e8b797a2e5077cee8791409291edd8aaa92e5d",
+      "bytes": 3119
+    },
+    "validation/test_native_hosted_execution.py.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/test_native_infrastructure.py.stderr.txt": {
+      "sha256": "15f37326c5606e6613c37deac528c752702b101a352290291ad607f98a25650c",
+      "bytes": 4024
+    },
+    "validation/test_native_infrastructure.py.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/test_native_qualification.py.stderr.txt": {
+      "sha256": "45619533d42666e6a63c604d42e32a0ebf8e61c6c15986ae6138bb80a538ffaf",
+      "bytes": 7802
+    },
+    "validation/test_native_qualification.py.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "validation/unit-results.json": {
+      "sha256": "943eebde419fb17acac85031952b75950330327a3a29d1c95e62eca1beb7e4fc",
+      "bytes": 2503
+    },
+    "reviewed-source/docs/native/qualification/highcontrast-buffer-review.md": {
+      "sha256": "3950bef40358a1199aa936f49f0d7877c78db054b0ad3d30442666333026a7e0",
+      "bytes": 9434
+    },
+    "reviewed-source/scripts/native/qualification_hosted/desktop_probe/DesktopProbe.csproj": {
+      "sha256": "e04800876e24a87d284a822fe2122124e3fa39e42215e509181ebed05a41810f",
+      "bytes": 634
+    },
+    "reviewed-source/scripts/native/qualification_hosted/desktop_probe/HighContrastReader.cs": {
+      "sha256": "bf59a42423bbce527a5e2f5851ff79494252d886c0dd85e1d8c2b1b1f5e77d59",
+      "bytes": 3858
+    },
+    "reviewed-source/scripts/native/qualification_hosted/desktop_probe/Program.cs": {
+      "sha256": "c5594b642795785b192c7c6c420bbb84a3c09df1314a4deb037ee2896d62b54f",
+      "bytes": 15407
+    },
+    "reviewed-source/scripts/native/qualification_hosted/desktop_probe/desktop.manifest": {
+      "sha256": "b61c71e10c4b0fba0eda63f493645103ad998d9ff9599d660a2174c59ab6816a",
+      "bytes": 790
+    },
+    "reviewed-source/scripts/native/qualification_hosted/discover_desktop.py": {
+      "sha256": "2763e87949f69bed89617c233fe664b7becdd21664f652e29d27ca240337552e",
+      "bytes": 8453
+    },
+    "reviewed-source/scripts/native/qualification_hosted/eligibility.py": {
+      "sha256": "18df748d3f4f5229903a2f867feb0518a37ad73ffefe57749c47ae7a317fc005",
+      "bytes": 9953
+    },
+    "reviewed-source/tests/unit/native_buffer/ManagedControls.cs": {
+      "sha256": "26045c726f1d78034b19d97743db17a3d7588f1872e5c1cfabe0669f2e9452b6",
+      "bytes": 12932
+    },
+    "reviewed-source/tests/unit/native_buffer/NativeBufferTests.csproj": {
+      "sha256": "308d94b0d0b6bf1a6d3099ef422cf1640013a227d96c18a7d8dd1f56eb71ef58",
+      "bytes": 618
+    },
+    "reviewed-source/tests/unit/native_buffer/fixture.cpp": {
+      "sha256": "829614ae15dc468f2c8734891e8d48c61aa0616385aa8cf99e54ffe4978523d1",
+      "bytes": 7855
+    },
+    "reviewed-source/tests/unit/native_buffer/run_controls.py": {
+      "sha256": "a33f4b49d10752187f532fb949545cbf9fe24a9dbe434304e380dd4a912a0a37",
+      "bytes": 10617
+    },
+    "reviewed-source/tests/unit/test_native_buffer_evidence.py": {
+      "sha256": "c752292ebbaeffc25c686356313fdae631fddf239d3770ce4a6e63a7d1ba986e",
+      "bytes": 4441
+    },
+    "reviewed-source/tests/unit/test_native_hosted_execution.py": {
+      "sha256": "2cfd6ee6a22c9677f6ffe9bb17548f1d6b0ed2ae180cf38628db4ebc8d3d5e84",
+      "bytes": 15644
+    },
+    "reviewed-source/tests/unit/test_native_infrastructure.py": {
+      "sha256": "dae47352899fd3a70f1e1caf43ec695aff989d3dcdb38d14c89e8eee578041cf",
+      "bytes": 18444
+    },
+    "reviewed-source/tests/unit/test_native_qualification.py": {
+      "sha256": "56b9aa00fa36efceb5912098e6a00557e16bc7111c1ab9c0cb48e7ce02cbb28a",
+      "bytes": 34510
+    }
+  },
+  "status": "PASS_CONTROLLED_SIMULATION_ONLY",
+  "collectorExecuted": false,
+  "actualHighContrastCalls": 0,
+  "hostedRuns": 0
+}

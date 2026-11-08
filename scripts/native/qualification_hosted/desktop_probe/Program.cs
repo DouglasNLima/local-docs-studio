@@ -25,7 +25,7 @@ internal static class Program
             Journal("guardedStart", new { processId = Environment.ProcessId, runtime = Environment.Version.ToString() });
             if (Marshal.SizeOf<Rect>() != 16 || Marshal.SizeOf<MonitorInfo>() != 104 ||
                 Marshal.SizeOf<DisplayDevice>() != 840 || Marshal.SizeOf<DevMode>() != 220 ||
-                Marshal.SizeOf<HighContrast>() != 16 || IntPtr.Size != 8)
+                Marshal.SizeOf<HighContrastNative>() != 16 || IntPtr.Size != 8)
                 throw new InvalidOperationException("Win32 x64 observation ABI differs.");
             var before = Snapshot();
             var after = Snapshot(); // Two fixed reads; no waiting or retry-until-equal.
@@ -133,35 +133,16 @@ internal static class Program
 
     private static object ReadAppearance()
     {
-        var state = new HighContrast { size = (uint)Marshal.SizeOf<HighContrast>() };
         Journal("highContrastGetBegin");
-        Check(SystemParametersInfoContrast(GetHighContrast, state.size, ref state, 0));
-        Journal("highContrastCopyBegin", new { state.flags, pointerWasNull = state.scheme == IntPtr.Zero });
-        string? scheme = null;
-        var wasNull = state.scheme == IntPtr.Zero;
-        try
+        var snapshot = HighContrastReader.Read(SchemeOwnership.BorrowedSystem, () =>
         {
-            if (!wasNull)
-            {
-                var value = new StringBuilder();
-                for (var index = 0; ; index++)
-                {
-                    if (index >= 32768) throw new IOException("Returned scheme exceeded the UTF-16 bound.");
-                    var character = (char)Marshal.ReadInt16(state.scheme, index * 2);
-                    if (character == '\0') break;
-                    value.Append(character);
-                }
-                scheme = value.ToString();
-            }
-            Journal("highContrastCopied", new { state.flags, pointerWasNull = wasNull, scheme });
-        }
-        finally
-        {
-            // HIGHCONTRASTW documents system allocation and LocalFree ownership.
-            Journal("highContrastFreeBegin", new { pointerWasNull = wasNull });
-            if (!wasNull && LocalFree(state.scheme) != IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error());
-            Journal("highContrastFreeComplete");
-        }
+            var state = new HighContrastNative { size = (uint)Marshal.SizeOf<HighContrastNative>() };
+            var success = SystemParametersInfoContrast(GetHighContrast, state.size, ref state, 0);
+            var error = success ? 0 : Marshal.GetLastPInvokeError();
+            return new HighContrastGet(success, state, error);
+        });
+        Journal("highContrastCopied", new { flags = snapshot.Flags, pointerWasNull = snapshot.PointerWasNull, scheme = snapshot.Scheme });
+        Journal("highContrastBorrowComplete");
         var theme = new StringBuilder(260); var colour = new StringBuilder(260); var size = new StringBuilder(260);
         Journal("themeReadBegin");
         var themeResult = GetCurrentThemeName(theme, theme.Capacity, colour, colour.Capacity, size, size.Capacity);
@@ -169,9 +150,10 @@ internal static class Program
         foreach (var index in new[] { 2, 3, 5, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 20, 26 })
             colours[index.ToString(System.Globalization.CultureInfo.InvariantCulture)] = GetSysColor(index);
         Journal("appearanceReadComplete");
-        return new { flags = state.flags, enabled = (state.flags & 1) != 0, schemePointerWasNull = wasNull,
-            schemeKind = wasNull ? "NULL" : scheme!.Length == 0 ? "EMPTY" : "NAMED", scheme,
-            getBufferReleased = true, colours, theme = new { hresult = themeResult,
+        return new { flags = snapshot.Flags, enabled = (snapshot.Flags & 1) != 0, schemePointerWasNull = snapshot.PointerWasNull,
+            schemeKind = snapshot.Kind, scheme = snapshot.Scheme, schemeOwnership = "BORROWED_OS",
+            schemeCopyComplete = true, schemeReleaseAttempted = false, ownershipContract = HighContrastReader.Contract,
+            colours, theme = new { hresult = themeResult,
                 file = theme.ToString(), colour = colour.ToString(), size = size.ToString() } };
     }
 
@@ -210,10 +192,11 @@ internal static class Program
         public ushort logPixels; public uint bits, width, height, displayFlags, frequency, icmMethod, icmIntent,
             mediaType, ditherType, reserved1, reserved2, panningWidth, panningHeight;
     }
-    [StructLayout(LayoutKind.Sequential)] private struct HighContrast { public uint size, flags; public IntPtr scheme; }
     private delegate bool MonitorCallback(IntPtr monitor, IntPtr dc, ref Rect rect, IntPtr data);
     [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)] private static extern bool SystemParametersInfoRect(uint action, uint parameter, out Rect value, uint flags);
-    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)] private static extern bool SystemParametersInfoContrast(uint action, uint parameter, ref HighContrast value, uint flags);
+    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SystemParametersInfoContrast(uint action, uint parameter, ref HighContrastNative value, uint flags);
     [DllImport("user32.dll", SetLastError = true)] private static extern bool EnumDisplayMonitors(IntPtr dc, IntPtr clip, MonitorCallback callback, IntPtr data);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] private static extern bool GetMonitorInfoW(IntPtr monitor, ref MonitorInfo info);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] private static extern bool EnumDisplayDevicesW(string name, uint index, ref DisplayDevice device, uint flags);
@@ -230,7 +213,6 @@ internal static class Program
     [DllImport("user32.dll", SetLastError = true)] private static extern IntPtr OpenInputDesktop(uint flags, bool inherit, uint access);
     [DllImport("user32.dll", SetLastError = true)] private static extern bool CloseDesktop(IntPtr desktop);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] private static extern bool GetUserObjectInformationW(IntPtr handle, int index, StringBuilder buffer, int length, out uint needed);
-    [DllImport("kernel32.dll", SetLastError = true)] private static extern IntPtr LocalFree(IntPtr memory);
     [DllImport("kernel32.dll")] private static extern uint GetCurrentThreadId();
     [DllImport("kernel32.dll", SetLastError = true)] private static extern bool ProcessIdToSessionId(uint process, out uint session);
     [DllImport("kernel32.dll")] private static extern uint WTSGetActiveConsoleSessionId();
