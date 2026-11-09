@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "preview-loading-visibility-one-v1",
+  "status": "LOCAL_GOVERNANCE_AND_INDEPENDENT_IMPLEMENTATION_REVIEW_PASS; WINDOWS_VALIDATION_NOT_RUN; INTEGRATION_NOT_APPROVED",
+  "authorisation": {
+    "preparation": {
+      "commit": "0fcab63d2d9f8db8df90c6f1f60cf3eac6301043",
+      "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+    },
+    "candidateManifestSha256": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+    "ownerApprovalSha256": "f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea"
+  },
+  "allowedChangedPaths": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json",
+    "docs/open-source/evidence/preview-loading-visibility/activation-validation.json",
+    "docs/open-source/evidence/preview-loading-visibility/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "implementationCanonicalSha256": {
+    "scripts/compliance/licence_scope.py": "6911f5906373bd6bb1f1e9130d45928c0ba9e2f70478309f6d6f17f00212cadf",
+    "scripts/compliance/test_governance.py": "45d84d99a44cbbc6734db4e07ce3a091d460d1707a7e87a069bbb372f07df18f",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json": "f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json": "ced6641fbc0c211ad94fa63bcbdadc9a9e9c6de9f479f0727c0c1a58ccd23ed2"
+  },
+  "historicalAndCurrentProof": {
+    "identities": {
+      "baseline": {
+        "commit": "cc465fd7f3bfbf949c460563c9be2d73a72193aa",
+        "tree": "b3cd0c8335aca772cfe011a0895792aca7ce9f91"
+      },
+      "candidate": {
+        "commit": "504f71eda248c6d4162f7b1f73e9bea555cb2e28",
+        "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+      },
+      "preparation": {
+        "commit": "0fcab63d2d9f8db8df90c6f1f60cf3eac6301043",
+        "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+      }
+    },
+    "protectedPathsChanged": {
+      "src/native/LensDocsStudio.Native/MainWindow.PreviewLoading.cs": {
+        "previous": "a87587c5c6c3403e766b895c1ad41ccb715a6472ffd0f7530cdfb0eb0abfe0ad",
+        "current": "aec177b20c1176d1e05ae8d0f9de17c22c437b3044ad3aac058a9227ba9c9053"
+      }
+    },
+    "nativeSourceDifferenceOnly": [
+      "src/native/LensDocsStudio.Native/MainWindow.PreviewLoading.cs"
+    ],
+    "previousRuntimeSourceTrees": {
+      "src/native": "8c90d7e3491615d4f156b3e33b3abb7b13cbc59f",
+      "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+    },
+    "runtimeSourceTrees": {
+      "src/native": "cc2bc7b62695a55e52b980147285bbf4ad759e8d",
+      "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+    },
+    "earlierRefreshFunctionsUnchanged": true,
+    "earlierNinePairEvidenceUnchanged": true,
+    "productAndOfflineControlBytesUnchanged": true,
+    "licenceScopeAndWorkflowsUnchanged": true,
+    "historicalTimeoutAttribution": "INCONCLUSIVE"
+  },
+  "localValidation": {
+    "governance": "PASS",
+    "governanceControls": {
+      "passed": 49,
+      "failed": 0,
+      "originalControlsRetained": 39,
+      "newControls": 10
+    },
+    "foundation": {
+      "status": "PASS",
+      "rightsPaths": 2545
+    },
+    "logsCanonicalOrFileSha256": {
+      "activation-governance-controls.log": "796e6940b39fcd6befd2c7d6d31e4751ceb567835cc8cb147a4d6c872bde00db",
+      "activation-foundation.log": "8eadcef6f60baa100adb1e44f5cf73651567d5c7bc57c5ca30555c6ed0b62ed4"
+    },
+    "priorUnchangedSourceEvidence": {
+      "offlineControls": {
+        "passed": 11,
+        "failed": 0
+      },
+      "coreLoadingStateTests": {
+        "passed": 8,
+        "failed": 0
+      },
+      "nativeBuild": "PASS; zero warnings/errors",
+      "rerunForGovernanceOnlyChange": false
+    }
+  },
+  "limits": {
+    "grantedPaths": 1081,
+    "protectedFiles": 2421,
+    "developRequiredContexts": 30,
+    "sourceOrHarnessAssertionChanged": false,
+    "performanceExceptionExtended": false,
+    "liveExecution": "NOT RUN",
+    "integration": "NOT APPROVED"
+  },
+  "independentReview": {
+    "reviewer": "/root/preview_loading_review",
+    "result": "GO for the approved isolated validation route; no blocking implementation findings",
+    "record": "activation-independent-review.md",
+    "finalCommittedIdentityReadbackRequiredBeforeDispatch": true
+  }
+}

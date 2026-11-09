@@ -81,6 +81,29 @@ FLOWCHART_PAIRS = {
     }
 }
 
+PREVIEW_LOADING_EVIDENCE = 'docs/open-source/evidence/preview-loading-visibility/'
+PREVIEW_LOADING_PROPOSAL = 'preview-loading-visibility-one-v1'
+PREVIEW_LOADING_MANIFEST_SHA256 = '0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32'
+PREVIEW_LOADING_APPROVAL_SHA256 = 'f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea'
+PREVIEW_LOADING_IDENTITIES = {
+    'baseline': {'commit': 'cc465fd7f3bfbf949c460563c9be2d73a72193aa',
+                 'tree': 'b3cd0c8335aca772cfe011a0895792aca7ce9f91'},
+    'candidate': {'commit': '504f71eda248c6d4162f7b1f73e9bea555cb2e28',
+                  'tree': '556cdcfc6f2541a082932a2f9529dc3ae3fabd2c'},
+    'preparation': {'commit': '0fcab63d2d9f8db8df90c6f1f60cf3eac6301043',
+                    'tree': '556cdcfc6f2541a082932a2f9529dc3ae3fabd2c'},
+}
+PREVIEW_LOADING_SOURCE_TREES = {
+    'src/native': 'cc2bc7b62695a55e52b980147285bbf4ad759e8d',
+    'tests/fixtures/native-flowchart': '4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35',
+}
+PREVIEW_LOADING_PAIRS = {
+    'src/native/LensDocsStudio.Native/MainWindow.PreviewLoading.cs': {
+        'previous': 'a87587c5c6c3403e766b895c1ad41ccb715a6472ffd0f7530cdfb0eb0abfe0ad',
+        'current': 'aec177b20c1176d1e05ae8d0f9de17c22c437b3044ad3aac058a9227ba9c9053',
+    },
+}
+
 
 
 def require(condition, message):
@@ -239,14 +262,18 @@ def validate_flowchart_evidence_digests(actual):
 
 
 def validate_flowchart_source_identity(trees, expected_objects, actual_objects):
-    require(trees == FLOWCHART_SOURCE_TREES,
+    validate_source_identity(trees, FLOWCHART_SOURCE_TREES, expected_objects, actual_objects)
+
+
+def validate_source_identity(trees, approved_trees, expected_objects, actual_objects):
+    require(trees == approved_trees,
             'Flowchart amendment source tree identity changed')
     require(bool(expected_objects) and set(actual_objects) == set(expected_objects),
             'Flowchart source identity has missing or additional paths')
     require(actual_objects == expected_objects, 'Flowchart source working bytes changed')
 
 
-def check_flowchart_source_identity(paths):
+def check_flowchart_source_identity(paths, approved_trees=FLOWCHART_SOURCE_TREES):
     # All objects below exist in a depth-1 checkout. Historical commit/tree labels
     # are exact pinned approval metadata; their full-history proof is retained in
     # activation-validation.json. No absent-history fallback or network fetch.
@@ -270,7 +297,68 @@ def check_flowchart_source_identity(paths):
     objects = git('-c', 'core.safecrlf=false', 'hash-object', '--stdin-paths',
                   data=('\n'.join(names) + '\n').encode('utf-8')).decode().splitlines()
     require(len(objects) == len(names), 'Incomplete Flowchart source object inventory')
-    validate_flowchart_source_identity(trees, expected, dict(zip(names, objects, strict=True)))
+    validate_source_identity(trees, approved_trees, expected, dict(zip(names, objects, strict=True)))
+
+
+def validate_preview_loading_approval(refresh, approval_bytes, candidate_bytes):
+    # The predecessor's constants and evidence stay immutable. A separate exact
+    # owner receipt is required before accepting this one-path successor tree.
+    approval = flowchart_json(approval_bytes, PREVIEW_LOADING_APPROVAL_SHA256)
+    candidate = flowchart_json(candidate_bytes, PREVIEW_LOADING_MANIFEST_SHA256)
+    require(approval['decision'] == 'APPROVED_ONE_PAIR_GOVERNANCE_AMENDMENT_ONLY'
+            and approval['proposalId'] == PREVIEW_LOADING_PROPOSAL
+            and approval['preparation'] == PREVIEW_LOADING_IDENTITIES['preparation']
+            and approval['candidateManifestSha256'] == PREVIEW_LOADING_MANIFEST_SHA256,
+            'Preview loading amendment lacks the exact owner decision')
+    expected = {
+        'schemaVersion': 1, 'proposalId': PREVIEW_LOADING_PROPOSAL,
+        'status': 'OWNER_APPROVED', 'repository': 'DouglasNLima/local-docs-studio',
+        'candidateManifestSha256': PREVIEW_LOADING_MANIFEST_SHA256,
+        'ownerApprovalSha256': PREVIEW_LOADING_APPROVAL_SHA256,
+        **PREVIEW_LOADING_IDENTITIES, 'excludedBoundaries': ['R3', 'R4', 'R5', 'R6', 'R7'],
+        'previousRuntimeSourceTrees': FLOWCHART_SOURCE_TREES,
+        'runtimeSourceTrees': PREVIEW_LOADING_SOURCE_TREES, 'files': PREVIEW_LOADING_PAIRS,
+    }
+    require(type(refresh) is dict and type(refresh.get('schemaVersion')) is int and refresh == expected,
+            'Preview loading amendment must retain its exact approved path, pair and identities')
+    require(candidate['files'] == PREVIEW_LOADING_PAIRS
+            and candidate['previousRuntimeSourceTrees'] == FLOWCHART_SOURCE_TREES
+            and candidate['runtimeSourceTrees'] == PREVIEW_LOADING_SOURCE_TREES
+            and all(candidate[key] == value for key, value in PREVIEW_LOADING_IDENTITIES.items()),
+            'Preview loading candidate differs from the approved identities')
+    return dict(PREVIEW_LOADING_SOURCE_TREES)
+
+
+def validate_preview_loading_evidence_digests(actual):
+    for name, digest in [('candidate-refresh.json', PREVIEW_LOADING_MANIFEST_SHA256),
+                         ('owner-approval.json', PREVIEW_LOADING_APPROVAL_SHA256)]:
+        require(actual.get(PREVIEW_LOADING_EVIDENCE + name) == digest,
+                'Preview loading canonical evidence bytes changed: ' + name)
+
+
+def check_preview_loading_source_identity(paths):
+    refresh = flowchart_json((ROOT / (PREVIEW_LOADING_EVIDENCE + 'approved-refresh.json')).read_bytes())
+    approval = (ROOT / (PREVIEW_LOADING_EVIDENCE + 'owner-approval.json')).read_bytes()
+    candidate = (ROOT / (PREVIEW_LOADING_EVIDENCE + 'candidate-refresh.json')).read_bytes()
+    trees = validate_preview_loading_approval(refresh, approval, candidate)
+    validate_preview_loading_evidence_digests(current_digests({PREVIEW_LOADING_EVIDENCE + name
+        for name in ('candidate-refresh.json', 'owner-approval.json')}))
+    check_flowchart_source_identity(paths, trees)
+    return refresh, approval, candidate
+
+
+def apply_preview_loading_refresh(preserved, refresh, approval_bytes, candidate_bytes, actual, granted):
+    validate_preview_loading_approval(refresh, approval_bytes, candidate_bytes)
+    result = dict(preserved)
+    for path, entry in PREVIEW_LOADING_PAIRS.items():
+        require(path in granted and boundary(path, granted)[:2] == ('R1', 'MIT_ORIGINAL_PORTIONS_ONLY'),
+                'Unapproved preview loading amendment path: ' + path)
+        require(preserved.get(path) == entry['previous'],
+                'Preview loading amendment changed the previous effective pin: ' + path)
+        require(actual.get(path) == entry['current'],
+                'Preview loading amendment candidate bytes changed: ' + path)
+        result[path] = entry['current']
+    return result
 
 
 def main():
@@ -317,7 +405,7 @@ def main():
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
     flowchart_refresh = flowchart_json((ROOT / (FLOWCHART_EVIDENCE + 'approved-refresh.json')).read_bytes())
-    check_flowchart_source_identity(paths)
+    preview_loading_evidence = check_preview_loading_source_identity(paths)
     actual = current_digests(set(preserved) | {
         FLOWCHART_EVIDENCE + 'candidate-refresh.json', FLOWCHART_EVIDENCE + 'owner-approval.json'})
     validate_flowchart_evidence_digests(actual)
@@ -325,6 +413,7 @@ def main():
         preserved, flowchart_refresh,
         (ROOT / (FLOWCHART_EVIDENCE + 'owner-approval.json')).read_bytes(),
         (ROOT / (FLOWCHART_EVIDENCE + 'candidate-refresh.json')).read_bytes(), actual, granted)
+    preserved = apply_preview_loading_refresh(preserved, *preview_loading_evidence, actual, granted)
     validate_preserved(preserved, actual)
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

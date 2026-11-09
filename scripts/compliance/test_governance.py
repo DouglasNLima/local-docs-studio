@@ -18,6 +18,10 @@ from licence_scope import (FLOWCHART_EVIDENCE, FLOWCHART_PAIRS, FLOWCHART_SOURCE
                            flowchart_json, apply_flowchart_styling_refresh,
                            check_flowchart_source_identity, validate_flowchart_source_identity,
                            validate_flowchart_evidence_digests)
+from licence_scope import (PREVIEW_LOADING_EVIDENCE, PREVIEW_LOADING_PAIRS, PREVIEW_LOADING_SOURCE_TREES,
+                           apply_preview_loading_refresh, validate_preview_loading_approval,
+                           check_preview_loading_source_identity, validate_preview_loading_evidence_digests,
+                           validate_source_identity)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -468,7 +472,7 @@ class FlowchartProvenanceTests(unittest.TestCase):
                 validate_preserved(updated, actual)
 
     def test_current_source_subtrees_and_working_bytes_match_the_approved_identity(self):
-        check_flowchart_source_identity(current_paths())
+        check_preview_loading_source_identity(current_paths())
 
     def test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed(self):
         helper = 'src/native/LensDocsStudio.Core/Rendering/FlowchartCompatibility.cs'
@@ -483,6 +487,129 @@ class FlowchartProvenanceTests(unittest.TestCase):
             validate_flowchart_source_identity(changed, expected, expected)
         with self.assertRaises(ValueError):
             validate_flowchart_source_identity(FLOWCHART_SOURCE_TREES, {}, {})
+
+
+class PreviewLoadingProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        prior = FlowchartProvenanceTests()
+        prior.setUp()
+        self.preserved = prior.apply()
+        self.granted = prior.granted
+        self.actual = dict(self.preserved)
+        self.actual.update({path: pair['current'] for path, pair in PREVIEW_LOADING_PAIRS.items()})
+        self.refresh = flowchart_json((ROOT / (PREVIEW_LOADING_EVIDENCE + 'approved-refresh.json')).read_bytes())
+        self.approval = (ROOT / (PREVIEW_LOADING_EVIDENCE + 'owner-approval.json')).read_bytes()
+        self.candidate = (ROOT / (PREVIEW_LOADING_EVIDENCE + 'candidate-refresh.json')).read_bytes()
+
+    def apply(self):
+        return apply_preview_loading_refresh(self.preserved, self.refresh, self.approval,
+                                             self.candidate, self.actual, self.granted)
+
+    def test_exact_one_pair_overlay_preserves_prior_nine_and_inputs(self):
+        before = copy.deepcopy((self.preserved, self.refresh, self.actual, self.granted))
+        updated = self.apply()
+        self.assertEqual({p for p in updated if updated[p] != self.preserved[p]}, set(PREVIEW_LOADING_PAIRS))
+        self.assertEqual(len(updated), len(self.preserved))
+        for path, pair in FLOWCHART_PAIRS.items():
+            self.assertEqual(updated[path], pair['current'])
+        self.assertEqual(before, (self.preserved, self.refresh, self.actual, self.granted))
+        validate_preserved(updated, self.actual)
+
+    def test_missing_extra_and_substituted_paths_are_rejected(self):
+        original = copy.deepcopy(self.refresh)
+        path = next(iter(PREVIEW_LOADING_PAIRS))
+        variants = [{}, {**original['files'], 'SECURITY.md': original['files'][path]},
+                    {'.github/workflows/native.yml': original['files'][path]}]
+        for files in variants:
+            with self.subTest(files=files), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                self.refresh['files'] = files
+                self.apply()
+
+    def test_previous_current_and_actual_digests_and_grant_are_required(self):
+        path = next(iter(PREVIEW_LOADING_PAIRS))
+        for field in ('previous', 'current'):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                original = self.refresh['files'][path][field]
+                self.refresh['files'][path][field] = '0' * 64
+                try:
+                    self.apply()
+                finally:
+                    self.refresh['files'][path][field] = original
+        for values in (self.preserved, self.actual):
+            original = values.pop(path)
+            with self.assertRaises(ValueError):
+                self.apply()
+            values[path] = '0' * 64
+            with self.assertRaises(ValueError):
+                self.apply()
+            values[path] = original
+        self.granted.remove(path)
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_exact_identities_scope_and_successor_trees_cannot_drift(self):
+        original = copy.deepcopy(self.refresh)
+        changes = [('schemaVersion', True), ('status', 'PROPOSED_NOT_APPROVED'), ('proposalId', 'other'),
+                   ('repository', 'other/repo'), ('ownerApprovalSha256', '0' * 64),
+                   ('candidateManifestSha256', '0' * 64), ('excludedBoundaries', []),
+                   ('previousRuntimeSourceTrees', {}), ('runtimeSourceTrees', {}), ('allowUnapproved', True)]
+        changes += [(key, {'commit': '0' * 40, 'tree': '0' * 40})
+                    for key in ('baseline', 'candidate', 'preparation')]
+        for field, value in changes:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                self.refresh[field] = value
+                self.apply()
+
+    def test_missing_modified_or_forged_approval_and_manifest_fail_closed(self):
+        original = self.approval
+        for value in (None, b'', original + b'\n', original.replace(b'"role": "user"', b'"role": "agent"')):
+            with self.subTest(approval=value is None), self.assertRaises(ValueError):
+                self.approval = value
+                self.apply()
+        self.approval = original
+        self.candidate += b'\n'
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_duplicate_fields_cannot_override_the_successor(self):
+        with self.assertRaisesRegex(ValueError, 'Duplicate'):
+            flowchart_json(b'{"runtimeSourceTrees": {}, "runtimeSourceTrees": {}}')
+
+    def test_successor_requires_exact_tree_and_complete_working_object_inventory(self):
+        trees = validate_preview_loading_approval(self.refresh, self.approval, self.candidate)
+        objects = {next(iter(PREVIEW_LOADING_PAIRS)): 'a' * 40}
+        validate_source_identity(trees, PREVIEW_LOADING_SOURCE_TREES, objects, dict(objects))
+        for actual in ({}, {**objects, 'src/native/additional.cs': 'b' * 40},
+                       {next(iter(objects)): 'b' * 40}):
+            with self.subTest(actual=actual), self.assertRaises(ValueError):
+                validate_source_identity(trees, PREVIEW_LOADING_SOURCE_TREES, objects, actual)
+        with self.assertRaises(ValueError):
+            validate_source_identity(FLOWCHART_SOURCE_TREES, trees, objects, objects)
+        with self.assertRaises(ValueError):
+            validate_flowchart_source_identity(trees, objects, objects)
+        with self.assertRaises(ValueError):
+            validate_source_identity(trees, trees, {}, {})
+
+    def test_other_protected_material_and_prior_flowchart_evidence_stay_protected(self):
+        updated = self.apply()
+        for path in ('SECURITY.md', '.github/workflows/native-continuous-performance.yml', *FLOWCHART_PAIRS):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                validate_preserved(updated, {**self.actual, path: '0' * 64})
+
+    def test_git_canonical_evidence_digest_changes_are_rejected(self):
+        names = {PREVIEW_LOADING_EVIDENCE + name for name in ('candidate-refresh.json', 'owner-approval.json')}
+        actual = current_digests(names)
+        validate_preview_loading_evidence_digests(actual)
+        for path in names:
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                validate_preview_loading_evidence_digests({**actual, path: '0' * 64})
+
+    def test_checkout_line_endings_do_not_change_exact_approval(self):
+        self.approval = self.approval.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+        self.candidate = self.candidate.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+        validate_preserved(self.apply(), self.actual)
 
 
 if __name__ == '__main__':

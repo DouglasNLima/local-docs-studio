@@ -40,12 +40,14 @@ public partial class MainWindow
 
     private void PresentPreviewLoading()
     {
+        // Visibility and its next timer tick must use the same side of the delay boundary.
+        var now = previewLoadingClock.Elapsed;
         previewLoadingDelay.Stop();
         PreviewContentHost.Visibility = previewLoading.MasksContent ? Visibility.Hidden : Visibility.Visible;
-        PreviewLoading.Present(previewLoading, previewLoadingClock.Elapsed);
+        PreviewLoading.Present(previewLoading, now);
         AutomationProperties.SetItemStatus(Preview, previewLoading.Busy ? "Busy; preview is being updated"
             : previewLoading.Phase == PreviewLoadingPhase.Failed ? "Preview unavailable" : "Ready");
-        if (previewLoading.IsVisible(previewLoadingClock.Elapsed))
+        if (previewLoading.IsVisible(now))
         {
             if (announcedPreviewLoading != previewLoading.Generation)
             {
@@ -57,7 +59,7 @@ public partial class MainWindow
         else if (previewLoading.Busy)
         {
             previewLoadingDelay.Interval = TimeSpan.FromMilliseconds(Math.Max(1,
-                (PreviewLoadingState.VisibilityDelay - (previewLoadingClock.Elapsed - previewLoading.PendingSince)).TotalMilliseconds));
+                (PreviewLoadingState.VisibilityDelay - (now - previewLoading.PendingSince)).TotalMilliseconds));
             previewLoadingDelay.Start();
         }
     }

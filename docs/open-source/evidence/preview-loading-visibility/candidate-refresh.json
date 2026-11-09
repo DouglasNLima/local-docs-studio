@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "preview-loading-visibility-one-v1",
+  "status": "PROPOSED_NOT_APPROVED",
+  "ownerApproval": null,
+  "repository": "DouglasNLima/local-docs-studio",
+  "baseline": {
+    "commit": "cc465fd7f3bfbf949c460563c9be2d73a72193aa",
+    "tree": "b3cd0c8335aca772cfe011a0895792aca7ce9f91"
+  },
+  "candidate": {
+    "commit": "504f71eda248c6d4162f7b1f73e9bea555cb2e28",
+    "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+  },
+  "preparation": {
+    "commit": "0fcab63d2d9f8db8df90c6f1f60cf3eac6301043",
+    "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+  },
+  "scope": "One exact protected-source substitution; no licence grant, performance exception or execution acceptance",
+  "files": {
+    "src/native/LensDocsStudio.Native/MainWindow.PreviewLoading.cs": {
+      "previous": "a87587c5c6c3403e766b895c1ad41ccb715a6472ffd0f7530cdfb0eb0abfe0ad",
+      "current": "aec177b20c1176d1e05ae8d0f9de17c22c437b3044ad3aac058a9227ba9c9053"
+    }
+  },
+  "previousRuntimeSourceTrees": {
+    "src/native": "8c90d7e3491615d4f156b3e33b3abb7b13cbc59f",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "runtimeSourceTrees": {
+    "src/native": "cc2bc7b62695a55e52b980147285bbf4ad759e8d",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "preservedFlowchartApproval": {
+    "proposalId": "pr81-flowchart-provenance-nine-v1",
+    "candidateManifestSha256": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+    "ownerApprovalSha256": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+    "exactNinePairsUnchanged": true
+  },
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "activationPathsOnly": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json",
+    "docs/open-source/evidence/preview-loading-visibility/activation-validation.json",
+    "docs/open-source/evidence/preview-loading-visibility/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "constraints": [
+    "Preserve all previous evidence and effective substitutions.",
+    "Reject missing, additional, substituted or unapproved protected paths and digests.",
+    "Validate exact native/fixture trees and canonical working bytes; no absent-history fallback.",
+    "Pin the new owner decision and manifest before accepting the new subtree.",
+    "Keep the three new offline-control paths outside the existing MIT grant.",
+    "Keep all 30 required contexts, all workflows and the 25-second correctness bound unchanged.",
+    "Do not extend the PR #81-specific performance exception or alter the 250 ms benchmark.",
+    "No merge, release, signing, deployment, tag or binary distribution."
+  ]
+}
