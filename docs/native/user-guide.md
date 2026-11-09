@@ -370,12 +370,6 @@ Maths supports inline dollar delimiters, parenthesised LaTeX delimiters and disp
 
 Unsupported or oversized formulae remain readable source. Each formula is limited to 4,096 characters, with at most 256 formulae and 32,768 formula characters per document. HTML, Word, PDF and rich clipboard output use high-resolution formula images; Markdown keeps the editable source.
 
-### Flowchart styling compatibility
-
-Native rendering accepts optional trailing semicolons on complete `class`, `classDef` and `style` instructions, comma-separated node targets, and repeated class assignments. Later assignments take precedence for overlapping properties. The original Mermaid remains unchanged. Malformed styling reports an unsupported-syntax message instead of becoming a diagram node. Comma-separated class names in a single assignment retain protected inspection with a visible warning and default appearance; use separate class statements to apply multiple styles. Unknown class names do not create nodes or add style properties.
-
-Label text and line breaks inside `<small>`, `<sub>`, `<sup>` and `<mark>` are retained, but their typography is not supported by the pinned native renderer. Preview displays this limitation. These labels remain protected in Visual Edit; read-only inspection and canonical SVG/PNG exports retain the same graph and text. The Web and Native layouts can differ.
-
 ## Details, callouts and document helpers
 
 **Insert → Details section** creates or edits a plain summary, Markdown body and initial expansion state. Complete passive details sections render as native expanders. Nested headings, links, tables, images and diagrams keep their source positions.

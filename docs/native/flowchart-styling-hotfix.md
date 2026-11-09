@@ -32,10 +32,12 @@ The compiled Windows check compares actual native preview, inspection and export
 
 Use the existing `Build-NativePackage.ps1` and the native workflow run number for the preview version. Package only clean exact source, retain ZIP/installer SHA-256 hashes and `version.json`, and do not install onto the owner's desktop. The final PR receipt records candidate commit/tree, independent review, terminal hosted results and any limitations or failed checks; this document does not predeclare a pass.
 
-## Supported semantics and limits
+The existing `0.1.1-preview.1055` evaluation packages remain attributed to commit `3a8f10d737791a1182d092676ecb17a47e2fde30`, tree `1f13a1afa64fd0b4419303bcaf0136f1ffcecfe7`, and their original validated SHA-256 hashes. Documentation-only follow-ups do not rebuild or reattribute those packages. The original provenance FAIL and Continuous 250 ms failures remain historical results.
+
+## Flowchart styling compatibility
 
 Complete `class`, `classDef` and `style` declarations accept optional semicolons. Multiple node targets and separate repeated class declarations are supported; later assignments win overlapping properties. Renderer-private effective class names never replace the original Markdown. Unknown class names add no properties and create no nodes.
 
 Comma-separated class names within one assignment remain protected with a visible warning and default appearance; use separate class statements. Malformed or unsupported directives fail explicitly instead of rendering as graph nodes. Subgraph title colour supports bounded hexadecimal or named colours, and dashes support bounded numeric values. Multiline quoted style values and ambiguous subgraph title matching remain unsupported.
 
-`<small>`, `<sub>`, `<sup>` and `<mark>` text and line breaks are retained, but their typography is unsupported. These labels remain protected in Visual Edit. The SPC fixture is inspected without rewriting or discarding its label content. Native and Web layout geometry can differ. Existing rendering and compatibility resource limits remain in force.
+`<small>`, `<sub>`, `<sup>` and `<mark>` text and line breaks are retained, but their typography is unsupported. Preview displays this limitation. These labels remain protected in Visual Edit; read-only inspection and canonical SVG/PNG exports retain the same graph and text. The SPC fixture is inspected without rewriting or discarding its label content. Native and Web layout geometry can differ. Existing rendering and compatibility resource limits remain in force.
