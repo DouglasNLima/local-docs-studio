@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "preview-reflow-integration-three-v1",
+  "status": "PROPOSED_NOT_APPROVED",
+  "ownerApproval": null,
+  "repository": "DouglasNLima/local-docs-studio",
+  "baseline": {
+    "commit": "3cd08bc2de31564e06973c5211e1aa231731f9cb",
+    "tree": "d5d07c445a12803f64dd36276a86511143a73648"
+  },
+  "candidate": {
+    "commit": "752b2c26e6c309b77fe23b812c6f3d1a5114d369",
+    "tree": "9835e2b16bdd113683effbed85a10416cd636b39"
+  },
+  "historicalSource": {
+    "commit": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+    "tree": "89e012f468801ac7f445113b811ca2fbe041c8d9",
+    "productCommits": [
+      "3f58591743abf81a5c96df5a4183c5b0b46fb995",
+      "4f133d1b110dd6b600d3e1ae06fe725a598feb4a",
+      "a798eaf051baa14470a14b1af1825abe2284a9ec"
+    ]
+  },
+  "scope": "Three exact protected-byte substitutions and a pinned successor native subtree; no licence grant, performance exception or hosted execution authorisation",
+  "files": {
+    "src/native/LensDocsStudio.Native/MainWindow.Find.cs": {
+      "previous": "9e8bcd8b2fbbcdf7d073a61f98b500e54c2c58dd6341e9dc506fab5fa6e7ac7e",
+      "current": "30bb76cb045afd2b27be472a560a22d86eaa176d9649b0eb2e663e0564b7c974"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
+      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
+      "current": "8a7e197f2e850c9eebf4d2e14d312e87cb20a1568a462ab44b5d4cb63b504907"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+      "previous": "50888389971d81a765bc00b3607baa26cc5e9982f5679779e3d87cbebbfa4585",
+      "current": "65781f39bb3e41508960f53f510b503e64dcc09724ea98a2f51656431ab325c1"
+    }
+  },
+  "addedFiles": {
+    "src/native/LensDocsStudio.Native/MainWindow.PreviewReflow.cs": "aa27b1f52d5c1c18fd7a3d8202c057aab0251be3dfa2464ed5ff52e9a918f37a",
+    "src/native/LensDocsStudio.Native/Rendering/PreviewViewportAnchor.cs": "9e12cc6ba3930efc75ffe9fe27f85060468039ab49af453a1f541a9901fb6ac1",
+    "tests/fixtures/native-preview-reflow/.gitattributes": "7e9478bbc133f5641ccb3386d555aacda156ad923b9e38c54d65e5d563ba4426",
+    "tests/fixtures/native-preview-reflow/mixed.md": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+    "tests/fixtures/native-preview-reflow/pixel.png": "a38a4ff7320a3d8764ac959b264f15e335360d7c1e23a0627dee7f366c95c58f",
+    "tests/native/preview-reflow/LayoutControl.cs": "31fbff54665dcacd7898886d228b66c19d87ec6428f2bea5740c649c80bc7129",
+    "tests/native/preview-reflow/PreviewReflowControls.csproj": "dbf9becd1ba70f36c136783a46a81363d8e2dc418f964aedc4f90233170be2e2",
+    "tests/native/preview-reflow/Program.cs": "95cc6c441c313bb9a447f6ab06a9260bcdcb87ac609146181edd419138e63ae0"
+  },
+  "previousRuntimeSourceTrees": {
+    "src/native": "cc2bc7b62695a55e52b980147285bbf4ad759e8d",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "runtimeSourceTrees": {
+    "src/native": "fe3d78249f388df1488bf09c1941f147363e63c1",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "controlTrees": {
+    "tests/native/preview-reflow": "1c828de5db3b2f82258616f460cf3f7f5aeeff7e",
+    "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a"
+  },
+  "preservedEvidence": {
+    "docs/open-source/configuration/mit-scope.json": "8270a564757e0851e15184a5ca2c64c46ca6892811503b6c20062c4e9fa48388",
+    "docs/open-source/evidence/goal62/preserved-files.json": "d56bdbcc1f16c1a5ce26a5936778baaf3f45a5b4c94bc661d4d61d8fbb845822",
+    "docs/open-source/evidence/flowchart-provenance-81/candidate-refresh.json": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+    "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+    "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json": "140568d16736ac59a0bb35b0d8199a3becda851e65588dfd5be97c8851c74a47",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json": "f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json": "ced6641fbc0c211ad94fa63bcbdadc9a9e9c6de9f479f0727c0c1a58ccd23ed2"
+  },
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "activationPathsOnly": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/preview-reflow-integration/owner-approval.json",
+    "docs/open-source/evidence/preview-reflow-integration/approved-refresh.json",
+    "docs/open-source/evidence/preview-reflow-integration/activation-validation.json",
+    "docs/open-source/evidence/preview-reflow-integration/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "constraints": [
+    "Preserve immutable historical records and every prior approved hash substitution.",
+    "Pin the owner decision and this manifest before accepting the successor subtree.",
+    "Do not extend the existing MIT allowlist; added paths retain their existing classification and require separate rights decisions.",
+    "Reject extra paths, changed previous/current hashes, unknown source trees and absent history.",
+    "Retain all 30 mandatory develop contexts and all workflow bytes.",
+    "Retain the Continuous 250 ms benchmark and its historical FAIL; no Goal #77 restart or ADR 007 activation.",
+    "No merge, release, signing, deployment, distribution or Native Stable certification."
+  ],
+  "testedProduct": {
+    "commit": "2003c1f24de3fa8c7b98e18ec543655cec281cf0",
+    "tree": "540eae1bff9effcede132793c14847d985bf8202"
+  }
+}

@@ -1,0 +1,21 @@
+....E............................................
+======================================================================
+ERROR: test_current_source_subtrees_and_working_bytes_match_the_approved_identity (__main__.FlowchartProvenanceTests.test_current_source_subtrees_and_working_bytes_match_the_approved_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Code\pr80-reflow-integration\scripts\compliance\test_governance.py", line 475, in test_current_source_subtrees_and_working_bytes_match_the_approved_identity
+    check_preview_loading_source_identity(current_paths())
+  File "C:\Code\pr80-reflow-integration\scripts\compliance\licence_scope.py", line 346, in check_preview_loading_source_identity
+    check_flowchart_source_identity(paths, trees)
+  File "C:\Code\pr80-reflow-integration\scripts\compliance\licence_scope.py", line 300, in check_flowchart_source_identity
+    validate_source_identity(trees, approved_trees, expected, dict(zip(names, objects, strict=True)))
+  File "C:\Code\pr80-reflow-integration\scripts\compliance\licence_scope.py", line 271, in validate_source_identity
+    require(bool(expected_objects) and set(actual_objects) == set(expected_objects),
+  File "C:\Code\pr80-reflow-integration\scripts\compliance\licence_scope.py", line 111, in require
+    raise ValueError(message)
+ValueError: Flowchart source identity has missing or additional paths
+
+----------------------------------------------------------------------
+Ran 49 tests in 12.616s
+
+FAILED (errors=1)

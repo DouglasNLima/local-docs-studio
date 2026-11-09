@@ -1,0 +1,4 @@
+System.IO.IOException: Complex 39/115/284 document completes through native preview: Rendering resource deadline reached (6 seconds). Retry the preview or reduce the diagram size.
+   at LensDocsStudio.Native.Validation.NativePreviewLoadingChecks.<>c__DisplayClass0_0.<Run>g__Check|7(Boolean value, String message) in C:\Code\pr80-reflow-integration\src\native\LensDocsStudio.Native.Validation\NativePreviewLoadingChecks.cs:line 219
+   at LensDocsStudio.Native.Validation.NativePreviewLoadingChecks.Run(String output, String root, Boolean shown, Boolean highContrast) in C:\Code\pr80-reflow-integration\src\native\LensDocsStudio.Native.Validation\NativePreviewLoadingChecks.cs:line 191
+   at LensDocsStudio.Native.Validation.Program.Main(String[] args) in C:\Code\pr80-reflow-integration\src\native\LensDocsStudio.Native.Validation\Program.cs:line 82
