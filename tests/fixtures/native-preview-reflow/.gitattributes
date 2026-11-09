@@ -1,0 +1,2 @@
+# Preserve the original PR #80 fixture bytes on Windows checkouts.
+mixed.md -text
