@@ -134,7 +134,9 @@ public sealed class ArrangementEngine
         MermaidRenderer.RenderSvgAsync(SourceAuthoring.SourceText.PrepareRendererSource(canonical.Source), stream, options, token).GetAwaiter().GetResult();
         token.ThrowIfCancellationRequested();
         if (stream.Length > 8_000_000) throw new InvalidDataException("The arranged SVG exceeds the 8 MB presentation limit.");
-        return System.Text.Encoding.UTF8.GetString(stream.ToArray());
+        var svg = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+        return FlowchartCompatibility.IsFlowchart(canonical.Source)
+            ? FlowchartSvgCompatibility.Apply(svg, canonical.FlowchartLayout, canonical.FidelityWarning) : svg;
     }
     private ArrangementSnapshot Finish(DiagramResult result, ArrangementState state, CancellationToken token)
     {

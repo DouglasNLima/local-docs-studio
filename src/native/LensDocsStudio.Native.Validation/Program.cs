@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--flowchart-compatibility" && args.Length == 3)
+        {
+            try { NativeFlowchartCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--selection-visual")
         {
             try { NativeSelectionVisualChecks.Run(Path.GetFullPath(args[1]), args.Contains("--expect-cold-invisible")); return 0; }

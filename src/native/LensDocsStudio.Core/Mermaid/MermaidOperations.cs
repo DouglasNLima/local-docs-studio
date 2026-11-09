@@ -155,13 +155,31 @@ public sealed class MermaidTransformationService
                 }
                 break;
             case SetMermaidClass assign:
+            {
                 model.Node(assign.Id);
                 if (!MermaidSourceParser.IsClassId(assign.ClassName) || !model.Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == assign.ClassName)))
                     throw new ArgumentException("Choose a class defined in this diagram's source.");
                 var existing = model.Styles.LastOrDefault(style => style.Kind == "class" && style.Targets.Any(target => target.Id == assign.Id));
+                // Selecting a class replaces this node's explicit assignments.
+                // Leave other targets, statement spacing and comments intact.
+                foreach (var prior in model.Styles.Where(style => style.Kind == "class" && style.Targets.Any(target => target.Id == assign.Id)))
+                {
+                    if (prior == existing && prior.Targets.Count == 1) continue;
+                    if (prior.Targets.All(target => target.Id == assign.Id)) { Replace(prior.Statement, ""); continue; }
+                    for (var index = 0; index < prior.Targets.Count; index++)
+                    {
+                        if (prior.Targets[index].Id != assign.Id) continue;
+                        var first = index;
+                        while (index + 1 < prior.Targets.Count && prior.Targets[index + 1].Id == assign.Id) index++;
+                        var start = index + 1 < prior.Targets.Count ? prior.Targets[first].Span.Start : prior.Targets[first - 1].Span.End;
+                        var end = index + 1 < prior.Targets.Count ? prior.Targets[index + 1].Span.Start : prior.Targets[index].Span.End;
+                        Replace(new(start, end - start), "");
+                    }
+                }
                 if (existing?.Targets.Count == 1) Replace(new(existing.Statement.End - existing.Value.Length, existing.Value.Length), assign.ClassName);
                 else Add("class " + assign.Id + " " + assign.ClassName);
                 break;
+            }
             case SetMermaidStyle style:
                 model.Node(style.Id); CheckColour(style.Fill); CheckColour(style.Stroke); CheckColour(style.Colour);
                 var value = "style " + style.Id + " fill:" + style.Fill + ",stroke:" + style.Stroke + ",color:" + style.Colour;
