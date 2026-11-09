@@ -75,6 +75,7 @@ public partial class MainWindow
     }
     private void CancelFindNavigation()
     {
+        CancelPreviewLayout();
         findInteraction++;
         if (Preview is not null) PreviewNavigationService.CancelPending(Preview);
         if (Editor is not null) EditorNavigationService.CancelPending(Editor);
