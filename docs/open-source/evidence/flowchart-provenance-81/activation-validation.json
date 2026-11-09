@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "pr81-flowchart-provenance-nine-v1",
+  "status": "PASS_FOR_OWNER_APPROVED_GOVERNANCE_IMPLEMENTATION; INTEGRATION_NOT_APPROVED",
+  "authorisation": {
+    "preparation": {
+      "commit": "5c3210d7acd39593f6ae6495a32c74564b50fa98",
+      "tree": "0599acd4077d75b71fb065a9564d574fb3d18950"
+    },
+    "candidateManifestSha256": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+    "ownerReceiptCanonicalSha256": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+    "source": {
+      "kind": "direct-owner-message-in-codex",
+      "threadId": "01a1c0a7-6da0-78e2-a093-03479bd7d30c",
+      "turnId": "01a1c0c9-468d-7881-91e5-b88ca212a4b2",
+      "messageId": "01a1c0c9-4763-7ee1-a947-686395a9d833",
+      "role": "user",
+      "receivedAt": "2026-11-09T14:49:38.000Z",
+      "verification": "Exact direct user approval in this conversation, independently read back with Codex read_thread; not a fabricated GitHub approval or an electronic signature."
+    }
+  },
+  "allowedChangedPaths": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json",
+    "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json",
+    "docs/open-source/evidence/flowchart-provenance-81/activation-validation.json",
+    "docs/open-source/evidence/flowchart-provenance-81/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "implementationCanonicalSha256": {
+    "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json": "140568d16736ac59a0bb35b0d8199a3becda851e65588dfd5be97c8851c74a47",
+    "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+    "scripts/compliance/licence_scope.py": "6303051730352d38fddabc51fb32e0655d08f867306645e8bb8c7e20166bd7ed",
+    "scripts/compliance/test_governance.py": "4517eba3d3cc05249f69029e93e88126b48ed634d89ff8690b4d8836a367e375"
+  },
+  "historicalAndCurrentProof": {
+    "historicalSourceIdentities": {
+      "baseline": {
+        "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+        "tree": "e4d137a12cbdd827583fcb841612890dd88736ec"
+      },
+      "candidate": {
+        "commit": "b29dbb862bd6fe2eebc26deba25bab072857048f",
+        "tree": "53aa0f0c18455ca61cb2bc7b4abf111124de50dc"
+      },
+      "evaluation": {
+        "commit": "3a8f10d737791a1182d092676ecb17a47e2fde30",
+        "tree": "1f13a1afa64fd0b4419303bcaf0136f1ffcecfe7"
+      },
+      "originalEvidence": {
+        "commit": "0890ec9b2ade8af24b9b3fca6cbe98cd7fd329ba",
+        "tree": "fd0e968cd8fb3ece8ebb73d78a859705e1605fe3"
+      },
+      "preparation": {
+        "commit": "5c3210d7acd39593f6ae6495a32c74564b50fa98",
+        "tree": "0599acd4077d75b71fb065a9564d574fb3d18950"
+      }
+    },
+    "protectedFiles": 2421,
+    "baselineMismatches": 0,
+    "candidateMismatchesBeforeApprovedOverlay": 9,
+    "currentMismatchesAfterApprovedOverlay": 0,
+    "historicalProtectedPredicate": "FAIL",
+    "retainedHistoricalFailure": "Protected notice/trust/performance bytes changed: src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj",
+    "earlierRefreshFunctionsAndPolicyPairsUnchanged": true,
+    "retainedExecutionEvidenceFiles": 15,
+    "pairs": [
+      {
+        "path": "src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj",
+        "previous": "5744f4a8b7e8784519a74b362d3a7f7f5a1d657b2c295b6c3d4d2b66ff585316",
+        "current": "bcc5936898b464e3da8116937349c04a411755db2d78e4376d3d763017c275b4",
+        "previousBlob": "5f9cd87e3eae751ff3499432c1e72acb2ee4cfb2",
+        "candidateBlob": "5669644f0a770585a3bcd3c1311006a9ec69139e",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs",
+        "previous": "8e12c1260ad97b08b509b1210dafe0124c2b117701f5d2a160b3a59f356af859",
+        "current": "ae71b419863ebf55de83e48984106023c583cf76520edd77d12d93d966120d77",
+        "previousBlob": "625cf1d17283dc8040fea7e1a4fe075b5146cbd7",
+        "candidateBlob": "1aebdc12fa93d696c438a4f46327b69a9564b87b",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Core/Mermaid/MermaidOperations.cs",
+        "previous": "bc11d28656c15935077a20ff0d981fd4aaafaaae099b805fa87f03bfe6c31245",
+        "current": "fde06abc85a0f3a68e33064d55c6df3f4fd9355eca2ef9f02ee5b8f27f894f70",
+        "previousBlob": "31acb2c18a0ab3622b47ff882e74502f4ab3584f",
+        "candidateBlob": "48869d13ae61f8d15dd548a9dbe0a3cf1b2b7675",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs",
+        "previous": "d2860c996f00e0a6a145ed1e006069b1118aab033c75d249ab13fc384e49a6a5",
+        "current": "311c66b3e3136767838aab0eeadc40bedd8ba35d4a368b01444da2ddc00cdeca",
+        "previousBlob": "cc11d92ac5228fafc8767d34e8f5c975b77c73cd",
+        "candidateBlob": "243e43083e7fd1c10fb93fd57b1384a18e3452fd",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs",
+        "previous": "ca956434be85b52c1ec5c66d3bcded2b4145fc4517de72f0c77fac18464dce8c",
+        "current": "7e8304ebb33911ceb58ec63401d3f17cc67b11ef26d912abca8b6e07a20af5d3",
+        "previousBlob": "ae36b6baa7036646a2c14357a1f6e035bd1013da",
+        "candidateBlob": "f66b3e38274878508e966f3b7042a34b98e578d4",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Core/Rendering/DiagramService.cs",
+        "previous": "c8a3b7b97bf0fc91e3aa7adfbce99646709380083fd53015eea9742192df4d0d",
+        "current": "158554c6f6d661e9563c8515f91a6985234da59aec123eeaf06246ae60961275",
+        "previousBlob": "8d1bb70edddc3438b6ddea0b4e3fea20f9539f71",
+        "candidateBlob": "659f4968e205fc12197d9aef9e3be2c8e9414aa9",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs",
+        "previous": "33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738",
+        "current": "7c99911849b28f54be0b0615b4c91374a0b791d86e897a40fa177e6d0cad888c",
+        "previousBlob": "0e5f2b45017d305680f8fbb329277fe957c1cb4e",
+        "candidateBlob": "23dcab23967512c9a729a013300fccb33149e4a9",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native.Validation/Program.cs",
+        "previous": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
+        "current": "e2e1977ff193a343de5dfe4f3ed1c8fc8f44621b9345c1957fa6726b39d2f2ca",
+        "previousBlob": "fcd2141e0dfb7ee54a9fa8235e960af821f4ad58",
+        "candidateBlob": "4942d25b37db0cf5805810fc980b9ffc46dd07bd",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      },
+      {
+        "path": "src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs",
+        "previous": "60ab0564756fc1a336656d437eea5ae16705db2620c3913dc2c797afe7c9c649",
+        "current": "a71d05d445699f1ed8adf8fa385c886b55613a74bd822af86ea98fbd20f3083c",
+        "previousBlob": "518fb39dcbf16af1d4744f428336c85e0d6ef0b3",
+        "candidateBlob": "3247478dc5e8187f0e70585b63827c9b4958350b",
+        "classification": [
+          "R1",
+          "MIT_ORIGINAL_PORTIONS_ONLY"
+        ]
+      }
+    ]
+  },
+  "checks": [
+    {
+      "check": "governance",
+      "command": [
+        "-B",
+        "scripts/compliance/check_governance.py"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1081, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\n",
+      "stderr": ""
+    },
+    {
+      "check": "governanceTests",
+      "command": [
+        "-B",
+        "scripts/compliance/test_governance.py",
+        "-v"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "test_actual_git_filters_must_preserve_the_approved_evidence_digests (__main__.FlowchartProvenanceTests.test_actual_git_filters_must_preserve_the_approved_evidence_digests) ... ok\ntest_candidate_manifest_is_the_exact_approved_preparation_document (__main__.FlowchartProvenanceTests.test_candidate_manifest_is_the_exact_approved_preparation_document) ... ok\ntest_canonical_receipt_and_manifest_accept_git_checkout_line_endings (__main__.FlowchartProvenanceTests.test_canonical_receipt_and_manifest_accept_git_checkout_line_endings) ... ok\ntest_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed (__main__.FlowchartProvenanceTests.test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed) ... ok\ntest_current_source_subtrees_and_working_bytes_match_the_approved_identity (__main__.FlowchartProvenanceTests.test_current_source_subtrees_and_working_bytes_match_the_approved_identity) ... ok\ntest_duplicate_fields_cannot_override_approval_or_path_decisions (__main__.FlowchartProvenanceTests.test_duplicate_fields_cannot_override_approval_or_path_decisions) ... ok\ntest_every_missing_or_unapproved_path_is_rejected (__main__.FlowchartProvenanceTests.test_every_missing_or_unapproved_path_is_rejected) ... ok\ntest_every_previous_current_and_actual_digest_is_bound_to_exact_bytes (__main__.FlowchartProvenanceTests.test_every_previous_current_and_actual_digest_is_bound_to_exact_bytes) ... ok\ntest_exact_commit_and_tree_identities_cannot_be_substituted (__main__.FlowchartProvenanceTests.test_exact_commit_and_tree_identities_cannot_be_substituted) ... ok\ntest_extra_and_substituted_excluded_or_trust_paths_are_rejected (__main__.FlowchartProvenanceTests.test_extra_and_substituted_excluded_or_trust_paths_are_rejected) ... ok\ntest_missing_forged_or_modified_owner_receipt_is_rejected (__main__.FlowchartProvenanceTests.test_missing_forged_or_modified_owner_receipt_is_rejected) ... ok\ntest_owner_approved_overlay_changes_exactly_nine_effective_pins_without_mutating_evidence (__main__.FlowchartProvenanceTests.test_owner_approved_overlay_changes_exactly_nine_effective_pins_without_mutating_evidence) ... ok\ntest_program_chains_from_selection_sync_rather_than_the_frozen_goal62_pin (__main__.FlowchartProvenanceTests.test_program_chains_from_selection_sync_rather_than_the_frozen_goal62_pin) ... ok\ntest_proposal_approval_scope_and_override_fields_cannot_change (__main__.FlowchartProvenanceTests.test_proposal_approval_scope_and_override_fields_cannot_change) ... ok\ntest_protected_change_outside_the_nine_still_fails_full_validation (__main__.FlowchartProvenanceTests.test_protected_change_outside_the_nine_still_fails_full_validation) ... ok\ntest_admin_packet_requires_exact_target_payload_and_rollback (__main__.GovernanceBoundaryTests.test_admin_packet_requires_exact_target_payload_and_rollback) ... ok\ntest_documentation_examples_are_not_live_links (__main__.GovernanceBoundaryTests.test_documentation_examples_are_not_live_links) ... ok\ntest_rejects_administrator_bypass (__main__.GovernanceBoundaryTests.test_rejects_administrator_bypass) ... ok\ntest_rejects_human_approval_deadlocks (__main__.GovernanceBoundaryTests.test_rejects_human_approval_deadlocks) ... ok\ntest_rejects_native_check_on_main (__main__.GovernanceBoundaryTests.test_rejects_native_check_on_main) ... ok\ntest_rejects_unobserved_or_wrong_app_check (__main__.GovernanceBoundaryTests.test_rejects_unobserved_or_wrong_app_check) ... ok\ntest_retains_upstream_visual_fixture_and_evidence_exclusions (__main__.GovernanceBoundaryTests.test_retains_upstream_visual_fixture_and_evidence_exclusions) ... ok\ntest_valid_solo_proposal (__main__.GovernanceBoundaryTests.test_valid_solo_proposal) ... ok\ntest_approved_notice_and_unmodified_terms (__main__.ScopedLicenceTests.test_approved_notice_and_unmodified_terms) ... ok\ntest_find_amendment_preserves_historical_hashes_and_rejects_unreviewed_paths (__main__.ScopedLicenceTests.test_find_amendment_preserves_historical_hashes_and_rejects_unreviewed_paths) ... ok\ntest_missing_source_cannot_masquerade_as_pre_adoption (__main__.ScopedLicenceTests.test_missing_source_cannot_masquerade_as_pre_adoption) ... ok\ntest_native_payload_contains_exact_licence_and_scoped_disclosure (__main__.ScopedLicenceTests.test_native_payload_contains_exact_licence_and_scoped_disclosure) ... ok\ntest_native_payload_refuses_missing_scope_before_copying (__main__.ScopedLicenceTests.test_native_payload_refuses_missing_scope_before_copying) ... ok\ntest_new_path_never_gets_an_automatic_grant (__main__.ScopedLicenceTests.test_new_path_never_gets_an_automatic_grant) ... ok\ntest_package_licence_contract_rejects_removed_or_tampered_notices (__main__.ScopedLicenceTests.test_package_licence_contract_rejects_removed_or_tampered_notices) ... ok\ntest_rejects_blanket_grant (__main__.ScopedLicenceTests.test_rejects_blanket_grant) ... ok\ntest_rejects_blanket_package_metadata (__main__.ScopedLicenceTests.test_rejects_blanket_package_metadata) ... ok\ntest_rejects_continuous_check_in_ordinary_integration (__main__.ScopedLicenceTests.test_rejects_continuous_check_in_ordinary_integration) ... ok\ntest_rejects_missing_operative_licence (__main__.ScopedLicenceTests.test_rejects_missing_operative_licence) ... ok\ntest_rejects_missing_or_modified_third_party_attribution (__main__.ScopedLicenceTests.test_rejects_missing_or_modified_third_party_attribution) ... ok\ntest_rejects_notice_or_terms_changes (__main__.ScopedLicenceTests.test_rejects_notice_or_terms_changes) ... ok\ntest_rejects_removed_content_exclusions (__main__.ScopedLicenceTests.test_rejects_removed_content_exclusions) ... ok\ntest_rejects_vendor_adaptation_artwork_fixture_and_evidence_grants (__main__.ScopedLicenceTests.test_rejects_vendor_adaptation_artwork_fixture_and_evidence_grants) ... ok\ntest_selection_amendment_preserves_unrelated_trust_and_performance_pins (__main__.ScopedLicenceTests.test_selection_amendment_preserves_unrelated_trust_and_performance_pins) ... ok\n\n----------------------------------------------------------------------\nRan 39 tests in 11.626s\n\nOK\n"
+    },
+    {
+      "check": "foundation",
+      "command": [
+        "-B",
+        "scripts/compliance/check_foundation.py"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"highlight\": \"exact historical bytes\", \"originalWebNotices\": 68, \"nativeFiles\": 537, \"exactNativeMatches\": 522, \"rightsPaths\": 2537, \"localLinks\": 215, \"operativeLicenceApproval\": true}\n",
+      "stderr": ""
+    }
+  ],
+  "runtimeSourceIdentity": {
+    "strategy": "Mandatory exact approved metadata plus current HEAD native/fixture tree identities and canonical working-tree OIDs; all objects exist in depth-1 checkout. No missing-history fallback or fetch. Historical commit/tree/blob identities separately proved with full local history.",
+    "nativeTree": "8c90d7e3491615d4f156b3e33b3abb7b13cbc59f",
+    "fixtureTree": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "reviewCorrection": {
+    "finding": "Unconditional CRLF normalisation alone could accept evidence whose actual Git canonical bytes differ under -text/autocrlf=false.",
+    "resolution": "Production now checks actual Git-filtered SHA-256 for the owner receipt and candidate manifest before overlay; real temporary Git integration control rejects -text CRLF and accepts text eol=lf.",
+    "status": "CORRECTED_AND_INDEPENDENTLY_VERIFIED"
+  },
+  "retainedFailures": {
+    "historicalProvenance": "FAIL, unchanged at original heads",
+    "ossRuns": [
+      42616164670,
+      42624169917
+    ],
+    "continuousRuns": [
+      42616165018,
+      42624170280
+    ],
+    "continuousFailedCandidateSamples": [
+      [
+        28,
+        27
+      ],
+      [
+        28,
+        31
+      ]
+    ],
+    "reclassified": false
+  },
+  "postCommitVerification": {
+    "receiptLocation": "PR #81 delivery body, with final commit/tree and exact depth-1 local clone results",
+    "reason": "This committed receipt cannot contain its own future commit identity. Final-source validation remains required before delivery."
+  },
+  "executionLimits": {
+    "continuousRerun": false,
+    "nativeBrowserExecutionRepeated": false,
+    "upstreamDownloadOrReconstructionRepeated": false,
+    "unchangedUpstreamValidation": "check_foundation.py verifies retained vendor/notice/source evidence; no vendor, lock or build-recipe inputs changed. Fresh network reconstruction is outside this offline governance amendment.",
+    "mergeReleaseSigningDeploymentDistribution": false,
+    "requiredChecksWaived": false,
+    "adr007Activated": false,
+    "pullRequestMustRemainDraft": true
+  },
+  "currentLedger": {
+    "pathCount": 2537,
+    "existingRows": 2533,
+    "unchangedExistingRows": 2531,
+    "changedExistingSha256CellsOnly": [
+      "scripts/compliance/licence_scope.py",
+      "scripts/compliance/test_governance.py"
+    ],
+    "addedR5EvidencePaths": [
+      "docs/open-source/evidence/flowchart-provenance-81/activation-independent-review.md",
+      "docs/open-source/evidence/flowchart-provenance-81/activation-validation.json",
+      "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json",
+      "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json"
+    ],
+    "classificationsAndApprovalsUnchanged": true
+  },
+  "scopeVerification": {
+    "exactlySevenAuthorisedPaths": true,
+    "unchangedExistingFilesOutsideAuthorisedScope": 2530,
+    "originalProposalAndPreparationEvidenceUnchanged": true,
+    "functionalImplementationAndProtectedTrustPerformanceAccessibilityPoliciesUnchanged": true
+  }
+}

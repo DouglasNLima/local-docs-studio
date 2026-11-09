@@ -1,17 +1,23 @@
 """Negative controls for approval deadlocks, bypass and inapplicable CI."""
 import copy
+import ast
 import json
 import unittest
 import subprocess
 import tempfile
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 from check_governance import CONFIG, EVIDENCE, validate_ruleset, validate_admin_packet
-from rights_ledger import boundary
+from rights_ledger import boundary, current_paths, current_digests
 from check_foundation import documentation_links
 from licence_scope import (ROOT, SCOPE, validate_licence, validate_scope,
                            validate_metadata, validate_preserved, apply_find_caret_refresh, apply_selection_sync_refresh)
+from licence_scope import (FLOWCHART_EVIDENCE, FLOWCHART_PAIRS, FLOWCHART_SOURCE_TREES,
+                           flowchart_json, apply_flowchart_styling_refresh,
+                           check_flowchart_source_identity, validate_flowchart_source_identity,
+                           validate_flowchart_evidence_digests)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -285,6 +291,198 @@ class ScopedLicenceTests(unittest.TestCase):
                     '-ExpectedVersion', version, '-InstallerSha256', '0' * 64],
                     capture_output=True, text=True, encoding='utf-8')
                 self.assertNotEqual(result.returncode, 0, result.stdout)
+
+
+class FlowchartProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.refresh = flowchart_json((ROOT / (FLOWCHART_EVIDENCE + 'approved-refresh.json')).read_bytes())
+        self.approval = (ROOT / (FLOWCHART_EVIDENCE + 'owner-approval.json')).read_bytes()
+        self.candidate = (ROOT / (FLOWCHART_EVIDENCE + 'candidate-refresh.json')).read_bytes()
+        self.granted = set(json.loads(SCOPE.read_text(encoding='utf-8'))['paths'])
+        self.preserved = json.loads((EVIDENCE / 'preserved-files.json').read_text())['sha256']
+        source = ast.parse((ROOT / 'scripts/compliance/licence_scope.py').read_text(encoding='utf-8'))
+        policy = next(ast.literal_eval(node.value) for node in ast.walk(source)
+                      if isinstance(node, ast.Assign)
+                      and any(isinstance(t, ast.Name) and t.id == 'policy_refresh' for t in node.targets))
+        for path, (previous, current) in policy.items():
+            self.assertEqual(self.preserved[path], previous)
+            self.preserved[path] = current
+        for name, apply in [('find-caret', apply_find_caret_refresh),
+                            ('selection-sync', apply_selection_sync_refresh)]:
+            self.preserved = apply(self.preserved, json.loads(
+                (ROOT / ('docs/open-source/evidence/' + name + '/preserved-refresh.json')).read_text()))
+        self.actual = dict(self.preserved)
+        self.actual.update({path: pair['current'] for path, pair in FLOWCHART_PAIRS.items()})
+
+    def apply(self):
+        return apply_flowchart_styling_refresh(self.preserved, self.refresh, self.approval,
+                                              self.candidate, self.actual, self.granted)
+
+    def test_owner_approved_overlay_changes_exactly_nine_effective_pins_without_mutating_evidence(self):
+        before = copy.deepcopy((self.preserved, self.refresh, self.actual, self.granted))
+        result = self.apply()
+        self.assertEqual({p for p in result if result[p] != self.preserved[p]}, set(FLOWCHART_PAIRS))
+        self.assertEqual(len(result), len(self.preserved))
+        self.assertEqual(before, (self.preserved, self.refresh, self.actual, self.granted))
+        validate_preserved(result, self.actual)
+
+    def test_every_missing_or_unapproved_path_is_rejected(self):
+        original = copy.deepcopy(self.refresh)
+        for path in FLOWCHART_PAIRS:
+            with self.subTest(missing=path), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                del self.refresh['files'][path]
+                self.apply()
+            self.refresh = copy.deepcopy(original)
+            with self.subTest(unapproved=path), self.assertRaises(ValueError):
+                self.granted.remove(path)
+                try:
+                    self.apply()
+                finally:
+                    self.granted.add(path)
+
+    def test_extra_and_substituted_excluded_or_trust_paths_are_rejected(self):
+        original = copy.deepcopy(self.refresh)
+        first = next(iter(FLOWCHART_PAIRS))
+        excluded = [
+            'tests/fixtures/native-flowchart/spc-application-architecture.md',
+            'src/native/LensDocsStudio.Native/Resources/CommandIcons.xaml',
+            'docs/open-source/evidence/goal62/preserved-files.json',
+            'src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs',
+            'user-content/private.md', 'SECURITY.md',
+            '.github/workflows/native-continuous-performance.yml',
+        ]
+        for path in excluded:
+            for substituted in (False, True):
+                with self.subTest(path=path, substituted=substituted), self.assertRaises(ValueError):
+                    self.refresh = copy.deepcopy(original)
+                    self.refresh['files'][path] = self.refresh['files'][first]
+                    if substituted:
+                        del self.refresh['files'][first]
+                    self.apply()
+
+    def test_every_previous_current_and_actual_digest_is_bound_to_exact_bytes(self):
+        for path in FLOWCHART_PAIRS:
+            for field in ('previous', 'current'):
+                for bad in ('0' * 64, 'not-a-digest'):
+                    with self.subTest(path=path, field=field, bad=bad), self.assertRaises(ValueError):
+                        original = self.refresh['files'][path][field]
+                        self.refresh['files'][path][field] = bad
+                        try:
+                            self.apply()
+                        finally:
+                            self.refresh['files'][path][field] = original
+            with self.subTest(actual=path), self.assertRaises(ValueError):
+                actual = self.actual.pop(path)
+                try:
+                    self.apply()
+                finally:
+                    self.actual[path] = actual
+            with self.subTest(previous=path), self.assertRaises(ValueError):
+                previous = self.preserved[path]
+                self.preserved[path] = '0' * 64
+                try:
+                    self.apply()
+                finally:
+                    self.preserved[path] = previous
+
+    def test_program_chains_from_selection_sync_rather_than_the_frozen_goal62_pin(self):
+        path = 'src/native/LensDocsStudio.Native.Validation/Program.cs'
+        self.preserved[path] = json.loads((EVIDENCE / 'preserved-files.json').read_text())['sha256'][path]
+        with self.assertRaisesRegex(ValueError, 'previous effective pin'):
+            self.apply()
+
+    def test_exact_commit_and_tree_identities_cannot_be_substituted(self):
+        original = copy.deepcopy(self.refresh)
+        for identity in ('preparation', 'baseline', 'candidate', 'evaluation', 'originalEvidence'):
+            for field in ('commit', 'tree'):
+                with self.subTest(identity=identity, field=field), self.assertRaises(ValueError):
+                    self.refresh = copy.deepcopy(original)
+                    self.refresh[identity][field] = '0' * 40
+                    self.apply()
+
+    def test_proposal_approval_scope_and_override_fields_cannot_change(self):
+        original = copy.deepcopy(self.refresh)
+        mutations = [
+            ('proposalId', 'another-proposal'), ('status', 'PROPOSED_NOT_APPROVED'),
+            ('repository', 'another/repository'), ('candidateManifestSha256', '0' * 64),
+            ('ownerApprovalSha256', '0' * 64), ('excludedBoundaries', ['R3']),
+            ('runtimeSourceTrees', {}), ('allowUnapproved', True), ('schemaVersion', True),
+        ]
+        for field, value in mutations:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                self.refresh[field] = value
+                self.apply()
+
+    def test_missing_forged_or_modified_owner_receipt_is_rejected(self):
+        original = self.approval
+        for altered in (None, b'', original + b'\n',
+                        original.replace(b'"role": "user"', b'"role": "agent"'),
+                        original.replace(b'only the nine', b'all the')):
+            with self.subTest(approval=altered is None), self.assertRaises(ValueError):
+                self.approval = altered
+                self.apply()
+
+    def test_candidate_manifest_is_the_exact_approved_preparation_document(self):
+        self.candidate += b'\n'
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_duplicate_fields_cannot_override_approval_or_path_decisions(self):
+        for raw in (b'{"files": {}, "files": {}}',
+                    b'{"files": {"path": 1, "path": 2}}',
+                    b'{"status": "PROPOSED", "status": "APPROVED"}'):
+            with self.subTest(raw=raw), self.assertRaisesRegex(ValueError, 'Duplicate'):
+                flowchart_json(raw)
+
+    def test_canonical_receipt_and_manifest_accept_git_checkout_line_endings(self):
+        self.approval = self.approval.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+        self.candidate = self.candidate.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+        validate_preserved(self.apply(), self.actual)
+
+    def test_actual_git_filters_must_preserve_the_approved_evidence_digests(self):
+        with tempfile.TemporaryDirectory(prefix='lens-flowchart-evidence-') as directory:
+            repository = Path(directory)
+            subprocess.run(['git', 'init', '-q', str(repository)], check=True, capture_output=True)
+            subprocess.run(['git', '-C', str(repository), 'config', 'core.autocrlf', 'false'], check=True)
+            folder = repository / FLOWCHART_EVIDENCE
+            folder.mkdir(parents=True)
+            for name, raw in [('candidate-refresh.json', self.candidate), ('owner-approval.json', self.approval)]:
+                (folder / name).write_bytes(raw.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n'))
+            names = {FLOWCHART_EVIDENCE + name for name in ('candidate-refresh.json', 'owner-approval.json')}
+            attributes = repository / '.gitattributes'
+            attributes.write_text('*.json -text\n', encoding='utf-8')
+            with patch('rights_ledger.ROOT', repository):
+                with self.assertRaisesRegex(ValueError, 'canonical evidence bytes'):
+                    validate_flowchart_evidence_digests(current_digests(names))
+                attributes.write_text('*.json text eol=lf\n', encoding='utf-8')
+                validate_flowchart_evidence_digests(current_digests(names))
+
+    def test_protected_change_outside_the_nine_still_fails_full_validation(self):
+        updated = self.apply()
+        for path in ('SECURITY.md', '.github/workflows/native-continuous-performance.yml'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                actual = dict(self.actual)
+                actual[path] = '0' * 64
+                validate_preserved(updated, actual)
+
+    def test_current_source_subtrees_and_working_bytes_match_the_approved_identity(self):
+        check_flowchart_source_identity(current_paths())
+
+    def test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed(self):
+        helper = 'src/native/LensDocsStudio.Core/Rendering/FlowchartCompatibility.cs'
+        expected = {helper: 'a' * 40}
+        validate_flowchart_source_identity(FLOWCHART_SOURCE_TREES, expected, dict(expected))
+        for actual in ({}, {**expected, helper + '.new': 'b' * 40}, {helper: 'b' * 40}):
+            with self.subTest(actual=actual), self.assertRaises(ValueError):
+                validate_flowchart_source_identity(FLOWCHART_SOURCE_TREES, expected, actual)
+        changed = dict(FLOWCHART_SOURCE_TREES)
+        changed['src/native'] = '0' * 40
+        with self.assertRaises(ValueError):
+            validate_flowchart_source_identity(changed, expected, expected)
+        with self.assertRaises(ValueError):
+            validate_flowchart_source_identity(FLOWCHART_SOURCE_TREES, {}, {})
 
 
 if __name__ == '__main__':

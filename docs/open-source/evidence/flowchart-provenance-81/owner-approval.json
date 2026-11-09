@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "repository": "DouglasNLima/local-docs-studio",
+  "proposalId": "pr81-flowchart-provenance-nine-v1",
+  "decision": "APPROVED_NINE_PAIR_GOVERNANCE_AMENDMENT_ONLY",
+  "preparation": {
+    "commit": "5c3210d7acd39593f6ae6495a32c74564b50fa98",
+    "tree": "0599acd4077d75b71fb065a9564d574fb3d18950"
+  },
+  "candidateManifestSha256": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+  "source": {
+    "kind": "direct-owner-message-in-codex",
+    "threadId": "01a1c0a7-6da0-78e2-a093-03479bd7d30c",
+    "turnId": "01a1c0c9-468d-7881-91e5-b88ca212a4b2",
+    "messageId": "01a1c0c9-4763-7ee1-a947-686395a9d833",
+    "role": "user",
+    "receivedAt": "2026-11-09T14:49:38.000Z",
+    "verification": "Exact direct user approval in this conversation, independently read back with Codex read_thread; not a fabricated GitHub approval or an electronic signature."
+  },
+  "authorisedPaths": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json",
+    "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json",
+    "docs/open-source/evidence/flowchart-provenance-81/activation-validation.json",
+    "docs/open-source/evidence/flowchart-provenance-81/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "approvalText": "# Owner Approval — PR #81 Flowchart Provenance Amendment\n\nAs repository owner, I explicitly approve proposal **`pr81-flowchart-provenance-nine-v1`**, as reviewed and delivered in:\n\n- Preparation commit: `5c3210d7acd39593f6ae6495a32c74564b50fa98`\n- Preparation tree: `0599acd4077d75b71fb065a9564d574fb3d18950`\n- Candidate manifest SHA-256: `97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c`\n\nI approve **only the nine exact previous/current canonical SHA-256 substitutions** defined in `docs/open-source/evidence/flowchart-provenance-81/candidate-refresh.json`.\n\nI authorise the bounded governance implementation described in the reviewed proposal, restricted to its seven explicitly identified future governance/evidence files.\n\nThe implementation must:\n\n- Preserve the immutable Goal #62 evidence and existing historical hashes.\n- Validate all nine approved previous/current pairs and exact source identities.\n- Reject additional, missing, substituted or unapproved paths.\n- Preserve existing MIT scope, owner approvals and R3–R7 exclusions.\n- Preserve trust, performance, accessibility and required-check policies.\n- Undergo independent implementation review and full applicable governance validation.\n- Retain all historical failures without reclassification.\n\nThis approval does **not** authorise merging PR #81, releasing, signing, deploying, distributing binaries, changing the 250 ms performance gate, waiving CI checks, rerunning Continuous acceptance or activating ADR 007.\n\nPR #81 must remain Draft until a separate integration decision.\n\nAny change to the approved scope or source identities requires a new owner decision.\n",
+  "limits": "Nine exact canonical hash substitutions and the seven named governance/evidence files only. Existing licence scope and approvals retained. No merge, release, signing, deployment, binary distribution, Continuous rerun, threshold change, required-check waiver or ADR 007 activation. PR #81 remains Draft."
+}
