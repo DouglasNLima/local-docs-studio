@@ -14,7 +14,7 @@ Only the flowchart compatibility helpers and their necessary callers are extract
 
 Independent review reproduced three editing regressions in the original extraction: selecting a shared class, deleting a multiply-styled node and defining a class whose name collides with a generated effective class. The small additional remedy compares authored declarations during edit validation and removes only the selected node's previous explicit class assignments when selecting its replacement. Rendering still compares the complete effective graph. Unrelated targets, comments, definitions, Undo/Redo and source-patch checks remain intact.
 
-The sole CI change adds this flowchart check and its evidence directory to the existing native workflow. Reading experience, comparison, performance, High Contrast implementation, versioning, signing and packaging infrastructure are unchanged.
+The flowchart check also runs within the existing native validation corpus, whose evidence directory is already retained by CI. Workflows remain byte-identical to the base. The current rights ledger is refreshed through its existing generator without changing approval or licence scope; historical ledgers are preserved. Reading experience, comparison, performance, High Contrast implementation, versioning, signing and packaging infrastructure are unchanged.
 
 ## Reproducible scoped checks
 

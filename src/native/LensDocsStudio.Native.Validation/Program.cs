@@ -934,6 +934,8 @@ internal static class Program
             Console.WriteLine($"Exports generated and DOCX schema validated: {docx.Length} DOCX bytes, {pdf.Length} PDF bytes.");
         }
         catch (Exception ex) { failures.Add("Export validation: " + ex.Message); }
+        try { NativeFlowchartCompatibilityChecks.Run(Path.Combine(output, "flowchart-compatibility"), repository); }
+        catch (Exception ex) { failures.Add("Native flowchart styling compatibility: " + ex.Message); }
         File.WriteAllText(Path.Combine(output, "validation-summary.json"), JsonSerializer.Serialize(new { DiagramCases = count, Failures = failures }, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine($"Native validation: {count} diagram cases and export checks; {failures.Count} failures. Evidence: {output}");
         foreach (var failure in failures) Console.WriteLine(failure);
