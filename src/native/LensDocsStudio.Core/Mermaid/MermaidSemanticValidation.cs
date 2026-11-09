@@ -17,7 +17,7 @@ internal static class MermaidSemanticValidation
             || rendered.FlowchartGroups.Count != model.Subgraphs.Count) return false;
         var nodes = graph.Nodes;
         Mermaider.Models.MermaidGraph parsedGraph;
-        using (Rendering.MermaidDiagnostics.Measure("renderer.parse.flowchart-validation")) parsedGraph = MermaidRenderer.Parse(model.Source);
+        using (Rendering.MermaidDiagnostics.Measure("renderer.parse.flowchart-validation")) parsedGraph = MermaidRenderer.Parse(Rendering.FlowchartCompatibility.Prepare(model.Source));
         var completeParserGraph = Rendering.MermaidEntityLayoutProvider.DecodeSemantics(parsedGraph);
         return JsonNode.DeepEquals(JsonSerializer.SerializeToNode(completeParserGraph, Options), JsonSerializer.SerializeToNode(graph, Options))
             && model.Nodes.All(node => nodes.TryGetValue(node.Id, out var shown) && shown.Label == node.Label && shown.Shape.ToString() == MermaidSourceParser.RendererShape(node.Shape))
@@ -39,8 +39,8 @@ internal static class MermaidSemanticValidation
             throw new ArgumentException("The candidate does not match its expected-text source patches.");
         ProtectSource(before, operation, patches);
         cancellationToken.ThrowIfCancellationRequested();
-        var expected = JsonSerializer.SerializeToNode(MermaidRenderer.Parse(before.Source), Options)!.AsObject();
-        var actual = JsonSerializer.SerializeToNode(MermaidRenderer.Parse(after.Source), Options)!.AsObject();
+        var expected = JsonSerializer.SerializeToNode(MermaidRenderer.Parse(Rendering.FlowchartCompatibility.Prepare(before.Source, combineClasses: false)), Options)!.AsObject();
+        var actual = JsonSerializer.SerializeToNode(MermaidRenderer.Parse(Rendering.FlowchartCompatibility.Prepare(after.Source, combineClasses: false)), Options)!.AsObject();
         cancellationToken.ThrowIfCancellationRequested();
         var expectedEdges = before.Edges.Select((edge, index) => (edge.Id, Value: expected["Edges"]![index]!.DeepClone()))
             .ToDictionary(item => item.Id, item => item.Value, StringComparer.Ordinal);

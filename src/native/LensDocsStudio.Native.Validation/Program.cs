@@ -17,6 +17,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--flowchart-compatibility" && args.Length == 3)
+        {
+            try { NativeFlowchartCompatibilityChecks.Run(Path.GetFullPath(args[1]), Path.GetFullPath(args[2])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--selection-visual")
         {
             try { NativeSelectionVisualChecks.Run(Path.GetFullPath(args[1]), args.Contains("--expect-cold-invisible")); return 0; }
@@ -929,6 +934,8 @@ internal static class Program
             Console.WriteLine($"Exports generated and DOCX schema validated: {docx.Length} DOCX bytes, {pdf.Length} PDF bytes.");
         }
         catch (Exception ex) { failures.Add("Export validation: " + ex.Message); }
+        try { NativeFlowchartCompatibilityChecks.Run(Path.Combine(output, "flowchart-compatibility"), repository); }
+        catch (Exception ex) { failures.Add("Native flowchart styling compatibility: " + ex.Message); }
         File.WriteAllText(Path.Combine(output, "validation-summary.json"), JsonSerializer.Serialize(new { DiagramCases = count, Failures = failures }, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine($"Native validation: {count} diagram cases and export checks; {failures.Count} failures. Evidence: {output}");
         foreach (var failure in failures) Console.WriteLine(failure);

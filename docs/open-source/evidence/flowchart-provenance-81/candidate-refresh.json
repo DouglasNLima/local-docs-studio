@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "pr81-flowchart-provenance-nine-v1",
+  "status": "PROPOSED_NOT_APPROVED",
+  "ownerApproval": null,
+  "repository": "DouglasNLima/local-docs-studio",
+  "baseline": {
+    "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+    "tree": "e4d137a12cbdd827583fcb841612890dd88736ec"
+  },
+  "candidate": {
+    "commit": "b29dbb862bd6fe2eebc26deba25bab072857048f",
+    "tree": "53aa0f0c18455ca61cb2bc7b4abf111124de50dc"
+  },
+  "evaluation": {
+    "commit": "3a8f10d737791a1182d092676ecb17a47e2fde30",
+    "tree": "1f13a1afa64fd0b4419303bcaf0136f1ffcecfe7"
+  },
+  "originalEvidence": {
+    "commit": "0890ec9b2ade8af24b9b3fca6cbe98cd7fd329ba",
+    "tree": "fd0e968cd8fb3ece8ebb73d78a859705e1605fe3"
+  },
+  "scope": "Protected-byte provenance only; no licence grant, policy activation or execution acceptance",
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "files": {
+    "src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj": {
+      "previous": "5744f4a8b7e8784519a74b362d3a7f7f5a1d657b2c295b6c3d4d2b66ff585316",
+      "current": "bcc5936898b464e3da8116937349c04a411755db2d78e4376d3d763017c275b4"
+    },
+    "src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs": {
+      "previous": "8e12c1260ad97b08b509b1210dafe0124c2b117701f5d2a160b3a59f356af859",
+      "current": "ae71b419863ebf55de83e48984106023c583cf76520edd77d12d93d966120d77"
+    },
+    "src/native/LensDocsStudio.Core/Mermaid/MermaidOperations.cs": {
+      "previous": "bc11d28656c15935077a20ff0d981fd4aaafaaae099b805fa87f03bfe6c31245",
+      "current": "fde06abc85a0f3a68e33064d55c6df3f4fd9355eca2ef9f02ee5b8f27f894f70"
+    },
+    "src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs": {
+      "previous": "d2860c996f00e0a6a145ed1e006069b1118aab033c75d249ab13fc384e49a6a5",
+      "current": "311c66b3e3136767838aab0eeadc40bedd8ba35d4a368b01444da2ddc00cdeca"
+    },
+    "src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs": {
+      "previous": "ca956434be85b52c1ec5c66d3bcded2b4145fc4517de72f0c77fac18464dce8c",
+      "current": "7e8304ebb33911ceb58ec63401d3f17cc67b11ef26d912abca8b6e07a20af5d3"
+    },
+    "src/native/LensDocsStudio.Core/Rendering/DiagramService.cs": {
+      "previous": "c8a3b7b97bf0fc91e3aa7adfbce99646709380083fd53015eea9742192df4d0d",
+      "current": "158554c6f6d661e9563c8515f91a6985234da59aec123eeaf06246ae60961275"
+    },
+    "src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs": {
+      "previous": "33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738",
+      "current": "7c99911849b28f54be0b0615b4c91374a0b791d86e897a40fa177e6d0cad888c"
+    },
+    "src/native/LensDocsStudio.Native.Validation/Program.cs": {
+      "previous": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
+      "current": "e2e1977ff193a343de5dfe4f3ed1c8fc8f44621b9345c1957fa6726b39d2f2ca"
+    },
+    "src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs": {
+      "previous": "60ab0564756fc1a336656d437eea5ae16705db2620c3913dc2c797afe7c9c649",
+      "current": "a71d05d445699f1ed8adf8fa385c886b55613a74bd822af86ea98fbd20f3083c"
+    }
+  }
+}

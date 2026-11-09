@@ -1,0 +1,222 @@
+{
+  "proposalValidation": "PASS; preparation only",
+  "amendmentActive": false,
+  "ownerApproval": null,
+  "proposalCanonicalSha256": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+  "identities": {
+    "baseline": {
+      "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "tree": "e4d137a12cbdd827583fcb841612890dd88736ec"
+    },
+    "candidate": {
+      "commit": "b29dbb862bd6fe2eebc26deba25bab072857048f",
+      "tree": "53aa0f0c18455ca61cb2bc7b4abf111124de50dc"
+    },
+    "evaluation": {
+      "commit": "3a8f10d737791a1182d092676ecb17a47e2fde30",
+      "tree": "1f13a1afa64fd0b4419303bcaf0136f1ffcecfe7"
+    },
+    "originalEvidence": {
+      "commit": "0890ec9b2ade8af24b9b3fca6cbe98cd7fd329ba",
+      "tree": "fd0e968cd8fb3ece8ebb73d78a859705e1605fe3"
+    }
+  },
+  "protectedFileCount": 2421,
+  "baselineProtectedMismatches": 0,
+  "candidateProtectedMismatches": 9,
+  "unchangedExistingFilesExcludingCurrentLedger": 2526,
+  "productionProtectedBytePredicate": "FAIL",
+  "retainedFailure": "Protected notice/trust/performance bytes changed: src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj",
+  "disposableMapSimulation": "PASS; exactly nine replacements, never installed",
+  "negativeControlsPassed": 35,
+  "negativeControls": [
+    "missing_path",
+    "extra_path",
+    "mismatched_previous_hash",
+    "well_formed_but_unreviewed_current_hash",
+    "malformed_current_hash",
+    "wrong_base_commit",
+    "wrong_base_tree",
+    "wrong_candidate_commit",
+    "wrong_candidate_tree",
+    "wrong_evaluation_commit",
+    "rewritten_goal62_identity",
+    "removed_exclusion",
+    "unapproved_activation_status",
+    "self_asserted_owner_approval",
+    "extra_override_field",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core/Mermaid/MermaidOperations.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core/Rendering/DiagramService.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Native.Validation/Program.cs",
+    "unapproved_grant_path:src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs",
+    "changed_effective_previous_pin",
+    "actual_candidate_byte_mismatch",
+    "outside_scope_protected_byte_mismatch",
+    "unapproved_scope_substitution:R3",
+    "unapproved_scope_substitution:R4",
+    "unapproved_scope_substitution:R5",
+    "unapproved_scope_substitution:R6",
+    "unapproved_scope_substitution:R7",
+    "unapproved_scope_substitution:trust",
+    "unapproved_scope_substitution:performance",
+    "duplicate_json_key"
+  ],
+  "existingReadOnlyGovernanceTests": {
+    "passed": 20,
+    "skipped": 0,
+    "omittedPackageWritingTests": [
+      "test_missing_source_cannot_masquerade_as_pre_adoption",
+      "test_native_payload_contains_exact_licence_and_scoped_disclosure",
+      "test_native_payload_refuses_missing_scope_before_copying",
+      "test_package_licence_contract_rejects_removed_or_tampered_notices"
+    ],
+    "omissionReason": "Evidence-only preparation requires offline read-only validation."
+  },
+  "files": [
+    {
+      "path": "src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj",
+      "previousEffectiveSha256": "5744f4a8b7e8784519a74b362d3a7f7f5a1d657b2c295b6c3d4d2b66ff585316",
+      "candidateSha256": "bcc5936898b464e3da8116937349c04a411755db2d78e4376d3d763017c275b4",
+      "originalGoal62Sha256": "5744f4a8b7e8784519a74b362d3a7f7f5a1d657b2c295b6c3d4d2b66ff585316",
+      "baseBlob": "5f9cd87e3eae751ff3499432c1e72acb2ee4cfb2",
+      "candidateBlob": "5669644f0a770585a3bcd3c1311006a9ec69139e",
+      "baseByteLength": 2321,
+      "candidateByteLength": 2504,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs",
+      "previousEffectiveSha256": "8e12c1260ad97b08b509b1210dafe0124c2b117701f5d2a160b3a59f356af859",
+      "candidateSha256": "ae71b419863ebf55de83e48984106023c583cf76520edd77d12d93d966120d77",
+      "originalGoal62Sha256": "8e12c1260ad97b08b509b1210dafe0124c2b117701f5d2a160b3a59f356af859",
+      "baseBlob": "625cf1d17283dc8040fea7e1a4fe075b5146cbd7",
+      "candidateBlob": "1aebdc12fa93d696c438a4f46327b69a9564b87b",
+      "baseByteLength": 24509,
+      "candidateByteLength": 24692,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/Mermaid/MermaidOperations.cs",
+      "previousEffectiveSha256": "bc11d28656c15935077a20ff0d981fd4aaafaaae099b805fa87f03bfe6c31245",
+      "candidateSha256": "fde06abc85a0f3a68e33064d55c6df3f4fd9355eca2ef9f02ee5b8f27f894f70",
+      "originalGoal62Sha256": "bc11d28656c15935077a20ff0d981fd4aaafaaae099b805fa87f03bfe6c31245",
+      "baseBlob": "31acb2c18a0ab3622b47ff882e74502f4ab3584f",
+      "candidateBlob": "48869d13ae61f8d15dd548a9dbe0a3cf1b2b7675",
+      "baseByteLength": 21326,
+      "candidateByteLength": 22592,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs",
+      "previousEffectiveSha256": "d2860c996f00e0a6a145ed1e006069b1118aab033c75d249ab13fc384e49a6a5",
+      "candidateSha256": "311c66b3e3136767838aab0eeadc40bedd8ba35d4a368b01444da2ddc00cdeca",
+      "originalGoal62Sha256": "d2860c996f00e0a6a145ed1e006069b1118aab033c75d249ab13fc384e49a6a5",
+      "baseBlob": "cc11d92ac5228fafc8767d34e8f5c975b77c73cd",
+      "candidateBlob": "243e43083e7fd1c10fb93fd57b1384a18e3452fd",
+      "baseByteLength": 15632,
+      "candidateByteLength": 15804,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs",
+      "previousEffectiveSha256": "ca956434be85b52c1ec5c66d3bcded2b4145fc4517de72f0c77fac18464dce8c",
+      "candidateSha256": "7e8304ebb33911ceb58ec63401d3f17cc67b11ef26d912abca8b6e07a20af5d3",
+      "originalGoal62Sha256": "ca956434be85b52c1ec5c66d3bcded2b4145fc4517de72f0c77fac18464dce8c",
+      "baseBlob": "ae36b6baa7036646a2c14357a1f6e035bd1013da",
+      "candidateBlob": "f66b3e38274878508e966f3b7042a34b98e578d4",
+      "baseByteLength": 26717,
+      "candidateByteLength": 27079,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/Rendering/DiagramService.cs",
+      "previousEffectiveSha256": "c8a3b7b97bf0fc91e3aa7adfbce99646709380083fd53015eea9742192df4d0d",
+      "candidateSha256": "158554c6f6d661e9563c8515f91a6985234da59aec123eeaf06246ae60961275",
+      "originalGoal62Sha256": "c8a3b7b97bf0fc91e3aa7adfbce99646709380083fd53015eea9742192df4d0d",
+      "baseBlob": "8d1bb70edddc3438b6ddea0b4e3fea20f9539f71",
+      "candidateBlob": "659f4968e205fc12197d9aef9e3be2c8e9414aa9",
+      "baseByteLength": 10065,
+      "candidateByteLength": 10345,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs",
+      "previousEffectiveSha256": "33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738",
+      "candidateSha256": "7c99911849b28f54be0b0615b4c91374a0b791d86e897a40fa177e6d0cad888c",
+      "originalGoal62Sha256": "33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738",
+      "baseBlob": "0e5f2b45017d305680f8fbb329277fe957c1cb4e",
+      "candidateBlob": "23dcab23967512c9a729a013300fccb33149e4a9",
+      "baseByteLength": 6819,
+      "candidateByteLength": 6942,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native.Validation/Program.cs",
+      "previousEffectiveSha256": "3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219",
+      "candidateSha256": "e2e1977ff193a343de5dfe4f3ed1c8fc8f44621b9345c1957fa6726b39d2f2ca",
+      "originalGoal62Sha256": "00288b43cf8bddcd82f53c4befbb2428f8bb32b3d05eff65dbfec8b6fc295ddf",
+      "baseBlob": "fcd2141e0dfb7ee54a9fa8235e960af821f4ad58",
+      "candidateBlob": "4942d25b37db0cf5805810fc980b9ffc46dd07bd",
+      "baseByteLength": 68201,
+      "candidateByteLength": 68734,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    },
+    {
+      "path": "src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs",
+      "previousEffectiveSha256": "60ab0564756fc1a336656d437eea5ae16705db2620c3913dc2c797afe7c9c649",
+      "candidateSha256": "a71d05d445699f1ed8adf8fa385c886b55613a74bd822af86ea98fbd20f3083c",
+      "originalGoal62Sha256": "60ab0564756fc1a336656d437eea5ae16705db2620c3913dc2c797afe7c9c649",
+      "baseBlob": "518fb39dcbf16af1d4744f428336c85e0d6ef0b3",
+      "candidateBlob": "3247478dc5e8187f0e70585b63827c9b4958350b",
+      "baseByteLength": 42926,
+      "candidateByteLength": 43468,
+      "differentFromDevelop": true,
+      "byteIdenticalToValidatedEvaluation": true,
+      "decisionId": "R1",
+      "ownerDecision": "MIT_ORIGINAL_PORTIONS_ONLY"
+    }
+  ],
+  "unchangedGovernanceCanonicalSha256": {
+    ".github/workflows/native-continuous-performance.yml": "78c2c8744dd36be39eef18bd505638d30c9dba5d0acdec9518c765f3ff8071c2",
+    "docs/open-source/configuration/mit-scope.json": "8270a564757e0851e15184a5ca2c64c46ca6892811503b6c20062c4e9fa48388",
+    "docs/open-source/evidence/find-caret/preserved-refresh.json": "a5ce3c4a9a8d1ce6b6a86f79b10b98ee8ca94296a2ca7de95ca8e037f0624237",
+    "docs/open-source/evidence/goal62/preserved-files.json": "d56bdbcc1f16c1a5ce26a5936778baaf3f45a5b4c94bc661d4d61d8fbb845822",
+    "docs/open-source/evidence/selection-sync/preserved-refresh.json": "f29e60b557cf1c4e0060262cda244431cea451108dad865122d087a744c74694",
+    "scripts/compliance/licence_scope.py": "2b1042d77d2e4ae255c7994923c4449a41d0576ff67884a0487b80ac5fa88813"
+  },
+  "limitations": [
+    "Not full hosted governance or native execution; existing evidence is retained.",
+    "No owner approval is inferred from path classification or this technical PASS.",
+    "No workflow, licence scope, historical pin, trust or performance policy is changed."
+  ],
+  "retainedLocalExecutionEvidenceFiles": 15
+}
