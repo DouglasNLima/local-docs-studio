@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "repository": "DouglasNLima/local-docs-studio",
+  "proposalId": "preview-loading-visibility-one-v1",
+  "decision": "APPROVED_ONE_PAIR_GOVERNANCE_AMENDMENT_ONLY",
+  "preparation": {
+    "commit": "0fcab63d2d9f8db8df90c6f1f60cf3eac6301043",
+    "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+  },
+  "candidateManifestSha256": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+  "source": {
+    "kind": "direct-owner-response-to-codex-approval-request",
+    "role": "user",
+    "questionItemId": "[\"request_user_input_async\",\"call_b4dcd2f109f74ffabd21ae815d3c6ae1\",0]",
+    "answer": "Approve this exact amendment",
+    "verification": "Direct user response in this conversation; not a GitHub review, signature or inferred approval."
+  },
+  "authorisedPaths": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json",
+    "docs/open-source/evidence/preview-loading-visibility/activation-validation.json",
+    "docs/open-source/evidence/preview-loading-visibility/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "separateExecutionDecision": {
+    "questionItemId": "[\"request_user_input_async\",\"call_b4dcd2f109f74ffabd21ae815d3c6ae1\",1]",
+    "answer": "Approve this isolated execution route",
+    "controlWorkflowSha256": "4ae4d1893d2eb082a42aba786a2b5f15f8481a6c5b68b3836767b7a9a9db9de3",
+    "conditions": "One isolated hosted execution after provenance implementation and independent review; no correction/develop workflow or required-context changes."
+  },
+  "limits": [
+    "Preserve all previous evidence and effective substitutions.",
+    "Reject missing, additional, substituted or unapproved protected paths and digests.",
+    "Validate exact native/fixture trees and canonical working bytes; no absent-history fallback.",
+    "Pin the new owner decision and manifest before accepting the new subtree.",
+    "Keep the three new offline-control paths outside the existing MIT grant.",
+    "Keep all 30 required contexts, all workflows and the 25-second correctness bound unchanged.",
+    "Do not extend the PR #81-specific performance exception or alter the 250 ms benchmark.",
+    "No merge, release, signing, deployment, tag or binary distribution."
+  ]
+}
