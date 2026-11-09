@@ -1,0 +1,148 @@
+{
+  "observationDate": "2026-11-09",
+  "conflictComment": {
+    "id": 6741989699,
+    "url": "https://github.com/DouglasNLima/local-docs-studio/pull/81#issuecomment-6741989699",
+    "author": "DouglasNLima",
+    "createdAt": "2026-11-09T14:04:31Z",
+    "updatedAt": "2026-11-09T14:04:31Z",
+    "body": "Documentation provenance correction completed; **integration remains BLOCKED**.\n\n- Commit: `b29dbb862bd6fe2eebc26deba25bab072857048f`.\n- Tree: `53aa0f0c18455ca61cb2bc7b4abf111124de50dc`.\n- Direct parent / original evaluation source: `3a8f10d737791a1182d092676ecb17a47e2fde30`.\n- Verified develop base: `99349d82eb06960eb1f9785cf384db2373aed4fa`.\n\nThe protected `docs/native/user-guide.md` is restored byte-for-byte to base blob `2d1516a6c84c7c8e116b8dddd970e098fbf29a8b`, raw SHA-256 `62c6bafa01c5aa82029a786861031d76545d7a6c7cf25c81378bf77f73583327`. Styling guidance, source preservation and the unsupported typography limitation remain in [the existing unprotected hotfix document](https://github.com/DouglasNLima/local-docs-studio/blob/b29dbb862bd6fe2eebc26deba25bab072857048f/docs/native/flowchart-styling-hotfix.md).\n\nExactly three tracked files changed. `python scripts/compliance/rights_ledger.py` regenerated the current allowed inventory: only the two documentation SHA-256 cells changed, with all 2,527 paths, classifications and approval states retained. Historical hashes, approval records, licence scope, rules and required checks are unchanged.\n\nNative implementation, tests, fixture, workflows and policy were verified unchanged across 772 paths. The entire native subtree remains `8c90d7e3491615d4f156b3e33b3abb7b13cbc59f`; the fixture subtree remains `4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35`. SPC fixture blob remains `2890ecc52c27f063b76564781c2f53d3ea11b9a3`, raw SHA-256 `1c04217dacebf3937a6b7a570318623f435374dcd0ca1b08a6e7012e109b62f7`.\n\nLocal focused validation: current inventory generation PASS; `check_foundation.py` PASS; `test_governance.py` **24 PASS**; `check_governance.py` **FAIL**; `git diff --check` PASS. The guide mismatch is resolved. The unchanged validator now stops at:\n\n```text\nProtected notice/trust/performance bytes changed: src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj\n```\n\nA read-only enumeration identifies nine remaining protected native/test mismatches. Every expected digest matches verified develop; every actual digest matches the original `3a8f10d` hotfix. No validator was patched, bypassed or replaced.\n\n<details>\n<summary>Exact remaining protected-byte mismatches (canonical SHA-256 under the existing validator)</summary>\n\n| Protected path | Existing expected SHA-256 | Unchanged actual SHA-256 |\n| --- | --- | --- |\n| `src/native/LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj` | `5744f4a8b7e8784519a74b362d3a7f7f5a1d657b2c295b6c3d4d2b66ff585316` | `bcc5936898b464e3da8116937349c04a411755db2d78e4376d3d763017c275b4` |\n| `src/native/LensDocsStudio.Core/Arrangement/ArrangementEngine.cs` | `8e12c1260ad97b08b509b1210dafe0124c2b117701f5d2a160b3a59f356af859` | `ae71b419863ebf55de83e48984106023c583cf76520edd77d12d93d966120d77` |\n| `src/native/LensDocsStudio.Core/Mermaid/MermaidOperations.cs` | `bc11d28656c15935077a20ff0d981fd4aaafaaae099b805fa87f03bfe6c31245` | `fde06abc85a0f3a68e33064d55c6df3f4fd9355eca2ef9f02ee5b8f27f894f70` |\n| `src/native/LensDocsStudio.Core/Mermaid/MermaidSemanticValidation.cs` | `d2860c996f00e0a6a145ed1e006069b1118aab033c75d249ab13fc384e49a6a5` | `311c66b3e3136767838aab0eeadc40bedd8ba35d4a368b01444da2ddc00cdeca` |\n| `src/native/LensDocsStudio.Core/Mermaid/MermaidSourceParser.cs` | `ca956434be85b52c1ec5c66d3bcded2b4145fc4517de72f0c77fac18464dce8c` | `7e8304ebb33911ceb58ec63401d3f17cc67b11ef26d912abca8b6e07a20af5d3` |\n| `src/native/LensDocsStudio.Core/Rendering/DiagramService.cs` | `c8a3b7b97bf0fc91e3aa7adfbce99646709380083fd53015eea9742192df4d0d` | `158554c6f6d661e9563c8515f91a6985234da59aec123eeaf06246ae60961275` |\n| `src/native/LensDocsStudio.Core/SourceAuthoring/SourceText.cs` | `33615f2d44fc1faecbbdf5f72e506769073bc9cbbd95a437f7c291a8b50fd738` | `7c99911849b28f54be0b0615b4c91374a0b791d86e897a40fa177e6d0cad888c` |\n| `src/native/LensDocsStudio.Native.Validation/Program.cs` | `3f7abecc36518604a7e644cc122d98fac8ef772d9e4e4ecbb574fc56977c1219` | `e2e1977ff193a343de5dfe4f3ed1c8fc8f44621b9345c1957fa6726b39d2f2ca` |\n| `src/native/LensDocsStudio.Native/Rendering/NativeMarkdownRenderer.cs` | `60ab0564756fc1a336656d437eea5ae16705db2620c3913dc2c797afe7c9c649` | `a71d05d445699f1ed8adf8fa385c886b55613a74bd822af86ea98fbd20f3083c` |\n\n</details>\n\nAll applicable hosted workflows are terminal as of 2026-11-09 14:00:46 UTC: **seven succeeded, two failed**, all attempt 1. All 68 check runs completed: 60 success, three failure and five existing conditional skips.\n\n| Workflow | Run | Terminal result |\n| --- | --- | --- |\n| Validate OSS provenance | [#102](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169917) | FAIL \u2014 protected native/test bytes; first mismatch is the Core test project |\n| Validate native workspace and Mermaid interactions | [#439](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169842) | PASS \u2014 workspace and Mermaid interactions |\n| Validate native desktop UX | [#664](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624170021) | PASS \u2014 14 executed jobs; one existing conditional job skipped |\n| Validate native Mermaid creation hub | [#139](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169841) | PASS \u2014 Light, Dark and Windows High Contrast |\n| Publish Lens Docs Studio (pull_request) | [#1561](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169818) | PASS \u2014 Chromium/Edge; Pages deployment skipped |\n| Native Continuous 250 ms acceptance | [#233](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624170280) | FAIL \u2014 28 and 31 candidate samples exceed the unchanged 250 ms gate |\n| Native editor selection reliability | [#64](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169629) | PASS \u2014 normal and Windows High Contrast |\n| Validate native Windows edition | [#1056](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169730) | PASS \u2014 30 executed jobs; two existing conditional jobs skipped |\n| Publish Lens Docs Studio (push) | [#1560](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624160382) | PASS \u2014 Chromium/Edge; Pages deployment skipped |\n\nThe current-head native run rebuilt `b29dbb8` and passed **2,320 Core tests, zero failures, zero skips**, plus native rendering/export, desktop, package verification, installer lifecycle and [installed Flowchart authoring](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42624169730/job/129199599927). Its two conditional skips are the original `.853` diagnostic replay and historical upgrade. Both Pages deployment jobs were skipped.\n\nCurrent Continuous 250 ms acceptance remains **INCOMPLETE / FAIL**, with **28** and **31** failed candidate samples. The [original provenance FAIL](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42616164670), [original Continuous failures (28/27)](https://github.com/DouglasNLima/local-docs-studio/actions/runs/42616165018), earlier failures, logs and metadata remain preserved without reclassification. The historical records match the original evidence byte-for-byte. No hosted run was retried, and no check was waived or retired.\n\nThe original unsigned internal `0.1.1-preview.1055` remains attributed to source `3a8f10d737791a1182d092676ecb17a47e2fde30`, tree `1f13a1afa64fd0b4419303bcaf0136f1ffcecfe7`:\n\n| Original artefact | Unchanged SHA-256 |\n| --- | --- |\n| Portable ZIP | `8f3b0d167205d0cecd89c6bd77eeaebe7cb2e3dacd59ad1703cabc4d0100cc32` |\n| Installer | `191272a893f147d3ab8c56fb73036c9fe42aad7fa1a2eab7e1e58bc57a042689` |\n| [Original evaluation evidence ZIP](https://github.com/user-attachments/files/34579969/LensDocsStudio.Native-0.1.1-preview.1055-flowchart-evidence.zip) | `2c1cf3bf11e2226a464a31fcf545c46efdf00f16c467d0f8b09c04230c09fcb7` |\n\nHosted #1056 outputs are separate CI artefacts from the new head; they do not replace or relabel `.1055`. The original packages were not rebuilt, installed, signed, distributed or republished during this correction.\n\nThe remaining integration blockers are the protected native/test byte conflicts and failed Continuous acceptance. Resolving the former requires a separately authorised change to implementation/test integration or provenance governance; this request explicitly preserves both. PR #81 remains **Draft**. PRs #76/#78/#80 remain unchanged and Draft; #76 remains NO-GO. Goal #77, ADR 007, the 250 ms gate, the 4.5:1 requirement and release restrictions remain unchanged. No merge, official release, package signing, deployment or distribution."
+  },
+  "ownerDecisionSource": {
+    "url": "https://github.com/DouglasNLima/local-docs-studio/issues/62",
+    "role": "Existing owner declaration, not approval of this amendment"
+  },
+  "relatedPullRequests": [
+    {
+      "number": 76,
+      "head": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+      "base": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "draft": true,
+      "state": "open",
+      "updated_at": "2026-11-07T21:11:36Z",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/pull/76"
+    },
+    {
+      "number": 78,
+      "head": "23bcbb58b65998af5089b8a4f4e3f4b69356df97",
+      "base": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "draft": true,
+      "state": "open",
+      "updated_at": "2026-11-08T21:43:54Z",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/pull/78"
+    },
+    {
+      "number": 80,
+      "head": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+      "base": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+      "draft": true,
+      "state": "open",
+      "updated_at": "2026-11-07T01:42:27Z",
+      "url": "https://github.com/DouglasNLima/local-docs-studio/pull/80"
+    }
+  ],
+  "retainedExecutionEvidence": [
+    {
+      "path": "artifacts/flowchart-review/independent-review-3a8f10d.md",
+      "sha256": "a4b5d1141e9df096ed195a09e9eb50e8cdc98f39cc6c4e56ff8cb2c10756d02c",
+      "bytes": 9923
+    },
+    {
+      "path": "artifacts/flowchart-review/final-3a8f10d-regressions.json",
+      "sha256": "07277a020cc995ceb68df1f3cbf858aeb8692b523299ea9559353af8c68ebd5c",
+      "bytes": 901
+    },
+    {
+      "path": "artifacts/flowchart-hotfix/final-3a8f10d/core/core.trx",
+      "sha256": "e232e30f0131cbbe1c43a2864c981271b9de6218e035093b72ae487224de8207",
+      "bytes": 3560741
+    },
+    {
+      "path": "artifacts/flowchart-hotfix/final-3a8f10d/native/completion.json",
+      "sha256": "29852274fd3f9441ac94149740d8bd5d4f32b23098c64a3534e74c3887617bed",
+      "bytes": 1878
+    },
+    {
+      "path": "artifacts/flowchart-hotfix/LensDocsStudio.Native-0.1.1-preview.1055-flowchart-evidence.zip",
+      "sha256": "2c1cf3bf11e2226a464a31fcf545c46efdf00f16c467d0f8b09c04230c09fcb7",
+      "bytes": 2907819
+    },
+    {
+      "path": "artifacts/provenance-docs-81/hosted-terminal-workflows.json",
+      "sha256": "37aea667d1684f4085596edbe511d7398836df8f511648de5c5f587fbdc0486c",
+      "bytes": 148545
+    },
+    {
+      "path": "artifacts/provenance-docs-81/hosted-terminal-check-runs.json",
+      "sha256": "5ca810ee8a50b102146e34f19e7492e46473fe6d099e00403a3321dcbcbcb7d7",
+      "bytes": 350849
+    },
+    {
+      "path": "artifacts/provenance-docs-81/local-exit-codes.json",
+      "sha256": "a7ab9c00c13357e776b9ab07c021d727ac24df347276106274ef5fdc3b9d17fd",
+      "bytes": 99
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical-preservation.json",
+      "sha256": "e91f4f81db2033d4b6a39e9c12b7c88bed3b462b08d9685960a5669beea61f76",
+      "bytes": 1346
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical/final-continuous-replication-1.log",
+      "sha256": "60b48637aac108facbf76ff764a89e5e5874f29737e254eead8c286e3956033a",
+      "bytes": 46510
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical/final-continuous-replication-2.log",
+      "sha256": "79f7332e4058540fd17a1e0076cf4759c0f92032e6a5173a8dd205897f7789b3",
+      "bytes": 49368
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical/final-oss-provenance.log",
+      "sha256": "bc6b68d552634a52d04957770bdd8a012f2cb20a67b27ab9619f076ab259b0ad",
+      "bytes": 21552
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical/final-terminal-workflows.json",
+      "sha256": "4685decf875d62bb4af3117b56db00a5f6b6d2a5e640b6ff907019d95026179e",
+      "bytes": 148705
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical/first-oss-provenance.log",
+      "sha256": "83893a56fbeeab3d3cfc7a0e2793eaed769d64ffc7d899df029fe9998f2faeb6",
+      "bytes": 19986
+    },
+    {
+      "path": "artifacts/provenance-docs-81/historical/initial-commit-workflows.json",
+      "sha256": "173d72d7c36cabe4308cf8b8cbcca5751ec356d5451f13d3561d26a71c23ac88",
+      "bytes": 148593
+    }
+  ],
+  "retainedCoreCounters": {
+    "total": "2320",
+    "executed": "2320",
+    "passed": "2320",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "retainedFlowchartCases": {
+    "total": 22,
+    "passed": 22
+  },
+  "retainedNativeChecks": {
+    "status": "PASS",
+    "source": "0.1.0-preview.1+3a8f10d737791a1182d092676ecb17a47e2fde30",
+    "count": 19
+  }
+}
