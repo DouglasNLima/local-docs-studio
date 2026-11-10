@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "preview-reflow-integration-three-v2",
+  "status": "LOCAL_GOVERNANCE_AND_INDEPENDENT_REVIEW_PASS; PROVENANCE_ACTIVATED; HOSTED_CI_NOT_AUTHORISED",
+  "preparation": {
+    "commit": "662870e83aceccaa19f3677ec7ed2bc4cb565bb4",
+    "tree": "c72610508f6a430d29918c26827d6433d92d244d"
+  },
+  "ownerDecision": "https://github.com/DouglasNLima/local-docs-studio/pull/83#issuecomment-6765036155",
+  "canonicalManifestSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+  "ownerApprovalSha256": "3f8bc670c9361973621bde8ab391f40f8b0d37919defa96ece86bb7a0469dabb",
+  "canonicalRepresentation": "Manifest and ten retained approval/scope records: exact HEAD Git blob bytes via binary git cat-file, with separate index and Git-clean working checks. Newly added owner receipt: exact pinned Git-clean blob bytes during precommit validation; its committed blob must match the same pin at final readback. No JSON reserialisation supplies an identity.",
+  "approvedPairs": {
+    "src/native/LensDocsStudio.Native/MainWindow.Find.cs": {
+      "previous": "9e8bcd8b2fbbcdf7d073a61f98b500e54c2c58dd6341e9dc506fab5fa6e7ac7e",
+      "current": "30bb76cb045afd2b27be472a560a22d86eaa176d9649b0eb2e663e0564b7c974"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs": {
+      "previous": "fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9",
+      "current": "8a7e197f2e850c9eebf4d2e14d312e87cb20a1568a462ab44b5d4cb63b504907"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+      "previous": "50888389971d81a765bc00b3607baa26cc5e9982f5679779e3d87cbebbfa4585",
+      "current": "65781f39bb3e41508960f53f510b503e64dcc09724ea98a2f51656431ab325c1"
+    }
+  },
+  "product": {
+    "commit": "932335027314fe710671d54266367a008fca5547",
+    "tree": "c58468fc41222f56eb38f277950486686e820553"
+  },
+  "runtimeSourceTrees": {
+    "src/native": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "controlTrees": {
+    "tests/native/preview-reflow": "a04548454b40bb63f954d240e02cea5ac0b0ec7d",
+    "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a"
+  },
+  "allowedChangedPaths": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/preview-reflow-integration-v2/owner-approval.json",
+    "docs/open-source/evidence/preview-reflow-integration-v2/approved-refresh.json",
+    "docs/open-source/evidence/preview-reflow-integration-v2/activation-validation.json",
+    "docs/open-source/evidence/preview-reflow-integration-v2/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "implementationCanonicalSha256": {
+    "docs/open-source/evidence/preview-reflow-integration-v2/approved-refresh.json": "88fbe06b2e40b0ec2a9e3962ba6777569d3700eb31050b453756d1baee1a990d",
+    "docs/open-source/evidence/preview-reflow-integration-v2/owner-approval.json": "3f8bc670c9361973621bde8ab391f40f8b0d37919defa96ece86bb7a0469dabb",
+    "scripts/compliance/licence_scope.py": "aeb43157c784a471b968b08ad440b9d3977fdfaafa3a4ceaf7c7ad1d372985f5",
+    "scripts/compliance/test_governance.py": "703428bb2292bd3f0f9a0fcf1e102c9f062c06b3ec72e1dbafedfd1ed1a8c288"
+  },
+  "localValidation": {
+    "governance": "PASS",
+    "governanceControls": {
+      "passed": 66,
+      "failed": 0,
+      "skipped": 0,
+      "previousControlsRetained": 49,
+      "newControls": 17
+    },
+    "foundation": {
+      "status": "PASS",
+      "rightsPaths": 2629,
+      "originalWebNotices": 68,
+      "nativeFiles": 537,
+      "exactNativeMatches": 522,
+      "localLinks": 215
+    },
+    "checkoutControls": {
+      "status": "PASS",
+      "fixture": "Local validation commit only; not the PR branch and never pushed. The two implementation and two approval blobs exactly match implementationCanonicalSha256. Documentary validation/review records are completed afterwards and the final ledger is rechecked.",
+      "representations": [
+        {
+          "checkout": "lf",
+          "depth": 1,
+          "commitsAvailable": 1,
+          "canonicalManifestSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+          "workingManifestSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+          "manifestCrlf": false,
+          "fixtureCanonicalBlobIdentityVerified": true,
+          "sourceTrees": {
+            "src/native": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+            "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35",
+            "tests/native/preview-reflow": "a04548454b40bb63f954d240e02cea5ac0b0ec7d",
+            "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a"
+          },
+          "checks": {
+            "governance": {
+              "exitCode": 0,
+              "logSha256": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348",
+              "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1081, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n"
+            },
+            "foundation": {
+              "exitCode": 0,
+              "logSha256": "36d8cc72ce6bfb41ee0377ff3229e2b9711f558f0b3e165938b33fa183b34fa4",
+              "output": "{\"highlight\": \"exact historical bytes\", \"originalWebNotices\": 68, \"nativeFiles\": 537, \"exactNativeMatches\": 522, \"rightsPaths\": 2629, \"localLinks\": 215, \"operativeLicenceApproval\": true}\r\n"
+            },
+            "canonicalControls": {
+              "exitCode": 0,
+              "logSha256": "61e8720705d50d35b48e8a7e969d59d45fd352f45eff198f6464f958355ec4dd",
+              "output": "test_changed_committed_manifest_is_rejected_by_original_pin (__main__.CanonicalManifestTests.test_changed_committed_manifest_is_rejected_by_original_pin) ... ok\r\ntest_lf_and_crlf_checkouts_share_exact_committed_identity (__main__.CanonicalManifestTests.test_lf_and_crlf_checkouts_share_exact_committed_identity) ... ok\r\ntest_missing_committed_manifest_is_rejected (__main__.CanonicalManifestTests.test_missing_committed_manifest_is_rejected) ... ok\r\ntest_missing_working_manifest_is_rejected (__main__.CanonicalManifestTests.test_missing_working_manifest_is_rejected) ... ok\r\ntest_same_json_with_different_spacing_is_not_normalised (__main__.CanonicalManifestTests.test_same_json_with_different_spacing_is_not_normalised) ... ok\r\ntest_semantically_modified_working_json_is_rejected (__main__.CanonicalManifestTests.test_semantically_modified_working_json_is_rejected) ... ok\r\ntest_staged_substitution_is_rejected_even_with_original_working_bytes (__main__.CanonicalManifestTests.test_staged_substitution_is_rejected_even_with_original_working_bytes) ... ok\r\ntest_substituted_working_manifest_is_rejected (__main__.CanonicalManifestTests.test_substituted_working_manifest_is_rejected) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 8 tests in 5.273s\r\n\r\nOK\r\n"
+            }
+          },
+          "worktreeClean": true
+        },
+        {
+          "checkout": "crlf",
+          "depth": 1,
+          "commitsAvailable": 1,
+          "canonicalManifestSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+          "workingManifestSha256": "4e73be88f91b6c423622079a05e861d0352f2e089ec2df3b7429939270af90c2",
+          "manifestCrlf": true,
+          "fixtureCanonicalBlobIdentityVerified": true,
+          "sourceTrees": {
+            "src/native": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+            "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35",
+            "tests/native/preview-reflow": "a04548454b40bb63f954d240e02cea5ac0b0ec7d",
+            "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a"
+          },
+          "checks": {
+            "governance": {
+              "exitCode": 0,
+              "logSha256": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348",
+              "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1081, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n"
+            },
+            "foundation": {
+              "exitCode": 0,
+              "logSha256": "36d8cc72ce6bfb41ee0377ff3229e2b9711f558f0b3e165938b33fa183b34fa4",
+              "output": "{\"highlight\": \"exact historical bytes\", \"originalWebNotices\": 68, \"nativeFiles\": 537, \"exactNativeMatches\": 522, \"rightsPaths\": 2629, \"localLinks\": 215, \"operativeLicenceApproval\": true}\r\n"
+            },
+            "canonicalControls": {
+              "exitCode": 0,
+              "logSha256": "856303fd8d8b109e77056fdb01e601314718bd8f01021d84d9c6cdf56f70c474",
+              "output": "test_changed_committed_manifest_is_rejected_by_original_pin (__main__.CanonicalManifestTests.test_changed_committed_manifest_is_rejected_by_original_pin) ... ok\r\ntest_lf_and_crlf_checkouts_share_exact_committed_identity (__main__.CanonicalManifestTests.test_lf_and_crlf_checkouts_share_exact_committed_identity) ... ok\r\ntest_missing_committed_manifest_is_rejected (__main__.CanonicalManifestTests.test_missing_committed_manifest_is_rejected) ... ok\r\ntest_missing_working_manifest_is_rejected (__main__.CanonicalManifestTests.test_missing_working_manifest_is_rejected) ... ok\r\ntest_same_json_with_different_spacing_is_not_normalised (__main__.CanonicalManifestTests.test_same_json_with_different_spacing_is_not_normalised) ... ok\r\ntest_semantically_modified_working_json_is_rejected (__main__.CanonicalManifestTests.test_semantically_modified_working_json_is_rejected) ... ok\r\ntest_staged_substitution_is_rejected_even_with_original_working_bytes (__main__.CanonicalManifestTests.test_staged_substitution_is_rejected_even_with_original_working_bytes) ... ok\r\ntest_substituted_working_manifest_is_rejected (__main__.CanonicalManifestTests.test_substituted_working_manifest_is_rejected) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 8 tests in 5.504s\r\n\r\nOK\r\n"
+            }
+          },
+          "worktreeClean": true
+        }
+      ]
+    },
+    "upstream": {
+      "status": "PASS",
+      "installedFilesVerified": 1559,
+      "exactMapSources": 194,
+      "syntheticMapSources": 1,
+      "archiveSha256": "fbc9443263e976583bd5640e550b77f84d8d7e19fc8408dfe53776a5bae7ed39"
+    },
+    "highlightReconstruction": {
+      "status": "PASS",
+      "exactHistoricalBody": true,
+      "exactHistoricalReconstruction": true,
+      "canonicalSha256": "980aa9a979a537d5f05c76d313c5f8b48f0bccba293a75e3c271975fce968aa0"
+    },
+    "originalCanonicalControls": {
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    "finalQualificationCounts": {
+      "governanceRegressionTests": {
+        "passed": 66,
+        "failed": 0,
+        "skipped": 0
+      },
+      "canonicalManifestTestsPerCheckout": {
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "checkouts": [
+          "working repository",
+          "depth-1 LF",
+          "depth-1 CRLF"
+        ]
+      },
+      "governanceInvocationsOnIntendedBytes": {
+        "passed": 3,
+        "failed": 0
+      },
+      "priorInvalidFixtureFoundationFailuresRetained": 1,
+      "foundationQualifiedCheckouts": {
+        "passed": 3,
+        "failed": 0,
+        "checkouts": [
+          "working repository",
+          "depth-1 LF",
+          "depth-1 CRLF"
+        ]
+      }
+    }
+  },
+  "historicalProof": {
+    "status": "PASS",
+    "commitTreePairs": 12,
+    "historicalProductCommits": 3,
+    "protectedPairs": 3,
+    "addedDigests": 9,
+    "retainedApprovalAndScopeDigests": 10,
+    "historyMissing": false,
+    "proof": "All pinned commits/trees and previous/current pairs read directly from available Git objects. No missing-object fallback. Previous approvals and v1 evidence remain byte-identical.",
+    "identities": {
+      "reflowPreparation": {
+        "commit": "662870e83aceccaa19f3677ec7ed2bc4cb565bb4",
+        "tree": "c72610508f6a430d29918c26827d6433d92d244d"
+      },
+      "reflowBaseline": {
+        "commit": "3cd08bc2de31564e06973c5211e1aa231731f9cb",
+        "tree": "d5d07c445a12803f64dd36276a86511143a73648"
+      },
+      "reflowCandidate": {
+        "commit": "932335027314fe710671d54266367a008fca5547",
+        "tree": "c58468fc41222f56eb38f277950486686e820553"
+      },
+      "reflowHistoricalsource": {
+        "commit": "22c223c6f56fa41fda2a36102e1eed0af44974ec",
+        "tree": "89e012f468801ac7f445113b811ca2fbe041c8d9",
+        "productCommits": [
+          "3f58591743abf81a5c96df5a4183c5b0b46fb995",
+          "4f133d1b110dd6b600d3e1ae06fe725a598feb4a",
+          "a798eaf051baa14470a14b1af1825abe2284a9ec"
+        ]
+      },
+      "flowchartBaseline": {
+        "commit": "99349d82eb06960eb1f9785cf384db2373aed4fa",
+        "tree": "e4d137a12cbdd827583fcb841612890dd88736ec"
+      },
+      "flowchartCandidate": {
+        "commit": "b29dbb862bd6fe2eebc26deba25bab072857048f",
+        "tree": "53aa0f0c18455ca61cb2bc7b4abf111124de50dc"
+      },
+      "flowchartEvaluation": {
+        "commit": "3a8f10d737791a1182d092676ecb17a47e2fde30",
+        "tree": "1f13a1afa64fd0b4419303bcaf0136f1ffcecfe7"
+      },
+      "flowchartOriginalevidence": {
+        "commit": "0890ec9b2ade8af24b9b3fca6cbe98cd7fd329ba",
+        "tree": "fd0e968cd8fb3ece8ebb73d78a859705e1605fe3"
+      },
+      "flowchartPreparation": {
+        "commit": "5c3210d7acd39593f6ae6495a32c74564b50fa98",
+        "tree": "0599acd4077d75b71fb065a9564d574fb3d18950"
+      },
+      "previewLoadingBaseline": {
+        "commit": "cc465fd7f3bfbf949c460563c9be2d73a72193aa",
+        "tree": "b3cd0c8335aca772cfe011a0895792aca7ce9f91"
+      },
+      "previewLoadingCandidate": {
+        "commit": "504f71eda248c6d4162f7b1f73e9bea555cb2e28",
+        "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+      },
+      "previewLoadingPreparation": {
+        "commit": "0fcab63d2d9f8db8df90c6f1f60cf3eac6301043",
+        "tree": "556cdcfc6f2541a082932a2f9529dc3ae3fabd2c"
+      }
+    },
+    "retainedApprovalAndScopeSha256": {
+      "docs/open-source/configuration/mit-scope.json": "8270a564757e0851e15184a5ca2c64c46ca6892811503b6c20062c4e9fa48388",
+      "docs/open-source/evidence/goal62/preserved-files.json": "d56bdbcc1f16c1a5ce26a5936778baaf3f45a5b4c94bc661d4d61d8fbb845822",
+      "docs/open-source/evidence/flowchart-provenance-81/candidate-refresh.json": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+      "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+      "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json": "140568d16736ac59a0bb35b0d8199a3becda851e65588dfd5be97c8851c74a47",
+      "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+      "docs/open-source/evidence/preview-loading-visibility/owner-approval.json": "f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea",
+      "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json": "ced6641fbc0c211ad94fa63bcbdadc9a9e9c6de9f479f0727c0c1a58ccd23ed2",
+      "docs/open-source/evidence/find-caret/preserved-refresh.json": "a5ce3c4a9a8d1ce6b6a86f79b10b98ee8ca94296a2ca7de95ca8e037f0624237",
+      "docs/open-source/evidence/selection-sync/preserved-refresh.json": "f29e60b557cf1c4e0060262cda244431cea451108dad865122d087a744c74694"
+    }
+  },
+  "depthOneContract": "As for PRs #81/#82, runtime checks require exact retained HEAD source/control/evidence trees and Git-clean working objects on every run, including depth-1 clones. Historical commit labels have a separate full-history activation proof; no conditional acceptance when an expected object is missing.",
+  "limits": {
+    "protectedFiles": 2421,
+    "mitGrantedPaths": 1081,
+    "developRequiredContexts": 30,
+    "liveDevelopStrictChecks": true,
+    "newLicenceGrant": false,
+    "hostedCiAuthorised": false,
+    "mergeAuthorised": false,
+    "performanceException": false,
+    "publicRelease": "NO-GO",
+    "nativeStable": "NO-GO"
+  },
+  "retainedObservations": {
+    "originalDenseErBaseline": "FAIL after 104 checks; six-second deadline; close assertion not reached",
+    "originalDenseErCandidate": "FAIL after 104 checks; six-second deadline; close assertion not reached",
+    "laterDenseErLifecycle": "PASS 106; separate retained observation, no historical cause attribution",
+    "historicalContinuous250ms": "FAIL; unchanged"
+  },
+  "independentReview": {
+    "reviewer": "/root/independent_product_review",
+    "status": "PASS; no blocking finding",
+    "record": "activation-independent-review.md",
+    "sourceAndApprovalHashesIndependentlyRead": true,
+    "depthOneLfAndCrlfBlobsIndependentlyRead": true
+  },
+  "finalCommitReadback": "Final commit and complete tree are supplied by the delivery receipt; a commit cannot contain its own identity.",
+  "retainedValidationFailure": {
+    "status": "FAIL",
+    "checksFailed": 1,
+    "check": "foundation in initial depth-1 LF fixture",
+    "error": "Rights ledger bytes are stale: scripts/compliance/licence_scope.py",
+    "logSha256": "3bb54b92517e017aedcbe25aafe418df31edb3994b5459a085908ec8f524854c",
+    "output": "Traceback (most recent call last):\r\n  File \"C:\\Users\\dougl\\AppData\\Local\\Temp\\lens-pr83-activation-vcxt12k9\\lf\\scripts\\compliance\\check_foundation.py\", line 99, in <module>\r\n    main()\r\n  File \"C:\\Users\\dougl\\AppData\\Local\\Temp\\lens-pr83-activation-vcxt12k9\\lf\\scripts\\compliance\\check_foundation.py\", line 76, in main\r\n    require(row['sha256'] == expected_hash, 'Rights ledger bytes are stale: ' + row['path'])\r\n  File \"C:\\Users\\dougl\\AppData\\Local\\Temp\\lens-pr83-activation-vcxt12k9\\lf\\scripts\\compliance\\check_foundation.py\", line 21, in require\r\n    raise ValueError(message)\r\nValueError: Rights ledger bytes are stale: scripts/compliance/licence_scope.py\r\n",
+    "observedFixtureScriptSha256": {
+      "scripts/compliance/licence_scope.py": "2d7c202159b0310543dddaf79dd2b71a58a067d473d3d53474d0d9a6e8eb4bbf",
+      "scripts/compliance/test_governance.py": "b282a043871bdf622b4472accd945de3cbd8a60aa6ded6d41526c061c3330a22"
+    },
+    "causeEstablished": "The fixture copied CRLF checkout scripts into core.autocrlf=false and committed different blobs from the intended Git-clean implementation. Direct Git-blob comparison established both mismatches. Foundation correctly rejected its stale ledger.",
+    "correction": "Rebuild a new local fixture from raw canonical Git-clean blob bytes, verify all seven blob identities before cloning. No production, policy or test change and no hosted retry.",
+    "qualification": "This failure remains FAIL and does not qualify the intended activation bytes.",
+    "fixtureCounts": {
+      "passed": 1,
+      "failed": 1,
+      "notReached": 1,
+      "passedCheck": "governance on unintended fixture blobs",
+      "failedCheck": "foundation",
+      "notReachedCheck": "canonical controls"
+    },
+    "governanceLogSha256": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348",
+    "governanceOutput": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1081, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n"
+  },
+  "negativeControlCoverage": {
+    "newGovernanceTestMethods": 17,
+    "rejectedCases": [
+      "missing, additional and substituted protected pairs",
+      "changed previous/current effective pins and missing grants",
+      "incorrect owner, decision URL, v1 identity or manifest bytes",
+      "scope, source/control/history tree, added-file and approval overrides",
+      "missing or modified protected bytes outside the three substitutions",
+      "all nine missing or altered added-file digests",
+      "changed native/control/fixture/history trees and missing/extra object inventories",
+      "all ten modified predecessor approval/scope records, in working files and commits",
+      "missing, substituted, modified or differently formatted manifest",
+      "modified index with restored working bytes",
+      "clean conversion changing the canonical object",
+      "committed CRLF blob misrepresented as the approved LF blob"
+    ],
+    "canonicalControlsPassed": 8,
+    "canonicalControlsFailed": 0,
+    "result": "All expected rejections occurred; these negative controls passed."
+  }
+}
