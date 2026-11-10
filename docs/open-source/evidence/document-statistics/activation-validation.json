@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "document-statistics-ten-v1",
+  "status": "LOCAL_GOVERNANCE_AND_INDEPENDENT_REVIEW_PASS; PROVENANCE_ACTIVATED; HOSTED_CI_NOT_AUTHORISED",
+  "ownerDecision": "https://github.com/DouglasNLima/local-docs-studio/pull/84#issuecomment-6769313461",
+  "preparation": {
+    "commit": "90b5218e2af82f90eedfb3809e59235a716ed8f9",
+    "tree": "bcae1db353c79955f935852c4c1aff9494035539"
+  },
+  "baseline": {
+    "commit": "2dbc6d4e61db431001b42bb93b02d8e503eb8096",
+    "tree": "14b6e74480a1e0ae76afb1bc8128ba73fe2c459a"
+  },
+  "candidate": {
+    "commit": "ed521c2bd7b30060580d3fee9967a5e307e0e89b",
+    "tree": "c042138e54b80c61dcc20dc2fb17cbf40405693c"
+  },
+  "testedProduct": {
+    "commit": "5b336179b5cbbb97d03880c0cf9674a2decaa000",
+    "tree": "67b10c1ce78b4843b35c852bc4b8dabe4cb87817"
+  },
+  "candidateManifestSha256": "7dd1bc0e1a4c1ccf798495cba950a422af06729ee3876d86a04e028f6141ec22",
+  "ownerApprovalSha256": "263f7fa6bb4d58b6dfe7371784a123a4daf75d81550c043caf8b02aae6cb24a7",
+  "approvedRefreshSha256": "17fc365494190bee00de5d678875e788de665e3cb96adfd578ca229ca72afff8",
+  "activationPathsOnly": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/document-statistics/owner-approval.json",
+    "docs/open-source/evidence/document-statistics/approved-refresh.json",
+    "docs/open-source/evidence/document-statistics/activation-validation.json",
+    "docs/open-source/evidence/document-statistics/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "identityProof": {
+    "status": "PASS",
+    "fullHistoryAvailable": true,
+    "protectedPairs": 10,
+    "addedFiles": 28,
+    "frozenProtectedPaths": 2421,
+    "runtimeSourceTrees": {
+      "src/native": "5aeb8c1f09f16c2b790de1542e45dcd3b0e41649",
+      "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+    },
+    "controlTrees": {
+      "tests/native/document-statistics": "1c751d38a4239cff4fa917cb61fc5fc86bc80e6b"
+    },
+    "unchangedTrees": {
+      ".github": "aa34495d1b4aef01955975c397acc96fb24ddf01",
+      "assets": "087e0dad051a709e2c0a29cafd72d8ed93b2f8c0",
+      "tests/native/preview-reflow": "a04548454b40bb63f954d240e02cea5ac0b0ec7d",
+      "tests/native/preview-loading-presentation": "82783c0fa644652d9df0da9330394b8414df19bb",
+      "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a"
+    },
+    "preActivationEvidence": {
+      "docs/open-source/evidence/document-statistics/candidate-refresh.json": "7dd1bc0e1a4c1ccf798495cba950a422af06729ee3876d86a04e028f6141ec22",
+      "docs/open-source/evidence/document-statistics/foundation.txt": "2b71fbbfb8358e7d4b598ae184eec0b7bf1509a95185beded0fe1334b4845575",
+      "docs/open-source/evidence/document-statistics/governance-tests.txt": "54dd6b049bea47b2016bd7558ab433396f10012dae6bc6158a1636cd155e389a",
+      "docs/open-source/evidence/document-statistics/governance.txt": "adef869a394db74141267ba83f5c06de24aec1294194ba8fba15edd490a4045d",
+      "docs/open-source/evidence/document-statistics/independent-review.md": "64b78777e2c8ba6bdeb923a74f97eb9cd313f25b47417119ec4f93527b7e2e4f",
+      "docs/open-source/evidence/document-statistics/initial-colour-failure.txt": "c8556b5d6c45562f9cce666543ed8eeb93877b032300fcdcbc1ed8e7d8994e9e",
+      "docs/open-source/evidence/document-statistics/initial-export-fixture-failure.txt": "cd58adc290aede9aa84896574523ce4763bf51f8f2cd78cac0e24f621476e9bd",
+      "docs/open-source/evidence/document-statistics/initial-focus-failure.txt": "b2691a215e11b1706449b3e1fbdf78930b19cf709db1bf7fbaa1a3843be634b9",
+      "docs/open-source/evidence/document-statistics/initial-timing-failure.txt": "1d6258453457b3909991e80218c8851098ffc76443218912d2f5d1fc0dc463bb",
+      "docs/open-source/evidence/document-statistics/proposal.md": "2c4c918202a3d00ec2ca638589ba118c413bc851088cda0361ff91316eaffb13",
+      "docs/open-source/evidence/document-statistics/validate-proposal.py": "f656f24640c39ec12997184c531e65c2573b8cfd75481081289687390c848160",
+      "docs/open-source/evidence/document-statistics/validation-results.json": "580b819e78472c09d6473963d3a7783ffbce3d14a9f8cdcf106f329d8e0f7dc2"
+    },
+    "developmentEvidenceTree": "21c2d9bfa08f8f3bb280efd7acce6a0524802e76",
+    "originalGovernanceDigests": {
+      "scripts/compliance/licence_scope.py": "aeb43157c784a471b968b08ad440b9d3977fdfaafa3a4ceaf7c7ad1d372985f5",
+      "scripts/compliance/test_governance.py": "703428bb2292bd3f0f9a0fcf1e102c9f062c06b3ec72e1dbafedfd1ed1a8c288"
+    },
+    "unchangedPreparationFiles": 2666,
+    "activationScope": "Exactly the seven authorised paths; all other HEAD/index/Git-clean working objects match preparation."
+  },
+  "validation": {
+    "status": "PASS",
+    "committedLocalFixture": {
+      "commit": "a0296df2698cf20b8869e4448d162d7df54d1ebd",
+      "tree": "6bd568055b11100fdbf7c85dcb14409d18904815",
+      "purpose": "Local test fixture only; no feature-branch commit or network push. Receipt placeholders are subsequently completed; executable and approval bytes remain pinned below."
+    },
+    "governanceControls": {
+      "passed": 89,
+      "failed": 0,
+      "skipped": 0,
+      "previousControlsRetained": 66,
+      "newControls": 23
+    },
+    "foundation": {
+      "status": "PASS",
+      "rightsPaths": 2673
+    },
+    "mandatoryDevelopContexts": 30,
+    "checkouts": [
+      {
+        "checkout": "shallow-lf-v1",
+        "head": "a0296df2698cf20b8869e4448d162d7df54d1ebd",
+        "tree": "6bd568055b11100fdbf7c85dcb14409d18904815",
+        "depth": 1,
+        "autocrlf": "false",
+        "status": "",
+        "checks": [
+          {
+            "command": "python -B scripts/compliance/check_governance.py",
+            "exitCode": 0,
+            "seconds": 46.265,
+            "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1081, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n",
+            "outputSha256": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348"
+          },
+          {
+            "command": "python -B scripts/compliance/test_governance.py",
+            "exitCode": 0,
+            "seconds": 86.907,
+            "output": ".........................................................................................\r\n----------------------------------------------------------------------\r\nRan 89 tests in 86.521s\r\n\r\nOK\r\n",
+            "outputSha256": "e156113023837f82c1e927f3ec9d47255887006711d6f6b3eb9b2d8bf88b6c7a"
+          },
+          {
+            "command": "python -B scripts/compliance/check_foundation.py",
+            "exitCode": 0,
+            "seconds": 2.922,
+            "output": "{\"highlight\": \"exact historical bytes\", \"originalWebNotices\": 68, \"nativeFiles\": 537, \"exactNativeMatches\": 522, \"rightsPaths\": 2673, \"localLinks\": 215, \"operativeLicenceApproval\": true}\r\n",
+            "outputSha256": "11b920722b93a15589ff9f875c2586925e651ac427cfde27a683241c19b91294"
+          }
+        ]
+      },
+      {
+        "checkout": "shallow-crlf-v1",
+        "head": "a0296df2698cf20b8869e4448d162d7df54d1ebd",
+        "tree": "6bd568055b11100fdbf7c85dcb14409d18904815",
+        "depth": 1,
+        "autocrlf": "true",
+        "status": "",
+        "checks": [
+          {
+            "command": "python -B scripts/compliance/check_governance.py",
+            "exitCode": 0,
+            "seconds": 40.188,
+            "output": "{\"operativeMIT\": \"original enumerated portions only\", \"grantedPaths\": 1081, \"protectedFiles\": 2421, \"newSpdxPaths\": 4}\r\n{\"rulesets\": 2, \"developChecks\": 30, \"mainChecks\": 2, \"trust\": \"unchanged\", \"metadata\": \"scoped licence pointer\", \"mitLicence\": \"operative for enumerated original portions\", \"administrativeMutation\": false}\r\n",
+            "outputSha256": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348"
+          },
+          {
+            "command": "python -B scripts/compliance/test_governance.py",
+            "exitCode": 0,
+            "seconds": 88.5,
+            "output": ".........................................................................................\r\n----------------------------------------------------------------------\r\nRan 89 tests in 87.886s\r\n\r\nOK\r\n",
+            "outputSha256": "a7373d475bb45102e4e9c01b2fe7bc7b90dc6d2bf3f90f02ba1bbb795e4a45bc"
+          },
+          {
+            "command": "python -B scripts/compliance/check_foundation.py",
+            "exitCode": 0,
+            "seconds": 3.718,
+            "output": "{\"highlight\": \"exact historical bytes\", \"originalWebNotices\": 68, \"nativeFiles\": 537, \"exactNativeMatches\": 522, \"rightsPaths\": 2673, \"localLinks\": 215, \"operativeLicenceApproval\": true}\r\n",
+            "outputSha256": "11b920722b93a15589ff9f875c2586925e651ac427cfde27a683241c19b91294"
+          }
+        ]
+      }
+    ]
+  },
+  "independentReview": {
+    "status": "PASS",
+    "reviewer": "Independent read-only Codex technical reviewer",
+    "blockingFindings": 0,
+    "reviewedPreparation": {
+      "commit": "90b5218e2af82f90eedfb3809e59235a716ed8f9",
+      "tree": "bcae1db353c79955f935852c4c1aff9494035539"
+    },
+    "reviewedFixture": {
+      "commit": "a0296df2698cf20b8869e4448d162d7df54d1ebd",
+      "tree": "6bd568055b11100fdbf7c85dcb14409d18904815",
+      "purpose": "Local test fixture only; no feature-branch commit or network push. Receipt placeholders are subsequently completed; executable and approval bytes remain pinned below."
+    },
+    "reviewedValidationSha256": "65e1c054b7c867ecf05b0cc7452f0f1edb97f64d48ce5bd0352069715edc5863",
+    "reviewedImplementationSha256": {
+      "scripts/compliance/licence_scope.py": "7573c4f4436d7503bc3b79a145afe7d17491ef84f7ccd5677c8d3967c53da3da",
+      "scripts/compliance/test_governance.py": "52f62496e647c3cfa2d69c7274ab9266463bf158282e5ca3ca3a9249f0e012d0",
+      "docs/open-source/evidence/document-statistics/owner-approval.json": "263f7fa6bb4d58b6dfe7371784a123a4daf75d81550c043caf8b02aae6cb24a7",
+      "docs/open-source/evidence/document-statistics/approved-refresh.json": "17fc365494190bee00de5d678875e788de665e3cb96adfd578ca229ca72afff8"
+    },
+    "verdict": "GO for the authorised [skip ci] commit/push and subsequent owner CI decision. Recording the verdict and regenerating the ledger need no additional technical review while executable and pinned approval bytes remain unchanged.",
+    "evidence": "activation-independent-review.md",
+    "executionScope": "Independently inspected exact code, identities, scope and receipts; matched both recorded depth-1 LF/CRLF results and their SHA-256 values against raw outputs. No repository or remote mutation by the reviewer."
+  },
+  "retainedLimitations": [
+    "No activation without an exact owner decision naming canonical manifest digest and final preparation HEAD/tree.",
+    "Preserve prior approved amendments and their original immutable evidence.",
+    "Added files receive no new licence grant; preserve the MIT allowlist and R3-R7 exclusions.",
+    "All 30 mandatory develop contexts remain required; hosted CI and merge require separate owner authorisation.",
+    "Historical Continuous 250 ms FAIL stays FAIL; no prior performance exception transfers.",
+    "Actual Windows High Contrast is NOT RUN/unavailable in this slice; required hosted accessibility checks remain.",
+    "No Goal #77 restart, ADR 007 activation, threshold, protection or workflow change.",
+    "No merge, release, signing, tagging, deployment, distribution or Native Stable certification."
+  ],
+  "historicalObservations": "All original development failures, the aborted control and the pre-activation governance failures remain unchanged. The aborted control remains INCONCLUSIVE; actual Windows High Contrast remains NOT RUN/unavailable. Historical Continuous 250 ms remains FAIL.",
+  "authorisation": {
+    "hostedCi": false,
+    "merge": false,
+    "newLicenceGrant": false,
+    "publicRelease": "NO-GO",
+    "nativeStable": "NO-GO"
+  },
+  "identityNote": "Final activation commit/tree and remote workflow observation are recorded in the PR delivery receipt; a file cannot embed its own final Git tree.",
+  "implementationCanonicalSha256": {
+    "scripts/compliance/licence_scope.py": "7573c4f4436d7503bc3b79a145afe7d17491ef84f7ccd5677c8d3967c53da3da",
+    "scripts/compliance/test_governance.py": "52f62496e647c3cfa2d69c7274ab9266463bf158282e5ca3ca3a9249f0e012d0",
+    "docs/open-source/evidence/document-statistics/owner-approval.json": "263f7fa6bb4d58b6dfe7371784a123a4daf75d81550c043caf8b02aae6cb24a7",
+    "docs/open-source/evidence/document-statistics/approved-refresh.json": "17fc365494190bee00de5d678875e788de665e3cb96adfd578ca229ca72afff8"
+  },
+  "canonicalRepresentation": "Approval, manifest and approved-refresh are pinned exact committed Git blobs. Every protected/added path is matched by HEAD object, index mode/blob/stage, Git-clean working object and SHA-256. Successor source/control/unchanged trees and prior receipts are checked before any effective substitution. LF/CRLF checkout conversion passes; altered canonical CRLF blobs fail.",
+  "remoteBeforePush": {
+    "branchHead": "90b5218e2af82f90eedfb3809e59235a716ed8f9",
+    "developHead": "2dbc6d4e61db431001b42bb93b02d8e503eb8096",
+    "workflowRuns": [],
+    "ownerCommentReadback": "Exact body matches recorded owner decision; GitHub author DouglasNLima, id 33501911."
+  },
+  "activationPreparationObservations": [
+    {
+      "classification": "RECEIPT_WRITER_ASSERTION_FAILURE; NOT A GOVERNANCE OR PRODUCT FAILURE",
+      "output": "Traceback (most recent call last):\n  File \"<stdin>\", line 8, in <module>\nAssertionError\n",
+      "cause": "The ad hoc receipt writer expected LF around OK in captured Windows unittest output. Both complete runs had already exited 0 with 89 passing controls.",
+      "correction": "Use splitlines for the summary assertion; retain original CRLF output and its SHA-256 unchanged."
+    },
+    {
+      "classification": "PRECOMMIT_GUARD_OUTPUT_PARSING_FAILURE; NO IDENTITY OR SCOPE MISMATCH",
+      "output": "Traceback (most recent call last):\n  File \"<stdin>\", line 12, in <module>\nAssertionError\n",
+      "cause": "The ad hoc precommit helper merged Git stderr with stdout, treating the rights-ledger LF/CRLF advisory as a changed path. It stopped before staging or committing. Separate readback confirmed exactly the seven authorised paths and unchanged preparation HEAD.",
+      "correction": "Keep Git stdout and stderr separate when parsing path inventories; retain the advisory without interpreting it as a filename."
+    }
+  ]
+}

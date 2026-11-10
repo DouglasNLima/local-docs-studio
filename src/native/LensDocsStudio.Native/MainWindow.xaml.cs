@@ -62,6 +62,7 @@ public partial class MainWindow : Window
         InitialiseFind();
         InitialisePreviewZoom();
         InitialisePreviewLoading();
+        InitialiseStatistics();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();

@@ -337,3 +337,12 @@ The disposable-certificate CI fixture now also combines the production update tr
 The validation clipboard adapter retries only read operations that fail with CLIPBRD_E_CANT_OPEN (0x800401D0), for at most five attempts with 50 ms between attempts on the MTA caller. Each read still runs on the owning pumping STA; writes and UI actions are not replayed. The last error propagates, and other COM failures are not retried. This addresses the observed read failure after a copy command in 5120f18's reinstalled app. The identity/duration of the clipboard holder was not captured. See [Windows OpenClipboard](https://learn.microsoft.com/en-nz/windows/win32/api/winuser/nf-winuser-openclipboard). Local tests simulate failures without accessing the Windows clipboard; actual delivery remains a CI check.
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+## Isolated document statistics (2026-11-10)
+
+The [first Reading Experience slice](native-document-statistics.md) adds current-buffer
+word/character/reading-time metrics and keyboard-accessible status-bar Review access.
+It shares Document Review counting, uses bounded cancellable background work and
+preserves source. This is Draft preparation from accepted develop `2dbc6d4e`;
+[validation and decision boundaries](native-document-statistics-validation.md) remain
+separate from hosted qualification and public/Native Stable acceptance.

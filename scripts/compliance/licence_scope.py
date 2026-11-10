@@ -141,6 +141,22 @@ PREVIEW_REFLOW_EARLIER_REFRESHES = {
         'f29e60b557cf1c4e0060262cda244431cea451108dad865122d087a744c74694',
 }
 
+DOCUMENT_STATISTICS_EVIDENCE = 'docs/open-source/evidence/document-statistics/'
+DOCUMENT_STATISTICS_PROPOSAL = 'document-statistics-ten-v1'
+DOCUMENT_STATISTICS_MANIFEST_SHA256 = '7dd1bc0e1a4c1ccf798495cba950a422af06729ee3876d86a04e028f6141ec22'
+DOCUMENT_STATISTICS_APPROVAL_SHA256 = '263f7fa6bb4d58b6dfe7371784a123a4daf75d81550c043caf8b02aae6cb24a7'
+DOCUMENT_STATISTICS_REFRESH_SHA256 = '17fc365494190bee00de5d678875e788de665e3cb96adfd578ca229ca72afff8'
+DOCUMENT_STATISTICS_DECISION = 'https://github.com/DouglasNLima/local-docs-studio/pull/84#issuecomment-6769313461'
+DOCUMENT_STATISTICS_PREPARATION = {
+    'commit': '90b5218e2af82f90eedfb3809e59235a716ed8f9',
+    'tree': 'bcae1db353c79955f935852c4c1aff9494035539',
+}
+# These two pre-activation hashes remain in the immutable candidate manifest.
+# Only their current implementations are authorised to change during activation.
+DOCUMENT_STATISTICS_GOVERNANCE_PATHS = {
+    'scripts/compliance/licence_scope.py', 'scripts/compliance/test_governance.py',
+}
+
 
 
 def require(condition, message):
@@ -475,7 +491,7 @@ def validate_preview_reflow_approval(refresh, approval_bytes, candidate_bytes):
     return candidate
 
 
-def check_preview_reflow_source_identity(paths):
+def read_preview_reflow_evidence():
     candidate_bytes = read_committed_evidence(
         PREVIEW_REFLOW_EVIDENCE + 'candidate-refresh.json', PREVIEW_REFLOW_MANIFEST_SHA256)
     approval_bytes, _ = read_working_evidence(
@@ -484,6 +500,13 @@ def check_preview_reflow_source_identity(paths):
     candidate = validate_preview_reflow_approval(refresh, approval_bytes, candidate_bytes)
     for path, digest in {**candidate['preservedEvidence'], **PREVIEW_REFLOW_EARLIER_REFRESHES}.items():
         read_committed_evidence(path, digest)
+    validate_preserved(candidate['addedFiles'], current_digests(set(candidate['addedFiles'])))
+    return refresh, approval_bytes, candidate_bytes
+
+
+def check_preview_reflow_source_identity(paths):
+    evidence = read_preview_reflow_evidence()
+    candidate = validate_preview_reflow_approval(*evidence)
     # The same pinned-HEAD mechanism as #81/#82, now also covering controls and
     # immutable observations. Full-history identities are proved at activation;
     # runtime validation always requires every current approved tree and object.
@@ -492,8 +515,7 @@ def check_preview_reflow_source_identity(paths):
                 for path in paths if any(path.startswith(prefix + '/') for prefix in trees)),
             'Preview reflow source is missing or substituted')
     check_flowchart_source_identity(paths, trees)
-    validate_preserved(candidate['addedFiles'], current_digests(set(candidate['addedFiles'])))
-    return refresh, approval_bytes, candidate_bytes
+    return evidence
 
 
 def apply_preview_reflow_refresh(preserved, refresh, approval_bytes, candidate_bytes, actual, granted):
@@ -508,6 +530,129 @@ def apply_preview_reflow_refresh(preserved, refresh, approval_bytes, candidate_b
         require(actual.get(path) == entry['current'],
                 'Preview reflow amendment candidate bytes changed: ' + path)
         result[path] = entry['current']
+    return result
+
+
+def validate_document_statistics_approval(refresh, approval_bytes, candidate_bytes):
+    # Pin both decisions before inspecting or accepting any successor identity.
+    # The canonical manifest fixes every pair and added file without a new grant.
+    approval = canonical_evidence_json(approval_bytes, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+    candidate = canonical_evidence_json(candidate_bytes, DOCUMENT_STATISTICS_MANIFEST_SHA256)
+    require(approval['decision'] == 'APPROVED_TEN_PAIR_GOVERNANCE_AMENDMENT_ONLY'
+            and approval['proposalId'] == DOCUMENT_STATISTICS_PROPOSAL
+            and approval['preparation'] == DOCUMENT_STATISTICS_PREPARATION
+            and approval['candidateManifestSha256'] == DOCUMENT_STATISTICS_MANIFEST_SHA256
+            and approval['source']['url'] == DOCUMENT_STATISTICS_DECISION
+            and approval['source']['owner'] == 'DouglasNLima',
+            'Document statistics amendment lacks the exact owner decision')
+    require(candidate['proposalId'] == DOCUMENT_STATISTICS_PROPOSAL
+            and len(candidate['files']) == 10 and len(candidate['addedFiles']) == 28
+            and candidate['previousRuntimeSourceTrees'] == {
+                path: PREVIEW_REFLOW_SOURCE_TREES[path] for path in candidate['runtimeSourceTrees']},
+            'Document statistics candidate differs from the approved predecessor')
+    expected = {
+        'schemaVersion': 1, 'proposalId': DOCUMENT_STATISTICS_PROPOSAL,
+        'status': 'OWNER_APPROVED', 'repository': 'DouglasNLima/local-docs-studio',
+        'preparation': DOCUMENT_STATISTICS_PREPARATION,
+        'candidateManifestSha256': DOCUMENT_STATISTICS_MANIFEST_SHA256,
+        'ownerApprovalSha256': DOCUMENT_STATISTICS_APPROVAL_SHA256,
+        'ownerDecision': DOCUMENT_STATISTICS_DECISION,
+        **{key: candidate[key] for key in ('baseline', 'candidate', 'testedProduct',
+            'historicalReference', 'previousRuntimeSourceTrees', 'runtimeSourceTrees',
+            'controlTrees', 'files', 'addedFiles', 'preservedEvidence', 'unchangedTrees',
+            'excludedBoundaries', 'activationPathsOnly', 'constraints')},
+    }
+    require(type(refresh) is dict and type(refresh.get('schemaVersion')) is int and refresh == expected,
+            'Document statistics amendment must retain its exact approved paths, pairs and identities')
+    return candidate
+
+
+def check_committed_file_identities(expected):
+    # Compare HEAD, index and actual Git-clean working objects, including modes.
+    # All required blobs are in HEAD, so this also works at fetch-depth 1.
+    committed = {}
+    for row in provenance_git('ls-tree', '-rz', 'HEAD').split(b'\0'):
+        if row:
+            metadata, name = row.split(b'\t', 1)
+            if name.decode('utf-8') in expected:
+                mode, kind, oid = metadata.split()
+                require(mode in (b'100644', b'100755') and kind == b'blob',
+                        'Protected committed object is substituted')
+                committed[name.decode('utf-8')] = (mode, oid)
+    require(set(committed) == set(expected), 'Protected committed files are missing')
+    index = {}
+    for row in provenance_git('ls-files', '--stage', '-z').split(b'\0'):
+        if row:
+            metadata, name = row.split(b'\t', 1)
+            if name.decode('utf-8') in expected:
+                mode, oid, stage = metadata.split()
+                require(stage == b'0' and name not in index, 'Protected index is unmerged')
+                index[name] = (mode, oid)
+    require(index == {p.encode(): entry for p, entry in committed.items()},
+            'Protected index differs from the committed identity')
+    names = sorted(expected)
+    require(all('\n' not in p and '\r' not in p and (ROOT / p).is_file()
+                and not (ROOT / p).is_symlink() for p in names),
+            'Protected working file is missing or substituted')
+    objects = provenance_git('-c', 'core.safecrlf=false', 'hash-object', '--stdin-paths',
+                             data=('\n'.join(names) + '\n').encode('utf-8')).splitlines()
+    require(objects == [committed[p][1] for p in names],
+            'Protected Git-clean working objects differ from the committed identity')
+    # With object equality established, these are also the exact committed blob
+    # SHA-256 identities, not hashes of decoded or reserialised text.
+    validate_preserved(expected, current_digests(set(expected)))
+
+
+def check_document_statistics_source_identity(paths):
+    candidate_bytes = read_committed_evidence(
+        DOCUMENT_STATISTICS_EVIDENCE + 'candidate-refresh.json', DOCUMENT_STATISTICS_MANIFEST_SHA256)
+    approval_bytes = read_committed_evidence(
+        DOCUMENT_STATISTICS_EVIDENCE + 'owner-approval.json', DOCUMENT_STATISTICS_APPROVAL_SHA256)
+    refresh = flowchart_json(read_committed_evidence(
+        DOCUMENT_STATISTICS_EVIDENCE + 'approved-refresh.json', DOCUMENT_STATISTICS_REFRESH_SHA256))
+    candidate = validate_document_statistics_approval(refresh, approval_bytes, candidate_bytes)
+    for path, digest in candidate['preservedEvidence'].items():
+        if path not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS:
+            read_committed_evidence(path, digest)
+    predecessor = validate_preview_reflow_approval(*read_preview_reflow_evidence())
+    trees = {**PREVIEW_REFLOW_SOURCE_TREES, **predecessor['historicalEvidenceTrees'],
+             **candidate['runtimeSourceTrees'], **candidate['controlTrees'], **candidate['unchangedTrees']}
+    require(all((ROOT / path).is_file() and not (ROOT / path).is_symlink()
+                for path in paths if any(path.startswith(prefix + '/') for prefix in trees)),
+            'Document statistics source is missing or substituted')
+    check_flowchart_source_identity(paths, trees)
+    require(not provenance_git('diff', '--cached', '--name-only', '--no-renames', 'HEAD', '--', *trees).strip(),
+            'Document statistics source index differs from the committed trees')
+    check_committed_file_identities({**candidate['addedFiles'],
+        **{path: pair['current'] for path, pair in candidate['files'].items()}})
+    return refresh, approval_bytes, candidate_bytes
+
+
+def document_statistics_predecessor_digests(refresh, approval_bytes, candidate_bytes, actual):
+    candidate = validate_document_statistics_approval(refresh, approval_bytes, candidate_bytes)
+    previous = dict(actual)
+    for path, pair in candidate['files'].items():
+        require(actual.get(path) == pair['current'],
+                'Document statistics candidate bytes changed: ' + path)
+        previous[path] = pair['previous']
+    # This view is solely for replaying immutable predecessor amendments. The
+    # final inventory is checked against actual current bytes after the successor.
+    return previous
+
+
+def apply_document_statistics_refresh(preserved, refresh, approval_bytes, candidate_bytes, actual, granted):
+    candidate = validate_document_statistics_approval(refresh, approval_bytes, candidate_bytes)
+    require(len(preserved) == 2421, 'Document statistics must retain all previously protected paths')
+    result = dict(preserved)
+    for path, pair in candidate['files'].items():
+        require(path in granted and boundary(path, granted)[:2] in (
+                    ('R1', 'MIT_ORIGINAL_PORTIONS_ONLY'), ('R2', 'MIT_ORIGINAL_PORTIONS_ONLY')),
+                'Unapproved document statistics amendment path: ' + path)
+        require(preserved.get(path) == pair['previous'],
+                'Document statistics amendment changed the previous effective pin: ' + path)
+        require(actual.get(path) == pair['current'],
+                'Document statistics amendment candidate bytes changed: ' + path)
+        result[path] = pair['current']
     return result
 
 
@@ -555,7 +700,8 @@ def main():
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
     flowchart_refresh = flowchart_json((ROOT / (FLOWCHART_EVIDENCE + 'approved-refresh.json')).read_bytes())
-    preview_reflow_evidence = check_preview_reflow_source_identity(paths)
+    statistics_evidence = check_document_statistics_source_identity(paths)
+    preview_reflow_evidence = read_preview_reflow_evidence()
     preview_loading_evidence = (
         flowchart_json((ROOT / (PREVIEW_LOADING_EVIDENCE + 'approved-refresh.json')).read_bytes()),
         (ROOT / (PREVIEW_LOADING_EVIDENCE + 'owner-approval.json')).read_bytes(),
@@ -564,13 +710,16 @@ def main():
     actual = current_digests(set(preserved) | {
         FLOWCHART_EVIDENCE + 'candidate-refresh.json', FLOWCHART_EVIDENCE + 'owner-approval.json'})
     validate_flowchart_evidence_digests(actual)
+    predecessor_actual = document_statistics_predecessor_digests(*statistics_evidence, actual)
     preserved = apply_flowchart_styling_refresh(
         preserved, flowchart_refresh,
         (ROOT / (FLOWCHART_EVIDENCE + 'owner-approval.json')).read_bytes(),
         (ROOT / (FLOWCHART_EVIDENCE + 'candidate-refresh.json')).read_bytes(), actual, granted)
     preserved = apply_preview_loading_refresh(preserved, *preview_loading_evidence, actual, granted)
-    preserved = apply_preview_reflow_refresh(preserved, *preview_reflow_evidence, actual, granted)
+    preserved = apply_preview_reflow_refresh(preserved, *preview_reflow_evidence, predecessor_actual, granted)
+    preserved = apply_document_statistics_refresh(preserved, *statistics_evidence, actual, granted)
     validate_preserved(preserved, actual)
+    check_committed_file_identities(preserved)
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}
     baseline_spdx = set(invariants['existingMitSpdxPaths'])

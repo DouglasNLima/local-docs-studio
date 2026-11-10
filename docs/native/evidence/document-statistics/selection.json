@@ -1,0 +1,82 @@
+[
+  {
+    "Mode": "Continuous",
+    "Name": "Newest repeated occurrence wins",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Explicit cancellation preserves the newer selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "View replacement and return invalidate queued selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Zoom invalidates queued selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "New source interaction invalidates queued selection before publication",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Source validity is checked again after deferred layout or pagination",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Render completion invalidates old pointers",
+    "Passed": true
+  },
+  {
+    "Mode": "Continuous",
+    "Name": "Navigation preserves all rendered rows",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "Newest repeated occurrence wins",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "Explicit cancellation preserves the newer selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "View replacement and return invalidate queued selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "Zoom invalidates queued selection",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "New source interaction invalidates queued selection before publication",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "Source validity is checked again after deferred layout or pagination",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "Render completion invalidates old pointers",
+    "Passed": true
+  },
+  {
+    "Mode": "Pages",
+    "Name": "Navigation preserves all rendered rows",
+    "Passed": true
+  }
+]

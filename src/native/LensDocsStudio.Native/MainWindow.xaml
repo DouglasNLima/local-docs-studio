@@ -256,7 +256,7 @@
    <StatusBar.ItemsPanel><ItemsPanelTemplate><Grid/></ItemsPanelTemplate></StatusBar.ItemsPanel>
    <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
     <Grid>
-     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*" MaxWidth="180"/><ColumnDefinition Width="1.5*" MaxWidth="280"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/>
      <StackPanel Grid.Column="1" Orientation="Horizontal" AutomationProperties.AutomationId="ExportCompletionActions">
       <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding CompletedExport}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
@@ -265,9 +265,14 @@
       <Button Command="{Binding DismissExportCommand}" ToolTip="Dismiss export actions" AutomationProperties.Name="Dismiss export actions" Padding="5,3" Margin="0,0,8,0"><ui:CommandIcon Kind="Close" Width="12" Height="12"/></Button>
      </StackPanel>
      <TextBlock x:Name="PreviewStatusLabel" Grid.Column="2" Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="180" AutomationProperties.AutomationId="PreviewStatus"/>
-     <TextBlock Grid.Column="3" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
+     <Button x:Name="DocumentStatisticsButton" Grid.Column="3" Content="No document" IsEnabled="False" Click="ReviewDocument" Style="{StaticResource Desktop.CommandButton}"
+      HorizontalContentAlignment="Left" Padding="6,3" Margin="0,0,6,0" MinWidth="0" Focusable="True" IsTabStop="True"
+      AutomationProperties.AutomationId="DocumentStatistics" AutomationProperties.Name="No document">
+      <Button.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/></DataTemplate></Button.ContentTemplate>
+     </Button>
+     <TextBlock Grid.Column="4" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
      <!-- Reserve the cancellation control's measured size so operations cannot repaginate the reader. -->
-     <Button Grid.Column="4" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation">
+     <Button Grid.Column="5" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation">
       <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Hidden"/><Style.Triggers>
        <DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
       </Style.Triggers></Style></Button.Style>

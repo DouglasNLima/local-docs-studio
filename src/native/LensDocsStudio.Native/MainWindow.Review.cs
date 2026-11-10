@@ -13,7 +13,7 @@ public partial class MainWindow
         if (tab.EditorDocument.TextLength > DocumentReviewService.MaximumSourceCharacters)
         { model.Status = "Document review supports up to 4 million source characters."; return; }
         var source = tab.EditorDocument.Text;
-        var standalone = Path.GetExtension(tab.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid";
+        var standalone = Path.GetExtension(tab.FilePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         var sourcePath = tab.FilePath; var workspaceRoot = tab.WorkspaceRoot;
         var captured = model.Documents.Where(document => document.FilePath is not null && workspaceRoot is not null && WorkspacePath.Contains(workspaceRoot, document.FilePath))
             .Select(document => (Document: document, Path: document.FilePath!, Text: document.EditorDocument.Text)).ToArray();

@@ -14,7 +14,8 @@ public sealed record DocumentReviewIssue(string Rule, ReviewSeverity Severity, s
 }
 public sealed record DocumentReviewMetrics(int Words, int Headings, int Links, int Images, int Tables, int CodeBlocks, int Diagrams)
 {
-    public int ReadingMinutes => Words == 0 ? 0 : Math.Max(1, (Words + 219) / 220);
+    public int ReadingMinutes => new DocumentStatistics(Words, Characters).ReadingMinutes;
+    public int Characters { get; init; }
 }
 public enum WorkspaceLinkReviewState { NotChecked, Complete, Incomplete }
 public sealed record DocumentReviewResult(DocumentReviewMetrics Metrics, IReadOnlyList<DocumentReviewIssue> Issues, bool Limited)
@@ -50,7 +51,7 @@ public sealed partial class DocumentReviewService
         var source = parsed.Source;
         cancellationToken.ThrowIfCancellationRequested();
         var issues = new List<DocumentReviewIssue>(); var limited = false;
-        var words = 0; var headings = 0; var links = 0; var images = 0; var tables = 0; var code = 0; var diagrams = 0; var previousLevel = 0;
+        var headings = 0; var links = 0; var images = 0; var tables = 0; var code = 0; var diagrams = 0; var previousLevel = 0;
         var lineStarts = SourceLines(source, cancellationToken);
         var seenHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var targets = parsed.Targets.Select(target => target.Id).ToHashSet(StringComparer.Ordinal);
@@ -62,7 +63,8 @@ public sealed partial class DocumentReviewService
         else if (!standaloneMermaid && !parsed.Headings.Any(heading => heading.Level == 1))
             Add("Headings", ReviewSeverity.Warning, "Missing H1 title.", "Add a level-one heading to identify this document.", 0, 0);
         cancellationToken.ThrowIfCancellationRequested();
-        return new(new(words, headings, links, images, tables, code, diagrams), issues.OrderBy(issue => issue.Severity).ThenBy(issue => issue.Start).ToArray(), limited);
+        var statistics = DocumentStatisticsService.MeasureParsed(parsed, cancellationToken);
+        return new(new(statistics.Words, headings, links, images, tables, code, diagrams) { Characters = statistics.Characters }, issues.OrderBy(issue => issue.Severity).ThenBy(issue => issue.Start).ToArray(), limited);
 
         void WalkBlocks(ContainerBlock container, int depth)
         {
@@ -86,16 +88,14 @@ public sealed partial class DocumentReviewService
                     if (!seenHeadings.Add(title)) Add("Headings", ReviewSeverity.Note, $"Duplicate heading \"{Short(title)}\".", "Consider a distinct heading if these sections have different purposes.", heading.Span.Start, heading.Span.Length);
                 }
                 if (block is Table) tables++;
-                if (block is DocumentImageFigureBlock figure) CountWords(figure.Caption);
-                if (block is DocumentDetailsBlock details) CountWords(details.Summary);
                 if (block is LeafBlock { Inline: { } inline })
                 {
-                    var text = new System.Text.StringBuilder(); WalkInlines(inline, depth + 1, false, text); CountWords(text.ToString());
+                    WalkInlines(inline, depth + 1, false);
                 }
                 if (block is ContainerBlock nested) WalkBlocks(nested, depth + 1);
             }
         }
-        void WalkInlines(ContainerInline container, int depth, bool skipProse, System.Text.StringBuilder text)
+        void WalkInlines(ContainerInline container, int depth, bool skipProse)
         {
             Check(depth);
             foreach (var inline in container)
@@ -103,7 +103,7 @@ public sealed partial class DocumentReviewService
                 cancellationToken.ThrowIfCancellationRequested();
                 switch (inline)
                 {
-                    case WikiLinkInline wiki: links++; text.Append(wiki.Label); break;
+                    case WikiLinkInline wiki: links++; break;
                     case LinkInline link:
                         if (link.IsImage)
                         {
@@ -117,23 +117,13 @@ public sealed partial class DocumentReviewService
                             if (link.Url is { Length: > 1 } url && url[0] == '#' && !targets.Contains(Uri.UnescapeDataString(url[1..])))
                                 Add("Internal links", ReviewSeverity.Warning, "Link target is missing from this document.", "Choose an existing heading or named anchor.", link.Span.Start, link.Span.Length);
                         }
-                        WalkInlines(link, depth + 1, skipProse || link.IsAutoLink, text); break;
-                    case AutolinkInline autolink: links++; text.Append(autolink.Url); break;
-                    case CodeInline: text.Append(' '); break;
+                        WalkInlines(link, depth + 1, skipProse || link.IsAutoLink); break;
+                    case AutolinkInline: links++; break;
                     case LiteralInline literal:
-                        text.Append(literal.Content.ToString());
                         if (!skipProse) ScanProse(literal.Span); break;
-                    case HtmlEntityInline entity: text.Append(entity.Transcoded.ToString()); break;
-                    case DocumentSemanticInline semantic: text.Append(semantic.Text); break;
-                    case DocumentAnchorInline anchor: text.Append(anchor.Text); break;
-                    case LineBreakInline: text.Append(' '); break;
-                    case ContainerInline nested: WalkInlines(nested, depth + 1, skipProse, text); break;
+                    case ContainerInline nested: WalkInlines(nested, depth + 1, skipProse); break;
                 }
             }
-        }
-        void CountWords(string text)
-        {
-            foreach (var match in Words().EnumerateMatches(text)) { cancellationToken.ThrowIfCancellationRequested(); words++; }
         }
         void ScanProse(SourceSpan span)
         {
@@ -177,6 +167,5 @@ public sealed partial class DocumentReviewService
         return starts;
     }
     private static string Short(string text) => text.Length > 160 ? text[..157] + "…" : text;
-    [GeneratedRegex(@"[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*", RegexOptions.CultureInvariant, 100)] private static partial Regex Words();
     [GeneratedRegex(@"\b[A-Za-z]+\b", RegexOptions.CultureInvariant, 100)] private static partial Regex Terms();
 }

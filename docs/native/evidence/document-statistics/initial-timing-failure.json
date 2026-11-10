@@ -1,0 +1,32 @@
+{
+  "result": "FAIL",
+  "checks": [
+    "No-document state is explicit and disabled",
+    "Current statistics: 4 words, 23 characters",
+    "Opening and statistics preserve loaded source and clean state",
+    "UIA exposes metrics, help and a keyboard-focusable button",
+    "Statistics accepts keyboard focus",
+    "Keyboard can leave statistics",
+    "Tab traversal returns to statistics",
+    "Document Review agrees with status metrics",
+    "Rapid edits immediately clear superseded metrics",
+    "Current statistics: 2 words, 8 characters",
+    "Current statistics: 1 words, 3 characters",
+    "Current statistics: 3 words, 14 characters",
+    "Current statistics: 1 words, 3 characters",
+    "Undo restores the preceding source and different metrics",
+    "Current statistics: 3 words, 14 characters",
+    "Redo restores the latest source and different metrics",
+    "Switching to an empty document clears outgoing figures",
+    "Current statistics: 0 words, 0 characters",
+    "Current statistics: 3 words, 14 characters",
+    "Only one calculation can hold the worker gate",
+    "Current statistics: 0 words, 0 characters",
+    "Cancelled queued calculations finish without publishing or surfacing errors",
+    "Changed source version rejects results even without a model notification",
+    "Current statistics: 1 words, 11 characters"
+  ],
+  "theme": "Light",
+  "actualHighContrast": false,
+  "scope": "Shown owned WPF window, UIA peers and routed keyboard events; no physical screen-reader or injected desktop-input certification"
+}

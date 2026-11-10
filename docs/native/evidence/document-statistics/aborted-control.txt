@@ -1,0 +1,1 @@
+ABORTED: focused control did not complete; test process stopped explicitly. Cause INCONCLUSIVE. Subsequent control records each assertion and uses bounded line lengths for editor fixtures; this does not retroactively attribute the aborted run.

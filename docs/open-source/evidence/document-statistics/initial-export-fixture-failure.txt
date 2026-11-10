@@ -1,0 +1,12 @@
+System.IO.IOException: Choose a supported exported file on disk.
+   at LensDocsStudio.Core.Exports.SavedExport.ValidatePath(String path) in C:\Code\native-document-statistics\src\native\LensDocsStudio.Core\Exports\ExportSessionHistory.cs:line 24
+   at LensDocsStudio.Core.Exports.SavedExport.FromSavedBytes(String path, Byte[] bytes) in C:\Code\native-document-statistics\src\native\LensDocsStudio.Core\Exports\ExportSessionHistory.cs:line 14
+   at LensDocsStudio.Native.ViewModels.WorkspaceViewModel.<>c__DisplayClass68_0.<CompleteExportAsync>b__0() in C:\Code\native-document-statistics\src\native\LensDocsStudio.Native\ViewModels\WorkspaceViewModel.Exports.cs:line 17
+   at System.Threading.Tasks.Task`1.InnerInvoke()
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at LensDocsStudio.Native.ViewModels.WorkspaceViewModel.CompleteExportAsync(String path, Byte[] bytes, String details) in C:\Code\native-document-statistics\src\native\LensDocsStudio.Native\ViewModels\WorkspaceViewModel.Exports.cs:line 17
+   at Program.<>c__DisplayClass0_0.<<Main>b__8>d.MoveNext() in C:\Code\native-document-statistics\tests\native\document-statistics\Program.cs:line 167

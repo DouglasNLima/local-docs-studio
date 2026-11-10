@@ -1,0 +1,49 @@
+{
+  "status": "PASS_INERT_ONLY",
+  "manifestSha256": "7dd1bc0e1a4c1ccf798495cba950a422af06729ee3876d86a04e028f6141ec22",
+  "protectedSubstitutions": 10,
+  "frozenProtectedPaths": 2421,
+  "addedCandidatePaths": 28,
+  "rejectedMutations": [
+    "extra protected path",
+    "changed previous digest",
+    "changed current digest",
+    "missing added file",
+    "changed native tree",
+    "changed control tree",
+    "invented approval",
+    "expanded activation",
+    "removed rights exclusion",
+    "changed pinned document object at HEAD"
+  ],
+  "activeProvenance": "UNAPPROVED; unchanged strict source identity must still fail",
+  "observedHead": "e8cc3b619d90bd18ae0ed1f7debe190c4977da41",
+  "foundation": "PASS; inventory 2664 paths at observation, regenerated after evidence preparation",
+  "normalGovernance": "FAIL: unchanged source identity rejects the unapproved native subtree",
+  "governanceControls": {
+    "total": 66,
+    "passed": 65,
+    "errors": 1,
+    "error": "Flowchart amendment source tree identity changed",
+    "waived": false
+  },
+  "historicalEvidenceMapping": {
+    "initial-colour-failure.txt": "artifacts/statistics-ui-light-lines/failure.txt; original native text-brush equality exception",
+    "initial-export-fixture-failure.txt": "artifacts/statistics-ui-light-focused/failure.txt; original unsupported .md export fixture exception",
+    "initial-timing-failure.txt": "artifacts/statistics-ui-light-corrected/failure.txt; original queued/running timing assumption exception",
+    "initial-focus-failure.txt": "artifacts/statistics-ui-light-final/failure.txt; intermediate Desktop.CommandButton inherited Focusable=False"
+  },
+  "mappingNote": "The colour and export checks JSON legitimately have identical passed-check prefixes; the preserved exception files distinguish their separate failures. No result JSON is substituted or relabelled.",
+  "supplementaryCanonicalSha256": {
+    "foundation.txt": "2b71fbbfb8358e7d4b598ae184eec0b7bf1509a95185beded0fe1334b4845575",
+    "governance-tests.txt": "54dd6b049bea47b2016bd7558ab433396f10012dae6bc6158a1636cd155e389a",
+    "governance.txt": "adef869a394db74141267ba83f5c06de24aec1294194ba8fba15edd490a4045d",
+    "initial-colour-failure.txt": "c8556b5d6c45562f9cce666543ed8eeb93877b032300fcdcbc1ed8e7d8994e9e",
+    "initial-export-fixture-failure.txt": "cd58adc290aede9aa84896574523ce4763bf51f8f2cd78cac0e24f621476e9bd",
+    "initial-focus-failure.txt": "b2691a215e11b1706449b3e1fbdf78930b19cf709db1bf7fbaa1a3843be634b9",
+    "initial-timing-failure.txt": "1d6258453457b3909991e80218c8851098ffc76443218912d2f5d1fc0dc463bb"
+  },
+  "actualHighContrast": "NOT RUN / UNAVAILABLE; no OS appearance change",
+  "hostedCi": "NOT RUN; all 30 mandatory develop checks remain required",
+  "decision": "Exact inactive proposal integrity only; no substitution activation, CI, merge or performance exception"
+}

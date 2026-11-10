@@ -570,3 +570,12 @@ Broader Word/template rendering, PDF complex-script shaping/BiDi/joined or colou
 No downloaded installer, foreground native application, clipboard, Office instance or certificate-store test ran locally in this batch. No merge, release or tag changed. Earlier baseline, failures, corrections, run IDs and artefact paths remain in [history through 0c20f64](history/validation-report-through-0c20f64.md) and [earlier validation history](history/validation-report-through-9fddfd9.md).
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+## Isolated document statistics (2026-11-10)
+
+The [first Reading Experience slice](native-document-statistics.md) adds current-buffer
+word/character/reading-time metrics and keyboard-accessible status-bar Review access.
+It shares Document Review counting, uses bounded cancellable background work and
+preserves source. This is Draft preparation from accepted develop `2dbc6d4e`;
+[validation and decision boundaries](native-document-statistics-validation.md) remain
+separate from hosted qualification and public/Native Stable acceptance.

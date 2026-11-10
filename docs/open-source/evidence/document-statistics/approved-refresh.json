@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "document-statistics-ten-v1",
+  "status": "OWNER_APPROVED",
+  "repository": "DouglasNLima/local-docs-studio",
+  "preparation": {
+    "commit": "90b5218e2af82f90eedfb3809e59235a716ed8f9",
+    "tree": "bcae1db353c79955f935852c4c1aff9494035539"
+  },
+  "candidateManifestSha256": "7dd1bc0e1a4c1ccf798495cba950a422af06729ee3876d86a04e028f6141ec22",
+  "ownerApprovalSha256": "263f7fa6bb4d58b6dfe7371784a123a4daf75d81550c043caf8b02aae6cb24a7",
+  "ownerDecision": "https://github.com/DouglasNLima/local-docs-studio/pull/84#issuecomment-6769313461",
+  "baseline": {
+    "commit": "2dbc6d4e61db431001b42bb93b02d8e503eb8096",
+    "tree": "14b6e74480a1e0ae76afb1bc8128ba73fe2c459a"
+  },
+  "candidate": {
+    "commit": "ed521c2bd7b30060580d3fee9967a5e307e0e89b",
+    "tree": "c042138e54b80c61dcc20dc2fb17cbf40405693c"
+  },
+  "testedProduct": {
+    "commit": "5b336179b5cbbb97d03880c0cf9674a2decaa000",
+    "tree": "67b10c1ce78b4843b35c852bc4b8dabe4cb87817"
+  },
+  "historicalReference": {
+    "commit": "7b1334b09a02ad2fbfd4a0234798e6c387d3e634",
+    "disposition": "Reference only; PR #76 is not modified, merged or closed"
+  },
+  "previousRuntimeSourceTrees": {
+    "src/native": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "runtimeSourceTrees": {
+    "src/native": "5aeb8c1f09f16c2b790de1542e45dcd3b0e41649",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "controlTrees": {
+    "tests/native/document-statistics": "1c751d38a4239cff4fa917cb61fc5fc86bc80e6b"
+  },
+  "files": {
+    "docs/native/architecture-decisions.md": {
+      "previous": "0c251b77ced0de39c7a29a66a75675e399ba122c58ff1b4fc8dcd8bd85649739",
+      "current": "3709f06204d37a7b553bd8698f39b0da3ee258ca74aff5d0eb50f27a8b75c5c4"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "previous": "a3a9835eaa7916ea6ceb4e6e5e65e7c463a0dea7f270b62ba74b8abee4f9f27f",
+      "current": "0e74fb215f3885f764fc6df9135405e459ecc1dd247160c4448350e8e70d5c6b"
+    },
+    "docs/native/implementation-progress.md": {
+      "previous": "c551965282c42b7e7ba7fb0a3e3ba60af7ff3fe6d6449cc3e6fc4a9d48bec9de",
+      "current": "32d9090f302f2a39d15688469a7eb5ba32c991a508f64e504a7e3beffcdd6f43"
+    },
+    "docs/native/native-experience-improvements.md": {
+      "previous": "93d6e98b8ed54744484d00a132795851251ca09c1eba029efdd444a5124a283f",
+      "current": "9de0ff568c041b676ad0987c288bed02f2af7553db35990a22dee6ca4cca38a8"
+    },
+    "docs/native/validation-report.md": {
+      "previous": "4db0c3955fa1ed99cc1e4dd9d4de378e881d6e989d9cbebf65c9eca064e51860",
+      "current": "d7109017deda52260f9ba2742f81eb2ef160b44d38544fae2efeaeb84b0649f7"
+    },
+    "src/native/LensDocsStudio.Core/Review/DocumentReviewService.cs": {
+      "previous": "9fd3e1f0a8ac8f7ac84f87fb06d64725024e62e3432bc3d3b8fb24a8dc39738e",
+      "current": "e9ff128c0a1c4734ea2d57fc9b221ad39853aaeed16521266fe519e040c5b286"
+    },
+    "src/native/LensDocsStudio.Native/DocumentReviewWindow.xaml.cs": {
+      "previous": "4f3c558461ae6e3751b8139bbb5ade0d541a404c1b566d2bef31f51d4e7807a9",
+      "current": "142e20ae4f5e6652cb89dd9f513871b8fca015179fca8ce51e9eb3c871321c0b"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Review.cs": {
+      "previous": "c306eb013f1ae14659083342274b01375d04ade51834f655f8748cb2b2b4a79e",
+      "current": "a67ba4d3d796fdb887ffcd596a67025910ae5bb3bb0c6ac973227a3b63e2fbb7"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml": {
+      "previous": "6cc4bfdfb12a723f96b0480149b0c882cb68d862618028c050f09dbc342ffb42",
+      "current": "9285f58ccba4b23462e9c69375ce38f89d73b8b1e1f50f4155fe09bfbfaed24e"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+      "previous": "65781f39bb3e41508960f53f510b503e64dcc09724ea98a2f51656431ab325c1",
+      "current": "048de6e8fe85405b910145d5e3095308d43f6476f3419a994c5ebcce62ba8594"
+    }
+  },
+  "addedFiles": {
+    "docs/native/evidence/document-statistics/.gitattributes": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+    "docs/native/evidence/document-statistics/aborted-control.txt": "115d5251c36484769baf72223a43a6ae8a82c5653df7e155b27454aa37d226da",
+    "docs/native/evidence/document-statistics/dark-860.png": "ef207656daf3893abf37e5365ca8df474f5ec32f8134dc5e3b3949e8c862e5a9",
+    "docs/native/evidence/document-statistics/dark.json": "d899b820295361e5a2d3fb677720070016355f591d1bb0012dd491720e6d1a6c",
+    "docs/native/evidence/document-statistics/export-860.png": "bf98e8ed61e8320e2d3e7bb245508e33b41f23f5bbdd751287fc46b21bd8eec8",
+    "docs/native/evidence/document-statistics/find.json": "f611c58d06795f53f9def56bafaa72b7c5eb64b72f15667301cccf4535f5149e",
+    "docs/native/evidence/document-statistics/focused-core.trx": "c1ebf7b4303239dab7fed93c33f36df4fe1f56de8c66327b93840f19595fa115",
+    "docs/native/evidence/document-statistics/initial-colour-failure.json": "cf2d44f9376fa60b3d1555708c637b790536c2ededc4bf2e5d349fee4d90fb8b",
+    "docs/native/evidence/document-statistics/initial-core-failure.trx": "bb06d24433d637f6e000f36d84947d181c53d4ebc7e034de37254d41e1054e08",
+    "docs/native/evidence/document-statistics/initial-export-fixture-failure.json": "cf2d44f9376fa60b3d1555708c637b790536c2ededc4bf2e5d349fee4d90fb8b",
+    "docs/native/evidence/document-statistics/initial-focus-failure.json": "2787a667c7f53c1b00f495bd33b5430d6b807d6ead8b0daacbc11f7e355e7f9f",
+    "docs/native/evidence/document-statistics/initial-observer-failure.txt": "679e5566dcb3b5dfa4cfb950a23ddacbd2abadbeb37a127c98ffe4a07e5a7898",
+    "docs/native/evidence/document-statistics/initial-timing-failure.json": "b4548f9a5b02de2ca201532f6fd26bd0022e5ba1c6d02b40c99badb86c5f5f94",
+    "docs/native/evidence/document-statistics/light-860.png": "b29d84ca830173a4fd4444524ec5e35d53aa2c6fc933da9292bbcd88e5ec86f0",
+    "docs/native/evidence/document-statistics/light.json": "312c75dbcee46ffef278ce12e5b8ffb38ec65f1da76ca21485d5b95c2da512a4",
+    "docs/native/evidence/document-statistics/loading.json": "da62bd3c6eabeef9a319da017294dd5f9e6a4c792ed22c8a5a1950aeddac55cb",
+    "docs/native/evidence/document-statistics/pages.json": "9deb689e4939e9cb0c32d8ad72c1370eaeb38e91b17593fa71e5e1a25077e5fd",
+    "docs/native/evidence/document-statistics/reflow.json": "0981bb5eaab79507571830045e086276d3ffd58f77f80bdecb6f56dbe6a2d6c3",
+    "docs/native/evidence/document-statistics/results.json": "e6de81ccf708300e29018f3a072488277df4fce96a54fc952adb42eadfdf6ceb",
+    "docs/native/evidence/document-statistics/selection.json": "078b7df6f4ca8d734bcdd802c982090941a7240e1ed228b246bb96af0c5d5d4e",
+    "docs/native/native-document-statistics-validation.md": "00ac44c89d26c3d558bb11bc8b15e40933b400dd298a8f9fdf5b59dc708e8f57",
+    "docs/native/native-document-statistics.md": "fbeb7a61db495132cae5c91ca5a16c1059e8d9d89be7a3b1a0a5cefc961fd8bc",
+    "docs/native/reading-experience-incremental-roadmap.md": "b34b82c718169ab7bd978a6eafa52cdf5b806671e8772891d63d1ace1fbc6d65",
+    "src/native/LensDocsStudio.Core.Tests/DocumentStatisticsTests.cs": "bf4f733ca14715615972bc916b983629ca0ddcdc34dff716925f81b87c68b906",
+    "src/native/LensDocsStudio.Core/Review/DocumentStatistics.cs": "fb9c7e030b5211a66b7782f4244bde91abc0054151e84fb58ac3674ac8617935",
+    "src/native/LensDocsStudio.Native/MainWindow.Statistics.cs": "c62bca6a0c07bda1831b3bd862b2cc562d9283bb01f18d00e72c1e878e4511b3",
+    "tests/native/document-statistics/DocumentStatisticsControls.csproj": "ed0842f8b33a4f2abd7681850ee8cacbf0d04669d18913550400bf6690686faa",
+    "tests/native/document-statistics/Program.cs": "9c8ed6c40cb0bd444164eb8f03035b65873fa256699d8fb081ec6e5dc0c821b9"
+  },
+  "preservedEvidence": {
+    "docs/open-source/configuration/mit-scope.json": "8270a564757e0851e15184a5ca2c64c46ca6892811503b6c20062c4e9fa48388",
+    "docs/open-source/evidence/goal62/preserved-files.json": "d56bdbcc1f16c1a5ce26a5936778baaf3f45a5b4c94bc661d4d61d8fbb845822",
+    "scripts/compliance/licence_scope.py": "aeb43157c784a471b968b08ad440b9d3977fdfaafa3a4ceaf7c7ad1d372985f5",
+    "scripts/compliance/test_governance.py": "703428bb2292bd3f0f9a0fcf1e102c9f062c06b3ec72e1dbafedfd1ed1a8c288",
+    "docs/open-source/evidence/flowchart-provenance-81/candidate-refresh.json": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+    "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json": "140568d16736ac59a0bb35b0d8199a3becda851e65588dfd5be97c8851c74a47",
+    "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json": "ced6641fbc0c211ad94fa63bcbdadc9a9e9c6de9f479f0727c0c1a58ccd23ed2",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json": "f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea",
+    "docs/open-source/evidence/preview-reflow-integration-v2/candidate-refresh.json": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+    "docs/open-source/evidence/preview-reflow-integration-v2/approved-refresh.json": "88fbe06b2e40b0ec2a9e3962ba6777569d3700eb31050b453756d1baee1a990d",
+    "docs/open-source/evidence/preview-reflow-integration-v2/owner-approval.json": "3f8bc670c9361973621bde8ab391f40f8b0d37919defa96ece86bb7a0469dabb"
+  },
+  "unchangedTrees": {
+    ".github": "aa34495d1b4aef01955975c397acc96fb24ddf01",
+    "assets": "087e0dad051a709e2c0a29cafd72d8ed93b2f8c0",
+    "tests/native/preview-reflow": "a04548454b40bb63f954d240e02cea5ac0b0ec7d",
+    "tests/native/preview-loading-presentation": "82783c0fa644652d9df0da9330394b8414df19bb",
+    "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a"
+  },
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "activationPathsOnly": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/document-statistics/owner-approval.json",
+    "docs/open-source/evidence/document-statistics/approved-refresh.json",
+    "docs/open-source/evidence/document-statistics/activation-validation.json",
+    "docs/open-source/evidence/document-statistics/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "constraints": [
+    "No activation without an exact owner decision naming canonical manifest digest and final preparation HEAD/tree.",
+    "Preserve prior approved amendments and their original immutable evidence.",
+    "Added files receive no new licence grant; preserve the MIT allowlist and R3-R7 exclusions.",
+    "All 30 mandatory develop contexts remain required; hosted CI and merge require separate owner authorisation.",
+    "Historical Continuous 250 ms FAIL stays FAIL; no prior performance exception transfers.",
+    "Actual Windows High Contrast is NOT RUN/unavailable in this slice; required hosted accessibility checks remain.",
+    "No Goal #77 restart, ADR 007 activation, threshold, protection or workflow change.",
+    "No merge, release, signing, tagging, deployment, distribution or Native Stable certification."
+  ]
+}
