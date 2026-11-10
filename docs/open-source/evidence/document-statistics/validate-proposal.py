@@ -57,7 +57,20 @@ def require(value, message):
 
 
 def changes(revision, kind):
-    return set(git('diff', '--name-only', '--diff-filter=' + kind, BASE, revision).decode().splitlines())
+    return set(git('diff', '--no-renames', '--name-only', '--diff-filter=' + kind, BASE, revision).decode().splitlines())
+
+
+def candidate_objects(revision, paths):
+    objects = {}
+    for row in git('ls-tree', '-rz', revision, '--', *sorted(paths)).split(b'\0'):
+        if row:
+            metadata, name = row.split(b'\t', 1)
+            objects[name.decode()] = metadata.decode()
+    return objects
+
+
+def verify_candidate_objects(expected, actual):
+    require(expected == actual, 'Pinned candidate source, document or evidence object changed at HEAD')
 
 
 def verify(contract):
@@ -69,7 +82,7 @@ def verify(contract):
     require(contract['activationPathsOnly'] == ACTIVATION, 'Activation boundary changed')
     require(contract['excludedBoundaries'] == ['R3', 'R4', 'R5', 'R6', 'R7'], 'Rights exclusions changed')
     protected = json.loads(blob(BASE, 'docs/open-source/evidence/goal62/preserved-files.json'))['sha256']
-    require(changes(CANDIDATE, 'MDR') == FILES == set(contract['files']) and FILES <= set(protected),
+    require(changes(CANDIDATE, 'MDRT') == FILES == set(contract['files']) and FILES <= set(protected),
             'Protected scope changed')
     for path, pair in contract['files'].items():
         require(pair == {'previous': digest(blob(BASE, path)), 'current': digest(blob(CANDIDATE, path))},
@@ -78,6 +91,7 @@ def verify(contract):
     require(set(contract['addedFiles']) == added, 'Added source/evidence inventory changed')
     for path, expected in contract['addedFiles'].items():
         require(digest(blob(CANDIDATE, path)) == expected, 'Added digest changed: ' + path)
+    verify_candidate_objects(candidate_objects(CANDIDATE, FILES | added), candidate_objects('HEAD', FILES | added))
     for field, revision in [('previousRuntimeSourceTrees', BASE), ('runtimeSourceTrees', CANDIDATE)]:
         require(contract[field] == {p: tree(revision, p) for p in RUNTIME}, 'Runtime tree changed')
     require(contract['controlTrees'] == {'tests/native/document-statistics': tree(PRODUCT, 'tests/native/document-statistics')},
@@ -96,7 +110,7 @@ def verify(contract):
     for path, expected in contract['preservedEvidence'].items():
         require(digest(blob(BASE, path)) == expected and blob('HEAD', path) == blob(BASE, path),
                 'Prior approval or active governance changed: ' + path)
-    require(changes('HEAD', 'MDR') <= FILES | {LEDGER}, 'Unrelated protected bytes changed')
+    require(changes('HEAD', 'MDRT') <= FILES | {LEDGER}, 'Unrelated protected bytes changed')
     require(changes('HEAD', 'A') <= added | PROPOSAL_FILES, 'Unrelated new source added')
     return len(protected), len(added)
 
@@ -145,6 +159,15 @@ def main():
             rejected.append(label)
         else:
             raise ValueError('Mutation was accepted: ' + label)
+    expected = candidate_objects(CANDIDATE, FILES | set(contract['addedFiles']))
+    altered = dict(expected)
+    altered['docs/native/validation-report.md'] = '100644 blob ' + '0' * 40
+    try:
+        verify_candidate_objects(expected, altered)
+    except ValueError:
+        rejected.append('changed pinned document object at HEAD')
+    else:
+        raise ValueError('Changed current document object was accepted')
     print(json.dumps({'status': 'PASS_INERT_ONLY', 'manifestSha256': MANIFEST_SHA256,
         'protectedSubstitutions': len(FILES), 'frozenProtectedPaths': protected,
         'addedCandidatePaths': added, 'rejectedMutations': rejected,
