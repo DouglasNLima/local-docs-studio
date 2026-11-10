@@ -13,7 +13,7 @@ public partial class DocumentReviewWindow : Window
     {
         InitializeComponent(); WindowStateService.FitInitialWindow(this);
         var metrics = result.Metrics;
-        Summary.Text = $"{Count(metrics.Words, "word")} · {metrics.ReadingMinutes} min read · {Count(metrics.Headings, "heading")} · {Count(metrics.Links, "link")} · {Count(metrics.Images, "image")} · {Count(metrics.Tables, "table")} · {Count(metrics.CodeBlocks, "code block")} · {Count(metrics.Diagrams, "diagram")}";
+        Summary.Text = $"{Count(metrics.Words, "word")} · {Count(metrics.Characters, "character")} · {metrics.ReadingMinutes} min read · {Count(metrics.Headings, "heading")} · {Count(metrics.Links, "link")} · {Count(metrics.Images, "image")} · {Count(metrics.Tables, "table")} · {Count(metrics.CodeBlocks, "code block")} · {Count(metrics.Diagrams, "diagram")}";
         ResultStatus.Text = result.Limited ? $"Showing {result.Issues.Count} notes; the review limit was reached."
             : result.Issues.Count == 0 ? "No notes from these checks." : $"{Count(result.Issues.Count, "advisory note")}. Choose one to inspect its source.";
         WorkspaceScope.Text = result.WorkspaceLinks switch
