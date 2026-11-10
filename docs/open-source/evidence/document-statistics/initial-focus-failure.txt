@@ -1,0 +1,3 @@
+System.IO.IOException: UIA exposes metrics, help and a keyboard-focusable button
+   at Program.<>c__DisplayClass0_0.<Main>g__Check|2(Boolean value, String label) in C:\Code\native-document-statistics\tests\native\document-statistics\Program.cs:line 63
+   at Program.<>c__DisplayClass0_0.<<Main>b__8>d.MoveNext()

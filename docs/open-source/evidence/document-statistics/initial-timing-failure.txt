@@ -1,0 +1,3 @@
+System.IO.IOException: Dispatcher input is served while large statistics are pending
+   at Program.<>c__DisplayClass0_0.<Main>g__Check|2(Boolean value, String label) in C:\Code\native-document-statistics\tests\native\document-statistics\Program.cs:line 61
+   at Program.<>c__DisplayClass0_0.<<Main>b__8>d.MoveNext() in C:\Code\native-document-statistics\tests\native\document-statistics\Program.cs:line 143

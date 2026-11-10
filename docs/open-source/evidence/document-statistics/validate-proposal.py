@@ -28,14 +28,15 @@ UNCHANGED = ('.github', 'assets', 'tests/native/preview-reflow',
              'tests/native/preview-loading-presentation', 'tests/fixtures/native-preview-reflow')
 PROPOSAL_FILES = {PROPOSAL_PREFIX + name for name in ['candidate-refresh.json', 'proposal.md',
     'validate-proposal.py', 'independent-review.md', 'validation-results.json',
-    'foundation.txt', 'governance.txt', 'governance-tests.txt']}
+    'foundation.txt', 'governance.txt', 'governance-tests.txt', 'initial-colour-failure.txt',
+    'initial-export-fixture-failure.txt', 'initial-timing-failure.txt', 'initial-focus-failure.txt']}
 ACTIVATION = ['scripts/compliance/licence_scope.py', 'scripts/compliance/test_governance.py',
     *(PROPOSAL_PREFIX + name for name in ['owner-approval.json', 'approved-refresh.json',
         'activation-validation.json', 'activation-independent-review.md']), LEDGER]
 
 
-def git(*args):
-    return subprocess.check_output(['git', *args], cwd=ROOT)
+def git(*args, data=None):
+    return subprocess.check_output(['git', *args], cwd=ROOT, input=data)
 
 
 def blob(revision, path):
@@ -111,10 +112,16 @@ def main():
     require(not git('diff', '--name-only', 'HEAD').strip(), 'Working/index changes remain')
     require(not git('ls-files', '--others', '--exclude-standard').strip(), 'Untracked source remains')
     names = sorted(set(git('ls-files').decode().splitlines()))
-    for path in names:
-        expected = git('rev-parse', 'HEAD:' + path).strip()
-        actual = git('-c', 'core.safecrlf=false', 'hash-object', '--', path).strip()
-        require(actual == expected, 'Working clean object changed: ' + path)
+    expected = {}
+    for row in git('ls-tree', '-rz', 'HEAD').split(b'\0'):
+        if row:
+            metadata, name = row.split(b'\t', 1)
+            mode, kind, oid = metadata.decode().split()
+            require(kind == 'blob' and mode in ('100644', '100755'), 'Unexpected source object')
+            expected[name.decode()] = oid
+    objects = git('-c', 'core.safecrlf=false', 'hash-object', '--stdin-paths',
+                  data=('\n'.join(names) + '\n').encode()).decode().splitlines()
+    require(expected == dict(zip(names, objects, strict=True)), 'Working clean objects changed')
     require(tree('HEAD', 'src/native') == tree(PRODUCT, 'src/native'), 'Current native source changed')
     require(tree('HEAD', 'tests/native/document-statistics') == tree(PRODUCT, 'tests/native/document-statistics'),
             'Current statistics controls changed')
