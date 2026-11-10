@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "source": "0.1.0-preview.1\u002B2003c1f24de3fa8c7b98e18ec543655cec281cf0",
+  "fixtureSha256": "1c04217dacebf3937a6b7a570318623f435374dcd0ca1b08a6e7012e109b62f7",
+  "renderer": "Mermaider 0.15.1",
+  "checks": [
+    "SPC canonical graph has nine nodes and nine connections",
+    "Eight declared classes style all nine nodes without a phantom class node",
+    "Actual WPF preview surfaces the unsupported label typography warning",
+    "Actual document preview and canonical PNG export have identical pixels on the same native path",
+    "Supported native visual inspection maps exactly nine nodes and nine connections",
+    "Native inspection retains the canonical drawing",
+    "The existing document export pipeline embeds the same canonical PNG",
+    "Preview and export retain the original Markdown and Mermaid source in memory",
+    "The written SVG export reopens with identical native pixels to preview and PNG export",
+    "SPC canonical graph has nine nodes and nine connections",
+    "Eight declared classes style all nine nodes without a phantom class node",
+    "Actual WPF preview surfaces the unsupported label typography warning",
+    "Actual document preview and canonical PNG export have identical pixels on the same native path",
+    "Supported native visual inspection maps exactly nine nodes and nine connections",
+    "Native inspection retains the canonical drawing",
+    "The existing document export pipeline embeds the same canonical PNG",
+    "Preview and export retain the original Markdown and Mermaid source in memory",
+    "The written SVG export reopens with identical native pixels to preview and PNG export",
+    "The exact captured SPC Markdown bytes remain unchanged"
+  ],
+  "scope": "COMPILED_WPF_PREVIEW_NATIVE_SVG_PNG_EXPORT_AND_INSPECTION; OS_HIGH_CONTRAST_AND_PHYSICAL_GUI_NOT_CERTIFIED"
+}

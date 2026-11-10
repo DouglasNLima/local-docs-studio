@@ -1,0 +1,185 @@
+{
+  "base": {
+    "commit": "3cd08bc2de31564e06973c5211e1aa231731f9cb",
+    "tree": "d5d07c445a12803f64dd36276a86511143a73648"
+  },
+  "testedProduct": {
+    "commit": "2003c1f24de3fa8c7b98e18ec543655cec281cf0",
+    "tree": "540eae1bff9effcede132793c14847d985bf8202",
+    "nativeTree": "fe3d78249f388df1488bf09c1941f147363e63c1"
+  },
+  "candidate": {
+    "commit": "752b2c26e6c309b77fe23b812c6f3d1a5114d369",
+    "tree": "9835e2b16bdd113683effbed85a10416cd636b39",
+    "differenceFromTestedProduct": "Only fixture-local .gitattributes; production and test code identical"
+  },
+  "binarySha256": {
+    "baselineNative": "7da252b879c250c8996e1c70172271d6ca7c3dd930fda8e231de489cb3770386",
+    "candidateNative": "64514d2bca378d638b9b66db88c8b865fd29e4d22bde214cd3be1aec83ddcc6f",
+    "baselineValidationHarness": "e92b0230849b9bebe7e5f1cd5c321aca3d3fb0a2e6b93611243e9e0748411ddb"
+  },
+  "fixtureSha256": "6b7cd92a7dcf1dd88ff31e68fb196bde2ab76655f99e9f9fee93d82bf57280a0",
+  "controls": [
+    {
+      "evidence": "committed-hc-100.json",
+      "mode": "Continuous",
+      "zoom": 100,
+      "highContrast": true,
+      "osHighContrast": true,
+      "shown": true,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-hc-200.json",
+      "mode": "Continuous",
+      "zoom": 200,
+      "highContrast": true,
+      "osHighContrast": true,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-hc-75.json",
+      "mode": "Continuous",
+      "zoom": 75,
+      "highContrast": true,
+      "osHighContrast": true,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-hc-Pages.json",
+      "mode": "Pages",
+      "zoom": 100,
+      "highContrast": true,
+      "osHighContrast": true,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-100.json",
+      "mode": "Continuous",
+      "zoom": 100,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": true,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-150.json",
+      "mode": "Continuous",
+      "zoom": 150,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-200.json",
+      "mode": "Continuous",
+      "zoom": 200,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-50.json",
+      "mode": "Continuous",
+      "zoom": 50,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-75.json",
+      "mode": "Continuous",
+      "zoom": 75,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-Automatic.json",
+      "mode": "Automatic",
+      "zoom": 100,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": false,
+      "verdict": "PASS"
+    },
+    {
+      "evidence": "committed-normal-Pages.json",
+      "mode": "Pages",
+      "zoom": 100,
+      "highContrast": false,
+      "osHighContrast": false,
+      "shown": false,
+      "verdict": "PASS"
+    }
+  ],
+  "coreTests": {
+    "passed": 2320,
+    "failed": 0,
+    "note": "Core source unchanged from develop; run before final shell-only cancellation adjustments"
+  },
+  "offlineLoading": {
+    "passed": 11,
+    "failed": 0
+  },
+  "flowchartChecks": 19,
+  "findRoutingChecks": 48,
+  "selectionNavigationCases": 16,
+  "loadingLifecycle": {
+    "baseline": "FAIL",
+    "candidate": "FAIL",
+    "passedChecksEach": 104,
+    "failure": "Dense ER preview hits unchanged six-second resource deadline; no retry or timeout extension"
+  },
+  "governance": {
+    "baseline": "PASS, 49 tests",
+    "candidate": "BLOCKED as expected; no authorised successor native tree",
+    "inertProposal": "Separate validation-results.json; no activation"
+  },
+  "mandatoryContexts": 30,
+  "hostedQualification": "NOT RUN; owner authorisation not requested before provenance",
+  "performance250ms": "NOT RUN; historical FAIL unchanged; no exception inherited",
+  "independentReview": "PENDING; no independent approval claimed",
+  "uiScope": "Owned shown/off-screen WPF windows, mapped text, arranged geometry, UIA visible ranges and WPF render PNGs. Computer-use target identity rejection prevents independent manual-input capture of the ordinary app. Actual Windows Aquatic High Contrast enabled through Settings, Win32/WPF observed true; original None restored.",
+  "retainedEvidenceSha256": {
+    "baseline-control.json": "ef7818014600f4972c6fbef1f6a09d96384be5d8d714d9c6e21df2cee4384016",
+    "baseline-governance-tests.txt": "74d6a720f85b45df5811bc13d00321f462235207ab35404a374102ca6db1a65a",
+    "baseline-loading-failure.json": "ff3a8a13ba6044f99f5d9fabe802c64d7f0bf9f3f14803c6408d9df384cabef5",
+    "baseline-loading-failure.png": "dfc74662dae8b7a14dc8f119faccb57a9a95201646ea68a28b06c5d1b0036916",
+    "baseline-loading-failure.txt": "19eaeae7f7c45a7d81e8cdf1546eb98f9afe29f55c8f1a2d9889de494b6ea372",
+    "baseline.png": "9374f32b2eebd338ddc53efa78cb530b3048ed361bcc93799d493127f228042e",
+    "candidate-governance-failure.txt": "5799d91e472418a5eea8aacd2cb268b621afa39eaea7d5c5097263e248949db6",
+    "candidate-governance-tests.txt": "b08c61b649a40dabea24decf7bccbd32a544389e2b5de08b14a97014c6e97bff",
+    "candidate-high-contrast.png": "9ee19b29cc0e5b5759ed64076d46b1d70c6a644dea32b5ad472c1230c68602c0",
+    "candidate-loading-failure.json": "37f026ff3886d0e4ad3ca0a570654a40aa5f632a8a8e41fc792896b7e3f1c313",
+    "candidate-loading-failure.png": "dfc74662dae8b7a14dc8f119faccb57a9a95201646ea68a28b06c5d1b0036916",
+    "candidate-loading-failure.txt": "19eaeae7f7c45a7d81e8cdf1546eb98f9afe29f55c8f1a2d9889de494b6ea372",
+    "candidate.png": "b346ad7b528b03e62cb5219b5525ad9db792b9e1818f33dbd5fb3da822170683",
+    "committed-hc-100.json": "7c00063ab49e25c675fb13734bd7677300cef23b5fbff1fe4afbdb2f9cff242e",
+    "committed-hc-200.json": "79fa9462b7376b81b94217c75703e144f329b668fdab59faf86a737e265d8011",
+    "committed-hc-75.json": "b23975d2e024aa186249ac3fced3f90f5ebc4d415d2c2bc38c6e52ddac32da15",
+    "committed-hc-Pages.json": "faaddc4ccf13f7629b94d405de015a7524ce6705463d6db3393c668fbf01f4e7",
+    "committed-normal-100.json": "7bf45a0f4a17abc1e44c9e41e42d99bc6eac02d5b6d8b8b6220fd9a397c9f4dd",
+    "committed-normal-150.json": "4ae27ca34466ff6c9d9ded91efd12f2ce74f821a356ddec631a606964e5d0ecc",
+    "committed-normal-200.json": "62e8b03d649f5eecb1c6d536745eeb295e22f596f1fe78112fa67a471ad8f7d8",
+    "committed-normal-50.json": "1f60bed132d8788eee02d897f27c80ae13a9e9c9decee9045cab0b91f8267d55",
+    "committed-normal-75.json": "440da0b7a7150c5ce1e4a8b11313c866b64bf2e470b9f2ae18875af226e590c5",
+    "committed-normal-Automatic.json": "6f591ae4915e3d4850e431ee3ef18057371385c268d8b437b357fc9d8d4c0779",
+    "committed-normal-Pages.json": "f051ce97a94e315bd44d98f3bb2370af23a905df3c10bf6684ac3f8d296d059f",
+    "develop-rules.json": "2eeb642c2e61d9af182692d4fa4b38086190ee65b668567eeb0d01e24166645e",
+    "find-routing.json": "0be1330c105c811e2e30826f6c47e15b01b93b1ac040a3b747e283e51d050f0c",
+    "flowchart.json": "f153dd2de260cbea7e8c693b4812b54d07e6028241681f91660725d0f6ef1e5a",
+    "offline-loading.json": "461c96aae4e0d78f399cfae053bd2d75e2309e9bd07d31c594f0da3cb6f85b82",
+    "selection-navigation.json": "078b7df6f4ca8d734bcdd802c982090941a7240e1ed228b246bb96af0c5d5d4e",
+    "static.txt": "b4dfe76f5c0b0a15c0fdd30499d25c1efd14294f10f2c5a2724754139cc5e7a9",
+    "core-summary.json": "3582db51d7eaac5d64d0b05bebb3eca995983c3f9c01f031ac0c8c5f941ea2ef",
+    "baseline-governance.jsonl": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348"
+  }
+}

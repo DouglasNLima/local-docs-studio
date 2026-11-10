@@ -1,0 +1,50 @@
+{
+  "Scope": "Offline production-source-linked presentation controls; scripted clock and inert UI/timer facades; no WPF process, window, desktop input or OS appearance change",
+  "Failed": 0,
+  "Results": [
+    {
+      "Name": "Crossing the visibility boundary cannot strand a held busy request",
+      "Status": "PASS"
+    },
+    {
+      "Name": "A pre-boundary tick rearms and a post-boundary tick presents",
+      "Status": "PASS"
+    },
+    {
+      "Name": "A tick exactly on the boundary presents busy content",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Fast completed work remains Ready without a spinner",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Mermaid warnings complete without leaving a stale spinner",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Failed work shows its error without a spinning ring",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Cancellation stops busy presentation",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Superseded cancellation cannot stop a replacement indicator",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Appearance replacement retains its own pending presentation",
+      "Status": "PASS"
+    },
+    {
+      "Name": "A new document masks old content during its visibility delay",
+      "Status": "PASS"
+    },
+    {
+      "Name": "Editor layout resets presentation and its timer",
+      "Status": "PASS"
+    }
+  ]
+}

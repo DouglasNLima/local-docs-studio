@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ProductRoot Condition="'$(ProductRoot)' == ''">../../..</ProductRoot>
+    <ApplicationManifest>$(ProductRoot)/src/native/LensDocsStudio.Native/app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(ProductRoot)/src/native/LensDocsStudio.Native/LensDocsStudio.Native.csproj" />
+    <Compile Include="$(ProductRoot)/src/native/LensDocsStudio.Native.Validation/NativeTestHighContrast.cs" Link="NativeTestHighContrast.cs" />
+  </ItemGroup>
+</Project>

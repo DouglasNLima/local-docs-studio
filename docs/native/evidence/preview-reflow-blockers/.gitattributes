@@ -1,0 +1,2 @@
+# Preserve collected observations byte-for-byte.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

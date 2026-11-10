@@ -1,0 +1,13 @@
+test_changed_committed_manifest_is_rejected_by_original_pin (__main__.CanonicalManifestTests.test_changed_committed_manifest_is_rejected_by_original_pin) ... ok
+test_lf_and_crlf_checkouts_share_exact_committed_identity (__main__.CanonicalManifestTests.test_lf_and_crlf_checkouts_share_exact_committed_identity) ... ok
+test_missing_committed_manifest_is_rejected (__main__.CanonicalManifestTests.test_missing_committed_manifest_is_rejected) ... ok
+test_missing_working_manifest_is_rejected (__main__.CanonicalManifestTests.test_missing_working_manifest_is_rejected) ... ok
+test_same_json_with_different_spacing_is_not_normalised (__main__.CanonicalManifestTests.test_same_json_with_different_spacing_is_not_normalised) ... ok
+test_semantically_modified_working_json_is_rejected (__main__.CanonicalManifestTests.test_semantically_modified_working_json_is_rejected) ... ok
+test_staged_substitution_is_rejected_even_with_original_working_bytes (__main__.CanonicalManifestTests.test_staged_substitution_is_rejected_even_with_original_working_bytes) ... ok
+test_substituted_working_manifest_is_rejected (__main__.CanonicalManifestTests.test_substituted_working_manifest_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.217s
+
+OK

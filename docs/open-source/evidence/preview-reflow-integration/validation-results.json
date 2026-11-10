@@ -1,0 +1,20 @@
+{
+  "status": "PASS_INERT_PROPOSAL_ONLY",
+  "protectedFiles": 2421,
+  "changedProtectedFiles": [
+    "src/native/LensDocsStudio.Native/MainWindow.Find.cs",
+    "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs",
+    "src/native/LensDocsStudio.Native/MainWindow.xaml.cs"
+  ],
+  "addedFiles": 8,
+  "manifestSha256": "1cecd8b708ea165e1bb73eb98382efb7799bd5dddd21cad3e5d46c586e3db9eb",
+  "negativeControlsRejected": [
+    "extra protected path",
+    "changed previous digest",
+    "changed current digest",
+    "changed source subtree",
+    "invented owner approval",
+    "removed exclusion"
+  ],
+  "activePolicy": "UNCHANGED; candidate governance remains blocked pending owner approval"
+}

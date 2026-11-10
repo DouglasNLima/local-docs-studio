@@ -104,6 +104,43 @@ PREVIEW_LOADING_PAIRS = {
     },
 }
 
+PREVIEW_REFLOW_EVIDENCE = 'docs/open-source/evidence/preview-reflow-integration-v2/'
+PREVIEW_REFLOW_PROPOSAL = 'preview-reflow-integration-three-v2'
+PREVIEW_REFLOW_MANIFEST_SHA256 = '340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681'
+PREVIEW_REFLOW_APPROVAL_SHA256 = '3f8bc670c9361973621bde8ab391f40f8b0d37919defa96ece86bb7a0469dabb'
+PREVIEW_REFLOW_DECISION = 'https://github.com/DouglasNLima/local-docs-studio/pull/83#issuecomment-6765036155'
+PREVIEW_REFLOW_PREPARATION = {
+    'commit': '662870e83aceccaa19f3677ec7ed2bc4cb565bb4',
+    'tree': 'c72610508f6a430d29918c26827d6433d92d244d',
+}
+PREVIEW_REFLOW_SOURCE_TREES = {
+    'src/native': '4deeb6f0b54fd2e982525968500fbbe94030563d',
+    'tests/fixtures/native-flowchart': '4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35',
+    'tests/native/preview-reflow': 'a04548454b40bb63f954d240e02cea5ac0b0ec7d',
+    'tests/fixtures/native-preview-reflow': '73c29573efa453df1e9a473c0256358bd6e4309a',
+}
+PREVIEW_REFLOW_PAIRS = {
+    'src/native/LensDocsStudio.Native/MainWindow.Find.cs': {
+        'previous': '9e8bcd8b2fbbcdf7d073a61f98b500e54c2c58dd6341e9dc506fab5fa6e7ac7e',
+        'current': '30bb76cb045afd2b27be472a560a22d86eaa176d9649b0eb2e663e0564b7c974',
+    },
+    'src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs': {
+        'previous': 'fb55e56f82805ec4d3de82dc5fa132db50639d89eb61b4182e4765ab2a087ec9',
+        'current': '8a7e197f2e850c9eebf4d2e14d312e87cb20a1568a462ab44b5d4cb63b504907',
+    },
+    'src/native/LensDocsStudio.Native/MainWindow.xaml.cs': {
+        'previous': '50888389971d81a765bc00b3607baa26cc5e9982f5679779e3d87cbebbfa4585',
+        'current': '65781f39bb3e41508960f53f510b503e64dcc09724ea98a2f51656431ab325c1',
+    },
+}
+# Earlier amendment receipts are retained, never replaced by successor authority.
+PREVIEW_REFLOW_EARLIER_REFRESHES = {
+    'docs/open-source/evidence/find-caret/preserved-refresh.json':
+        'a5ce3c4a9a8d1ce6b6a86f79b10b98ee8ca94296a2ca7de95ca8e037f0624237',
+    'docs/open-source/evidence/selection-sync/preserved-refresh.json':
+        'f29e60b557cf1c4e0060262cda244431cea451108dad865122d087a744c74694',
+}
+
 
 
 def require(condition, message):
@@ -280,9 +317,9 @@ def check_flowchart_source_identity(paths, approved_trees=FLOWCHART_SOURCE_TREES
     def git(*args, data=None):
         return subprocess.check_output(['git', *args], cwd=ROOT, input=data)
     trees = {path: git('rev-parse', 'HEAD:' + path).decode().strip()
-             for path in FLOWCHART_SOURCE_TREES}
+             for path in approved_trees}
     expected = {}
-    for row in git('ls-tree', '-rz', '--full-tree', 'HEAD', '--', *FLOWCHART_SOURCE_TREES).split(b'\0'):
+    for row in git('ls-tree', '-rz', '--full-tree', 'HEAD', '--', *approved_trees).split(b'\0'):
         if not row:
             continue
         metadata, name = row.split(b'\t', 1)
@@ -291,7 +328,7 @@ def check_flowchart_source_identity(paths, approved_trees=FLOWCHART_SOURCE_TREES
                 'Unexpected Flowchart source object')
         expected[name.decode('utf-8')] = oid
     names = sorted(path for path in paths
-                   if any(path.startswith(prefix + '/') for prefix in FLOWCHART_SOURCE_TREES))
+                   if any(path.startswith(prefix + '/') for prefix in approved_trees))
     require(all('\n' not in path and '\r' not in path for path in names),
             'Unsupported newline in a Flowchart source path')
     objects = git('-c', 'core.safecrlf=false', 'hash-object', '--stdin-paths',
@@ -361,6 +398,119 @@ def apply_preview_loading_refresh(preserved, refresh, approval_bytes, candidate_
     return result
 
 
+def provenance_git(*args, data=None):
+    # Binary plumbing only: never shell-pipe or decode blob bytes before hashing.
+    return subprocess.check_output(['git', *args], cwd=ROOT, input=data)
+
+
+def canonical_evidence_json(raw, expected_sha256):
+    require(isinstance(raw, bytes) and hashlib.sha256(raw).hexdigest() == expected_sha256,
+            'Canonical committed provenance evidence bytes changed')
+    return flowchart_json(raw)
+
+
+def read_working_evidence(path, expected_sha256):
+    working = ROOT / path
+    require(working.is_file() and not working.is_symlink(),
+            'Working provenance evidence is missing or substituted: ' + path)
+    raw = working.read_bytes()
+    oid = provenance_git('-c', 'core.safecrlf=false', 'hash-object', '-w',
+                         '--path=' + path, '--stdin', data=raw).strip()
+    canonical = provenance_git('cat-file', 'blob', oid.decode())
+    require(raw.replace(b'\r\n', b'\n') == canonical.replace(b'\r\n', b'\n'),
+            'Working provenance evidence differs beyond checkout line endings: ' + path)
+    canonical_evidence_json(canonical, expected_sha256)
+    return canonical, oid
+
+
+def read_committed_evidence(path, expected_sha256):
+    # HEAD contains these immutable records even in depth-1 clones. There is no
+    # historical-object exception or fallback to checkout/serialised JSON bytes.
+    rows = provenance_git('ls-tree', '-z', 'HEAD', '--', path).split(b'\0')
+    require(len(rows) == 2 and not rows[1], 'Committed provenance evidence is missing')
+    metadata, name = rows[0].split(b'\t', 1)
+    mode, kind, oid = metadata.split()
+    require(name == path.encode() and mode == b'100644' and kind == b'blob',
+            'Committed provenance evidence must be a regular source blob')
+    raw = provenance_git('cat-file', 'blob', oid.decode())
+    canonical_evidence_json(raw, expected_sha256)
+    require(provenance_git('ls-files', '--stage', '-z', '--', path) ==
+            b'100644 ' + oid + b' 0\t' + path.encode() + b'\0',
+            'Provenance evidence index differs from the committed identity')
+    working, working_oid = read_working_evidence(path, expected_sha256)
+    require(working == raw and working_oid == oid,
+            'Provenance evidence Git-clean object differs from the committed identity')
+    return raw
+
+
+def validate_preview_reflow_approval(refresh, approval_bytes, candidate_bytes):
+    approval = canonical_evidence_json(approval_bytes, PREVIEW_REFLOW_APPROVAL_SHA256)
+    candidate = canonical_evidence_json(candidate_bytes, PREVIEW_REFLOW_MANIFEST_SHA256)
+    require(approval['decision'] == 'APPROVED_THREE_PAIR_GOVERNANCE_AMENDMENT_ONLY'
+            and approval['proposalId'] == PREVIEW_REFLOW_PROPOSAL
+            and approval['preparation'] == PREVIEW_REFLOW_PREPARATION
+            and approval['candidateManifestSha256'] == PREVIEW_REFLOW_MANIFEST_SHA256
+            and approval['source']['url'] == PREVIEW_REFLOW_DECISION
+            and approval['source']['author'] == 'DouglasNLima',
+            'Preview reflow amendment lacks the exact owner decision')
+    require(candidate['proposalId'] == PREVIEW_REFLOW_PROPOSAL
+            and candidate['files'] == PREVIEW_REFLOW_PAIRS
+            and candidate['previousRuntimeSourceTrees'] == PREVIEW_LOADING_SOURCE_TREES
+            and {**candidate['runtimeSourceTrees'], **candidate['controlTrees']} == PREVIEW_REFLOW_SOURCE_TREES,
+            'Preview reflow candidate differs from the approved identities')
+    expected = {
+        'schemaVersion': 1, 'proposalId': PREVIEW_REFLOW_PROPOSAL,
+        'status': 'OWNER_APPROVED', 'repository': 'DouglasNLima/local-docs-studio',
+        'preparation': PREVIEW_REFLOW_PREPARATION,
+        'candidateManifestSha256': PREVIEW_REFLOW_MANIFEST_SHA256,
+        'ownerApprovalSha256': PREVIEW_REFLOW_APPROVAL_SHA256,
+        'ownerDecision': PREVIEW_REFLOW_DECISION,
+        **{key: candidate[key] for key in ('baseline', 'candidate', 'historicalSource',
+            'previousRuntimeSourceTrees', 'runtimeSourceTrees', 'controlTrees', 'files',
+            'addedFiles', 'preservedEvidence', 'historicalEvidenceTrees', 'excludedBoundaries',
+            'activationPathsOnly')},
+    }
+    require(type(refresh) is dict and type(refresh.get('schemaVersion')) is int and refresh == expected,
+            'Preview reflow amendment must retain its exact approved paths, pairs and identities')
+    return candidate
+
+
+def check_preview_reflow_source_identity(paths):
+    candidate_bytes = read_committed_evidence(
+        PREVIEW_REFLOW_EVIDENCE + 'candidate-refresh.json', PREVIEW_REFLOW_MANIFEST_SHA256)
+    approval_bytes, _ = read_working_evidence(
+        PREVIEW_REFLOW_EVIDENCE + 'owner-approval.json', PREVIEW_REFLOW_APPROVAL_SHA256)
+    refresh = flowchart_json((ROOT / (PREVIEW_REFLOW_EVIDENCE + 'approved-refresh.json')).read_bytes())
+    candidate = validate_preview_reflow_approval(refresh, approval_bytes, candidate_bytes)
+    for path, digest in {**candidate['preservedEvidence'], **PREVIEW_REFLOW_EARLIER_REFRESHES}.items():
+        read_committed_evidence(path, digest)
+    # The same pinned-HEAD mechanism as #81/#82, now also covering controls and
+    # immutable observations. Full-history identities are proved at activation;
+    # runtime validation always requires every current approved tree and object.
+    trees = {**PREVIEW_REFLOW_SOURCE_TREES, **candidate['historicalEvidenceTrees']}
+    require(all((ROOT / path).is_file() and not (ROOT / path).is_symlink()
+                for path in paths if any(path.startswith(prefix + '/') for prefix in trees)),
+            'Preview reflow source is missing or substituted')
+    check_flowchart_source_identity(paths, trees)
+    validate_preserved(candidate['addedFiles'], current_digests(set(candidate['addedFiles'])))
+    return refresh, approval_bytes, candidate_bytes
+
+
+def apply_preview_reflow_refresh(preserved, refresh, approval_bytes, candidate_bytes, actual, granted):
+    validate_preview_reflow_approval(refresh, approval_bytes, candidate_bytes)
+    require(len(preserved) == 2421, 'Preview reflow must retain all previously protected paths')
+    result = dict(preserved)
+    for path, entry in PREVIEW_REFLOW_PAIRS.items():
+        require(path in granted and boundary(path, granted)[:2] == ('R1', 'MIT_ORIGINAL_PORTIONS_ONLY'),
+                'Unapproved preview reflow amendment path: ' + path)
+        require(preserved.get(path) == entry['previous'],
+                'Preview reflow amendment changed the previous effective pin: ' + path)
+        require(actual.get(path) == entry['current'],
+                'Preview reflow amendment candidate bytes changed: ' + path)
+        result[path] = entry['current']
+    return result
+
+
 def main():
     validate_licence((ROOT / 'LICENSE').read_text(encoding='utf-8'))
     scope = json.loads(SCOPE.read_text(encoding='utf-8'))
@@ -405,7 +555,12 @@ def main():
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
     flowchart_refresh = flowchart_json((ROOT / (FLOWCHART_EVIDENCE + 'approved-refresh.json')).read_bytes())
-    preview_loading_evidence = check_preview_loading_source_identity(paths)
+    preview_reflow_evidence = check_preview_reflow_source_identity(paths)
+    preview_loading_evidence = (
+        flowchart_json((ROOT / (PREVIEW_LOADING_EVIDENCE + 'approved-refresh.json')).read_bytes()),
+        (ROOT / (PREVIEW_LOADING_EVIDENCE + 'owner-approval.json')).read_bytes(),
+        (ROOT / (PREVIEW_LOADING_EVIDENCE + 'candidate-refresh.json')).read_bytes(),
+    )
     actual = current_digests(set(preserved) | {
         FLOWCHART_EVIDENCE + 'candidate-refresh.json', FLOWCHART_EVIDENCE + 'owner-approval.json'})
     validate_flowchart_evidence_digests(actual)
@@ -414,6 +569,7 @@ def main():
         (ROOT / (FLOWCHART_EVIDENCE + 'owner-approval.json')).read_bytes(),
         (ROOT / (FLOWCHART_EVIDENCE + 'candidate-refresh.json')).read_bytes(), actual, granted)
     preserved = apply_preview_loading_refresh(preserved, *preview_loading_evidence, actual, granted)
+    preserved = apply_preview_reflow_refresh(preserved, *preview_reflow_evidence, actual, granted)
     validate_preserved(preserved, actual)
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
     source_extensions = {'.py', '.ps1', '.cs', '.js', '.mjs', '.css', '.xaml', '.html', '.yml'}

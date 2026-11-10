@@ -124,6 +124,7 @@ public partial class MainWindow : Window
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
         mermaidOwnerGeneration++;
         CancelSynchronisation(); CancelPreview(); viewportGeneration++;
+        previewLayoutAnchor = null;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
         // The shared reader may still display the outgoing document while rendering.
         // Its visible position must never be captured for the incoming tab.
@@ -152,11 +153,12 @@ public partial class MainWindow : Window
         BindActiveDocument(); QueuePreview();
         QueueActiveTabVisibility();
     }
-    private void QueuePreview() { CancelPreview(); previewTimer.Stop(); QueuePreviewLoading(); if (!closing) previewTimer.Start(); }
+    private void QueuePreview() { CancelPreviewLayout(); CancelPreview(); previewTimer.Stop(); QueuePreviewLoading(); if (!closing) previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
         previewTimer.Stop();
         if (closing) return;
+        CancelPreviewLayout();
         CancelPreview();
         model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
@@ -641,6 +643,8 @@ public partial class MainWindow : Window
     private void SetLayout(string layout)
     {
         var changed = model.Layout != layout;
+        var completedPreviewStatus = previewLayoutStatus ?? previewBeforeEditorStatus ?? model.PreviewStatus;
+        if (changed) CapturePreviewLayoutAnchor();
         model.Layout = layout;
         EditorColumn.Width = layout == "Preview" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         PreviewColumn.Width = layout == "Editor" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
@@ -650,7 +654,7 @@ public partial class MainWindow : Window
         EditorSplitter.Visibility = layout == "Split" ? Visibility.Visible : Visibility.Collapsed;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
         PreviewPane.Visibility = Preview.Visibility;
-        CancelSynchronisation();
+        if (changed) CancelSynchronisation();
         ApplyPanels();
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
@@ -661,9 +665,16 @@ public partial class MainWindow : Window
                 // Native layout can reuse an unchanged completed preview. Hidden source
                 // edits still invalidate it through the normal preview scheduling path.
                 if (layout == "Editor")
-                { previewBeforeEditorStatus = model.PreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
-                else if (previewBeforeEditorStatus is { } status)
-                { model.PreviewStatus = status; previewBeforeEditorStatus = null; }
+                {
+                    previewBeforeEditorStatus = completedPreviewStatus;
+                    model.PreviewStatus = "Preview paused in Editor layout";
+                    ResetPreviewLoading();
+                }
+                else
+                {
+                    model.PreviewStatus = completedPreviewStatus; previewBeforeEditorStatus = null;
+                    _ = RestorePreviewLayoutAsync(completedPreviewStatus);
+                }
             }
             else { previewBeforeEditorStatus = null; QueuePreview(); }
         }
@@ -675,6 +686,7 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (Preview.IsKeyboardFocusWithin) CancelPreviewLayout();
         if (Editor.IsKeyboardFocusWithin) ObserveEditorFindKey(sender, e);
         // Native command surfaces consume Escape before Find and viewing modes.
         if (e.Key == Key.Escape && CommandSurfaceOpen) return;

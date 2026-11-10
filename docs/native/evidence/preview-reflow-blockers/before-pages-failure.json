@@ -1,0 +1,60 @@
+{
+  "verdict": "FAIL",
+  "checks": [
+    "Source selection is mapped",
+    "Settings applied Continuous through its production callback",
+    "Continuous retains a source anchor while hidden before Preview",
+    "Settings applied Pages through its production callback",
+    "Settings selects effective Pages while hidden",
+    "Persistent workspace focus is available"
+  ],
+  "facts": [
+    {
+      "stage": "immediate-Preview",
+      "layout": "Preview",
+      "mode": "Page",
+      "previewStatus": "Updating preview layout\u2026",
+      "itemStatus": "Busy; preview layout is being updated",
+      "phase": "Attaching",
+      "generation": 6,
+      "busy": true,
+      "active": "fef693c8-6503-414d-b58b-78597bcd715f",
+      "rendered": "fef693c8-6503-414d-b58b-78597bcd715f",
+      "sourceGeneration": 1,
+      "acceptedGeneration": 1,
+      "sameDocument": true,
+      "sourceMatches": true,
+      "anchorRetained": true,
+      "restorationPending": true,
+      "visibleText": false,
+      "zoom": 100
+    },
+    {
+      "stage": "visible-Preview",
+      "layout": "Preview",
+      "mode": "Page",
+      "previewStatus": "Preview layout could not be restored. Retry preview.",
+      "itemStatus": "Preview unavailable",
+      "phase": "Failed",
+      "generation": 6,
+      "busy": false,
+      "active": "fef693c8-6503-414d-b58b-78597bcd715f",
+      "rendered": "fef693c8-6503-414d-b58b-78597bcd715f",
+      "sourceGeneration": 1,
+      "acceptedGeneration": 1,
+      "sameDocument": true,
+      "sourceMatches": true,
+      "anchorRetained": true,
+      "restorationPending": false,
+      "visibleText": true,
+      "zoom": 100
+    },
+    {
+      "error": "System.IO.IOException: Valid Pages content is not reported as failed in Preview\r\n   at LensDocsStudio.Native.UxProbe.PagesTransitionControl.\u003C\u003Ec__DisplayClass0_0.\u003CRun\u003Eg__Check|2(Boolean value, String message) in C:\\Code\\pr80-reflow-integration\\tests\\native\\preview-reflow\\PagesTransitionControl.cs:line 58\r\n   at LensDocsStudio.Native.UxProbe.PagesTransitionControl.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CRun\u003Eb__7\u003Ed.MoveNext()"
+    }
+  ],
+  "product": "0.1.0-preview.1\u002B16b4b6864fd6cd72e3e7cf2bfb42d25af713ea85",
+  "highContrast": false,
+  "osHighContrast": false,
+  "scope": "Actual shown WPF Settings apply and UIA visible text; no injected input or physical-display certification"
+}

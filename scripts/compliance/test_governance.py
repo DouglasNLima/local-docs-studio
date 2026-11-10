@@ -22,6 +22,11 @@ from licence_scope import (PREVIEW_LOADING_EVIDENCE, PREVIEW_LOADING_PAIRS, PREV
                            apply_preview_loading_refresh, validate_preview_loading_approval,
                            check_preview_loading_source_identity, validate_preview_loading_evidence_digests,
                            validate_source_identity)
+from licence_scope import (PREVIEW_REFLOW_EVIDENCE, PREVIEW_REFLOW_PAIRS, PREVIEW_REFLOW_SOURCE_TREES,
+                           PREVIEW_REFLOW_MANIFEST_SHA256, PREVIEW_REFLOW_APPROVAL_SHA256,
+                           PREVIEW_REFLOW_EARLIER_REFRESHES, apply_preview_reflow_refresh,
+                           validate_preview_reflow_approval, check_preview_reflow_source_identity,
+                           read_committed_evidence, read_working_evidence)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -472,7 +477,7 @@ class FlowchartProvenanceTests(unittest.TestCase):
                 validate_preserved(updated, actual)
 
     def test_current_source_subtrees_and_working_bytes_match_the_approved_identity(self):
-        check_preview_loading_source_identity(current_paths())
+        check_preview_reflow_source_identity(current_paths())
 
     def test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed(self):
         helper = 'src/native/LensDocsStudio.Core/Rendering/FlowchartCompatibility.cs'
@@ -610,6 +615,240 @@ class PreviewLoadingProvenanceTests(unittest.TestCase):
         self.approval = self.approval.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
         self.candidate = self.candidate.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
         validate_preserved(self.apply(), self.actual)
+
+
+class PreviewReflowProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        prior = PreviewLoadingProvenanceTests()
+        prior.setUp()
+        self.preserved = prior.apply()
+        self.granted = prior.granted
+        self.actual = {**self.preserved, **{p: pair['current'] for p, pair in PREVIEW_REFLOW_PAIRS.items()}}
+        self.refresh = flowchart_json((ROOT / (PREVIEW_REFLOW_EVIDENCE + 'approved-refresh.json')).read_bytes())
+        self.approval, _ = read_working_evidence(
+            PREVIEW_REFLOW_EVIDENCE + 'owner-approval.json', PREVIEW_REFLOW_APPROVAL_SHA256)
+        self.candidate = read_committed_evidence(
+            PREVIEW_REFLOW_EVIDENCE + 'candidate-refresh.json', PREVIEW_REFLOW_MANIFEST_SHA256)
+
+    def apply(self):
+        return apply_preview_reflow_refresh(self.preserved, self.refresh, self.approval,
+                                           self.candidate, self.actual, self.granted)
+
+    def test_three_pairs_preserve_all_2421_pins_and_previous_successors(self):
+        before = copy.deepcopy((self.preserved, self.refresh, self.actual, self.granted))
+        updated = self.apply()
+        self.assertEqual(len(updated), 2421)
+        self.assertEqual({p for p in updated if updated[p] != self.preserved[p]}, set(PREVIEW_REFLOW_PAIRS))
+        for path, pair in {**FLOWCHART_PAIRS, **PREVIEW_LOADING_PAIRS}.items():
+            self.assertEqual(updated[path], pair['current'])
+        validate_preserved(updated, self.actual)
+        self.assertEqual(before, (self.preserved, self.refresh, self.actual, self.granted))
+
+    def test_rejects_missing_additional_or_substituted_protected_pairs(self):
+        original = copy.deepcopy(self.refresh)
+        for path in PREVIEW_REFLOW_PAIRS:
+            for extra in (None, 'SECURITY.md', 'src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs'):
+                for remove in (False, True):
+                    if extra is None and not remove:
+                        continue
+                    with self.subTest(path=path, extra=extra, remove=remove), self.assertRaises(ValueError):
+                        self.refresh = copy.deepcopy(original)
+                        if extra:
+                            self.refresh['files'][extra] = self.refresh['files'][path]
+                        if remove:
+                            del self.refresh['files'][path]
+                        self.apply()
+
+    def test_rejects_every_altered_pair_effective_pin_actual_byte_and_missing_grant(self):
+        for path in PREVIEW_REFLOW_PAIRS:
+            for mapping, field in [(self.refresh['files'][path], 'previous'),
+                                    (self.refresh['files'][path], 'current'),
+                                    (self.preserved, path), (self.actual, path)]:
+                for missing in (False, True):
+                    with self.subTest(path=path, field=field, missing=missing):
+                        original = mapping.pop(field)
+                        if not missing:
+                            mapping[field] = '0' * 64
+                        try:
+                            with self.assertRaises(ValueError):
+                                self.apply()
+                        finally:
+                            mapping[field] = original
+            self.granted.remove(path)
+            with self.subTest(ungranted=path), self.assertRaises(ValueError):
+                self.apply()
+            self.granted.add(path)
+
+    def test_rejects_identity_scope_added_file_and_evidence_overrides(self):
+        original = copy.deepcopy(self.refresh)
+        for field, value in [('schemaVersion', True), ('proposalId', 'preview-reflow-integration-three-v1'),
+                ('status', 'PROPOSED_NOT_APPROVED'), ('ownerDecision', 'https://example.com/approval'),
+                ('candidateManifestSha256', '1cecd8b708ea165e1bb73eb98382efb7799bd5dddd21cad3e5d46c586e3db9eb'),
+                ('ownerApprovalSha256', '0' * 64), ('repository', 'another/repo'),
+                ('excludedBoundaries', []), ('preparation', {}), ('baseline', {}), ('candidate', {}),
+                ('historicalSource', {}), ('runtimeSourceTrees', {}), ('controlTrees', {}),
+                ('previousRuntimeSourceTrees', {}), ('addedFiles', {}), ('preservedEvidence', {}),
+                ('historicalEvidenceTrees', {}), ('activationPathsOnly', []), ('allowUnapproved', True)]:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                self.refresh[field] = value
+                self.apply()
+
+    def test_rejects_modified_missing_or_forged_owner_decision_and_manifest(self):
+        for field in ('approval', 'candidate'):
+            original = getattr(self, field)
+            values = [None, b'', original + b'\n', original.replace(b'\n', b'\r\n'),
+                      original.replace(b'preview-reflow-integration-three-v2', b'preview-reflow-integration-three-v1')]
+            if field == 'approval':
+                values.append(original.replace(b'6765036155', b'6765036156'))
+                values.append(original.replace(b'DouglasNLima', b'AnotherOwner'))
+            for value in values:
+                with self.subTest(field=field, missing=value is None), self.assertRaises(ValueError):
+                    setattr(self, field, value)
+                    self.apply()
+            setattr(self, field, original)
+
+    def test_rejects_protected_changes_outside_the_three_and_lost_inventory(self):
+        updated = self.apply()
+        for path in ('SECURITY.md', '.github/workflows/native-continuous-performance.yml',
+                     *FLOWCHART_PAIRS, *PREVIEW_LOADING_PAIRS):
+            for missing in (False, True):
+                with self.subTest(path=path, missing=missing), self.assertRaises(ValueError):
+                    actual = dict(self.actual)
+                    actual.pop(path)
+                    if not missing:
+                        actual[path] = '0' * 64
+                    validate_preserved(updated, actual)
+        del self.preserved['SECURITY.md']
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_added_paths_have_exact_digests_without_an_additional_licence_grant(self):
+        added = json.loads(self.candidate)['addedFiles']
+        self.assertEqual(len(added), 9)
+        self.assertFalse(set(added) & self.granted)
+        validate_preserved(added, current_digests(set(added)))
+        for path in added:
+            for missing in (False, True):
+                with self.subTest(path=path, missing=missing), self.assertRaises(ValueError):
+                    actual = dict(added)
+                    actual.pop(path)
+                    if not missing:
+                        actual[path] = '0' * 64
+                    validate_preserved(added, actual)
+
+    def test_rejects_native_control_fixture_and_historical_tree_or_inventory_changes(self):
+        trees = {**PREVIEW_REFLOW_SOURCE_TREES, **json.loads(self.candidate)['historicalEvidenceTrees']}
+        objects = {p: 'a' * 40 for p in json.loads(self.candidate)['addedFiles']}
+        for path in trees:
+            with self.subTest(tree=path), self.assertRaises(ValueError):
+                validate_source_identity({**trees, path: '0' * 40}, trees, objects, objects)
+        for actual in ({}, {**objects, 'src/native/unapproved.cs': 'b' * 40},
+                       {**objects, next(iter(objects)): 'b' * 40}):
+            with self.subTest(inventory=actual), self.assertRaises(ValueError):
+                validate_source_identity(trees, trees, objects, actual)
+
+    def test_all_prior_approvals_and_scope_are_exact_committed_and_working_bytes(self):
+        for path, digest in {**json.loads(self.candidate)['preservedEvidence'],
+                             **PREVIEW_REFLOW_EARLIER_REFRESHES}.items():
+            with self.subTest(path=path):
+                read_committed_evidence(path, digest)
+
+
+class PreviewReflowCheckoutTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix='lens-reflow-provenance-')
+        self.addCleanup(self.temporary.cleanup)
+        self.repository = Path(self.temporary.name)
+        self.path = PREVIEW_REFLOW_EVIDENCE + 'candidate-refresh.json'
+        self.raw = subprocess.check_output(['git', 'cat-file', 'blob', 'HEAD:' + self.path], cwd=ROOT)
+        self.git('init', '-q')
+        self.git('config', 'core.autocrlf', 'false')
+        self.git('config', 'user.name', 'Local control')
+        self.git('config', 'user.email', 'control@example.invalid')
+        self.file = self.repository / self.path
+        self.file.parent.mkdir(parents=True)
+        self.file.write_bytes(self.raw)
+        self.git('add', '--', self.path)
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Local fixture [skip ci]')
+
+    def git(self, *args):
+        return subprocess.check_output(['git', *args], cwd=self.repository, stderr=subprocess.PIPE)
+
+    def verify(self, path=None, digest=None):
+        with patch('licence_scope.ROOT', self.repository):
+            return read_committed_evidence(path or self.path, digest or PREVIEW_REFLOW_MANIFEST_SHA256)
+
+    def test_lf_and_crlf_checkout_conversion_retain_exact_committed_identity(self):
+        for autocrlf in ('false', 'true'):
+            self.git('config', 'core.autocrlf', autocrlf)
+            self.file.unlink()
+            self.git('checkout-index', '--force', '--', self.path)
+            self.assertEqual(b'\r\n' in self.file.read_bytes(), autocrlf == 'true')
+            self.assertEqual(self.verify(), self.raw)
+
+    def test_rejects_semantic_and_formatting_edits_in_working_or_committed_manifest(self):
+        for raw in (self.raw.replace(b'PROPOSED_NOT_APPROVED', b'APPROVED'), self.raw + b'\n'):
+            with self.subTest(committed=False), self.assertRaises(ValueError):
+                self.file.write_bytes(raw)
+                self.verify()
+            self.git('add', '--', self.path)
+            self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Negative fixture [skip ci]')
+            with self.subTest(committed=True), self.assertRaises(ValueError):
+                self.verify()
+
+    def test_rejects_missing_working_or_committed_manifest(self):
+        self.file.unlink()
+        with self.assertRaises(ValueError):
+            self.verify()
+        self.git('add', '-u')
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Missing fixture [skip ci]')
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_rejects_substituted_working_manifest(self):
+        self.file.unlink()
+        self.file.mkdir()
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_rejects_modified_index_even_with_restored_working_bytes(self):
+        self.file.write_bytes(self.raw + b'\n')
+        self.git('add', '--', self.path)
+        self.file.write_bytes(self.raw)
+        with self.assertRaisesRegex(ValueError, 'index differs'):
+            self.verify()
+
+    def test_rejects_clean_filter_that_changes_canonical_identity(self):
+        self.file.write_bytes(self.raw.replace(b'\n', b'\r\n'))
+        (self.repository / '.gitattributes').write_text('*.json -text\n')
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_rejects_committed_crlf_blob_as_a_different_approval_identity(self):
+        self.file.write_bytes(self.raw.replace(b'\n', b'\r\n'))
+        self.git('add', '--', self.path)
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'CRLF blob [skip ci]')
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_rejects_each_altered_predecessor_approval(self):
+        manifest = json.loads(self.raw)
+        for path, digest in {**manifest['preservedEvidence'], **PREVIEW_REFLOW_EARLIER_REFRESHES}.items():
+            original = subprocess.check_output(['git', 'cat-file', 'blob', 'HEAD:' + path], cwd=ROOT)
+            file = self.repository / path
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_bytes(original)
+            self.git('add', '--', path)
+            self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Prior approval [skip ci]')
+            self.verify(path, digest)
+            for committed in (False, True):
+                file.write_bytes(original + b'\n')
+                if committed:
+                    self.git('add', '--', path)
+                    self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Altered approval [skip ci]')
+                with self.subTest(path=path, committed=committed), self.assertRaises(ValueError):
+                    self.verify(path, digest)
 
 
 if __name__ == '__main__':

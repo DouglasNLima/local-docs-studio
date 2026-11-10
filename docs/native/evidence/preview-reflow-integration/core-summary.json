@@ -1,0 +1,29 @@
+{
+  "counters": {
+    "total": "2320",
+    "executed": "2320",
+    "passed": "2320",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "times": {
+    "creation": "2026-11-09T21:29:06.5450441+00:00",
+    "queuing": "2026-11-09T21:29:06.5450446+00:00",
+    "start": "2026-11-09T21:29:03.1407701+00:00",
+    "finish": "2026-11-09T21:29:30.6574180+00:00"
+  },
+  "rawTrxSha256": "0ccc245dc023f4dac447b0186caf0023441ee3f00ed99a1896b2735a4723d0b9",
+  "rawTrxLocalPath": "artifacts/reflow/core/reflow-core.trx",
+  "scope": "Full offline Core suite; Core source is unchanged by the reflow integration"
+}

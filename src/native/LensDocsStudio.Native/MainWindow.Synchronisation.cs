@@ -100,6 +100,7 @@ public partial class MainWindow
     {
         TraceSelection("install-map");
         CancelSynchronisation(); renderedVersion = version;
+        previewLayoutAnchor = null;
         syncAnchors = rendered is null ? null : new(rendered);
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)
@@ -151,6 +152,7 @@ public partial class MainWindow
     }
     private void CancelSynchronisation([System.Runtime.CompilerServices.CallerMemberName] string reason = "")
     {
+        CancelPreviewLayout();
         TraceSelection("cancel " + reason);
         syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false; applyingSyncOrigin = null;
         PreviewNavigationService.CancelPending(Preview); EditorNavigationService.CancelPending(Editor); semanticHighlight?.Show(null);
