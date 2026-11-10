@@ -63,6 +63,7 @@ public partial class MainWindow : Window
         InitialisePreviewZoom();
         InitialisePreviewLoading();
         InitialiseStatistics();
+        InitialiseOutline();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();
@@ -307,7 +308,7 @@ public partial class MainWindow : Window
             if (Current()) FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Completed, rendered.Warnings.Count != 0);
         }
         catch (OperationCanceledException) { Phase("cancel-observed"); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Cancelled); }
-        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) { diagnosticError = ex.GetType().Name; model.PreviewStatus = "Preview could not be updated: " + ex.Message; Phase("failed"); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Failed); } }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) { diagnosticError = ex.GetType().Name; model.PreviewStatus = "Preview could not be updated: " + ex.Message; OutlineUpdateFailed(); Phase("failed"); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Failed); } }
         finally { if (acquired) previewGate.Release(); FinishPreviewLoading(loadingTicket, PreviewLoadingPhase.Cancelled); Phase("finished"); }
     }
 
@@ -350,15 +351,6 @@ public partial class MainWindow : Window
         VisitCurrentNavigation();
         if (await EditorNavigationService.BringIntoViewAsync(Editor, target) && Editor.Document == document && Editor.CaretOffset == target)
             CaptureCurrentNavigation();
-    }
-    private void OutlineSelected(object sender, SelectionChangedEventArgs e)
-    {
-        if (updatingOutline) return;
-        if (Outline.SelectedItem is not DocumentHeading heading) return;
-        if (parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
-        JumpToSource(heading.SourceStart, focusEditor: model.Layout == "Editor");
-        if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
-        { rendered.RevealSource(heading.SourceStart); _ = PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
     }
     private async void Navigate(string reference)
     {

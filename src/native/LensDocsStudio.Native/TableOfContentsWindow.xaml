@@ -1,0 +1,37 @@
+<Window x:Class="LensDocsStudio.Native.TableOfContentsWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Copy Table of Contents" Width="680" Height="520" MinWidth="440" MinHeight="340" WindowStartupLocation="CenterOwner"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
+ <Grid Margin="18">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <TextBlock Text="Copy Table of Contents" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,12"/>
+  <WrapPanel Grid.Row="1" Margin="0,0,0,8">
+   <StackPanel Orientation="Horizontal">
+   <Label Content="_Start level" Target="{Binding ElementName=StartLevel}"/>
+   <ComboBox x:Name="StartLevel" Width="65" SelectionChanged="OptionsChanged" AutomationProperties.Name="Start heading level"/>
+   </StackPanel><StackPanel Orientation="Horizontal">
+   <Label Content="_End level" Target="{Binding ElementName=EndLevel}" Margin="8,0,0,0"/>
+   <ComboBox x:Name="EndLevel" Width="65" SelectionChanged="OptionsChanged" AutomationProperties.Name="End heading level"/>
+   </StackPanel><StackPanel Orientation="Horizontal">
+   <Label Content="St_yle" Target="{Binding ElementName=ListStyle}" Margin="8,0,0,0"/>
+   <ComboBox x:Name="ListStyle" Width="125" SelectedIndex="0" SelectionChanged="OptionsChanged" AutomationProperties.Name="Table of contents style">
+    <ComboBoxItem Content="Bullet list"/><ComboBoxItem Content="Numbered list"/><ComboBoxItem Content="Plain text"/>
+   </ComboBox>
+   </StackPanel>
+  </WrapPanel>
+  <WrapPanel Grid.Row="2" Margin="0,0,0,10">
+   <CheckBox x:Name="NormaliseLevels" Content="_Normalise hierarchy" IsChecked="True" Checked="OptionsChanged" Unchecked="OptionsChanged" Margin="0,0,15,0"
+    ToolTip="Indent by parent relationships, closing gaps between skipped heading levels."/>
+   <CheckBox x:Name="DetailsWrapper" Content="Collapsible _details wrapper" Checked="OptionsChanged" Unchecked="OptionsChanged"/>
+  </WrapPanel>
+  <TextBox x:Name="PreviewText" Grid.Row="3" IsReadOnly="True" AcceptsReturn="True" FontFamily="Consolas" TextWrapping="NoWrap"
+   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" AutomationProperties.Name="Generated Markdown table of contents"/>
+  <DockPanel Grid.Row="4" Margin="0,10,0,0" LastChildFill="True">
+   <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+    <Button x:Name="CopyButton" Content="_Copy" Click="Copy" IsEnabled="False" IsDefault="True" Style="{StaticResource Form.PrimaryAction}" AutomationProperties.Name="Copy Table of Contents"/>
+    <Button Content="Close" IsCancel="True" Style="{StaticResource Form.Action}"/>
+   </StackPanel>
+   <TextBlock x:Name="ResultStatus" Text="Generating table of contents…" TextWrapping="Wrap" VerticalAlignment="Center" AutomationProperties.LiveSetting="Polite"/>
+  </DockPanel>
+ </Grid>
+</Window>

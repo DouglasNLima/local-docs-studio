@@ -1,0 +1,11 @@
+{
+  "result": "FAIL",
+  "checks": [
+    "Dialog supports Tab traversal from its initial option",
+    "Tab reaches the next labelled heading option",
+    "Dialog Copy action is keyboard reachable"
+  ],
+  "theme": "Light",
+  "actualHighContrast": false,
+  "scope": "Owned shown WPF windows, UIA providers and routed keyboard events; physical input and screen-reader certification are not claimed"
+}

@@ -1,0 +1,5 @@
+System.IO.IOException: Clipboard contains the exact generated Markdown
+   at Program.<>c__DisplayClass3_0.<Main>g__Check|1(Boolean value, String label) in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 64
+   at Program.<>c__DisplayClass3_1.<<Main>g__ObserveDialog|19>d.MoveNext() in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 176
+--- End of stack trace from previous location ---
+   at Program.<>c__DisplayClass3_0.<<Main>b__11>d.MoveNext() in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 189

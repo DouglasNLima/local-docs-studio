@@ -1,0 +1,9 @@
+  LensDocsStudio.Core -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\bin\Debug\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Native -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native\bin\Debug\net10.0-windows\LensDocsStudio.Native.dll
+  OutlineTocControls -> C:\Code\native-advanced-outline-toc\tests\native\outline-toc\bin\Debug\net10.0-windows\OutlineTocControls.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.28

@@ -1,0 +1,3 @@
+System.IO.IOException: Editor-only outline navigation depended on a rendered preview.
+   at LensDocsStudio.Native.Validation.NativePreviewSchedulingChecks.Run(String output, Boolean shown, Boolean highContrast) in C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native.Validation\NativePreviewSchedulingChecks.cs:line 116
+   at LensDocsStudio.Native.Validation.Program.Main(String[] args) in C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native.Validation\Program.cs:line 652

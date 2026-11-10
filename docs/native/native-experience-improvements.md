@@ -156,3 +156,13 @@ It shares Document Review counting, uses bounded cancellable background work and
 preserves source. This is Draft preparation from accepted develop `2dbc6d4e`;
 [validation and decision boundaries](native-document-statistics-validation.md) remain
 separate from hosted qualification and public/Native Stable acceptance.
+
+## Advanced Outline and Copy TOC (2026-11-10)
+
+Compact, keyboard-focusable Outline commands retain native icons and dynamic theme colours. Native TreeView heading names expose levels and real expansion state; filtering retains ancestor context. Copy TOC has a responsive native preview dialog, explicit invalid/empty/stale states and recoverable clipboard errors.
+
+See [feature contracts](native-outline-toc.md) and [focused validation](native-outline-toc-validation.md).
+The provenance proposal is INACTIVE pending an exact owner decision. Existing
+approvals and MIT/R3–R7 boundaries are preserved. Historical Continuous 250 ms
+remains FAIL; no exception transfers. ADR 007 remains inactive. Public release
+and Native Stable remain NO-GO; no CI, merge, release or distribution is authorised.

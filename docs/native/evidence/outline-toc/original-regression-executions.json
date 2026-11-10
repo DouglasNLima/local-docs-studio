@@ -1,0 +1,127 @@
+[
+  {
+    "name": "find",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "src/native/LensDocsStudio.Native.Validation/bin/Debug/net10.0-windows/LensDocsStudio.Native.Validation.dll",
+      "--find-routing",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\find"
+    ]
+  },
+  {
+    "name": "selection",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "src/native/LensDocsStudio.Native.Validation/bin/Debug/net10.0-windows/LensDocsStudio.Native.Validation.dll",
+      "--selection-mapping",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\selection"
+    ]
+  },
+  {
+    "name": "flowchart",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "src/native/LensDocsStudio.Native.Validation/bin/Debug/net10.0-windows/LensDocsStudio.Native.Validation.dll",
+      "--flowchart-compatibility",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\flowchart",
+      "C:\\Code\\native-advanced-outline-toc"
+    ]
+  },
+  {
+    "name": "loading",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "src/native/LensDocsStudio.Native.Validation/bin/Debug/net10.0-windows/LensDocsStudio.Native.Validation.dll",
+      "--preview-loading-ui",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\loading",
+      "C:\\Code\\native-advanced-outline-toc"
+    ]
+  },
+  {
+    "name": "scheduling",
+    "status": "FAIL",
+    "exitCode": 1,
+    "command": [
+      "dotnet",
+      "src/native/LensDocsStudio.Native.Validation/bin/Debug/net10.0-windows/LensDocsStudio.Native.Validation.dll",
+      "--preview-scheduling",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\scheduling"
+    ]
+  },
+  {
+    "name": "statistics",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "run",
+      "--project",
+      "tests/native/document-statistics/DocumentStatisticsControls.csproj",
+      "--no-launch-profile",
+      "--",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\statistics"
+    ]
+  },
+  {
+    "name": "reflow",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "run",
+      "--project",
+      "tests/native/preview-reflow/PreviewReflowControls.csproj",
+      "--no-launch-profile",
+      "--",
+      "--control",
+      "tests/fixtures/native-preview-reflow",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\reflow",
+      "--shown"
+    ]
+  },
+  {
+    "name": "pages",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "run",
+      "--project",
+      "tests/native/preview-reflow/PreviewReflowControls.csproj",
+      "--no-build",
+      "--",
+      "--pages-transition",
+      "tests/fixtures/native-preview-reflow",
+      "C:\\Code\\native-advanced-outline-toc\\artifacts\\outline-toc\\pages"
+    ]
+  },
+  {
+    "name": "loading-offline",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "dotnet",
+      "run",
+      "--project",
+      "tests/native/preview-loading-presentation/PreviewLoadingControls.csproj",
+      "--no-launch-profile"
+    ]
+  },
+  {
+    "name": "static",
+    "status": "PASS",
+    "exitCode": 0,
+    "command": [
+      "node",
+      "tests/static/check-assets.mjs"
+    ]
+  }
+]

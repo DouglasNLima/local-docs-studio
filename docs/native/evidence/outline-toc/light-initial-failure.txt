@@ -1,0 +1,3 @@
+System.IO.IOException: Copy and dismissal preserve source, dirty state, selection, Find and caller focus
+   at Program.<>c__DisplayClass3_0.<Main>g__Check|1(Boolean value, String label) in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 64
+   at Program.<>c__DisplayClass3_0.<<Main>b__11>d.MoveNext() in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 189

@@ -1,0 +1,7 @@
+  LensDocsStudio.Core -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\bin\Debug\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Core.Tests -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\bin\Debug\net10.0\LensDocsStudio.Core.Tests.dll
+Test run for C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\bin\Debug\net10.0\LensDocsStudio.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: C:\Code\native-advanced-outline-toc\artifacts\outline-toc\focused-core-final.trx
+
+Passed!  - Failed:     0, Passed:   116, Skipped:     0, Total:   116, Duration: 2 s - LensDocsStudio.Core.Tests.dll (net10.0)

@@ -1,0 +1,32 @@
+  Determining projects to restore...
+  Restored C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj (in 290 ms).
+  2 of 3 projects are up-to-date for restore.
+  LensDocsStudio.Core -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\bin\Debug\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Native -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native\bin\Debug\net10.0-windows\LensDocsStudio.Native.dll
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(105,86): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(107,34): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(108,34): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(109,32): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(110,32): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(111,34): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(112,32): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(113,73): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(115,73): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(116,86): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+
+Build FAILED.
+
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(105,86): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(107,34): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(108,34): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(109,32): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(110,32): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(111,34): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(112,32): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(113,73): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(115,73): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs(116,86): error CS0119: 'Key(UIElement, Key)' is a method, which is not valid in the given context [C:\Code\native-advanced-outline-toc\tests\native\outline-toc\OutlineTocControls.csproj]
+    0 Warning(s)
+    10 Error(s)
+
+Time Elapsed 00:00:01.95

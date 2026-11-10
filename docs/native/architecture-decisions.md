@@ -346,3 +346,13 @@ It shares Document Review counting, uses bounded cancellable background work and
 preserves source. This is Draft preparation from accepted develop `2dbc6d4e`;
 [validation and decision boundaries](native-document-statistics-validation.md) remain
 separate from hosted qualification and public/Native Stable acceptance.
+
+## Advanced Outline and Copy TOC (2026-11-10)
+
+A native TreeView replaces the flat Outline ListBox so hierarchy, focus and UIA ExpandCollapse semantics share one control. Parser-owned targets remain authoritative. TOC snapshot parsing/formatting runs behind one shared worker gate; source identity, version and parser mode guard publication and Copy.
+
+See [feature contracts](native-outline-toc.md) and [focused validation](native-outline-toc-validation.md).
+The provenance proposal is INACTIVE pending an exact owner decision. Existing
+approvals and MIT/R3–R7 boundaries are preserved. Historical Continuous 250 ms
+remains FAIL; no exception transfers. ADR 007 remains inactive. Public release
+and Native Stable remain NO-GO; no CI, merge, release or distribution is authorised.

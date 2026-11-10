@@ -61,7 +61,7 @@ internal static class NativePreviewSchedulingChecks
             Pump(Dispatcher.CurrentDispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task);
             var tab = model.ActiveDocument!;
             var editor = (TextEditor)window.FindName("Editor");
-            var outline = (ListBox)window.FindName("Outline");
+            var outline = (TreeView)window.FindName("Outline");
             var preview = (LensDocsStudio.Native.Rendering.DocumentPreview)window.FindName("Preview");
             if (shown)
             {
@@ -104,13 +104,15 @@ internal static class NativePreviewSchedulingChecks
             var source = "# Current heading\n\nBefore.\n\n## Target heading\n\n<details>\n<summary>Evidence</summary>\n\nHidden current text.\n</details>";
             tab.EditorDocument.Text = source;
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);
-            if (outline.Items.Count != 2 || !model.PreviewStatus.Contains("paused", StringComparison.Ordinal)
+            if (outline.Items.Count != 1 || ((OutlineHeadingViewModel)outline.Items[0]).Children.Count != 1 || !model.PreviewStatus.Contains("paused", StringComparison.Ordinal)
                 || preview.Document.Blocks.Count != 0 || editor.Text != source)
                 throw new IOException("Editor layout did not retain its current outline while pausing native preview work: "
                     + JsonSerializer.Serialize(new { Headings = outline.Items.Count, model.PreviewStatus, Blocks = preview.Document?.Blocks.Count, SourceMatches = editor.Text == source }));
-            // Visible fixture opening may already have selected this index. Exercise
-            // a real selection change rather than assigning the retained value.
-            outline.SelectedIndex = -1; outline.SelectedIndex = 1;
+            // This scheduling control also runs without a shown/realised item container.
+            // Deliver TreeView's selection event; shown keyboard/provider selection is
+            // exercised separately by the focused Outline controls.
+            var targetHeading = ((OutlineHeadingViewModel)outline.Items[0]).Children.Single();
+            outline.RaiseEvent(new RoutedPropertyChangedEventArgs<object>(null!, targetHeading, TreeView.SelectedItemChangedEvent));
             if (editor.CaretOffset != source.IndexOf("## Target heading", StringComparison.Ordinal))
                 throw new IOException("Editor-only outline navigation depended on a rendered preview.");
             Invoke("ShowFind", false);

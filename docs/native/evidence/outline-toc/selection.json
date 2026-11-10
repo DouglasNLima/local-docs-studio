@@ -1,0 +1,201 @@
+{
+  "Passed": true,
+  "Observations": [
+    {
+      "Dark": false,
+      "SourceOffset": 2,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "SourceOffset": 10,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "SourceOffset": 19,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "SourceOffset": 29,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "SourceOffset": 38,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "SourceOffset": 57,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "SourceOffset": 77,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "Source": "Caf\u00E9",
+      "Rendered": "Caf\u00E9",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "Source": "\uD83D\uDE00",
+      "Rendered": "\uD83D\uDE00",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "Source": "e\u0301",
+      "Rendered": "e\u0301",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "Source": "action **action** *action* [action",
+      "Rendered": "action action action action",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "Source": "hard  \nbreak.",
+      "Rendered": "hard\r\nbreak.",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "Source": "Caf\u00E9 \uD83D\uDE00 e\u0301 action\n\nSoft",
+      "Rendered": "Caf\u00E9 \uD83D\uDE00 e\u0301 action\r\nSoft",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": false,
+      "ReadingSource": 19,
+      "ForwardAffinity": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 2,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 10,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 19,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 29,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 38,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 57,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "SourceOffset": 77,
+      "Length": 6,
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "Source": "Caf\u00E9",
+      "Rendered": "Caf\u00E9",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "Source": "\uD83D\uDE00",
+      "Rendered": "\uD83D\uDE00",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "Source": "e\u0301",
+      "Rendered": "e\u0301",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "Source": "action **action** *action* [action",
+      "Rendered": "action action action action",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "Source": "hard  \nbreak.",
+      "Rendered": "hard\r\nbreak.",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "Source": "Caf\u00E9 \uD83D\uDE00 e\u0301 action\n\nSoft",
+      "Rendered": "Caf\u00E9 \uD83D\uDE00 e\u0301 action\r\nSoft",
+      "ExactRoundTrip": true
+    },
+    {
+      "Dark": true,
+      "ReadingSource": 19,
+      "ForwardAffinity": true
+    },
+    {
+      "Coalesced": true,
+      "LineEnding": "LF",
+      "SourceSelection": true,
+      "NativeRtf": true
+    },
+    {
+      "Coalesced": true,
+      "LineEnding": "CRLF",
+      "SourceSelection": true,
+      "NativeRtf": true
+    },
+    {
+      "Table": true,
+      "Rows": 15,
+      "Columns": 6,
+      "Newline": 1,
+      "ExactRepeatedOccurrences": true,
+      "CrossInline": true,
+      "SyntaxRequiresSemanticFallback": true
+    },
+    {
+      "Table": true,
+      "Rows": 15,
+      "Columns": 6,
+      "Newline": 2,
+      "ExactRepeatedOccurrences": true,
+      "CrossInline": true,
+      "SyntaxRequiresSemanticFallback": true
+    }
+  ]
+}

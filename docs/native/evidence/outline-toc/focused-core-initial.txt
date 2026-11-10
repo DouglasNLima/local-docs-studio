@@ -1,0 +1,39 @@
+  Determining projects to restore...
+  Restored C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\LensDocsStudio.Core.Tests.csproj (in 482 ms).
+  1 of 2 projects are up-to-date for restore.
+  LensDocsStudio.Core -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\bin\Debug\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Core.Tests -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\bin\Debug\net10.0\LensDocsStudio.Core.Tests.dll
+Test run for C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\bin\Debug\net10.0\LensDocsStudio.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:04.13]     LensDocsStudio.Core.Tests.TableOfContentsTests.Containers_and_code_follow_the_current_parser_and_all_export_targets_match [FAIL]
+  Failed LensDocsStudio.Core.Tests.TableOfContentsTests.Containers_and_code_follow_the_current_parser_and_all_export_targets_match [15 ms]
+  Error Message:
+   System.IO.InvalidDataException : A Mermaid diagram could not be exported.
+  Stack Trace:
+     at LensDocsStudio.Core.Exports.HtmlExporter.CodeRenderer.Write(HtmlRenderer renderer, FencedCodeBlock obj) in C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\Exports\HtmlExporter.cs:line 92
+   at Markdig.Renderers.MarkdownObjectRenderer`2.Write(RendererBase renderer, MarkdownObject obj)
+   at Markdig.Renderers.RendererBase.Write(MarkdownObject obj)
+   at Markdig.Renderers.RendererBase.WriteChildren(ContainerBlock containerBlock)
+   at Markdig.Renderers.RendererBase.Write(MarkdownObject obj)
+   at Markdig.Renderers.TextRendererBase.Render(MarkdownObject markdownObject)
+   at LensDocsStudio.Core.Exports.HtmlExporter.RenderFragment(ExportContent content, ExportTableSelection table, Boolean flattenDetails, Boolean preserveWikiLinks, CancellationToken cancellationToken) in C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\Exports\HtmlExporter.cs:line 44
+   at LensDocsStudio.Core.Tests.TableOfContentsTests.Containers_and_code_follow_the_current_parser_and_all_export_targets_match() in C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\TableOfContentsTests.cs:line 97
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:04.13]     LensDocsStudio.Core.Tests.TableOfContentsTests.Every_punctuation_label_round_trips_as_text_and_fragments_remain_parser_owned [FAIL]
+  Failed LensDocsStudio.Core.Tests.TableOfContentsTests.Every_punctuation_label_round_trips_as_text_and_fragments_remain_parser_owned [8 ms]
+  Error Message:
+   Assert.Equal() Failure: Strings differ
+                                                  ↓ (pos 60)
+Expected: ···"<b> *x* _y_ `z` {#id} | ~ ^ $ = + : (one)"
+Actual:   ···"; <b> *x* _y_ `z` {#id} | ~ ^ $ = + : one"
+                                                    ↑ (pos 60)
+  Stack Trace:
+     at LensDocsStudio.Core.Tests.TableOfContentsTests.Every_punctuation_label_round_trips_as_text_and_fragments_remain_parser_owned() in C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core.Tests\TableOfContentsTests.cs:line 84
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+Results File: C:\Code\native-advanced-outline-toc\artifacts\outline-toc\focused-core-initial.trx
+
+Failed!  - Failed:     2, Passed:    34, Skipped:     0, Total:    36, Duration: 2 s - LensDocsStudio.Core.Tests.dll (net10.0)
