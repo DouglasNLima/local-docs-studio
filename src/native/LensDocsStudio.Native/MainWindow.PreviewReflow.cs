@@ -1,4 +1,5 @@
 using System.Windows.Automation;
+using System.Windows.Controls;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Native.Rendering;
 
@@ -36,7 +37,16 @@ public partial class MainWindow
 
     private async Task RestorePreviewLayoutAsync(string status)
     {
-        if (previewLayoutAnchor is not { } anchor || !SyncCurrent || anchor.Document != Preview.Document) return;
+        if (previewLayoutAnchor is not { } anchor) return;
+        // Settings can change the effective reading mode while Editor hides the
+        // preview. A retained scroll anchor cannot restore Pages; keep its valid
+        // document and loading state without starting an inapplicable request.
+        if (!SyncCurrent || anchor.Document != Preview.Document
+            || Preview.ViewingMode != FlowDocumentReaderViewingMode.Scroll)
+        {
+            previewLayoutAnchor = null;
+            return;
+        }
         var result = rendered; var owner = model.ActiveDocument; var generation = syncGeneration;
         var request = diagnosticRequest;
         var zoom = Preview.Zoom; var viewingMode = Preview.ViewingMode;
