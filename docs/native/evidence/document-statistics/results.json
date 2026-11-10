@@ -1,0 +1,65 @@
+{
+  "base": "2dbc6d4e61db431001b42bb93b02d8e503eb8096",
+  "productCommit": "5b336179b5cbbb97d03880c0cf9674a2decaa000",
+  "productTree": "67b10c1ce78b4843b35c852bc4b8dabe4cb87817",
+  "nativeTree": "5aeb8c1f09f16c2b790de1542e45dcd3b0e41649",
+  "statisticsControlTree": "1c751d38a4239cff4fa917cb61fc5fc86bc80e6b",
+  "core": {
+    "passed": 67,
+    "failed": 0,
+    "skipped": 0
+  },
+  "wpf": {
+    "lightChecks": 48,
+    "darkChecks": 48,
+    "scope": "Shown owned windows, UIA peers, routed keyboard activation; no physical display or screen-reader certification"
+  },
+  "regressions": {
+    "findChecks": 48,
+    "selectionCases": 16,
+    "continuousReflow": "PASS",
+    "pagesTransitionChecks": 31,
+    "loadingChecks": 106,
+    "offlineLoadingControls": 11,
+    "static": "PASS"
+  },
+  "regressionIdentity": "Reflow/loading/Find/selection executed from pre-commit working product bytes; the canonical native source matches the product commit. Assembly source metadata still named the starting develop commit. Final statistics Light/Dark and 67 Core checks ran after the product commit.",
+  "actualHighContrast": {
+    "result": "NOT RUN / UNAVAILABLE",
+    "reason": "Computer Use could not obtain a targetable Windows Settings window; explicit SystemSettings launch failed and refreshed window inventory contained no Settings window. No OS appearance changed. No hosted-runner flags were forged."
+  },
+  "historical250ms": "FAIL unchanged; not run",
+  "hostedCi": "NOT RUN; separate owner authorisation required",
+  "provenance": "INACTIVE; owner decision required; ordinary strict source identity remains failing",
+  "retainedDevelopmentObservations": [
+    "Initial Core: 44 PASS / 1 FAIL; Unicode scalar expectation corrected from 28 to 27.",
+    "Initial WPF observer raised before review opened; fixed bounded wait for actual owned modal.",
+    "Timing assertion failed; revised control holds the worker gate to prove dispatcher progress while queued, not a latency claim.",
+    "Single-line large-document control did not complete and was explicitly stopped. Cause INCONCLUSIVE; no retrospective pass. Final fixture uses bounded lines, with the same 100002 words/500011 characters.",
+    "Colour equality assertion failed on stock Fluent colour. Existing native command style selected for palette/pressed/focus consistency; no contrast failure was measured by equality alone.",
+    "Intermediate style inherited Focusable=False; focused UIA check failed. Explicit Focusable=True corrected the product before final commit.",
+    "Export-layout test supplied unsupported .md extension; changed test output to supported local .html. No export-validation rule weakened.",
+    "Initial foundation inventory failed before regeneration; strict governance source identity failed as expected with unapproved product source."
+  ],
+  "evidenceSha256": {
+    ".gitattributes": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+    "aborted-control.txt": "115d5251c36484769baf72223a43a6ae8a82c5653df7e155b27454aa37d226da",
+    "dark-860.png": "ef207656daf3893abf37e5365ca8df474f5ec32f8134dc5e3b3949e8c862e5a9",
+    "dark.json": "d899b820295361e5a2d3fb677720070016355f591d1bb0012dd491720e6d1a6c",
+    "export-860.png": "bf98e8ed61e8320e2d3e7bb245508e33b41f23f5bbdd751287fc46b21bd8eec8",
+    "find.json": "f611c58d06795f53f9def56bafaa72b7c5eb64b72f15667301cccf4535f5149e",
+    "focused-core.trx": "c1ebf7b4303239dab7fed93c33f36df4fe1f56de8c66327b93840f19595fa115",
+    "initial-colour-failure.json": "cf2d44f9376fa60b3d1555708c637b790536c2ededc4bf2e5d349fee4d90fb8b",
+    "initial-core-failure.trx": "bb06d24433d637f6e000f36d84947d181c53d4ebc7e034de37254d41e1054e08",
+    "initial-export-fixture-failure.json": "cf2d44f9376fa60b3d1555708c637b790536c2ededc4bf2e5d349fee4d90fb8b",
+    "initial-focus-failure.json": "2787a667c7f53c1b00f495bd33b5430d6b807d6ead8b0daacbc11f7e355e7f9f",
+    "initial-observer-failure.txt": "679e5566dcb3b5dfa4cfb950a23ddacbd2abadbeb37a127c98ffe4a07e5a7898",
+    "initial-timing-failure.json": "b4548f9a5b02de2ca201532f6fd26bd0022e5ba1c6d02b40c99badb86c5f5f94",
+    "light-860.png": "b29d84ca830173a4fd4444524ec5e35d53aa2c6fc933da9292bbcd88e5ec86f0",
+    "light.json": "312c75dbcee46ffef278ce12e5b8ffb38ec65f1da76ca21485d5b95c2da512a4",
+    "loading.json": "da62bd3c6eabeef9a319da017294dd5f9e6a4c792ed22c8a5a1950aeddac55cb",
+    "pages.json": "9deb689e4939e9cb0c32d8ad72c1370eaeb38e91b17593fa71e5e1a25077e5fd",
+    "reflow.json": "0981bb5eaab79507571830045e086276d3ffd58f77f80bdecb6f56dbe6a2d6c3",
+    "selection.json": "078b7df6f4ca8d734bcdd802c982090941a7240e1ed228b246bb96af0c5d5d4e"
+  }
+}

@@ -321,3 +321,12 @@ The web guide, catalogue and regressions define the reference outcomes. Rows ret
 | Existing web/PWA/Pages and legacy shell | Preserve separate pipelines | Both 7008751 web runs pass 264 Chromium/Edge cases and static checks. Publication remains buildless; native installation/state and the legacy shell remain separate. The draft/feature runs skip deployment |
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+## Isolated document statistics (2026-11-10)
+
+The [first Reading Experience slice](native-document-statistics.md) adds current-buffer
+word/character/reading-time metrics and keyboard-accessible status-bar Review access.
+It shares Document Review counting, uses bounded cancellable background work and
+preserves source. This is Draft preparation from accepted develop `2dbc6d4e`;
+[validation and decision boundaries](native-document-statistics-validation.md) remain
+separate from hosted qualification and public/Native Stable acceptance.

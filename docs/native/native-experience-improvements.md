@@ -147,3 +147,12 @@ An embedded browser and proprietary document store were rejected because they do
 Earlier implementation decisions, run-specific results and failed scenarios remain intact in the [experience history through b3a4d59](history/native-experience-improvements-through-b3a4d59.md). Current package paths and next actions are in the [engineering handover](engineering-handover.md).
 
 The final PR #55 arrangement acceptance pass is recorded in [Final Arrangement Acceptance Addendum](smart-diagram-arrangement.md#final-arrangement-acceptance-addendum). It includes original private-topology aggregates, independent review and fixes, explicit journalled persistence/recovery semantics, real-input measurements and separately labelled physical/simulated DPI coverage. The Draft PR engineering receipt owns exact final revision and terminal CI results; remaining certification conditions and the independent Continuous 250 ms exception are preserved.
+
+## Isolated document statistics (2026-11-10)
+
+The [first Reading Experience slice](native-document-statistics.md) adds current-buffer
+word/character/reading-time metrics and keyboard-accessible status-bar Review access.
+It shares Document Review counting, uses bounded cancellable background work and
+preserves source. This is Draft preparation from accepted develop `2dbc6d4e`;
+[validation and decision boundaries](native-document-statistics-validation.md) remain
+separate from hosted qualification and public/Native Stable acceptance.

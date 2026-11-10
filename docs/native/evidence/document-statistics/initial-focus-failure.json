@@ -1,0 +1,11 @@
+{
+  "result": "FAIL",
+  "checks": [
+    "No-document state is explicit and disabled",
+    "Current statistics: 4 words, 23 characters",
+    "Opening and statistics preserve loaded source and clean state"
+  ],
+  "theme": "Light",
+  "actualHighContrast": false,
+  "scope": "Shown owned WPF window, UIA peers and routed keyboard events; no physical screen-reader or injected desktop-input certification"
+}

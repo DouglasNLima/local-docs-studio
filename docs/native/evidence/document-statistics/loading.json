@@ -1,0 +1,471 @@
+{
+  "Status": "PASS",
+  "Scope": "Actual shown WPF and UIA",
+  "highContrast": false,
+  "checks": [
+    "Incoming document masks stale content while pending",
+    "Visible ring and meaningful status reflect real pending work",
+    "Stable accessible busy indicator",
+    "Shown WPF progress ring is actually visible",
+    "Ring honours the current Windows animation preference",
+    "Reduced motion removes animation while keeping visible busy feedback",
+    "Successful first layout dismisses loading",
+    "Current document and exact source revision completed after any superseded request",
+    "Accepted content belongs to the active document",
+    "Local image media is prepared with the ordinary table and long text: ",
+    "Deterministic supersession starts with a pending held render task",
+    "A completed superseded task cannot certify the current queued preview",
+    "Queued replacement accepts the current source and dismisses loading within the original deadline",
+    "Queued replacement retains prepared local media without warnings",
+    "Selected source has a verified preview range",
+    "Same-document refresh retains accepted content with compact status",
+    "Rapid source edits retain the accepted document and transfer loading",
+    "Successful refresh preserves zoom selection and keyboard focus",
+    "Stale cancellation cannot hide the new document spinner or expose outgoing content",
+    "Rapid switching across three tabs retains only the latest request",
+    "Latest document installs with preserved zoom",
+    "Actual Mermaid syntax error ends loading while successful Markdown and the other diagram survive",
+    "Diagram failure preserves unrelated Markdown",
+    "Editor-only layout cancels visible loading",
+    "Closing the active document removes loading and outgoing content",
+    "Incoming document masks stale content while pending",
+    "Visible ring and meaningful status reflect real pending work",
+    "Stable accessible busy indicator",
+    "Shown WPF progress ring is actually visible",
+    "Ring honours the current Windows animation preference",
+    "Reduced motion removes animation while keeping visible busy feedback",
+    "Successful first layout dismisses loading",
+    "Current document and exact source revision completed after any superseded request",
+    "Accepted content belongs to the active document",
+    "Local image media is prepared with the ordinary table and long text: ",
+    "Deterministic supersession starts with a pending held render task",
+    "A completed superseded task cannot certify the current queued preview",
+    "Queued replacement accepts the current source and dismisses loading within the original deadline",
+    "Queued replacement retains prepared local media without warnings",
+    "Selected source has a verified preview range",
+    "Same-document refresh retains accepted content with compact status",
+    "Rapid source edits retain the accepted document and transfer loading",
+    "Successful refresh preserves zoom selection and keyboard focus",
+    "Stale cancellation cannot hide the new document spinner or expose outgoing content",
+    "Rapid switching across three tabs retains only the latest request",
+    "Latest document installs with preserved zoom",
+    "Actual Mermaid syntax error ends loading while successful Markdown and the other diagram survive",
+    "Diagram failure preserves unrelated Markdown",
+    "Editor-only layout cancels visible loading",
+    "Closing the active document removes loading and outgoing content",
+    "Incoming document masks stale content while pending",
+    "Visible ring and meaningful status reflect real pending work",
+    "Stable accessible busy indicator",
+    "Shown WPF progress ring is actually visible",
+    "Ring honours the current Windows animation preference",
+    "Reduced motion removes animation while keeping visible busy feedback",
+    "Successful first layout dismisses loading",
+    "Current document and exact source revision completed after any superseded request",
+    "Accepted content belongs to the active document",
+    "Local image media is prepared with the ordinary table and long text: ",
+    "Deterministic supersession starts with a pending held render task",
+    "A completed superseded task cannot certify the current queued preview",
+    "Queued replacement accepts the current source and dismisses loading within the original deadline",
+    "Queued replacement retains prepared local media without warnings",
+    "Selected source has a verified preview range",
+    "Same-document refresh retains accepted content with compact status",
+    "Rapid source edits retain the accepted document and transfer loading",
+    "Successful refresh preserves zoom selection and keyboard focus",
+    "Stale cancellation cannot hide the new document spinner or expose outgoing content",
+    "Rapid switching across three tabs retains only the latest request",
+    "Latest document installs with preserved zoom",
+    "Actual Mermaid syntax error ends loading while successful Markdown and the other diagram survive",
+    "Diagram failure preserves unrelated Markdown",
+    "Editor-only layout cancels visible loading",
+    "Closing the active document removes loading and outgoing content",
+    "Incoming document masks stale content while pending",
+    "Visible ring and meaningful status reflect real pending work",
+    "Stable accessible busy indicator",
+    "Shown WPF progress ring is actually visible",
+    "Ring honours the current Windows animation preference",
+    "Reduced motion removes animation while keeping visible busy feedback",
+    "Successful first layout dismisses loading",
+    "Current document and exact source revision completed after any superseded request",
+    "Accepted content belongs to the active document",
+    "Local image media is prepared with the ordinary table and long text: ",
+    "Deterministic supersession starts with a pending held render task",
+    "A completed superseded task cannot certify the current queued preview",
+    "Queued replacement accepts the current source and dismisses loading within the original deadline",
+    "Queued replacement retains prepared local media without warnings",
+    "Selected source has a verified preview range",
+    "Same-document refresh retains accepted content with compact status",
+    "Rapid source edits retain the accepted document and transfer loading",
+    "Successful refresh preserves zoom selection and keyboard focus",
+    "Stale cancellation cannot hide the new document spinner or expose outgoing content",
+    "Rapid switching across three tabs retains only the latest request",
+    "Latest document installs with preserved zoom",
+    "Actual Mermaid syntax error ends loading while successful Markdown and the other diagram survive",
+    "Diagram failure preserves unrelated Markdown",
+    "Editor-only layout cancels visible loading",
+    "Closing the active document removes loading and outgoing content",
+    "Pages refresh installs its first visible page and dismisses loading",
+    "Pages refresh does not wait for all background pages",
+    "A real dense Mermaid render keeps the busy indicator visible",
+    "Real dense rendering reaches a terminal state with no stale spinner",
+    "Complex 39/115/284 document completes through native preview: ",
+    "Application closure removes pending loading and stops its visibility timer"
+  ],
+  "timings": [
+    {
+      "scenario": "Windows animation preference",
+      "Milliseconds": 405.2477,
+      "CpuMilliseconds": 718.75,
+      "AllocatedBytes": 7844784,
+      "Pulses": 16,
+      "MeanDispatcherGap": 24.28855,
+      "MaximumDispatcherGap": 33.40699999999998
+    },
+    {
+      "scenario": "Static reduced-motion ring",
+      "Milliseconds": 407.5457,
+      "CpuMilliseconds": 531.25,
+      "AllocatedBytes": 9086928,
+      "Pulses": 16,
+      "MeanDispatcherGap": 24.5211875,
+      "MaximumDispatcherGap": 37.28469999999999
+    },
+    {
+      "theme": "Light",
+      "mode": "Continuous",
+      "Scenario": "Captured render before gate release",
+      "Observation": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 4,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 1,
+        "CurrentAcceptedSource": false
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Continuous",
+      "Scenario": "Captured render task finished",
+      "CapturedTaskCompletionMilliseconds": 212.8442,
+      "Observation": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 4,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 1,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Continuous",
+      "OrdinaryPreviewMilliseconds": 213.3414,
+      "CapturedTaskCompletionMilliseconds": 212.8442,
+      "BeforeRelease": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 4,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 1,
+        "CurrentAcceptedSource": false
+      },
+      "AfterCapturedTask": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 4,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 1,
+        "CurrentAcceptedSource": true
+      },
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 4,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 1,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Continuous",
+      "Scenario": "Deterministic queued refresh supersession",
+      "ReplacementMilliseconds": 354.5117,
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 6,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 3,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Pages",
+      "Scenario": "Captured render before gate release",
+      "Observation": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 38,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 15,
+        "CurrentAcceptedSource": false
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Pages",
+      "Scenario": "Captured render task finished",
+      "CapturedTaskCompletionMilliseconds": 48.4322,
+      "Observation": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 38,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 15,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Pages",
+      "OrdinaryPreviewMilliseconds": 48.4523,
+      "CapturedTaskCompletionMilliseconds": 48.4322,
+      "BeforeRelease": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 38,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 15,
+        "CurrentAcceptedSource": false
+      },
+      "AfterCapturedTask": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 38,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 15,
+        "CurrentAcceptedSource": true
+      },
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 38,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 15,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Light",
+      "mode": "Pages",
+      "Scenario": "Deterministic queued refresh supersession",
+      "ReplacementMilliseconds": 315.4037,
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 40,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 17,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Continuous",
+      "Scenario": "Captured render before gate release",
+      "Observation": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 72,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 29,
+        "CurrentAcceptedSource": false
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Continuous",
+      "Scenario": "Captured render task finished",
+      "CapturedTaskCompletionMilliseconds": 39.1299,
+      "Observation": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 72,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 29,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Continuous",
+      "OrdinaryPreviewMilliseconds": 39.173,
+      "CapturedTaskCompletionMilliseconds": 39.1299,
+      "BeforeRelease": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 72,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 29,
+        "CurrentAcceptedSource": false
+      },
+      "AfterCapturedTask": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 72,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 29,
+        "CurrentAcceptedSource": true
+      },
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 72,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 29,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Continuous",
+      "Scenario": "Deterministic queued refresh supersession",
+      "ReplacementMilliseconds": 358.2586,
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 74,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 31,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Pages",
+      "Scenario": "Captured render before gate release",
+      "Observation": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 106,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 43,
+        "CurrentAcceptedSource": false
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Pages",
+      "Scenario": "Captured render task finished",
+      "CapturedTaskCompletionMilliseconds": 28.2498,
+      "Observation": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 106,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 43,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Pages",
+      "OrdinaryPreviewMilliseconds": 28.2643,
+      "CapturedTaskCompletionMilliseconds": 28.2498,
+      "BeforeRelease": {
+        "IsCompleted": false,
+        "TaskStatus": "WaitingForActivation",
+        "Generation": 106,
+        "Phase": "Parsing",
+        "Busy": true,
+        "PreviewQueued": false,
+        "Request": 43,
+        "CurrentAcceptedSource": false
+      },
+      "AfterCapturedTask": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 106,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 43,
+        "CurrentAcceptedSource": true
+      },
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 106,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 43,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "theme": "Dark",
+      "mode": "Pages",
+      "Scenario": "Deterministic queued refresh supersession",
+      "ReplacementMilliseconds": 333.3035,
+      "CurrentTerminal": {
+        "IsCompleted": true,
+        "TaskStatus": "RanToCompletion",
+        "Generation": 108,
+        "Phase": "Completed",
+        "Busy": false,
+        "PreviewQueued": false,
+        "Request": 45,
+        "CurrentAcceptedSource": true
+      }
+    },
+    {
+      "Scenario": "Pages refresh readiness",
+      "PagesAtReady": 1,
+      "PaginationCompleteAtReady": false,
+      "BackgroundPaginationEnabled": true
+    }
+  ]
+}
