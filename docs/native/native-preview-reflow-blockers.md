@@ -3,7 +3,9 @@
 The corrected product rejects incompatible retained scroll anchors before
 starting a loading request. The replacement inert provenance proposal uses
 canonical committed Git bytes and independently checks working-source integrity.
-Independent review of these corrections is pending; provenance remains inactive.
+Independent read-only review passed both corrections without a new blocking
+finding. Provenance remains inactive: **REVIEW PASS — UPDATED PROVENANCE OWNER
+APPROVAL REQUIRED**. See the [independent review](../open-source/evidence/preview-reflow-integration-v2/independent-review.md).
 
 Starting source: `16b4b6864fd6cd72e3e7cf2bfb42d25af713ea85`, complete tree
 `14cec47913bce3732e23eac585963362f8d93eea`, against accepted develop
@@ -57,6 +59,7 @@ The original Windows None setting was restored after Aquatic controls.
 | PR #82 offline presentation | 11/11 controls pass |
 | Unchanged shown WPF/UIA loading lifecycle | One execution, 106 checks pass; dense ER and application closure reached |
 | Canonical manifest controls | 8 tests pass, including fresh LF/CRLF Windows Git checkouts and altered/missing/staged/committed content |
+| Complete proposal verification | PASS on two fresh full-source Windows checkouts (LF and CRLF); nine proposal mutations rejected in each |
 | Original local dense ER executions | Both remain FAIL after 104 checks; close assertion NOT REACHED |
 | Hosted qualification | NOT RUN; all 30 mandatory contexts remain required |
 | Historical Continuous 250 ms | FAIL unchanged; not rerun |
@@ -89,9 +92,13 @@ The verifier reads raw committed Git blob bytes. Separate checks bind the index,
 working manifest and Git-clean source objects; line-ending conversion alone is
 allowed, while different spacing or JSON semantics cannot inherit the pin.
 The original v1 checkout digest is not reused as an approval identifier.
+The [full checkout records](../open-source/evidence/preview-reflow-integration-v2/checkout-validation.json)
+show different working-file hashes for LF and CRLF, but the same canonical
+manifest digest and verified product source. The [proposal result](../open-source/evidence/preview-reflow-integration-v2/validation-results.json)
+is explicitly inert verification, not an active OSS-provenance PASS.
 
 Preparation commits carry `[skip ci]`; PR #83 remains Draft. Independent review
-must pass before recommending an exact owner provenance decision. Activation,
+supports an exact owner provenance decision for the updated proposal. Activation,
 hosted CI and merge have not been authorised by this correction task. PRs #76,
 #78 and #80, all workflow bytes, the six-second deadline and performance policy
 remain unchanged. No signing, release, deployment, distribution or Native

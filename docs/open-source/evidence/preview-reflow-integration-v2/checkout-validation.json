@@ -1,0 +1,76 @@
+[
+  {
+    "autocrlf": "false",
+    "actualWorkingLineEndings": "LF",
+    "preparationHead": "d16c43d3308d7824603862f73e85987f08ce8328",
+    "workingSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+    "canonicalSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+    "result": {
+      "status": "PASS_INERT_PROPOSAL_ONLY",
+      "protectedFiles": 2421,
+      "changedProtectedFiles": [
+        "src/native/LensDocsStudio.Native/MainWindow.Find.cs",
+        "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs",
+        "src/native/LensDocsStudio.Native/MainWindow.xaml.cs"
+      ],
+      "addedFiles": 9,
+      "manifestSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+      "canonicalRepresentation": "Exact committed Git blob bytes",
+      "workingTree": "Index and Git-clean source objects verified separately",
+      "candidate": {
+        "commit": "932335027314fe710671d54266367a008fca5547",
+        "tree": "c58468fc41222f56eb38f277950486686e820553"
+      },
+      "nativeTree": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+      "negativeControlsRejected": [
+        "extra protected path",
+        "changed previous digest",
+        "changed current digest",
+        "changed source subtree",
+        "invented owner approval",
+        "removed exclusion",
+        "missing added path",
+        "changed added digest",
+        "changed historical evidence"
+      ],
+      "activePolicy": "UNCHANGED; owner approval and bounded activation still required"
+    }
+  },
+  {
+    "autocrlf": "true",
+    "actualWorkingLineEndings": "CRLF",
+    "preparationHead": "d16c43d3308d7824603862f73e85987f08ce8328",
+    "workingSha256": "4e73be88f91b6c423622079a05e861d0352f2e089ec2df3b7429939270af90c2",
+    "canonicalSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+    "result": {
+      "status": "PASS_INERT_PROPOSAL_ONLY",
+      "protectedFiles": 2421,
+      "changedProtectedFiles": [
+        "src/native/LensDocsStudio.Native/MainWindow.Find.cs",
+        "src/native/LensDocsStudio.Native/MainWindow.Synchronisation.cs",
+        "src/native/LensDocsStudio.Native/MainWindow.xaml.cs"
+      ],
+      "addedFiles": 9,
+      "manifestSha256": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+      "canonicalRepresentation": "Exact committed Git blob bytes",
+      "workingTree": "Index and Git-clean source objects verified separately",
+      "candidate": {
+        "commit": "932335027314fe710671d54266367a008fca5547",
+        "tree": "c58468fc41222f56eb38f277950486686e820553"
+      },
+      "nativeTree": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+      "negativeControlsRejected": [
+        "extra protected path",
+        "changed previous digest",
+        "changed current digest",
+        "changed source subtree",
+        "invented owner approval",
+        "removed exclusion",
+        "missing added path",
+        "changed added digest",
+        "changed historical evidence"
+      ],
+      "activePolicy": "UNCHANGED; owner approval and bounded activation still required"
+    }
+  }
+]

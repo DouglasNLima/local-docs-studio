@@ -61,7 +61,8 @@ records the focused results. Original local dense ER failures remain FAIL after
 shown lifecycle execution reaches 106 checks, including dense ER and closure;
 this does not attribute the earlier failures or waive eventual hosted checks.
 
-Recommended owner decision after independent review: approve only bounded
+The [independent read-only review](independent-review.md) passed both corrections
+without a new blocking finding. Recommended owner decision: approve only bounded
 activation of `preview-reflow-integration-three-v2`, identifying the canonical
 manifest SHA-256 above, exact product commit/tree and final preparation HEAD/tree
 from the delivery receipt. Limit activation to the seven `activationPathsOnly`
