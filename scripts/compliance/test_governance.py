@@ -27,6 +27,12 @@ from licence_scope import (PREVIEW_REFLOW_EVIDENCE, PREVIEW_REFLOW_PAIRS, PREVIE
                            PREVIEW_REFLOW_EARLIER_REFRESHES, apply_preview_reflow_refresh,
                            validate_preview_reflow_approval, check_preview_reflow_source_identity,
                            read_committed_evidence, read_working_evidence)
+from licence_scope import (DOCUMENT_STATISTICS_EVIDENCE, DOCUMENT_STATISTICS_MANIFEST_SHA256,
+                           DOCUMENT_STATISTICS_APPROVAL_SHA256, DOCUMENT_STATISTICS_REFRESH_SHA256,
+                           DOCUMENT_STATISTICS_GOVERNANCE_PATHS,
+                           apply_document_statistics_refresh, validate_document_statistics_approval,
+                           check_document_statistics_source_identity, check_committed_file_identities,
+                           document_statistics_predecessor_digests)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -477,7 +483,7 @@ class FlowchartProvenanceTests(unittest.TestCase):
                 validate_preserved(updated, actual)
 
     def test_current_source_subtrees_and_working_bytes_match_the_approved_identity(self):
-        check_preview_reflow_source_identity(current_paths())
+        check_document_statistics_source_identity(current_paths())
 
     def test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed(self):
         helper = 'src/native/LensDocsStudio.Core/Rendering/FlowchartCompatibility.cs'
@@ -756,11 +762,14 @@ class PreviewReflowProvenanceTests(unittest.TestCase):
 
 
 class PreviewReflowCheckoutTests(unittest.TestCase):
+    evidence_prefix = PREVIEW_REFLOW_EVIDENCE
+    manifest_sha256 = PREVIEW_REFLOW_MANIFEST_SHA256
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='lens-reflow-provenance-')
         self.addCleanup(self.temporary.cleanup)
         self.repository = Path(self.temporary.name)
-        self.path = PREVIEW_REFLOW_EVIDENCE + 'candidate-refresh.json'
+        self.path = self.evidence_prefix + 'candidate-refresh.json'
         self.raw = subprocess.check_output(['git', 'cat-file', 'blob', 'HEAD:' + self.path], cwd=ROOT)
         self.git('init', '-q')
         self.git('config', 'core.autocrlf', 'false')
@@ -777,7 +786,7 @@ class PreviewReflowCheckoutTests(unittest.TestCase):
 
     def verify(self, path=None, digest=None):
         with patch('licence_scope.ROOT', self.repository):
-            return read_committed_evidence(path or self.path, digest or PREVIEW_REFLOW_MANIFEST_SHA256)
+            return read_committed_evidence(path or self.path, digest or self.manifest_sha256)
 
     def test_lf_and_crlf_checkout_conversion_retain_exact_committed_identity(self):
         for autocrlf in ('false', 'true'):
@@ -832,9 +841,12 @@ class PreviewReflowCheckoutTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.verify()
 
-    def test_rejects_each_altered_predecessor_approval(self):
+    def predecessor_evidence(self):
         manifest = json.loads(self.raw)
-        for path, digest in {**manifest['preservedEvidence'], **PREVIEW_REFLOW_EARLIER_REFRESHES}.items():
+        return {**manifest['preservedEvidence'], **PREVIEW_REFLOW_EARLIER_REFRESHES}
+
+    def test_rejects_each_altered_predecessor_approval(self):
+        for path, digest in self.predecessor_evidence().items():
             original = subprocess.check_output(['git', 'cat-file', 'blob', 'HEAD:' + path], cwd=ROOT)
             file = self.repository / path
             file.parent.mkdir(parents=True, exist_ok=True)
@@ -849,6 +861,243 @@ class PreviewReflowCheckoutTests(unittest.TestCase):
                     self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Altered approval [skip ci]')
                 with self.subTest(path=path, committed=committed), self.assertRaises(ValueError):
                     self.verify(path, digest)
+
+
+class DocumentStatisticsProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.prior = PreviewReflowProvenanceTests()
+        self.prior.setUp()
+        self.preserved = self.prior.apply()
+        self.granted = set(self.prior.granted)
+        self.candidate = read_committed_evidence(
+            DOCUMENT_STATISTICS_EVIDENCE + 'candidate-refresh.json', DOCUMENT_STATISTICS_MANIFEST_SHA256)
+        self.approval, _ = read_working_evidence(
+            DOCUMENT_STATISTICS_EVIDENCE + 'owner-approval.json', DOCUMENT_STATISTICS_APPROVAL_SHA256)
+        self.refresh = flowchart_json((ROOT / (DOCUMENT_STATISTICS_EVIDENCE + 'approved-refresh.json')).read_bytes())
+        self.contract = json.loads(self.candidate)
+        self.pairs = self.contract['files']
+        self.actual = {**self.preserved, **{p: pair['current'] for p, pair in self.pairs.items()}}
+
+    def apply(self):
+        return apply_document_statistics_refresh(self.preserved, self.refresh, self.approval,
+                                                 self.candidate, self.actual, self.granted)
+
+    def test_exact_ten_pair_overlay_retains_2421_paths_and_does_not_mutate_its_inputs(self):
+        original = copy.deepcopy((self.preserved, self.refresh, self.actual, self.granted))
+        result = self.apply()
+        self.assertEqual(len(result), 2421)
+        self.assertEqual(set(result), set(self.preserved))
+        self.assertEqual({p for p in result if result[p] != self.preserved[p]}, set(self.pairs))
+        self.assertEqual(len(self.pairs), 10)
+        self.assertEqual(sum(boundary(p, self.granted)[0] == 'R2' for p in self.pairs), 5)
+        validate_preserved(result, self.actual)
+        self.assertEqual(original, (self.preserved, self.refresh, self.actual, self.granted))
+
+    def test_missing_additional_or_substituted_pairs_never_expand_the_amendment(self):
+        original = copy.deepcopy(self.refresh)
+        for path in self.pairs:
+            for extra in (None, 'SECURITY.md', 'src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs'):
+                for remove in (False, True):
+                    if extra is None and not remove:
+                        continue
+                    with self.subTest(path=path, extra=extra, remove=remove), self.assertRaises(ValueError):
+                        self.refresh = copy.deepcopy(original)
+                        if extra:
+                            self.refresh['files'][extra] = self.refresh['files'][path]
+                        if remove:
+                            del self.refresh['files'][path]
+                        self.apply()
+
+    def test_every_pair_requires_exact_previous_current_actual_bytes_and_existing_grant(self):
+        for path in self.pairs:
+            for mapping, field in [(self.refresh['files'][path], 'previous'),
+                                    (self.refresh['files'][path], 'current'),
+                                    (self.preserved, path), (self.actual, path)]:
+                for missing in (False, True):
+                    with self.subTest(path=path, field=field, missing=missing):
+                        original = mapping.pop(field)
+                        if not missing:
+                            mapping[field] = '0' * 64
+                        try:
+                            with self.assertRaises(ValueError):
+                                self.apply()
+                        finally:
+                            mapping[field] = original
+            self.granted.remove(path)
+            with self.subTest(ungranted=path), self.assertRaises(ValueError):
+                self.apply()
+            self.granted.add(path)
+
+    def test_rejects_all_identity_scope_evidence_and_override_changes(self):
+        original = copy.deepcopy(self.refresh)
+        for field in original:
+            value = original[field]
+            replacement = {} if isinstance(value, dict) else [] if isinstance(value, list) else 'unapproved'
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                self.refresh[field] = replacement
+                self.apply()
+        for field, value in [('schemaVersion', True), ('allowUnapproved', True), ('licenceGrant', True)]:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.refresh = copy.deepcopy(original)
+                self.refresh[field] = value
+                self.apply()
+
+    def test_canonical_owner_and_manifest_bytes_cannot_be_replaced_or_reserialised(self):
+        for field in ('approval', 'candidate'):
+            original = getattr(self, field)
+            for value in (None, b'', original + b'\n', original.replace(b'\n', b'\r\n'),
+                          original.replace(b'DouglasNLima', b'AnotherOwner'),
+                          original.replace(b'document-statistics-ten-v1', b'document-statistics-ten-v2')):
+                with self.subTest(field=field, missing=value is None), self.assertRaises(ValueError):
+                    setattr(self, field, value)
+                    self.apply()
+            setattr(self, field, original)
+        with self.assertRaises(ValueError):
+            flowchart_json(b'{"files": {}, "files": {}}')
+
+    def test_predecessor_replay_is_bounded_and_requires_verified_successor_bytes_first(self):
+        previous = document_statistics_predecessor_digests(
+            self.refresh, self.approval, self.candidate, self.actual)
+        self.assertEqual(previous, self.preserved)
+        self.assertEqual(apply_preview_reflow_refresh(self.prior.preserved, self.prior.refresh,
+            self.prior.approval, self.prior.candidate, previous, self.granted), self.preserved)
+        with self.assertRaises(ValueError):
+            apply_preview_reflow_refresh(self.prior.preserved, self.prior.refresh,
+                self.prior.approval, self.prior.candidate, self.actual, self.granted)
+        for path in self.pairs:
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                document_statistics_predecessor_digests(self.refresh, self.approval, self.candidate,
+                    {**self.actual, path: self.pairs[path]['previous']})
+
+    def test_all_28_added_files_are_pinned_without_a_new_licence_grant(self):
+        added = self.contract['addedFiles']
+        self.assertEqual(len(added), 28)
+        self.assertFalse(set(added) & self.granted)
+        check_committed_file_identities(added)
+        for path in added:
+            for missing in (False, True):
+                with self.subTest(path=path, missing=missing), self.assertRaises(ValueError):
+                    actual = dict(added)
+                    actual.pop(path)
+                    if not missing:
+                        actual[path] = '0' * 64
+                    validate_preserved(added, actual)
+
+    def test_unrelated_protected_failures_and_previous_amendments_remain_protected(self):
+        result = self.apply()
+        for path in ('SECURITY.md', '.github/workflows/native-continuous-performance.yml',
+                     *FLOWCHART_PAIRS, *PREVIEW_LOADING_PAIRS,
+                     *(set(PREVIEW_REFLOW_PAIRS) - set(self.pairs))):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                validate_preserved(result, {**self.actual, path: '0' * 64})
+        del self.preserved['SECURITY.md']
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_native_control_unchanged_tree_and_complete_inventory_changes_fail_closed(self):
+        trees = {**self.contract['runtimeSourceTrees'], **self.contract['controlTrees'],
+                 **self.contract['unchangedTrees']}
+        objects = {p: 'a' * 40 for p in self.contract['addedFiles']}
+        for path in trees:
+            with self.subTest(tree=path), self.assertRaises(ValueError):
+                validate_source_identity({**trees, path: '0' * 40}, trees, objects, objects)
+        for actual in ({}, {**objects, 'src/native/unapproved.cs': 'b' * 40},
+                       {**objects, next(iter(objects)): 'b' * 40}):
+            with self.subTest(inventory=actual), self.assertRaises(ValueError):
+                validate_source_identity(trees, trees, objects, actual)
+
+    def test_prior_approval_evidence_allowlist_and_original_inventory_stay_exact(self):
+        for path, digest in {**self.contract['preservedEvidence'], **PREVIEW_REFLOW_EARLIER_REFRESHES}.items():
+            if path not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS:
+                with self.subTest(path=path):
+                    read_committed_evidence(path, digest)
+
+
+class DocumentStatisticsCheckoutTests(PreviewReflowCheckoutTests):
+    evidence_prefix = DOCUMENT_STATISTICS_EVIDENCE
+    manifest_sha256 = DOCUMENT_STATISTICS_MANIFEST_SHA256
+
+    def predecessor_evidence(self):
+        return {p: digest for p, digest in super().predecessor_evidence().items()
+                if p not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS}
+
+    def test_owner_receipt_is_pinned_in_committed_index_and_working_identities(self):
+        path = DOCUMENT_STATISTICS_EVIDENCE + 'owner-approval.json'
+        raw, _ = read_working_evidence(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+        file = self.repository / path
+        file.write_bytes(raw)
+        self.git('add', '--', path)
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Owner receipt fixture [skip ci]')
+        self.assertEqual(self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256), raw)
+        file.write_bytes(raw + b'\n')
+        with self.assertRaises(ValueError):
+            self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+        self.git('add', '--', path)
+        file.write_bytes(raw)
+        with self.assertRaisesRegex(ValueError, 'index differs'):
+            self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Altered owner fixture [skip ci]')
+        with self.assertRaises(ValueError):
+            self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+
+    def test_active_receipt_requires_exact_committed_bytes_and_index_identity(self):
+        path = DOCUMENT_STATISTICS_EVIDENCE + 'approved-refresh.json'
+        raw, _ = read_working_evidence(path, DOCUMENT_STATISTICS_REFRESH_SHA256)
+        file = self.repository / path
+        file.write_bytes(raw)
+        with self.assertRaisesRegex(ValueError, 'Committed provenance evidence is missing'):
+            self.verify(path, DOCUMENT_STATISTICS_REFRESH_SHA256)
+        self.git('add', '--', path)
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Active receipt fixture [skip ci]')
+        self.assertEqual(self.verify(path, DOCUMENT_STATISTICS_REFRESH_SHA256), raw)
+        file.write_bytes(raw + b'\n')
+        self.git('add', '--', path)
+        file.write_bytes(raw)
+        with self.assertRaisesRegex(ValueError, 'index differs'):
+            self.verify(path, DOCUMENT_STATISTICS_REFRESH_SHA256)
+
+    def check_source(self, expected):
+        with patch('licence_scope.ROOT', self.repository), patch('rights_ledger.ROOT', self.repository):
+            check_committed_file_identities(expected)
+
+    def test_protected_source_lf_and_crlf_checkouts_match_committed_blob(self):
+        expected = {self.path: self.manifest_sha256}
+        for autocrlf in ('false', 'true'):
+            self.git('config', 'core.autocrlf', autocrlf)
+            self.file.unlink()
+            self.git('checkout-index', '--force', '--', self.path)
+            self.check_source(expected)
+
+    def test_protected_source_rejects_dirty_working_index_missing_and_substituted_objects(self):
+        expected = {self.path: self.manifest_sha256}
+        self.file.write_bytes(self.raw + b'\n')
+        with self.assertRaisesRegex(ValueError, 'Git-clean working'):
+            self.check_source(expected)
+        self.git('add', '--', self.path)
+        self.file.write_bytes(self.raw)
+        with self.assertRaisesRegex(ValueError, 'index differs'):
+            self.check_source(expected)
+        self.git('add', '--', self.path)
+        self.git('update-index', '--chmod=+x', '--', self.path)
+        with self.assertRaisesRegex(ValueError, 'index differs'):
+            self.check_source(expected)
+        self.git('update-index', '--chmod=-x', '--', self.path)
+        self.file.unlink()
+        with self.assertRaisesRegex(ValueError, 'missing or substituted'):
+            self.check_source(expected)
+        self.file.mkdir()
+        with self.assertRaisesRegex(ValueError, 'missing or substituted'):
+            self.check_source(expected)
+        with self.assertRaisesRegex(ValueError, 'committed files are missing'):
+            self.check_source({'missing.txt': '0' * 64})
+
+    def test_unapproved_committed_blob_digest_is_rejected_even_when_index_and_working_match(self):
+        self.file.write_bytes(self.raw + b'\n')
+        self.git('add', '--', self.path)
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Unapproved source fixture [skip ci]')
+        with self.assertRaisesRegex(ValueError, 'bytes changed'):
+            self.check_source({self.path: self.manifest_sha256})
 
 
 if __name__ == '__main__':
