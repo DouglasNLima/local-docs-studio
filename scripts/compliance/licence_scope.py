@@ -157,6 +157,21 @@ DOCUMENT_STATISTICS_GOVERNANCE_PATHS = {
     'scripts/compliance/licence_scope.py', 'scripts/compliance/test_governance.py',
 }
 
+OUTLINE_TOC_EVIDENCE = 'docs/open-source/evidence/outline-toc/'
+OUTLINE_TOC_PROPOSAL = 'advanced-outline-toc-eleven-v1'
+OUTLINE_TOC_MANIFEST_SHA256 = 'acff902eec465c6fb56c9dfca7943d0beb61f1029e55e9842d69d0efd4bbbcf2'
+OUTLINE_TOC_MANIFEST_BYTES = 19765
+OUTLINE_TOC_APPROVAL_SHA256 = 'f590393de9a61ced700ca708d2fbad4f42cfc25fa7822b50bbfe9af8e44aa563'
+OUTLINE_TOC_REFRESH_SHA256 = '5e13ebf3cb89de515b10f99e536ffbcf873d9f2c36ba2cbcc9923d064218ca39'
+OUTLINE_TOC_PREPARATION = {
+    'commit': '6566088e67a0d269a151c25ad83342743bc4f242',
+    'tree': '0173a0119e1bb00bbee241f8ef95171867767ca1',
+}
+OUTLINE_TOC_DECISION = {
+    'kind': 'explicit-owner-instruction-in-codex', 'owner': 'DouglasNLima',
+    'title': 'Owner Decision — PR #85 Advanced Outline & Copy TOC Provenance Activation',
+}
+
 
 
 def require(condition, message):
@@ -603,7 +618,7 @@ def check_committed_file_identities(expected):
     validate_preserved(expected, current_digests(set(expected)))
 
 
-def check_document_statistics_source_identity(paths):
+def read_document_statistics_evidence():
     candidate_bytes = read_committed_evidence(
         DOCUMENT_STATISTICS_EVIDENCE + 'candidate-refresh.json', DOCUMENT_STATISTICS_MANIFEST_SHA256)
     approval_bytes = read_committed_evidence(
@@ -614,6 +629,12 @@ def check_document_statistics_source_identity(paths):
     for path, digest in candidate['preservedEvidence'].items():
         if path not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS:
             read_committed_evidence(path, digest)
+    return refresh, approval_bytes, candidate_bytes
+
+
+def check_document_statistics_source_identity(paths):
+    refresh, approval_bytes, candidate_bytes = read_document_statistics_evidence()
+    candidate = validate_document_statistics_approval(refresh, approval_bytes, candidate_bytes)
     predecessor = validate_preview_reflow_approval(*read_preview_reflow_evidence())
     trees = {**PREVIEW_REFLOW_SOURCE_TREES, **predecessor['historicalEvidenceTrees'],
              **candidate['runtimeSourceTrees'], **candidate['controlTrees'], **candidate['unchangedTrees']}
@@ -652,6 +673,101 @@ def apply_document_statistics_refresh(preserved, refresh, approval_bytes, candid
                 'Document statistics amendment changed the previous effective pin: ' + path)
         require(actual.get(path) == pair['current'],
                 'Document statistics amendment candidate bytes changed: ' + path)
+        result[path] = pair['current']
+    return result
+
+
+def validate_outline_toc_approval(refresh, approval_bytes, candidate_bytes):
+    # Pin the local owner decision and the exact committed manifest before any
+    # successor is accepted. The original proposal remains immutable and inert.
+    approval = canonical_evidence_json(approval_bytes, OUTLINE_TOC_APPROVAL_SHA256)
+    candidate = canonical_evidence_json(candidate_bytes, OUTLINE_TOC_MANIFEST_SHA256)
+    require(len(candidate_bytes) == OUTLINE_TOC_MANIFEST_BYTES
+            and approval['decision'] == 'APPROVED_ELEVEN_PAIR_GOVERNANCE_AMENDMENT_ONLY'
+            and approval['proposalId'] == OUTLINE_TOC_PROPOSAL
+            and approval['preparation'] == OUTLINE_TOC_PREPARATION
+            and approval['candidateManifestSha256'] == OUTLINE_TOC_MANIFEST_SHA256
+            and approval['candidateManifestBytes'] == OUTLINE_TOC_MANIFEST_BYTES
+            and all(approval['source'][key] == value for key, value in OUTLINE_TOC_DECISION.items()),
+            'Outline and TOC amendment lacks the exact owner decision')
+    require(candidate['proposalId'] == OUTLINE_TOC_PROPOSAL
+            and len(candidate['files']) == 11 and len(candidate['addedFiles']) == 88,
+            'Outline and TOC candidate differs from the approved scope')
+    expected = {
+        'schemaVersion': 1, 'proposalId': OUTLINE_TOC_PROPOSAL,
+        'status': 'OWNER_APPROVED', 'repository': 'DouglasNLima/local-docs-studio',
+        'preparation': OUTLINE_TOC_PREPARATION,
+        'candidateManifestSha256': OUTLINE_TOC_MANIFEST_SHA256,
+        'candidateManifestBytes': OUTLINE_TOC_MANIFEST_BYTES,
+        'ownerApprovalSha256': OUTLINE_TOC_APPROVAL_SHA256,
+        'ownerDecision': OUTLINE_TOC_DECISION,
+        **{key: candidate[key] for key in ('baseline', 'candidate', 'testedProduct',
+            'historicalReference', 'previousRuntimeSourceTrees', 'runtimeSourceTrees',
+            'controlTrees', 'files', 'addedFiles', 'preservedEvidence', 'unchangedTrees',
+            'excludedBoundaries', 'activationPathsOnly')},
+    }
+    require(type(refresh) is dict and type(refresh.get('schemaVersion')) is int
+            and type(refresh.get('candidateManifestBytes')) is int and refresh == expected,
+            'Outline and TOC amendment must retain its exact approved paths, pairs and identities')
+    return candidate
+
+
+def check_outline_toc_source_identity(paths):
+    candidate_bytes = read_committed_evidence(
+        OUTLINE_TOC_EVIDENCE + 'candidate-refresh.json', OUTLINE_TOC_MANIFEST_SHA256)
+    approval_bytes = read_committed_evidence(
+        OUTLINE_TOC_EVIDENCE + 'owner-approval.json', OUTLINE_TOC_APPROVAL_SHA256)
+    refresh = flowchart_json(read_committed_evidence(
+        OUTLINE_TOC_EVIDENCE + 'approved-refresh.json', OUTLINE_TOC_REFRESH_SHA256))
+    candidate = validate_outline_toc_approval(refresh, approval_bytes, candidate_bytes)
+    # These pins include opaque licence and disclosure text as well as JSON.
+    # Only the two governance implementations may change during activation;
+    # their preparation hashes stay pinned in the immutable manifest.
+    check_committed_file_identities({path: digest for path, digest in candidate['preservedEvidence'].items()
+                                    if path not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS})
+    statistics_evidence = read_document_statistics_evidence()
+    statistics = validate_document_statistics_approval(*statistics_evidence)
+    require(candidate['previousRuntimeSourceTrees'] == statistics['runtimeSourceTrees'],
+            'Outline and TOC amendment has an incorrect approved predecessor')
+    reflow = validate_preview_reflow_approval(*read_preview_reflow_evidence())
+    trees = {**PREVIEW_REFLOW_SOURCE_TREES, **reflow['historicalEvidenceTrees'],
+             **statistics['runtimeSourceTrees'], **statistics['controlTrees'], **statistics['unchangedTrees'],
+             **candidate['runtimeSourceTrees'], **candidate['controlTrees'], **candidate['unchangedTrees']}
+    require(all((ROOT / path).is_file() and not (ROOT / path).is_symlink()
+                for path in paths if any(path.startswith(prefix + '/') for prefix in trees)),
+            'Outline and TOC source is missing or substituted')
+    check_flowchart_source_identity(paths, trees)
+    require(not provenance_git('diff', '--cached', '--name-only', '--no-renames', 'HEAD', '--', *trees).strip(),
+            'Outline and TOC source index differs from the committed trees')
+    check_committed_file_identities({**statistics['addedFiles'], **candidate['addedFiles'],
+        **{path: pair['current'] for path, pair in statistics['files'].items()},
+        **{path: pair['current'] for path, pair in candidate['files'].items()}})
+    return (refresh, approval_bytes, candidate_bytes), statistics_evidence
+
+
+def outline_toc_predecessor_digests(refresh, approval_bytes, candidate_bytes, actual):
+    candidate = validate_outline_toc_approval(refresh, approval_bytes, candidate_bytes)
+    previous = dict(actual)
+    for path, pair in candidate['files'].items():
+        require(actual.get(path) == pair['current'], 'Outline and TOC candidate bytes changed: ' + path)
+        previous[path] = pair['previous']
+    # Replay the unchanged predecessor approvals against their authorised bytes.
+    # The final protected inventory is still checked against actual current bytes.
+    return previous
+
+
+def apply_outline_toc_refresh(preserved, refresh, approval_bytes, candidate_bytes, actual, granted):
+    candidate = validate_outline_toc_approval(refresh, approval_bytes, candidate_bytes)
+    require(len(preserved) == 2421, 'Outline and TOC must retain all previously protected paths')
+    result = dict(preserved)
+    for path, pair in candidate['files'].items():
+        require(path in granted and boundary(path, granted)[:2] in (
+                    ('R1', 'MIT_ORIGINAL_PORTIONS_ONLY'), ('R2', 'MIT_ORIGINAL_PORTIONS_ONLY')),
+                'Unapproved Outline and TOC amendment path: ' + path)
+        require(preserved.get(path) == pair['previous'],
+                'Outline and TOC amendment changed the previous effective pin: ' + path)
+        require(actual.get(path) == pair['current'],
+                'Outline and TOC amendment candidate bytes changed: ' + path)
         result[path] = pair['current']
     return result
 
@@ -700,7 +816,7 @@ def main():
     selection_refresh = json.loads((ROOT / 'docs/open-source/evidence/selection-sync/preserved-refresh.json').read_text(encoding='utf-8'))
     preserved = apply_selection_sync_refresh(preserved, selection_refresh)
     flowchart_refresh = flowchart_json((ROOT / (FLOWCHART_EVIDENCE + 'approved-refresh.json')).read_bytes())
-    statistics_evidence = check_document_statistics_source_identity(paths)
+    outline_evidence, statistics_evidence = check_outline_toc_source_identity(paths)
     preview_reflow_evidence = read_preview_reflow_evidence()
     preview_loading_evidence = (
         flowchart_json((ROOT / (PREVIEW_LOADING_EVIDENCE + 'approved-refresh.json')).read_bytes()),
@@ -710,14 +826,16 @@ def main():
     actual = current_digests(set(preserved) | {
         FLOWCHART_EVIDENCE + 'candidate-refresh.json', FLOWCHART_EVIDENCE + 'owner-approval.json'})
     validate_flowchart_evidence_digests(actual)
-    predecessor_actual = document_statistics_predecessor_digests(*statistics_evidence, actual)
+    statistics_actual = outline_toc_predecessor_digests(*outline_evidence, actual)
+    predecessor_actual = document_statistics_predecessor_digests(*statistics_evidence, statistics_actual)
     preserved = apply_flowchart_styling_refresh(
         preserved, flowchart_refresh,
         (ROOT / (FLOWCHART_EVIDENCE + 'owner-approval.json')).read_bytes(),
         (ROOT / (FLOWCHART_EVIDENCE + 'candidate-refresh.json')).read_bytes(), actual, granted)
     preserved = apply_preview_loading_refresh(preserved, *preview_loading_evidence, actual, granted)
     preserved = apply_preview_reflow_refresh(preserved, *preview_reflow_evidence, predecessor_actual, granted)
-    preserved = apply_document_statistics_refresh(preserved, *statistics_evidence, actual, granted)
+    preserved = apply_document_statistics_refresh(preserved, *statistics_evidence, statistics_actual, granted)
+    preserved = apply_outline_toc_refresh(preserved, *outline_evidence, actual, granted)
     validate_preserved(preserved, actual)
     check_committed_file_identities(preserved)
     marker = re.compile(r'^\s*(?://|#|/\*|<!--)\s*SPDX-License-Identifier:\s*MIT\b', re.M)
