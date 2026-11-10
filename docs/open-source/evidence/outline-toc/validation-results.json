@@ -1,0 +1,51 @@
+{
+  "status": "PASS_INERT_ONLY",
+  "manifestSha256": "acff902eec465c6fb56c9dfca7943d0beb61f1029e55e9842d69d0efd4bbbcf2",
+  "protectedSubstitutions": 11,
+  "frozenProtectedPaths": 2421,
+  "addedCandidatePaths": 88,
+  "rejectedMutations": [
+    "extra protected path",
+    "changed previous digest",
+    "changed current digest",
+    "missing added file",
+    "changed native tree",
+    "changed control tree",
+    "invented approval",
+    "expanded activation",
+    "removed rights exclusion",
+    "changed pinned document object at HEAD"
+  ],
+  "activeProvenance": "UNAPPROVED; unchanged strict source identity must still fail",
+  "observedPreparationHead": "1d783c5fe07ae89f8cd47dc2bf97957320597e08",
+  "observedPreparationTree": "80994f7aef5d24673613158d05c347c9dfef3dd5",
+  "foundation": "PASS; 2766 inventoried paths before adding these final receipt files; ledger regenerated afterwards",
+  "ordinaryGovernance": "FAIL as required: Flowchart amendment source tree identity changed",
+  "governanceControls": {
+    "total": 89,
+    "passed": 88,
+    "errors": 1,
+    "error": "Flowchart amendment source tree identity changed",
+    "waived": false
+  },
+  "acceptedBaselineGovernance": {
+    "passed": 89,
+    "errors": 0,
+    "protectedInventory": 2421,
+    "existingMitAllowlist": 1081
+  },
+  "independentReview": "PASS for Draft preparation; no remaining blocking implementation finding; read-only independent verifier and strict rejection repeated",
+  "highContrast": "SKIPPED / NOT RUN; actual OS HC off; no hosted transition or OS mutation",
+  "hostedCi": "NOT RUN / unauthorised; all 30 mandatory develop contexts remain required",
+  "remainingObservation": "Intermediate clipboard assertion failure retained with UNESTABLISHED cause; no retrospective pass",
+  "supplementaryCanonicalSha256": {
+    "foundation.txt": "1a3d3a26e3eb57d24a3d855ff9a55a5cc7ab802aabef54397eebe77797c1e25e",
+    "governance.txt": "c7bc76ed3b0add33af3dcd5100dd20e080a5df07636b383dd91938e3f131b0b0",
+    "governance-tests.txt": "1be50b7ed531480c82f65e28071579c5ead281439fa8b4e7c6f1bca956f46566",
+    "independent-review.md": "df0fc9fffa966ce99abaefa8cac3e57487c31fb83b89502483dfffe6fd49e6ef",
+    "engineering-receipt.md": "6a800e9ea069ac793473c5f7451f8912ab57cae49a7bdfd16a338fba0c5fa468",
+    "validate-proposal.py": "cbe51eb90d5a24f63bff1eac24aa2b8b26d9b7917af8bc45d9a9846037248332",
+    "proposal.md": "e37c0c67f52b66dedc3e71383de32ece164977818b8c37bf8d549077f5872805",
+    ".gitattributes": "730a35ae3d558080083c3103d9ac8100c3f6561678092abe341701dfa331eb1d"
+  }
+}

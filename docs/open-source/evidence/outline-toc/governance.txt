@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\check_governance.py", line 135, in <module>
+    main()
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\check_governance.py", line 123, in main
+    check_licence()
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\licence_scope.py", line 703, in main
+    statistics_evidence = check_document_statistics_source_identity(paths)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\licence_scope.py", line 623, in check_document_statistics_source_identity
+    check_flowchart_source_identity(paths, trees)
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\licence_scope.py", line 353, in check_flowchart_source_identity
+    validate_source_identity(trees, approved_trees, expected, dict(zip(names, objects, strict=True)))
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\licence_scope.py", line 322, in validate_source_identity
+    require(trees == approved_trees,
+  File "C:\Code\native-advanced-outline-toc\scripts\compliance\licence_scope.py", line 164, in require
+    raise ValueError(message)
+ValueError: Flowchart amendment source tree identity changed
