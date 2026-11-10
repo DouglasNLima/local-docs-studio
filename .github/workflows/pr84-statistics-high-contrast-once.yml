@@ -1,0 +1,55 @@
+name: PR 84 isolated statistics High Contrast
+on: create
+permissions:
+  contents: read
+jobs:
+  statistics-high-contrast-once:
+    if: github.event.ref_type == 'branch' && github.event.ref == 'control/pr84-statistics-high-contrast-once' && github.run_attempt == 1
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out the isolated control only
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: protocol
+          persist-credentials: false
+      - name: Check out the exact unchanged PR 84 source
+        uses: actions/checkout@v4
+        with:
+          ref: 34808f59f9fe60a3d54b5bd5d82928f7c57d5a43
+          path: candidate
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Verify source and build the unchanged harness and isolated appearance control
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Path evidence | Out-Null
+          $candidate = (Resolve-Path candidate).Path
+          if ((git -C $candidate rev-parse HEAD) -ne '34808f59f9fe60a3d54b5bd5d82928f7c57d5a43') { throw 'Unexpected source HEAD' }
+          if ((git -C $candidate rev-parse 'HEAD^{tree}') -ne '7685cd6939275d3bef442b3ff1df579616a348aa') { throw 'Unexpected source tree' }
+          if (git -C $candidate status --porcelain=v1 --untracked-files=all) { throw 'Source checkout is not clean' }
+          dotnet --info | Out-File evidence/dotnet-info.txt -Encoding utf8
+          dotnet build candidate/tests/native/document-statistics/DocumentStatisticsControls.csproj -c Release -p:RestoreLockedMode=true 2>&1 | Tee-Object evidence/build-harness.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build protocol/controls/pr84-statistics-high-contrast/HighContrastControl.csproj -c Release "-p:CandidateRoot=$candidate" 2>&1 | Tee-Object evidence/build-control.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (git -C $candidate status --porcelain=v1 --untracked-files=all) { throw 'Build altered source checkout' }
+      - name: Execute the single actual High Contrast control and restore appearance
+        shell: pwsh
+        run: |
+          $candidate = (Resolve-Path candidate).Path
+          $output = Join-Path (Resolve-Path evidence).Path 'execution'
+          & protocol/controls/pr84-statistics-high-contrast/bin/Release/net10.0-windows/HighContrastControl.exe $candidate $output 2>&1 | Tee-Object evidence/control-console.log
+          exit $LASTEXITCODE
+      - name: Retain original outcomes and screenshots without binaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr84-statistics-high-contrast-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 90
