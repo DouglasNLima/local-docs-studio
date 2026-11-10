@@ -1,0 +1,99 @@
+{
+  "startingHead": "16b4b6864fd6cd72e3e7cf2bfb42d25af713ea85",
+  "testedProduct": {
+    "commit": "932335027314fe710671d54266367a008fca5547",
+    "tree": "c58468fc41222f56eb38f277950486686e820553",
+    "nativeTree": "4deeb6f0b54fd2e982525968500fbbe94030563d",
+    "controlTree": "a04548454b40bb63f954d240e02cea5ac0b0ec7d"
+  },
+  "pagesTransition": {
+    "before": "FAIL: retained incompatible anchor; settled follow-up demonstrates Failed and Preview unavailable for visible Pages content",
+    "normalChecks": 31,
+    "highContrastChecks": 31,
+    "result": "PASS",
+    "control": "Actual shown WPF Settings Apply callback and UIA visible ranges; both direct Preview and Split returns, Preview-to-Split, return to Continuous and rapid replacement"
+  },
+  "existingReflowControls": {
+    "normal": 7,
+    "actualHighContrast": 4,
+    "passed": 11
+  },
+  "core": {
+    "total": "2320",
+    "executed": "2320",
+    "passed": "2320",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "findRoutingChecks": 48,
+  "selectionNavigationCases": 16,
+  "offlineLoadingControls": 11,
+  "shownLoading": {
+    "result": "PASS",
+    "checks": 106,
+    "executions": 1,
+    "denseErAndCloseReached": true,
+    "deadline": "Unchanged six seconds",
+    "attribution": "This new-source observation does not establish why the original local baseline/candidate failed. Both original FAIL records remain unchanged."
+  },
+  "canonicalIdentityControls": {
+    "passed": 8,
+    "scope": "Isolated Windows Git repositories; fresh LF and CRLF checkouts plus seven altered/missing/staged/committed-content controls",
+    "developmentNote": "Initial checkout materialisation control found Git retained its already-present LF file. The isolated fixture now removes that file before checkout; final tests assert actual LF/CRLF bytes."
+  },
+  "appearance": {
+    "original": "None",
+    "tested": "Aquatic",
+    "restored": "None",
+    "win32AndWpfFlagsVerified": true,
+    "scope": "Owned WPF/UIA; no physical-display, injected keyboard journey or screen-reader certification"
+  },
+  "historicalDenseEr": {
+    "baseline": "FAIL after 104 checks",
+    "candidate": "FAIL after 104 checks",
+    "closeAssertion": "NOT REACHED",
+    "evidenceDirectory": "../preview-reflow-integration"
+  },
+  "historical250ms": "FAIL unchanged; not rerun",
+  "hostedCi": "NOT RUN",
+  "provenance": "INACTIVE; owner approval required",
+  "binarySha256": {
+    "src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.dll": "e1f0761747d06cbed70ba00e3f05b67910226c5b316c127982798ac02a8dc2c6",
+    "tests\\native\\preview-reflow\\bin\\Release\\net10.0-windows\\PreviewReflowControls.dll": "bb4f9445940b6615fb123d091cfcc71717b0bfa5940e7113990d199abd2a33d9"
+  },
+  "retainedEvidenceSha256": {
+    ".gitattributes": "94fbd57ff56ff9477f5e2ec94ca0e0bffc7a6766879b7c64f19be2fd68680e94",
+    "before-pages-anchor.json": "150956a2a92f43e3742eb53590957ea056a55e00dc8fd81f740bf9ac41e38732",
+    "before-pages-failure.json": "d64c84a1565f19ba0a452bec0d2a4b64185abf5f0ba61f10292be99411c4fa87",
+    "canonical-controls.txt": "acefcb5fa5ad5bd1355a9f5f7b3feb90072e339839211847ccc5e473dd664527",
+    "core-summary.json": "8bb674ea90b179d935843f97c3c5e97a4001337ffa8933217da179c924901086",
+    "final-hc-100.json": "f7d25ce1a7c082641857aa6c1efd43b7ba5cfd175c9a793d4a9290aae4e92428",
+    "final-hc-200.json": "3b0cf1f94cb7045ff986fa533f18ba8647da901458323839e09758390752cb11",
+    "final-hc-75.json": "64fc4a5d22b60ddf91b9397e206bc4039876ed10f82930e1e5b2b86c047874b1",
+    "final-hc-Pages.json": "22cb3d0dc5f13ca9210eb2262dc5936bab5894dca51b6779b7ea9edf9f13f148",
+    "final-normal-100.json": "fbf608f5bef588bfa9689e36e90862b7553215215bb3d353fc3bc9ec6ff91921",
+    "final-normal-150.json": "01aa0c0cfc3fe6e6293f0ca15b4f5a19fa2e1e2169ef0ccff5b2bc59c8725511",
+    "final-normal-200.json": "af34ec93087ee695ec9f043afc2906a542b787e2be01b0a60a51a3df6ea23a13",
+    "final-normal-50.json": "44af64260c072504cdd306c92d7d327807b65f22b32f844aaf040a9eac31b0df",
+    "final-normal-75.json": "0b42eff4d7e01e5e4264be8356fc448ec41705594e8373a4cdfb90d403cb36ee",
+    "final-normal-Automatic.json": "94f7b2af96f1c732b07a895cb879273137da58eeb25c4983e65272a4a25f767c",
+    "final-normal-Pages.json": "1272f6b9fd59f67d916f8d8d6ea1094773ff93b354c7cc8228697592cecdfe5f",
+    "find-routing.json": "25f1685fa46ca37c705cd92cb08c4d90de239023d3fe2daa71d73a8f572747c4",
+    "loading-presentation.json": "461c96aae4e0d78f399cfae053bd2d75e2309e9bd07d31c594f0da3cb6f85b82",
+    "loading-ui.json": "44f86bab80e12a4d56a805494414a6072f172c811d16697b2988fddebe0b0644",
+    "pages-high-contrast.json": "43052cf32accbcf6b004249af51408e3c142d312262efdc84ea69cd0d2afb04a",
+    "pages-normal.json": "e919bd2981c5f6227f450ecb1771442c63850598cbaa68e96d65a00bae514b52",
+    "selection-navigation.json": "078b7df6f4ca8d734bcdd802c982090941a7240e1ed228b246bb96af0c5d5d4e"
+  }
+}
