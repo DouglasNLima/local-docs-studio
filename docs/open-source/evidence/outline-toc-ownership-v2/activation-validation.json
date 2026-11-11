@@ -1,0 +1,11 @@
+{
+  "status": "VALIDATION_PENDING",
+  "ownerApprovalRecorded": true,
+  "preparation": {
+    "commit": "db102ace2ff7339febc554eb74dd56f6ce9551ec",
+    "tree": "0a96bb21ad1b87e74ec7f02fc30d13cc856ab488"
+  },
+  "manifestSha256": "aa7bb08472517ae75e92e67451bec437972a8d896a022df5c52a2b3f40861af8",
+  "activationDeclared": false,
+  "hostedQualification": "NOT STARTED"
+}
