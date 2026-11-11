@@ -495,7 +495,7 @@ class FlowchartProvenanceTests(unittest.TestCase):
                 validate_preserved(updated, actual)
 
     def test_current_source_subtrees_and_working_bytes_match_the_approved_identity(self):
-        check_outline_toc_source_identity(current_paths())
+        check_outline_ownership_source_identity(current_paths())
 
     def test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed(self):
         helper = 'src/native/LensDocsStudio.Core/Rendering/FlowchartCompatibility.cs'
