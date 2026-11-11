@@ -1,0 +1,483 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "advanced-outline-toc-ownership-v2",
+  "status": "PROPOSED_NOT_APPROVED",
+  "ownerApproval": null,
+  "v2State": "INACTIVE / BLOCKED / UNSEALED",
+  "repository": "DouglasNLima/local-docs-studio",
+  "baseline": {
+    "commit": "20aedc2d2257ef52cfa02fe0ef328f3f1d570adf",
+    "tree": "5c96749cc103d79a490feba526a7769ab657437a"
+  },
+  "acceptedDevelop": {
+    "commit": "50bc2354e49662c9831338310d23c91cfe7a7b8a",
+    "tree": "7685cd6939275d3bef442b3ff1df579616a348aa"
+  },
+  "candidate": {
+    "commit": "498ff0c40f9ddbb7eb1cd89b3c091ad79b5cd34c",
+    "tree": "2b6eb7746bc0d5ea8b31f847c3900fda28d33d2d"
+  },
+  "testedProduct": {
+    "commit": "6e9c70a81bb37ce789533c2438e3ca6438aa4f30",
+    "tree": "6cf00508ce90b8914540d9e0eb9e7d4847050187",
+    "equivalence": "Exact Native aggregate and Outline/TOC control trees; candidate differs only in selected tracking/evidence packaging and ownership README wording"
+  },
+  "preservedRecovery": {
+    "committedHead": "20aedc2d2257ef52cfa02fe0ef328f3f1d570adf",
+    "committedTree": "5c96749cc103d79a490feba526a7769ab657437a",
+    "uncommittedSnapshot": "1b48eea664decfd459745c066b268a7e8ec9d6c9",
+    "nativeTree": "75d47ad664813a833dd472318fda65e5a8735c1f",
+    "workingInventorySha256": "862f5f1e5641855a00da8446caf95bc88e24b56f85255688d486325b83484224",
+    "indexSha256": "ea01dcd4d3cbdcbbc022c0399c6981a9c14c962013d1fa82ceddc27fc5e9e66d"
+  },
+  "previousRuntimeSourceTrees": {
+    "src/native": "15273162a09ed867f8af36c06ed5143fa114619c",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35"
+  },
+  "runtimeSourceTrees": {
+    "src/native": "fcdff03d1bfa3709f212d2860799115f2e4dc155",
+    "src/native/LensDocsStudio.Native": "101d8e0e102e724ec79dda938433f3c1961187cb",
+    "src/native/LensDocsStudio.Core": "5bf7e7b818b1495094a61204fbfa9af901b84231",
+    "src/native/LensDocsStudio.Native.Validation": "bc7eb4cbc702e5dfe793c9f665f4fda876628a73"
+  },
+  "controlTrees": {
+    "tests/native/outline-toc": "abee1c024143ac90894e575db312700c69e3fb00",
+    "tests/native/outline-ownership": "c3d1e71fef33b7e40ae65d2a2fe70ef22ee57d6e"
+  },
+  "files": {
+    "docs/native/architecture-decisions.md": {
+      "previous": "07b871c4c78a79c3017309c05a5fe01b28d6a7a39f25fb83511339362b8b3b64",
+      "current": "a4890beca9aa896dc5137108edf92c38a4473b9b310e8ac3083431f1d034cefe"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "previous": "28493ef21226ba9b12442f447c27ea1b6c3142cb36f3d6cf110d252d92878010",
+      "current": "6f43aa161b656007a23afc180d71fb64b294ea33c97bf7dd231abd00db099108"
+    },
+    "docs/native/implementation-progress.md": {
+      "previous": "fd4b9b5cf09fdd84a78727aa788668b05cdcf89b5269a4b725dcf55cd1f4e1ae",
+      "current": "f679289943d0d3fdb5f62230d5d0661785f89466fffb685c4be4ba7e6173e152"
+    },
+    "docs/native/native-experience-improvements.md": {
+      "previous": "a0e5c1820eaa445de93ac94ac366974f4e87c59361770026406112b051b4d7eb",
+      "current": "f27b2bee95ad2f490f9fdaa12a0d1f030feaffa470517e5a4f62a052c16ce43f"
+    },
+    "docs/native/validation-report.md": {
+      "previous": "427afbfbbdda87b2205d8f2951d1a678f7568494de2d51afe43859734c949b57",
+      "current": "ce2a97217d5744841178056b6fee1f9991aa7966e90f06d1842af57145602faf"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativePreviewSchedulingChecks.cs": {
+      "previous": "7849ddcd21487206af002bf471871ba5d71e4eb4571eadaf8ce6d62676e34d3a",
+      "current": "69760f5502961b80e24822a9c0857948c0ab07dafc9f63a19eaade19931693b5"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml": {
+      "previous": "c2b533e574046ef2738d7c8615c07f866f22fcd6876c94c4738648b338373549",
+      "current": "5e051f8e751f6c709ec1bc8ca9ceac11c314402ad01f6dbca2d56c9984b5aeff"
+    }
+  },
+  "amendedPredecessorAddedFiles": {
+    "src/native/LensDocsStudio.Native/MainWindow.Outline.cs": {
+      "previous": "943f8f498b34ee669144d1fbfe9dc8ddd0951b9360ccc69d31756db6550dc907",
+      "current": "5470cd06f05dc6fd6fe5d1dc550e24f8f3ea149d249e3d425bee667cf0025fa7"
+    },
+    "tests/native/outline-toc/Program.cs": {
+      "previous": "4f5f83ae31259a1b6fb989679e79209553d6a68f78978a00dd4e2f1d0222d56c",
+      "current": "118ebdd1a82e1dbc33a30c44d213f7dca48c9e62fac7f4e91bc31f0882a95447"
+    },
+    "tests/native/outline-toc/README.md": {
+      "previous": "fec882fca24a37532b9ab3e012f3458d0cf89e5cda85a0131e46e60b290e4341",
+      "current": "f94ccf1c92324349637e2aeb0a05878c03a4ce61c7b7bea06740e97b53b09307"
+    }
+  },
+  "addedFiles": {
+    "docs/native/evidence/pr85-autonomous-qualification/.gitattributes": {
+      "sha256": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992",
+      "gitBlob": "625449502ba4b4d7c229c6ccee42e3ec41cc780c",
+      "mode": "100644"
+    },
+    "docs/native/evidence/pr85-autonomous-qualification/REPORT.md": {
+      "sha256": "94650ef5abe21d6580fadb11c7339a460d608098a1ee0462eb6ebda10d5d268f",
+      "gitBlob": "d0dc1f65bb3ca11a42c9d975b084f2e3570590cf",
+      "mode": "100644"
+    },
+    "docs/native/evidence/pr85-autonomous-qualification/qualification-receipt.json": {
+      "sha256": "0f3cc243ad8bca49c1fd8e2db3be47e607812e7494bec142d325023f2e4c7402",
+      "gitBlob": "8232c4b3414ee5941f7283bd73d1d2d072f558d1",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/LocalOriginalControls.csproj": {
+      "sha256": "d1414d6381d07d2e1c0b01eeddf45938d540720bad6645de16c0fbdc4f0e35ab",
+      "gitBlob": "89e24943a46ebfecf447054fef66ce47c93ae513",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/LocalViewportChecks.cs": {
+      "sha256": "69523fb1cd4ff07536f17f5e83adc15f0476654f079042fa177e742d94c29644",
+      "gitBlob": "77a86a4f83a0c5c90104cde8305f390409819690",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/PointerControl.cs": {
+      "sha256": "b1d9e89ff11f638f519cd70b7deb6bcfbb927c95771de9821886aad90cf3b540",
+      "gitBlob": "50843a88ef780a91883833621d82fbfabb6af20e",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/Program.cs": {
+      "sha256": "ccbda82a8b1f52c3e633f85049df701d92c61d5c89fef5b5cf01b58541dbd556",
+      "gitBlob": "4c9a89378552ad39e800b3f6a8b2c0cee5ae9c3c",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/OwnershipProbe/OwnershipProbe.csproj": {
+      "sha256": "60c524661dda6e4965fcc87631bf70d99c7339c201a78b3aa70f84a594d9be4e",
+      "gitBlob": "9c39489d927f52ba28e12245f600b07214affaaf",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/OwnershipProbe/Program.cs": {
+      "sha256": "d5c2ad338447dd39e08981baefd344669559c7d7416af8e98fdd03836bcb5cdb",
+      "gitBlob": "ab5c91a140efdcdc33d41fd8ff777f40d842f63b",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/README.md": {
+      "sha256": "3c2adc33efca01e72a3ec2f2de6d1ef50fcaaad801c9e0f793da5ab0100262d3",
+      "gitBlob": "f5f93351e50bf9b9958b6e8643d9455106919f85",
+      "mode": "100644"
+    },
+    "tests/native/outline-ownership/verify-control-parity.py": {
+      "sha256": "d35fa32bda27f876fd90820bacd2847573ca1b012be79068303bd80de8354579",
+      "gitBlob": "cea9dc279f88bb46322dbe749c117ee0bc48110b",
+      "mode": "100644"
+    },
+    "tests/native/outline-toc/packages.lock.json": {
+      "sha256": "6f877dd215be3a2a356a762df49a4e8e1362001b8e7bbd44fb64b9a856d07100",
+      "gitBlob": "b0f8bbc505c7eaa56dcfc0c3c4e5bd7bfba5e6c3",
+      "mode": "100644"
+    }
+  },
+  "predecessor": {
+    "proposalId": "advanced-outline-toc-eleven-v1",
+    "manifestSha256": "acff902eec465c6fb56c9dfca7943d0beb61f1029e55e9842d69d0efd4bbbcf2",
+    "manifestBytes": 19765,
+    "approvedSubstitutions": {
+      "docs/native/architecture-decisions.md": {
+        "previous": "3709f06204d37a7b553bd8698f39b0da3ee258ca74aff5d0eb50f27a8b75c5c4",
+        "current": "07b871c4c78a79c3017309c05a5fe01b28d6a7a39f25fb83511339362b8b3b64"
+      },
+      "docs/native/functional-parity-matrix.md": {
+        "previous": "0e74fb215f3885f764fc6df9135405e459ecc1dd247160c4448350e8e70d5c6b",
+        "current": "28493ef21226ba9b12442f447c27ea1b6c3142cb36f3d6cf110d252d92878010"
+      },
+      "docs/native/implementation-progress.md": {
+        "previous": "32d9090f302f2a39d15688469a7eb5ba32c991a508f64e504a7e3beffcdd6f43",
+        "current": "fd4b9b5cf09fdd84a78727aa788668b05cdcf89b5269a4b725dcf55cd1f4e1ae"
+      },
+      "docs/native/native-experience-improvements.md": {
+        "previous": "9de0ff568c041b676ad0987c288bed02f2af7553db35990a22dee6ca4cca38a8",
+        "current": "a0e5c1820eaa445de93ac94ac366974f4e87c59361770026406112b051b4d7eb"
+      },
+      "docs/native/validation-report.md": {
+        "previous": "d7109017deda52260f9ba2742f81eb2ef160b44d38544fae2efeaeb84b0649f7",
+        "current": "427afbfbbdda87b2205d8f2951d1a678f7568494de2d51afe43859734c949b57"
+      },
+      "src/native/LensDocsStudio.Native.Validation/NativePreviewSchedulingChecks.cs": {
+        "previous": "139b41508ece5a83e100454f9f4088196994e0323ec61d942354375593f9d721",
+        "current": "7849ddcd21487206af002bf471871ba5d71e4eb4571eadaf8ce6d62676e34d3a"
+      },
+      "src/native/LensDocsStudio.Native.Validation/NativeShellLayoutChecks.cs": {
+        "previous": "c76791a461f9ebb89d1687c84e83776edbb54b921f750cf60a638313a1a42470",
+        "current": "710b958e4baa0c469c394b52eb8c5ddb1f95ebfafe15ff7beb3f4c9f3a629e69"
+      },
+      "src/native/LensDocsStudio.Native.Validation/NativeUiOutlineModernisationChecks.cs": {
+        "previous": "aad29655f5634c898acea6496df5ff2fa68a316cf2a14ef4521432a912e3e609",
+        "current": "e3b7ce6cbe76282c439d8bb6cdf7aea240835a5c96d46de9de04cad1d1333de0"
+      },
+      "src/native/LensDocsStudio.Native/MainWindow.WorkspaceChrome.cs": {
+        "previous": "b80ada80d49aa569100a3ef1e67da1a2e49b81d994f997da2959575b9b58f748",
+        "current": "56eeeba19bdaa8e8d0286994922038e2087f5f3ea242db603aaa070917730be9"
+      },
+      "src/native/LensDocsStudio.Native/MainWindow.xaml": {
+        "previous": "9285f58ccba4b23462e9c69375ce38f89d73b8b1e1f50f4155fe09bfbfaed24e",
+        "current": "c2b533e574046ef2738d7c8615c07f866f22fcd6876c94c4738648b338373549"
+      },
+      "src/native/LensDocsStudio.Native/MainWindow.xaml.cs": {
+        "previous": "048de6e8fe85405b910145d5e3095308d43f6476f3419a994c5ebcce62ba8594",
+        "current": "5020be32b05ec88862728b951439e296d18f66f614200223bebd91615c14b89c"
+      }
+    },
+    "approvedAddedFilePins": {
+      "docs/native/evidence/outline-toc/.gitattributes": "730a35ae3d558080083c3103d9ac8100c3f6561678092abe341701dfa331eb1d",
+      "docs/native/evidence/outline-toc/baseline-governance-tests.txt": "64f9ccb671311cf2c22bf0fb5a9671ae9737556d5be933e773bbc9f2b24b6a21",
+      "docs/native/evidence/outline-toc/baseline-governance.txt": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348",
+      "docs/native/evidence/outline-toc/control-build-dismissal-scope.txt": "680cdd77dee6d72a8df224bdb7166b4473334527bd961329d7bd097720b572d9",
+      "docs/native/evidence/outline-toc/control-build-dismissal-wait.txt": "9cc216b19c49d572fed3846a9603b5718c0888e370fa0ffe151aa8dfa32f336e",
+      "docs/native/evidence/outline-toc/control-build-dismissal.txt": "7bef3bffe2d8421271e096d48128aae323bd39321443c39d88d75e01c630fe41",
+      "docs/native/evidence/outline-toc/control-build-final.txt": "c24f0fd1d4409f3d480918d38e63b805d578038c56dd928fe232ec1262d08c20",
+      "docs/native/evidence/outline-toc/control-build-fixed.txt": "d93ea2a33bd025ac4989a059ed282f87796568cf4dd9b0022f466b75ede8bc71",
+      "docs/native/evidence/outline-toc/control-build-focus.txt": "3865326b4c77ae81a17fd20551b8a58823c705ef55fe831c9254faed6cabad42",
+      "docs/native/evidence/outline-toc/control-build-initial.txt": "7495a18c78320ab4729e025ebace9b63a664198eabacce4fa72b5633785d07c2",
+      "docs/native/evidence/outline-toc/control-build-ownership.txt": "d0d8dfb89c5ae994291680abb08ae7bc150297c6823e2b2c7d351bafd49ee92c",
+      "docs/native/evidence/outline-toc/control-build-reviewed.txt": "1d7ed8e05a211274e5de078be5cd1e194eaba4f3b7ef7fad6521ff306459b840",
+      "docs/native/evidence/outline-toc/dark-reviewed-clipboard-copy.json": "e918c41cf3da9199d405cc771661943ec4c4c080f1653d16f130f789ab375b9e",
+      "docs/native/evidence/outline-toc/dark-reviewed-outline-minimum.png": "e6fbc66fa893cae27e0c8dcc3bb08396e0ad8796d9aaf3cb47437aedc4ebb52b",
+      "docs/native/evidence/outline-toc/dark-reviewed-preservation.json": "e7cb5945c4c180c6afc41934f0a4f1728f8a765ab6f367aa1ef20a129aac1899",
+      "docs/native/evidence/outline-toc/dark-reviewed-results.json": "b1168d8089f77d2fd4a7440bef074d0359d0122b45849b9a9966926724172674",
+      "docs/native/evidence/outline-toc/dark-reviewed-toc-minimum.png": "0cdb6e130cf85955e81acb64e3d785517b60b024b6e39853519bbf7b361ae3c4",
+      "docs/native/evidence/outline-toc/dark-reviewed.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/dialog-dismissal-awaited-failure.txt": "09458288469bdd41d37730116b11e14ecefc772757bb73a8de75fc204bf8b5e1",
+      "docs/native/evidence/outline-toc/dialog-dismissal-awaited-results.json": "404ee0a2f99daa2a35b1862d2265f048334a704c74b90fa7d8e1fc39a68ab482",
+      "docs/native/evidence/outline-toc/dialog-dismissal-awaited.txt": "6292583670dbf0fcbe8ab0453ab14a9984c752a0354c395d96007f2b62538a80",
+      "docs/native/evidence/outline-toc/dialog-dismissal-failure.txt": "264f88f8905e28fd04a866cd49c12de55ac9038d16093b2fdeb721d6a85f6b8c",
+      "docs/native/evidence/outline-toc/dialog-dismissal-results.json": "404ee0a2f99daa2a35b1862d2265f048334a704c74b90fa7d8e1fc39a68ab482",
+      "docs/native/evidence/outline-toc/dialog-dismissal-scope-results.json": "f94f2cf6999156ae8994cf0ac7832d87865ecc59d57ca8d8ef527ca55090133e",
+      "docs/native/evidence/outline-toc/dialog-dismissal-scope.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/dialog-dismissal.txt": "a1e11801de50f0fb8701ae3856fbb02dde3bf00402b3616dec9a300778dd0cf3",
+      "docs/native/evidence/outline-toc/find-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/find.json": "488ca5aa5d8805247d5a8094af32927d1ac23c646b35c82767335f097a26803f",
+      "docs/native/evidence/outline-toc/flowchart-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/flowchart.json": "ca2109f50aa84b35fe0d238f7930316c21b2163fc3f57696216e100428175d39",
+      "docs/native/evidence/outline-toc/focused-core-corrected.trx": "aa8a214755eb548af285ff4ec4f637f2c33c0bdcc243e0988d452374707f3aaa",
+      "docs/native/evidence/outline-toc/focused-core-corrected.txt": "68172a0a9ff8a228feec45415c9830bae118fbdc9aa1e6b677492b962c92354d",
+      "docs/native/evidence/outline-toc/focused-core-final.trx": "ed0da11d845c45bed3dd83b3ceb2f31863d75e2c82715bdd25ec040f920dc762",
+      "docs/native/evidence/outline-toc/focused-core-final.txt": "fc9a54a9692d3f0982e94203f56461c5df99692c8ee4371630c9a7f61543acda",
+      "docs/native/evidence/outline-toc/focused-core-initial.trx": "796f169f6f32e814b7c195388e254cf04e5172bbe465deb03673515a33cacdc9",
+      "docs/native/evidence/outline-toc/focused-core-initial.txt": "59c5df696ec96a4699466afc0723e987d2102abbbaa3de6fde76ab3351b941d9",
+      "docs/native/evidence/outline-toc/initial-build.txt": "f73e22deed02f3bfb01e0e7c4f0d0ec7649122fe4b75a30ab99672b0ed6f911a",
+      "docs/native/evidence/outline-toc/light-focus-corrected-failure.txt": "4c5841618885f4b4ea46ee445d690c8f90869ce8593cafa07ae2c54c390efb0c",
+      "docs/native/evidence/outline-toc/light-focus-corrected-results.json": "a2488e2b0544e07ce07fa5b2ad15cf0fc042390aa6a73f555f6a212540afc631",
+      "docs/native/evidence/outline-toc/light-focus-corrected.txt": "d31e42a8fd4ad604971aa64f1334de5a6251ad09440261fd4ff5b756b04826b6",
+      "docs/native/evidence/outline-toc/light-initial-failure.txt": "6de064da3c3fb4a8e5b53c569e9961efef62c357c50e884c9c11bb1cf3b93959",
+      "docs/native/evidence/outline-toc/light-initial-results.json": "05bc165a2f0673894ac4fcac3ac4bbca69425f39628ded573e36c89e2ac2fe2f",
+      "docs/native/evidence/outline-toc/light-initial.txt": "b4e588828ac0762ec709e09562b628d8598b806c8d23f92c8d86b1c46cc26271",
+      "docs/native/evidence/outline-toc/light-ownership-clipboard-copy.json": "d4f6af11e0dc52b6b6ef43bd66670e19bc13325b12cbd14037b15ea0b860770c",
+      "docs/native/evidence/outline-toc/light-ownership-preservation.json": "e7cb5945c4c180c6afc41934f0a4f1728f8a765ab6f367aa1ef20a129aac1899",
+      "docs/native/evidence/outline-toc/light-ownership-results.json": "858621aa9448e84583c362082721c0f09a6349ac06e4d61fc0d8582cd073f2a3",
+      "docs/native/evidence/outline-toc/light-ownership.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/light-reviewed-clipboard-copy.json": "f7ea4dd4132880fc216a7632f29a861cc08bef71a56d425f74375c37932c71b0",
+      "docs/native/evidence/outline-toc/light-reviewed-outline-minimum.png": "e92e9cad1b1c48a951c93653a8d27b25d441467be87038eb6c1a9b82f8bc88ac",
+      "docs/native/evidence/outline-toc/light-reviewed-preservation.json": "e7cb5945c4c180c6afc41934f0a4f1728f8a765ab6f367aa1ef20a129aac1899",
+      "docs/native/evidence/outline-toc/light-reviewed-results.json": "61b5849078a8ad52f8e404bc86cb7d711baae165f1547b23a267e0678ed184b7",
+      "docs/native/evidence/outline-toc/light-reviewed-toc-minimum.png": "60422ca944e46d76493a3a3865a7b1d3277a6fea3c4f21538388aea8ead480e9",
+      "docs/native/evidence/outline-toc/light-reviewed.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/loading-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/loading-offline-execution.txt": "461c96aae4e0d78f399cfae053bd2d75e2309e9bd07d31c594f0da3cb6f85b82",
+      "docs/native/evidence/outline-toc/loading.json": "9184dec0e2eef0948e7e0e48992f52f014c78f2757059e3386d158103ddc3980",
+      "docs/native/evidence/outline-toc/original-regression-executions.json": "1e7df2ea5b1f3702186be1aaf29d6f51a1d9beb3ab26719fc629575499489e3c",
+      "docs/native/evidence/outline-toc/os.json": "e27f4fb59d1d40be755243a652cefbe0309a3c9f7ff82202f77904316c6e8664",
+      "docs/native/evidence/outline-toc/pages-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/pages.json": "fc49d99e4df787fdb5e90343b3feb4a9eda3874ca76a3e35a1469025bd153f45",
+      "docs/native/evidence/outline-toc/reflow-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/reflow.json": "57ee093736205629ff17a0bb580688f2d7eed7b685e5ad0bb3365d866cce06df",
+      "docs/native/evidence/outline-toc/results.json": "d02526f087f3fdae606974d019fd46e1b6fe1142a5dfb327aed3b70b4c17d6fc",
+      "docs/native/evidence/outline-toc/run-regressions.py.txt": "bd7448a2e946c7dcfe9986e781720626efbe148bdbb6930695010347b4916d52",
+      "docs/native/evidence/outline-toc/runtime.txt": "82e50aa6826f49ab83c2c22db73f150c81e15835d128b6529f5e44b137038e8b",
+      "docs/native/evidence/outline-toc/scheduling-corrected.json": "d83e84e4655ca186bb0e0183280b6dd0376717281b32db452a154773298448f3",
+      "docs/native/evidence/outline-toc/scheduling-corrected.txt": "5ec762d2c6d2b5e1e258283e0d59604abb0a664ae0baab741f765a1ecf226942",
+      "docs/native/evidence/outline-toc/scheduling-execution.txt": "2ebeae344b2f4896d6172d1ddcdac795a77ced4752505d51420297efff5d4af0",
+      "docs/native/evidence/outline-toc/selection-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/selection.json": "cdb6d6049d64aa202315cd55461c39aed15b508530c31d2e1d11b18844469a9b",
+      "docs/native/evidence/outline-toc/static-execution.txt": "ce4220c64ffb98d827db6dd22dccdbcb4e5e9d908e4dfff266cabaf54e4c90fa",
+      "docs/native/evidence/outline-toc/statistics-execution.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/native/evidence/outline-toc/statistics.json": "312c75dbcee46ffef278ce12e5b8ffb38ec65f1da76ca21485d5b95c2da512a4",
+      "docs/native/evidence/outline-toc/validation-build-final.txt": "c1e72365301bbae0ba860ab653f485e2ceb80fab15017be03b45fadfc476ceb9",
+      "docs/native/evidence/outline-toc/validation-build-initial.txt": "a27f0ad3da4e0245cb849be0933cce12bd7669378637edd20684f463c5ef8286",
+      "docs/native/evidence/outline-toc/validation-build-scheduling.txt": "a19fba0dbff948e10730fac23728c2aaf10d90b8d23d2675261b9ee1a1b5674b",
+      "docs/native/native-outline-toc-validation.md": "a7d982455c1f19da1d8c2ea35fd04883a3a1461d9f5698e4dd4e12753d3f2c93",
+      "docs/native/native-outline-toc.md": "cc5a4e4f84d978ce61de8f77440a74b78ddaf58c5f73c61abcf57df137c18d95",
+      "src/native/LensDocsStudio.Core.Tests/TableOfContentsTests.cs": "4d4d3b571c8704ce68957637ea8cd1f5a95ece566cae9bda5a475ba639974e51",
+      "src/native/LensDocsStudio.Core/Editing/TableOfContentsService.cs": "97f4c7472eafce4001a246c097782eb76405e6bdfd6f7ebf057ffb4c14704ccb",
+      "src/native/LensDocsStudio.Native/MainWindow.Outline.cs": "943f8f498b34ee669144d1fbfe9dc8ddd0951b9360ccc69d31756db6550dc907",
+      "src/native/LensDocsStudio.Native/MainWindow.TableOfContents.cs": "ea0ccc60896df74151702fa10a372a391622e053390ffef0c0b754a56c76dd94",
+      "src/native/LensDocsStudio.Native/TableOfContentsWindow.xaml": "4a8f10592851ba6eadc86cd95af5baeaf5a155cf5c4135cee89fe8a5f972635b",
+      "src/native/LensDocsStudio.Native/TableOfContentsWindow.xaml.cs": "d2317a2b6135114d8286982b2d942b12ad22cfbf3716095ba9f2b7ccfc3fd39c",
+      "src/native/LensDocsStudio.Native/ViewModels/OutlineHeadingViewModel.cs": "abf680539c9be31dd07df994dc3bfcd2c87e406a8d5d2b3c655dce247a149fde",
+      "tests/native/outline-toc/OutlineTocControls.csproj": "ed0842f8b33a4f2abd7681850ee8cacbf0d04669d18913550400bf6690686faa",
+      "tests/native/outline-toc/Program.cs": "4f5f83ae31259a1b6fb989679e79209553d6a68f78978a00dd4e2f1d0222d56c",
+      "tests/native/outline-toc/README.md": "fec882fca24a37532b9ab3e012f3458d0cf89e5cda85a0131e46e60b290e4341"
+    },
+    "requireImmutableApprovalAndReplay": true
+  },
+  "preservedEvidence": {
+    "LICENSE": "f4126eb8680101babaa6c1ee89b9693320eb204139f3ee3fcd08abb66eb31261",
+    "LICENSING.md": "cd099b27d5841dcc285e2439d1dd4c43cdd09fc37199cb971b09e13587ec5bd7",
+    "docs/open-source/configuration/mit-scope.json": "8270a564757e0851e15184a5ca2c64c46ca6892811503b6c20062c4e9fa48388",
+    "docs/open-source/evidence/document-statistics/approved-refresh.json": "17fc365494190bee00de5d678875e788de665e3cb96adfd578ca229ca72afff8",
+    "docs/open-source/evidence/document-statistics/candidate-refresh.json": "7dd1bc0e1a4c1ccf798495cba950a422af06729ee3876d86a04e028f6141ec22",
+    "docs/open-source/evidence/document-statistics/owner-approval.json": "263f7fa6bb4d58b6dfe7371784a123a4daf75d81550c043caf8b02aae6cb24a7",
+    "docs/open-source/evidence/find-caret/preserved-refresh.json": "a5ce3c4a9a8d1ce6b6a86f79b10b98ee8ca94296a2ca7de95ca8e037f0624237",
+    "docs/open-source/evidence/flowchart-provenance-81/approved-refresh.json": "140568d16736ac59a0bb35b0d8199a3becda851e65588dfd5be97c8851c74a47",
+    "docs/open-source/evidence/flowchart-provenance-81/candidate-refresh.json": "97582b1d4e1c7bf1d2f8762bf812a50c2b8aae976be1491daacb9e75bb8abb4c",
+    "docs/open-source/evidence/flowchart-provenance-81/owner-approval.json": "7232a84cb6f90256a818b0e027c3a22f95acc69e3c1a21faa5f7edcffc6aaec5",
+    "docs/open-source/evidence/goal62/preserved-files.json": "d56bdbcc1f16c1a5ce26a5936778baaf3f45a5b4c94bc661d4d61d8fbb845822",
+    "docs/open-source/evidence/goal62/rights-ledger.csv": "10cc099628ea075443496b0f3bafc0c7685c80cde05a7985ddd1c07b99d7d151",
+    "docs/open-source/evidence/outline-toc/approved-refresh.json": "5e13ebf3cb89de515b10f99e536ffbcf873d9f2c36ba2cbcc9923d064218ca39",
+    "docs/open-source/evidence/outline-toc/candidate-refresh.json": "acff902eec465c6fb56c9dfca7943d0beb61f1029e55e9842d69d0efd4bbbcf2",
+    "docs/open-source/evidence/outline-toc/owner-approval.json": "f590393de9a61ced700ca708d2fbad4f42cfc25fa7822b50bbfe9af8e44aa563",
+    "docs/open-source/evidence/preview-loading-visibility/approved-refresh.json": "ced6641fbc0c211ad94fa63bcbdadc9a9e9c6de9f479f0727c0c1a58ccd23ed2",
+    "docs/open-source/evidence/preview-loading-visibility/candidate-refresh.json": "0dc374121eafa93c66c1f67a9562d326472a8c58aa41c64a94e6346ee5511e32",
+    "docs/open-source/evidence/preview-loading-visibility/owner-approval.json": "f38b0799d5b85680e27cb1509b1dc5dd0facf226a8a9c3c3c1b3f1021e0425ea",
+    "docs/open-source/evidence/preview-reflow-integration-v2/approved-refresh.json": "88fbe06b2e40b0ec2a9e3962ba6777569d3700eb31050b453756d1baee1a990d",
+    "docs/open-source/evidence/preview-reflow-integration-v2/candidate-refresh.json": "340745a23758a94cb50b9aadeb761b817697777481a39762dbe0465ef64a8681",
+    "docs/open-source/evidence/preview-reflow-integration-v2/owner-approval.json": "3f8bc670c9361973621bde8ab391f40f8b0d37919defa96ece86bb7a0469dabb",
+    "docs/open-source/evidence/selection-sync/preserved-refresh.json": "f29e60b557cf1c4e0060262cda244431cea451108dad865122d087a744c74694",
+    "scripts/compliance/licence_scope.py": "23b513def24322cb582bc9cb2c77dd19baae691706a35a8cfd1b7f7902b85adc",
+    "scripts/compliance/test_governance.py": "66f7e73140c107f7261f59d3e4457532d27614f2c611f2e28567a0b76f5bf2eb"
+  },
+  "unchangedTrees": {
+    ".github": "aa34495d1b4aef01955975c397acc96fb24ddf01",
+    "assets": "087e0dad051a709e2c0a29cafd72d8ed93b2f8c0",
+    "src/native/LensDocsStudio.Core": "5bf7e7b818b1495094a61204fbfa9af901b84231",
+    "src/native/LensDocsStudio.Native/Rendering": "b69c05be4bb4de8744c463358e40387972f20520",
+    "src/windows": "a26f0302620e932f4349d0c994cb7971a280f7cb",
+    "tests/fixtures/native-flowchart": "4b0a5ae1e829c87e70d0796e5bbaed9a1e6d4b35",
+    "tests/fixtures/native-preview-reflow": "73c29573efa453df1e9a473c0256358bd6e4309a",
+    "tests/native/document-statistics": "1c751d38a4239cff4fa917cb61fc5fc86bc80e6b",
+    "tests/native/preview-loading-presentation": "82783c0fa644652d9df0da9330394b8414df19bb",
+    "tests/native/preview-reflow": "a04548454b40bb63f954d240e02cea5ac0b0ec7d"
+  },
+  "protectedPathCount": 2421,
+  "mitAllowlistPathCount": 1081,
+  "rightsReview": {
+    "docs/native/architecture-decisions.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "docs/native/evidence/pr85-autonomous-qualification/.gitattributes": {
+      "boundary": "R5",
+      "existingGrantStatus": "NOT APPLICABLE",
+      "reason": "Historical machine evidence; visible artwork also requires R4 clearance; excluded from default MIT"
+    },
+    "docs/native/evidence/pr85-autonomous-qualification/REPORT.md": {
+      "boundary": "R5",
+      "existingGrantStatus": "NOT APPLICABLE",
+      "reason": "Historical machine evidence; visible artwork also requires R4 clearance; excluded from default MIT"
+    },
+    "docs/native/evidence/pr85-autonomous-qualification/qualification-receipt.json": {
+      "boundary": "R5",
+      "existingGrantStatus": "NOT APPLICABLE",
+      "reason": "Historical machine evidence; visible artwork also requires R4 clearance; excluded from default MIT"
+    },
+    "docs/native/functional-parity-matrix.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "docs/native/implementation-progress.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "docs/native/native-experience-improvements.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "docs/native/validation-report.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "src/native/LensDocsStudio.Native.Validation/NativePreviewSchedulingChecks.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.Outline.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "src/native/LensDocsStudio.Native/MainWindow.xaml": {
+      "boundary": "R1",
+      "existingGrantStatus": "MIT_ORIGINAL_PORTIONS_ONLY",
+      "reason": "Owner-approved original portions only; embedded R3-R7 and third-party content excluded"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/LocalOriginalControls.csproj": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/LocalViewportChecks.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/PointerControl.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/LocalOriginalControls/Program.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/OwnershipProbe/OwnershipProbe.csproj": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/OwnershipProbe/Program.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/README.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-ownership/verify-control-parity.py": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-toc/Program.cs": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-toc/README.md": {
+      "boundary": "R2",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    },
+    "tests/native/outline-toc/packages.lock.json": {
+      "boundary": "R1",
+      "existingGrantStatus": "BLOCKED",
+      "reason": "Unreviewed path; no first-party grant is inferred from its classification"
+    }
+  },
+  "excludedBoundaries": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7"
+  ],
+  "rightsGrantChangesAuthorised": false,
+  "historicalFailuresMayBeRelabelled": false,
+  "privateQualification": {
+    "controllerCommit": "4144ca1844c32ec595e2541c9605973780541fe4",
+    "controllerTree": "b2c3b69d24b95677fddfb819b11fb5da85093568",
+    "runId": 43079505301,
+    "attempt": 1,
+    "sourceArchiveSha256": "d6a502f826b1d9721a1270ab4b53eeef96fc908a9b138bf57fac662c2819d413",
+    "extensionManifestSha256": "6af3ce3419754ad5a1bc7b596d9225b38ec88d212b5b2b36144a2e27810c39b3",
+    "evidenceTransportSha256": "91a477bc2cee891bc79fcf0a8c2742acd0c40c2056982b973550e462b60b4b34",
+    "redactedReceipt": "docs/native/evidence/pr85-autonomous-qualification/qualification-receipt.json"
+  },
+  "activationPathsOnly": [
+    "scripts/compliance/licence_scope.py",
+    "scripts/compliance/test_governance.py",
+    "docs/open-source/evidence/outline-toc-ownership-v2/owner-approval.json",
+    "docs/open-source/evidence/outline-toc-ownership-v2/approved-refresh.json",
+    "docs/open-source/evidence/outline-toc-ownership-v2/activation-validation.json",
+    "docs/open-source/evidence/outline-toc-ownership-v2/activation-independent-review.md",
+    "docs/open-source/evidence/goal62/rights-ledger.csv"
+  ],
+  "remainingIntegrationRequirements": [
+    "An actual exact-manifest owner provenance decision; this general engineering mandate is not represented as that future decision",
+    "Independent successor implementation and negative/clean-checkout validation with immutable predecessor replay",
+    "All applicable mandatory develop checks PASS on final source; no waiver or protection bypass",
+    "Final independent review and resolved blocking conversations"
+  ],
+  "publicRelease": "NO-GO",
+  "nativeStable": "NO-GO"
+}
