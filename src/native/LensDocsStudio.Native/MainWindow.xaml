@@ -464,7 +464,7 @@
        <TextBlock Text="Filter headings…" DataContext="{Binding ElementName=OutlineFilter}" Style="{StaticResource Desktop.FilterHint}"/>
       </Grid>
       <Grid>
-       <TreeView x:Name="Outline" BorderThickness="0" Background="Transparent" SelectedItemChanged="OutlineSelected" KeyDown="OutlineKeyDown"
+       <TreeView x:Name="Outline" BorderThickness="0" Background="Transparent"
         ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
         AutomationProperties.Name="Document outline" AutomationProperties.AutomationId="Outline"
         AutomationProperties.HelpText="Use arrow keys to navigate and expand headings; Enter goes to source. Filtered results include parent headings.">

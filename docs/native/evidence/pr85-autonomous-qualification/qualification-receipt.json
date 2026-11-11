@@ -1,0 +1,553 @@
+{
+  "status": "QUALIFIED_WITH_EVIDENCE_FOR_RECORDED_SCOPE",
+  "integrationReady": false,
+  "publicRelease": "NO-GO",
+  "nativeStable": "NO-GO",
+  "source": {
+    "commit": "6e9c70a81bb37ce789533c2438e3ca6438aa4f30",
+    "parent": "1555d8e42e9c6845c9b07c60bc76c61ba920a2f1",
+    "tree": "6cf00508ce90b8914540d9e0eb9e7d4847050187",
+    "changedFiles": [
+      "src/native/LensDocsStudio.Native.Validation/NativePreviewSchedulingChecks.cs",
+      "tests/native/outline-toc/Program.cs",
+      "tests/native/outline-toc/README.md",
+      "tests/native/outline-toc/packages.lock.json"
+    ],
+    "nativeTree": "fcdff03d1bfa3709f212d2860799115f2e4dc155",
+    "nativeProductionTree": "101d8e0e102e724ec79dda938433f3c1961187cb",
+    "coreTree": "5bf7e7b818b1495094a61204fbfa9af901b84231",
+    "baselineAdapterReconstructedTree": "f3139940e821202679c41e752832dd3275ae4ea3",
+    "sourceExtensionManifestSha256": "6af3ce3419754ad5a1bc7b596d9225b38ec88d212b5b2b36144a2e27810c39b3",
+    "productionChanges": false
+  },
+  "controller": {
+    "commit": "4144ca1844c32ec595e2541c9605973780541fe4",
+    "parent": "e6177eb422d9d7883542e4554227734a10c225ac",
+    "tree": "b2c3b69d24b95677fddfb819b11fb5da85093568",
+    "fileCount": 48,
+    "workflowId": 414978758,
+    "workflowPath": ".github/workflows/pr85-original-definition-probe.yml",
+    "workflowSha256": "558e55ab5e3f6a20ceb9bbce11a0821eb761c9997ed79eac6017ec0b34b3f47a",
+    "planManifestSha256": "6be36debefb086fc1c4248c2bff593f4e7e9025bfdcdd1774a5b1d730d46f8b6",
+    "sourceArchiveSha256": "d6a502f826b1d9721a1270ab4b53eeef96fc908a9b138bf57fac662c2819d413",
+    "original27FilesUnchanged": true,
+    "runNumber": 3,
+    "hypothesis": "Qualify explicit non-vacuous Redo and the corrected single-observation clipboard control in Light Dark and actual Windows High Contrast; product bytes unchanged"
+  },
+  "runtime": {
+    "utc": "2026-11-11T18:37:27.9012092+00:00",
+    "runId": "43079505301",
+    "commit": "4144ca1844c32ec595e2541c9605973780541fe4",
+    "imageOS": "win25-vs2026",
+    "imageVersion": "20261103.298.1",
+    "expectedImage": "20261103.298.1",
+    "osVersion": "10.0.26100.0",
+    "logicalProcessors": 2,
+    "physicalMemoryBytes": 8584425472,
+    "stopwatchFrequency": 10000000,
+    "schedulingExecutions": 0
+  },
+  "desktop": {
+    "Utc": "2026-11-11T18:40:03.7829189+00:00",
+    "UserInteractive": true,
+    "SessionId": 2,
+    "WindowStation": "WinSta0",
+    "ThreadDesktop": "Default",
+    "InputDesktop": "Default",
+    "DesktopError": null,
+    "Width": 1024,
+    "Height": 768,
+    "SystemDpi": 96,
+    "ImageOS": "win25-vs2026",
+    "ImageVersion": "20261103.298.1",
+    "ProductOrSchedulingExecuted": false
+  },
+  "privateRun": {
+    "url": "https://github.com/DouglasNLima/pr85-scheduling-isolation/actions/runs/43079505301",
+    "id": 43079505301,
+    "attempt": 1,
+    "logSha256": "bee13d2c89caa6486f838648063860274dd64c28d6b65c2aa9ba53e021e0d68d",
+    "diagnosticTransportSha256": "91a477bc2cee891bc79fcf0a8c2742acd0c40c2056982b973550e462b60b4b34",
+    "diagnosticFilesIncludingInventory": 108
+  },
+  "scheduling": {
+    "A": {
+      "executions": 1,
+      "processId": 6220,
+      "completeRunMilliseconds": 3241.5952,
+      "externalProcessSeconds": 4.0075147000000015,
+      "allExercisedPumpsUnder15Seconds": true,
+      "originalDeadlineDefinitions": 3,
+      "unusedAppearanceWaitDefinitions": 2,
+      "safetySeconds": 120,
+      "watchdogIntervention": false,
+      "requestCount": 25,
+      "finishedRequests": 25,
+      "installations": 12,
+      "rejectedNeverInstalled": [
+        9,
+        11,
+        13,
+        15,
+        17,
+        21,
+        23,
+        25
+      ],
+      "redo": {
+        "HiddenPreparation": true,
+        "RapidEdits": 13,
+        "ExactSource": true,
+        "CurrentPreview": true,
+        "UndoAfterRedo": true
+      },
+      "allOriginalHiddenAssertionsReached": true,
+      "uniqueWindows": 1,
+      "finalWindows": 0,
+      "defaultStateUnchanged": true,
+      "instrumentation": {
+        "PhaseCallbacks": 916,
+        "PhaseCallbackMilliseconds": 13.4366,
+        "HeartbeatCallbackMilliseconds": 1.2332,
+        "WriterMilliseconds": 86.2796,
+        "Dropped": 0,
+        "Limitation": "Callback bodies measured; event dispatch and timer scheduling overhead not fully measured. No editor/source mutations or extra test scenarios."
+      },
+      "watchdog": {
+        "polls": 4,
+        "loopBodyMilliseconds": [
+          0.07549999986622424,
+          0.2961999998660758,
+          0.5836999998791725,
+          0.5665999999564519
+        ],
+        "cpuSeconds": 0.0,
+        "wallSeconds": 4.0075147000000015,
+        "pollIntervalSeconds": 1,
+        "safetySeconds": 120,
+        "systemWideQueriesDuringExecution": 0
+      },
+      "inputHeartbeatMaximumMilliseconds": 325.9823
+    },
+    "B": {
+      "executions": 1,
+      "processId": 7264,
+      "completeRunMilliseconds": 3275.1971,
+      "externalProcessSeconds": 4.039746700000023,
+      "allExercisedPumpsUnder15Seconds": true,
+      "originalDeadlineDefinitions": 3,
+      "unusedAppearanceWaitDefinitions": 2,
+      "safetySeconds": 120,
+      "watchdogIntervention": false,
+      "requestCount": 25,
+      "finishedRequests": 25,
+      "installations": 12,
+      "rejectedNeverInstalled": [
+        9,
+        11,
+        13,
+        15,
+        17,
+        21,
+        23,
+        25
+      ],
+      "redo": {
+        "HiddenPreparation": true,
+        "RapidEdits": 13,
+        "ExactSource": true,
+        "CurrentPreview": true,
+        "UndoAfterRedo": true
+      },
+      "allOriginalHiddenAssertionsReached": true,
+      "uniqueWindows": 1,
+      "finalWindows": 0,
+      "defaultStateUnchanged": true,
+      "instrumentation": {
+        "PhaseCallbacks": 916,
+        "PhaseCallbackMilliseconds": 13.8447,
+        "HeartbeatCallbackMilliseconds": 1.102,
+        "WriterMilliseconds": 117.274,
+        "Dropped": 0,
+        "Limitation": "Callback bodies measured; event dispatch and timer scheduling overhead not fully measured. No editor/source mutations or extra test scenarios."
+      },
+      "watchdog": {
+        "polls": 4,
+        "loopBodyMilliseconds": [
+          0.07640000012543169,
+          0.2991999999721884,
+          0.5821000002015353,
+          0.5873000000065076
+        ],
+        "cpuSeconds": 0.0,
+        "wallSeconds": 4.039746700000023,
+        "pollIntervalSeconds": 1,
+        "safetySeconds": 120,
+        "systemWideQueriesDuringExecution": 0
+      },
+      "inputHeartbeatMaximumMilliseconds": 250.1697
+    }
+  },
+  "outline": {
+    "Light": {
+      "executions": 1,
+      "checksPassed": 62,
+      "originalChecksRetained": 60,
+      "actualHighContrast": false,
+      "hostElapsedMilliseconds": 4126.8457,
+      "hostObserverCpuMilliseconds": 0,
+      "clipboard": {
+        "status": "Table of contents copied.",
+        "expectedLength": 306,
+        "expectedSha256": "e378f85a2507d9023856284f93e0f6c447235afc9d6e9dc4a8e77a752e88da10",
+        "actualLength": 306,
+        "actualSha256": "e378f85a2507d9023856284f93e0f6c447235afc9d6e9dc4a8e77a752e88da10",
+        "matches": true,
+        "sourceCurrent": true,
+        "sequenceBeforeCopy": 0,
+        "sequenceAfterCopy": 9,
+        "sequenceBeforeRead": 9,
+        "sequenceAfterRead": 9,
+        "ownerWindowAfterCopy": 131594,
+        "ownerProcessAfterCopy": 2232,
+        "ownerWindowAfterRead": 131594,
+        "ownerProcessAfterRead": 2232,
+        "testProcess": 2232,
+        "restorationOwnershipEstablished": true,
+        "readErrorType": null,
+        "readErrorHResult": null
+      },
+      "restoration": {
+        "restoration": "Restored the captured clipboard",
+        "ownedClipboard": 9,
+        "sequenceBeforeRestore": 9,
+        "sequenceAfterRestore": 14
+      },
+      "ownership": {
+        "applicationType": "System.Windows.Application",
+        "bootstrapResources": [
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/CommandIcons.xaml",
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/DesktopStyles.xaml",
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/FormStyles.xaml"
+        ],
+        "observedWindows": [
+          {
+            "Type": "LensDocsStudio.Native.MainWindow",
+            "MainWindow": true,
+            "OwnedByMainWindow": false
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          }
+        ],
+        "observations": 62,
+        "observationMilliseconds": 1.772,
+        "productionAppConstructed": false
+      },
+      "cleanup": {
+        "remainingWindows": 0,
+        "exitCode": 0
+      },
+      "defaultStateUnchanged": true,
+      "appearanceRestored": true,
+      "screenshots": {
+        "outline-minimum.png": "2004b71d72c66d39c003aa61047b56b77daefd63a1a907c711c8d4e5c9fa403f",
+        "toc-minimum.png": "8e1ed92ffae8730248e5d45885d2584519654d9a8169ba6c4181b91c32b3c954"
+      }
+    },
+    "Dark": {
+      "executions": 1,
+      "checksPassed": 62,
+      "originalChecksRetained": 60,
+      "actualHighContrast": false,
+      "hostElapsedMilliseconds": 4000.2947,
+      "hostObserverCpuMilliseconds": 15.625,
+      "clipboard": {
+        "status": "Table of contents copied.",
+        "expectedLength": 306,
+        "expectedSha256": "e378f85a2507d9023856284f93e0f6c447235afc9d6e9dc4a8e77a752e88da10",
+        "actualLength": 306,
+        "actualSha256": "e378f85a2507d9023856284f93e0f6c447235afc9d6e9dc4a8e77a752e88da10",
+        "matches": true,
+        "sourceCurrent": true,
+        "sequenceBeforeCopy": 14,
+        "sequenceAfterCopy": 23,
+        "sequenceBeforeRead": 23,
+        "sequenceAfterRead": 23,
+        "ownerWindowAfterCopy": 328088,
+        "ownerProcessAfterCopy": 7928,
+        "ownerWindowAfterRead": 328088,
+        "ownerProcessAfterRead": 7928,
+        "testProcess": 7928,
+        "restorationOwnershipEstablished": true,
+        "readErrorType": null,
+        "readErrorHResult": null
+      },
+      "restoration": {
+        "restoration": "Restored the captured clipboard",
+        "ownedClipboard": 23,
+        "sequenceBeforeRestore": 23,
+        "sequenceAfterRestore": 28
+      },
+      "ownership": {
+        "applicationType": "System.Windows.Application",
+        "bootstrapResources": [
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/CommandIcons.xaml",
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/DesktopStyles.xaml",
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/FormStyles.xaml"
+        ],
+        "observedWindows": [
+          {
+            "Type": "LensDocsStudio.Native.MainWindow",
+            "MainWindow": true,
+            "OwnedByMainWindow": false
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          }
+        ],
+        "observations": 62,
+        "observationMilliseconds": 1.7606,
+        "productionAppConstructed": false
+      },
+      "cleanup": {
+        "remainingWindows": 0,
+        "exitCode": 0
+      },
+      "defaultStateUnchanged": true,
+      "appearanceRestored": true,
+      "screenshots": {
+        "outline-minimum.png": "7ab9c32a9aabee75fd16a4d29eeadee312f70da869c2a5af8562e53836b11116",
+        "toc-minimum.png": "a032ab95f55bb78e6e1c6705a737e296c32b58c603657e2b31346764ef0a69a9"
+      }
+    },
+    "HighContrast": {
+      "executions": 1,
+      "checksPassed": 62,
+      "originalChecksRetained": 60,
+      "actualHighContrast": true,
+      "hostElapsedMilliseconds": 5377.3124,
+      "hostObserverCpuMilliseconds": 15.625,
+      "clipboard": {
+        "status": "Table of contents copied.",
+        "expectedLength": 306,
+        "expectedSha256": "e378f85a2507d9023856284f93e0f6c447235afc9d6e9dc4a8e77a752e88da10",
+        "actualLength": 306,
+        "actualSha256": "e378f85a2507d9023856284f93e0f6c447235afc9d6e9dc4a8e77a752e88da10",
+        "matches": true,
+        "sourceCurrent": true,
+        "sequenceBeforeCopy": 28,
+        "sequenceAfterCopy": 37,
+        "sequenceBeforeRead": 37,
+        "sequenceAfterRead": 37,
+        "ownerWindowAfterCopy": 66068,
+        "ownerProcessAfterCopy": 6516,
+        "ownerWindowAfterRead": 66068,
+        "ownerProcessAfterRead": 6516,
+        "testProcess": 6516,
+        "restorationOwnershipEstablished": true,
+        "readErrorType": null,
+        "readErrorHResult": null
+      },
+      "restoration": {
+        "restoration": "Restored the captured clipboard",
+        "ownedClipboard": 37,
+        "sequenceBeforeRestore": 37,
+        "sequenceAfterRestore": 42
+      },
+      "ownership": {
+        "applicationType": "System.Windows.Application",
+        "bootstrapResources": [
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/CommandIcons.xaml",
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/DesktopStyles.xaml",
+          "pack://application:,,,/LensDocsStudio.Native;component/Resources/FormStyles.xaml"
+        ],
+        "observedWindows": [
+          {
+            "Type": "LensDocsStudio.Native.MainWindow",
+            "MainWindow": true,
+            "OwnedByMainWindow": false
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          },
+          {
+            "Type": "LensDocsStudio.Native.TableOfContentsWindow",
+            "MainWindow": false,
+            "OwnedByMainWindow": true
+          }
+        ],
+        "observations": 62,
+        "observationMilliseconds": 1.9736,
+        "productionAppConstructed": false
+      },
+      "cleanup": {
+        "remainingWindows": 0,
+        "exitCode": 0
+      },
+      "defaultStateUnchanged": true,
+      "appearanceRestored": true,
+      "screenshots": {
+        "outline-minimum.png": "2e263ebb937b938b32473636832c5972f1bbb88fc62226690fe2d956c6aa7a2a",
+        "toc-minimum.png": "7f74c52ade272aaf617e46592e677be97f547a09e93c158a6dde958f301d4bfe"
+      }
+    }
+  },
+  "campaignCounts": {
+    "privateManualRuns": 3,
+    "allowedMaximum": 12,
+    "run1SchedulingExecutions": 0,
+    "run2OriginalCandidate": 1,
+    "run2OriginalDevelop": 1,
+    "run3ExtendedCandidate": 1,
+    "run3ExtendedDevelop": 1,
+    "outlineLight": 1,
+    "outlineDark": 1,
+    "outlineActualHighContrast": 1,
+    "automaticRetries": 0
+  },
+  "historicalFindings": {
+    "P1CaretFind": "64 PASS in original local scope",
+    "P1Viewports": "four modes PASS in original local scope",
+    "P1Ownership": "13 PASS in original local scope",
+    "P1ActualPointerUIA": "four PASS in original local scope",
+    "P1OutlineLightDark": "60/60 PASS; diagnostic clipboard mismatch retained",
+    "P1Core": "116 PASS in original scope",
+    "originalHostedQualification": {
+      "PASS": 5,
+      "FAIL": 1,
+      "SKIPPED": 3,
+      "MISSING": 21
+    },
+    "installedAuthoring": "0/24 qualified in original receipt",
+    "historicalTimeoutCause": "INCONCLUSIVE",
+    "historicalClipboardMismatch": "FAIL / COMPLETE CAUSE UNESTABLISHED",
+    "Continuous250ms": "FAIL; separate performance/release blocker",
+    "ADR007": "Design-approved; operational transition not activated"
+  },
+  "scopeLimits": [
+    "Hidden scheduling Run(false,false) does not qualify numeric viewport restoration or shown scheduling fixtures",
+    "Actual Outline HC is scoped to the existing shown WPF, UIA-provider and routed-key assertions; numeric4.5:1 colour-contrast and physical screen-reader certification are not claimed",
+    "Private runs do not substitute for the 30-check develop gate",
+    "The original v1 approval and MIT grant are unchanged; V2 remains inactive pending exact approval"
+  ],
+  "security": {
+    "repositoryVisibility": "PRIVATE",
+    "humanCollaborators": [
+      "DouglasNLima"
+    ],
+    "acceptedExistingAppInstallation": 124550919,
+    "appEffectivePermissionsAndHistoricalSourceAccess": "UNVERIFIED",
+    "additionalAccessGrants": 0,
+    "ownerDefaultStateTransferred": false,
+    "artifactSourceOrBinaryUploads": false,
+    "paidUsage": "Existing zero-dollar Actions budget retained; no new paid expenditure authorised"
+  },
+  "independentReview": "Separate read-only scheduling and clipboard reviewers found no blocking finding within the tested scopes; integration/provenance gates remain separate"
+}

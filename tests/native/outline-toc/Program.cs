@@ -27,6 +27,8 @@ using LensDocsStudio.Native.ViewModels;
 internal static class Program
 {
     [DllImport("user32.dll")] private static extern uint GetClipboardSequenceNumber();
+    [DllImport("user32.dll")] private static extern IntPtr GetClipboardOwner();
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
     [DllImport("user32.dll")] private static extern bool OpenClipboard(IntPtr owner);
     [DllImport("user32.dll")] private static extern bool CloseClipboard();
     [STAThread]
@@ -48,6 +50,7 @@ internal static class Program
         var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         foreach (var resource in new[] { "CommandIcons", "DesktopStyles", "FormStyles" })
             app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"pack://application:,,,/LensDocsStudio.Native;component/Resources/{resource}.xaml") });
+        var bootstrapResources = app.Resources.MergedDictionaries.Select(resource => resource.Source.ToString()).ToArray();
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(app.Dispatcher));
         ThemeService.Apply(app.Resources, theme);
         var dialogs = new DesktopDialogs();
@@ -61,7 +64,20 @@ internal static class Program
         var editor = (TextEditor)window.FindName("Editor"); var tocButton = (Button)window.FindName("CopyTocButton");
         var checks = new List<string>(); var code = 1;
         DataObject? savedClipboard = null; uint ownedClipboard = 0;
-        void Check(bool value, string label) { if (!value) throw new IOException(label); checks.Add(label); File.AppendAllText(Path.Combine(output, "checks.txt"), label + "\n"); }
+        var observedWindows = new Dictionary<Window, object>(); long ownershipObservationTicks = 0;
+        void Check(bool value, string label)
+        {
+            var started = Stopwatch.GetTimestamp();
+            var windows = app.Windows.Cast<Window>().ToArray();
+            if (!ReferenceEquals(Application.Current, app) || app.GetType() != typeof(Application) || windows.Count(item => ReferenceEquals(item, window)) != 1
+                || windows.Any(item => !ReferenceEquals(item, window) && (item is not TableOfContentsWindow || !ReferenceEquals(item.Owner, window))))
+                throw new IOException("The Outline control has an unexpected application or window owner.");
+            foreach (var item in windows) observedWindows.TryAdd(item, new
+            { Type = item.GetType().FullName, MainWindow = ReferenceEquals(item, window), OwnedByMainWindow = ReferenceEquals(item.Owner, window) });
+            ownershipObservationTicks += Stopwatch.GetTimestamp() - started;
+            if (!value) throw new IOException(label);
+            checks.Add(label); File.AppendAllText(Path.Combine(output, "checks.txt"), label + "\n");
+        }
         async Task WaitFor(Func<bool> ready)
         {
             var clock = Stopwatch.StartNew();
@@ -194,9 +210,42 @@ internal static class Program
                             await WaitFor(() => copy.IsEnabled && preview.Text.StartsWith("<details>"));
                             var expected = TableOfContentsService.Create(new MarkdownService().Parse(editor.Text).Headings, new(Style: TableOfContentsStyle.Numbered, Details: true));
                             Check(preview.Text == expected, "Numbered and details options update the exact preview");
-                            copy.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); ownedClipboard = GetClipboardSequenceNumber();
-                            File.WriteAllText(Path.Combine(output, "clipboard-copy.json"), JsonSerializer.Serialize(new { status = status.Text, expectedLength = expected.Length, matches = Clipboard.GetText() == expected, sourceCurrent = editor.Text == source, sequence = ownedClipboard }));
-                            Check(Clipboard.GetText() == expected, "Clipboard contains the exact generated Markdown");
+                            var sequenceBeforeCopy = GetClipboardSequenceNumber();
+                            copy.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                            var copyStatus = status.Text;
+                            var sequenceAfterCopy = GetClipboardSequenceNumber();
+                            var ownerAfterCopy = GetClipboardOwner();
+                            GetWindowThreadProcessId(ownerAfterCopy, out var ownerProcessAfterCopy);
+                            var sequenceBeforeRead = GetClipboardSequenceNumber();
+                            string? actualClipboard = null; Exception? clipboardReadFailure = null;
+                            try { actualClipboard = Clipboard.GetText(); }
+                            catch (Exception error) when (error is ExternalException or ThreadStateException) { clipboardReadFailure = error; }
+                            var sequenceAfterRead = GetClipboardSequenceNumber();
+                            var ownerAfterRead = GetClipboardOwner();
+                            GetWindowThreadProcessId(ownerAfterRead, out var ownerProcessAfterRead);
+                            var copied = copyStatus == "Table of contents copied.";
+                            var matches = clipboardReadFailure is null && actualClipboard == expected;
+                            var stable = sequenceAfterCopy != 0 && sequenceAfterCopy == sequenceBeforeRead && sequenceBeforeRead == sequenceAfterRead;
+                            // Restore only after an exact, stable observation of a successful
+                            // test write. A failed Copy must not claim another owner's data.
+                            ownedClipboard = copied && matches && stable && sequenceAfterCopy != sequenceBeforeCopy
+                                ? sequenceAfterRead : 0;
+                            string TextDigest(string value) => Convert.ToHexString(
+                                System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
+                            File.WriteAllText(Path.Combine(output, "clipboard-copy.json"), JsonSerializer.Serialize(new
+                            {
+                                status = copyStatus, expectedLength = expected.Length, expectedSha256 = TextDigest(expected),
+                                actualLength = actualClipboard?.Length, actualSha256 = actualClipboard is null ? null : TextDigest(actualClipboard),
+                                matches, sourceCurrent = editor.Text == source, sequenceBeforeCopy, sequenceAfterCopy, sequenceBeforeRead, sequenceAfterRead,
+                                ownerWindowAfterCopy = ownerAfterCopy.ToInt64(), ownerProcessAfterCopy,
+                                ownerWindowAfterRead = ownerAfterRead.ToInt64(), ownerProcessAfterRead,
+                                testProcess = Environment.ProcessId, restorationOwnershipEstablished = ownedClipboard != 0,
+                                readErrorType = clipboardReadFailure?.GetType().FullName, readErrorHResult = clipboardReadFailure?.HResult
+                            }));
+                            if (clipboardReadFailure is not null) throw new IOException("Clipboard observation failed.", clipboardReadFailure);
+                            Check(copied, "Copy reports a successful clipboard write");
+                            Check(stable, "Clipboard observation retains the copied sequence");
+                            Check(matches, "Clipboard contains the exact generated Markdown");
                             using var locked = new ManualResetEventSlim(); using var release = new ManualResetEventSlim();
                             var lockThread = new Thread(() => { if (!OpenClipboard(IntPtr.Zero)) return; locked.Set(); release.Wait(TimeSpan.FromSeconds(5)); CloseClipboard(); });
                             lockThread.Start();
@@ -281,13 +330,45 @@ internal static class Program
             catch (Exception error) { File.WriteAllText(Path.Combine(output, "failure.txt"), error.ToString()); Console.Error.WriteLine(error); Capture("failure", window); }
             finally
             {
-                try { if (ownedClipboard != 0 && GetClipboardSequenceNumber() == ownedClipboard) { if (savedClipboard is null) Clipboard.Clear(); else Clipboard.SetDataObject(savedClipboard, true); } }
-                catch (Exception error) { code = 1; File.WriteAllText(Path.Combine(output, "clipboard-restoration-failure.txt"), error.ToString()); }
+                try
+                {
+                var sequenceBeforeRestore = GetClipboardSequenceNumber();
+                var restoration = ownedClipboard == 0 ? "No successful test ownership established" : "Clipboard changed after the test write";
+                try
+                {
+                    if (ownedClipboard != 0 && sequenceBeforeRestore == ownedClipboard)
+                    {
+                        if (savedClipboard is null) Clipboard.Clear(); else Clipboard.SetDataObject(savedClipboard, true);
+                        restoration = "Restored the captured clipboard";
+                    }
+                }
+                catch (Exception error) { code = 1; restoration = "Clipboard restoration failed"; File.WriteAllText(Path.Combine(output, "clipboard-restoration-failure.txt"), error.ToString()); }
+                File.WriteAllText(Path.Combine(output, "clipboard-restoration.json"), JsonSerializer.Serialize(new
+                { restoration, ownedClipboard, sequenceBeforeRestore, sequenceAfterRestore = GetClipboardSequenceNumber() }));
+                File.WriteAllText(Path.Combine(output, "window-ownership.json"), JsonSerializer.Serialize(new
+                { applicationType = app.GetType().FullName, bootstrapResources, observedWindows = observedWindows.Values,
+                    observations = checks.Count, observationMilliseconds = ownershipObservationTicks * 1000d / Stopwatch.Frequency,
+                    productionAppConstructed = app is App }));
                 File.WriteAllText(Path.Combine(output, "results.json"), JsonSerializer.Serialize(new { result = code == 0 ? "PASS" : "FAIL", checks, theme,
                     actualHighContrast = highContrast, scope = "Owned shown WPF windows, UIA providers and routed keyboard events; physical input and screen-reader certification are not claimed" }, new JsonSerializerOptions { WriteIndented = true }));
-                window.Close(); app.Shutdown(code);
+                }
+                catch (Exception error) { code = 1; Console.Error.WriteLine("Final control evidence failed: " + error); }
+                finally
+                {
+                    try { window.Close(); }
+                    catch (Exception error) { code = 1; Console.Error.WriteLine("Control window cleanup failed: " + error); }
+                    finally { app.Shutdown(code); }
+                }
             }
         });
-        app.Run(); return code;
+        app.Run();
+        try
+        {
+            var remainingWindows = app.Windows.Count;
+            if (remainingWindows != 0) code = 1;
+            File.WriteAllText(Path.Combine(output, "cleanup.json"), JsonSerializer.Serialize(new { remainingWindows, exitCode = code }));
+        }
+        catch (Exception error) { code = 1; Console.Error.WriteLine("Final window cleanup observation failed: " + error); }
+        return code;
     }
 }

@@ -28,6 +28,8 @@ public partial class MainWindow
         model.Documents.CollectionChanged += OutlineDocumentsChanged;
         Outline.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(OutlineExpansionChanged));
         Outline.AddHandler(TreeViewItem.CollapsedEvent, new RoutedEventHandler(OutlineExpansionChanged));
+        Outline.AddHandler(Keyboard.KeyDownEvent, new KeyEventHandler(OutlineKeyDown), handledEventsToo: true);
+        Outline.AddHandler(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OutlineActivated), handledEventsToo: true);
         Closed += (_, _) =>
         {
             model.DocumentChanged -= OutlineDocumentChanged;
@@ -173,13 +175,20 @@ public partial class MainWindow
     {
         // WPF TreeView owns Up/Down, Home/End and parent/child Left/Right navigation,
         // including focus and ExpandCollapse/SelectionItem automation patterns.
-        if (e.Key != Key.Enter || Outline.SelectedItem is not OutlineHeadingViewModel node) return;
+        if (e.Key is not (Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Home or Key.End)
+            || !Outline.IsKeyboardFocusWithin || Outline.SelectedItem is not OutlineHeadingViewModel node) return;
         e.Handled = true; NavigateOutlineHeading(node);
     }
 
-    private void OutlineSelected(object sender, RoutedPropertyChangedEventArgs<object> e)
+    private void OutlineActivated(object sender, MouseButtonEventArgs e)
     {
-        if (!updatingOutline && e.NewValue is OutlineHeadingViewModel node) NavigateOutlineHeading(node);
+        // Selection bindings can be applied later when WPF realises/recycles a row.
+        // SelectedItemChanged therefore cannot distinguish reading updates from input.
+        // Only a header activation navigates; the expander retains its native action.
+        if (e.ChangedButton != MouseButton.Left || e.OriginalSource is not DependencyObject origin
+            || Ancestor<System.Windows.Controls.Primitives.ToggleButton>(origin) is not null
+            || Ancestor<TreeViewItem>(origin) is not { IsSelected: true, DataContext: OutlineHeadingViewModel node }) return;
+        NavigateOutlineHeading(node);
     }
 
     private void NavigateOutlineHeading(OutlineHeadingViewModel node)
@@ -189,8 +198,13 @@ public partial class MainWindow
         JumpToSource(node.Heading.SourceStart, focusEditor: false);
         if (SyncCurrent && Preview.IsVisible && rendered!.SourceElements.TryGetValue(node.Heading.SourceStart, out var element))
         {
-            rendered.RevealSource(node.Heading.SourceStart);
-            _ = Rendering.PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
+            var owner = model.ActiveDocument; var version = Editor.Document.Version; var result = rendered;
+            var generation = viewportGeneration; var synchronisation = syncGeneration;
+            result.RevealSource(node.Heading.SourceStart);
+            _ = Rendering.PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart, null, null,
+                () => !closing && model.ActiveDocument == owner && viewportGeneration == generation
+                    && syncGeneration == synchronisation && rendered == result && SyncCurrent
+                    && Editor.Document == owner?.EditorDocument && Editor.Document.Version.CompareAge(version) == 0);
         }
     }
 }

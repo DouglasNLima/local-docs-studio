@@ -26,7 +26,14 @@ internal static class NativePreviewSchedulingChecks
             throw new IOException("A normal-appearance run requires an initially normal disposable desktop; a previous failed transition cannot contaminate its comparison.");
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         var application = Application.Current;
-        if (application is null) { var nativeApplication = new App { ShutdownMode = ShutdownMode.OnExplicitShutdown }; nativeApplication.InitializeComponent(); application = nativeApplication; }
+        if (application is null)
+        {
+            application = new SchedulingApplication { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+            // Match App.xaml's resources without loading its production application root.
+            foreach (var resource in new[] { "CommandIcons", "DesktopStyles", "FormStyles" })
+                application.Resources.MergedDictionaries.Add(new ResourceDictionary
+                { Source = new Uri($"pack://application:,,,/LensDocsStudio.Native;component/Resources/{resource}.xaml") });
+        }
         using var phases = new ShellPhases(output);
         ThemeService.Apply(application.Resources, "Light");
         var previous = SynchronizationContext.Current;
@@ -59,10 +66,21 @@ internal static class NativePreviewSchedulingChecks
             }
             Invoke("BindActiveDocument"); Invoke("SetLayout", "Editor");
             Pump(Dispatcher.CurrentDispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task);
+            AssertOwnedWindow();
             var tab = model.ActiveDocument!;
             var editor = (TextEditor)window.FindName("Editor");
             var outline = (TreeView)window.FindName("Outline");
             var preview = (LensDocsStudio.Native.Rendering.DocumentPreview)window.FindName("Preview");
+            void AssertCurrentRenderOwnership()
+            {
+                if (!Equals(Field("parsedDocumentId"), tab.Id) || !Equals(Field("renderedDocumentId"), tab.Id)
+                    || Field("parsedVersion") is not ICSharpCode.AvalonEdit.Document.ITextSourceVersion parsedVersion
+                    || parsedVersion.CompareAge(tab.EditorDocument.Version) != 0
+                    || Field("renderedVersion") is not ICSharpCode.AvalonEdit.Document.ITextSourceVersion renderedVersion
+                    || renderedVersion.CompareAge(tab.EditorDocument.Version) != 0
+                    || !Equals(Field("diagnosticAcceptedGeneration"), Field("diagnosticSourceGeneration")))
+                    throw new IOException("Redo coverage requires current document, source version and accepted generation ownership.");
+            }
             if (shown)
             {
                 foreach (var fixture in ContinuousPreviewFixtures.Create(root, "all"))
@@ -109,10 +127,21 @@ internal static class NativePreviewSchedulingChecks
                 throw new IOException("Editor layout did not retain its current outline while pausing native preview work: "
                     + JsonSerializer.Serialize(new { Headings = outline.Items.Count, model.PreviewStatus, Blocks = preview.Document?.Blocks.Count, SourceMatches = editor.Text == source }));
             // This scheduling control also runs without a shown/realised item container.
-            // Deliver TreeView's selection event; shown keyboard/provider selection is
-            // exercised separately by the focused Outline controls.
+            // A selection notification is passive, including deferred row realisation.
+            // Shown pointer/keyboard activation is covered by the ownership controls.
             var targetHeading = ((OutlineHeadingViewModel)outline.Items[0]).Children.Single();
+            editor.Select(0, 5);
+            if (editor.CaretOffset == targetHeading.Heading.SourceStart) throw new IOException("Passive selection control requires a distinct starting caret.");
+            var passiveCaret = editor.CaretOffset; var passiveStart = editor.SelectionStart; var passiveLength = editor.SelectionLength;
+            if (passiveLength == 0) throw new IOException("Passive selection control requires a non-empty starting selection.");
             outline.RaiseEvent(new RoutedPropertyChangedEventArgs<object>(null!, targetHeading, TreeView.SelectedItemChangedEvent));
+            AssertPassiveSelection(); Drain(); AssertPassiveSelection();
+            void AssertPassiveSelection()
+            {
+                if (editor.CaretOffset != passiveCaret || editor.SelectionStart != passiveStart || editor.SelectionLength != passiveLength)
+                    throw new IOException("Passive Outline selection moved the editor caret or selection.");
+            }
+            Invoke("NavigateOutlineHeading", targetHeading);
             if (editor.CaretOffset != source.IndexOf("## Target heading", StringComparison.Ordinal))
                 throw new IOException("Editor-only outline navigation depended on a rendered preview.");
             Invoke("ShowFind", false);
@@ -128,6 +157,19 @@ internal static class NativePreviewSchedulingChecks
             if (!copy.Result!.Contains("Latest edit.", StringComparison.Ordinal)) throw new IOException("A second text preparation reused stale hidden preview text.");
             tab.EditorDocument.UndoStack.Undo();
             if (editor.Text != source) throw new IOException("Preview preparation damaged source Undo.");
+            Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            if (preview.Document.Blocks.Count != 0) throw new IOException("Undo did not return the hidden preview to its paused state.");
+            if (!tab.EditorDocument.UndoStack.CanRedo) throw new IOException("Preview preparation lost the edit available for Redo.");
+            tab.EditorDocument.UndoStack.Redo();
+            if (editor.Text != source + "\n\nLatest edit.") throw new IOException("Preview preparation damaged exact source Redo.");
+            Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            if (preview.Document.Blocks.Count != 0) throw new IOException("Redo resumed unnecessary hidden preview construction.");
+            copy = (Task<string?>)Invoke("PreparePreviewTextAsync")!; Pump(copy);
+            if (!copy.Result!.Contains("Latest edit.", StringComparison.Ordinal) || editor.Text != source + "\n\nLatest edit." || model.Layout != "Editor")
+                throw new IOException("Redo did not refresh explicit text preparation or changed its source/layout.");
+            AssertCurrentRenderOwnership();
+            tab.EditorDocument.UndoStack.Undo();
+            if (editor.Text != source) throw new IOException("Undo after hidden-preview Redo did not restore exact source.");
 
             Invoke("SetLayout", "Preview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!);
             if (preview.Document.Blocks.Count == 0 || !new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Current heading", StringComparison.Ordinal))
@@ -328,8 +370,30 @@ internal static class NativePreviewSchedulingChecks
             var latestText = new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text;
             if (!latestText.Contains("Fresh revision 11", StringComparison.Ordinal) || !latestText.Contains("distant changed item", StringComparison.Ordinal)
                 || latestText.Contains("item4000", StringComparison.Ordinal)) throw new IOException("Rapid/distant source edits installed an obsolete preview.");
+            var rapidEditedSource = editor.Text;
             for (var undo = 0; undo < 13; undo++) tab.EditorDocument.UndoStack.Undo();
             if (editor.Text != large) throw new IOException("Rapid edit preview regeneration damaged exact Undo history.");
+            Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            var undoneText = new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text;
+            if (!undoneText.Contains("item4000", StringComparison.Ordinal) || undoneText.Contains("Fresh revision 11", StringComparison.Ordinal)
+                || undoneText.Contains("distant changed item", StringComparison.Ordinal))
+                throw new IOException("Redo coverage did not first establish the different, undone preview target.");
+            AssertCurrentRenderOwnership();
+            var undoneDocument = preview.Document;
+            for (var redo = 0; redo < 13; redo++)
+            {
+                if (!tab.EditorDocument.UndoStack.CanRedo) throw new IOException("Rapid preview regeneration lost a Redo operation.");
+                tab.EditorDocument.UndoStack.Redo();
+            }
+            if (editor.Text != rapidEditedSource) throw new IOException("Rapid edit Redo did not restore the exact edited source.");
+            Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            var redoneText = new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text;
+            if (!redoneText.Contains("Fresh revision 11", StringComparison.Ordinal) || !redoneText.Contains("distant changed item", StringComparison.Ordinal)
+                || redoneText.Contains("item4000", StringComparison.Ordinal) || editor.Text != rapidEditedSource || preview.Document == undoneDocument)
+                throw new IOException("Rapid edit Redo installed an obsolete preview or changed source.");
+            AssertCurrentRenderOwnership();
+            for (var undo = 0; undo < 13; undo++) tab.EditorDocument.UndoStack.Undo();
+            if (editor.Text != large) throw new IOException("Undo after rapid Redo did not restore the exact original source.");
             using (var switchDuringConstruction = new DuringConstruction(() =>
             {
                 model.NewDocumentCommand.Execute(null);
@@ -375,17 +439,20 @@ internal static class NativePreviewSchedulingChecks
 
             previousDocument = preview.Document;
             model.ActiveDocument!.EditorDocument.Text = large;
+            AssertOwnedWindow();
             using (var closeWindowDuringConstruction = new DuringConstruction(() => Invoke("CompleteClose")))
             {
                 Pump((Task)Invoke("UpdatePreviewAsync", false)!);
                 if (!closeWindowDuringConstruction.Observed || preview.Document != previousDocument)
                     throw new IOException("A closing window installed an obsolete preview.");
             }
+            if (application.Windows.Count != 0) throw new IOException("Scheduling cleanup left an unexpected application window open.");
             heartbeat.Stop();
             File.WriteAllText(Path.Combine(output, "native-preview-scheduling.json"), JsonSerializer.Serialize(new { Passed = true,
                 VisibleWindow = shown, ActualHighContrast = SystemParameters.HighContrast, Fixtures = fixtureEvidence,
                 Cancellations = cancellationEvidence,
-                ExclusivePhaseMarkerFile = "shell-phases.json", ApplicationResources = "App.xaml",
+                Redo = new { HiddenPreparation = true, RapidEdits = 13, ExactSource = true, CurrentPreview = true, UndoAfterRedo = true },
+                ExclusivePhaseMarkerFile = "shell-phases.json", ApplicationResources = "App.xaml dictionaries in an isolated scheduling Application",
                 InputHeartbeatMilliseconds = gaps, MaximumObservedInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
                 Checks = new[] { "Editor-only layout retains current headings and source navigation without a preview",
                     "Explicit text preparation includes current closed details and subsequent edits without changing layout or Undo",
@@ -406,6 +473,12 @@ internal static class NativePreviewSchedulingChecks
         object? Invoke(string name, params object[] arguments) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, arguments);
         object? Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window);
         void Drain() => Pump(Dispatcher.CurrentDispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle).Task);
+        void AssertOwnedWindow()
+        {
+            if (application is SchedulingApplication { StartupObserved: false } || application.Windows.Count != 1
+                || !ReferenceEquals(application.Windows[0], window))
+                throw new IOException("Scheduling validation must own exactly one window and must not restore the production session.");
+        }
         async Task WaitForAppearanceAsync(bool expected)
         {
             var wait = Stopwatch.StartNew();
@@ -414,6 +487,19 @@ internal static class NativePreviewSchedulingChecks
                 if (wait.Elapsed >= TimeSpan.FromSeconds(15)) throw new TimeoutException("Windows appearance notification exceeded the existing validation deadline.");
                 await Task.Delay(25);
             }
+        }
+    }
+
+    private sealed class SchedulingApplication : Application
+    {
+        public bool StartupObserved { get; private set; }
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            // Dispatcher pumping delivers Application startup even without Run(). Keep
+            // App.xaml resources, but do not launch another shell or touch real user state.
+            base.OnStartup(e);
+            AppContext.SetSwitch("Switch.System.Windows.Appearance.DisableFluentThemeWindowBackdrop", true);
+            StartupObserved = true;
         }
     }
 

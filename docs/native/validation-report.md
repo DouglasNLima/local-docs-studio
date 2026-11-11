@@ -589,3 +589,9 @@ The provenance proposal is INACTIVE pending an exact owner decision. Existing
 approvals and MIT/R3–R7 boundaries are preserved. Historical Continuous 250 ms
 remains FAIL; no exception transfers. ADR 007 remains inactive. Public release
 and Native Stable remain NO-GO; no CI, merge, release or distribution is authorised.
+
+## PR #85 delegated recovery qualification — 11 November 2026
+
+Passive Outline highlighting and explicit navigation retain the P1 ownership correction. Deferred preview requests remain bound to document, source version and generation. The isolated scheduling comparison now passes for candidate and accepted develop, including explicit Redo. Light, Dark and actual Windows High Contrast each pass the sixty original Outline/TOC controls plus two clipboard checks. One captured clipboard value now supplies both diagnostic and assertion; production clipboard code is unchanged.
+
+See the [source-bound campaign receipt](evidence/pr85-autonomous-qualification/REPORT.md) for exact identities, timing, review and limitations. Historical failures remain preserved. V2 remains INACTIVE / BLOCKED / UNSEALED pending exact approval and activation; final mandatory checks remain required. Continuous 250 ms, public release and Native Stable remain NO-GO. No performance threshold, rights grant or branch protection changed.
