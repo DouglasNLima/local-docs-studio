@@ -1499,8 +1499,10 @@ class OutlineOwnershipCheckoutTests(unittest.TestCase):
         for autocrlf in ('false', 'true'):
             with self.subTest(autocrlf=autocrlf), tempfile.TemporaryDirectory() as directory:
                 target = Path(directory) / 'checkout'
-                subprocess.run(['git', '-c', 'core.autocrlf=' + autocrlf, 'clone', '--quiet', '--depth=1',
+                subprocess.run(['git', 'clone', '--config', 'core.autocrlf=' + autocrlf, '--quiet', '--depth=1',
                                 ROOT.as_uri(), str(target)], check=True, capture_output=True)
+                self.assertEqual(subprocess.check_output(['git', 'config', '--local', '--get', 'core.autocrlf'],
+                                                         cwd=target).decode().strip(), autocrlf)
                 self.assertEqual(subprocess.check_output(['git', 'rev-parse', '--is-shallow-repository'],
                                                          cwd=target).strip(), b'true')
                 for revision in ('db102ace2ff7339febc554eb74dd56f6ce9551ec',
