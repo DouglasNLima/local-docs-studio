@@ -1,0 +1,2 @@
+{"operativeMIT": "original enumerated portions only", "grantedPaths": 1081, "protectedFiles": 2421, "newSpdxPaths": 4}
+{"rulesets": 2, "developChecks": 30, "mainChecks": 2, "trust": "unchanged", "metadata": "scoped licence pointer", "mitLicence": "operative for enumerated original portions", "administrativeMutation": false}

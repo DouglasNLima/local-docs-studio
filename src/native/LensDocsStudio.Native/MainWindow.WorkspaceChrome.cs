@@ -13,17 +13,6 @@ namespace LensDocsStudio.Native;
 
 public partial class MainWindow
 {
-    private bool updatingOutline;
-    private readonly Dictionary<Guid, HashSet<string>> collapsedOutlineSections = [];
-    private HashSet<string> CollapsedOutlineSections
-    {
-        get
-        {
-            if (model.ActiveDocument is not { } document) return [];
-            if (!collapsedOutlineSections.TryGetValue(document.Id, out var sections)) collapsedOutlineSections[document.Id] = sections = [];
-            return sections;
-        }
-    }
     private static T? Ancestor<T>(DependencyObject? origin) where T : DependencyObject
     {
         while (origin is not null)
@@ -161,59 +150,5 @@ public partial class MainWindow
         if (document.FilePath is not { } path) return;
         try { WorkspacePath.RejectReparsePoints(path); Process.Start(new ProcessStartInfo("explorer.exe") { UseShellExecute = true, Arguments = "/select,\"" + path + "\"" }); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException) { dialogs.Error(error.Message); }
-    }
-    private void OutlineFilterChanged(object sender, TextChangedEventArgs e) => RefreshOutline();
-    private void RefreshOutline()
-    {
-        if (Outline is null) return;
-        updatingOutline = true;
-        try
-        {
-            var query = OutlineFilter?.Text ?? "";
-            var visible = new List<DocumentHeading>(); int? closedLevel = null;
-            foreach (var heading in parsed?.Headings ?? [])
-            {
-                if (query.Length > 0)
-                { if (heading.Title.Contains(query, StringComparison.CurrentCultureIgnoreCase)) visible.Add(heading); continue; }
-                if (closedLevel is { } level && heading.Level <= level) closedLevel = null;
-                if (closedLevel is not null) continue;
-                visible.Add(heading);
-                if (CollapsedOutlineSections.Contains(heading.Anchor)) closedLevel = heading.Level;
-            }
-            Outline.ItemsSource = visible;
-            HighlightCurrentHeading();
-        }
-        finally { updatingOutline = false; }
-    }
-    private void HighlightCurrentHeading()
-    {
-        if (parsed is null || parsedVersion is null || parsedDocumentId != model.ActiveDocument?.Id || Editor.Document.Version.CompareAge(parsedVersion) != 0 || !OutlinePanel.IsVisible) return;
-        var heading = Outline.Items.OfType<DocumentHeading>().LastOrDefault(item => item.SourceStart <= Editor.CaretOffset);
-        var wasUpdating = updatingOutline; updatingOutline = true;
-        try { Outline.SelectedItem = heading; }
-        finally { updatingOutline = wasUpdating; }
-    }
-    private void ExpandOutlineGroups(object sender, RoutedEventArgs e) { CollapsedOutlineSections.Clear(); RefreshOutline(); }
-    private void CollapseOutlineGroups(object sender, RoutedEventArgs e)
-    {
-        if (parsed is null) return;
-        for (var index = 0; index + 1 < parsed.Headings.Count; index++)
-            if (parsed.Headings[index + 1].Level > parsed.Headings[index].Level) CollapsedOutlineSections.Add(parsed.Headings[index].Anchor);
-        RefreshOutline();
-    }
-    private void OutlineKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key is not (Key.Left or Key.Right) || Outline.SelectedItem is not DocumentHeading heading) return;
-        if (e.Key == Key.Left) CollapsedOutlineSections.Add(heading.Anchor); else CollapsedOutlineSections.Remove(heading.Anchor);
-        e.Handled = true; RefreshOutline();
-        // Replacing the filtered item collection removes its focused container.
-        // Keep subsequent group keys in the outline without forcing preview layout.
-        Outline.Focus();
-        var document = model.ActiveDocument;
-        Dispatcher.BeginInvoke(() =>
-        {
-            if (model.ActiveDocument == document && Outline.IsKeyboardFocusWithin && ReferenceEquals(Outline.SelectedItem, heading)
-                && Outline.ItemContainerGenerator.ContainerFromItem(heading) is ListBoxItem { IsVisible: true } row) row.Focus();
-        }, System.Windows.Threading.DispatcherPriority.Loaded);
     }
 }

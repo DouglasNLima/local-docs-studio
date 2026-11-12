@@ -1,0 +1,29 @@
+from pathlib import Path
+import json
+import subprocess
+root = Path(__file__).resolve().parents[2]
+output = root / 'artifacts/outline-toc'
+validation = 'src/native/LensDocsStudio.Native.Validation/bin/Debug/net10.0-windows/LensDocsStudio.Native.Validation.dll'
+jobs = [
+    ('find', ['dotnet', validation, '--find-routing', str(output / 'find')]),
+    ('selection', ['dotnet', validation, '--selection-mapping', str(output / 'selection')]),
+    ('flowchart', ['dotnet', validation, '--flowchart-compatibility', str(output / 'flowchart'), str(root)]),
+    ('loading', ['dotnet', validation, '--preview-loading-ui', str(output / 'loading'), str(root)]),
+    ('scheduling', ['dotnet', validation, '--preview-scheduling', str(output / 'scheduling')]),
+    ('statistics', ['dotnet', 'run', '--project', 'tests/native/document-statistics/DocumentStatisticsControls.csproj', '--no-launch-profile', '--', str(output / 'statistics')]),
+    ('reflow', ['dotnet', 'run', '--project', 'tests/native/preview-reflow/PreviewReflowControls.csproj', '--no-launch-profile', '--', '--control', 'tests/fixtures/native-preview-reflow', str(output / 'reflow'), '--shown']),
+    ('pages', ['dotnet', 'run', '--project', 'tests/native/preview-reflow/PreviewReflowControls.csproj', '--no-build', '--', '--pages-transition', 'tests/fixtures/native-preview-reflow', str(output / 'pages')]),
+    ('loading-offline', ['dotnet', 'run', '--project', 'tests/native/preview-loading-presentation/PreviewLoadingControls.csproj', '--no-launch-profile']),
+    ('static', ['node', 'tests/static/check-assets.mjs']),
+]
+results=[]
+for name, command in jobs:
+    with (output / (name + '-execution.txt')).open('wb') as log:
+        try:
+            run=subprocess.run(command, cwd=root, stdout=log, stderr=subprocess.STDOUT, timeout=180)
+            record={'name':name,'status':'PASS' if run.returncode == 0 else 'FAIL','exitCode':run.returncode,'command':command}
+        except subprocess.TimeoutExpired:
+            record={'name':name,'status':'BLOCKED','reason':'180-second execution supervision bound exceeded; no repeat','command':command}
+    results.append(record)
+    (output/'regressions.json').write_text(json.dumps(results,indent=2)+'\n',encoding='utf-8')
+    print(json.dumps(record),flush=True)

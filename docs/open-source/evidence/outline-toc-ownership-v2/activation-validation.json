@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "proposalId": "advanced-outline-toc-ownership-v2",
+  "status": "LOCAL_ACTIVATION_VALIDATED",
+  "ownerApprovalRecorded": true,
+  "preparation": {
+    "commit": "db102ace2ff7339febc554eb74dd56f6ce9551ec",
+    "tree": "0a96bb21ad1b87e74ec7f02fc30d13cc856ab488"
+  },
+  "implementation": {
+    "commit": "3daf1f77a2488663b4c90e07a26c2956462ee40b",
+    "tree": "b037eab14965e85611ca27be1947d233e286de11",
+    "code": {
+      "scripts/compliance/licence_scope.py": {
+        "gitBlob": "55f35b6abc0195c4b0011eb55604a33832e7b3d0",
+        "sha256": "1ac63321b908c9d0530f6f3006ac3cf0884030a0892fae8f45e1464e73013310"
+      },
+      "scripts/compliance/test_governance.py": {
+        "gitBlob": "0a79e63aeb6393512636b810aac544d684e051aa",
+        "sha256": "7ceb14686594a4ac499e28bf2a18a24dccb75eba26f5abc1f16678e8d05a8ac3"
+      }
+    }
+  },
+  "canonicalManifestSha256": "aa7bb08472517ae75e92e67451bec437972a8d896a022df5c52a2b3f40861af8",
+  "canonicalManifestBytes": 33664,
+  "ownerApprovalSha256": "e58fdd46730d5126a1e8628080cbb6be1b07dbf291da4032e1b578b71fd7d278",
+  "approvedRefreshSha256": "22313f62ab28bee438968d151bd800743595e2f4e0d63bad3b3c8a3a4a250273",
+  "exactScope": {
+    "protectedSubstitutions": 7,
+    "amendedV1AddedFiles": 3,
+    "newSourceEvidenceFiles": 12,
+    "preparationFiles": 7,
+    "activationPaths": 7
+  },
+  "governance": {
+    "status": "PASS",
+    "grantedPaths": 1081,
+    "protectedPaths": 2421,
+    "requiredDevelopChecks": 30,
+    "administrativeMutation": false,
+    "stdoutSha256": "88b0669802f709ce650430ca952c62f5febe307fd54e1bbd706912bbfe785348"
+  },
+  "foundation": {
+    "status": "PASS",
+    "rightsPaths": 2798,
+    "originalWebNotices": 68,
+    "nativeFiles": 537,
+    "exactNativeMatches": 522,
+    "localLinks": 215,
+    "stdoutSha256": "054d90d338a0755936a93e43d0213d4621a9588fec484992769b64fbc89bdb59"
+  },
+  "governanceControls": {
+    "total": 124,
+    "passed": 124,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 302.898,
+    "logSha256": "c5ee06c656ac7fb379801a7a51792da158e49716bf6fe6ddedcda5ec0beaeea0",
+    "originalControlsRetained": 115,
+    "focusedV2ControlsAdded": 9,
+    "coverage": [
+      "Exact canonical owner and manifest bytes",
+      "Duplicate and incorrect fields",
+      "Seven previous/current substitutions and existing rights",
+      "All three amended added-file predecessors",
+      "All immutable eleven/eighty-eight v1 pins",
+      "Actual final bytes after predecessor replay",
+      "Complete source tree projection and every non-activation path",
+      "Missing/new/type/mode substitutions",
+      "Current HEAD/index/Git-clean working equality",
+      "Real staged-only and untracked-file negatives",
+      "Genuine depth-one LF and CRLF clones with absent preparation/private tested commits"
+    ]
+  },
+  "retainedInitialFailure": {
+    "sourceCommit": "8a54c3d22e50a1a224c85859e44e4851a56af469",
+    "passed": 123,
+    "errors": 1,
+    "cause": "The existing final-source positive assertion still invoked the v1 reader",
+    "correction": "Use the strict approved V2 source chain; no negative control or acceptance requirement removed",
+    "logSha256": "45dfc5da8b22d6d979b901ad2cea62c01d7a1ba2c80dfffdf8ef5c8c67026fa3"
+  },
+  "localRuntime": {
+    "python": "3.12.0",
+    "platform": "Windows"
+  },
+  "preservation": {
+    "originalRecoveryWorkingPaths": 3028,
+    "sourceTransferPins": 1500,
+    "historicalArchives": 41,
+    "previousCampaignEvidenceFiles": 703,
+    "protectedIndexes": "UNCHANGED",
+    "defaultState": "UNCHANGED",
+    "binaryPins": "UNCHANGED",
+    "v1Substitutions": 11,
+    "v1AddedPins": 88,
+    "mitAllowlist": "UNCHANGED",
+    "R3toR7": "UNCHANGED"
+  },
+  "independentReview": {
+    "kind": "separate-read-only-engineering-review",
+    "implementationReviewer": "/root/integration_gate_review",
+    "publicationReviewer": "/root/clipboard_review",
+    "implementation": "No unresolved code finding; full results independently inspected",
+    "publication": "Approved source and seven activation paths only; no excluded sensitive material",
+    "limitations": "Review is not a human GitHub approval or hosted CI result"
+  },
+  "ciQualificationException": {
+    "source": "Actual owner reply to the asynchronous CI-scope question in this conversation",
+    "body": "OWNER DECISION — APPROVED: NARROW CI QUALIFICATION EXCEPTION\nI authorise the existing .github/workflows/native.yml qualification pipeline, including its disposable one-day test-signing certificate and temporary downloadable CI installer/ZIP artifacts.\nThis authorisation applies to PR #85 qualification and the corresponding normal post-merge native CI runs.\nConditions:\n- Test signing is permitted exclusively on disposable GitHub-hosted runners, using non-exportable, temporary certificates with verified cleanup.\n- Production signing certificates and credentials remain prohibited.\n- Existing unsigned installer/ZIP fixtures may be uploaded as GitHub Actions artifacts, with a maximum retention of 14 days.\n- Public accessibility of these temporary CI artifacts is explicitly acknowledged and accepted.\n- Artifacts must contain no secrets, personal data, private source archives or production credentials.\n- These artifacts are test outputs, not official releases or certified production binaries.\n- No GitHub Releases, tags, production signing, deployments, updater publication or additional distribution channels are authorised.\n- No expansion beyond the existing CI artifact scope without separate approval.\n- All mandatory checks, provenance requirements, rights restrictions and performance gates remain unchanged.\nContinue V2 activation, independent review, scoped PR publication and all mandatory CI checks autonomously.\nNormal integration into develop remains authorised only after every required gate passes. Do not request further approval for routine CI execution within this exception.\n",
+    "recordedTextSha256": "3626805dfefa65c6dcaebe65a92dd4601d2fc70ac8557f8e9209b8c3f17c09f1",
+    "temporaryTestSigning": "Disposable GitHub-hosted runner; non-exportable one-day certificate; cleanup required",
+    "publicCIArtifacts": "Existing unsigned installer/ZIP fixtures only; at most14days retention; public downloads explicitly accepted",
+    "scope": "PR85 qualification and corresponding normal post-merge native CI",
+    "remainingProhibitions": [
+      "Production signing/credentials",
+      "Release/tag/deployment",
+      "Updater publication",
+      "Additional distribution channels",
+      "Expanded artifact scope"
+    ],
+    "noExistingWorkflowChangeRequired": true
+  },
+  "hostedQualificationAtReceipt": "NOT RUN; all30mandatorycontexts still required",
+  "publicPublicationAtReceipt": "NOT YET PERFORMED",
+  "integrationAtReceipt": "NOT MERGED",
+  "finalReceiptEnvelope": "Final committed identities and positive checks are retained separately; this record does not claim its own future commit hash",
+  "continuous250ms": "Historical FAIL retained; no threshold change",
+  "adr007": "Operational transition remains independent and inactive",
+  "historicalSchedulingClipboardAttribution": "Complete historical causes remain unestablished",
+  "publicRelease": "NO-GO",
+  "nativeStable": "NO-GO"
+}

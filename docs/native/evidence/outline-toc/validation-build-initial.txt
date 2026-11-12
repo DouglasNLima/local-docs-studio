@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  Restored C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native.Validation\LensDocsStudio.Native.Validation.csproj (in 712 ms).
+  2 of 3 projects are up-to-date for restore.
+  LensDocsStudio.Core -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Core\bin\Debug\net10.0\LensDocsStudio.Core.dll
+  LensDocsStudio.Native -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native\bin\Debug\net10.0-windows\LensDocsStudio.Native.dll
+  LensDocsStudio.Native.Validation -> C:\Code\native-advanced-outline-toc\src\native\LensDocsStudio.Native.Validation\bin\Debug\net10.0-windows\LensDocsStudio.Native.Validation.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:31.39

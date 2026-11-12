@@ -455,24 +455,35 @@
      <DockPanel x:Name="OutlinePanel" Grid.Column="4" Background="{DynamicResource PanelBrush}">
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>
       <ToolBar x:Name="OutlineToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Outline groups">
-       <Button Click="ExpandOutlineGroups" ToolTip="Expand all heading groups" AutomationProperties.Name="Expand all heading groups"><ui:CommandIcon Kind="Expand"/></Button>
-       <Button Click="CollapseOutlineGroups" ToolTip="Collapse all heading groups" AutomationProperties.Name="Collapse all heading groups"><ui:CommandIcon Kind="Collapse"/></Button>
+       <Button Click="ExpandOutlineGroups" Focusable="True" ToolTip="Expand all heading groups" AutomationProperties.Name="Expand all heading groups"><ui:CommandIcon Kind="Expand"/></Button>
+       <Button Click="CollapseOutlineGroups" Focusable="True" ToolTip="Collapse all heading groups" AutomationProperties.Name="Collapse all heading groups"><ui:CommandIcon Kind="Collapse"/></Button>
+       <Button x:Name="CopyTocButton" Focusable="True" Click="CopyDocumentTableOfContents" ToolTip="Copy Table of Contents" AutomationProperties.Name="Copy Table of Contents" AutomationProperties.AutomationId="CopyTocButton"><ui:CommandIcon Kind="Copy"/></Button>
       </ToolBar>
       <Grid DockPanel.Dock="Top" Margin="10,0,10,10">
        <TextBox x:Name="OutlineFilter" Padding="6" TextChanged="OutlineFilterChanged" ToolTip="Filter document headings" AutomationProperties.Name="Filter document headings"/>
        <TextBlock Text="Filter headings…" DataContext="{Binding ElementName=OutlineFilter}" Style="{StaticResource Desktop.FilterHint}"/>
       </Grid>
-      <Grid><ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
-       AutomationProperties.Name="Document outline">
-       <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
-      <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" Margin="{Binding Level, Converter={StaticResource HeadingIndent}}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
-      </ListBox>
-       <TextBlock TextWrapping="Wrap" Margin="14,10" VerticalAlignment="Top" Foreground="{DynamicResource MutedTextBrush}">
-        <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Text" Value="No headings match this filter."/><Style.Triggers>
-         <DataTrigger Binding="{Binding HasItems, ElementName=Outline}" Value="False"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
-         <DataTrigger Binding="{Binding Text, ElementName=OutlineFilter}" Value=""><Setter Property="Text" Value="Add Markdown headings to navigate this document."/></DataTrigger>
-        </Style.Triggers></Style></TextBlock.Style>
-       </TextBlock>
+      <Grid>
+       <TreeView x:Name="Outline" BorderThickness="0" Background="Transparent"
+        ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+        AutomationProperties.Name="Document outline" AutomationProperties.AutomationId="Outline"
+        AutomationProperties.HelpText="Use arrow keys to navigate and expand headings; Enter goes to source. Filtered results include parent headings.">
+        <TreeView.ItemContainerStyle><Style TargetType="TreeViewItem" BasedOn="{StaticResource Desktop.WorkspaceItem}">
+         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/><Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+         <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
+         <Style.Triggers>
+          <DataTrigger Binding="{Binding IsVisible}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+          <DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter Property="FontWeight" Value="Bold"/></DataTrigger>
+         </Style.Triggers>
+        </Style></TreeView.ItemContainerStyle>
+        <TreeView.ItemTemplate><HierarchicalDataTemplate ItemsSource="{Binding Children}">
+         <Grid Margin="2,5"><Grid.ColumnDefinitions><ColumnDefinition Width="25"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+          <TextBlock Text="{Binding LevelLabel}" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Text="{Binding Title}" ToolTip="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+         </Grid>
+        </HierarchicalDataTemplate></TreeView.ItemTemplate>
+       </TreeView>
+       <TextBlock x:Name="OutlineEmpty" TextWrapping="Wrap" Margin="14,10" VerticalAlignment="Top" Foreground="{DynamicResource MutedTextBrush}" AutomationProperties.LiveSetting="Polite"/>
       </Grid>
      </DockPanel>
     </Grid>

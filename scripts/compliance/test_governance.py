@@ -33,6 +33,18 @@ from licence_scope import (DOCUMENT_STATISTICS_EVIDENCE, DOCUMENT_STATISTICS_MAN
                            apply_document_statistics_refresh, validate_document_statistics_approval,
                            check_document_statistics_source_identity, check_committed_file_identities,
                            document_statistics_predecessor_digests)
+from licence_scope import (OUTLINE_TOC_EVIDENCE, OUTLINE_TOC_MANIFEST_SHA256, OUTLINE_TOC_MANIFEST_BYTES,
+                           OUTLINE_TOC_APPROVAL_SHA256, OUTLINE_TOC_REFRESH_SHA256,
+                           apply_outline_toc_refresh, validate_outline_toc_approval,
+                           check_outline_toc_source_identity, outline_toc_predecessor_digests)
+
+from licence_scope import (OUTLINE_OWNERSHIP_EVIDENCE, OUTLINE_OWNERSHIP_PREPARATION_OBJECTS,
+                           OUTLINE_OWNERSHIP_NEW_RECORDS, read_outline_ownership_evidence,
+                           validate_outline_ownership_approval, validate_outline_ownership_continuity,
+                           apply_outline_ownership_refresh, outline_ownership_predecessor_digests,
+                           outline_ownership_current_added_pins, check_outline_ownership_source_identity,
+                           check_outline_ownership_checkout, validate_outline_ownership_projection,
+                           git_tree_from_files)
 
 
 class GovernanceBoundaryTests(unittest.TestCase):
@@ -483,7 +495,7 @@ class FlowchartProvenanceTests(unittest.TestCase):
                 validate_preserved(updated, actual)
 
     def test_current_source_subtrees_and_working_bytes_match_the_approved_identity(self):
-        check_document_statistics_source_identity(current_paths())
+        check_outline_ownership_source_identity(current_paths())
 
     def test_changed_tree_missing_extra_or_modified_helper_bytes_fail_closed(self):
         helper = 'src/native/LensDocsStudio.Core/Rendering/FlowchartCompatibility.cs'
@@ -1017,45 +1029,47 @@ class DocumentStatisticsProvenanceTests(unittest.TestCase):
 class DocumentStatisticsCheckoutTests(PreviewReflowCheckoutTests):
     evidence_prefix = DOCUMENT_STATISTICS_EVIDENCE
     manifest_sha256 = DOCUMENT_STATISTICS_MANIFEST_SHA256
+    approval_sha256 = DOCUMENT_STATISTICS_APPROVAL_SHA256
+    refresh_sha256 = DOCUMENT_STATISTICS_REFRESH_SHA256
 
     def predecessor_evidence(self):
         return {p: digest for p, digest in super().predecessor_evidence().items()
                 if p not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS}
 
     def test_owner_receipt_is_pinned_in_committed_index_and_working_identities(self):
-        path = DOCUMENT_STATISTICS_EVIDENCE + 'owner-approval.json'
-        raw, _ = read_working_evidence(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+        path = self.evidence_prefix + 'owner-approval.json'
+        raw, _ = read_working_evidence(path, self.approval_sha256)
         file = self.repository / path
         file.write_bytes(raw)
         self.git('add', '--', path)
         self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Owner receipt fixture [skip ci]')
-        self.assertEqual(self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256), raw)
+        self.assertEqual(self.verify(path, self.approval_sha256), raw)
         file.write_bytes(raw + b'\n')
         with self.assertRaises(ValueError):
-            self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+            self.verify(path, self.approval_sha256)
         self.git('add', '--', path)
         file.write_bytes(raw)
         with self.assertRaisesRegex(ValueError, 'index differs'):
-            self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+            self.verify(path, self.approval_sha256)
         self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Altered owner fixture [skip ci]')
         with self.assertRaises(ValueError):
-            self.verify(path, DOCUMENT_STATISTICS_APPROVAL_SHA256)
+            self.verify(path, self.approval_sha256)
 
     def test_active_receipt_requires_exact_committed_bytes_and_index_identity(self):
-        path = DOCUMENT_STATISTICS_EVIDENCE + 'approved-refresh.json'
-        raw, _ = read_working_evidence(path, DOCUMENT_STATISTICS_REFRESH_SHA256)
+        path = self.evidence_prefix + 'approved-refresh.json'
+        raw, _ = read_working_evidence(path, self.refresh_sha256)
         file = self.repository / path
         file.write_bytes(raw)
         with self.assertRaisesRegex(ValueError, 'Committed provenance evidence is missing'):
-            self.verify(path, DOCUMENT_STATISTICS_REFRESH_SHA256)
+            self.verify(path, self.refresh_sha256)
         self.git('add', '--', path)
         self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Active receipt fixture [skip ci]')
-        self.assertEqual(self.verify(path, DOCUMENT_STATISTICS_REFRESH_SHA256), raw)
+        self.assertEqual(self.verify(path, self.refresh_sha256), raw)
         file.write_bytes(raw + b'\n')
         self.git('add', '--', path)
         file.write_bytes(raw)
         with self.assertRaisesRegex(ValueError, 'index differs'):
-            self.verify(path, DOCUMENT_STATISTICS_REFRESH_SHA256)
+            self.verify(path, self.refresh_sha256)
 
     def check_source(self, expected):
         with patch('licence_scope.ROOT', self.repository), patch('rights_ledger.ROOT', self.repository):
@@ -1098,6 +1112,440 @@ class DocumentStatisticsCheckoutTests(PreviewReflowCheckoutTests):
         self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Unapproved source fixture [skip ci]')
         with self.assertRaisesRegex(ValueError, 'bytes changed'):
             self.check_source({self.path: self.manifest_sha256})
+
+
+class OutlineTocProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.prior = DocumentStatisticsProvenanceTests()
+        self.prior.setUp()
+        self.preserved = self.prior.apply()
+        self.granted = set(self.prior.granted)
+        self.candidate = read_committed_evidence(
+            OUTLINE_TOC_EVIDENCE + 'candidate-refresh.json', OUTLINE_TOC_MANIFEST_SHA256)
+        self.approval, _ = read_working_evidence(
+            OUTLINE_TOC_EVIDENCE + 'owner-approval.json', OUTLINE_TOC_APPROVAL_SHA256)
+        self.refresh = flowchart_json((ROOT / (OUTLINE_TOC_EVIDENCE + 'approved-refresh.json')).read_bytes())
+        self.contract = json.loads(self.candidate)
+        self.pairs = self.contract['files']
+        self.actual = {**self.preserved, **{p: pair['current'] for p, pair in self.pairs.items()}}
+
+    def apply(self):
+        return apply_outline_toc_refresh(self.preserved, self.refresh, self.approval,
+                                         self.candidate, self.actual, self.granted)
+
+    def test_exact_eleven_pair_overlay_preserves_all_2421_paths_without_mutating_inputs(self):
+        original = copy.deepcopy((self.preserved, self.refresh, self.actual, self.granted))
+        result = self.apply()
+        self.assertEqual(len(self.candidate), OUTLINE_TOC_MANIFEST_BYTES)
+        self.assertEqual(len(result), 2421)
+        self.assertEqual(set(result), set(self.preserved))
+        self.assertEqual(len(self.pairs), 11)
+        self.assertEqual({p for p in result if result[p] != self.preserved[p]}, set(self.pairs))
+        self.assertEqual(sum(boundary(p, self.granted)[0] == 'R2' for p in self.pairs), 5)
+        validate_preserved(result, self.actual)
+        self.assertEqual(original, (self.preserved, self.refresh, self.actual, self.granted))
+
+    def test_every_pair_requires_exact_previous_current_actual_bytes_and_existing_rights(self):
+        for path in self.pairs:
+            for mapping, field in [(self.refresh['files'][path], 'previous'),
+                                    (self.refresh['files'][path], 'current'),
+                                    (self.preserved, path), (self.actual, path)]:
+                for missing in (False, True):
+                    original = mapping.pop(field)
+                    if not missing:
+                        mapping[field] = '0' * 64
+                    try:
+                        with self.subTest(path=path, field=field, missing=missing), self.assertRaises(ValueError):
+                            self.apply()
+                    finally:
+                        mapping[field] = original
+            self.granted.remove(path)
+            with self.subTest(ungranted=path), self.assertRaises(ValueError):
+                self.apply()
+            self.granted.add(path)
+
+    def test_missing_extra_and_substituted_protected_paths_are_rejected(self):
+        original = copy.deepcopy(self.refresh)
+        for path in self.pairs:
+            for extra in (None, 'SECURITY.md', 'src/native/LensDocsStudio.Core/Rendering/BoundedErLayout.cs'):
+                self.refresh = copy.deepcopy(original)
+                pair = self.refresh['files'].pop(path)
+                if extra:
+                    self.refresh['files'][extra] = pair
+                with self.subTest(path=path, extra=extra), self.assertRaises(ValueError):
+                    self.apply()
+        self.refresh = copy.deepcopy(original)
+        self.refresh['files']['extra'] = next(iter(self.pairs.values()))
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_all_identity_scope_and_approval_overrides_are_rejected(self):
+        original = copy.deepcopy(self.refresh)
+        for field, value in original.items():
+            self.refresh = copy.deepcopy(original)
+            self.refresh[field] = {} if isinstance(value, dict) else [] if isinstance(value, list) else 'unapproved'
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.apply()
+        for field, value in [('schemaVersion', True), ('allowUnapproved', True), ('licenceGrant', True)]:
+            self.refresh = {**copy.deepcopy(original), field: value}
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.apply()
+
+    def test_missing_altered_substituted_or_reserialised_owner_and_manifest_bytes_are_rejected(self):
+        for field in ('approval', 'candidate'):
+            original = getattr(self, field)
+            for value in (None, b'', original + b'\n', original.replace(b'\n', b'\r\n'),
+                          original.replace(b'DouglasNLima', b'AnotherOwner'),
+                          original.replace(b'advanced-outline-toc-eleven-v1', b'advanced-outline-toc-eleven-v2'),
+                          json.dumps(json.loads(original)).encode('utf-8')):
+                setattr(self, field, value)
+                with self.subTest(field=field, missing=value is None), self.assertRaises(ValueError):
+                    self.apply()
+            setattr(self, field, original)
+        with self.assertRaises(ValueError):
+            flowchart_json(b'{"files": {}, "files": {}}')
+
+    def test_predecessor_replay_requires_verified_successor_bytes_and_preserves_the_chain(self):
+        previous = outline_toc_predecessor_digests(self.refresh, self.approval, self.candidate, self.actual)
+        self.assertEqual(previous, self.preserved)
+        self.assertEqual(apply_document_statistics_refresh(self.prior.preserved, self.prior.refresh,
+            self.prior.approval, self.prior.candidate, previous, self.granted), self.preserved)
+        with self.assertRaises(ValueError):
+            apply_document_statistics_refresh(self.prior.preserved, self.prior.refresh,
+                self.prior.approval, self.prior.candidate, self.actual, self.granted)
+        for path in self.pairs:
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                outline_toc_predecessor_digests(self.refresh, self.approval, self.candidate,
+                    {**self.actual, path: self.pairs[path]['previous']})
+
+    def test_all_88_added_files_require_their_exact_committed_objects_without_new_rights(self):
+        added = self.contract['addedFiles']
+        self.assertEqual(len(added), 88)
+        self.assertFalse(set(added) & self.granted)
+        # Preserve every original pin. Three current objects are superseded only
+        # after the separately pinned V2 owner decision and continuity checks.
+        evidence, predecessor = read_outline_ownership_evidence()
+        successor = validate_outline_ownership_approval(*evidence)
+        self.assertEqual(validate_outline_toc_approval(*predecessor), self.contract)
+        check_committed_file_identities(outline_ownership_current_added_pins(successor, self.contract))
+        for path in added:
+            for missing in (False, True):
+                actual = dict(added)
+                actual.pop(path)
+                if not missing:
+                    actual[path] = '0' * 64
+                with self.subTest(path=path, missing=missing), self.assertRaises(ValueError):
+                    validate_preserved(added, actual)
+        self.assertTrue(all(boundary(p, self.granted)[1] != 'MIT_ORIGINAL_PORTIONS_ONLY' for p in added))
+
+    def test_native_control_unchanged_trees_and_complete_source_inventory_are_enforced(self):
+        trees = {**self.contract['runtimeSourceTrees'], **self.contract['controlTrees'],
+                 **self.contract['unchangedTrees']}
+        objects = {p: 'a' * 40 for p in self.contract['addedFiles']}
+        for path in trees:
+            with self.subTest(tree=path), self.assertRaises(ValueError):
+                validate_source_identity({**trees, path: '0' * 40}, trees, objects, objects)
+        for actual in ({}, {**objects, 'src/native/unapproved.cs': 'b' * 40},
+                       {**objects, next(iter(objects)): 'b' * 40}):
+            with self.subTest(inventory=actual), self.assertRaises(ValueError):
+                validate_source_identity(trees, trees, objects, actual)
+
+    def test_prior_approvals_allowlist_and_original_inventory_stay_exact(self):
+        self.assertEqual(len(self.contract['preservedEvidence']), 20)
+        check_committed_file_identities({path: digest for path, digest in self.contract['preservedEvidence'].items()
+                                        if path not in DOCUMENT_STATISTICS_GOVERNANCE_PATHS})
+        self.assertEqual(len(self.granted), 1081)
+        self.assertEqual(self.contract['excludedBoundaries'], ['R3', 'R4', 'R5', 'R6', 'R7'])
+
+    def test_unrelated_protected_files_and_previous_amendments_still_fail_closed(self):
+        result = self.apply()
+        for path in ('SECURITY.md', '.github/workflows/native-continuous-performance.yml',
+                     *FLOWCHART_PAIRS, *PREVIEW_LOADING_PAIRS,
+                     *(set(PREVIEW_REFLOW_PAIRS) - set(self.pairs)),
+                     *(set(self.prior.pairs) - set(self.pairs))):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                validate_preserved(result, {**self.actual, path: '0' * 64})
+        del self.preserved['SECURITY.md']
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_receipt_rejection_precedes_any_successor_source_validation(self):
+        for path in (OUTLINE_TOC_EVIDENCE + 'owner-approval.json',
+                     OUTLINE_TOC_EVIDENCE + 'candidate-refresh.json',
+                     DOCUMENT_STATISTICS_EVIDENCE + 'owner-approval.json'):
+            def reject(name, digest):
+                if name == path:
+                    raise ValueError('Negative control: altered decision')
+                return read_committed_evidence(name, digest)
+            with patch('licence_scope.read_committed_evidence', side_effect=reject), \
+                 patch('licence_scope.check_flowchart_source_identity') as source:
+                with self.subTest(path=path), self.assertRaisesRegex(ValueError, 'altered decision'):
+                    check_outline_toc_source_identity(current_paths())
+                source.assert_not_called()
+
+
+class OutlineTocCheckoutTests(DocumentStatisticsCheckoutTests):
+    evidence_prefix = OUTLINE_TOC_EVIDENCE
+    manifest_sha256 = OUTLINE_TOC_MANIFEST_SHA256
+    approval_sha256 = OUTLINE_TOC_APPROVAL_SHA256
+    refresh_sha256 = OUTLINE_TOC_REFRESH_SHA256
+
+    def predecessor_evidence(self):
+        return {p: digest for p, digest in super().predecessor_evidence().items() if p.endswith('.json')}
+
+    def test_opaque_licence_pins_reject_working_index_and_committed_mutations(self):
+        for path in ('LICENSE', 'LICENSING.md'):
+            digest = json.loads(self.raw)['preservedEvidence'][path]
+            original = subprocess.check_output(['git', 'cat-file', 'blob', 'HEAD:' + path], cwd=ROOT)
+            file = self.repository / path
+            file.write_bytes(original)
+            self.git('add', '--', path)
+            self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Licence pin fixture [skip ci]')
+            self.check_source({path: digest})
+            file.write_bytes(original + b'\n')
+            with self.subTest(path=path, state='working'), self.assertRaises(ValueError):
+                self.check_source({path: digest})
+            self.git('add', '--', path)
+            file.write_bytes(original)
+            with self.subTest(path=path, state='index'), self.assertRaises(ValueError):
+                self.check_source({path: digest})
+            self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Altered licence fixture [skip ci]')
+            file.write_bytes(original + b'\n')
+            with self.subTest(path=path, state='committed'), self.assertRaises(ValueError):
+                self.check_source({path: digest})
+
+    def test_original_raw_evidence_attribute_preserves_lf_bytes_in_both_checkout_modes(self):
+        attributes = self.file.parent / '.gitattributes'
+        attributes.write_bytes(b'* -text whitespace=cr-at-eol\n')
+        self.git('add', '--', str(attributes.relative_to(self.repository)))
+        self.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Raw evidence fixture [skip ci]')
+        for autocrlf in ('false', 'true'):
+            self.git('config', 'core.autocrlf', autocrlf)
+            self.file.unlink()
+            self.git('checkout-index', '--force', '--', self.path)
+            self.assertEqual(self.file.read_bytes(), self.raw)
+            self.assertEqual(self.verify(), self.raw)
+        self.file.write_bytes(self.raw.replace(b'\n', b'\r\n'))
+        with self.assertRaises(ValueError):
+            self.verify()
+
+
+class OutlineOwnershipProvenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.prior = OutlineTocProvenanceTests()
+        self.prior.setUp()
+        self.preserved = self.prior.apply()
+        self.granted = set(self.prior.granted)
+        self.evidence, self.predecessor_evidence = read_outline_ownership_evidence()
+        self.refresh, self.approval, self.raw = self.evidence
+        self.contract = validate_outline_ownership_approval(*self.evidence)
+        self.actual = {**self.preserved, **{p: pair['current'] for p, pair in self.contract['files'].items()}}
+
+    def apply(self):
+        return apply_outline_ownership_refresh(self.preserved, self.refresh, self.approval,
+                                               self.raw, self.actual, self.granted)
+
+    def test_exact_seven_pair_successor_preserves_all_inventories_and_inputs(self):
+        original = copy.deepcopy((self.preserved, self.actual, self.granted, self.refresh))
+        result = self.apply()
+        self.assertEqual(len(result), 2421)
+        self.assertEqual(len(self.granted), 1081)
+        self.assertEqual({p for p in result if result[p] != self.preserved[p]}, set(self.contract['files']))
+        self.assertEqual(len(self.contract['files']), 7)
+        self.assertEqual(len(self.contract['amendedPredecessorAddedFiles']), 3)
+        self.assertEqual(len(self.contract['addedFiles']), 12)
+        validate_preserved(result, self.actual)
+        self.assertEqual(original, (self.preserved, self.actual, self.granted, self.refresh))
+
+    def test_every_protected_pair_requires_previous_current_actual_and_existing_grant(self):
+        for path in self.contract['files']:
+            for mapping, key in ((self.preserved, path), (self.actual, path),
+                                 (self.refresh['files'][path], 'previous'),
+                                 (self.refresh['files'][path], 'current')):
+                original = mapping.pop(key)
+                for value in (None, '0' * 64):
+                    if value is not None:
+                        mapping[key] = value
+                    with self.subTest(path=path, value=value), self.assertRaises(ValueError):
+                        self.apply()
+                mapping[key] = original
+            self.granted.remove(path)
+            with self.subTest(ungranted=path), self.assertRaises(ValueError):
+                self.apply()
+            self.granted.add(path)
+
+    def test_canonical_owner_manifest_and_all_refresh_overrides_fail_closed(self):
+        for field in ('approval', 'raw'):
+            original = getattr(self, field)
+            for changed in (None, b'', original + b'\n', original.replace(b'\n', b'\r\n'),
+                            original.replace(b'DouglasNLima', b'AnotherOwner'),
+                            json.dumps(json.loads(original)).encode()):
+                setattr(self, field, changed)
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    self.apply()
+            setattr(self, field, original)
+        original = copy.deepcopy(self.refresh)
+        for field, value in original.items():
+            self.refresh = copy.deepcopy(original)
+            self.refresh[field] = {} if isinstance(value, dict) else [] if isinstance(value, list) else 'unapproved'
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.apply()
+        for key, value in (('schemaVersion', True), ('candidateManifestBytes', True),
+                           ('allowUnapproved', True), ('licenceGrant', True)):
+            self.refresh = {**copy.deepcopy(original), key: value}
+            with self.subTest(field=key), self.assertRaises(ValueError):
+                self.apply()
+        self.refresh = original
+        with self.assertRaises(ValueError):
+            flowchart_json(b'{"files":{},"files":{}}')
+
+    def test_predecessor_continuity_includes_every_amended_added_file(self):
+        predecessor = validate_outline_toc_approval(*self.predecessor_evidence)
+        validate_outline_ownership_continuity(self.contract, predecessor)
+        for field in ('files', 'amendedPredecessorAddedFiles'):
+            for path in self.contract[field]:
+                altered = copy.deepcopy(self.contract)
+                altered[field][path]['previous'] = '0' * 64
+                with self.subTest(path=path), self.assertRaises(ValueError):
+                    validate_outline_ownership_continuity(altered, predecessor)
+        for field in ('approvedSubstitutions', 'approvedAddedFilePins'):
+            altered = copy.deepcopy(self.contract)
+            altered['predecessor'][field].pop(next(iter(altered['predecessor'][field])))
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate_outline_ownership_continuity(altered, predecessor)
+        current = outline_ownership_current_added_pins(self.contract, predecessor)
+        self.assertEqual(len(current), 100)
+        check_committed_file_identities(current)
+        for path, pair in self.contract['amendedPredecessorAddedFiles'].items():
+            self.assertEqual(predecessor['addedFiles'][path], pair['previous'])
+            self.assertEqual(current[path], pair['current'])
+        for path in current:
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                validate_preserved(current, {**current, path: '0' * 64})
+        self.assertFalse(set(current) & self.granted)
+
+    def test_predecessor_replay_does_not_substitute_for_actual_final_enforcement(self):
+        previous = outline_ownership_predecessor_digests(*self.evidence, self.actual)
+        self.assertEqual(previous, self.preserved)
+        self.assertEqual(apply_outline_toc_refresh(self.prior.preserved, *self.predecessor_evidence,
+                                                  previous, self.granted), self.preserved)
+        with self.assertRaises(ValueError):
+            apply_outline_toc_refresh(self.prior.preserved, *self.predecessor_evidence,
+                                      self.actual, self.granted)
+        for path, pair in self.contract['files'].items():
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                outline_ownership_predecessor_digests(*self.evidence, {**self.actual, path: pair['previous']})
+        result = self.apply()
+        for path in ('SECURITY.md', '.github/workflows/native-continuous-performance.yml',
+                     *FLOWCHART_PAIRS, *PREVIEW_LOADING_PAIRS):
+            with self.subTest(unrelated=path), self.assertRaises(ValueError):
+                validate_preserved(result, {**self.actual, path: '0' * 64})
+
+    def test_all_approval_rejections_precede_any_successor_checkout(self):
+        for path in (OUTLINE_OWNERSHIP_EVIDENCE + 'candidate-refresh.json',
+                     OUTLINE_OWNERSHIP_EVIDENCE + 'owner-approval.json',
+                     OUTLINE_OWNERSHIP_EVIDENCE + 'approved-refresh.json',
+                     OUTLINE_TOC_EVIDENCE + 'owner-approval.json',
+                     OUTLINE_TOC_EVIDENCE + 'candidate-refresh.json',
+                     DOCUMENT_STATISTICS_EVIDENCE + 'owner-approval.json'):
+            def reject(name, digest):
+                if name == path:
+                    raise ValueError('Negative control: altered decision')
+                return read_committed_evidence(name, digest)
+            with patch('licence_scope.read_committed_evidence', side_effect=reject), \
+                 patch('licence_scope.check_outline_ownership_checkout') as checkout:
+                with self.subTest(path=path), self.assertRaisesRegex(ValueError, 'altered decision'):
+                    check_outline_ownership_source_identity(current_paths())
+                checkout.assert_not_called()
+
+    def test_projection_binds_every_non_activation_path_and_all_modes(self):
+        committed = {}
+        for row in subprocess.check_output(['git', 'ls-tree', '-rz', 'HEAD'], cwd=ROOT).split(b'\0'):
+            if row:
+                metadata, name = row.split(b'\t')
+                mode, kind, oid = metadata.decode().split()
+                self.assertEqual(kind, 'blob')
+                committed[name.decode()] = (mode, oid)
+        validate_outline_ownership_projection(committed)
+        actual_tree = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'], cwd=ROOT).decode().strip()
+        self.assertEqual(git_tree_from_files(committed), actual_tree)
+        for path in (*OUTLINE_OWNERSHIP_NEW_RECORDS, 'README.md',
+                     OUTLINE_OWNERSHIP_EVIDENCE + 'proposal.md'):
+            altered = dict(committed)
+            del altered[path]
+            with self.subTest(missing=path), self.assertRaises(ValueError):
+                validate_outline_ownership_projection(altered)
+        for path in ('README.md', OUTLINE_OWNERSHIP_EVIDENCE + 'proposal.md',
+                     'src/native/LensDocsStudio.Native/MainWindow.Outline.cs'):
+            for entry in (('100644', '0' * 40), ('100755', committed[path][1])):
+                with self.subTest(path=path, entry=entry), self.assertRaises(ValueError):
+                    validate_outline_ownership_projection({**committed, path: entry})
+        with self.assertRaises(ValueError):
+            validate_outline_ownership_projection({**committed, 'unapproved.txt': ('100644', '0' * 40)})
+        for path in OUTLINE_OWNERSHIP_PREPARATION_OBJECTS:
+            for replacement in (('100644', '0' * 40), ('100755', OUTLINE_OWNERSHIP_PREPARATION_OBJECTS[path][1])):
+                with patch.dict('licence_scope.OUTLINE_OWNERSHIP_PREPARATION_OBJECTS', {path: replacement}), \
+                     self.subTest(restored=path), self.assertRaises(ValueError):
+                    validate_outline_ownership_projection(committed)
+        for bad in ('../escape', 'a/../escape', 'a\\escape', '/absolute', 'a\nline'):
+            with self.subTest(path=bad), self.assertRaises(ValueError):
+                git_tree_from_files({bad: ('100644', '0' * 40)})
+        with self.assertRaises(ValueError):
+            git_tree_from_files({'a': ('100644', '0' * 40), 'a/b': ('100644', '0' * 40)})
+
+
+class OutlineOwnershipCheckoutTests(unittest.TestCase):
+    def test_depth_one_lf_and_crlf_validate_without_historical_objects(self):
+        for autocrlf in ('false', 'true'):
+            with self.subTest(autocrlf=autocrlf), tempfile.TemporaryDirectory() as directory:
+                target = Path(directory) / 'checkout'
+                subprocess.run(['git', 'clone', '--config', 'core.autocrlf=' + autocrlf, '--quiet', '--depth=1',
+                                ROOT.as_uri(), str(target)], check=True, capture_output=True)
+                self.assertEqual(subprocess.check_output(['git', 'config', '--local', '--get', 'core.autocrlf'],
+                                                         cwd=target).decode().strip(), autocrlf)
+                self.assertEqual(subprocess.check_output(['git', 'rev-parse', '--is-shallow-repository'],
+                                                         cwd=target).strip(), b'true')
+                for revision in ('db102ace2ff7339febc554eb74dd56f6ce9551ec',
+                                 '6e9c70a81bb37ce789533c2438e3ca6438aa4f30'):
+                    self.assertNotEqual(subprocess.run(['git', 'cat-file', '-e', revision + '^{commit}'],
+                                                      cwd=target, capture_output=True).returncode, 0)
+                with patch('licence_scope.ROOT', target), patch('rights_ledger.ROOT', target), \
+                     patch('licence_scope.SCOPE', target / SCOPE.relative_to(ROOT)):
+                    check_outline_ownership_source_identity(current_paths())
+
+    def test_real_staged_only_untracked_working_and_file_type_mutations_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / 'checkout'
+            subprocess.run(['git', 'clone', '--quiet', '--depth=1', ROOT.as_uri(), str(target)],
+                           check=True, capture_output=True)
+            path = 'README.md'
+            file = target / path
+            original = file.read_bytes()
+            index = target / '.git/index'
+            original_index = index.read_bytes()
+            with patch('licence_scope.ROOT', target), patch('rights_ledger.ROOT', target):
+                check_outline_ownership_checkout(current_paths())
+                file.write_bytes(original + b'\nnegative\n')
+                with self.assertRaisesRegex(ValueError, 'Git-clean working'):
+                    check_outline_ownership_checkout(current_paths())
+                subprocess.run(['git', 'add', '--', path], cwd=target, check=True, capture_output=True)
+                file.write_bytes(original)
+                self.assertEqual(subprocess.check_output(['git', 'diff', '--name-only', 'HEAD'], cwd=target), b'')
+                with self.assertRaisesRegex(ValueError, 'index differs'):
+                    check_outline_ownership_checkout(current_paths())
+                index.write_bytes(original_index)
+                extra = target / 'unapproved-source.txt'
+                extra.write_text('negative', encoding='utf-8')
+                with self.assertRaisesRegex(ValueError, 'extra source paths'):
+                    check_outline_ownership_checkout(current_paths())
+                extra.unlink()
+                file.unlink()
+                file.mkdir()
+                with self.assertRaisesRegex(ValueError, 'missing or substituted'):
+                    check_outline_ownership_checkout(current_paths())
+                file.rmdir()
+                file.write_bytes(original)
+                check_outline_ownership_checkout(current_paths())
 
 
 if __name__ == '__main__':

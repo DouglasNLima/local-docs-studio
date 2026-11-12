@@ -1,0 +1,53 @@
+{
+  "status": "PASS_INACTIVE_PROPOSAL_ONLY",
+  "manifestSha256": "aa7bb08472517ae75e92e67451bec437972a8d896a022df5c52a2b3f40861af8",
+  "manifestBytes": 33664,
+  "protectedPaths": 2421,
+  "mitAllowlist": 1081,
+  "protectedSubstitutions": 7,
+  "amendedV1AddedFiles": 3,
+  "newSourceAndEvidenceFiles": 12,
+  "preservedV1Substitutions": 11,
+  "preservedV1AddedPins": 88,
+  "currentSourceCheck": {
+    "head": "498ff0c40f9ddbb7eb1cd89b3c091ad79b5cd34c",
+    "tree": "2b6eb7746bc0d5ea8b31f847c3900fda28d33d2d",
+    "checkedCommittedFiles": 2787,
+    "untrackedPreparationFiles": [
+      "docs/open-source/evidence/outline-toc-ownership-v2/.gitattributes",
+      "docs/open-source/evidence/outline-toc-ownership-v2/candidate-refresh.json",
+      "docs/open-source/evidence/outline-toc-ownership-v2/engineering-receipt.md",
+      "docs/open-source/evidence/outline-toc-ownership-v2/proposal.md",
+      "docs/open-source/evidence/outline-toc-ownership-v2/validate-proposal.py"
+    ]
+  },
+  "rejectedMutations": [
+    "invented owner approval",
+    "expanded activation scope",
+    "removed excluded rights boundary",
+    "new rights grant",
+    "altered predecessor substitution",
+    "removed predecessor added-file pin",
+    "changed previous source",
+    "changed current source",
+    "missing new source file",
+    "changed validation tree",
+    "removed preserved evidence",
+    "changed grant classification",
+    "historical failure relabelled",
+    "release status changed"
+  ],
+  "provenanceActivation": false,
+  "mandatoryDevelopQualification": "NOT SATISFIED BY THIS VALIDATION",
+  "startedUtc": "2026-11-11T19:00:45.600300+00:00",
+  "finishedUtc": "2026-11-11T19:01:09.070662+00:00",
+  "verifierSha256": "412281e9d79143046a9ebab88e86e769cc7e77fdbf294ac9d37d2765a8be7872",
+  "cleanCheckout": "Pending final committed preparation; retained in an external final receipt",
+  "activeGovernance": {
+    "exitCode": 1,
+    "message": "Flowchart amendment source tree identity changed",
+    "waived": false,
+    "activeValidatorChanged": false
+  },
+  "ownerApproval": "NONE; exact decision required before activation"
+}

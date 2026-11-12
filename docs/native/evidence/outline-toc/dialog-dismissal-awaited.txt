@@ -1,0 +1,5 @@
+System.TimeoutException: Outline control did not settle.
+   at Program.<Main>g__WaitFor|3_2(Func`1 ready) in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 68
+   at Program.<>c__DisplayClass3_2.<<Main>g__ObserveDismissal|31>d.MoveNext() in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 107
+--- End of stack trace from previous location ---
+   at Program.<>c__DisplayClass3_0.<<Main>b__11>d.MoveNext() in C:\Code\native-advanced-outline-toc\tests\native\outline-toc\Program.cs:line 112

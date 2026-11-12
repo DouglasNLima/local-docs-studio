@@ -62,7 +62,9 @@ internal static class NativeShellLayoutChecks
                 var rendered = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, dark,
                     new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
                 ((DocumentPreview)window.FindName("Preview")).Document = rendered.Document;
-                ((ListBox)window.FindName("Outline")).ItemsSource = parsed.Headings;
+                ((TreeView)window.FindName("Outline")).ItemsSource = parsed.Headings.Select(heading => new OutlineHeadingViewModel(heading, null));
+                ((TreeView)window.FindName("Outline")).IsEnabled = true;
+                ((TextBlock)window.FindName("OutlineEmpty")).Visibility = Visibility.Collapsed;
                 ((FrameworkElement)window.FindName("FindBar")).Visibility = Visibility.Visible;
                 ((TextBox)window.FindName("ReplaceText")).Visibility = Visibility.Visible;
                 ((Button)window.FindName("ReplaceButton")).Visibility = Visibility.Visible;
